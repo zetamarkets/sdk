@@ -37,15 +37,15 @@ PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
 
-Zeta is a protocol that allows the trading of undercollateralized options and futures on solana.
+Zeta is a protocol that allows the trading of undercollateralized options and futures on Solana.
 
 Zeta uses the Serum DEX for its order matching.
 
-Zeta is currently only live on devnet and support SOL as underlying.
+Zeta is currently only live on devnet and only supports SOL as its underlying asset.
 
-Each asset corresponds to a `ZetaGroup` account. A zeta group contains all the respective data for its markets.
+Each asset corresponds to a `ZetaGroup` account. A Zeta group contains all the respective data for its markets.
 
-Zeta markets use a circular buffer of expirations, as the serum markets are re-used after expiry.
+Zeta markets use a circular buffer of expirations, as the Serum markets are re-used after expiry.
 
 | Field  | Value |
 | ------------- |:-------------:|
@@ -358,7 +358,7 @@ See callbacks to update state live.
 
 ## Callbacks and state tracking
 
-Due to the number of changing states in the zeta program, the SDK makes use of solana websockets for users to receive callbacks when accounts are **polled and or changed.**
+Due to the number of changing states in the Zeta program, the SDK makes use of Solana websockets for users to receive callbacks when accounts are **polled and or changed.**
 
 There are two categories of callbacks, one relating to user state and the other non-user based state (program state).
 
