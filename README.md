@@ -129,6 +129,7 @@ await Exchange.load(
 // Can only be run after `Exchange` is loaded.
 utils.displayState();
 
+`
 [EXCHANGE] Display market state...
 Expiration @ Thu Nov 18 2021 08:00:00 GMT+0800
 [MARKET] INDEX: 23 KIND: call STRIKE: 220
@@ -145,6 +146,7 @@ Expiration @ Fri Nov 19 2021 08:00:00 GMT+0800
 [MARKET] INDEX: 20 KIND: put STRIKE: 240
 [MARKET] INDEX: 21 KIND: put STRIKE: 245
 [MARKET] INDEX: 22 KIND: future STRIKE: 0
+`
 ```
 
 Note our markets are identified by index - in a circular buffer fashion for expiries.
@@ -172,6 +174,7 @@ NOTE: Orderbook depth is capped to default = 5.
 
 Set via `Exchange.markets.orderbookDepth = N`.
 ```ts
+`
 {
   bids: [
     { price: 7.71, size: 23 },
@@ -181,6 +184,7 @@ Set via `Exchange.markets.orderbookDepth = N`.
   ],
   asks: [ { price: 9.53, size: 23 } ]
 }
+`
 ```
 
 Placing an order
@@ -206,6 +210,7 @@ await client.updateState();
 console.log(client.orders);
 
 // `client.orders` is a list of orders in market index order.
+`
 [
   {
     marketIndex: 2,
@@ -221,6 +226,7 @@ console.log(client.orders);
     }
   }
 ]
+`
 
 // See our new order on the orderbook.
 console.log(Exchange.markets.markets[index].orderbook);
@@ -254,6 +260,7 @@ await client.updateState();
 console.log(client.positions);
 
 // `client.positions` is a list of positions in market index order.
+`
 [
   {
     marketIndex: 2,
@@ -264,6 +271,7 @@ console.log(client.positions);
     costOfTrades: 9530000 // 6 d.p, so $9.53
   }
 ]
+`
 ```
 
 We have a position of 1, with cost of trades 9530000 / 10^6 = $9.53.
@@ -276,7 +284,7 @@ This is the price that position is marked to - (This is calculated by our on cha
 // Use the market index you wish to check.
 console.log(Exchange.getMarkPrice(index));
 // The fair price of this option is $8.202024.
-8.202024
+`8.202024`
 ```
 
 ### Calculate user margin account state
@@ -288,6 +296,7 @@ let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
 console.log(marginAccountState);
 
 // These values have all been normalized (converted from 6 d.p precision to 2 d.p)
+`
 {
   balance: 10000,                       // Deposited $10,000
   initialMargin: 8.202024,              // Initial margin, from the 1 open order
@@ -296,6 +305,7 @@ console.log(marginAccountState);
   unrealizedPnl: -1.3279759999999996,   // Unrealized pnl, marked to mark price
   availableBalance: 9982.267976         // Equity available for trading.
 }
+`
 ```
 
 ## Zeta market data
@@ -454,7 +464,7 @@ This is *almost* how often the SDK will call `await client.updateState()`, which
 
 There is a timer that on default fires every 2 seconds, checking the last poll timestamp. If time greater than client.pollInterval has elapsed, it will poll.
 
-This will do multiple things (`client.updateState`):
+This will do multiple things (`client.updateState()`):
 1. Fetch user margin account (`client.marginAccount`).
 2. Update user orders (this will poll the market orderbook for each market that the user has a non zero position or open orders in - `client.orders`).
 3. Update user positions (`client.positions`).
