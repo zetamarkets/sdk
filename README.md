@@ -145,7 +145,8 @@ Expiration @ Fri Nov 19 2021 08:00:00 GMT+0800
 // ... Deleted for space ...
 [MARKET] INDEX: 20 KIND: put STRIKE: 240
 [MARKET] INDEX: 21 KIND: put STRIKE: 245
-[MARKET] INDEX: 22 KIND: future STRIKE: 0`
+[MARKET] INDEX: 22 KIND: future STRIKE: 0
+`
 ```
 
 Note our markets are identified by index - in a circular buffer fashion for expiries.
