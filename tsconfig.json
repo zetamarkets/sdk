@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "types": ["mocha"],
+    "module": "commonjs",
+    "target": "es2019",
+    "declaration": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ]
+}
