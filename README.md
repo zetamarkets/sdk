@@ -21,6 +21,18 @@ This is the typescript library to interact with our zeta program smart contract.
 
 [Learn more about zeta here.](https://zetamarkets.gitbook.io/zeta/whitepaper/)
 
+## Variables
+
+| Key  | Value |
+| ------------- |:-------------:|
+| NETWORK_URL        | https://api.devnet.solana.com     |
+| PROGRAM_ID         | GoB7HN9PAumGbFBZUWokX7GiNe8Etcsc22JWmarRhPBq   |
+| SERVER_URL         | https://server.zeta.markets     |
+
+DM @zetamarkets on twitter if you are running into rate limit issues.
+
+PROGRAM_ID is subject to change based on redeployments.
+
 ## Context
 
 Zeta is a protocol that allows the trading of undercollateralized options and futures on solana. Zeta uses the Serum DEX orderbook as an order matching engine.
@@ -65,18 +77,6 @@ solana-keygen pubkey bot-key.json
 # (Make sure you are in the same directory as where you are running the script.)
 echo private_key=`cat bot-key.json` >> .env
 ```
-
-## Variables
-
-| Key  | Value |
-| ------------- |:-------------:|
-| NETWORK_URL        | https://api.devnet.solana.com     |
-| PROGRAM_ID        | GoB7HN9PAumGbFBZUWokX7GiNe8Etcsc22JWmarRhPBq   |
-| SERVER_URL         | https://server.zeta.markets     |
-
-DM @zetamarkets on twitter if you are running into rate limit issues.
-
-PROGRAM_ID is subject to change based on redeployments.
 
 ### Basic setup boilerplate
 
