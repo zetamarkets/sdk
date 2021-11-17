@@ -19,7 +19,9 @@
 
 This is the typescript library to interact with our zeta program smart contract.
 
-[Learn more about zeta here.](https://zetamarkets.gitbook.io/zeta/whitepaper/)
+[Learn more about zeta.](https://zetamarkets.gitbook.io/zeta/whitepaper/)
+
+[Try out zeta devnet.](https://devnet.zeta.markets/)
 
 ## Variables
 
@@ -35,13 +37,15 @@ PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
 
-Zeta is a protocol that allows the trading of undercollateralized options and futures on solana. Zeta uses the Serum DEX orderbook as an order matching engine.
+Zeta is a protocol that allows the trading of undercollateralized options and futures on solana.
 
-Zeta is currently only live on devnet and support SOL as underlying, try our platform here - https://devnet.zeta.markets/
+Zeta uses the Serum DEX for its order matching.
 
-Each asset corresponds to a `ZetaGroup` account. A zeta group contains all the respective data for it's markets.
+Zeta is currently only live on devnet and support SOL as underlying.
 
-Zeta markets follow a circular buffer of expirations, as the serum markets are re-used on expiration.
+Each asset corresponds to a `ZetaGroup` account. A zeta group contains all the respective data for its markets.
+
+Zeta markets use a circular buffer of expirations, as the serum markets are re-used after expiry.
 
 | Field  | Value |
 | ------------- |:-------------:|
@@ -52,9 +56,6 @@ Zeta markets follow a circular buffer of expirations, as the serum markets are r
 
 As such - there are 23 markets per expiry
 - 11 calls, 11 puts, 1 future
-
-For now, numbers in ou smart contract use 6 decimals of precision and are stored as u64. These are represented as BN in javascript.
-
 
 ## Install
 
