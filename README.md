@@ -46,10 +46,9 @@ For now, numbers in ou smart contract use 6 decimals of precision and are stored
 
 ## Install
 
+```sh
+npm install @zetamarkets/sdk
 ```
-// TODO add installation, also include solana web3...
-```
-
 
 ## Getting started
 
@@ -472,4 +471,4 @@ Alternatively, `throttle` can be set to `false`, and `client.updateState` will b
 
 ## Licensing
 
-APACHE 2.0 //TODO
+[Apache 2.0](./LICENSE).
