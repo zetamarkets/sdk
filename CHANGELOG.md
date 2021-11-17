@@ -8,7 +8,7 @@ Version changes are pinned to SDK releases.
 - client: improve logging on deposit.
 - client: throttle defaults to false instead of true.
 - utils: improve display state.
-- risk: add `getMarginAccountState`.
+- risk: add `getMarginAccountState` to risk calculator for general margin account state.
 - general: export anchor Wallet so it is accessible via this sdk.
 
 ### Breaking
