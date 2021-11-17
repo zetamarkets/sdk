@@ -57,6 +57,10 @@ Zeta markets use a circular buffer of expirations, as the serum markets are re-u
 As such - there are 23 markets per expiry
 - 11 calls, 11 puts, 1 future
 
+Native numbers are represented with BN to the precision of 6 d.p as u64 in the smart contract code.
+
+They will need to be divided by 10^6 to get the decimal value.
+
 ## Install
 
 ```sh
