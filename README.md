@@ -17,11 +17,11 @@
   </body>
 </html>
 
-This is the typescript library to interact with our zeta program smart contract.
+This is the typescript library to interact with our Zeta program smart contract.
 
-[Learn more about zeta.](https://zetamarkets.gitbook.io/zeta/whitepaper/)
+[Learn more about Zeta.](https://zetamarkets.gitbook.io/zeta/whitepaper/)
 
-[Try out zeta devnet.](https://devnet.zeta.markets/)
+[Try out Zeta devnet.](https://devnet.zeta.markets/)
 
 ## Variables
 
