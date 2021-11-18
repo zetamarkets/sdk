@@ -1,22 +1,23 @@
-## Zeta SDK
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div align="center">
-        <p>
-          <a href="https://discord.gg/dD7YREfBkR"><img alt="Discord Chat" src="https://img.shields.io/discord/841556000632078378?color=blueviolet" /></a>
-          <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/github/license/project-serum/anchor?color=blueviolet" /></a>
-        </p>
-      </div>
-  </body>
-</html>
+<div align="center">
+  <img height="120px" src="./logo.png" />
 
+  <h1 style="margin-top: 0px">Zeta SDK</h1>
+
+  <p>
+    <a href="https://discord.gg/dD7YREfBkR"
+      ><img
+        alt="Discord Chat"
+        src="https://img.shields.io/discord/841556000632078378?color=blueviolet"
+    /></a>
+    <a href="https://opensource.org/licenses/Apache-2.0"
+      ><img
+        alt="License"
+        src="https://img.shields.io/github/license/project-serum/anchor?color=blueviolet"
+    /></a>
+  </p>
+</div>
+
+## Zeta SDK
 This is the typescript library to interact with our Zeta program smart contract.
 
 [Learn more about Zeta.](https://zetamarkets.gitbook.io/zeta/whitepaper/)
@@ -37,11 +38,7 @@ PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
 
-Zeta is a protocol that allows the trading of undercollateralized options and futures on Solana.
-
-Zeta uses the Serum DEX for its order matching.
-
-Zeta is currently only live on devnet and only supports SOL as its underlying asset.
+Zeta is a protocol that allows the trading of undercollateralized options and futures on Solana, using the Serum DEX for its order matching. Zeta is only available on devnet with SOL as the underlying asset.
 
 Each asset corresponds to a `ZetaGroup` account. A Zeta group contains all the respective data for its markets.
 
