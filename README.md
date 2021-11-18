@@ -37,11 +37,7 @@ PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
 
-Zeta is a protocol that allows the trading of undercollateralized options and futures on Solana.
-
-Zeta uses the Serum DEX for its order matching.
-
-Zeta is currently only live on devnet and only supports SOL as its underlying asset.
+Zeta is a protocol that allows the trading of undercollateralized options and futures on Solana, using the Serum DEX for its order matching. Zeta is only available on devnet with SOL as the underlying asset.
 
 Each asset corresponds to a `ZetaGroup` account. A Zeta group contains all the respective data for its markets.
 
