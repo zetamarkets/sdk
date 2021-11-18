@@ -170,7 +170,7 @@ const client = await Client.load(
 ```
 For examples sake, we want to see the orderbook for market index 2, i.e. the CALL option expiring on Fri Nov 19 with strike 211.
 
-```
+```ts
 const index = 2;
 await Exchange.markets.markets[index].updateOrderbook();
 console.log(Exchange.markets.markets[index].orderbook);
@@ -467,7 +467,9 @@ You can change this via `client.pollInterval`.
 
 This is *almost* how often the SDK will call `await client.updateState()`, which is the manual way of polling user state.
 
-There is a timer that on default fires every 2 seconds, checking the last poll timestamp. If time greater than client.pollInterval has elapsed, it will poll.
+There is a timer that on default fires every 2 seconds, checking the last poll timestamp. If time greater than client.pollInterval has elapsed or there is a pending update, it will poll.
+
+Pending update refers to a margin account websocket change callback. (The SDK subscribes to user `MarginAccount` on `Client.load`.)
 
 This will do multiple things (`client.updateState()`):
 1. Fetch user margin account (`client.marginAccount`).
