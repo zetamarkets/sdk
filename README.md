@@ -31,8 +31,6 @@ This is the typescript library to interact with our Zeta program smart contract.
 | PROGRAM_ID         | GoB7HN9PAumGbFBZUWokX7GiNe8Etcsc22JWmarRhPBq   |
 | SERVER_URL         | https://server.zeta.markets     |
 
-DM @zetamarkets on twitter if you are running into rate limit issues.
-
 PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
@@ -53,9 +51,19 @@ Zeta markets use a circular buffer of expirations, as the Serum markets are re-u
 As such - there are 23 markets per expiry
 - 11 calls, 11 puts, 1 future
 
+**TBD: We will be moving to weekly expiries in the future.**
+
 Native numbers are represented with BN to the precision of 6 d.p as u64 in the smart contract code.
 
 They will need to be divided by 10^6 to get the decimal value.
+
+```ts
+// A variable of type BN (big number)
+let balance: BN = client.marginAccount.balance;
+
+// If you had deposited $10,000 USDC
+balance.toNumber(); // == 100_000_000;
+```
 
 ## Install
 
@@ -316,7 +324,7 @@ let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
 );
 console.log(marginAccountState);
 
-// These values have all been normalized (converted from 6 d.p precision to 2 d.p)
+// These values have all been normalized (converted from 6 dp fixed point integer to 2 d.p float)
 `
 {
   balance: 10000,                       // Deposited $10,000
