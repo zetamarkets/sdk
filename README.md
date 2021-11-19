@@ -277,6 +277,26 @@ console.log(client.positions);
 
 We have a position of 1, with cost of trades 9530000 / 10^6 = $9.53.
 
+Cancel order.
+
+```ts
+// We only have one order at the moment.
+let order = client.orders[0];
+await client.cancelOrder(
+    order.market,
+    order.orderId,
+    order.side
+);
+```
+
+Cancel all orders.
+
+```ts
+await client.cancelAllOrders();
+```
+
+See `src/client.ts` for full functionality.
+
 ### Check market mark price
 
 This is the price that position is marked to - (This is calculated by our on chain black scholes pricing that is constantly being cranked.)
