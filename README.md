@@ -32,8 +32,6 @@ This is the typescript library to interact with our Zeta program smart contract.
 | PROGRAM_ID         | GoB7HN9PAumGbFBZUWokX7GiNe8Etcsc22JWmarRhPBq   |
 | SERVER_URL         | https://server.zeta.markets     |
 
-DM @zetamarkets on twitter if you are running into rate limit issues.
-
 PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
@@ -54,9 +52,19 @@ Zeta markets use a circular buffer of expirations, as the Serum markets are re-u
 As such - there are 23 markets per expiry
 - 11 calls, 11 puts, 1 future
 
+**TBD: We will be moving to weekly expiries in the future.**
+
 Native numbers are represented with BN to the precision of 6 d.p as u64 in the smart contract code.
 
 They will need to be divided by 10^6 to get the decimal value.
+
+```ts
+// A variable of type BN (big number)
+let balance: BN = client.marginAccount.balance;
+
+// If you had deposited $10,000 USDC
+balance.toNumber(); // == 100_000_000;
+```
 
 ## Install
 
@@ -167,7 +175,7 @@ const client = await Client.load(
 ```
 For examples sake, we want to see the orderbook for market index 2, i.e. the CALL option expiring on Fri Nov 19 with strike 211.
 
-```
+```ts
 const index = 2;
 await Exchange.markets.markets[index].updateOrderbook();
 console.log(Exchange.markets.markets[index].orderbook);
@@ -278,6 +286,26 @@ console.log(client.positions);
 
 We have a position of 1, with cost of trades 9530000 / 10^6 = $9.53.
 
+Cancel order.
+
+```ts
+// We only have one order at the moment.
+let order = client.orders[0];
+await client.cancelOrder(
+    order.market,
+    order.orderId,
+    order.side
+);
+```
+
+Cancel all orders.
+
+```ts
+await client.cancelAllOrders();
+```
+
+See `src/client.ts` for full functionality.
+
 ### Check market mark price
 
 This is the price that position is marked to - (This is calculated by our on chain black scholes pricing that is constantly being cranked.)
@@ -297,7 +325,7 @@ let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
 );
 console.log(marginAccountState);
 
-// These values have all been normalized (converted from 6 d.p precision to 2 d.p)
+// These values have all been normalized (converted from 6 dp fixed point integer to decimal)
 `
 {
   balance: 10000,                       // Deposited $10,000
@@ -464,7 +492,9 @@ You can change this via `client.pollInterval`.
 
 This is *almost* how often the SDK will call `await client.updateState()`, which is the manual way of polling user state.
 
-There is a timer that on default fires every 2 seconds, checking the last poll timestamp. If time greater than client.pollInterval has elapsed, it will poll.
+There is a timer that on default fires every 2 seconds, checking the last poll timestamp. If time greater than client.pollInterval has elapsed or there is a pending update, it will poll.
+
+Pending update refers to a margin account websocket change callback. (The SDK subscribes to user `MarginAccount` on `Client.load`.)
 
 This will do multiple things (`client.updateState()`):
 1. Fetch user margin account (`client.marginAccount`).
