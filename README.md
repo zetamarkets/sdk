@@ -324,7 +324,7 @@ let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
 );
 console.log(marginAccountState);
 
-// These values have all been normalized (converted from 6 dp fixed point integer to 2 d.p float)
+// These values have all been normalized (converted from 6 dp fixed point integer to decimal)
 `
 {
   balance: 10000,                       // Deposited $10,000
