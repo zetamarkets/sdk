@@ -178,7 +178,8 @@ const client = await Client.load(
     undefined, // Callback - See below for more details.
 );
 
-await client.deposit(utils.getNativeAmount(STARTING_BALANCE));
+// This will create a margin account on first deposit.
+await client.deposit(utils.getNativeAmount(10_000));
 ```
 
 Structure
