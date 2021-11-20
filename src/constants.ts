@@ -80,8 +80,3 @@ export const FUTURES_MARGIN_PARAMS = {
   initial: 0.15,
   maintenance: 0.075,
 };
-
-export const DEX_ERRORS: Map<number, string> = new Map([
-  [59, "Order doesn't exist"],
-  [61, "Order would self-trade"],
-]);
