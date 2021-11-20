@@ -127,7 +127,7 @@ await Exchange.load(
     connection,
     utils.defaultCommitment(),
     undefined, // Exchange wallet can be ignored for normal clients.
-    0          // ThrottleMs - increase if you are running into rate limit issues on startup.
+    0,         // ThrottleMs - increase if you are running into rate limit issues on startup.
     undefined, // Callback - See below for more details.
 );
 ```
