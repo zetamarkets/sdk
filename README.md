@@ -161,8 +161,13 @@ Expiration @ Fri Nov 19 2021 08:00:00 GMT+0800
 
 Note our markets are identified by index - in a circular buffer fashion for expiries.
 
+### User margin accounts
 
-### Basic script setup to place a trade and view positions
+A user's state is represented by a `MarginAccount` in the Zeta program. This is per underlying per user.
+
+It stores all the state related to a user's balance, open orders and positions.
+
+Creation is baked into the `deposit` function if you don't have one already.
 
 ```ts
 // Load the user SDK client.
@@ -172,7 +177,31 @@ const client = await Client.load(
     utils.defaultCommitment(),
     undefined, // Callback - See below for more details.
 );
+
+await client.deposit(utils.getNativeAmount(STARTING_BALANCE));
 ```
+
+Structure
+
+```ts
+// client.marginAccount
+export interface MarginAccount {
+  authority: PublicKey;                 // Wallet publickey.
+  nonce: number;                        // Margin account PDA nonce.
+  balance: anchor.BN;                   // Balance - doesn't take into account unrealized pnl.
+  forceCancelFlag: boolean;             // If you are underwater, liquidators can cancel your open orders in consecutive transactions.
+
+  openOrdersNonce: Array<number>;       // Open orders account PDA nonce.
+  seriesExpiry: Array<anchor.BN>;       // Expiry timestamp for your orders and positions (used for settlement)
+  positions: Array<Position>;           // Vector of your positions and open order state.
+  _positionsPadding: Array<Position>;
+}
+```
+
+The details should be abstracted away into `client.orders` and client.positions` in the SDK.
+
+### Basic script setup to place a trade and view positions
+
 For examples sake, we want to see the orderbook for market index 2, i.e. the CALL option expiring on Fri Nov 19 with strike 211.
 
 ```ts
@@ -197,7 +226,8 @@ Set via `Exchange.markets.orderbookDepth = N`.
 `
 ```
 
-Placing an order
+Placing an order.
+- Placing an order on a new market (market index) will create a serum `OpenOrders` account. This is handled by the SDK.
 
 ```ts
 // We need to convert price to the native spl token amount (6.dp)
