@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [Unreleased]
+
+- error: Move error related functionality to error.ts. ([#6](https://github.com/zetamarkets/sdk/pull/6))
+
 ## [0.7.0] 2021-11-17
 
 - client: improve logging on deposit.

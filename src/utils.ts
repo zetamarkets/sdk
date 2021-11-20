@@ -2,7 +2,6 @@ import * as anchor from "@project-serum/anchor";
 import {
   ConfirmOptions,
   PublicKey,
-  Keypair,
   Connection,
   Signer,
   Transaction,
@@ -24,7 +23,7 @@ import BufferLayout from "buffer-layout";
 const BN = anchor.BN;
 
 import * as constants from "./constants";
-import { idlErrors } from "./errors";
+import { parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { Market } from "./market";
 import { OpenOrdersMap } from "./program-types";
@@ -435,7 +434,7 @@ export async function processTransaction(
   } catch (err) {
     let translatedErr = anchor.ProgramError.parse(err, idlErrors);
     if (translatedErr === null) {
-      throw parseCustomErr(err);
+      throw parseCustomError(err);
     }
     throw translatedErr;
   }
@@ -480,7 +479,7 @@ export function splitIxsIntoTx(
   return txs;
 }
 
-export async function sleep(ms) {
+export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms, undefined));
 }
 
@@ -769,33 +768,5 @@ export function getMostRecentExpiredIndex() {
     return constants.ACTIVE_EXPIRIES - 1;
   } else {
     return Exchange.markets.frontExpiryIndex - 1;
-  }
-}
-
-/**
- * Extract error code from custom non-anchor errors
- */
-export function parseCustomErr(untranslatedError: string) {
-  let components = untranslatedError.toString().split("custom program error: ");
-  if (components.length !== 2) {
-    return null;
-  }
-
-  let errorCode: number;
-  try {
-    errorCode = parseInt(components[1]);
-  } catch (parseErr) {
-    return null;
-  }
-
-  // Parse user error.
-  let errorMsg = constants.DEX_ERRORS.get(errorCode);
-
-  if (errorMsg !== undefined) {
-    return new anchor.ProgramError(
-      errorCode,
-      errorMsg,
-      errorCode + ": " + errorMsg
-    );
   }
 }

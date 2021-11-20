@@ -199,7 +199,7 @@ export interface MarginAccount {
 }
 ```
 
-The details should be abstracted away into `client.orders` and client.positions` in the SDK.
+The details should be abstracted away into `client.orders` and `client.positions` in the SDK.
 
 ### Basic script setup to place a trade and view positions
 
