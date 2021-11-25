@@ -31,6 +31,7 @@ import {
   initializeZetaGroupTx,
   updateGreeksIx,
   UpdateGreeksArgs,
+  rebalanceInsuranceVaultIx,
 } from "./program-instructions";
 
 export class Exchange {
@@ -661,6 +662,13 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     return utils.getReadableAmount(
       this._greeks.productGreeks[index].theo.toNumber()
     );
+  }
+
+  public async rebalanceInsuranceVault(remainingAccounts: any[]) {
+    let tx = new Transaction();
+    tx.add(await rebalanceInsuranceVaultIx(remainingAccounts));
+    await utils.processTransaction(this._provider, tx);
+    console.log(`[REBALANCE INSURANCE VAULT]`);
   }
 
   /**

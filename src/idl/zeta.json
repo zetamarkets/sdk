@@ -272,6 +272,26 @@
           "name": "greeks",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -648,6 +668,47 @@
       ]
     },
     {
+      "name": "depositInsuranceVault",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -769,6 +830,37 @@
         },
         {
           "name": "mapNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeInsuranceDepositAccount",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
           "type": "u8"
         }
       ]
@@ -1161,6 +1253,37 @@
       "args": []
     },
     {
+      "name": "rebalanceInsuranceVault",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "liquidate",
       "accounts": [
         {
@@ -1433,6 +1556,14 @@
                 4
               ]
             }
+          },
+          {
+            "name": "insuranceVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "insuranceVaultNonce",
+            "type": "u8"
           }
         ]
       }
@@ -1497,6 +1628,26 @@
                 92
               ]
             }
+          },
+          {
+            "name": "overbankruptAmount",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InsuranceDepositAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
           }
         ]
       }
@@ -1744,6 +1895,10 @@
           },
           {
             "name": "greeksNonce",
+            "type": "u8"
+          },
+          {
+            "name": "insuranceVaultNonce",
             "type": "u8"
           }
         ]
@@ -2142,6 +2297,11 @@
       "code": 354,
       "name": "UnsortedOpenOrdersAccounts",
       "msg": "Unsorted open orders accounts"
+    },
+    {
+      "code": 355,
+      "name": "RebalanceInsuranceInvalidRemainingAccounts",
+      "msg": "Rebalance insurance vault with no margin accounts"
     }
   ],
   "metadata": {

@@ -6,7 +6,11 @@ import {
   DEFAULT_CLIENT_TIMER_INTERVAL,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
-import { MarginAccount, TradeEvent } from "./program-types";
+import {
+  InsuranceDepositAccount,
+  MarginAccount,
+  TradeEvent,
+} from "./program-types";
 import {
   PublicKey,
   Connection,
@@ -25,6 +29,8 @@ import {
   cancelOrderIx,
   forceCancelOrdersIx,
   liquidateIx,
+  initializeInsuranceDepositAccountIx,
+  depositInsuranceVaultIx,
 } from "./program-instructions";
 
 import { Position, Order, Side } from "./types";
@@ -63,6 +69,22 @@ export class Client {
     return this._marginAccountAddress;
   }
   private _marginAccountAddress: PublicKey;
+
+  /**
+   * CLient insurance vault deposit account to track how much they deposited / are allowed to withdraw
+   */
+  public get insuranceDepositAccount(): InsuranceDepositAccount | null {
+    return this._insuranceDepositAccount;
+  }
+  private _insuranceDepositAccount: InsuranceDepositAccount | null;
+
+  /**
+   * Client insurance vault deposit account address
+   */
+  public get insuranceDepositAccountAddress(): PublicKey {
+    return this._insuranceDepositAccountAddress;
+  }
+  private _insuranceDepositAccountAddress: PublicKey;
 
   /**
    * Client usdc account address.
@@ -162,6 +184,7 @@ export class Client {
     this._lastUpdateTimestamp = 0;
     this._pendingUpdate = false;
     this._marginAccount = null;
+    this._insuranceDepositAccount = null;
   }
 
   /**
@@ -181,12 +204,21 @@ export class Client {
   ): Promise<Client> {
     console.log(`Loading client: ${wallet.publicKey.toString()}`);
     let client = new Client(connection, wallet, opts);
-    let [marginAccountAddress, _nonce] = await utils.getMarginAccount(
-      Exchange.programId,
-      Exchange.zetaGroupAddress,
-      wallet.publicKey
-    );
+    let [marginAccountAddress, _marginAccountNonce] =
+      await utils.getMarginAccount(
+        Exchange.programId,
+        Exchange.zetaGroupAddress,
+        wallet.publicKey
+      );
     client._marginAccountAddress = marginAccountAddress;
+
+    let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
+      await utils.getUserInsuranceDepositAccount(
+        Exchange.programId,
+        Exchange.zetaGroupAddress,
+        wallet.publicKey
+      );
+    client._insuranceDepositAccountAddress = insuranceDepositAccountAddress;
 
     client._eventEmitter = client._program.account.marginAccount.subscribe(
       client.marginAccountAddress
@@ -221,6 +253,15 @@ export class Client {
         )) as MarginAccount;
     } catch (e) {
       console.log("User does not have a margin account.");
+    }
+
+    try {
+      client._insuranceDepositAccount =
+        (await client._program.account.insuranceDepositAccount.fetch(
+          client._insuranceDepositAccountAddress
+        )) as InsuranceDepositAccount;
+    } catch (e) {
+      console.log("User does not have an insurance vault deposit account.");
     }
 
     if (client.marginAccount !== null) {
@@ -311,21 +352,7 @@ export class Client {
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
     // Check if the user has a USDC account.
-    try {
-      let tokenAccountInfo = await utils.getTokenAccountInfo(
-        this._provider.connection,
-        this._usdcAccountAddress
-      );
-      console.log(
-        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.getReadableAmount(
-          tokenAccountInfo.amount.toNumber()
-        )}.`
-      );
-    } catch (e) {
-      throw Error(
-        "User has no USDC associated token account. Please create one and deposit USDC."
-      );
-    }
+    this.usdcAccountCheck();
 
     let tx = new Transaction();
     if (this._marginAccount === null) {
@@ -344,6 +371,41 @@ export class Client {
     console.log(
       `[DEPOSIT] $${utils.getReadableAmount(amount)}. Transaction: ${txId}`
     );
+    return txId;
+  }
+
+  public async depositInsuranceVault(
+    amount: number
+  ): Promise<TransactionSignature> {
+    this.usdcAccountCheck();
+
+    let tx = new Transaction();
+    if (this._insuranceDepositAccount === null) {
+      console.log(
+        "User has no insurance vault deposit account. Creating insurance vault deposit account..."
+      );
+      tx.add(await initializeInsuranceDepositAccountIx(this.publicKey));
+    }
+    tx.add(
+      await depositInsuranceVaultIx(
+        amount,
+        this._insuranceDepositAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    let txId = await utils.processTransaction(this._provider, tx);
+    console.log(
+      `[DEPOSIT INSURANCE VAULT] $${utils.getReadableAmount(
+        amount
+      )}. Transaction: ${txId}`
+    );
+
+    this._insuranceDepositAccount =
+      (await this._program.account.insuranceDepositAccount.fetch(
+        this._insuranceDepositAccountAddress
+      )) as InsuranceDepositAccount;
+
     return txId;
   }
 
@@ -655,6 +717,24 @@ export class Client {
       }
     }
     this._positions = positions;
+  }
+
+  private async usdcAccountCheck() {
+    try {
+      let tokenAccountInfo = await utils.getTokenAccountInfo(
+        this._provider.connection,
+        this._usdcAccountAddress
+      );
+      console.log(
+        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.getReadableAmount(
+          tokenAccountInfo.amount.toNumber()
+        )}.`
+      );
+    } catch (e) {
+      throw Error(
+        "User has no USDC associated token account. Please create one and deposit USDC."
+      );
+    }
   }
 
   /**

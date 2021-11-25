@@ -47,6 +47,29 @@ export async function initializeMarginAccountTx(
   return tx;
 }
 
+export async function initializeInsuranceDepositAccountIx(
+  userKey: PublicKey
+): Promise<Transaction> {
+  let [insuranceDepositAccount, nonce] =
+    await utils.getUserInsuranceDepositAccount(
+      Exchange.programId,
+      Exchange.zetaGroupAddress,
+      userKey
+    );
+
+  return await Exchange.program.instruction.initializeInsuranceDepositAccount(
+    nonce,
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        insuranceDepositAccount,
+        authority: userKey,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
+}
+
 /**
  * @param amount the native amount to deposit (6dp)
  */
@@ -68,6 +91,27 @@ export async function depositIx(
       tokenProgram: TOKEN_PROGRAM_ID,
     },
   });
+}
+
+export async function depositInsuranceVaultIx(
+  amount: number,
+  insuranceDepositAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey
+): Promise<TransactionInstruction> {
+  return await Exchange.program.instruction.depositInsuranceVault(
+    new anchor.BN(amount),
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        insuranceVault: Exchange.zetaGroup.insuranceVault,
+        insuranceDepositAccount,
+        userTokenAccount: usdcAccount,
+        authority: userKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    }
+  );
 }
 
 /**
@@ -441,6 +485,11 @@ export async function initializeZetaGroupTx(
     Exchange.zetaGroupAddress
   );
 
+  let [insuranceVault, insuranceVaultNonce] = await utils.getZetaInsuranceVault(
+    Exchange.programId,
+    Exchange.zetaGroupAddress
+  );
+
   let tx = new Transaction();
 
   tx.add(
@@ -475,6 +524,7 @@ export async function initializeZetaGroupTx(
         zetaGroupNonce,
         underlyingNonce,
         greeksNonce,
+        insuranceVaultNonce,
       },
       {
         accounts: {
@@ -486,12 +536,31 @@ export async function initializeZetaGroupTx(
           underlying,
           oracle,
           greeks,
+          insuranceVault,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          usdcMint: Exchange.usdcMintAddress,
+          rent: SYSVAR_RENT_PUBKEY,
         },
       }
     )
   );
 
   return tx;
+}
+
+export async function rebalanceInsuranceVaultIx(
+  remainingAccounts: any[]
+): Promise<TransactionInstruction> {
+  return await Exchange.program.instruction.rebalanceInsuranceVault({
+    accounts: {
+      zetaGroup: Exchange.zetaGroupAddress,
+      state: Exchange.stateAddress,
+      zetaVault: Exchange.vaultAddress,
+      insuranceVault: Exchange.zetaGroup.insuranceVault,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    },
+    remainingAccounts,
+  });
 }
 
 export async function liquidateIx(

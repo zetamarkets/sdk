@@ -150,6 +150,34 @@ export async function getZetaVault(
   );
 }
 
+export async function getZetaInsuranceVault(
+  programId: PublicKey,
+  zetaGroup: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("zeta-insurance-vault")),
+      zetaGroup.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function getUserInsuranceDepositAccount(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("user-insurance-deposit")),
+      zetaGroup.toBuffer(),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getZetaGroup(
   programId: PublicKey,
   mint: PublicKey
