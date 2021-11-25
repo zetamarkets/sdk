@@ -15,7 +15,7 @@ import {
   TransactionSignature,
 } from "@solana/web3.js";
 import idl from "./idl/zeta.json";
-import { Wallet } from "./types";
+import { Wallet, CancelArgs } from "./types";
 import {
   initializeMarginAccountTx,
   initializeOpenOrdersIx,
@@ -674,9 +674,4 @@ export class Client {
   }
 }
 
-export interface CancelArgs{
-  market: PublicKey;
-  orderId: anchor.BN;
-  cancelSide: Side;
-}
 

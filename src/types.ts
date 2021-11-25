@@ -1,6 +1,6 @@
+import * as anchor from "@project-serum/anchor";
 import { BN } from "@project-serum/anchor";
 import { AccountInfo, PublicKey, Transaction } from "@solana/web3.js";
-import BufferLayout from "buffer-layout";
 
 /**
  * Wallet interface for objects that can be used to sign provider transactions.
@@ -141,4 +141,10 @@ export interface MarginAccountState {
   totalMargin: number;
   unrealizedPnl: number;
   availableBalance: number;
+}
+
+export interface CancelArgs{
+  market: PublicKey;
+  orderId: anchor.BN;
+  cancelSide: Side;
 }
