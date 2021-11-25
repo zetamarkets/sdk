@@ -500,7 +500,6 @@ export class Client {
   public async cancelMultipleOrders(
     cancelArguments: CancelArgs[]
   ): Promise<TransactionSignature[]> {
-    let tx = new Transaction();
     let ixs = [];
     for (var i = 0; i < cancelArguments.length; i++) {
       let marketIndex = Exchange.markets.getMarketIndex(
