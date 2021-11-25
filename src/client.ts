@@ -31,6 +31,7 @@ import {
   liquidateIx,
   initializeInsuranceDepositAccountIx,
   depositInsuranceVaultIx,
+  withdrawInsuranceVaultIx,
 } from "./program-instructions";
 
 import { Position, Order, Side } from "./types";
@@ -374,6 +375,9 @@ export class Client {
     return txId;
   }
 
+  /**
+   * @param amount the native amount to deposit to the insurance vault (6 d.p)
+   */
   public async depositInsuranceVault(
     amount: number
   ): Promise<TransactionSignature> {
@@ -423,6 +427,34 @@ export class Client {
       )
     );
     return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * @param percentageAmount the percentage amount to withdraw from the insurance vault (integer percentage)
+   */
+  public async withdrawInsuranceVault(
+    percentageAmount: number
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    tx.add(
+      await withdrawInsuranceVaultIx(
+        percentageAmount,
+        this._insuranceDepositAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    let txId = await utils.processTransaction(this._provider, tx);
+    console.log(
+      `[WITHDRAW INSURANCE VAULT] ${percentageAmount}% of Deposit. Transaction: ${txId}`
+    );
+
+    this._insuranceDepositAccount =
+      (await this._program.account.insuranceDepositAccount.fetch(
+        this._insuranceDepositAccountAddress
+      )) as InsuranceDepositAccount;
+
+    return txId;
   }
 
   /**

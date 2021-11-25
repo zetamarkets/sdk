@@ -93,6 +93,12 @@ export async function depositIx(
   });
 }
 
+/**
+ * @param amount
+ * @param insuranceDepositAccount
+ * @param usdcAccount
+ * @param userKey
+ */
 export async function depositInsuranceVaultIx(
   amount: number,
   insuranceDepositAccount: PublicKey,
@@ -101,6 +107,27 @@ export async function depositInsuranceVaultIx(
 ): Promise<TransactionInstruction> {
   return await Exchange.program.instruction.depositInsuranceVault(
     new anchor.BN(amount),
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        insuranceVault: Exchange.zetaGroup.insuranceVault,
+        insuranceDepositAccount,
+        userTokenAccount: usdcAccount,
+        authority: userKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    }
+  );
+}
+
+export async function withdrawInsuranceVaultIx(
+  percentageAmount: number,
+  insuranceDepositAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey
+): Promise<TransactionInstruction> {
+  return await Exchange.program.instruction.withdrawInsuranceVault(
+    new anchor.BN(percentageAmount),
     {
       accounts: {
         zetaGroup: Exchange.zetaGroupAddress,

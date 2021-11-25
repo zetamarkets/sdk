@@ -44,6 +44,7 @@ export interface ZetaGroup {
   _expirySeriesPadding: Array<ExpirySeries>;
   insuranceVault: PublicKey;
   insuranceVaultNonce: number;
+  totalInsuranceDepositedAmount: anchor.BN;
 }
 
 export interface Product {
