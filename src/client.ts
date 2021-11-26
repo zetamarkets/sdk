@@ -15,7 +15,7 @@ import {
   TransactionSignature,
 } from "@solana/web3.js";
 import idl from "./idl/zeta.json";
-import { Wallet } from "./types";
+import { Wallet, CancelArgs } from "./types";
 import {
   initializeMarginAccountTx,
   initializeOpenOrdersIx,
@@ -494,6 +494,38 @@ export class Client {
   }
 
   /**
+   * Cancels a user order by orderId and atomically places an order
+   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
+   */
+  public async cancelMultipleOrders(
+    cancelArguments: CancelArgs[]
+  ): Promise<TransactionSignature[]> {
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let marketIndex = Exchange.markets.getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = await cancelOrderIx(
+        cancelArguments[i].market,
+        this.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._provider, tx));
+      })
+    );
+    return txIds;
+  }
+
+  /**
    * Calls force cancel on another user's orders
    * @param market  Market to cancel orders on
    * @param marginAccountToCancel Users to be force-cancelled's margin account
@@ -641,3 +673,5 @@ export class Client {
     }
   }
 }
+
+
