@@ -38,6 +38,21 @@ export async function getState(
   );
 }
 
+export async function getMarketNode(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  marketIndex: number
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("market-node")),
+      zetaGroup.toBuffer(),
+      Buffer.from([marketIndex]),
+    ],
+    programId
+  );
+}
+
 export async function getSettlement(
   programId: PublicKey,
   underlyingMint: PublicKey,

@@ -3,56 +3,10 @@
   "name": "zeta",
   "instructions": [
     {
-      "name": "createGreeksAccount",
+      "name": "initializeZetaGroup",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "nonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "createZetaGroupAccount",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -75,17 +29,39 @@
           "name": "zetaProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "underlying",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
         {
-          "name": "nonce",
-          "type": "u8"
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaGroupArgs"
+          }
         }
       ]
     },
     {
-      "name": "createMarginAccount",
+      "name": "initializeMarginAccount",
       "accounts": [
         {
           "name": "marginAccount",
@@ -98,12 +74,12 @@
           "isSigner": true
         },
         {
-          "name": "systemProgram",
+          "name": "zetaProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "zetaProgram",
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -155,6 +131,65 @@
           "type": "u8"
         }
       ]
+    },
+    {
+      "name": "initializeMarketNode",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketNode",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarketNodeArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateMarketNode",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ommMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "addMarketIndexes",
@@ -226,59 +261,6 @@
           "name": "args",
           "type": {
             "defined": "InitializeStateArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "initializeZetaGroup",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "underlyingMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "underlying",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeZetaGroupArgs"
           }
         }
       ]
@@ -530,46 +512,15 @@
       ],
       "args": [
         {
-          "name": "nonces",
+          "name": "args",
           "type": {
-            "defined": "InitializeMarketNonces"
+            "defined": "InitializeMarketArgs"
           }
         }
       ]
     },
     {
-      "name": "initializeMarginAccount",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "nonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "updateGreeks",
+      "name": "updatePricing",
       "accounts": [
         {
           "name": "state",
@@ -587,17 +538,15 @@
           "isSigner": false
         },
         {
-          "name": "admin",
+          "name": "oracle",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
         {
-          "name": "args",
-          "type": {
-            "defined": "UpdateGreeksArgs"
-          }
+          "name": "expiryIndex",
+          "type": "u8"
         }
       ]
     },
@@ -885,6 +834,11 @@
           "name": "oracle",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "marketNode",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1164,6 +1118,11 @@
       "name": "liquidate",
       "accounts": [
         {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "liquidator",
           "isMut": false,
           "isSigner": true
@@ -1218,24 +1177,96 @@
             "type": "u8"
           },
           {
+            "name": "markPrice",
+            "type": {
+              "array": [
+                "u64",
+                46
+              ]
+            }
+          },
+          {
+            "name": "markPricePadding",
+            "type": {
+              "array": [
+                "u64",
+                92
+              ]
+            }
+          },
+          {
             "name": "productGreeks",
             "type": {
               "array": [
                 {
                   "defined": "ProductGreeks"
                 },
-                46
+                22
               ]
             }
           },
           {
-            "name": "padding",
+            "name": "productGreeksPadding",
             "type": {
               "array": [
                 {
                   "defined": "ProductGreeks"
                 },
-                92
+                44
+              ]
+            }
+          },
+          {
+            "name": "updateTimestamp",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
+          },
+          {
+            "name": "interestRates",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
+          },
+          {
+            "name": "nodes",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "volatility",
+            "type": {
+              "array": [
+                "u64",
+                10
+              ]
+            }
+          },
+          {
+            "name": "volatilityPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "nodeKeys",
+            "type": {
+              "array": [
+                "publicKey",
+                138
               ]
             }
           }
@@ -1382,11 +1413,17 @@
             "type": "publicKey"
           },
           {
+            "name": "pricingParameters",
+            "type": {
+              "defined": "PricingParameters"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                158
+                122
               ]
             }
           },
@@ -1433,6 +1470,35 @@
                 4
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarketNode",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "nodeUpdates",
+            "type": {
+              "array": [
+                "i64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "interestUpdate",
+            "type": "i64"
           }
         ]
       }
@@ -1509,23 +1575,89 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "theo",
+            "name": "delta",
             "type": "u64"
           },
           {
-            "name": "delta",
-            "type": "u32"
-          },
-          {
-            "name": "gamma",
-            "type": "u32"
+            "name": "vega",
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "volatility",
+            "type": {
+              "defined": "AnchorDecimal"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AnchorDecimal",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "flags",
             "type": "u32"
           },
           {
-            "name": "updateTimestamp",
+            "name": "hi",
+            "type": "u32"
+          },
+          {
+            "name": "lo",
+            "type": "u32"
+          },
+          {
+            "name": "mid",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PricingParameters",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "retreatAmount",
+            "type": {
+              "defined": "AnchorDecimal"
+            }
+          },
+          {
+            "name": "optionTradeNormalizer",
+            "type": {
+              "defined": "AnchorDecimal"
+            }
+          },
+          {
+            "name": "futureTradeNormalizer",
+            "type": {
+              "defined": "AnchorDecimal"
+            }
+          },
+          {
+            "name": "maxVolatilityRetreat",
+            "type": {
+              "defined": "AnchorDecimal"
+            }
+          },
+          {
+            "name": "maxInterestRetreat",
+            "type": {
+              "defined": "AnchorDecimal"
+            }
+          },
+          {
+            "name": "maxDelta",
+            "type": "u64"
+          },
+          {
+            "name": "minDelta",
             "type": "u64"
           }
         ]
@@ -1605,6 +1737,26 @@
       }
     },
     {
+      "name": "OmmExpiryState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "refreshTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "oraclePrice",
+            "type": "u64"
+          },
+          {
+            "name": "volatility",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
       "name": "Position",
       "type": {
         "kind": "struct",
@@ -1634,40 +1786,44 @@
       }
     },
     {
-      "name": "InitializeMarketNonces",
+      "name": "InitializeMarketArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "market",
+            "name": "index",
             "type": "u8"
           },
           {
-            "name": "baseMint",
+            "name": "marketNonce",
             "type": "u8"
           },
           {
-            "name": "quoteMint",
+            "name": "baseMintNonce",
             "type": "u8"
           },
           {
-            "name": "zetaBaseVault",
+            "name": "quoteMintNonce",
             "type": "u8"
           },
           {
-            "name": "zetaQuoteVault",
+            "name": "zetaBaseVaultNonce",
             "type": "u8"
           },
           {
-            "name": "dexBaseVault",
+            "name": "zetaQuoteVaultNonce",
             "type": "u8"
           },
           {
-            "name": "dexQuoteVault",
+            "name": "dexBaseVaultNonce",
             "type": "u8"
           },
           {
-            "name": "vaultSigner",
+            "name": "dexQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "vaultSignerNonce",
             "type": "u64"
           }
         ]
@@ -1705,6 +1861,22 @@
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarketNodeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "index",
+            "type": "u8"
           }
         ]
       }
@@ -1826,6 +1998,9 @@
         "kind": "enum",
         "variants": [
           {
+            "name": "Uninitialized"
+          },
+          {
             "name": "Bid"
           },
           {
@@ -1915,233 +2090,298 @@
     },
     {
       "code": 309,
+      "name": "ZeroPrice",
+      "msg": "ZeroPrice"
+    },
+    {
+      "code": 310,
+      "name": "ZeroSize",
+      "msg": "ZeroSize"
+    },
+    {
+      "code": 311,
       "name": "ZeroWithdrawableBalance",
       "msg": "Zero withdrawable balance"
     },
     {
-      "code": 310,
+      "code": 312,
       "name": "AccountHasSufficientMarginPostCancels",
       "msg": "Account has sufficient margin post cancels"
     },
     {
-      "code": 311,
+      "code": 313,
       "name": "OverBankrupt",
       "msg": "Over bankrupt"
     },
     {
-      "code": 312,
+      "code": 314,
       "name": "AccountHasSufficientMargin",
       "msg": "Account has sufficient margin"
     },
     {
-      "code": 313,
+      "code": 315,
       "name": "UserHasNoActiveOrders",
       "msg": "User has no active orders"
     },
     {
-      "code": 314,
+      "code": 316,
       "name": "InvalidExpirationInterval",
       "msg": "Invalid expiration interval"
     },
     {
-      "code": 315,
+      "code": 317,
       "name": "ProductMarketsAlreadyInitialized",
       "msg": "Product markets already initialized"
     },
     {
-      "code": 316,
+      "code": 318,
       "name": "InvalidProductMarketKey",
       "msg": "Invalid product market key"
     },
     {
-      "code": 317,
+      "code": 319,
       "name": "MarketNotLive",
       "msg": "Market not live"
     },
     {
-      "code": 318,
+      "code": 320,
+      "name": "MarketPricingNotReady",
+      "msg": "Market pricing not ready"
+    },
+    {
+      "code": 321,
       "name": "UserHasRemainingOrdersOnExpiredMarket",
       "msg": "User has remaining orders on expired market"
     },
     {
-      "code": 319,
+      "code": 322,
       "name": "InvalidSeriesExpiration",
       "msg": "Invalid series expiration"
     },
     {
-      "code": 320,
+      "code": 323,
       "name": "InvalidExpiredOrderCancel",
       "msg": "Invalid expired order cancel"
     },
     {
-      "code": 321,
+      "code": 324,
       "name": "NoMarketsToAdd",
       "msg": "No markets to add"
     },
     {
-      "code": 322,
+      "code": 325,
       "name": "UserHasUnsettledPositions",
       "msg": "User has unsettled positions"
     },
     {
-      "code": 323,
+      "code": 326,
       "name": "NoMarginAccountsToSettle",
       "msg": "No margin accounts to settle"
     },
     {
-      "code": 324,
+      "code": 327,
       "name": "CannotSettleUserWithActiveOrders",
       "msg": "Cannot settle users with active orders"
     },
     {
-      "code": 325,
+      "code": 328,
       "name": "OrderbookNotEmpty",
       "msg": "Orderbook not empty"
     },
     {
-      "code": 326,
+      "code": 329,
       "name": "InvalidNumberOfAccounts",
       "msg": "Invalid number of accounts"
     },
     {
-      "code": 327,
+      "code": 330,
       "name": "InvalidMarketAccounts",
       "msg": "Bids or Asks don't match the Market"
     },
     {
-      "code": 328,
+      "code": 331,
       "name": "ProductStrikeUninitialized",
       "msg": "Product strike uninitialized"
     },
     {
-      "code": 329,
+      "code": 332,
+      "name": "PricingNotUpToDate",
+      "msg": "Pricing not up to date"
+    },
+    {
+      "code": 333,
       "name": "ProductDirty",
       "msg": "Product dirty"
     },
     {
-      "code": 330,
+      "code": 334,
       "name": "ProductStrikesInitialized",
       "msg": "Product strikes initialized"
     },
     {
-      "code": 331,
+      "code": 335,
       "name": "StrikeInitializationNotReady",
       "msg": "Strike initialization not ready"
     },
     {
-      "code": 332,
+      "code": 336,
       "name": "UnsupportedKind",
       "msg": "Unsupported kind"
     },
     {
-      "code": 333,
+      "code": 337,
       "name": "InvalidZetaGroup",
       "msg": "Invalid zeta group"
     },
     {
-      "code": 334,
+      "code": 338,
       "name": "InvalidMarginAccount",
       "msg": "Invalid margin account"
     },
     {
-      "code": 335,
+      "code": 339,
       "name": "InvalidGreeksAccount",
       "msg": "Invalid greeks account"
     },
     {
-      "code": 336,
+      "code": 340,
       "name": "InvalidSettlementAccount",
       "msg": "Invalid settlement account"
     },
     {
-      "code": 337,
+      "code": 341,
       "name": "InvalidCancelAuthority",
       "msg": "Invalid cancel authority"
     },
     {
-      "code": 338,
-      "name": "CannotUpdateGreeksAfterExpiry",
-      "msg": "Cannot update greeks after expiry"
+      "code": 342,
+      "name": "CannotUpdatePricingAfterExpiry",
+      "msg": "Cannot update pricing after expiry"
     },
     {
-      "code": 339,
+      "code": 343,
       "name": "LoadAccountDiscriminatorAlreadySet",
       "msg": "Account discriminator already set"
     },
     {
-      "code": 340,
+      "code": 344,
       "name": "AccountAlreadyInitialized",
       "msg": "Account already initialized"
     },
     {
-      "code": 341,
+      "code": 345,
       "name": "GreeksAccountSeedsMismatch",
       "msg": "Greeks account seeds mismatch"
     },
     {
-      "code": 342,
+      "code": 346,
       "name": "ZetaGroupAccountSeedsMismatch",
       "msg": "Zeta group account seeds mismatch"
     },
     {
-      "code": 343,
+      "code": 347,
       "name": "MarginAccountSeedsMismatch",
       "msg": "Margin account seeds mismatch"
     },
     {
-      "code": 344,
+      "code": 348,
+      "name": "OmmMarginAccountSeedsMismatch",
+      "msg": "OMM margin account seeds mismatch"
+    },
+    {
+      "code": 349,
       "name": "MarketIndexesUninitialized",
       "msg": "Market indexes uninitialized"
     },
     {
-      "code": 345,
+      "code": 350,
       "name": "MarketIndexesAlreadyInitialized",
       "msg": "Market indexes already initialized"
     },
     {
-      "code": 346,
+      "code": 351,
       "name": "CannotGetUnsetStrike",
       "msg": "Cannot get unset strike"
     },
     {
-      "code": 347,
+      "code": 352,
       "name": "CannotSetInitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 348,
+      "code": 353,
       "name": "CannotResetUninitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 349,
+      "code": 354,
       "name": "CrankMarginAccountNotMutable",
       "msg": "CrankMarginAccountNotMutable"
     },
     {
-      "code": 350,
+      "code": 355,
       "name": "InvalidAdminSigner",
       "msg": "InvalidAdminSigner"
     },
     {
-      "code": 351,
+      "code": 356,
       "name": "UserHasActiveOrders",
       "msg": "User still has active orders"
     },
     {
-      "code": 352,
+      "code": 357,
       "name": "UserForceCancelInProgress",
       "msg": "User has a force cancel in progress"
     },
     {
-      "code": 353,
+      "code": 358,
       "name": "FailedPriceBandCheck",
       "msg": "Failed price band check"
     },
     {
-      "code": 354,
+      "code": 359,
       "name": "UnsortedOpenOrdersAccounts",
       "msg": "Unsorted open orders accounts"
+    },
+    {
+      "code": 360,
+      "name": "AccountNotMutable",
+      "msg": "Account not mutable"
+    },
+    {
+      "code": 361,
+      "name": "AccountDiscriminatorMismatch",
+      "msg": "Account discriminator mismatch"
+    },
+    {
+      "code": 362,
+      "name": "InvalidMarketNodeIndex",
+      "msg": "Invalid market node index"
+    },
+    {
+      "code": 363,
+      "name": "OMMNotInitialized",
+      "msg": "Omm not initialized"
+    },
+    {
+      "code": 364,
+      "name": "InvalidUpdateOMMStateAccounts",
+      "msg": "Invalid update omm state accounts"
+    },
+    {
+      "code": 365,
+      "name": "InvalidMarketNode",
+      "msg": "Invalid market node"
+    },
+    {
+      "code": 366,
+      "name": "LUTOutOfBounds",
+      "msg": "Lut out of bounds"
+    },
+    {
+      "code": 367,
+      "name": "InvalidOracle",
+      "msg": "Invalid oracle"
     }
   ],
   "metadata": {

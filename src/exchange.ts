@@ -28,7 +28,7 @@ import idl from "./idl/zeta.json";
 import { DummyWallet, Wallet } from "./types";
 import {
   initializeZetaMarketTxs,
-  initializeZetaGroupTx,
+  initializeZetaGroupIx,
   updateGreeksIx,
   UpdateGreeksArgs,
 } from "./program-instructions";
@@ -290,7 +290,7 @@ export class Exchange {
     await exchange.updateState();
     console.log(`Initialized zeta state!`);
     console.log(
-      `Params: 
+      `Params:
 expiryIntervalSeconds=${params.expiryIntervalSeconds},
 newExpiryThresholdSeconds=${params.newExpiryThresholdSeconds},
 strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}`
@@ -399,7 +399,9 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     );
     this._zetaGroupAddress = zetaGroup;
 
-    let tx = await initializeZetaGroupTx(underlyingMint, oracle);
+    let tx = new Transaction().add(
+      await initializeZetaGroupIx(underlyingMint, oracle)
+    );
     await utils.processTransaction(this._provider, tx);
 
     await this.updateZetaGroup();
@@ -476,26 +478,31 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
       throw Error("Market indexes are not initialized!");
     }
 
-    for (var i = 0; i < this.zetaGroup.products.length; i++) {
-      console.log(
-        `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
-      );
-      const requestQueue = anchor.web3.Keypair.generate();
-      const eventQueue = anchor.web3.Keypair.generate();
-      const bids = anchor.web3.Keypair.generate();
-      const asks = anchor.web3.Keypair.generate();
+    let indexes = [...Array(this.zetaGroup.products.length).keys()];
+    await Promise.all(
+      indexes.map(async (i) => {
+        console.log(
+          `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
+        );
 
-      let [tx, tx2] = await initializeZetaMarketTxs(
-        marketIndexesAccount.indexes[i],
-        requestQueue.publicKey,
-        eventQueue.publicKey,
-        bids.publicKey,
-        asks.publicKey,
-        marketIndexes
-      );
-      await this.provider.send(tx, [requestQueue, eventQueue, bids, asks]);
-      await this.provider.send(tx2);
-    }
+        const requestQueue = anchor.web3.Keypair.generate();
+        const eventQueue = anchor.web3.Keypair.generate();
+        const bids = anchor.web3.Keypair.generate();
+        const asks = anchor.web3.Keypair.generate();
+
+        let [tx, tx2] = await initializeZetaMarketTxs(
+          i,
+          marketIndexesAccount.indexes[i],
+          requestQueue.publicKey,
+          eventQueue.publicKey,
+          bids.publicKey,
+          asks.publicKey,
+          marketIndexes
+        );
+        await this.provider.send(tx, [requestQueue, eventQueue, bids, asks]);
+        await this.provider.send(tx2);
+      })
+    );
 
     console.log("Market initialization complete!");
     await this.updateZetaGroup();
@@ -658,9 +665,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    return utils.getReadableAmount(
-      this._greeks.productGreeks[index].theo.toNumber()
-    );
+    return utils.getReadableAmount(this._greeks.markPrice[index].toNumber());
   }
 
   /**
