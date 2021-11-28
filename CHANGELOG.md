@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+test
+
 - error: Move error related functionality to error.ts. ([#6](https://github.com/zetamarkets/sdk/pull/6))
 
 ## [0.7.0] 2021-11-17
