@@ -36,13 +36,7 @@ export class Decimal {
     return (this._flags & SIGN_MASK) == 0;
   }
 
-  public toNumber(): number {
-    let scale = this.scale();
-    if (scale == 0) {
-      // TODO don't need yet as we don't expect scale 0 decimals.
-      throw Error("Scale 0 is not handled.");
-    }
-
+  public toBN(): BN {
     let bytes = [
       (this._hi >> 24) & 0xff,
       (this._hi >> 16) & 0xff,
@@ -58,7 +52,17 @@ export class Decimal {
       this._lo & 0xff,
     ];
 
-    let bn = new BN(new Uint8Array(bytes));
+    return new BN(new Uint8Array(bytes));
+  }
+
+  public toNumber(): number {
+    let scale = this.scale();
+    if (scale == 0) {
+      // TODO don't need yet as we don't expect scale 0 decimals.
+      throw Error("Scale 0 is not handled.");
+    }
+
+    let bn = this.toBN();
     // We use toString because only 53 bits can be stored for floats.
     return (bn.toString() as any) / 10 ** scale;
   }

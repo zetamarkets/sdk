@@ -27,6 +27,7 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { DummyWallet, Wallet } from "./types";
 import {
+  InitializeZetaGroupPricingArgs,
   initializeZetaMarketTxs,
   initializeZetaGroupIx,
   updateGreeksIx,
@@ -388,6 +389,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
    */
   public async initializeZetaGroup(
     oracle: PublicKey,
+    args: InitializeZetaGroupPricingArgs,
     callback?: (type: EventType, data: any) => void
   ) {
     let underlyingIndex = this.state.numUnderlyings;
@@ -400,7 +402,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     this._zetaGroupAddress = zetaGroup;
 
     let tx = new Transaction().add(
-      await initializeZetaGroupIx(underlyingMint, oracle)
+      await initializeZetaGroupIx(underlyingMint, oracle, args)
     );
     await utils.processTransaction(this._provider, tx);
 

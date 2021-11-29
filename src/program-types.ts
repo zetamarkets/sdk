@@ -31,7 +31,6 @@ export interface SettlementAccount {
 }
 
 export interface PricingParameters {
-  retreatAmount: AnchorDecimal;
   optionTradeNormalizer: AnchorDecimal;
   futureTradeNormalizer: AnchorDecimal;
   maxVolatilityRetreat: AnchorDecimal;
@@ -103,7 +102,9 @@ export interface Greeks {
   productGreeks: Array<ProductGreeks>;
   _productGreeksPadding: Array<ProductGreeks>;
   updateTimestamp: Array<anchor.BN>;
-  interestRates: Array<anchor.BN>;
+  _updateTimestampPadding: Array<anchor.BN>;
+  interestRate: Array<anchor.BN>;
+  _interestRatePadding: Array<anchor.BN>;
   nodes: Array<anchor.BN>;
   volatility: Array<anchor.BN>;
   _volatilityPadding: Array<anchor.BN>;

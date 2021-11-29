@@ -289,6 +289,34 @@
       ]
     },
     {
+      "name": "updatePricingParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePricingParametersArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "cleanZetaMarkets",
       "accounts": [
         {
@@ -1221,16 +1249,34 @@
             "type": {
               "array": [
                 "u64",
-                6
+                2
               ]
             }
           },
           {
-            "name": "interestRates",
+            "name": "updateTimestampPadding",
             "type": {
               "array": [
                 "u64",
-                6
+                4
+              ]
+            }
+          },
+          {
+            "name": "interestRate",
+            "type": {
+              "array": [
+                "u64",
+                2
+              ]
+            }
+          },
+          {
+            "name": "interestRatePadding",
+            "type": {
+              "array": [
+                "u64",
+                4
               ]
             }
           },
@@ -1623,12 +1669,6 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "retreatAmount",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
             "name": "optionTradeNormalizer",
             "type": {
               "defined": "AnchorDecimal"
@@ -1902,6 +1942,38 @@
       }
     },
     {
+      "name": "UpdatePricingParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "optionTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "futureTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatilityRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "maxInterestRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "minDelta",
+            "type": "u64"
+          },
+          {
+            "name": "maxDelta",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitializeZetaGroupArgs",
       "type": {
         "kind": "struct",
@@ -1917,6 +1989,43 @@
           {
             "name": "greeksNonce",
             "type": "u8"
+          },
+          {
+            "name": "interestRate",
+            "type": "u64"
+          },
+          {
+            "name": "volatility",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "optionTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "futureTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatilityRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "maxInterestRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "maxDelta",
+            "type": "u64"
+          },
+          {
+            "name": "minDelta",
+            "type": "u64"
           }
         ]
       }

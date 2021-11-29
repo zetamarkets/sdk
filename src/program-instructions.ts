@@ -400,6 +400,15 @@ export interface UpdateGreeksArgs {
   volatility: number;
 }
 
+export interface UpdatePricingParameterArgs {
+  optionTradeNormalizer: anchor.BN;
+  futureTradeNormalizer: anchor.BN;
+  maxVolatilityRetreat: anchor.BN;
+  maxInterestRetreat: anchor.BN;
+  maxDelta: anchor.BN;
+  minDelta: anchor.BN;
+}
+
 export async function updateGreeksIx(
   greekArgs: UpdateGreeksArgs
 ): Promise<TransactionInstruction> {
@@ -413,9 +422,21 @@ export async function updateGreeksIx(
   });
 }
 
+export interface InitializeZetaGroupPricingArgs {
+  interestRate: anchor.BN;
+  volatility: Array<anchor.BN>;
+  optionTradeNormalizer: anchor.BN;
+  futureTradeNormalizer: anchor.BN;
+  maxVolatilityRetreat: anchor.BN;
+  maxInterestRetreat: anchor.BN;
+  minDelta: anchor.BN;
+  maxDelta: anchor.BN;
+}
+
 export async function initializeZetaGroupIx(
   underlyingMint: PublicKey,
-  oracle: PublicKey
+  oracle: PublicKey,
+  args: InitializeZetaGroupPricingArgs
 ): Promise<Transaction> {
   let [zetaGroup, zetaGroupNonce] = await utils.getZetaGroup(
     Exchange.programId,
@@ -437,6 +458,14 @@ export async function initializeZetaGroupIx(
       zetaGroupNonce,
       underlyingNonce,
       greeksNonce,
+      interestRate: args.interestRate,
+      volatility: args.volatility,
+      optionTradeNormalizer: args.optionTradeNormalizer,
+      futureTradeNormalizer: args.futureTradeNormalizer,
+      maxVolatilityRetreat: args.maxVolatilityRetreat,
+      maxInterestRetreat: args.maxInterestRetreat,
+      maxDelta: args.maxDelta,
+      minDelta: args.minDelta,
     },
     {
       accounts: {
