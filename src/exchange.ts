@@ -30,8 +30,9 @@ import {
   InitializeZetaGroupPricingArgs,
   initializeZetaMarketTxs,
   initializeZetaGroupIx,
-  updateGreeksIx,
-  UpdateGreeksArgs,
+  initializeMarketNodeIx,
+  updatePricingIx,
+  UpdatePricingParameterArgs,
 } from "./program-instructions";
 
 export class Exchange {
@@ -173,6 +174,11 @@ export class Exchange {
     return this._greeks;
   }
   private _greeks: Greeks;
+
+  public get greeksAddress(): PublicKey {
+    return this._greeksAddress;
+  }
+  private _greeksAddress: PublicKey;
 
   /**
    * @param interval   How often to poll zeta group and state in seconds.
@@ -364,9 +370,15 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
       throw "Zeta group markets are uninitialized!";
     }
 
+    let [greeks, _greeksNonce] = await utils.getGreeks(
+      exchange.programId,
+      exchange.zetaGroupAddress
+    );
+
+    exchange._greeksAddress = greeks;
     exchange._markets = await ZetaGroupMarkets.load(opts, throttleMs);
     exchange._greeks = (await exchange.program.account.greeks.fetch(
-      exchange._zetaGroup.greeks
+      greeks
     )) as Greeks;
     exchange._riskCalculator.updateMarginRequirements();
 
@@ -381,6 +393,19 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
 
     console.log(
       `Exchange loaded @ ${new Date(exchange.clockTimestamp * 1000)}`
+    );
+  }
+
+  /**
+   * Initializes the market nodes for a zeta group.
+   */
+  public async initializeMarketNodes(zetaGroup: PublicKey) {
+    let indexes = [...Array(constants.ACTIVE_MARKETS).keys()];
+    await Promise.all(
+      indexes.map(async (index: number) => {
+        let tx = new Transaction().add(await initializeMarketNodeIx(index));
+        await utils.processTransaction(this._provider, tx);
+      })
     );
   }
 
@@ -400,6 +425,12 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
       underlyingMint
     );
     this._zetaGroupAddress = zetaGroup;
+
+    let [greeks, _greeksNonce] = await utils.getGreeks(
+      this.programId,
+      this._zetaGroupAddress
+    );
+    this._greeksAddress = greeks;
 
     let tx = new Transaction().add(
       await initializeZetaGroupIx(underlyingMint, oracle, args)
@@ -434,6 +465,20 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
       }
     );
     await this.updateState();
+  }
+
+  /**
+   * Update the expiry state variables for the program.
+   */
+  public async updatePricingParameters(args: UpdatePricingParameterArgs) {
+    await this.program.rpc.updatePricingParameters(args, {
+      accounts: {
+        state: this.stateAddress,
+        zetaGroup: this.zetaGroupAddress,
+        admin: this.provider.wallet.publicKey,
+      },
+    });
+    await this.updateZetaGroup();
   }
 
   /**
@@ -544,17 +589,12 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     )) as ZetaGroup;
   }
 
-  public async updateGreeks(updates: UpdateGreeksArgs[]) {
-    let ixs = [];
-    for (var i = 0; i < updates.length; i++) {
-      ixs.push(await updateGreeksIx(updates[i]));
-    }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_GREEK_UPDATES_PER_TX);
-    await Promise.all(
-      txs.map(async (tx) => {
-        await utils.processTransaction(this._provider, tx);
-      })
-    );
+  /**
+   * Update pricing for an expiry index.
+   */
+  public async updatePricing(expiryIndex: number) {
+    let tx = new Transaction().add(await updatePricingIx(expiryIndex));
+    await utils.processTransaction(this._provider, tx);
   }
 
   public assertInitialized() {

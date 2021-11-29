@@ -392,14 +392,6 @@ export async function initializeZetaMarketTxs(
   return [tx, tx2];
 }
 
-export interface UpdateGreeksArgs {
-  index: number;
-  theo: anchor.BN;
-  delta: number;
-  gamma: number;
-  volatility: number;
-}
-
 export interface UpdatePricingParameterArgs {
   optionTradeNormalizer: anchor.BN;
   futureTradeNormalizer: anchor.BN;
@@ -407,19 +399,6 @@ export interface UpdatePricingParameterArgs {
   maxInterestRetreat: anchor.BN;
   maxDelta: anchor.BN;
   minDelta: anchor.BN;
-}
-
-export async function updateGreeksIx(
-  greekArgs: UpdateGreeksArgs
-): Promise<TransactionInstruction> {
-  return await Exchange.program.instruction.updateGreeks(greekArgs, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.zetaGroup.greeks,
-      admin: Exchange.provider.wallet.publicKey,
-    },
-  });
 }
 
 export interface InitializeZetaGroupPricingArgs {
@@ -518,6 +497,54 @@ export async function crankMarketIx(
       eventQueue,
       dexProgram,
       serumAuthority: Exchange.serumAuthority,
+    },
+    remainingAccounts,
+  });
+}
+
+export async function initializeMarketNodeIx(
+  index: number
+): Promise<TransactionInstruction> {
+  let [marketNode, nonce] = await utils.getMarketNode(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    index
+  );
+
+  return await Exchange.program.instruction.initializeMarketNode(
+    { nonce, index },
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        marketNode,
+        greeks: Exchange.greeksAddress,
+        payer: Exchange.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
+}
+
+export async function updatePricingIx(
+  expiryIndex: number
+): Promise<TransactionInstruction> {
+  let head = expiryIndex * constants.PRODUCTS_PER_EXPIRY;
+  let remainingAccounts = Exchange.greeks.nodeKeys
+    .map((x: PublicKey) => {
+      return {
+        pubkey: x,
+        isSigner: false,
+        isWritable: true,
+      };
+    })
+    .slice(head, head + constants.PRODUCTS_PER_EXPIRY);
+
+  return await Exchange.program.instruction.updatePricing(expiryIndex, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      oracle: Exchange.zetaGroup.oracle,
     },
     remainingAccounts,
   });
