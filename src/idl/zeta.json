@@ -181,11 +181,6 @@
           "isSigner": false
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "mintAuthority",
           "isMut": false,
           "isSigner": false
@@ -270,6 +265,11 @@
         },
         {
           "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
           "isMut": true,
           "isSigner": false
         },
@@ -625,11 +625,6 @@
       "name": "deposit",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "zetaGroup",
           "isMut": false,
           "isSigner": false
@@ -713,11 +708,6 @@
       "accounts": [
         {
           "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "state",
           "isMut": false,
           "isSigner": false
         },
@@ -1302,11 +1292,6 @@
           "isSigner": false
         },
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "zetaVault",
           "isMut": true,
           "isSigner": false
@@ -1327,6 +1312,11 @@
     {
       "name": "liquidate",
       "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "liquidator",
           "isMut": false,
@@ -1457,10 +1447,6 @@
             "type": "u8"
           },
           {
-            "name": "vaultNonce",
-            "type": "u8"
-          },
-          {
             "name": "serumNonce",
             "type": "u8"
           },
@@ -1482,6 +1468,10 @@
           },
           {
             "name": "strikeInitializationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
           }
         ]
@@ -1599,6 +1589,14 @@
             }
           },
           {
+            "name": "vault",
+            "type": "publicKey"
+          },
+          {
+            "name": "vaultNonce",
+            "type": "u8"
+          },
+          {
             "name": "insuranceVault",
             "type": "publicKey"
           },
@@ -1607,7 +1605,7 @@
             "type": "u8"
           },
           {
-            "name": "totalInsuranceDepositedAmount",
+            "name": "totalInsuranceVaultDeposits",
             "type": "u64"
           }
         ]
@@ -1675,7 +1673,7 @@
             }
           },
           {
-            "name": "overbankruptAmount",
+            "name": "rebalanceAmount",
             "type": "i64"
           }
         ]
@@ -1879,10 +1877,6 @@
             "type": "u8"
           },
           {
-            "name": "vaultNonce",
-            "type": "u8"
-          },
-          {
             "name": "serumNonce",
             "type": "u8"
           },
@@ -1900,6 +1894,10 @@
           },
           {
             "name": "strikeInitializationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
           }
         ]
@@ -1921,6 +1919,10 @@
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "insuranceVaultLiquidationPercentage",
+            "type": "u32"
           }
         ]
       }
@@ -1940,6 +1942,10 @@
           },
           {
             "name": "greeksNonce",
+            "type": "u8"
+          },
+          {
+            "name": "vaultNonce",
             "type": "u8"
           },
           {
@@ -2347,6 +2353,26 @@
       "code": 355,
       "name": "RebalanceInsuranceInvalidRemainingAccounts",
       "msg": "Rebalance insurance vault with no margin accounts"
+    },
+    {
+      "code": 356,
+      "name": "InvalidMintDecimals",
+      "msg": "Invalid mint decimals"
+    },
+    {
+      "code": 357,
+      "name": "InvalidZetaGroupOracle",
+      "msg": "Invalid oracle for this zeta group"
+    },
+    {
+      "code": 358,
+      "name": "InvalidZetaGroupMint",
+      "msg": "Invalid zeta group mint"
+    },
+    {
+      "code": 359,
+      "name": "InvalidDepositAmount",
+      "msg": "Invalid deposit amount"
     }
   ],
   "metadata": {

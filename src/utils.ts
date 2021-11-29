@@ -116,10 +116,14 @@ export async function getMintAuthority(
 }
 
 export async function getVault(
-  programId: PublicKey
+  programId: PublicKey,
+  zetaGroup: PublicKey
 ): Promise<[PublicKey, number]> {
   return await anchor.web3.PublicKey.findProgramAddress(
-    [Buffer.from(anchor.utils.bytes.utf8.encode("vault"))],
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("vault")),
+      zetaGroup.toBuffer(),
+    ],
     programId
   );
 }

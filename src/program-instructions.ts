@@ -82,10 +82,9 @@ export async function depositIx(
   // TODO: Probably use mint to find decimal places in future.
   return await Exchange.program.instruction.deposit(new anchor.BN(amount), {
     accounts: {
-      state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
       marginAccount: marginAccount,
-      vault: Exchange.vaultAddress,
+      vault: Exchange.zetaGroup.vault,
       userTokenAccount: usdcAccount,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -152,9 +151,8 @@ export async function withdrawIx(
 ): Promise<TransactionInstruction> {
   return await Exchange.program.instruction.withdraw(new anchor.BN(amount), {
     accounts: {
-      state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
-      vault: Exchange.vaultAddress,
+      vault: Exchange.zetaGroup.vault,
       marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
@@ -512,6 +510,11 @@ export async function initializeZetaGroupTx(
     Exchange.zetaGroupAddress
   );
 
+  let [vault, vaultNonce] = await utils.getVault(
+    Exchange.programId,
+    Exchange.zetaGroupAddress
+  );
+
   let [insuranceVault, insuranceVaultNonce] = await utils.getZetaInsuranceVault(
     Exchange.programId,
     Exchange.zetaGroupAddress
@@ -551,6 +554,7 @@ export async function initializeZetaGroupTx(
         zetaGroupNonce,
         underlyingNonce,
         greeksNonce,
+        vaultNonce,
         insuranceVaultNonce,
       },
       {
@@ -563,6 +567,7 @@ export async function initializeZetaGroupTx(
           underlying,
           oracle,
           greeks,
+          vault,
           insuranceVault,
           tokenProgram: TOKEN_PROGRAM_ID,
           usdcMint: Exchange.usdcMintAddress,
@@ -581,8 +586,7 @@ export async function rebalanceInsuranceVaultIx(
   return await Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
-      state: Exchange.stateAddress,
-      zetaVault: Exchange.vaultAddress,
+      zetaVault: Exchange.zetaGroup.vault,
       insuranceVault: Exchange.zetaGroup.insuranceVault,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
@@ -599,6 +603,7 @@ export async function liquidateIx(
 ): Promise<TransactionInstruction> {
   return await Exchange.program.instruction.liquidate(new anchor.BN(size), {
     accounts: {
+      state: Exchange.stateAddress,
       liquidator,
       liquidatorMarginAccount,
       greeks: Exchange.zetaGroup.greeks,

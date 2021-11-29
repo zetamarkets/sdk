@@ -109,14 +109,6 @@ export class Exchange {
   private _zetaGroupAddress: PublicKey;
 
   /**
-   * Address of global vault token account.
-   */
-  public get vaultAddress(): PublicKey {
-    return this._vaultAddress;
-  }
-  private _vaultAddress: PublicKey;
-
-  /**
    * Zeta PDA for serum market authority
    */
   public get serumAuthority(): PublicKey {
@@ -254,23 +246,22 @@ export class Exchange {
     const [serumAuthority, serumNonce] = await utils.getSerumAuthority(
       programId
     );
-    const [vault, vaultNonce] = await utils.getVault(programId);
 
     await exchange.program.rpc.initializeZetaState(
       {
         stateNonce: stateNonce,
-        vaultNonce: vaultNonce,
         serumNonce: serumNonce,
         mintAuthNonce: mintAuthorityNonce,
         expiryIntervalSeconds: params.expiryIntervalSeconds,
         newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
+        insuranceVaultLiquidationPercentage:
+          params.insuranceVaultLiquidationPercentage,
       },
       {
         accounts: {
           state,
-          vault,
           serumAuthority,
           mintAuthority,
           mint: usdcMint,
@@ -283,7 +274,6 @@ export class Exchange {
     );
 
     exchange._stateAddress = state;
-    exchange._vaultAddress = vault;
     exchange._serumAuthority = serumAuthority;
     exchange._mintAuthority = mintAuthority;
     exchange._usdcMintAddress = usdcMint;
@@ -294,7 +284,8 @@ export class Exchange {
       `Params: 
 expiryIntervalSeconds=${params.expiryIntervalSeconds},
 newExpiryThresholdSeconds=${params.newExpiryThresholdSeconds},
-strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}`
+strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}
+insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage}`
     );
   }
 
@@ -327,14 +318,10 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     const [serumAuthority, _serumNonce] = await utils.getSerumAuthority(
       programId
     );
-    const [vault, _vaultNonce] = await utils.getVault(programId);
-    let usdcMint = await utils.getTokenMint(this.connection, vault);
 
     exchange._mintAuthority = mintAuthority;
     exchange._stateAddress = state;
-    exchange._vaultAddress = vault;
     exchange._serumAuthority = serumAuthority;
-    exchange._usdcMintAddress = usdcMint;
 
     // Load zeta group.
     // TODO: Use constants since we only have 1 underlying for now.
@@ -355,6 +342,12 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
 
     await exchange.updateState();
     await exchange.updateZetaGroup();
+
+    let usdcMint = await utils.getTokenMint(
+      this.connection,
+      exchange.zetaGroup.vault
+    );
+    exchange._usdcMintAddress = usdcMint;
 
     if (
       exchange.zetaGroup.products[
@@ -422,6 +415,8 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
         newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
+        insuranceVaultLiquidationPercentage:
+          params.insuranceVaultLiquidationPercentage,
       },
       {
         accounts: {
@@ -695,6 +690,7 @@ type StateParams = {
   readonly expiryIntervalSeconds: number;
   readonly newExpiryThresholdSeconds: number;
   readonly strikeInitializationThresholdSeconds: number;
+  readonly insuranceVaultLiquidationPercentage: number;
 };
 
 // Exchange singleton.
