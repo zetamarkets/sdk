@@ -40,7 +40,6 @@ export interface PricingParameters {
 }
 
 export interface ZetaGroup {
-  initialized: boolean;
   nonce: number;
   frontExpiryIndex: number;
   underlyingMint: PublicKey;

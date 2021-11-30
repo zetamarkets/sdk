@@ -549,3 +549,21 @@ export async function updatePricingIx(
     remainingAccounts,
   });
 }
+
+export async function updatePricingParametersIx(
+  args: UpdatePricingParameterArgs
+): Promise<TransactionInstruction> {
+  return await Exchange.program.instruction.updatePricingParameters(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export type StateParams = {
+  readonly expiryIntervalSeconds: number;
+  readonly newExpiryThresholdSeconds: number;
+  readonly strikeInitializationThresholdSeconds: number;
+};

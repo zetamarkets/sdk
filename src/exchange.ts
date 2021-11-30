@@ -32,7 +32,9 @@ import {
   initializeZetaGroupIx,
   initializeMarketNodeIx,
   updatePricingIx,
+  updatePricingParametersIx,
   UpdatePricingParameterArgs,
+  StateParams,
 } from "./program-instructions";
 
 export class Exchange {
@@ -440,6 +442,10 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     await this.updateZetaGroup();
     await this.updateState();
 
+    this._greeks = (await exchange.program.account.greeks.fetch(
+      greeks
+    )) as Greeks;
+
     this.subscribeZetaGroup(callback);
     this.subscribeClock(callback);
     this.subscribeGreeks(callback);
@@ -471,13 +477,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
    * Update the expiry state variables for the program.
    */
   public async updatePricingParameters(args: UpdatePricingParameterArgs) {
-    await this.program.rpc.updatePricingParameters(args, {
-      accounts: {
-        state: this.stateAddress,
-        zetaGroup: this.zetaGroupAddress,
-        admin: this.provider.wallet.publicKey,
-      },
-    });
+    let tx = new Transaction().add(await updatePricingParametersIx(args));
     await this.updateZetaGroup();
   }
 
@@ -729,12 +729,6 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     await this._oracle.close();
   }
 }
-
-type StateParams = {
-  readonly expiryIntervalSeconds: number;
-  readonly newExpiryThresholdSeconds: number;
-  readonly strikeInitializationThresholdSeconds: number;
-};
 
 // Exchange singleton.
 export const exchange = new Exchange();
