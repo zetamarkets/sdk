@@ -662,10 +662,30 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   }
 
   public async rebalanceInsuranceVault(remainingAccounts: any[]) {
-    let tx = new Transaction();
-    tx.add(await rebalanceInsuranceVaultIx(remainingAccounts));
-    await utils.processTransaction(this._provider, tx);
-    console.log(`[REBALANCE INSURANCE VAULT]`);
+    let txs = [];
+    for (
+      var i = 0;
+      i < remainingAccounts.length;
+      i += constants.MAX_REBALANCE_ACCOUNTS
+    ) {
+      let tx = new Transaction();
+      let slice = remainingAccounts.slice(
+        i,
+        i + constants.MAX_REBALANCE_ACCOUNTS
+      );
+      tx.add(await rebalanceInsuranceVaultIx(slice));
+      txs.push(tx);
+    }
+    try {
+      await Promise.all(
+        txs.map(async (tx) => {
+          let txSig = await utils.processTransaction(this._provider, tx);
+          console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
+        })
+      );
+    } catch (e) {
+      console.log(`Error in rebalancing the insurance vault ${e}`);
+    }
   }
 
   /**
