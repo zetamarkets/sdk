@@ -562,6 +562,19 @@ export async function updatePricingParametersIx(
   });
 }
 
+export async function updateVolatilityNodesIx(
+  nodes: Array<anchor.BN>
+): Promise<TransactionInstruction> {
+  return await Exchange.program.instruction.updateVolatilityNodes(nodes, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
 export type StateParams = {
   readonly expiryIntervalSeconds: number;
   readonly newExpiryThresholdSeconds: number;

@@ -171,27 +171,6 @@
       ]
     },
     {
-      "name": "updateMarketNode",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ommMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "addMarketIndexes",
       "accounts": [
         {
@@ -543,6 +522,42 @@
           "name": "args",
           "type": {
             "defined": "InitializeMarketArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateVolatilityNodes",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nodes",
+          "type": {
+            "array": [
+              "u64",
+              5
+            ]
           }
         }
       ]
@@ -2386,101 +2401,96 @@
     },
     {
       "code": 348,
-      "name": "OmmMarginAccountSeedsMismatch",
-      "msg": "OMM margin account seeds mismatch"
+      "name": "OpenOrdersAccountSeedsMismatch",
+      "msg": "Open orders account seeds mismatch"
     },
     {
       "code": 349,
+      "name": "MarketNodeAccountSeedsMismatch",
+      "msg": "Market node seeds mismatch"
+    },
+    {
+      "code": 350,
       "name": "MarketIndexesUninitialized",
       "msg": "Market indexes uninitialized"
     },
     {
-      "code": 350,
+      "code": 351,
       "name": "MarketIndexesAlreadyInitialized",
       "msg": "Market indexes already initialized"
     },
     {
-      "code": 351,
+      "code": 352,
       "name": "CannotGetUnsetStrike",
       "msg": "Cannot get unset strike"
     },
     {
-      "code": 352,
+      "code": 353,
       "name": "CannotSetInitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 353,
+      "code": 354,
       "name": "CannotResetUninitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 354,
+      "code": 355,
       "name": "CrankMarginAccountNotMutable",
       "msg": "CrankMarginAccountNotMutable"
     },
     {
-      "code": 355,
+      "code": 356,
       "name": "InvalidAdminSigner",
       "msg": "InvalidAdminSigner"
     },
     {
-      "code": 356,
+      "code": 357,
       "name": "UserHasActiveOrders",
       "msg": "User still has active orders"
     },
     {
-      "code": 357,
+      "code": 358,
       "name": "UserForceCancelInProgress",
       "msg": "User has a force cancel in progress"
     },
     {
-      "code": 358,
+      "code": 359,
       "name": "FailedPriceBandCheck",
       "msg": "Failed price band check"
     },
     {
-      "code": 359,
+      "code": 360,
       "name": "UnsortedOpenOrdersAccounts",
       "msg": "Unsorted open orders accounts"
     },
     {
-      "code": 360,
+      "code": 361,
       "name": "AccountNotMutable",
       "msg": "Account not mutable"
     },
     {
-      "code": 361,
+      "code": 362,
       "name": "AccountDiscriminatorMismatch",
       "msg": "Account discriminator mismatch"
     },
     {
-      "code": 362,
+      "code": 363,
       "name": "InvalidMarketNodeIndex",
       "msg": "Invalid market node index"
     },
     {
-      "code": 363,
-      "name": "OMMNotInitialized",
-      "msg": "Omm not initialized"
-    },
-    {
       "code": 364,
-      "name": "InvalidUpdateOMMStateAccounts",
-      "msg": "Invalid update omm state accounts"
-    },
-    {
-      "code": 365,
       "name": "InvalidMarketNode",
       "msg": "Invalid market node"
     },
     {
-      "code": 366,
+      "code": 365,
       "name": "LUTOutOfBounds",
       "msg": "Lut out of bounds"
     },
     {
-      "code": 367,
+      "code": 366,
       "name": "InvalidOracle",
       "msg": "Invalid oracle"
     }

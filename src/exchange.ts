@@ -33,6 +33,7 @@ import {
   initializeMarketNodeIx,
   updatePricingIx,
   updatePricingParametersIx,
+  updateVolatilityNodesIx,
   UpdatePricingParameterArgs,
   StateParams,
 } from "./program-instructions";
@@ -476,12 +477,25 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
   }
 
   /**
-   * Update the expiry state variables for the program.
+   * Update the pricing parameters for a zeta group.
    */
   public async updatePricingParameters(args: UpdatePricingParameterArgs) {
     let tx = new Transaction().add(await updatePricingParametersIx(args));
     await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
+  }
+
+  /**
+   * Update the pricing parameters for a zeta group.
+   */
+  public async updateVolatilityNodes(nodes: Array<anchor.BN>) {
+    if (nodes.length != constants.VOLATILITY_POINTS) {
+      throw Error(
+        `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
+      );
+    }
+    let tx = new Transaction().add(await updateVolatilityNodesIx(nodes));
+    await utils.processTransaction(this._provider, tx);
   }
 
   /**
