@@ -48,7 +48,8 @@ export async function initializeMarginAccountTx(
 }
 
 export async function initializeInsuranceDepositAccountIx(
-  userKey: PublicKey
+  userKey: PublicKey,
+  userWhitelistInsuranceKey: PublicKey
 ): Promise<Transaction> {
   let [insuranceDepositAccount, nonce] =
     await utils.getUserInsuranceDepositAccount(
@@ -65,6 +66,7 @@ export async function initializeInsuranceDepositAccountIx(
         insuranceDepositAccount,
         authority: userKey,
         systemProgram: SystemProgram.programId,
+        whitelistInsuranceAccount: userWhitelistInsuranceKey,
       },
     }
   );
@@ -80,11 +82,18 @@ export async function depositIx(
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
   // TODO: Probably use mint to find decimal places in future.
+
+  let vaultAddress = await utils.createVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.vaultNonce
+  );
+
   return await Exchange.program.instruction.deposit(new anchor.BN(amount), {
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
       marginAccount: marginAccount,
-      vault: Exchange.zetaGroup.vault,
+      vault: vaultAddress,
       userTokenAccount: usdcAccount,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -104,12 +113,18 @@ export async function depositInsuranceVaultIx(
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
+  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.insuranceVaultNonce
+  );
+
   return await Exchange.program.instruction.depositInsuranceVault(
     new anchor.BN(amount),
     {
       accounts: {
         zetaGroup: Exchange.zetaGroupAddress,
-        insuranceVault: Exchange.zetaGroup.insuranceVault,
+        insuranceVault: insuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
         authority: userKey,
@@ -125,12 +140,18 @@ export async function withdrawInsuranceVaultIx(
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
+  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.insuranceVaultNonce
+  );
+
   return await Exchange.program.instruction.withdrawInsuranceVault(
     new anchor.BN(percentageAmount),
     {
       accounts: {
         zetaGroup: Exchange.zetaGroupAddress,
-        insuranceVault: Exchange.zetaGroup.insuranceVault,
+        insuranceVault: insuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
         authority: userKey,
@@ -149,10 +170,16 @@ export async function withdrawIx(
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
+  let vaultAddress = await utils.createVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.vaultNonce
+  );
+
   return await Exchange.program.instruction.withdraw(new anchor.BN(amount), {
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
-      vault: Exchange.zetaGroup.vault,
+      vault: vaultAddress,
       marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
@@ -583,11 +610,23 @@ export async function initializeZetaGroupTx(
 export async function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
 ): Promise<TransactionInstruction> {
+  let vaultAddress = await utils.createVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.vaultNonce
+  );
+
+  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.insuranceVaultNonce
+  );
+
   return await Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
-      zetaVault: Exchange.zetaGroup.vault,
-      insuranceVault: Exchange.zetaGroup.insuranceVault,
+      zetaVault: vaultAddress,
+      insuranceVault: insuranceVaultAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,

@@ -8,6 +8,7 @@ import {
 import { exchange as Exchange } from "./exchange";
 import {
   InsuranceDepositAccount,
+  WhitelistInsuranceAccount,
   MarginAccount,
   TradeEvent,
 } from "./program-types";
@@ -86,6 +87,22 @@ export class Client {
     return this._insuranceDepositAccountAddress;
   }
   private _insuranceDepositAccountAddress: PublicKey;
+
+  /**
+   * Client account that exists only if they're whitelisted to deposit in the insurance vault
+   */
+  public get whitelistInsuranceAccount(): WhitelistInsuranceAccount | null {
+    return this._whitelistInsuranceAccount;
+  }
+  private _whitelistInsuranceAccount: WhitelistInsuranceAccount | null;
+
+  /**
+   * Client white list insurance account address
+   */
+  public get whitelistInsuranceAccountAddress(): PublicKey | null {
+    return this._whitelistInsuranceAccountAddress;
+  }
+  private _whitelistInsuranceAccountAddress: PublicKey | null;
 
   /**
    * Client usdc account address.
@@ -213,6 +230,13 @@ export class Client {
       );
     client._marginAccountAddress = marginAccountAddress;
 
+    let [whitelistInsuranceAccountAddress, _whitelistInsuranceAccountNonce] =
+      await utils.getUserWhitelistInsuranceAccount(
+        Exchange.programId,
+        wallet.publicKey
+      );
+    client._whitelistInsuranceAccountAddress = whitelistInsuranceAccountAddress;
+
     let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
       await utils.getUserInsuranceDepositAccount(
         Exchange.programId,
@@ -254,6 +278,15 @@ export class Client {
         )) as MarginAccount;
     } catch (e) {
       console.log("User does not have a margin account.");
+    }
+
+    try {
+      client._whitelistInsuranceAccount =
+        (await client._program.account.whitelistInsuranceAccount.fetch(
+          client._whitelistInsuranceAccountAddress
+        )) as WhitelistInsuranceAccount;
+    } catch (e) {
+      console.log("User does not have a whitelist insurance account.");
     }
 
     try {
@@ -353,7 +386,7 @@ export class Client {
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
     // Check if the user has a USDC account.
-    this.usdcAccountCheck();
+    await this.usdcAccountCheck();
 
     let tx = new Transaction();
     if (this._marginAccount === null) {
@@ -381,14 +414,21 @@ export class Client {
   public async depositInsuranceVault(
     amount: number
   ): Promise<TransactionSignature> {
-    this.usdcAccountCheck();
+    await this.usdcAccountCheck();
+
+    await this.insuranceWhitelistCheck();
 
     let tx = new Transaction();
     if (this._insuranceDepositAccount === null) {
       console.log(
         "User has no insurance vault deposit account. Creating insurance vault deposit account..."
       );
-      tx.add(await initializeInsuranceDepositAccountIx(this.publicKey));
+      tx.add(
+        await initializeInsuranceDepositAccountIx(
+          this.publicKey,
+          this.whitelistInsuranceAccountAddress
+        )
+      );
     }
     tx.add(
       await depositInsuranceVaultIx(
@@ -435,6 +475,8 @@ export class Client {
   public async withdrawInsuranceVault(
     percentageAmount: number
   ): Promise<TransactionSignature> {
+    await this.insuranceWhitelistCheck();
+
     let tx = new Transaction();
     tx.add(
       await withdrawInsuranceVaultIx(
@@ -769,6 +811,17 @@ export class Client {
     }
   }
 
+  private async insuranceWhitelistCheck() {
+    try {
+      this._whitelistInsuranceAccount =
+        (await this._program.account.whitelistInsuranceAccount.fetch(
+          this._whitelistInsuranceAccountAddress
+        )) as WhitelistInsuranceAccount;
+    } catch (e) {
+      throw Error("User does not have a whitelist insurance account.");
+    }
+  }
+
   /**
    * Closes the client websocket subscription to margin account.
    */
@@ -785,5 +838,3 @@ export class Client {
     }
   }
 }
-
-

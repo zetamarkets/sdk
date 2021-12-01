@@ -343,10 +343,12 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     await exchange.updateState();
     await exchange.updateZetaGroup();
 
-    let usdcMint = await utils.getTokenMint(
-      this.connection,
-      exchange.zetaGroup.vault
+    let vaultAddress = await utils.createVaultAddress(
+      exchange.programId,
+      exchange.zetaGroupAddress,
+      exchange.zetaGroup.vaultNonce
     );
+    let usdcMint = await utils.getTokenMint(this.connection, vaultAddress);
     exchange._usdcMintAddress = usdcMint;
 
     if (

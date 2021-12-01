@@ -866,6 +866,42 @@
       ]
     },
     {
+      "name": "initializeWhitelistInsuranceAccount",
+      "accounts": [
+        {
+          "name": "whitelistInsuranceAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "initializeInsuranceDepositAccount",
       "accounts": [
         {
@@ -885,6 +921,11 @@
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelistInsuranceAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -1589,16 +1630,8 @@
             }
           },
           {
-            "name": "vault",
-            "type": "publicKey"
-          },
-          {
             "name": "vaultNonce",
             "type": "u8"
-          },
-          {
-            "name": "insuranceVault",
-            "type": "publicKey"
           },
           {
             "name": "insuranceVaultNonce",
@@ -1688,6 +1721,18 @@
             "name": "amount",
             "type": "u64"
           },
+          {
+            "name": "nonce",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistInsuranceAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "nonce",
             "type": "u8"
@@ -2366,11 +2411,16 @@
     },
     {
       "code": 358,
-      "name": "InvalidZetaGroupMint",
-      "msg": "Invalid zeta group mint"
+      "name": "InvalidZetaGroupDepositMint",
+      "msg": "Invalid zeta group deposit mint"
     },
     {
       "code": 359,
+      "name": "InvalidZetaGroupRebalanceMint",
+      "msg": "Invalid zeta group rebalance insurance vault mint"
+    },
+    {
+      "code": 360,
       "name": "InvalidDepositAmount",
       "msg": "Invalid deposit amount"
     }
