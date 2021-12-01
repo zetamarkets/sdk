@@ -13,6 +13,7 @@ export interface State {
   expiryIntervalSeconds: number;
   newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
+  pricingFrequencySeconds: number;
 }
 
 export interface MarketIndexes {

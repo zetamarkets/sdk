@@ -1396,6 +1396,10 @@
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "pricingFrequencySeconds",
+            "type": "u32"
           }
         ]
       }
@@ -1777,26 +1781,6 @@
       }
     },
     {
-      "name": "OmmExpiryState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "refreshTimestamp",
-            "type": "u64"
-          },
-          {
-            "name": "oraclePrice",
-            "type": "u64"
-          },
-          {
-            "name": "volatility",
-            "type": "u32"
-          }
-        ]
-      }
-    },
-    {
       "name": "Position",
       "type": {
         "kind": "struct",
@@ -1901,6 +1885,10 @@
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "pricingFrequencySeconds",
+            "type": "u32"
           }
         ]
       }
@@ -1936,6 +1924,10 @@
           },
           {
             "name": "strikeInitializationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "pricingFrequencySeconds",
             "type": "u32"
           }
         ]

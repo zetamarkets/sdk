@@ -566,4 +566,5 @@ export type StateParams = {
   readonly expiryIntervalSeconds: number;
   readonly newExpiryThresholdSeconds: number;
   readonly strikeInitializationThresholdSeconds: number;
+  readonly pricingFrequencySeconds: number;
 };

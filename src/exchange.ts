@@ -274,6 +274,7 @@ export class Exchange {
         newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
+        pricingFrequencySeconds: params.pricingFrequencySeconds,
       },
       {
         accounts: {
@@ -462,6 +463,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
         newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
+        pricingFrequencySeconds: params.pricingFrequencySeconds,
       },
       {
         accounts: {
@@ -478,6 +480,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
    */
   public async updatePricingParameters(args: UpdatePricingParameterArgs) {
     let tx = new Transaction().add(await updatePricingParametersIx(args));
+    await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
   }
 
