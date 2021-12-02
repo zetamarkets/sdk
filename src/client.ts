@@ -6,12 +6,7 @@ import {
   DEFAULT_CLIENT_TIMER_INTERVAL,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
-import {
-  InsuranceDepositAccount,
-  WhitelistInsuranceAccount,
-  MarginAccount,
-  TradeEvent,
-} from "./program-types";
+import { MarginAccount, TradeEvent } from "./program-types";
 import {
   PublicKey,
   Connection,
@@ -30,9 +25,6 @@ import {
   cancelOrderIx,
   forceCancelOrdersIx,
   liquidateIx,
-  initializeInsuranceDepositAccountIx,
-  depositInsuranceVaultIx,
-  withdrawInsuranceVaultIx,
 } from "./program-instructions";
 
 import { Position, Order, Side } from "./types";
@@ -71,38 +63,6 @@ export class Client {
     return this._marginAccountAddress;
   }
   private _marginAccountAddress: PublicKey;
-
-  /**
-   * CLient insurance vault deposit account to track how much they deposited / are allowed to withdraw
-   */
-  public get insuranceDepositAccount(): InsuranceDepositAccount | null {
-    return this._insuranceDepositAccount;
-  }
-  private _insuranceDepositAccount: InsuranceDepositAccount | null;
-
-  /**
-   * Client insurance vault deposit account address
-   */
-  public get insuranceDepositAccountAddress(): PublicKey {
-    return this._insuranceDepositAccountAddress;
-  }
-  private _insuranceDepositAccountAddress: PublicKey;
-
-  /**
-   * Client account that exists only if they're whitelisted to deposit in the insurance vault
-   */
-  public get whitelistInsuranceAccount(): WhitelistInsuranceAccount | null {
-    return this._whitelistInsuranceAccount;
-  }
-  private _whitelistInsuranceAccount: WhitelistInsuranceAccount | null;
-
-  /**
-   * Client white list insurance account address
-   */
-  public get whitelistInsuranceAccountAddress(): PublicKey | null {
-    return this._whitelistInsuranceAccountAddress;
-  }
-  private _whitelistInsuranceAccountAddress: PublicKey | null;
 
   /**
    * Client usdc account address.
@@ -202,7 +162,6 @@ export class Client {
     this._lastUpdateTimestamp = 0;
     this._pendingUpdate = false;
     this._marginAccount = null;
-    this._insuranceDepositAccount = null;
   }
 
   /**
@@ -229,21 +188,6 @@ export class Client {
         wallet.publicKey
       );
     client._marginAccountAddress = marginAccountAddress;
-
-    let [whitelistInsuranceAccountAddress, _whitelistInsuranceAccountNonce] =
-      await utils.getUserWhitelistInsuranceAccount(
-        Exchange.programId,
-        wallet.publicKey
-      );
-    client._whitelistInsuranceAccountAddress = whitelistInsuranceAccountAddress;
-
-    let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
-      await utils.getUserInsuranceDepositAccount(
-        Exchange.programId,
-        Exchange.zetaGroupAddress,
-        wallet.publicKey
-      );
-    client._insuranceDepositAccountAddress = insuranceDepositAccountAddress;
 
     client._eventEmitter = client._program.account.marginAccount.subscribe(
       client.marginAccountAddress
@@ -279,16 +223,6 @@ export class Client {
     } catch (e) {
       console.log("User does not have a margin account.");
     }
-
-    // No logging for less noise
-    try {
-      await client.insuranceWhitelistCheck();
-
-      client._insuranceDepositAccount =
-        (await client._program.account.insuranceDepositAccount.fetch(
-          client._insuranceDepositAccountAddress
-        )) as InsuranceDepositAccount;
-    } catch (e) {}
 
     if (client.marginAccount !== null) {
       // Set open order pdas for initialized accounts.
@@ -401,51 +335,6 @@ export class Client {
   }
 
   /**
-   * @param amount the native amount to deposit to the insurance vault (6 d.p)
-   */
-  public async depositInsuranceVault(
-    amount: number
-  ): Promise<TransactionSignature> {
-    await this.usdcAccountCheck();
-
-    await this.insuranceWhitelistCheck();
-
-    let tx = new Transaction();
-    if (this._insuranceDepositAccount === null) {
-      console.log(
-        "User has no insurance vault deposit account. Creating insurance vault deposit account..."
-      );
-      tx.add(
-        await initializeInsuranceDepositAccountIx(
-          this.publicKey,
-          this.whitelistInsuranceAccountAddress
-        )
-      );
-    }
-    tx.add(
-      await depositInsuranceVaultIx(
-        amount,
-        this._insuranceDepositAccountAddress,
-        this._usdcAccountAddress,
-        this.publicKey
-      )
-    );
-    let txId = await utils.processTransaction(this._provider, tx);
-    console.log(
-      `[DEPOSIT INSURANCE VAULT] $${utils.getReadableAmount(
-        amount
-      )}. Transaction: ${txId}`
-    );
-
-    this._insuranceDepositAccount =
-      (await this._program.account.insuranceDepositAccount.fetch(
-        this._insuranceDepositAccountAddress
-      )) as InsuranceDepositAccount;
-
-    return txId;
-  }
-
-  /**
    * @param amount  the native amount to withdraw (6 dp)
    */
   public async withdraw(amount: number): Promise<TransactionSignature> {
@@ -459,36 +348,6 @@ export class Client {
       )
     );
     return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * @param percentageAmount the percentage amount to withdraw from the insurance vault (integer percentage)
-   */
-  public async withdrawInsuranceVault(
-    percentageAmount: number
-  ): Promise<TransactionSignature> {
-    await this.insuranceWhitelistCheck();
-
-    let tx = new Transaction();
-    tx.add(
-      await withdrawInsuranceVaultIx(
-        percentageAmount,
-        this._insuranceDepositAccountAddress,
-        this._usdcAccountAddress,
-        this.publicKey
-      )
-    );
-    let txId = await utils.processTransaction(this._provider, tx);
-    console.log(
-      `[WITHDRAW INSURANCE VAULT] ${percentageAmount}% of Deposit. Transaction: ${txId}`
-    );
-
-    this._insuranceDepositAccount =
-      (await this._program.account.insuranceDepositAccount.fetch(
-        this._insuranceDepositAccountAddress
-      )) as InsuranceDepositAccount;
-
-    return txId;
   }
 
   /**
@@ -800,17 +659,6 @@ export class Client {
       throw Error(
         "User has no USDC associated token account. Please create one and deposit USDC."
       );
-    }
-  }
-
-  private async insuranceWhitelistCheck() {
-    try {
-      this._whitelistInsuranceAccount =
-        (await this._program.account.whitelistInsuranceAccount.fetch(
-          this._whitelistInsuranceAccountAddress
-        )) as WhitelistInsuranceAccount;
-    } catch (e) {
-      throw Error("User is not white listed for the insurance vault.");
     }
   }
 
