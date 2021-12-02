@@ -2423,6 +2423,16 @@
       "code": 360,
       "name": "InvalidDepositAmount",
       "msg": "Invalid deposit amount"
+    },
+    {
+      "code": 361,
+      "name": "InvalidTokenAccountOwner",
+      "msg": "Invalid token account owner"
+    },
+    {
+      "code": 362,
+      "name": "InvalidWithdrawAmount",
+      "msg": "Invalid withdraw amount"
     }
   ],
   "metadata": {

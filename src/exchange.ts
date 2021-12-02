@@ -661,18 +661,43 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     );
   }
 
-  public async rebalanceInsuranceVault(remainingAccounts: any[]) {
+  /**
+   * @param user user pubkey to be whitelisted for our insurance vault
+   */
+  public async whitelistUserForInsuranceVault(user: PublicKey) {
+    let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
+      await utils.getUserWhitelistInsuranceAccount(
+        this.program.programId,
+        user
+      );
+
+    await this._program.rpc.initializeWhitelistInsuranceAccount(
+      whitelistInsuranceNonce,
+      {
+        accounts: {
+          whitelistInsuranceAccount,
+          admin: this._provider.wallet.publicKey,
+          user,
+          systemProgram: SystemProgram.programId,
+          state: this._stateAddress,
+        },
+      }
+    );
+  }
+
+  /**
+   *
+   * @param marginAccounts an array of remaining accounts (margin accounts) that will be rebalanced
+   */
+  public async rebalanceInsuranceVault(marginAccounts: any[]) {
     let txs = [];
     for (
       var i = 0;
-      i < remainingAccounts.length;
+      i < marginAccounts.length;
       i += constants.MAX_REBALANCE_ACCOUNTS
     ) {
       let tx = new Transaction();
-      let slice = remainingAccounts.slice(
-        i,
-        i + constants.MAX_REBALANCE_ACCOUNTS
-      );
+      let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
       tx.add(await rebalanceInsuranceVaultIx(slice));
       txs.push(tx);
     }

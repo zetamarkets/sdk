@@ -280,23 +280,15 @@ export class Client {
       console.log("User does not have a margin account.");
     }
 
+    // No logging for less noise
     try {
-      client._whitelistInsuranceAccount =
-        (await client._program.account.whitelistInsuranceAccount.fetch(
-          client._whitelistInsuranceAccountAddress
-        )) as WhitelistInsuranceAccount;
-    } catch (e) {
-      console.log("User does not have a whitelist insurance account.");
-    }
+      await client.insuranceWhitelistCheck();
 
-    try {
       client._insuranceDepositAccount =
         (await client._program.account.insuranceDepositAccount.fetch(
           client._insuranceDepositAccountAddress
         )) as InsuranceDepositAccount;
-    } catch (e) {
-      console.log("User does not have an insurance vault deposit account.");
-    }
+    } catch (e) {}
 
     if (client.marginAccount !== null) {
       // Set open order pdas for initialized accounts.
@@ -818,7 +810,7 @@ export class Client {
           this._whitelistInsuranceAccountAddress
         )) as WhitelistInsuranceAccount;
     } catch (e) {
-      throw Error("User does not have a whitelist insurance account.");
+      throw Error("User is not white listed for the insurance vault.");
     }
   }
 
