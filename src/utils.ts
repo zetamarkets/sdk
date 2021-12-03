@@ -28,6 +28,7 @@ import { exchange as Exchange } from "./exchange";
 import { Market } from "./market";
 import { OpenOrdersMap } from "./program-types";
 import { crankMarketIx } from "./program-instructions";
+import { Decimal } from "./decimal";
 
 export async function getState(
   programId: PublicKey
@@ -448,10 +449,16 @@ export async function processTransaction(
     return txSig;
   } catch (err) {
     let translatedErr = anchor.ProgramError.parse(err, idlErrors);
-    if (translatedErr === null) {
-      throw parseCustomError(err);
+    if (translatedErr !== null) {
+      throw translatedErr;
     }
-    throw translatedErr;
+
+    let customErr = parseCustomError(err);
+    if (customErr != null) {
+      throw customErr;
+    }
+
+    throw err;
   }
 }
 
@@ -524,6 +531,14 @@ export function getDirtySeriesIndices(): number[] {
   return dirtyIndices;
 }
 
+export function getGreeksIndex(marketIndex: number): number {
+  let expirySeries = Math.floor(marketIndex / constants.PRODUCTS_PER_EXPIRY);
+  let modIndex = marketIndex % constants.PRODUCTS_PER_EXPIRY;
+  return (
+    expirySeries * constants.NUM_STRIKES + (modIndex % constants.NUM_STRIKES)
+  );
+}
+
 export function displayState() {
   let orderedIndexes = [
     Exchange.zetaGroup.frontExpiryIndex,
@@ -541,8 +556,24 @@ export function displayState() {
     let markets = Exchange.markets.getMarketsByExpiryIndex(index);
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
+      let greeksIndex = getGreeksIndex(market.marketIndex);
+      let markPrice =
+        Exchange.greeks.markPrice[market.marketIndex].toNumber() / 10 ** 6;
+      let delta =
+        Exchange.greeks.productGreeks[greeksIndex].delta.toNumber() / 10 ** 12;
+      let sigma = Decimal.fromAnchorDecimal(
+        Exchange.greeks.productGreeks[greeksIndex].volatility
+      ).toNumber();
+
+      let vega = Decimal.fromAnchorDecimal(
+        Exchange.greeks.productGreeks[greeksIndex].vega
+      ).toNumber();
       console.log(
-        `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${market.strike}`
+        `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
+          market.strike
+        } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
+          2
+        )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
       );
     }
   }

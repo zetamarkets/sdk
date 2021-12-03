@@ -55,7 +55,15 @@ export class Decimal {
     return new BN(new Uint8Array(bytes));
   }
 
+  public isUnset(): boolean {
+    return this._hi == 0 && this._mid == 0 && this._lo == 0 && this._flags == 0;
+  }
+
   public toNumber(): number {
+    if (this.isUnset()) {
+      return 0;
+    }
+
     let scale = this.scale();
     if (scale == 0) {
       // TODO don't need yet as we don't expect scale 0 decimals.
