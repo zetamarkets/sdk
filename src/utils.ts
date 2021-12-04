@@ -548,17 +548,18 @@ export function displayState() {
   console.log(`[EXCHANGE] Display market state...`);
   for (var i = 0; i < orderedIndexes.length; i++) {
     let index = orderedIndexes[i];
+    let expirySeries = Exchange.markets.expirySeries[index];
     console.log(
       `Expiration @ ${new Date(
-        Exchange.markets.expirySeries[index].expiryTs * 1000
-      )}`
+        expirySeries.expiryTs * 1000
+      )} Live: ${expirySeries.isLive()}`
     );
     let markets = Exchange.markets.getMarketsByExpiryIndex(index);
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
       let greeksIndex = getGreeksIndex(market.marketIndex);
       let markPrice =
-        Exchange.greeks.markPrice[market.marketIndex].toNumber() / 10 ** 6;
+        Exchange.greeks.markPrices[market.marketIndex].toNumber() / 10 ** 6;
       let delta =
         Exchange.greeks.productGreeks[greeksIndex].delta.toNumber() / 10 ** 12;
       let sigma = Decimal.fromAnchorDecimal(

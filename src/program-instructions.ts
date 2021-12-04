@@ -525,7 +525,7 @@ export async function initializeMarketNodeIx(
   );
 }
 
-export async function updatePricingIx(
+export async function retreatMarketNodesIx(
   expiryIndex: number
 ): Promise<TransactionInstruction> {
   let head = expiryIndex * constants.PRODUCTS_PER_EXPIRY;
@@ -539,6 +539,19 @@ export async function updatePricingIx(
     })
     .slice(head, head + constants.PRODUCTS_PER_EXPIRY);
 
+  return await Exchange.program.instruction.retreatMarketNodes(expiryIndex, {
+    accounts: {
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      oracle: Exchange.zetaGroup.oracle,
+    },
+    remainingAccounts,
+  });
+}
+
+export async function updatePricingIx(
+  expiryIndex: number
+): Promise<TransactionInstruction> {
   return await Exchange.program.instruction.updatePricing(expiryIndex, {
     accounts: {
       state: Exchange.stateAddress,
@@ -546,7 +559,6 @@ export async function updatePricingIx(
       greeks: Exchange.greeksAddress,
       oracle: Exchange.zetaGroup.oracle,
     },
-    remainingAccounts,
   });
 }
 

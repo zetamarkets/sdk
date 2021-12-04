@@ -97,12 +97,14 @@ export interface MarginAccount {
 
 export interface Greeks {
   nonce: number;
-  markPrice: Array<anchor.BN>;
-  _markPricePadding: Array<anchor.BN>;
+  markPrices: Array<anchor.BN>;
+  _markPricesPadding: Array<anchor.BN>;
   productGreeks: Array<ProductGreeks>;
   _productGreeksPadding: Array<ProductGreeks>;
   updateTimestamp: Array<anchor.BN>;
   _updateTimestampPadding: Array<anchor.BN>;
+  retreatExpirationTimestamp: Array<anchor.BN>;
+  _retreatExpirationTimestampPadding: Array<anchor.BN>;
   interestRate: Array<anchor.BN>;
   _interestRatePadding: Array<anchor.BN>;
   nodes: Array<anchor.BN>;

@@ -31,6 +31,7 @@ import {
   initializeZetaMarketTxs,
   initializeZetaGroupIx,
   initializeMarketNodeIx,
+  retreatMarketNodesIx,
   updatePricingIx,
   updatePricingParametersIx,
   updateVolatilityNodesIx,
@@ -486,7 +487,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
   }
 
   /**
-   * Update the pricing parameters for a zeta group.
+   * Update the volatility nodes for a surface.
    */
   public async updateVolatilityNodes(nodes: Array<anchor.BN>) {
     if (nodes.length != constants.VOLATILITY_POINTS) {
@@ -614,6 +615,14 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     await utils.processTransaction(this._provider, tx);
   }
 
+  /**
+   * Retreat volatility surface and interest rates for an expiry index.
+   */
+  public async retreatMarketNodes(expiryIndex: number) {
+    let tx = new Transaction().add(await retreatMarketNodesIx(expiryIndex));
+    await utils.processTransaction(this._provider, tx);
+  }
+
   public assertInitialized() {
     if (!this.isInitialized) {
       throw "Exchange uninitialized";
@@ -724,7 +733,7 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    return utils.getReadableAmount(this._greeks.markPrice[index].toNumber());
+    return utils.getReadableAmount(this._greeks.markPrices[index].toNumber());
   }
 
   /**
