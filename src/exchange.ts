@@ -27,10 +27,16 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { DummyWallet, Wallet } from "./types";
 import {
+  InitializeZetaGroupPricingArgs,
   initializeZetaMarketTxs,
-  initializeZetaGroupTx,
-  updateGreeksIx,
-  UpdateGreeksArgs,
+  initializeZetaGroupIx,
+  initializeMarketNodeIx,
+  retreatMarketNodesIx,
+  updatePricingIx,
+  updatePricingParametersIx,
+  updateVolatilityNodesIx,
+  UpdatePricingParameterArgs,
+  StateParams,
   rebalanceInsuranceVaultIx,
 } from "./program-instructions";
 
@@ -166,6 +172,11 @@ export class Exchange {
   }
   private _greeks: Greeks;
 
+  public get greeksAddress(): PublicKey {
+    return this._greeksAddress;
+  }
+  private _greeksAddress: PublicKey;
+
   /**
    * @param interval   How often to poll zeta group and state in seconds.
    */
@@ -256,6 +267,7 @@ export class Exchange {
         newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
+        pricingFrequencySeconds: params.pricingFrequencySeconds,
         insuranceVaultLiquidationPercentage:
           params.insuranceVaultLiquidationPercentage,
       },
@@ -281,10 +293,11 @@ export class Exchange {
     await exchange.updateState();
     console.log(`Initialized zeta state!`);
     console.log(
-      `Params: 
+      `Params:
 expiryIntervalSeconds=${params.expiryIntervalSeconds},
 newExpiryThresholdSeconds=${params.newExpiryThresholdSeconds},
 strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}
+pricingFrequencySeconds=${params.pricingFrequencySeconds}
 insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage}`
     );
   }
@@ -359,9 +372,15 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       throw "Zeta group markets are uninitialized!";
     }
 
+    let [greeks, _greeksNonce] = await utils.getGreeks(
+      exchange.programId,
+      exchange.zetaGroupAddress
+    );
+
+    exchange._greeksAddress = greeks;
     exchange._markets = await ZetaGroupMarkets.load(opts, throttleMs);
     exchange._greeks = (await exchange.program.account.greeks.fetch(
-      exchange._zetaGroup.greeks
+      greeks
     )) as Greeks;
     exchange._riskCalculator.updateMarginRequirements();
 
@@ -380,10 +399,24 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   }
 
   /**
+   * Initializes the market nodes for a zeta group.
+   */
+  public async initializeMarketNodes(zetaGroup: PublicKey) {
+    let indexes = [...Array(constants.ACTIVE_MARKETS).keys()];
+    await Promise.all(
+      indexes.map(async (index: number) => {
+        let tx = new Transaction().add(await initializeMarketNodeIx(index));
+        await utils.processTransaction(this._provider, tx);
+      })
+    );
+  }
+
+  /**
    * Initializes a zeta group
    */
   public async initializeZetaGroup(
     oracle: PublicKey,
+    args: InitializeZetaGroupPricingArgs,
     callback?: (type: EventType, data: any) => void
   ) {
     let underlyingIndex = this.state.numUnderlyings;
@@ -395,11 +428,23 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     );
     this._zetaGroupAddress = zetaGroup;
 
-    let tx = await initializeZetaGroupTx(underlyingMint, oracle);
+    let [greeks, _greeksNonce] = await utils.getGreeks(
+      this.programId,
+      this._zetaGroupAddress
+    );
+    this._greeksAddress = greeks;
+
+    let tx = new Transaction().add(
+      await initializeZetaGroupIx(underlyingMint, oracle, args)
+    );
     await utils.processTransaction(this._provider, tx);
 
     await this.updateZetaGroup();
     await this.updateState();
+
+    this._greeks = (await exchange.program.account.greeks.fetch(
+      greeks
+    )) as Greeks;
 
     this.subscribeZetaGroup(callback);
     this.subscribeClock(callback);
@@ -417,6 +462,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
+        pricingFrequencySeconds: params.pricingFrequencySeconds,
         insuranceVaultLiquidationPercentage:
           params.insuranceVaultLiquidationPercentage,
       },
@@ -428,6 +474,28 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       }
     );
     await this.updateState();
+  }
+
+  /**
+   * Update the pricing parameters for a zeta group.
+   */
+  public async updatePricingParameters(args: UpdatePricingParameterArgs) {
+    let tx = new Transaction().add(updatePricingParametersIx(args));
+    await utils.processTransaction(this._provider, tx);
+    await this.updateZetaGroup();
+  }
+
+  /**
+   * Update the volatility nodes for a surface.
+   */
+  public async updateVolatilityNodes(nodes: Array<anchor.BN>) {
+    if (nodes.length != constants.VOLATILITY_POINTS) {
+      throw Error(
+        `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
+      );
+    }
+    let tx = new Transaction().add(updateVolatilityNodesIx(nodes));
+    await utils.processTransaction(this._provider, tx);
   }
 
   /**
@@ -474,26 +542,31 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       throw Error("Market indexes are not initialized!");
     }
 
-    for (var i = 0; i < this.zetaGroup.products.length; i++) {
-      console.log(
-        `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
-      );
-      const requestQueue = anchor.web3.Keypair.generate();
-      const eventQueue = anchor.web3.Keypair.generate();
-      const bids = anchor.web3.Keypair.generate();
-      const asks = anchor.web3.Keypair.generate();
+    let indexes = [...Array(this.zetaGroup.products.length).keys()];
+    await Promise.all(
+      indexes.map(async (i) => {
+        console.log(
+          `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
+        );
 
-      let [tx, tx2] = await initializeZetaMarketTxs(
-        marketIndexesAccount.indexes[i],
-        requestQueue.publicKey,
-        eventQueue.publicKey,
-        bids.publicKey,
-        asks.publicKey,
-        marketIndexes
-      );
-      await this.provider.send(tx, [requestQueue, eventQueue, bids, asks]);
-      await this.provider.send(tx2);
-    }
+        const requestQueue = anchor.web3.Keypair.generate();
+        const eventQueue = anchor.web3.Keypair.generate();
+        const bids = anchor.web3.Keypair.generate();
+        const asks = anchor.web3.Keypair.generate();
+
+        let [tx, tx2] = await initializeZetaMarketTxs(
+          i,
+          marketIndexesAccount.indexes[i],
+          requestQueue.publicKey,
+          eventQueue.publicKey,
+          bids.publicKey,
+          asks.publicKey,
+          marketIndexes
+        );
+        await this.provider.send(tx, [requestQueue, eventQueue, bids, asks]);
+        await this.provider.send(tx2);
+      })
+    );
 
     console.log("Market initialization complete!");
     await this.updateZetaGroup();
@@ -533,17 +606,20 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     )) as ZetaGroup;
   }
 
-  public async updateGreeks(updates: UpdateGreeksArgs[]) {
-    let ixs = [];
-    for (var i = 0; i < updates.length; i++) {
-      ixs.push(await updateGreeksIx(updates[i]));
-    }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_GREEK_UPDATES_PER_TX);
-    await Promise.all(
-      txs.map(async (tx) => {
-        await utils.processTransaction(this._provider, tx);
-      })
-    );
+  /**
+   * Update pricing for an expiry index.
+   */
+  public async updatePricing(expiryIndex: number) {
+    let tx = new Transaction().add(updatePricingIx(expiryIndex));
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Retreat volatility surface and interest rates for an expiry index.
+   */
+  public async retreatMarketNodes(expiryIndex: number) {
+    let tx = new Transaction().add(retreatMarketNodesIx(expiryIndex));
+    await utils.processTransaction(this._provider, tx);
   }
 
   public assertInitialized() {
@@ -656,9 +732,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    return utils.getReadableAmount(
-      this._greeks.productGreeks[index].theo.toNumber()
-    );
+    return utils.getReadableAmount(this._greeks.markPrices[index].toNumber());
   }
 
   /**
@@ -732,13 +806,6 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     await this._oracle.close();
   }
 }
-
-type StateParams = {
-  readonly expiryIntervalSeconds: number;
-  readonly newExpiryThresholdSeconds: number;
-  readonly strikeInitializationThresholdSeconds: number;
-  readonly insuranceVaultLiquidationPercentage: number;
-};
 
 // Exchange singleton.
 export const exchange = new Exchange();

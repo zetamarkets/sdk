@@ -535,7 +535,7 @@ export class Market {
         );
 
         let ix = await cancelExpiredOrderIx(
-          this._address,
+          this._marketIndex,
           marginAccount,
           order.owner,
           order.orderId,

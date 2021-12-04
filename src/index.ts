@@ -3,6 +3,7 @@ import { exchange as Exchange } from "./exchange";
 import { Client } from "./client";
 import { InsuranceClient } from "./insurance-client";
 import { Network } from "./network";
+import { Decimal } from "./decimal";
 import { idlErrors as Errors } from "./errors";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
@@ -22,6 +23,7 @@ export {
   constants,
   types,
   Client,
+  Decimal,
   instructions,
   InsuranceClient,
   Network,

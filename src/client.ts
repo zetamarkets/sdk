@@ -128,7 +128,7 @@ export class Client {
   public get pollInterval(): number {
     return this._pollInterval;
   }
-  public set pollingInterval(interval: number) {
+  public set pollInterval(interval: number) {
     if (interval < 0) {
       throw Error("Polling interval invalid!");
     }
@@ -308,7 +308,7 @@ export class Client {
   }
 
   /**
-   * @param amount  the native amount to deposit (6 dp)
+   * @param amount  the native amount to deposit (6 decimals fixed point)
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
     // Check if the user has a USDC account.
@@ -353,7 +353,7 @@ export class Client {
   /**
    * Places an order on a zeta market.
    * @param market the address of the serum market
-   * @param price  the native price of the order (6 d.p)
+   * @param price  the native price of the order (6 d.p as integer)
    * @param size   the quantity of the order
    * @param side   the side of the order. bid / ask
    */
@@ -383,7 +383,7 @@ export class Client {
     }
 
     let orderIx = await placeOrderIx(
-      market,
+      marketIndex,
       price,
       size,
       side,
@@ -423,7 +423,7 @@ export class Client {
     let tx = new Transaction();
     let index = Exchange.markets.getMarketIndex(market);
     let ix = await cancelOrderIx(
-      market,
+      index,
       this.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[index],
@@ -457,7 +457,7 @@ export class Client {
     let ixs = [];
     ixs.push(
       await cancelOrderIx(
-        market,
+        marketIndex,
         this.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
@@ -467,7 +467,7 @@ export class Client {
     );
     ixs.push(
       await placeOrderIx(
-        market,
+        marketIndex,
         newOrderPrice,
         newOrderSize,
         newOrderSide,
@@ -493,7 +493,7 @@ export class Client {
         cancelArguments[i].market
       );
       let ix = await cancelOrderIx(
-        cancelArguments[i].market,
+        marketIndex,
         this.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
@@ -556,7 +556,7 @@ export class Client {
     size: number
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let ix = await liquidateIx(
+    let ix = liquidateIx(
       this.publicKey,
       this._marginAccountAddress,
       market,
@@ -578,7 +578,7 @@ export class Client {
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
       let ix = await cancelOrderIx(
-        order.market,
+        order.marketIndex,
         this.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[order.marketIndex],

@@ -46,11 +46,11 @@ export enum Kind {
 }
 
 export function toProductKind(kind: Object): Kind {
-  if (Object.keys(kind).includes("call")) return Kind.CALL;
-  if (Object.keys(kind).includes("put")) return Kind.PUT;
-  if (Object.keys(kind).includes("future")) return Kind.FUTURE;
+  if (Object.keys(kind).includes(Kind.CALL)) return Kind.CALL;
+  if (Object.keys(kind).includes(Kind.PUT)) return Kind.PUT;
+  if (Object.keys(kind).includes(Kind.FUTURE)) return Kind.FUTURE;
   // We don't expect uninitialized.
-  throw "Invalid product type";
+  throw Error("Invalid product type");
 }
 
 export interface Order {
@@ -143,7 +143,7 @@ export interface MarginAccountState {
   availableBalance: number;
 }
 
-export interface CancelArgs{
+export interface CancelArgs {
   market: PublicKey;
   orderId: anchor.BN;
   cancelSide: Side;

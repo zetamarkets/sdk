@@ -28,12 +28,28 @@ import { exchange as Exchange } from "./exchange";
 import { Market } from "./market";
 import { OpenOrdersMap } from "./program-types";
 import { crankMarketIx } from "./program-instructions";
+import { Decimal } from "./decimal";
 
 export async function getState(
   programId: PublicKey
 ): Promise<[PublicKey, number]> {
   return await anchor.web3.PublicKey.findProgramAddress(
     [Buffer.from(anchor.utils.bytes.utf8.encode("state"))],
+    programId
+  );
+}
+
+export async function getMarketNode(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  marketIndex: number
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("market-node")),
+      zetaGroup.toBuffer(),
+      Buffer.from([marketIndex]),
+    ],
     programId
   );
 }
@@ -508,10 +524,16 @@ export async function processTransaction(
     return txSig;
   } catch (err) {
     let translatedErr = anchor.ProgramError.parse(err, idlErrors);
-    if (translatedErr === null) {
-      throw parseCustomError(err);
+    if (translatedErr !== null) {
+      throw translatedErr;
     }
-    throw translatedErr;
+
+    let customErr = parseCustomError(err);
+    if (customErr != null) {
+      throw customErr;
+    }
+
+    throw err;
   }
 }
 
@@ -584,6 +606,14 @@ export function getDirtySeriesIndices(): number[] {
   return dirtyIndices;
 }
 
+export function getGreeksIndex(marketIndex: number): number {
+  let expirySeries = Math.floor(marketIndex / constants.PRODUCTS_PER_EXPIRY);
+  let modIndex = marketIndex % constants.PRODUCTS_PER_EXPIRY;
+  return (
+    expirySeries * constants.NUM_STRIKES + (modIndex % constants.NUM_STRIKES)
+  );
+}
+
 export function displayState() {
   let orderedIndexes = [
     Exchange.zetaGroup.frontExpiryIndex,
@@ -593,16 +623,33 @@ export function displayState() {
   console.log(`[EXCHANGE] Display market state...`);
   for (var i = 0; i < orderedIndexes.length; i++) {
     let index = orderedIndexes[i];
+    let expirySeries = Exchange.markets.expirySeries[index];
     console.log(
       `Expiration @ ${new Date(
-        Exchange.markets.expirySeries[index].expiryTs * 1000
-      )}`
+        expirySeries.expiryTs * 1000
+      )} Live: ${expirySeries.isLive()}`
     );
     let markets = Exchange.markets.getMarketsByExpiryIndex(index);
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
+      let greeksIndex = getGreeksIndex(market.marketIndex);
+      let markPrice =
+        Exchange.greeks.markPrices[market.marketIndex].toNumber() / 10 ** 6;
+      let delta =
+        Exchange.greeks.productGreeks[greeksIndex].delta.toNumber() / 10 ** 12;
+      let sigma = Decimal.fromAnchorDecimal(
+        Exchange.greeks.productGreeks[greeksIndex].volatility
+      ).toNumber();
+
+      let vega = Decimal.fromAnchorDecimal(
+        Exchange.greeks.productGreeks[greeksIndex].vega
+      ).toNumber();
       console.log(
-        `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${market.strike}`
+        `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
+          market.strike
+        } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
+          2
+        )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
       );
     }
   }

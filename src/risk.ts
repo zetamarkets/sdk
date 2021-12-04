@@ -105,16 +105,12 @@ export class RiskCalculator {
       if (position.position > 0) {
         pnl +=
           position.position *
-            getReadableAmount(
-              Exchange.greeks.productGreeks[i].theo.toNumber()
-            ) -
+            getReadableAmount(Exchange.greeks.markPrices[i].toNumber()) -
           getReadableAmount(position.costOfTrades.toNumber());
       } else {
         pnl +=
           position.position *
-            getReadableAmount(
-              Exchange.greeks.productGreeks[i].theo.toNumber()
-            ) +
+            getReadableAmount(Exchange.greeks.markPrices[i].toNumber()) +
           getReadableAmount(position.costOfTrades.toNumber());
       }
     }
@@ -274,7 +270,7 @@ export function calculateProductMargin(
   let kind = market.kind;
   let strike = market.strike;
   let markPrice = getReadableAmount(
-    Exchange.greeks.productGreeks[productIndex].theo.toNumber()
+    Exchange.greeks.markPrices[productIndex].toNumber()
   );
   switch (kind) {
     case Kind.FUTURE:

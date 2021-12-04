@@ -56,6 +56,8 @@ export const DEFAULT_MARKET_POLL_INTERVAL = 5;
 export const DEFAULT_CLIENT_POLL_INTERVAL = 20;
 export const DEFAULT_CLIENT_TIMER_INTERVAL = 2;
 
+export const VOLATILITY_POINTS = 5;
+
 /**
  * markPricePercentageLong - Percentage of mark price for a long
  * spotPricePercentageLong = Percentage of spot price for a long

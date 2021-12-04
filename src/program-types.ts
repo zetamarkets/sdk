@@ -13,6 +13,7 @@ export interface State {
   expiryIntervalSeconds: number;
   newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
+  pricingFrequencySeconds: number;
   insuranceVaultLiquidationPercentage: number;
 }
 
@@ -31,13 +32,22 @@ export interface SettlementAccount {
   strikes: Array<anchor.BN>;
 }
 
+export interface PricingParameters {
+  optionTradeNormalizer: AnchorDecimal;
+  futureTradeNormalizer: AnchorDecimal;
+  maxVolatilityRetreat: AnchorDecimal;
+  maxInterestRetreat: AnchorDecimal;
+  minDelta: anchor.BN;
+  maxDelta: anchor.BN;
+}
+
 export interface ZetaGroup {
-  initialized: boolean;
   nonce: number;
   frontExpiryIndex: number;
   underlyingMint: PublicKey;
   oracle: PublicKey;
   greeks: PublicKey;
+  pricingParameters: PricingParameters;
   padding: Array<number>;
   products: Array<Product>;
   _productsPadding: Array<Product>;
@@ -93,16 +103,40 @@ export interface MarginAccount {
 
 export interface Greeks {
   nonce: number;
+  markPrices: Array<anchor.BN>;
+  _markPricesPadding: Array<anchor.BN>;
   productGreeks: Array<ProductGreeks>;
-  padding: Array<ProductGreeks>;
+  _productGreeksPadding: Array<ProductGreeks>;
+  updateTimestamp: Array<anchor.BN>;
+  _updateTimestampPadding: Array<anchor.BN>;
+  retreatExpirationTimestamp: Array<anchor.BN>;
+  _retreatExpirationTimestampPadding: Array<anchor.BN>;
+  interestRate: Array<anchor.BN>;
+  _interestRatePadding: Array<anchor.BN>;
+  nodes: Array<anchor.BN>;
+  volatility: Array<anchor.BN>;
+  _volatilityPadding: Array<anchor.BN>;
+  nodeKeys: Array<PublicKey>;
+}
+
+export interface MarketNode {
+  index: number;
+  nonce: number;
+  nodeUpdates: Array<anchor.BN>;
+  interestUpdate: anchor.BN;
+}
+
+export interface AnchorDecimal {
+  flags: number;
+  hi: number;
+  lo: number;
+  mid: number;
 }
 
 export interface ProductGreeks {
-  theo: anchor.BN;
-  delta: number;
-  gamma: number;
-  volatility: number;
-  updateTimestamp: anchor.BN;
+  delta: anchor.BN;
+  vega: AnchorDecimal;
+  volatility: AnchorDecimal;
 }
 
 export interface TradeEvent {
