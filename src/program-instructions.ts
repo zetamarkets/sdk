@@ -35,6 +35,31 @@ export async function initializeMarginAccountTx(
   return tx;
 }
 
+export async function initializeInsuranceDepositAccountIx(
+  userKey: PublicKey,
+  userWhitelistInsuranceKey: PublicKey
+): Promise<Transaction> {
+  let [insuranceDepositAccount, nonce] =
+    await utils.getUserInsuranceDepositAccount(
+      Exchange.programId,
+      Exchange.zetaGroupAddress,
+      userKey
+    );
+
+  return await Exchange.program.instruction.initializeInsuranceDepositAccount(
+    nonce,
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        insuranceDepositAccount,
+        authority: userKey,
+        systemProgram: SystemProgram.programId,
+        whitelistInsuranceAccount: userWhitelistInsuranceKey,
+      },
+    }
+  );
+}
+
 /**
  * @param amount the native amount to deposit (6dp)
  */
@@ -45,17 +70,83 @@ export async function depositIx(
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
   // TODO: Probably use mint to find decimal places in future.
+
+  let vaultAddress = await utils.createVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.vaultNonce
+  );
+
   return await Exchange.program.instruction.deposit(new anchor.BN(amount), {
     accounts: {
-      state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
       marginAccount: marginAccount,
-      vault: Exchange.vaultAddress,
+      vault: vaultAddress,
       userTokenAccount: usdcAccount,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
   });
+}
+
+/**
+ * @param amount
+ * @param insuranceDepositAccount
+ * @param usdcAccount
+ * @param userKey
+ */
+export async function depositInsuranceVaultIx(
+  amount: number,
+  insuranceDepositAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey
+): Promise<TransactionInstruction> {
+  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.insuranceVaultNonce
+  );
+
+  return await Exchange.program.instruction.depositInsuranceVault(
+    new anchor.BN(amount),
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        insuranceVault: insuranceVaultAddress,
+        insuranceDepositAccount,
+        userTokenAccount: usdcAccount,
+        authority: userKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    }
+  );
+}
+
+export async function withdrawInsuranceVaultIx(
+  percentageAmount: number,
+  insuranceDepositAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey
+): Promise<TransactionInstruction> {
+  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.insuranceVaultNonce
+  );
+
+  return await Exchange.program.instruction.withdrawInsuranceVault(
+    new anchor.BN(percentageAmount),
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        insuranceVault: insuranceVaultAddress,
+        insuranceDepositAccount,
+        userTokenAccount: usdcAccount,
+        authority: userKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    }
+  );
 }
 
 /**
@@ -67,11 +158,16 @@ export async function withdrawIx(
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
+  let vaultAddress = await utils.createVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.vaultNonce
+  );
+
   return await Exchange.program.instruction.withdraw(new anchor.BN(amount), {
     accounts: {
-      state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
-      vault: Exchange.vaultAddress,
+      vault: vaultAddress,
       marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
@@ -432,11 +528,23 @@ export async function initializeZetaGroupIx(
     Exchange.zetaGroupAddress
   );
 
+  let [vault, vaultNonce] = await utils.getVault(
+    Exchange.programId,
+    Exchange.zetaGroupAddress
+  );
+
+  let [insuranceVault, insuranceVaultNonce] = await utils.getZetaInsuranceVault(
+    Exchange.programId,
+    Exchange.zetaGroupAddress
+  );
+
   return await Exchange.program.instruction.initializeZetaGroup(
     {
       zetaGroupNonce,
       underlyingNonce,
       greeksNonce,
+      vaultNonce,
+      insuranceVaultNonce,
       interestRate: args.interestRate,
       volatility: args.volatility,
       optionTradeNormalizer: args.optionTradeNormalizer,
@@ -453,14 +561,44 @@ export async function initializeZetaGroupIx(
         systemProgram: SystemProgram.programId,
         underlyingMint,
         zetaProgram: Exchange.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
         oracle,
         zetaGroup,
         greeks,
         underlying,
+        vault,
+        insuranceVault,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        usdcMint: Exchange.usdcMintAddress,
+        rent: SYSVAR_RENT_PUBKEY,
       },
     }
   );
+}
+
+export async function rebalanceInsuranceVaultIx(
+  remainingAccounts: any[]
+): Promise<TransactionInstruction> {
+  let vaultAddress = await utils.createVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.vaultNonce
+  );
+
+  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
+    Exchange.programId,
+    Exchange.zetaGroupAddress,
+    Exchange.zetaGroup.insuranceVaultNonce
+  );
+
+  return await Exchange.program.instruction.rebalanceInsuranceVault({
+    accounts: {
+      zetaGroup: Exchange.zetaGroupAddress,
+      zetaVault: vaultAddress,
+      insuranceVault: insuranceVaultAddress,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    },
+    remainingAccounts,
+  });
 }
 
 export async function liquidateIx(
@@ -472,6 +610,7 @@ export async function liquidateIx(
 ): Promise<TransactionInstruction> {
   return await Exchange.program.instruction.liquidate(new anchor.BN(size), {
     accounts: {
+      state: Exchange.stateAddress,
       liquidator,
       liquidatorMarginAccount,
       greeks: Exchange.zetaGroup.greeks,
@@ -592,4 +731,5 @@ export type StateParams = {
   readonly newExpiryThresholdSeconds: number;
   readonly strikeInitializationThresholdSeconds: number;
   readonly pricingFrequencySeconds: number;
+  readonly insuranceVaultLiquidationPercentage: number;
 };

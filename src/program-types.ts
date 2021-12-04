@@ -14,6 +14,7 @@ export interface State {
   newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
+  insuranceVaultLiquidationPercentage: number;
 }
 
 export interface MarketIndexes {
@@ -52,6 +53,9 @@ export interface ZetaGroup {
   _productsPadding: Array<Product>;
   expirySeries: Array<ExpirySeries>;
   _expirySeriesPadding: Array<ExpirySeries>;
+  vaultNonce: number;
+  insuranceVaultNonce: number;
+  totalInsuranceVaultDeposits: anchor.BN;
 }
 
 export interface Product {
@@ -93,6 +97,8 @@ export interface MarginAccount {
   seriesExpiry: Array<anchor.BN>;
   positions: Array<Position>;
   _positionsPadding: Array<Position>;
+
+  rebalanceAmount: anchor.BN;
 }
 
 export interface Greeks {
@@ -139,4 +145,13 @@ export interface TradeEvent {
   price: anchor.BN;
   size: number;
   isBid: boolean;
+}
+
+export interface InsuranceDepositAccount {
+  amount: anchor.BN;
+  nonce: number;
+}
+
+export interface WhitelistInsuranceAccount {
+  nonce: number;
 }

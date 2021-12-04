@@ -132,10 +132,29 @@ export async function getMintAuthority(
 }
 
 export async function getVault(
-  programId: PublicKey
+  programId: PublicKey,
+  zetaGroup: PublicKey
 ): Promise<[PublicKey, number]> {
   return await anchor.web3.PublicKey.findProgramAddress(
-    [Buffer.from(anchor.utils.bytes.utf8.encode("vault"))],
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("vault")),
+      zetaGroup.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function createVaultAddress(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  vaultNonce: number
+): Promise<PublicKey> {
+  return await anchor.web3.PublicKey.createProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("vault")),
+      zetaGroup.toBuffer(),
+      Buffer.from([vaultNonce]),
+    ],
     programId
   );
 }
@@ -161,6 +180,62 @@ export async function getZetaVault(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-vault")),
       mint.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function getZetaInsuranceVault(
+  programId: PublicKey,
+  zetaGroup: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("zeta-insurance-vault")),
+      zetaGroup.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function createZetaInsuranceVaultAddress(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  insuranceVaultNonce: number
+): Promise<PublicKey> {
+  return await anchor.web3.PublicKey.createProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("zeta-insurance-vault")),
+      zetaGroup.toBuffer(),
+      Buffer.from([insuranceVaultNonce]),
+    ],
+    programId
+  );
+}
+
+export async function getUserInsuranceDepositAccount(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("user-insurance-deposit")),
+      zetaGroup.toBuffer(),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function getUserWhitelistInsuranceAccount(
+  programId: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("whitelist")),
+      userKey.toBuffer(),
     ],
     programId
   );

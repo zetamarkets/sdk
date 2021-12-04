@@ -1,6 +1,7 @@
 // Singleton
 import { exchange as Exchange } from "./exchange";
 import { Client } from "./client";
+import { InsuranceClient } from "./insurance-client";
 import { Network } from "./network";
 import { Decimal } from "./decimal";
 import { idlErrors as Errors } from "./errors";
@@ -24,6 +25,7 @@ export {
   Client,
   Decimal,
   instructions,
+  InsuranceClient,
   Network,
   Errors,
   Oracle,

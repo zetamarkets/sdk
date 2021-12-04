@@ -37,6 +37,7 @@ import {
   updateVolatilityNodesIx,
   UpdatePricingParameterArgs,
   StateParams,
+  rebalanceInsuranceVaultIx,
 } from "./program-instructions";
 
 export class Exchange {
@@ -112,14 +113,6 @@ export class Exchange {
     return this._zetaGroupAddress;
   }
   private _zetaGroupAddress: PublicKey;
-
-  /**
-   * Address of global vault token account.
-   */
-  public get vaultAddress(): PublicKey {
-    return this._vaultAddress;
-  }
-  private _vaultAddress: PublicKey;
 
   /**
    * Zeta PDA for serum market authority
@@ -264,12 +257,10 @@ export class Exchange {
     const [serumAuthority, serumNonce] = await utils.getSerumAuthority(
       programId
     );
-    const [vault, vaultNonce] = await utils.getVault(programId);
 
     await exchange.program.rpc.initializeZetaState(
       {
         stateNonce: stateNonce,
-        vaultNonce: vaultNonce,
         serumNonce: serumNonce,
         mintAuthNonce: mintAuthorityNonce,
         expiryIntervalSeconds: params.expiryIntervalSeconds,
@@ -277,11 +268,12 @@ export class Exchange {
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
         pricingFrequencySeconds: params.pricingFrequencySeconds,
+        insuranceVaultLiquidationPercentage:
+          params.insuranceVaultLiquidationPercentage,
       },
       {
         accounts: {
           state,
-          vault,
           serumAuthority,
           mintAuthority,
           mint: usdcMint,
@@ -294,7 +286,6 @@ export class Exchange {
     );
 
     exchange._stateAddress = state;
-    exchange._vaultAddress = vault;
     exchange._serumAuthority = serumAuthority;
     exchange._mintAuthority = mintAuthority;
     exchange._usdcMintAddress = usdcMint;
@@ -305,7 +296,9 @@ export class Exchange {
       `Params:
 expiryIntervalSeconds=${params.expiryIntervalSeconds},
 newExpiryThresholdSeconds=${params.newExpiryThresholdSeconds},
-strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}`
+strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}
+pricingFrequencySeconds=${params.pricingFrequencySeconds}
+insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage}`
     );
   }
 
@@ -338,14 +331,10 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
     const [serumAuthority, _serumNonce] = await utils.getSerumAuthority(
       programId
     );
-    const [vault, _vaultNonce] = await utils.getVault(programId);
-    let usdcMint = await utils.getTokenMint(this.connection, vault);
 
     exchange._mintAuthority = mintAuthority;
     exchange._stateAddress = state;
-    exchange._vaultAddress = vault;
     exchange._serumAuthority = serumAuthority;
-    exchange._usdcMintAddress = usdcMint;
 
     // Load zeta group.
     // TODO: Use constants since we only have 1 underlying for now.
@@ -366,6 +355,14 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
 
     await exchange.updateState();
     await exchange.updateZetaGroup();
+
+    let vaultAddress = await utils.createVaultAddress(
+      exchange.programId,
+      exchange.zetaGroupAddress,
+      exchange.zetaGroup.vaultNonce
+    );
+    let usdcMint = await utils.getTokenMint(this.connection, vaultAddress);
+    exchange._usdcMintAddress = usdcMint;
 
     if (
       exchange.zetaGroup.products[
@@ -466,6 +463,8 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
         strikeInitializationThresholdSeconds:
           params.strikeInitializationThresholdSeconds,
         pricingFrequencySeconds: params.pricingFrequencySeconds,
+        insuranceVaultLiquidationPercentage:
+          params.insuranceVaultLiquidationPercentage,
       },
       {
         accounts: {
@@ -734,6 +733,58 @@ strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSecon
    */
   public getMarkPrice(index: number): number {
     return utils.getReadableAmount(this._greeks.markPrices[index].toNumber());
+  }
+
+  /**
+   * @param user user pubkey to be whitelisted for our insurance vault
+   */
+  public async whitelistUserForInsuranceVault(user: PublicKey) {
+    let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
+      await utils.getUserWhitelistInsuranceAccount(
+        this.program.programId,
+        user
+      );
+
+    await this._program.rpc.initializeWhitelistInsuranceAccount(
+      whitelistInsuranceNonce,
+      {
+        accounts: {
+          whitelistInsuranceAccount,
+          admin: this._provider.wallet.publicKey,
+          user,
+          systemProgram: SystemProgram.programId,
+          state: this._stateAddress,
+        },
+      }
+    );
+  }
+
+  /**
+   *
+   * @param marginAccounts an array of remaining accounts (margin accounts) that will be rebalanced
+   */
+  public async rebalanceInsuranceVault(marginAccounts: any[]) {
+    let txs = [];
+    for (
+      var i = 0;
+      i < marginAccounts.length;
+      i += constants.MAX_REBALANCE_ACCOUNTS
+    ) {
+      let tx = new Transaction();
+      let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
+      tx.add(await rebalanceInsuranceVaultIx(slice));
+      txs.push(tx);
+    }
+    try {
+      await Promise.all(
+        txs.map(async (tx) => {
+          let txSig = await utils.processTransaction(this._provider, tx);
+          console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
+        })
+      );
+    } catch (e) {
+      console.log(`Error in rebalancing the insurance vault ${e}`);
+    }
   }
 
   /**

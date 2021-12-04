@@ -181,11 +181,12 @@ export class Client {
   ): Promise<Client> {
     console.log(`Loading client: ${wallet.publicKey.toString()}`);
     let client = new Client(connection, wallet, opts);
-    let [marginAccountAddress, _nonce] = await utils.getMarginAccount(
-      Exchange.programId,
-      Exchange.zetaGroupAddress,
-      wallet.publicKey
-    );
+    let [marginAccountAddress, _marginAccountNonce] =
+      await utils.getMarginAccount(
+        Exchange.programId,
+        Exchange.zetaGroupAddress,
+        wallet.publicKey
+      );
     client._marginAccountAddress = marginAccountAddress;
 
     client._eventEmitter = client._program.account.marginAccount.subscribe(
@@ -311,21 +312,7 @@ export class Client {
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
     // Check if the user has a USDC account.
-    try {
-      let tokenAccountInfo = await utils.getTokenAccountInfo(
-        this._provider.connection,
-        this._usdcAccountAddress
-      );
-      console.log(
-        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.getReadableAmount(
-          tokenAccountInfo.amount.toNumber()
-        )}.`
-      );
-    } catch (e) {
-      throw Error(
-        "User has no USDC associated token account. Please create one and deposit USDC."
-      );
-    }
+    await this.usdcAccountCheck();
 
     let tx = new Transaction();
     if (this._marginAccount === null) {
@@ -655,6 +642,24 @@ export class Client {
       }
     }
     this._positions = positions;
+  }
+
+  private async usdcAccountCheck() {
+    try {
+      let tokenAccountInfo = await utils.getTokenAccountInfo(
+        this._provider.connection,
+        this._usdcAccountAddress
+      );
+      console.log(
+        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.getReadableAmount(
+          tokenAccountInfo.amount.toNumber()
+        )}.`
+      );
+    } catch (e) {
+      throw Error(
+        "User has no USDC associated token account. Please create one and deposit USDC."
+      );
+    }
   }
 
   /**
