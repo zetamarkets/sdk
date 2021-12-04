@@ -556,7 +556,7 @@ export class Client {
     size: number
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let ix = await liquidateIx(
+    let ix = liquidateIx(
       this.publicKey,
       this._marginAccountAddress,
       market,

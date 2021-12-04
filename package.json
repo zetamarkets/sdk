@@ -1,7 +1,7 @@
 {
   "name": "@zetamarkets/sdk",
   "repository": "https://github.com/zetamarkets/sdk/",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Zeta SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
     "build": "rm -rf dist/ && tsc"
   },
   "dependencies": {
-    "@project-serum/anchor": "0.17.0",
+    "@project-serum/anchor": "0.18.2",
     "@project-serum/serum": "0.13.55",
     "@solana/spl-token": "0.1.6",
     "@solana/web3.js": "1.18.0",

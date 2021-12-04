@@ -480,7 +480,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * Update the pricing parameters for a zeta group.
    */
   public async updatePricingParameters(args: UpdatePricingParameterArgs) {
-    let tx = new Transaction().add(await updatePricingParametersIx(args));
+    let tx = new Transaction().add(updatePricingParametersIx(args));
     await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
   }
@@ -494,7 +494,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
       );
     }
-    let tx = new Transaction().add(await updateVolatilityNodesIx(nodes));
+    let tx = new Transaction().add(updateVolatilityNodesIx(nodes));
     await utils.processTransaction(this._provider, tx);
   }
 
@@ -610,7 +610,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * Update pricing for an expiry index.
    */
   public async updatePricing(expiryIndex: number) {
-    let tx = new Transaction().add(await updatePricingIx(expiryIndex));
+    let tx = new Transaction().add(updatePricingIx(expiryIndex));
     await utils.processTransaction(this._provider, tx);
   }
 
@@ -618,7 +618,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * Retreat volatility surface and interest rates for an expiry index.
    */
   public async retreatMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(await retreatMarketNodesIx(expiryIndex));
+    let tx = new Transaction().add(retreatMarketNodesIx(expiryIndex));
     await utils.processTransaction(this._provider, tx);
   }
 
