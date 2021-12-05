@@ -324,13 +324,13 @@ export async function cancelExpiredOrderIx(
   );
 }
 
-export async function forceCancelOrdersIx(
+export function forceCancelOrdersIx(
   market: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.getMarket(market);
-  return await Exchange.program.instruction.forceCancelOrders({
+  return Exchange.program.instruction.forceCancelOrders({
     accounts: {
       greeks: Exchange.zetaGroup.greeks,
       oracle: Exchange.zetaGroup.oracle,

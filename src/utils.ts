@@ -824,17 +824,13 @@ export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
       i + constants.MAX_SETTLEMENT_ACCOUNTS
     );
     tx.add(
-      await Exchange.program.instruction.settlePositions(
-        expiryTs,
-        settlementNonce,
-        {
-          accounts: {
-            zetaGroup: Exchange.zetaGroupAddress,
-            settlementAccount: settlement,
-          },
-          remainingAccounts: slice,
-        }
-      )
+      Exchange.program.instruction.settlePositions(expiryTs, settlementNonce, {
+        accounts: {
+          zetaGroup: Exchange.zetaGroupAddress,
+          settlementAccount: settlement,
+        },
+        remainingAccounts: slice,
+      })
     );
     txs.push(tx);
   }
@@ -849,7 +845,7 @@ export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
 
 export async function crankMarket(market: Market, remainingAccounts: any[]) {
   let tx = new Transaction().add(
-    await crankMarketIx(
+    crankMarketIx(
       market.address,
       market.serumMarket.decoded.eventQueue,
       constants.DEX_PID,

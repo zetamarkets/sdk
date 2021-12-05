@@ -535,7 +535,7 @@ export class Client {
     );
 
     let tx = new Transaction();
-    let ix = await forceCancelOrdersIx(
+    let ix = forceCancelOrdersIx(
       market,
       marginAccountToCancel,
       openOrdersAccountToCancel
