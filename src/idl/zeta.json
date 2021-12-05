@@ -2824,8 +2824,5 @@
       "name": "InvalidWithdrawAmount",
       "msg": "Invalid withdraw amount"
     }
-  ],
-  "metadata": {
-    "address": "25vRAEHB3k3viVFLuiF8jKwqqq9mC2hALMDic9YMXZLq"
-  }
+  ]
 }
