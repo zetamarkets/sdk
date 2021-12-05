@@ -407,16 +407,24 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
   return keys.sort((a, b) => a.toBuffer().compare(b.toBuffer()));
 }
 
-// Converts from int/float to native fixed point integer.
+/**
+ * Converts a decimal number to native fixed point integer of precision 6.
+ */
 export function convertDecimalToNativeInteger(amount: number): number {
   return Math.floor(amount * Math.pow(10, constants.PLATFORM_PRECISION));
 }
 
-// Converts from native fixed point number to normal decimal number.
+/**
+ * Converts a native fixed point integer of precision 6 to decimal.
+ */
 export function convertNativeIntegerToDecimal(amount: number): number {
   return amount / Math.pow(10, constants.PLATFORM_PRECISION);
 }
 
+/**
+ * Converts a program BN to a decimal number.
+ * @param pricing   whether the BN you are converting is a pricing BN - defaults to false.
+ */
 export function convertNativeBNToDecimal(
   number: anchor.BN,
   pricing = false

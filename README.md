@@ -56,16 +56,27 @@ As such - there are 23 markets per expiry
 
 We are on weekly expiries.
 
-Native numbers are represented with BN to the precision of 6 d.p as u64 in the smart contract code.
+Native numbers are represented with BN to the precision of 6 d.p as u64 integers in the smart contract code.
 
 They will need to be divided by 10^6 to get the decimal value.
+
+Use our helper functions in `src/utils.ts` to convert.
 
 ```ts
 // A variable of type BN (big number)
 let balance: BN = client.marginAccount.balance;
 
 // If you had deposited $10,000 USDC
-balance.toNumber(); // == 100_000_000;
+balance.toNumber(); // == 10_000_000_000
+
+// Convert decimal number to native fixed point.
+utils.convertDecimalToNativeInteger(10_000); // == 10_000_000_000;
+
+// Convert native integer to decimal.
+utils.convertNativeIntegerToDecimal(balance.ToNumber()); // == 10_000
+
+// Convert native BN to decimal.
+utils.convertNativeBNToDecimal(balance); // == 10_000
 ```
 
 ## Install
