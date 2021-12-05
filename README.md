@@ -333,7 +333,7 @@ console.log(client.positions);
       _bn: <BN: 94cce37bd47128c757766685f012cac541a534ba9ed59e6bf05cd004eae1ae5>
     },
     position: 1,
-    costOfTrades: 9530000 // 6 d.p, so $9.53
+    costOfTrades: 9.53 // 6 d.p, so $9.53
   }
 ]
 `;
