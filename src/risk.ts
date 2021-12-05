@@ -1,4 +1,5 @@
 import { exchange as Exchange } from "./exchange";
+import { BN } from "@project-serum/anchor";
 import {
   Kind,
   MarginType,
@@ -8,7 +9,7 @@ import {
 import { ACTIVE_MARKETS } from "./constants";
 import { MarginAccount } from "./program-types";
 import { FUTURES_MARGIN_PARAMS, OPTION_MARGIN_PARAMS } from "./constants";
-import { getReadableAmount } from "./utils";
+import { convertNativeBNToDecimal } from "./utils";
 
 export class RiskCalculator {
   /**
@@ -105,13 +106,13 @@ export class RiskCalculator {
       if (position.position > 0) {
         pnl +=
           position.position *
-            getReadableAmount(Exchange.greeks.markPrices[i].toNumber()) -
-          getReadableAmount(position.costOfTrades.toNumber());
+            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) -
+          convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
           position.position *
-            getReadableAmount(Exchange.greeks.markPrices[i].toNumber()) +
-          getReadableAmount(position.costOfTrades.toNumber());
+            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
+          convertNativeBNToDecimal(position.costOfTrades);
       }
     }
     return pnl;
@@ -190,7 +191,7 @@ export class RiskCalculator {
   public getMarginAccountState(
     marginAccount: MarginAccount
   ): MarginAccountState {
-    let balance = getReadableAmount(marginAccount.balance.toNumber());
+    let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
@@ -269,9 +270,9 @@ export function calculateProductMargin(
   }
   let kind = market.kind;
   let strike = market.strike;
-  let markPrice = getReadableAmount(
-    Exchange.greeks.markPrices[productIndex].toNumber()
-  );
+  let markPrice = Exchange.greeks.markPrices[productIndex]
+    .div(new BN(10 ** 6))
+    .toNumber();
   switch (kind) {
     case Kind.FUTURE:
       return calculateFutureMargin(spotPrice);

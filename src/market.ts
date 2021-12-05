@@ -18,13 +18,13 @@ import {
 } from "./constants";
 import {
   getZetaVault,
-  getReadableAmount,
   sortOpenOrderKeys,
   getOpenOrdersMap,
   getMarginAccount,
   processTransaction,
   getPriceFromSerumOrderKey,
   sleep,
+  convertNativeBNToDecimal,
 } from "./utils";
 import { crankMarketIx, cancelExpiredOrderIx } from "./program-instructions";
 import {
@@ -430,7 +430,7 @@ export class Market {
     if (!strike.isSet) {
       this._strike = null;
     } else {
-      this._strike = getReadableAmount(strike.value.toNumber());
+      this._strike = convertNativeBNToDecimal(strike.value);
     }
   }
 

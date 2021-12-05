@@ -58,6 +58,10 @@ export const DEFAULT_CLIENT_TIMER_INTERVAL = 2;
 
 export const VOLATILITY_POINTS = 5;
 
+// Numbers represented in BN are generally fixed point integers with precision of 6.
+export const PLATFORM_PRECISION = 6;
+export const PRICING_PRECISION = 12;
+
 /**
  * markPricePercentageLong - Percentage of mark price for a long
  * spotPricePercentageLong = Percentage of spot price for a long

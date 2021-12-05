@@ -188,7 +188,7 @@ const client = await Client.load(
 );
 
 // This will create a margin account on first deposit.
-await client.deposit(utils.getNativeAmount(10_000));
+await client.deposit(utils.convertDecimalToNativeInteger(10_000));
 ```
 
 Structure
@@ -244,8 +244,8 @@ Placing an order.
 
 ```ts
 // We need to convert price to the native spl token amount (6.dp)
-// utils.getNativeAmount(8) == (8*10^6)
-const orderPrice = utils.getNativeAmount(8);
+// utils.convertDecimalToNativeInteger(8) == (8*10^6)
+const orderPrice = utils.convertDecimalToNativeInteger(8);
 const orderLots = 1;
 
 // Place a bid order.
@@ -304,7 +304,7 @@ Place bid order in cross to get a position (Best ask was 9.53)
 // Place an order in cross with offers to get a position.
 await client.placeOrder(
   Exchange.markets.markets[index].address,
-  utils.getNativeAmount(10),
+  utils.convertDecimalToNativeInteger(10),
   orderLots,
   types.Side.BID
 );

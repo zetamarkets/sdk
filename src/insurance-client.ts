@@ -159,7 +159,7 @@ export class InsuranceClient {
     );
     let txId = await utils.processTransaction(this._provider, tx);
     console.log(
-      `[DEPOSIT INSURANCE VAULT] $${utils.getReadableAmount(
+      `[DEPOSIT INSURANCE VAULT] $${utils.convertNativeIntegerToDecimal(
         amount
       )}. Transaction: ${txId}`
     );
@@ -222,8 +222,8 @@ export class InsuranceClient {
         this._usdcAccountAddress
       );
       console.log(
-        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.getReadableAmount(
-          tokenAccountInfo.amount.toNumber()
+        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.convertNativeBNToDecimal(
+          tokenAccountInfo.amount
         )}.`
       );
     } catch (e) {

@@ -329,7 +329,9 @@ export class Client {
     );
     let txId = await utils.processTransaction(this._provider, tx);
     console.log(
-      `[DEPOSIT] $${utils.getReadableAmount(amount)}. Transaction: ${txId}`
+      `[DEPOSIT] $${utils.convertNativeIntegerToDecimal(
+        amount
+      )}. Transaction: ${txId}`
     );
     return txId;
   }
@@ -636,8 +638,9 @@ export class Client {
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
           position: this._marginAccount.positions[i].position,
-          costOfTrades:
-            this._marginAccount.positions[i].costOfTrades.toNumber(),
+          costOfTrades: utils.convertNativeBNToDecimal(
+            this._marginAccount.positions[i].costOfTrades
+          ),
         });
       }
     }
@@ -651,8 +654,8 @@ export class Client {
         this._usdcAccountAddress
       );
       console.log(
-        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.getReadableAmount(
-          tokenAccountInfo.amount.toNumber()
+        `Found user USDC associated token account ${this._usdcAccountAddress.toString()}. Balance = $${utils.convertNativeBNToDecimal(
+          tokenAccountInfo.amount
         )}.`
       );
     } catch (e) {

@@ -56,7 +56,7 @@ async function main() {
     undefined
   );
 
-  await client.deposit(utils.getNativeAmount(STARTING_BALANCE));
+  await client.deposit(utils.convertDecimalToNativeInteger(STARTING_BALANCE));
 
   // Display existing exchange state.
   utils.displayState();
@@ -68,7 +68,7 @@ async function main() {
   await Exchange.markets.markets[index].updateOrderbook();
   console.log(Exchange.markets.markets[index].orderbook);
 
-  const orderPrice = utils.getNativeAmount(8);
+  const orderPrice = utils.convertDecimalToNativeInteger(8);
   const orderLots = 1;
 
   // Place a bid order.
@@ -91,7 +91,7 @@ async function main() {
   // Place an order in cross with offers to get a position.
   await client.placeOrder(
     Exchange.markets.markets[index].address,
-    utils.getNativeAmount(10),
+    utils.convertDecimalToNativeInteger(10),
     orderLots,
     types.Side.BID
   );
