@@ -407,14 +407,39 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
   return keys.sort((a, b) => a.toBuffer().compare(b.toBuffer()));
 }
 
-// Converts from int/float to native fixed point number.
-export function getNativeAmount(amount: number): number {
-  return Math.floor(amount * Math.pow(10, 6));
+/**
+ * Converts a decimal number to native fixed point integer of precision 6.
+ */
+export function convertDecimalToNativeInteger(amount: number): number {
+  return Math.floor(amount * Math.pow(10, constants.PLATFORM_PRECISION));
 }
 
-// Converts from native fixed point number to normal decimal number.
-export function getReadableAmount(amount: number): number {
-  return amount / Math.pow(10, 6);
+/**
+ * Converts a native fixed point integer of precision 6 to decimal.
+ */
+export function convertNativeIntegerToDecimal(amount: number): number {
+  return amount / Math.pow(10, constants.PLATFORM_PRECISION);
+}
+
+/**
+ * Converts a program BN to a decimal number.
+ * @param pricing   whether the BN you are converting is a pricing BN - defaults to false.
+ */
+export function convertNativeBNToDecimal(
+  number: anchor.BN,
+  pricing = false
+): number {
+  // Note 53 bits - max number is slightly larger than 9 * 10 ^ 9 with decimals.
+  let precision = pricing
+    ? new anchor.BN(Math.pow(10, constants.PRICING_PRECISION))
+    : new anchor.BN(Math.pow(10, constants.PLATFORM_PRECISION));
+
+  return (
+    // Integer
+    number.div(precision).toNumber() +
+    // Decimal
+    number.mod(precision).toNumber() / precision.toNumber()
+  );
 }
 
 export async function getTokenMint(
@@ -606,6 +631,9 @@ export function getDirtySeriesIndices(): number[] {
   return dirtyIndices;
 }
 
+/**
+ * Given a market index, return the index to access the greeks.productGreeks.
+ */
 export function getGreeksIndex(marketIndex: number): number {
   let expirySeries = Math.floor(marketIndex / constants.PRODUCTS_PER_EXPIRY);
   let modIndex = marketIndex % constants.PRODUCTS_PER_EXPIRY;
@@ -633,10 +661,14 @@ export function displayState() {
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
       let greeksIndex = getGreeksIndex(market.marketIndex);
-      let markPrice =
-        Exchange.greeks.markPrices[market.marketIndex].toNumber() / 10 ** 6;
-      let delta =
-        Exchange.greeks.productGreeks[greeksIndex].delta.toNumber() / 10 ** 12;
+      let markPrice = convertNativeBNToDecimal(
+        Exchange.greeks.markPrices[market.marketIndex]
+      );
+      let delta = convertNativeBNToDecimal(
+        Exchange.greeks.productGreeks[greeksIndex].delta,
+        true
+      );
+
       let sigma = Decimal.fromAnchorDecimal(
         Exchange.greeks.productGreeks[greeksIndex].volatility
       ).toNumber();
@@ -644,6 +676,7 @@ export function displayState() {
       let vega = Decimal.fromAnchorDecimal(
         Exchange.greeks.productGreeks[greeksIndex].vega
       ).toNumber();
+
       console.log(
         `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
           market.strike

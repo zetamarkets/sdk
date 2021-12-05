@@ -258,32 +258,36 @@ export class Exchange {
       programId
     );
 
-    await exchange.program.rpc.initializeZetaState(
-      {
-        stateNonce: stateNonce,
-        serumNonce: serumNonce,
-        mintAuthNonce: mintAuthorityNonce,
-        expiryIntervalSeconds: params.expiryIntervalSeconds,
-        newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
-        strikeInitializationThresholdSeconds:
-          params.strikeInitializationThresholdSeconds,
-        pricingFrequencySeconds: params.pricingFrequencySeconds,
-        insuranceVaultLiquidationPercentage:
-          params.insuranceVaultLiquidationPercentage,
-      },
-      {
-        accounts: {
-          state,
-          serumAuthority,
-          mintAuthority,
-          mint: usdcMint,
-          rent: SYSVAR_RENT_PUBKEY,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          admin: wallet.publicKey,
+    try {
+      await exchange.program.rpc.initializeZetaState(
+        {
+          stateNonce: stateNonce,
+          serumNonce: serumNonce,
+          mintAuthNonce: mintAuthorityNonce,
+          expiryIntervalSeconds: params.expiryIntervalSeconds,
+          newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
+          strikeInitializationThresholdSeconds:
+            params.strikeInitializationThresholdSeconds,
+          pricingFrequencySeconds: params.pricingFrequencySeconds,
+          insuranceVaultLiquidationPercentage:
+            params.insuranceVaultLiquidationPercentage,
         },
-      }
-    );
+        {
+          accounts: {
+            state,
+            serumAuthority,
+            mintAuthority,
+            mint: usdcMint,
+            rent: SYSVAR_RENT_PUBKEY,
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            admin: wallet.publicKey,
+          },
+        }
+      );
+    } catch (e) {
+      console.error(`Initialize zeta state failed: ${e}`);
+    }
 
     exchange._stateAddress = state;
     exchange._serumAuthority = serumAuthority;
@@ -419,8 +423,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     args: InitializeZetaGroupPricingArgs,
     callback?: (type: EventType, data: any) => void
   ) {
-    let underlyingIndex = this.state.numUnderlyings;
-    let underlyingMint = constants.UNDERLYINGS[underlyingIndex];
+    // TODO fix to be dynamic once we support more than 1 underlying.
+    // TODO if deployment breaks midway, this won't necessarily represent the index you want to initialize.
+    // let underlyingIndex = this.state.numUnderlyings;
+    let underlyingMint = constants.UNDERLYINGS[0];
 
     const [zetaGroup, _zetaGroupNonce] = await utils.getZetaGroup(
       this.program.programId,
@@ -437,7 +443,11 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     let tx = new Transaction().add(
       await initializeZetaGroupIx(underlyingMint, oracle, args)
     );
-    await utils.processTransaction(this._provider, tx);
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`Initialize zeta group failed: ${e}`);
+    }
 
     await this.updateZetaGroup();
     await this.updateState();
@@ -510,15 +520,19 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
 
     console.log("Initializing market indexes.");
 
-    await this.program.rpc.initializeMarketIndexes(marketIndexesNonce, {
-      accounts: {
-        state: this._stateAddress,
-        marketIndexes,
-        admin: this._provider.wallet.publicKey,
-        systemProgram: SystemProgram.programId,
-        zetaGroup: this._zetaGroupAddress,
-      },
-    });
+    try {
+      await this.program.rpc.initializeMarketIndexes(marketIndexesNonce, {
+        accounts: {
+          state: this._stateAddress,
+          marketIndexes,
+          admin: this._provider.wallet.publicKey,
+          systemProgram: SystemProgram.programId,
+          zetaGroup: this._zetaGroupAddress,
+        },
+      });
+    } catch (e) {
+      console.error(`Initialize market indexes failed: ${e}`);
+    }
 
     // We initialize 50 indexes at a time in the program.
     for (
@@ -526,12 +540,16 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       i < constants.TOTAL_MARKETS;
       i += constants.MARKET_INDEX_LIMIT
     ) {
-      await this._program.rpc.addMarketIndexes({
-        accounts: {
-          marketIndexes,
-          zetaGroup: this._zetaGroupAddress,
-        },
-      });
+      try {
+        await this._program.rpc.addMarketIndexes({
+          accounts: {
+            marketIndexes,
+            zetaGroup: this._zetaGroupAddress,
+          },
+        });
+      } catch (e) {
+        console.error(`Add market indexes failed: ${e}`);
+      }
     }
 
     let marketIndexesAccount = (await this._program.account.marketIndexes.fetch(
@@ -563,8 +581,38 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
           asks.publicKey,
           marketIndexes
         );
-        await this.provider.send(tx, [requestQueue, eventQueue, bids, asks]);
-        await this.provider.send(tx2);
+
+        let initialized = false;
+        if (this.network != Network.LOCALNET) {
+          // Validate that the market hasn't already been initialized
+          // So no sol is wasted on unnecessary accounts.
+          const [market, marketNonce] = await utils.getMarketUninitialized(
+            this.programId,
+            this._zetaGroupAddress,
+            marketIndexesAccount.indexes[i]
+          );
+
+          let info = await this.provider.connection.getAccountInfo(market);
+          if (info !== null) {
+            initialized = true;
+          }
+        }
+
+        if (initialized) {
+          console.log(`Market ${i} already initialized. Skipping...`);
+        } else {
+          try {
+            await this.provider.send(tx, [
+              requestQueue,
+              eventQueue,
+              bids,
+              asks,
+            ]);
+            await this.provider.send(tx2);
+          } catch (e) {
+            console.error(`Initialize zeta market ${i} failed: ${e}`);
+          }
+        }
       })
     );
 
@@ -706,7 +754,9 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       if (callback !== undefined) {
         callback(EventType.ORACLE, price);
       }
-      this._riskCalculator.updateMarginRequirements();
+      if (this._isInitialized) {
+        this._riskCalculator.updateMarginRequirements();
+      }
     });
   }
 
@@ -732,7 +782,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    return utils.getReadableAmount(this._greeks.markPrices[index].toNumber());
+    return utils.convertNativeBNToDecimal(this._greeks.markPrices[index]);
   }
 
   /**
