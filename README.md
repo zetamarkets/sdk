@@ -550,15 +550,15 @@ If `throttle` is set to `true`, in `Client.load`, then this timer allows users t
 
 Alternatively, `throttle` can be set to `false`, and `client.updateState` will be called on every margin account change and ensure you have the latest state at all times.
 
-### Shutting down.
+### Shutting down
 
 When you want to shut down or restart the client, call this to disconnect the respective websockets.
 
 ```ts
-// Close `Exchange`.
+// Close exchange object.
 await Exchange.close();
 
-// Close `Client`.
+// Close client object.
 await client.close();
 ```
 
