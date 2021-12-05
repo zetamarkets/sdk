@@ -631,6 +631,9 @@ export function getDirtySeriesIndices(): number[] {
   return dirtyIndices;
 }
 
+/**
+ * Given a market index, return the index to access the greeks.productGreeks.
+ */
 export function getGreeksIndex(marketIndex: number): number {
   let expirySeries = Math.floor(marketIndex / constants.PRODUCTS_PER_EXPIRY);
   let modIndex = marketIndex % constants.PRODUCTS_PER_EXPIRY;
