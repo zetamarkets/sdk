@@ -7,7 +7,6 @@ Version changes are pinned to SDK releases.
 
 ## [0.8.0] 2021-12-06
 
-- error: Move error related functionality to error.ts. ([#6](https://github.com/zetamarkets/sdk/pull/6))
 - insurance-client: Insurance fund functionality, whitelist checks, deposit & withdrawal. ([#9](https://github.com/zetamarkets/sdk/pull/9))
 - exchange: Insurance functionality, whitelist a user, rebalance vaults. ([#9](https://github.com/zetamarkets/sdk/pull/9))
 - general: Add functionality to SDK to support on chain options pricing. ([#11](https://github.com/zetamarkets/sdk/pull/11))
