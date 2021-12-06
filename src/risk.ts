@@ -270,9 +270,9 @@ export function calculateProductMargin(
   }
   let kind = market.kind;
   let strike = market.strike;
-  let markPrice = Exchange.greeks.markPrices[productIndex]
-    .div(new BN(10 ** 6))
-    .toNumber();
+  let markPrice = convertNativeBNToDecimal(
+    Exchange.greeks.markPrices[productIndex]
+  );
   switch (kind) {
     case Kind.FUTURE:
       return calculateFutureMargin(spotPrice);
