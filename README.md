@@ -73,7 +73,7 @@ balance.toNumber(); // == 10_000_000_000
 utils.convertDecimalToNativeInteger(10_000); // == 10_000_000_000;
 
 // Convert native integer to decimal.
-utils.convertNativeIntegerToDecimal(balance.ToNumber()); // == 10_000
+utils.convertNativeIntegerToDecimal(balance.toNumber()); // == 10_000
 
 // Convert native BN to decimal.
 utils.convertNativeBNToDecimal(balance); // == 10_000

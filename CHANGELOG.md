@@ -15,8 +15,9 @@ Version changes are pinned to SDK releases.
 
 ### Breaking
 
-- Deprecated `getNativeAmount` and `getReadableAmount` in `src/utils.ts`. This is replaced by `convertDecimalToNativeInteger`, `convertNativeIntegerToDecimal`, `convertNativeBNToDecimal` in `src/utils.ts`. ([#14](https://github.com/zetamarkets/sdk/pull/14))
-- Client position `costOfTrades` are now represented in decimal instead of native fixed point integer.
+- utils: Deprecated `getNativeAmount` and `getReadableAmount` in `src/utils.ts`. This is replaced by `convertDecimalToNativeInteger`, `convertNativeIntegerToDecimal`, `convertNativeBNToDecimal` in `src/utils.ts`. ([#14](https://github.com/zetamarkets/sdk/pull/14))
+- client: Client position `costOfTrades` are now represented in decimal instead of native fixed point integer.
+- exchange: Deprecated `Greeks` account `theo` field in `ProductGreeks`. This is now replaced by `Exchange.greeks.markPrices[productIndex]`.
 
 ## [0.7.3] 2021-11-29
 
