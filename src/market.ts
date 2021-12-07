@@ -81,22 +81,55 @@ export class ZetaGroupMarkets {
   /**
    * Returns the market's index.
    */
-  public getMarketsByExpiryIndex(index: number): Market[] {
-    let head = index * this.productsPerExpiry();
+  public getMarketsByExpiryIndex(expiryIndex: number): Market[] {
+    let head = expiryIndex * this.productsPerExpiry();
     return this._markets.slice(head, head + this.productsPerExpiry());
+  }
+
+  /**
+   * Returns the options market given an expiry index and options kind.
+   */
+  public getOptionsMarketByExpiryIndex(expiryIndex: number, kind: Kind): Market[] {
+    let markets = this.getMarketsByExpiryIndex(expiryIndex);
+    switch (kind) {
+        case Kind.CALL:
+            return markets.slice(0, this.productsPerExpiry());
+        case Kind.PUT:
+            return markets.slice(this.productsPerExpiry(), 2*this.productsPerExpiry());
+        default:
+            throw Error("Options market kind not supported, must be CALL or PUT");
+    }
   }
 
   /**
    * Returns the futures market given an expiry index.
    */
-  public getFuturesMarketByExpiryIndex(index: number): Market {
-    let markets = this.getMarketsByExpiryIndex(index);
+  public getFuturesMarketByExpiryIndex(expiryIndex: number): Market {
+    let markets = this.getMarketsByExpiryIndex(expiryIndex);
     let market = markets[markets.length - 1];
     if (market.kind != Kind.FUTURE) {
       throw Error("Futures market kind error");
     }
     return market;
   }
+
+  public getMarketByExpiryKindStrike(expiryIndex: number, kind: Kind, strike?: number): Market | undefined {
+      let markets = this.getMarketsByExpiryIndex(expiryIndex);
+      let marketsKind = undefined;
+      if (kind === Kind.CALL || kind === Kind.PUT) {
+          if (strike === undefined) {
+              throw new Error("Strike must be specified for options markets");
+          }
+          marketsKind = this.getOptionsMarketByExpiryIndex(expiryIndex, kind);
+      } else if (kind === Kind.FUTURE) {
+          return this.getFuturesMarketByExpiryIndex(expiryIndex);
+      } else {
+          throw new Error("Only CALL, PUT, FUTURE kinds are supported");
+      }
+
+      return marketsKind.filter(x => x.strike === strike)[0];
+  }
+
 
   private constructor() {
     this._expirySeries = new Array(Exchange.zetaGroup.expirySeries.length);
