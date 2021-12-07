@@ -373,23 +373,6 @@ export async function getSerumVaultOwnerAndNonce(
   throw new Error("Unable to find nonce");
 }
 
-export async function createUsdcMint(
-  provider: anchor.Provider,
-  usdcMintAuthority: PublicKey
-): Promise<Token> {
-  let payer = (provider.wallet as anchor.Wallet).payer;
-  // This is for USDC for the program overall
-  let usdcMint = await Token.createMint(
-    provider.connection,
-    payer,
-    usdcMintAuthority,
-    null,
-    6,
-    TOKEN_PROGRAM_ID
-  );
-  return usdcMint;
-}
-
 /**
  * Serum interprets publickeys as [u64; 4]
  * Which requires swap64 sorting.
