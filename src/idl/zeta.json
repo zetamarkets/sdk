@@ -1520,7 +1520,7 @@
             "name": "interestRate",
             "type": {
               "array": [
-                "u64",
+                "i64",
                 2
               ]
             }
@@ -1529,7 +1529,7 @@
             "name": "interestRatePadding",
             "type": {
               "array": [
-                "u64",
+                "i64",
                 4
               ]
             }
@@ -2294,7 +2294,7 @@
           },
           {
             "name": "interestRate",
-            "type": "u64"
+            "type": "i64"
           },
           {
             "name": "volatility",

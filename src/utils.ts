@@ -640,6 +640,11 @@ export function displayState() {
         expirySeries.expiryTs * 1000
       )} Live: ${expirySeries.isLive()}`
     );
+    let interestRate = convertNativeBNToDecimal(
+      Exchange.greeks[index].interestRate,
+      true
+    );
+    console.log(`Interest rate: ${interestRate}`);
     let markets = Exchange.markets.getMarketsByExpiryIndex(index);
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
