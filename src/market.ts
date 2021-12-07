@@ -15,6 +15,7 @@ import {
   MARKET_LOAD_LIMIT,
   DEFAULT_MARKET_POLL_INTERVAL,
   ACTIVE_MARKETS,
+  NUM_STRIKES,
 } from "./constants";
 import {
   getZetaVault,
@@ -93,9 +94,9 @@ export class ZetaGroupMarkets {
     let markets = this.getMarketsByExpiryIndex(expiryIndex);
     switch (kind) {
         case Kind.CALL:
-            return markets.slice(0, this.productsPerExpiry());
+            return markets.slice(0, NUM_STRIKES);
         case Kind.PUT:
-            return markets.slice(this.productsPerExpiry(), 2*this.productsPerExpiry());
+            return markets.slice(NUM_STRIKES, 2 * NUM_STRIKES);
         default:
             throw Error("Options market kind not supported, must be CALL or PUT");
     }
@@ -115,7 +116,7 @@ export class ZetaGroupMarkets {
 
   public getMarketByExpiryKindStrike(expiryIndex: number, kind: Kind, strike?: number): Market | undefined {
       let markets = this.getMarketsByExpiryIndex(expiryIndex);
-      let marketsKind = undefined;
+      let marketsKind: Array<Market>;
       if (kind === Kind.CALL || kind === Kind.PUT) {
           if (strike === undefined) {
               throw new Error("Strike must be specified for options markets");
@@ -127,7 +128,8 @@ export class ZetaGroupMarkets {
           throw new Error("Only CALL, PUT, FUTURE kinds are supported");
       }
 
-      return marketsKind.filter(x => x.strike === strike)[0];
+      let market = marketsKind.filter( (x) => x.strike == strike);
+      return markets.length == 0 ? undefined : markets[0];
   }
 
 
