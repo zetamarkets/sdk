@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.8.1] 2021-12-07
+
+- market: Add helper functions for finding a market given parameters. ([#9](https://github.com/zetamarkets/sdk/pull/9))
+- client: Update client open orders address on callback for scenario where open orders address is initialized outside of the sdk. ([#20](https://github.com/zetamarkets/sdk/pull/20))
+
 ## [0.8.0] 2021-12-06
 
 - insurance-client: Insurance fund functionality, whitelist checks, deposit & withdrawal. ([#9](https://github.com/zetamarkets/sdk/pull/9))
