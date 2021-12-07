@@ -132,7 +132,6 @@ export class ZetaGroupMarkets {
       return markets.length == 0 ? undefined : markets[0];
   }
 
-
   private constructor() {
     this._expirySeries = new Array(Exchange.zetaGroup.expirySeries.length);
     this._markets = new Array(Exchange.zetaGroup.products.length);
