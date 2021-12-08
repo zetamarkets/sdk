@@ -810,6 +810,29 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   }
 
   /**
+   * @param user user pubkey to be whitelisted for trading fees
+   */
+  public async whitelistUserForTradingFees(user: PublicKey) {
+    let [whitelistTradingFeesAccount, whitelistTradingFeesNonce] =
+      await utils.getUserWhitelistTradingFeesAccount(
+        this.program.programId,
+        user
+      );
+
+    await this._program.rpc.initializeWhitelistTradingFeesAccount(
+      whitelistTradingFeesNonce,
+      {
+        accounts: {
+          whitelistTradingFeesAccount,
+          admin: this._provider.wallet.publicKey,
+          user,
+          systemProgram: SystemProgram.programId,
+          state: this._stateAddress,
+        },
+      }
+    );
+  }
+  /**
    *
    * @param marginAccounts an array of remaining accounts (margin accounts) that will be rebalanced
    */

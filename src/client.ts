@@ -123,6 +123,15 @@ export class Client {
   private _pendingUpdate: boolean;
 
   /**
+   * whitelist trading fees account.
+   */
+  private _whitelistTradingFeesAddress: PublicKey;
+
+  /**
+   * Whitelited for trading fees.
+   */
+  private _whitelistedTradingFees: boolean;
+  /**
    * Polling interval.
    */
   public get pollInterval(): number {
@@ -232,6 +241,24 @@ export class Client {
       client.updatePositions();
       // We don't update orders here to make load faster.
       client._pendingUpdate = true;
+    }
+
+    let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
+      await utils.getUserWhitelistTradingFeesAccount(
+        Exchange.programId,
+        wallet.publicKey
+      );
+    client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
+
+    try {
+      await client._program.account.whitelistTradingFeesAccount.fetch(
+        client._whitelistTradingFeesAddress
+      );
+      console.log("User is whitelisted for trading fees.");
+      client._whitelistedTradingFees = true;
+    } catch (e) {
+      console.log("User is not whitelisted for trading fees.");
+      client._whitelistedTradingFees = false;
     }
 
     if (callback !== undefined) {
@@ -374,15 +401,29 @@ export class Client {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx = await placeOrderIx(
-      marketIndex,
-      price,
-      size,
-      side,
-      this.marginAccountAddress,
-      this.publicKey,
-      openOrdersPda
-    );
+    let orderIx;
+    if (this._whitelistedTradingFees) {
+      orderIx = await placeOrderIx(
+        marketIndex,
+        price,
+        size,
+        side,
+        this.marginAccountAddress,
+        this.publicKey,
+        openOrdersPda,
+        this._whitelistTradingFeesAddress
+      );
+    } else {
+      orderIx = await placeOrderIx(
+        marketIndex,
+        price,
+        size,
+        side,
+        this.marginAccountAddress,
+        this.publicKey,
+        openOrdersPda
+      );
+    }
 
     tx.add(orderIx);
 

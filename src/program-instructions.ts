@@ -222,9 +222,20 @@ export async function placeOrderIx(
   side: Side,
   marginAccount: PublicKey,
   authority: PublicKey,
-  openOrders: PublicKey
+  openOrders: PublicKey,
+  whitelistTradingFeesAccount?: PublicKey
 ): Promise<TransactionInstruction> {
   let marketData = Exchange.markets.markets[marketIndex];
+  let remainingAccounts =
+    whitelistTradingFeesAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistTradingFeesAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
   return Exchange.program.instruction.placeOrder(
     new anchor.BN(price),
     new anchor.BN(size),
@@ -258,6 +269,7 @@ export async function placeOrderIx(
         oracle: Exchange.zetaGroup.oracle,
         marketNode: Exchange.greeks.nodeKeys[marketIndex],
       },
+      remainingAccounts,
     }
   );
 }

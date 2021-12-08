@@ -234,7 +234,20 @@ export async function getUserWhitelistInsuranceAccount(
 ): Promise<[PublicKey, number]> {
   return await anchor.web3.PublicKey.findProgramAddress(
     [
-      Buffer.from(anchor.utils.bytes.utf8.encode("whitelist")),
+      Buffer.from(anchor.utils.bytes.utf8.encode("whitelist-insurance")),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function getUserWhitelistTradingFeesAccount(
+  programId: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("whitelist-trading-fees")),
       userKey.toBuffer(),
     ],
     programId
