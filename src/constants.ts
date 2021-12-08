@@ -7,7 +7,7 @@ export const MINTS = {
 export const UNDERLYINGS = [MINTS["SOL"]];
 
 export const DEX_PID = new PublicKey(
-  "DEX6XtaRGm4cNU2XE18ykY4RMAY3xdygdkas7CdhMLaF"
+  "5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"
 );
 
 export const MAX_CANCELS_PER_TX = 4;
