@@ -30,7 +30,7 @@ This is the typescript library to interact with our Zeta program smart contract.
 | Key         |                    Value                     |
 | ----------- | :------------------------------------------: |
 | NETWORK_URL |        https://api.devnet.solana.com         |
-| PROGRAM_ID  | 9VqrmtqpGSnKXYcNkQVvVneGeHujWU6KuVZkNHbyV8oL |
+| PROGRAM_ID  | 98utEQgwfbkvTKVS1seNQmFYFviaLsXAXqaWHr1V8JXF |
 | SERVER_URL  |         https://server.zeta.markets          |
 
 PROGRAM_ID is subject to change based on redeployments.

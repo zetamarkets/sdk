@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.8.3] 2021-12-08
+
+- npm: Fix issue with 0.8.2 package.
+
 ## [0.8.2] 2021-12-08
 
 - constants: Migrate to new serum DEX pid to fix execution bug. ([#21](https://github.com/zetamarkets/sdk/pull/21))
