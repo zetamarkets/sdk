@@ -207,6 +207,8 @@ export class Client {
       if (callback !== undefined) {
         callback(EventType.USER, null);
       }
+
+      await client.updateOpenOrdersAddresses();
     });
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
@@ -226,19 +228,7 @@ export class Client {
 
     if (client.marginAccount !== null) {
       // Set open order pdas for initialized accounts.
-      await Promise.all(
-        Exchange.zetaGroup.products.map(async (product, index) => {
-          if (client.marginAccount.openOrdersNonce[index] !== 0) {
-            let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
-              Exchange.programId,
-              product.market,
-              client.publicKey
-            );
-
-            client._openOrdersAccounts[index] = openOrdersPda;
-          }
-        })
-      );
+      await client.updateOpenOrdersAddresses();
       client.updatePositions();
       // We don't update orders here to make load faster.
       client._pendingUpdate = true;
@@ -663,6 +653,26 @@ export class Client {
         "User has no USDC associated token account. Please create one and deposit USDC."
       );
     }
+  }
+
+  private async updateOpenOrdersAddresses() {
+    await Promise.all(
+      Exchange.zetaGroup.products.map(async (product, index) => {
+        if (
+          // If the nonce is not zero, we know there is an open orders account.
+          this._marginAccount.openOrdersNonce[index] !== 0 &&
+          // If this is equal to default, it means we haven't added the PDA yet.
+          this._openOrdersAccounts[index].equals(PublicKey.default)
+        ) {
+          let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
+            Exchange.programId,
+            product.market,
+            this.publicKey
+          );
+          this._openOrdersAccounts[index] = openOrdersPda;
+        }
+      })
+    );
   }
 
   /**

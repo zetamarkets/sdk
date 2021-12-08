@@ -1,7 +1,7 @@
 <div align="center">
   <img height="120px" src="./logo.png" />
 
-  <h1 style="margin-top: 0px">Zeta SDK</h1>
+  <h1 style="margin-top: 0px">Zeta SDK 🔌</h1>
 
   <p>
     <a href="https://discord.gg/dD7YREfBkR"

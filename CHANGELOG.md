@@ -5,9 +5,17 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.8.2] 2021-12-08
+
+- constants: Migrate to new serum DEX pid to fix execution bug. ([#21](https://github.com/zetamarkets/sdk/pull/21))
+
+## [0.8.1] 2021-12-07
+
+- market: Add helper functions for finding a market given parameters. ([#9](https://github.com/zetamarkets/sdk/pull/9))
+- client: Update client open orders address on callback for scenario where open orders address is initialized outside of the sdk. ([#20](https://github.com/zetamarkets/sdk/pull/20))
+
 ## [0.8.0] 2021-12-06
 
-- error: Move error related functionality to error.ts. ([#6](https://github.com/zetamarkets/sdk/pull/6))
 - insurance-client: Insurance fund functionality, whitelist checks, deposit & withdrawal. ([#9](https://github.com/zetamarkets/sdk/pull/9))
 - exchange: Insurance functionality, whitelist a user, rebalance vaults. ([#9](https://github.com/zetamarkets/sdk/pull/9))
 - general: Add functionality to SDK to support on chain options pricing. ([#11](https://github.com/zetamarkets/sdk/pull/11))
