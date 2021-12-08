@@ -271,6 +271,10 @@ export class Exchange {
           pricingFrequencySeconds: params.pricingFrequencySeconds,
           insuranceVaultLiquidationPercentage:
             params.insuranceVaultLiquidationPercentage,
+          nativeTradeFeePercentage: params.nativeTradeFeePercentage,
+          nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
+          nativeWhitelistUnderlyingFeePercentage:
+            params.nativeWhitelistUnderlyingFeePercentage,
         },
         {
           accounts: {
@@ -475,6 +479,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         pricingFrequencySeconds: params.pricingFrequencySeconds,
         insuranceVaultLiquidationPercentage:
           params.insuranceVaultLiquidationPercentage,
+        nativeTradeFeePercentage: params.nativeTradeFeePercentage,
+        nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
+        nativeWhitelistUnderlyingFeePercentage:
+          params.nativeWhitelistUnderlyingFeePercentage,
       },
       {
         accounts: {

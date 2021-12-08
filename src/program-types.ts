@@ -155,3 +155,7 @@ export interface InsuranceDepositAccount {
 export interface WhitelistInsuranceAccount {
   nonce: number;
 }
+
+export interface whitelistTradingFeesAccount {
+  nonce: number;
+}

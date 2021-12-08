@@ -1690,6 +1690,18 @@
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
+          },
+          {
+            "name": "nativeTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeWhilelistUnderlyingFeePercentage",
+            "type": "u64"
           }
         ]
       }
@@ -2235,6 +2247,18 @@
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
+          },
+          {
+            "name": "nativeTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "type": "u64"
           }
         ]
       }
@@ -2279,6 +2303,18 @@
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
+          },
+          {
+            "name": "nativeTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "type": "u64"
           }
         ]
       }

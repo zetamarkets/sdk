@@ -11,6 +11,7 @@ import * as utils from "./utils";
 import * as anchor from "@project-serum/anchor";
 import { Side, toProgramSide } from "./types";
 import * as constants from "./constants";
+import { AnchorDecimal } from "./program-types";
 
 export async function initializeMarginAccountTx(
   userKey: PublicKey
@@ -739,4 +740,7 @@ export type StateParams = {
   readonly strikeInitializationThresholdSeconds: number;
   readonly pricingFrequencySeconds: number;
   readonly insuranceVaultLiquidationPercentage: number;
+  readonly nativeTradeFeePercentage: anchor.BN;
+  readonly nativeUnderlyingFeePercentage: anchor.BN;
+  readonly nativeWhitelistUnderlyingFeePercentage: anchor.BN;
 };
