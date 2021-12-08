@@ -5,7 +5,9 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- constants: Migrate to new serum DEX pid to fix execution bug ([#21](https://github.com/zetamarkets/sdk/pull/21))
+## [0.8.2] 2021-12-08
+
+- constants: Migrate to new serum DEX pid to fix execution bug. ([#21](https://github.com/zetamarkets/sdk/pull/21))
 
 ## [0.8.1] 2021-12-07
 
