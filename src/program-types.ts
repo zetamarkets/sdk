@@ -156,6 +156,6 @@ export interface WhitelistInsuranceAccount {
   nonce: number;
 }
 
-export interface whitelistTradingFeesAccount {
+export interface WhitelistTradingFeesAccount {
   nonce: number;
 }

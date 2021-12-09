@@ -1700,7 +1700,7 @@
             "type": "u64"
           },
           {
-            "name": "nativeWhilelistUnderlyingFeePercentage",
+            "name": "nativeWhitelistUnderlyingFeePercentage",
             "type": "u64"
           }
         ]
