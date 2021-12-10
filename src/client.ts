@@ -123,6 +123,11 @@ export class Client {
   private _pendingUpdate: boolean;
 
   /**
+   * whitelist trading fees account.
+   */
+  private _whitelistTradingFeesAddress: PublicKey | undefined;
+
+  /**
    * Polling interval.
    */
   public get pollInterval(): number {
@@ -233,6 +238,20 @@ export class Client {
       // We don't update orders here to make load faster.
       client._pendingUpdate = true;
     }
+
+    client._whitelistTradingFeesAddress = undefined;
+    try {
+      let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
+        await utils.getUserWhitelistTradingFeesAccount(
+          Exchange.programId,
+          wallet.publicKey
+        );
+      await client._program.account.whitelistTradingFeesAccount.fetch(
+        whitelistTradingFeesAddress
+      );
+      console.log("User is whitelisted for trading fees.");
+      client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
+    } catch (e) {}
 
     if (callback !== undefined) {
       client._tradeEventListener = client._program.addEventListener(
@@ -381,7 +400,8 @@ export class Client {
       side,
       this.marginAccountAddress,
       this.publicKey,
-      openOrdersPda
+      openOrdersPda,
+      this._whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
@@ -465,7 +485,8 @@ export class Client {
         newOrderSide,
         this.marginAccountAddress,
         this.publicKey,
-        this._openOrdersAccounts[marketIndex]
+        this._openOrdersAccounts[marketIndex],
+        this._whitelistTradingFeesAddress
       )
     );
     ixs.forEach((ix) => tx.add(ix));
