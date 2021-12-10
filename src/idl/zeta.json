@@ -950,6 +950,42 @@
       ]
     },
     {
+      "name": "initializeWhitelistTradingFeesAccount",
+      "accounts": [
+        {
+          "name": "whitelistTradingFeesAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "initializeInsuranceDepositAccount",
       "accounts": [
         {
@@ -1684,6 +1720,18 @@
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
+          },
+          {
+            "name": "nativeTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "type": "u64"
           }
         ]
       }
@@ -1955,9 +2003,21 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
             "name": "amount",
             "type": "u64"
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistTradingFeesAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "nonce",
             "type": "u8"
@@ -2237,6 +2297,18 @@
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
+          },
+          {
+            "name": "nativeTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "type": "u64"
           }
         ]
       }
@@ -2281,6 +2353,18 @@
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
+          },
+          {
+            "name": "nativeTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "type": "u64"
           }
         ]
       }
@@ -2765,126 +2849,133 @@
     },
     {
       "code": 351,
+      "name": "UserTradingFeeWhitelistAccountSeedsMismatch",
+      "msg": "User trading fee whitelist account seeds mismatch"
+    },
+    {
+      "code": 352,
       "name": "MarketIndexesUninitialized",
       "msg": "Market indexes uninitialized"
     },
     {
-      "code": 352,
+      "code": 353,
       "name": "MarketIndexesAlreadyInitialized",
       "msg": "Market indexes already initialized"
     },
     {
-      "code": 353,
+      "code": 354,
       "name": "CannotGetUnsetStrike",
       "msg": "Cannot get unset strike"
     },
     {
-      "code": 354,
+      "code": 355,
       "name": "CannotSetInitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 355,
+      "code": 356,
       "name": "CannotResetUninitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 356,
+      "code": 357,
       "name": "CrankMarginAccountNotMutable",
       "msg": "CrankMarginAccountNotMutable"
     },
     {
-      "code": 357,
+      "code": 358,
       "name": "InvalidAdminSigner",
       "msg": "InvalidAdminSigner"
     },
     {
-      "code": 358,
+      "code": 359,
       "name": "UserHasActiveOrders",
       "msg": "User still has active orders"
     },
     {
-      "code": 359,
+      "code": 360,
       "name": "UserForceCancelInProgress",
       "msg": "User has a force cancel in progress"
     },
     {
-      "code": 360,
+      "code": 361,
       "name": "FailedPriceBandCheck",
       "msg": "Failed price band check"
     },
     {
-      "code": 361,
+      "code": 362,
       "name": "UnsortedOpenOrdersAccounts",
       "msg": "Unsorted open orders accounts"
     },
     {
-      "code": 362,
+      "code": 363,
       "name": "AccountNotMutable",
       "msg": "Account not mutable"
     },
     {
-      "code": 363,
+      "code": 364,
       "name": "AccountDiscriminatorMismatch",
       "msg": "Account discriminator mismatch"
     },
     {
-      "code": 364,
+      "code": 365,
       "name": "InvalidMarketNodeIndex",
       "msg": "Invalid market node index"
     },
     {
-      "code": 365,
+      "code": 366,
       "name": "InvalidMarketNode",
       "msg": "Invalid market node"
     },
     {
-      "code": 366,
+      "code": 367,
       "name": "LUTOutOfBounds",
       "msg": "Lut out of bounds"
     },
     {
-      "code": 367,
+      "code": 368,
       "name": "RebalanceInsuranceInvalidRemainingAccounts",
       "msg": "Rebalance insurance vault with no margin accounts"
     },
     {
-      "code": 368,
+      "code": 369,
       "name": "InvalidMintDecimals",
       "msg": "Invalid mint decimals"
     },
     {
-      "code": 369,
+      "code": 370,
       "name": "InvalidZetaGroupOracle",
       "msg": "Invalid oracle for this zeta group"
     },
     {
-      "code": 370,
+      "code": 371,
       "name": "InvalidZetaGroupDepositMint",
       "msg": "Invalid zeta group deposit mint"
     },
     {
-      "code": 371,
+      "code": 372,
       "name": "InvalidZetaGroupRebalanceMint",
       "msg": "Invalid zeta group rebalance insurance vault mint"
     },
     {
-      "code": 372,
+      "code": 373,
       "name": "InvalidDepositAmount",
       "msg": "Invalid deposit amount"
     },
     {
-      "code": 373,
+      "code": 374,
       "name": "InvalidTokenAccountOwner",
       "msg": "Invalid token account owner"
     },
     {
-      "code": 374,
+      "code": 375,
       "name": "InvalidWithdrawAmount",
       "msg": "Invalid withdraw amount"
+    },
+    {
+      "code": 376,
+      "name": "InvalidPlaceOrderRemainingAccounts",
+      "msg": "Invalid number of remaining accounts in place order"
     }
-  ],
-  "metadata": {
-    "address": "ZETAXyu4bSyZEjfrF3aqpmLW7mgpAS38R1wGHPmqt5d"
-  }
+  ]
 }

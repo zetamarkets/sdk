@@ -148,8 +148,8 @@ export interface TradeEvent {
 }
 
 export interface InsuranceDepositAccount {
-  amount: anchor.BN;
   nonce: number;
+  amount: anchor.BN;
 }
 
 export interface WhitelistInsuranceAccount {
@@ -160,4 +160,8 @@ export interface SocializedLossAccount {
   nonce: number;
   totalDeposits: anchor.BN;
   overbanrkuptAmount: anchor.BN;
+}
+
+export interface WhitelistTradingFeesAccount {
+  nonce: number;
 }

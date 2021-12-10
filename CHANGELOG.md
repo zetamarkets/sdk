@@ -5,6 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- exchange: Add whitelist trading fees account initialization. ([#24](https://github.com/zetamarkets/sdk/pull/24/files))
+- client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/files))
+
+## [0.8.3] 2021-12-08
+
+- npm: Fix issue with 0.8.2 package.
+
 ## [0.8.2] 2021-12-08
 
 - constants: Migrate to new serum DEX pid to fix execution bug. ([#21](https://github.com/zetamarkets/sdk/pull/21))
