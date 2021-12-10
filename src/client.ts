@@ -125,12 +125,8 @@ export class Client {
   /**
    * whitelist trading fees account.
    */
-  private _whitelistTradingFeesAddress: PublicKey;
+  private _whitelistTradingFeesAddress: PublicKey | undefined;
 
-  /**
-   * Whitelited for trading fees.
-   */
-  private _whitelistedTradingFees: boolean;
   /**
    * Polling interval.
    */
@@ -243,23 +239,19 @@ export class Client {
       client._pendingUpdate = true;
     }
 
-    let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
-      await utils.getUserWhitelistTradingFeesAccount(
-        Exchange.programId,
-        wallet.publicKey
-      );
-    client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
-
+    client._whitelistTradingFeesAddress = undefined;
     try {
+      let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
+        await utils.getUserWhitelistTradingFeesAccount(
+          Exchange.programId,
+          wallet.publicKey
+        );
       await client._program.account.whitelistTradingFeesAccount.fetch(
-        client._whitelistTradingFeesAddress
+        whitelistTradingFeesAddress
       );
       console.log("User is whitelisted for trading fees.");
-      client._whitelistedTradingFees = true;
-    } catch (e) {
-      console.log("User is not whitelisted for trading fees.");
-      client._whitelistedTradingFees = false;
-    }
+      client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
+    } catch (e) {}
 
     if (callback !== undefined) {
       client._tradeEventListener = client._program.addEventListener(
@@ -401,29 +393,16 @@ export class Client {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx;
-    if (this._whitelistedTradingFees) {
-      orderIx = await placeOrderIx(
-        marketIndex,
-        price,
-        size,
-        side,
-        this.marginAccountAddress,
-        this.publicKey,
-        openOrdersPda,
-        this._whitelistTradingFeesAddress
-      );
-    } else {
-      orderIx = await placeOrderIx(
-        marketIndex,
-        price,
-        size,
-        side,
-        this.marginAccountAddress,
-        this.publicKey,
-        openOrdersPda
-      );
-    }
+    let orderIx = await placeOrderIx(
+      marketIndex,
+      price,
+      size,
+      side,
+      this.marginAccountAddress,
+      this.publicKey,
+      openOrdersPda,
+      this._whitelistTradingFeesAddress
+    );
 
     tx.add(orderIx);
 
@@ -506,7 +485,8 @@ export class Client {
         newOrderSide,
         this.marginAccountAddress,
         this.publicKey,
-        this._openOrdersAccounts[marketIndex]
+        this._openOrdersAccounts[marketIndex],
+        this._whitelistTradingFeesAddress
       )
     );
     ixs.forEach((ix) => tx.add(ix));

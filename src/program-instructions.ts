@@ -223,7 +223,7 @@ export async function placeOrderIx(
   marginAccount: PublicKey,
   authority: PublicKey,
   openOrders: PublicKey,
-  whitelistTradingFeesAccount?: PublicKey
+  whitelistTradingFeesAccount: PublicKey | undefined
 ): Promise<TransactionInstruction> {
   let marketData = Exchange.markets.markets[marketIndex];
   let remainingAccounts =
