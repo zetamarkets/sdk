@@ -93,16 +93,10 @@ export class InsuranceClient {
     wallet: Wallet,
     opts: ConfirmOptions = utils.defaultCommitment()
   ): Promise<InsuranceClient> {
-    console.log(`Loading insuranceClient: ${wallet.publicKey.toString()}`);
+    console.log(`Loading insurance client: ${wallet.publicKey.toString()}`);
     let insuranceClient = new InsuranceClient(connection, wallet, opts);
 
-    let [whitelistInsuranceAccountAddress, _whitelistInsuranceAccountNonce] =
-      await utils.getUserWhitelistInsuranceAccount(
-        Exchange.programId,
-        wallet.publicKey
-      );
-    insuranceClient._whitelistInsuranceAccountAddress =
-      whitelistInsuranceAccountAddress;
+    await insuranceClient.insuranceWhitelistCheck();
 
     let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
       await utils.getUserInsuranceDepositAccount(
@@ -110,6 +104,7 @@ export class InsuranceClient {
         Exchange.zetaGroupAddress,
         wallet.publicKey
       );
+
     insuranceClient._insuranceDepositAccountAddress =
       insuranceDepositAccountAddress;
 
@@ -119,7 +114,6 @@ export class InsuranceClient {
     );
 
     try {
-      await insuranceClient.insuranceWhitelistCheck();
       await insuranceClient.updateInsuranceDepositAccount();
     } catch (e) {}
 
@@ -131,7 +125,6 @@ export class InsuranceClient {
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
     await this.usdcAccountCheck();
-    await this.insuranceWhitelistCheck();
 
     let tx = new Transaction();
     if (this._insuranceDepositAccount === null) {
@@ -170,8 +163,6 @@ export class InsuranceClient {
   public async withdraw(
     percentageAmount: number
   ): Promise<TransactionSignature> {
-    await this.insuranceWhitelistCheck();
-
     let tx = new Transaction();
     tx.add(
       await withdrawInsuranceVaultIx(
@@ -198,7 +189,7 @@ export class InsuranceClient {
         )) as InsuranceDepositAccount;
     } catch (e) {
       console.log(
-        "User has no insurance deposit account. Please deposit into the insurance vault if you are whitelited."
+        "User has no insurance deposit account. Please deposit into the insurance vault if you are whitelisted."
       );
     }
   }
@@ -222,12 +213,20 @@ export class InsuranceClient {
   }
 
   public async insuranceWhitelistCheck() {
+    let [whitelistInsuranceAccountAddress, _whitelistInsuranceAccountNonce] =
+      await utils.getUserWhitelistInsuranceAccount(
+        Exchange.programId,
+        this.publicKey
+      );
+
     try {
       (await this._program.account.whitelistInsuranceAccount.fetch(
-        this._whitelistInsuranceAccountAddress
+        whitelistInsuranceAccountAddress
       )) as WhitelistInsuranceAccount;
     } catch (e) {
       throw Error("User is not white listed for the insurance vault.");
     }
+
+    this._whitelistInsuranceAccountAddress = whitelistInsuranceAccountAddress;
   }
 }
