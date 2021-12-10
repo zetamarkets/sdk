@@ -155,3 +155,9 @@ export interface InsuranceDepositAccount {
 export interface WhitelistInsuranceAccount {
   nonce: number;
 }
+
+export interface SocializedLossAccount {
+  nonce: number;
+  totalDeposits: anchor.BN;
+  overbanrkuptAmount: anchor.BN;
+}

@@ -120,11 +120,7 @@ export class InsuranceClient {
 
     try {
       await insuranceClient.insuranceWhitelistCheck();
-
-      insuranceClient._insuranceDepositAccount =
-        (await insuranceClient._program.account.insuranceDepositAccount.fetch(
-          insuranceClient._insuranceDepositAccountAddress
-        )) as InsuranceDepositAccount;
+      await insuranceClient.updateInsuranceDepositAccount();
     } catch (e) {}
 
     return insuranceClient;
@@ -164,11 +160,7 @@ export class InsuranceClient {
       )}. Transaction: ${txId}`
     );
 
-    this._insuranceDepositAccount =
-      (await this._program.account.insuranceDepositAccount.fetch(
-        this._insuranceDepositAccountAddress
-      )) as InsuranceDepositAccount;
-
+    await this.updateInsuranceDepositAccount();
     return txId;
   }
 
@@ -194,11 +186,7 @@ export class InsuranceClient {
       `[WITHDRAW INSURANCE VAULT] ${percentageAmount}% of Deposit. Transaction: ${txId}`
     );
 
-    this._insuranceDepositAccount =
-      (await this._program.account.insuranceDepositAccount.fetch(
-        this._insuranceDepositAccountAddress
-      )) as InsuranceDepositAccount;
-
+    await this.updateInsuranceDepositAccount();
     return txId;
   }
 

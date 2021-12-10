@@ -137,6 +137,29 @@ export class Exchange {
     return this._usdcMintAddress;
   }
   private _usdcMintAddress: PublicKey;
+  /**
+   * Public key for a given zeta group vault.
+   */
+  public get vaultAddress(): PublicKey {
+    return this._vaultAddress;
+  }
+  private _vaultAddress: PublicKey;
+
+  /**
+   * Public key for insurance vault.
+   */
+  public get insuranceVaultAddress(): PublicKey {
+    return this._insuranceVaultAddress;
+  }
+  private _insuranceVaultAddress: PublicKey;
+
+  /**
+   * Public key for socialized loss account.
+   */
+  public get socializedLossAccountAddress(): PublicKey {
+    return this._socializedLossAccountAddress;
+  }
+  private _socializedLossAccountAddress: PublicKey;
 
   /**
    * Returns the markets object.
@@ -360,11 +383,27 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     await exchange.updateState();
     await exchange.updateZetaGroup();
 
-    let vaultAddress = await utils.createVaultAddress(
+    const [vaultAddress, _vaultNonce] = await utils.getVault(
       exchange.programId,
-      exchange.zetaGroupAddress,
-      exchange.zetaGroup.vaultNonce
+      zetaGroup
     );
+
+    const [insuranceVaultAddress, _insuranceNonce] =
+      await utils.getZetaInsuranceVault(
+        exchange.programId,
+        exchange.zetaGroupAddress
+      );
+
+    const [socializedLossAccount, _socializedLossAccountNonce] =
+      await utils.getSocializedLossAccount(
+        exchange.programId,
+        exchange._zetaGroupAddress
+      );
+
+    exchange._vaultAddress = vaultAddress;
+    exchange._insuranceVaultAddress = insuranceVaultAddress;
+    exchange._socializedLossAccountAddress = socializedLossAccount;
+
     let usdcMint = await utils.getTokenMint(this.connection, vaultAddress);
     exchange._usdcMintAddress = usdcMint;
 
@@ -439,6 +478,26 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       this._zetaGroupAddress
     );
     this._greeksAddress = greeks;
+
+    const [vaultAddress, _vaultNonce] = await utils.getVault(
+      exchange.programId,
+      zetaGroup
+    );
+    this._vaultAddress = vaultAddress;
+
+    const [insuranceVaultAddress, _insuranceNonce] =
+      await utils.getZetaInsuranceVault(
+        exchange.programId,
+        exchange.zetaGroupAddress
+      );
+    this._insuranceVaultAddress = insuranceVaultAddress;
+
+    const [socializedLossAccount, _socializedLossAccountNonce] =
+      await utils.getSocializedLossAccount(
+        exchange.programId,
+        exchange._zetaGroupAddress
+      );
+    this._socializedLossAccountAddress = socializedLossAccount;
 
     let tx = new Transaction().add(
       await initializeZetaGroupIx(underlyingMint, oracle, args)

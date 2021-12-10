@@ -67,19 +67,13 @@ export async function depositIx(
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
   // TODO: Probably use mint to find decimal places in future.
-
-  let vaultAddress = await utils.createVaultAddress(
-    Exchange.programId,
-    Exchange.zetaGroupAddress,
-    Exchange.zetaGroup.vaultNonce
-  );
-
   return Exchange.program.instruction.deposit(new anchor.BN(amount), {
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
       marginAccount: marginAccount,
-      vault: vaultAddress,
+      vault: Exchange.vaultAddress,
       userTokenAccount: usdcAccount,
+      socializedLossAccount: Exchange.socializedLossAccountAddress,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
@@ -98,20 +92,16 @@ export async function depositInsuranceVaultIx(
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
-  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
-    Exchange.programId,
-    Exchange.zetaGroupAddress,
-    Exchange.zetaGroup.insuranceVaultNonce
-  );
-
   return Exchange.program.instruction.depositInsuranceVault(
     new anchor.BN(amount),
     {
       accounts: {
         zetaGroup: Exchange.zetaGroupAddress,
-        insuranceVault: insuranceVaultAddress,
+        insuranceVault: Exchange.insuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
+        zetaVault: Exchange.vaultAddress,
+        socializedLossAccount: Exchange.socializedLossAccountAddress,
         authority: userKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       },
@@ -125,18 +115,12 @@ export async function withdrawInsuranceVaultIx(
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
-  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
-    Exchange.programId,
-    Exchange.zetaGroupAddress,
-    Exchange.zetaGroup.insuranceVaultNonce
-  );
-
   return Exchange.program.instruction.withdrawInsuranceVault(
     new anchor.BN(percentageAmount),
     {
       accounts: {
         zetaGroup: Exchange.zetaGroupAddress,
-        insuranceVault: insuranceVaultAddress,
+        insuranceVault: Exchange.insuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
         authority: userKey,
@@ -155,22 +139,18 @@ export async function withdrawIx(
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): Promise<TransactionInstruction> {
-  let vaultAddress = await utils.createVaultAddress(
-    Exchange.programId,
-    Exchange.zetaGroupAddress,
-    Exchange.zetaGroup.vaultNonce
-  );
-
   return Exchange.program.instruction.withdraw(new anchor.BN(amount), {
     accounts: {
+      state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
-      vault: vaultAddress,
+      vault: Exchange.vaultAddress,
       marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
       greeks: Exchange.zetaGroup.greeks,
       oracle: Exchange.zetaGroup.oracle,
+      socializedLossAccount: Exchange.socializedLossAccountAddress,
     },
   });
 }
@@ -535,6 +515,12 @@ export async function initializeZetaGroupIx(
     Exchange.zetaGroupAddress
   );
 
+  let [socializedLossAccount, socializedLossAccountNonce] =
+    await utils.getSocializedLossAccount(
+      Exchange.programId,
+      Exchange.zetaGroupAddress
+    );
+
   return Exchange.program.instruction.initializeZetaGroup(
     {
       zetaGroupNonce,
@@ -542,6 +528,7 @@ export async function initializeZetaGroupIx(
       greeksNonce,
       vaultNonce,
       insuranceVaultNonce,
+      socializedLossAccountNonce,
       interestRate: args.interestRate,
       volatility: args.volatility,
       optionTradeNormalizer: args.optionTradeNormalizer,
@@ -564,6 +551,7 @@ export async function initializeZetaGroupIx(
         underlying,
         vault,
         insuranceVault,
+        socializedLossAccount,
         tokenProgram: TOKEN_PROGRAM_ID,
         usdcMint: Exchange.usdcMintAddress,
         rent: SYSVAR_RENT_PUBKEY,
@@ -575,23 +563,12 @@ export async function initializeZetaGroupIx(
 export async function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
 ): Promise<TransactionInstruction> {
-  let vaultAddress = await utils.createVaultAddress(
-    Exchange.programId,
-    Exchange.zetaGroupAddress,
-    Exchange.zetaGroup.vaultNonce
-  );
-
-  let insuranceVaultAddress = await utils.createZetaInsuranceVaultAddress(
-    Exchange.programId,
-    Exchange.zetaGroupAddress,
-    Exchange.zetaGroup.insuranceVaultNonce
-  );
-
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
-      zetaVault: vaultAddress,
-      insuranceVault: insuranceVaultAddress,
+      zetaVault: Exchange.vaultAddress,
+      insuranceVault: Exchange.insuranceVaultAddress,
+      socializedLossAccount: Exchange.socializedLossAccountAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,
