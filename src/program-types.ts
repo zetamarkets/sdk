@@ -15,6 +15,9 @@ export interface State {
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
   insuranceVaultLiquidationPercentage: number;
+  nativeTradeFeePercentage: anchor.BN;
+  nativeUnderlyingFeePercentage: anchor.BN;
+  nativeWhitelistUnderlyingFeePercentage: anchor.BN;
 }
 
 export interface MarketIndexes {
