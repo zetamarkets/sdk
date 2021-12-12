@@ -144,21 +144,6 @@ export async function getVault(
   );
 }
 
-export async function createVaultAddress(
-  programId: PublicKey,
-  zetaGroup: PublicKey,
-  vaultNonce: number
-): Promise<PublicKey> {
-  return await anchor.web3.PublicKey.createProgramAddress(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode("vault")),
-      zetaGroup.toBuffer(),
-      Buffer.from([vaultNonce]),
-    ],
-    programId
-  );
-}
-
 export async function getSerumVault(
   programId: PublicKey,
   mint: PublicKey
@@ -193,21 +178,6 @@ export async function getZetaInsuranceVault(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-insurance-vault")),
       zetaGroup.toBuffer(),
-    ],
-    programId
-  );
-}
-
-export async function createZetaInsuranceVaultAddress(
-  programId: PublicKey,
-  zetaGroup: PublicKey,
-  insuranceVaultNonce: number
-): Promise<PublicKey> {
-  return await anchor.web3.PublicKey.createProgramAddress(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode("zeta-insurance-vault")),
-      zetaGroup.toBuffer(),
-      Buffer.from([insuranceVaultNonce]),
     ],
     programId
   );
@@ -362,6 +332,19 @@ export async function getMarketUninitialized(
   );
 }
 
+export async function getSocializedLossAccount(
+  programId: PublicKey,
+  zetaGroup: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("socialized-loss")),
+      zetaGroup.toBuffer(),
+    ],
+    programId
+  );
+}
+
 /**
  * Returns the expected PDA by serum to own the serum vault
  * Serum uses a u64 as nonce which is not the same as
@@ -384,23 +367,6 @@ export async function getSerumVaultOwnerAndNonce(
     }
   }
   throw new Error("Unable to find nonce");
-}
-
-export async function createUsdcMint(
-  provider: anchor.Provider,
-  usdcMintAuthority: PublicKey
-): Promise<Token> {
-  let payer = (provider.wallet as anchor.Wallet).payer;
-  // This is for USDC for the program overall
-  let usdcMint = await Token.createMint(
-    provider.connection,
-    payer,
-    usdcMintAuthority,
-    null,
-    6,
-    TOKEN_PROGRAM_ID
-  );
-  return usdcMint;
 }
 
 /**
@@ -670,6 +636,11 @@ export function displayState() {
         expirySeries.expiryTs * 1000
       )} Live: ${expirySeries.isLive()}`
     );
+    let interestRate = convertNativeBNToDecimal(
+      Exchange.greeks.interestRate[index],
+      true
+    );
+    console.log(`Interest rate: ${interestRate}`);
     let markets = Exchange.markets.getMarketsByExpiryIndex(index);
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
@@ -699,60 +670,6 @@ export function displayState() {
       );
     }
   }
-}
-
-/**
- * Allows you to pass in a map that may have cached values for openOrdersAccounts
- * @param eventQueue
- * @param marketIndex
- * @param openOrdersToMargin
- * @returns remainingAccounts
- */
-export async function getCrankRemainingAccounts(
-  eventQueue: any[],
-  marketIndex: number,
-  openOrdersToMargin?: Map<PublicKey, PublicKey>
-) {
-  const openOrdersSet = new Set();
-  for (var i = 0; i < eventQueue.length; i++) {
-    openOrdersSet.add(eventQueue[i].openOrders.toString());
-    if (openOrdersSet.size == constants.CRANK_ACCOUNT_LIMIT) {
-      break;
-    }
-  }
-
-  const uniqueOpenOrders = sortOpenOrderKeys(
-    [...openOrdersSet].map((s) => new PublicKey(s))
-  );
-
-  let remainingAccounts: any[] = new Array(uniqueOpenOrders.length * 2);
-
-  await Promise.all(
-    uniqueOpenOrders.map(async (openOrders, index) => {
-      let marginAccount: PublicKey;
-      if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
-        marginAccount = await getMarginFromOpenOrders(openOrders, marketIndex);
-        openOrdersToMargin.set(openOrders, marginAccount);
-      } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
-        marginAccount = openOrdersToMargin.get(openOrders);
-      } else {
-        marginAccount = await getMarginFromOpenOrders(openOrders, marketIndex);
-      }
-
-      let openOrdersIndex = index * 2;
-      remainingAccounts[openOrdersIndex] = {
-        pubkey: openOrders,
-        isSigner: false,
-        isWritable: true,
-      };
-      remainingAccounts[openOrdersIndex + 1] = {
-        pubkey: marginAccount,
-        isSigner: false,
-        isWritable: true,
-      };
-    })
-  );
-  return remainingAccounts;
 }
 
 export async function getMarginFromOpenOrders(
@@ -889,7 +806,54 @@ export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
   );
 }
 
-export async function crankMarket(market: Market, remainingAccounts: any[]) {
+/*
+ * Allows you to pass in a map that may have cached values for openOrdersAccounts
+ */
+export async function crankMarket(
+  marketIndex: number,
+  openOrdersToMargin?: Map<PublicKey, PublicKey>
+) {
+  let market = Exchange.markets.markets[marketIndex];
+  let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
+  const openOrdersSet = new Set();
+  for (var i = 0; i < eventQueue.length; i++) {
+    openOrdersSet.add(eventQueue[i].openOrders.toString());
+    if (openOrdersSet.size == constants.CRANK_ACCOUNT_LIMIT) {
+      break;
+    }
+  }
+
+  const uniqueOpenOrders = sortOpenOrderKeys(
+    [...openOrdersSet].map((s) => new PublicKey(s))
+  );
+
+  let remainingAccounts: any[] = new Array(uniqueOpenOrders.length * 2);
+
+  await Promise.all(
+    uniqueOpenOrders.map(async (openOrders, index) => {
+      let marginAccount: PublicKey;
+      if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
+        marginAccount = await getMarginFromOpenOrders(openOrders, marketIndex);
+        openOrdersToMargin.set(openOrders, marginAccount);
+      } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
+        marginAccount = openOrdersToMargin.get(openOrders);
+      } else {
+        marginAccount = await getMarginFromOpenOrders(openOrders, marketIndex);
+      }
+
+      let openOrdersIndex = index * 2;
+      remainingAccounts[openOrdersIndex] = {
+        pubkey: openOrders,
+        isSigner: false,
+        isWritable: true,
+      };
+      remainingAccounts[openOrdersIndex + 1] = {
+        pubkey: marginAccount,
+        isSigner: false,
+        isWritable: true,
+      };
+    })
+  );
   let tx = new Transaction().add(
     crankMarketIx(
       market.address,

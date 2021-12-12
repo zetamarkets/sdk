@@ -15,6 +15,9 @@ export interface State {
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
   insuranceVaultLiquidationPercentage: number;
+  nativeTradeFeePercentage: anchor.BN;
+  nativeUnderlyingFeePercentage: anchor.BN;
+  nativeWhitelistUnderlyingFeePercentage: anchor.BN;
 }
 
 export interface MarketIndexes {
@@ -148,12 +151,17 @@ export interface TradeEvent {
 }
 
 export interface InsuranceDepositAccount {
-  amount: anchor.BN;
   nonce: number;
+  amount: anchor.BN;
 }
 
 export interface WhitelistInsuranceAccount {
   nonce: number;
+}
+
+export interface SocializedLossAccount {
+  nonce: number;
+  overbankruptAmount: anchor.BN;
 }
 
 export interface WhitelistTradingFeesAccount {
