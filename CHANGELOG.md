@@ -10,7 +10,8 @@ Version changes are pinned to SDK releases.
 - general: Support new changes for socialized loss mechanism. ([#25](https://github.com/zetamarkets/sdk/pull/25))
 - general: Added typedoc documentation and github action for publishing to gh-pages. ([#30](https://github.com/zetamarkets/sdk/pull/30))
 - general: Changed pkg manager from npm to yarn. ([#30](https://github.com/zetamarkets/sdk/pull/30))
-- client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/files))
+- client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/))
+- risk: Handle new margin calculation parameters being read from `ZetaGroup`. ([#31](https://github.com/zetamarkets/sdk/pull/31/))
 
 ## [0.8.3] 2021-12-08
 
