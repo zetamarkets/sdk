@@ -29,7 +29,6 @@ import {
 
 import { Position, Order, Side } from "./types";
 import { EventType } from "./events";
-import * as constants from "./constants";
 
 export class Client {
   /**
