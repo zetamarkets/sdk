@@ -406,18 +406,16 @@ export function convertNativeIntegerToDecimal(amount: number): number {
  */
 export function convertNativeBNToDecimal(
   number: anchor.BN,
-  pricing = false
+  precision = constants.PLATFORM_PRECISION
 ): number {
   // Note 53 bits - max number is slightly larger than 9 * 10 ^ 9 with decimals.
-  let precision = pricing
-    ? new anchor.BN(Math.pow(10, constants.PRICING_PRECISION))
-    : new anchor.BN(Math.pow(10, constants.PLATFORM_PRECISION));
+  let precisionBn = new anchor.BN(Math.pow(10, precision));
 
   return (
     // Integer
-    number.div(precision).toNumber() +
+    number.div(precisionBn).toNumber() +
     // Decimal
-    number.mod(precision).toNumber() / precision.toNumber()
+    number.mod(precisionBn).toNumber() / precisionBn.toNumber()
   );
 }
 
@@ -638,7 +636,7 @@ export function displayState() {
     );
     let interestRate = convertNativeBNToDecimal(
       Exchange.greeks.interestRate[index],
-      true
+      constants.PRICING_PRECISION
     );
     console.log(`Interest rate: ${interestRate}`);
     let markets = Exchange.markets.getMarketsByExpiryIndex(index);
@@ -650,7 +648,7 @@ export function displayState() {
       );
       let delta = convertNativeBNToDecimal(
         Exchange.greeks.productGreeks[greeksIndex].delta,
-        true
+        constants.PRICING_PRECISION
       );
 
       let sigma = Decimal.fromAnchorDecimal(

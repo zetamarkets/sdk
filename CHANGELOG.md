@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 - exchange: Add whitelist trading fees account initialization. ([#24](https://github.com/zetamarkets/sdk/pull/24/files))
 - client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/files))
+- risk: Move margin calculation parameters to `Exchange.riskParams` and read values from `ZetaGroup`.
 
 ## [0.8.3] 2021-12-08
 

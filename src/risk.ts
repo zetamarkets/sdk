@@ -5,10 +5,10 @@ import {
   MarginType,
   MarginRequirement,
   MarginAccountState,
+  MarginParams,
 } from "./types";
-import { ACTIVE_MARKETS } from "./constants";
+import { MARGIN_PRECISION, ACTIVE_MARKETS } from "./constants";
 import { MarginAccount } from "./program-types";
-import { FUTURES_MARGIN_PARAMS, OPTION_MARGIN_PARAMS } from "./constants";
 import { convertNativeBNToDecimal } from "./utils";
 
 export class RiskCalculator {
@@ -287,8 +287,8 @@ export function calculateProductMargin(
  * @param spotPrice     price of the spot.
  */
 export function calculateFutureMargin(spotPrice: number): MarginRequirement {
-  let initial = spotPrice * FUTURES_MARGIN_PARAMS.initial;
-  let maintenance = spotPrice * FUTURES_MARGIN_PARAMS.maintenance;
+  let initial = spotPrice * Exchange.marginParams.futureMarginInitial;
+  let maintenance = spotPrice * Exchange.marginParams.futureMarginMaintenance;
   return {
     initialLong: initial,
     initialShort: initial,
@@ -351,9 +351,15 @@ export function calculateShortOptionMargin(
   marginType: MarginType
 ): number {
   let basePercentageShort =
-    OPTION_MARGIN_PARAMS[marginType].basePercentageShort;
+    marginType == MarginType.INITIAL
+      ? Exchange.marginParams.optionBasePercentageShortInitial
+      : Exchange.marginParams.optionBasePercentageShortMaintenance;
+
   let spotPricePercentageShort =
-    OPTION_MARGIN_PARAMS[marginType].spotPricePercentageShort;
+    marginType == MarginType.INITIAL
+      ? Exchange.marginParams.optionSpotPercentageShortInitial
+      : Exchange.marginParams.optionSpotPercentageShortMaintenance;
+
   let dynamicMargin = spotPrice * (basePercentageShort - otmAmount / spotPrice);
   let minMargin = spotPrice * spotPricePercentageShort;
   return Math.max(dynamicMargin, minMargin);
@@ -370,8 +376,18 @@ export function calculateLongOptionMargin(
   markPrice: number,
   marginType: MarginType
 ): number {
+  let markPercentageLong =
+    marginType == MarginType.INITIAL
+      ? Exchange.marginParams.optionMarkPercentageLongInitial
+      : Exchange.marginParams.optionMarkPercentageLongMaintenance;
+
+  let spotPercentageLong =
+    marginType == MarginType.INITIAL
+      ? Exchange.marginParams.optionSpotPercentageLongInitial
+      : Exchange.marginParams.optionSpotPercentageLongMaintenance;
+
   return Math.min(
-    markPrice * OPTION_MARGIN_PARAMS[marginType].markPricePercentageLong,
-    spotPrice * OPTION_MARGIN_PARAMS[marginType].spotPricePercentageLong
+    markPrice * markPercentageLong,
+    spotPrice * spotPercentageLong
   );
 }

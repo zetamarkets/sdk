@@ -321,6 +321,34 @@
       ]
     },
     {
+      "name": "updateMarginParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMarginParametersArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "cleanZetaMarkets",
       "accounts": [
         {
@@ -1801,6 +1829,12 @@
             }
           },
           {
+            "name": "marginParameters",
+            "type": {
+              "defined": "MarginParameters"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -2112,6 +2146,54 @@
       }
     },
     {
+      "name": "MarginParameters",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "futureMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "futureMarginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionMarkPercentageLongInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageLongInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageShortInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionBasePercentageShortInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionMarkPercentageLongMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageLongMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageShortMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionBasePercentageShortMaintenance",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExpirySeries",
       "type": {
         "kind": "struct",
@@ -2398,6 +2480,54 @@
       }
     },
     {
+      "name": "UpdateMarginParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "futureMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "futureMarginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionMarkPercentageLongInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageLongInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageShortInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionBasePercentageShortInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionMarkPercentageLongMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageLongMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageShortMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionBasePercentageShortMaintenance",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitializeZetaGroupArgs",
       "type": {
         "kind": "struct",
@@ -2461,6 +2591,46 @@
           },
           {
             "name": "minDelta",
+            "type": "u64"
+          },
+          {
+            "name": "futureMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "futureMarginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionMarkPercentageLongInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageLongInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageShortInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionBasePercentageShortInitial",
+            "type": "u64"
+          },
+          {
+            "name": "optionMarkPercentageLongMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageLongMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionSpotPercentageShortMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionBasePercentageShortMaintenance",
             "type": "u64"
           }
         ]

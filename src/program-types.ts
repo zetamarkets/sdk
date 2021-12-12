@@ -44,6 +44,19 @@ export interface PricingParameters {
   maxDelta: anchor.BN;
 }
 
+export interface MarginParameters {
+  futureMarginInitial: anchor.BN;
+  futureMarginMaintenance: anchor.BN;
+  optionMarkPercentageLongInitial: anchor.BN;
+  optionSpotPercentageLongInitial: anchor.BN;
+  optionSpotPercentageShortInitial: anchor.BN;
+  optionBasePercentageShortInitial: anchor.BN;
+  optionMarkPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageShortMaintenance: anchor.BN;
+  optionBasePercentageShortMaintenance: anchor.BN;
+}
+
 export interface ZetaGroup {
   nonce: number;
   frontExpiryIndex: number;
@@ -51,6 +64,7 @@ export interface ZetaGroup {
   oracle: PublicKey;
   greeks: PublicKey;
   pricingParameters: PricingParameters;
+  marginParameters: MarginParameters;
   padding: Array<number>;
   products: Array<Product>;
   _productsPadding: Array<Product>;

@@ -25,17 +25,19 @@ import { EventType } from "./events";
 import { Network } from "./network";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
-import { DummyWallet, Wallet } from "./types";
+import { MarginParams, DummyWallet, Wallet } from "./types";
 import {
   InitializeZetaGroupPricingArgs,
+  UpdateMarginParametersArgs,
   initializeZetaMarketTxs,
   initializeZetaGroupIx,
   initializeMarketNodeIx,
   retreatMarketNodesIx,
   updatePricingIx,
   updatePricingParametersIx,
+  updateMarginParametersIx,
   updateVolatilityNodesIx,
-  UpdatePricingParameterArgs,
+  UpdatePricingParametersArgs,
   StateParams,
   rebalanceInsuranceVaultIx,
 } from "./program-instructions";
@@ -199,6 +201,11 @@ export class Exchange {
     return this._greeksAddress;
   }
   private _greeksAddress: PublicKey;
+
+  public get marginParams(): MarginParams {
+    return this._marginParams;
+  }
+  private _marginParams: MarginParams;
 
   /**
    * @param interval   How often to poll zeta group and state in seconds.
@@ -463,7 +470,8 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    */
   public async initializeZetaGroup(
     oracle: PublicKey,
-    args: InitializeZetaGroupPricingArgs,
+    pricingArgs: InitializeZetaGroupPricingArgs,
+    marginArgs: UpdateMarginParametersArgs,
     callback?: (type: EventType, data: any) => void
   ) {
     // TODO fix to be dynamic once we support more than 1 underlying.
@@ -504,7 +512,12 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     this._socializedLossAccountAddress = socializedLossAccount;
 
     let tx = new Transaction().add(
-      await initializeZetaGroupIx(underlyingMint, oracle, args)
+      await initializeZetaGroupIx(
+        underlyingMint,
+        oracle,
+        pricingArgs,
+        marginArgs
+      )
     );
     try {
       await utils.processTransaction(this._provider, tx);
@@ -556,8 +569,17 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   /**
    * Update the pricing parameters for a zeta group.
    */
-  public async updatePricingParameters(args: UpdatePricingParameterArgs) {
+  public async updatePricingParameters(args: UpdatePricingParametersArgs) {
     let tx = new Transaction().add(updatePricingParametersIx(args));
+    await utils.processTransaction(this._provider, tx);
+    await this.updateZetaGroup();
+  }
+
+  /**
+   * Update the margin parameters for a zeta group.
+   */
+  public async updateMarginParameters(args: UpdateMarginParametersArgs) {
+    let tx = new Transaction().add(updateMarginParametersIx(args));
     await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
   }
@@ -719,6 +741,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     this._zetaGroup = (await this.program.account.zetaGroup.fetch(
       this.zetaGroupAddress
     )) as ZetaGroup;
+    this.updateMarginParams();
   }
 
   /**
@@ -756,6 +779,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       if (this._markets !== undefined) {
         this._markets.updateExpirySeries();
       }
+      this.updateMarginParams();
       if (callback !== undefined) {
         if (expiry) {
           callback(EventType.EXPIRY, null);
@@ -849,7 +873,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    return utils.convertNativeBNToDecimal(this._greeks.markPrices[index]);
+    return utils.convertNativeBNToDecimal(
+      this._greeks.markPrices[index],
+      constants.PLATFORM_PRECISION
+    );
   }
 
   /**
@@ -944,6 +971,54 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       this._clockSubscriptionId = undefined;
     }
     await this._oracle.close();
+  }
+
+  public updateMarginParams() {
+    if (this.zetaGroup === undefined) {
+      return;
+    }
+    this._marginParams = {
+      futureMarginInitial: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.futureMarginInitial,
+        constants.MARGIN_PRECISION
+      ),
+      futureMarginMaintenance: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.futureMarginMaintenance,
+        constants.MARGIN_PRECISION
+      ),
+      optionMarkPercentageLongInitial: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionMarkPercentageLongInitial,
+        constants.MARGIN_PRECISION
+      ),
+      optionSpotPercentageLongInitial: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionSpotPercentageLongInitial,
+        constants.MARGIN_PRECISION
+      ),
+      optionSpotPercentageShortInitial: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionSpotPercentageShortInitial,
+        constants.MARGIN_PRECISION
+      ),
+      optionBasePercentageShortInitial: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionBasePercentageShortInitial,
+        constants.MARGIN_PRECISION
+      ),
+      optionMarkPercentageLongMaintenance: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionMarkPercentageLongMaintenance,
+        constants.MARGIN_PRECISION
+      ),
+      optionSpotPercentageLongMaintenance: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionSpotPercentageLongMaintenance,
+        constants.MARGIN_PRECISION
+      ),
+      optionSpotPercentageShortMaintenance: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionSpotPercentageShortMaintenance,
+        constants.MARGIN_PRECISION
+      ),
+      optionBasePercentageShortMaintenance: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionBasePercentageShortMaintenance,
+        constants.MARGIN_PRECISION
+      ),
+    };
   }
 }
 

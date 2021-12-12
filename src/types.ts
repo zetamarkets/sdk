@@ -148,3 +148,16 @@ export interface CancelArgs {
   orderId: anchor.BN;
   cancelSide: Side;
 }
+
+export interface MarginParams {
+  futureMarginInitial: number;
+  futureMarginMaintenance: number;
+  optionMarkPercentageLongInitial: number;
+  optionSpotPercentageLongInitial: number;
+  optionSpotPercentageShortInitial: number;
+  optionBasePercentageShortInitial: number;
+  optionMarkPercentageLongMaintenance: number;
+  optionSpotPercentageLongMaintenance: number;
+  optionSpotPercentageShortMaintenance: number;
+  optionBasePercentageShortMaintenance: number;
+}
