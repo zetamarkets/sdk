@@ -497,10 +497,24 @@ export interface InitializeZetaGroupPricingArgs {
   maxDelta: anchor.BN;
 }
 
+export interface UpdateMarginParametersArgs {
+  futureMarginInitial: anchor.BN;
+  futureMarginMaintenance: anchor.BN;
+  optionMarkPercentageLongInitial: anchor.BN;
+  optionSpotPercentageLongInitial: anchor.BN;
+  optionSpotPercentageShortInitial: anchor.BN;
+  optionBasePercentageShortInitial: anchor.BN;
+  optionMarkPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageShortMaintenance: anchor.BN;
+  optionBasePercentageShortMaintenance: anchor.BN;
+}
+
 export async function initializeZetaGroupIx(
   underlyingMint: PublicKey,
   oracle: PublicKey,
-  args: InitializeZetaGroupPricingArgs
+  pricingArgs: InitializeZetaGroupPricingArgs,
+  marginArgs: UpdateMarginParametersArgs
 ): Promise<TransactionInstruction> {
   let [zetaGroup, zetaGroupNonce] = await utils.getZetaGroup(
     Exchange.programId,
@@ -541,14 +555,32 @@ export async function initializeZetaGroupIx(
       vaultNonce,
       insuranceVaultNonce,
       socializedLossAccountNonce,
-      interestRate: args.interestRate,
-      volatility: args.volatility,
-      optionTradeNormalizer: args.optionTradeNormalizer,
-      futureTradeNormalizer: args.futureTradeNormalizer,
-      maxVolatilityRetreat: args.maxVolatilityRetreat,
-      maxInterestRetreat: args.maxInterestRetreat,
-      maxDelta: args.maxDelta,
-      minDelta: args.minDelta,
+      interestRate: pricingArgs.interestRate,
+      volatility: pricingArgs.volatility,
+      optionTradeNormalizer: pricingArgs.optionTradeNormalizer,
+      futureTradeNormalizer: pricingArgs.futureTradeNormalizer,
+      maxVolatilityRetreat: pricingArgs.maxVolatilityRetreat,
+      maxInterestRetreat: pricingArgs.maxInterestRetreat,
+      maxDelta: pricingArgs.maxDelta,
+      minDelta: pricingArgs.minDelta,
+      futureMarginInitial: marginArgs.futureMarginInitial,
+      futureMarginMaintenance: marginArgs.futureMarginMaintenance,
+      optionMarkPercentageLongInitial:
+        marginArgs.optionMarkPercentageLongInitial,
+      optionSpotPercentageLongInitial:
+        marginArgs.optionSpotPercentageLongInitial,
+      optionSpotPercentageShortInitial:
+        marginArgs.optionSpotPercentageShortInitial,
+      optionBasePercentageShortInitial:
+        marginArgs.optionBasePercentageShortInitial,
+      optionMarkPercentageLongMaintenance:
+        marginArgs.optionMarkPercentageLongMaintenance,
+      optionSpotPercentageLongMaintenance:
+        marginArgs.optionSpotPercentageLongMaintenance,
+      optionSpotPercentageShortMaintenance:
+        marginArgs.optionSpotPercentageShortMaintenance,
+      optionBasePercentageShortMaintenance:
+        marginArgs.optionBasePercentageShortMaintenance,
     },
     {
       accounts: {
@@ -689,6 +721,18 @@ export function updatePricingParametersIx(
   args: UpdatePricingParametersArgs
 ): TransactionInstruction {
   return Exchange.program.instruction.updatePricingParameters(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function updateMarginParametersIx(
+  args: UpdateMarginParametersArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateMarginParameters(args, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,

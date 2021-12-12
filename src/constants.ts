@@ -67,29 +67,4 @@ export const VOLATILITY_POINTS = 5;
 // Numbers represented in BN are generally fixed point integers with precision of 6.
 export const PLATFORM_PRECISION = 6;
 export const PRICING_PRECISION = 12;
-
-/**
- * markPricePercentageLong - Percentage of mark price for a long
- * spotPricePercentageLong = Percentage of spot price for a long
- * spotPricePercentageShort = Percentage of spot price for a short
- * basePercentageShort = The base percentage pre scaling for OTM
- */
-export const OPTION_MARGIN_PARAMS = {
-  initial: {
-    markPricePercentageLong: 1.0,
-    spotPricePercentageLong: 0.15,
-    spotPricePercentageShort: 0.1,
-    basePercentageShort: 0.25,
-  },
-  maintenance: {
-    markPricePercentageLong: 1.0,
-    spotPricePercentageLong: 0.075,
-    spotPricePercentageShort: 0.125,
-    basePercentageShort: 0.05,
-  },
-};
-
-export const FUTURES_MARGIN_PARAMS = {
-  initial: 0.15,
-  maintenance: 0.075,
-};
+export const MARGIN_PRECISION = 8;
