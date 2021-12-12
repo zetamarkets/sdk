@@ -274,7 +274,6 @@ export class Exchange {
     network: Network,
     connection: Connection,
     wallet: Wallet,
-    usdcMint: PublicKey,
     params: StateParams,
     opts?: ConfirmOptions
   ) {
@@ -311,7 +310,6 @@ export class Exchange {
             state,
             serumAuthority,
             mintAuthority,
-            mint: usdcMint,
             rent: SYSVAR_RENT_PUBKEY,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_PROGRAM_ID,
@@ -326,7 +324,7 @@ export class Exchange {
     exchange._stateAddress = state;
     exchange._serumAuthority = serumAuthority;
     exchange._mintAuthority = mintAuthority;
-    exchange._usdcMintAddress = usdcMint;
+    exchange._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
 
     await exchange.updateState();
     console.log(`Initialized zeta state!`);
@@ -414,9 +412,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     exchange._vaultAddress = vaultAddress;
     exchange._insuranceVaultAddress = insuranceVaultAddress;
     exchange._socializedLossAccountAddress = socializedLossAccount;
-
-    let usdcMint = await utils.getTokenMint(this.connection, vaultAddress);
-    exchange._usdcMintAddress = usdcMint;
+    exchange._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
 
     if (
       exchange.zetaGroup.products[
