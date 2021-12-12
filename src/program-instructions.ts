@@ -477,7 +477,7 @@ export async function initializeZetaMarketTxs(
   return [tx, tx2];
 }
 
-export interface UpdatePricingParameterArgs {
+export interface UpdatePricingParametersArgs {
   optionTradeNormalizer: anchor.BN;
   futureTradeNormalizer: anchor.BN;
   maxVolatilityRetreat: anchor.BN;
@@ -686,7 +686,7 @@ export function updatePricingIx(expiryIndex: number): TransactionInstruction {
 }
 
 export function updatePricingParametersIx(
-  args: UpdatePricingParameterArgs
+  args: UpdatePricingParametersArgs
 ): TransactionInstruction {
   return Exchange.program.instruction.updatePricingParameters(args, {
     accounts: {
