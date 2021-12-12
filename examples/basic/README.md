@@ -1,7 +1,7 @@
 ## Setup
 
 ```sh
-npm install
+yarn install
 
 ts-node basic-example.ts
 ```
