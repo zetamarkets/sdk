@@ -80,6 +80,10 @@ export interface Product {
   strike: Strike;
   dirty: boolean;
   kind: Object;
+  baseMintNonce: number;
+  quoteMintNonce: number;
+  zetaBaseVaultNonce: number;
+  zetaQuoteVaultNonce: number;
 }
 
 export interface Strike {

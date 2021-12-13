@@ -12,6 +12,7 @@ Version changes are pinned to SDK releases.
 - general: Changed pkg manager from npm to yarn. ([#30](https://github.com/zetamarkets/sdk/pull/30))
 - client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/))
 - risk: Handle new margin calculation parameters being read from `ZetaGroup`. ([#31](https://github.com/zetamarkets/sdk/pull/31/))
+- general: Move minting of dex tokens to place_order instead. ([]())
 
 ## [0.8.3] 2021-12-08
 
