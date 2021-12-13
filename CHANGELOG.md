@@ -11,8 +11,8 @@ Version changes are pinned to SDK releases.
 - general: Added typedoc documentation and github action for publishing to gh-pages. ([#30](https://github.com/zetamarkets/sdk/pull/30))
 - general: Changed pkg manager from npm to yarn. ([#30](https://github.com/zetamarkets/sdk/pull/30))
 - client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/))
-- risk: Handle new margin calculation parameters being read from `ZetaGroup`. ([#31](https://github.com/zetamarkets/sdk/pull/31/))
-- general: Move minting of dex tokens to place_order instead. ([]())
+- risk: Handle new margin calculation parameters being read from `ZetaGroup`. ([#31](https://github.com/zetamarkets/sdk/pull/31))
+- general: Move minting of dex tokens to place_order instead. ([33](https://github.com/zetamarkets/sdk/pull/33))
 
 ## [0.8.3] 2021-12-08
 
