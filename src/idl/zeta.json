@@ -2282,22 +2282,6 @@
             "type": {
               "defined": "Kind"
             }
-          },
-          {
-            "name": "baseMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "quoteMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaQuoteVaultNonce",
-            "type": "u8"
           }
         ]
       }
