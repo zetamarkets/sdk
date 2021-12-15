@@ -27,7 +27,7 @@ import { parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { Market } from "./market";
 import { OpenOrdersMap } from "./program-types";
-import { crankMarketIx } from "./program-instructions";
+import { cleanZetaMarketsIx, crankMarketIx } from "./program-instructions";
 import { Decimal } from "./decimal";
 
 export async function getState(
@@ -740,15 +740,7 @@ export async function cleanZetaMarkets(marketAccountTuples: any[]) {
   ) {
     let tx = new Transaction();
     let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
-    tx.add(
-      await Exchange.program.instruction.cleanZetaMarkets({
-        accounts: {
-          state: Exchange.stateAddress,
-          zetaGroup: Exchange.zetaGroupAddress,
-        },
-        remainingAccounts: slice.flat(),
-      })
-    );
+    tx.add(cleanZetaMarketsIx(slice.flat()));
     txs.push(tx);
   }
 

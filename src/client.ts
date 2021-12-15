@@ -549,7 +549,7 @@ export class Client {
 
     let tx = new Transaction();
     let ix = forceCancelOrdersIx(
-      market,
+      marketIndex,
       marginAccountToCancel,
       openOrdersAccountToCancel
     );

@@ -317,11 +317,11 @@ export async function cancelExpiredOrderIx(
 }
 
 export function forceCancelOrdersIx(
-  market: PublicKey,
+  marketIndex: number,
   marginAccount: PublicKey,
   openOrders: PublicKey
 ): TransactionInstruction {
-  let marketData = Exchange.markets.getMarket(market);
+  let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.forceCancelOrders({
     accounts: {
       greeks: Exchange.zetaGroup.greeks,
@@ -333,7 +333,7 @@ export function forceCancelOrdersIx(
         dexProgram: constants.DEX_PID,
         serumAuthority: Exchange.serumAuthority,
         openOrders,
-        market,
+        market: marketData.address,
         bids: marketData.serumMarket.decoded.bids,
         asks: marketData.serumMarket.decoded.asks,
         eventQueue: marketData.serumMarket.decoded.eventQueue,
@@ -475,39 +475,6 @@ export async function initializeZetaMarketTxs(
     )
   );
   return [tx, tx2];
-}
-
-export interface UpdatePricingParametersArgs {
-  optionTradeNormalizer: anchor.BN;
-  futureTradeNormalizer: anchor.BN;
-  maxVolatilityRetreat: anchor.BN;
-  maxInterestRetreat: anchor.BN;
-  maxDelta: anchor.BN;
-  minDelta: anchor.BN;
-}
-
-export interface InitializeZetaGroupPricingArgs {
-  interestRate: anchor.BN;
-  volatility: Array<anchor.BN>;
-  optionTradeNormalizer: anchor.BN;
-  futureTradeNormalizer: anchor.BN;
-  maxVolatilityRetreat: anchor.BN;
-  maxInterestRetreat: anchor.BN;
-  minDelta: anchor.BN;
-  maxDelta: anchor.BN;
-}
-
-export interface UpdateMarginParametersArgs {
-  futureMarginInitial: anchor.BN;
-  futureMarginMaintenance: anchor.BN;
-  optionMarkPercentageLongInitial: anchor.BN;
-  optionSpotPercentageLongInitial: anchor.BN;
-  optionSpotPercentageShortInitial: anchor.BN;
-  optionBasePercentageShortInitial: anchor.BN;
-  optionMarkPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageShortMaintenance: anchor.BN;
-  optionBasePercentageShortMaintenance: anchor.BN;
 }
 
 export async function initializeZetaGroupIx(
@@ -911,13 +878,216 @@ export function settlePositionsIx(
   });
 }
 
-export type StateParams = {
-  readonly expiryIntervalSeconds: number;
-  readonly newExpiryThresholdSeconds: number;
-  readonly strikeInitializationThresholdSeconds: number;
-  readonly pricingFrequencySeconds: number;
-  readonly insuranceVaultLiquidationPercentage: number;
-  readonly nativeTradeFeePercentage: anchor.BN;
-  readonly nativeUnderlyingFeePercentage: anchor.BN;
-  readonly nativeWhitelistUnderlyingFeePercentage: anchor.BN;
-};
+export function settlePositionsHaltedIx(
+  marginAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.settlePositionsHalted({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+    remainingAccounts: marginAccounts,
+  });
+}
+
+export function cleanZetaMarketsIx(
+  marginAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.cleanZetaMarkets({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+    remainingAccounts: marginAccounts,
+  });
+}
+
+export function cleanZetaMarketsHaltedIx(
+  marginAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.cleanZetaMarketsHalted({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+    remainingAccounts: marginAccounts,
+  });
+}
+
+export function updatePricingHaltedIx(
+  expiryIndex: number
+): TransactionInstruction {
+  return Exchange.program.instruction.updatePricingHalted(expiryIndex, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function cleanMarketNodesIx(
+  expiryIndex: number
+): TransactionInstruction {
+  let head = expiryIndex * constants.PRODUCTS_PER_EXPIRY;
+  let remainingAccounts = Exchange.greeks.nodeKeys
+    .map((x: PublicKey) => {
+      return {
+        pubkey: x,
+        isSigner: false,
+        isWritable: true,
+      };
+    })
+    .slice(head, head + constants.PRODUCTS_PER_EXPIRY);
+
+  return Exchange.program.instruction.cleanMarketNodes(expiryIndex, {
+    accounts: {
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+    },
+    remainingAccounts,
+  });
+}
+
+export function cancelOrderHaltedIx(
+  marketIndex: number,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  orderId: anchor.BN,
+  side: Side
+): TransactionInstruction {
+  let marketData = Exchange.markets.markets[marketIndex];
+  return Exchange.program.instruction.cancelOrderHalted(
+    toProgramSide(side),
+    orderId,
+    {
+      accounts: {
+        cancelAccounts: {
+          zetaGroup: Exchange.zetaGroupAddress,
+          state: Exchange.stateAddress,
+          marginAccount,
+          dexProgram: constants.DEX_PID,
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+        },
+      },
+    }
+  );
+}
+
+export function haltZetaGroupIx(): TransactionInstruction {
+  return Exchange.program.instruction.haltZetaGroup({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function unhaltZetaGroupIx(): TransactionInstruction {
+  return Exchange.program.instruction.unhaltZetaGroup({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function updateHaltStateIx(): TransactionInstruction {
+  return Exchange.program.instruction.updateHaltState({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function updateVolatilityIx(
+  args: UpdateVolatilityArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateVolatility(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      greeks: Exchange.greeksAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function updateInterestRateIx(
+  args: UpdateInterestRateArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateInterestRate(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      greeks: Exchange.greeksAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export interface UpdateVolatilityArgs {
+  expiryIndex: number;
+  volatility: Array<anchor.BN>;
+}
+
+export interface UpdateInterestRateArgs {
+  expiryIndex: number;
+  interestRate: anchor.BN;
+}
+
+export interface StateParams {
+  expiryIntervalSeconds: number;
+  newExpiryThresholdSeconds: number;
+  strikeInitializationThresholdSeconds: number;
+  pricingFrequencySeconds: number;
+  insuranceVaultLiquidationPercentage: number;
+  nativeTradeFeePercentage: anchor.BN;
+  nativeUnderlyingFeePercentage: anchor.BN;
+  nativeWhitelistUnderlyingFeePercentage: anchor.BN;
+}
+
+export interface UpdatePricingParametersArgs {
+  optionTradeNormalizer: anchor.BN;
+  futureTradeNormalizer: anchor.BN;
+  maxVolatilityRetreat: anchor.BN;
+  maxInterestRetreat: anchor.BN;
+  maxDelta: anchor.BN;
+  minDelta: anchor.BN;
+}
+
+export interface InitializeZetaGroupPricingArgs {
+  interestRate: anchor.BN;
+  volatility: Array<anchor.BN>;
+  optionTradeNormalizer: anchor.BN;
+  futureTradeNormalizer: anchor.BN;
+  maxVolatilityRetreat: anchor.BN;
+  maxInterestRetreat: anchor.BN;
+  minDelta: anchor.BN;
+  maxDelta: anchor.BN;
+}
+
+export interface UpdateMarginParametersArgs {
+  futureMarginInitial: anchor.BN;
+  futureMarginMaintenance: anchor.BN;
+  optionMarkPercentageLongInitial: anchor.BN;
+  optionSpotPercentageLongInitial: anchor.BN;
+  optionSpotPercentageShortInitial: anchor.BN;
+  optionBasePercentageShortInitial: anchor.BN;
+  optionMarkPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageShortMaintenance: anchor.BN;
+  optionBasePercentageShortMaintenance: anchor.BN;
+}
