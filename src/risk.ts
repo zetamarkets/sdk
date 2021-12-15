@@ -100,17 +100,17 @@ export class RiskCalculator {
     let pnl = 0;
     for (var i = 0; i < marginAccount.positions.length; i++) {
       let position = marginAccount.positions[i];
-      if (position.position == 0) {
+      if (position.position.toNumber() == 0) {
         continue;
       }
-      if (position.position > 0) {
+      if (position.position.toNumber() > 0) {
         pnl +=
-          position.position *
+          position.position.toNumber() *
             convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
-          position.position *
+          position.position.toNumber() *
             convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
@@ -126,14 +126,17 @@ export class RiskCalculator {
     let margin = 0;
     for (var i = 0; i < marginAccount.positions.length; i++) {
       let position = marginAccount.positions[i];
-      if (position.openingOrders[0] == 0 && position.openingOrders[1] == 0) {
+      if (
+        position.openingOrders[0].toNumber() == 0 &&
+        position.openingOrders[1].toNumber() == 0
+      ) {
         continue;
       }
       let marginPerMarket =
         this.getMarginRequirement(
           i,
           // Positive for buys.
-          position.openingOrders[0],
+          position.openingOrders[0].toNumber(),
           MarginType.INITIAL
         ) +
         this.getMarginRequirement(
@@ -157,13 +160,13 @@ export class RiskCalculator {
     let margin = 0;
     for (var i = 0; i < marginAccount.positions.length; i++) {
       let position = marginAccount.positions[i];
-      if (position.position == 0) {
+      if (position.position.toNumber() == 0) {
         continue;
       }
       let _ = this.getMarginRequirement(
         i,
         // This is signed.
-        position.position,
+        position.position.toNumber(),
         MarginType.MAINTENANCE
       );
       if (_ !== undefined) {

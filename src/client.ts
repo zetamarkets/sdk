@@ -652,9 +652,9 @@ export class Client {
     for (var i = 0; i < this._marginAccount.positions.length; i++) {
       let position = this._marginAccount.positions[i];
       if (
-        position.position !== 0 ||
-        position.openingOrders[0] != 0 ||
-        position.openingOrders[1] != 0
+        position.position.toNumber() !== 0 ||
+        position.openingOrders[0].toNumber() != 0 ||
+        position.openingOrders[1].toNumber() != 0
       ) {
         indexes.push(i);
       }
@@ -680,11 +680,11 @@ export class Client {
   private updatePositions() {
     let positions: Position[] = [];
     for (var i = 0; i < this._marginAccount.positions.length; i++) {
-      if (this._marginAccount.positions[i].position != 0) {
+      if (this._marginAccount.positions[i].position.toNumber() != 0) {
         positions.push({
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
-          position: this._marginAccount.positions[i].position,
+          position: this._marginAccount.positions[i].position.toNumber(),
           costOfTrades: utils.convertNativeBNToDecimal(
             this._marginAccount.positions[i].costOfTrades
           ),

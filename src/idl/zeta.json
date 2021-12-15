@@ -1415,7 +1415,7 @@
         },
         {
           "name": "size",
-          "type": "u32"
+          "type": "u64"
         },
         {
           "name": "side",
@@ -2742,7 +2742,7 @@
         "fields": [
           {
             "name": "position",
-            "type": "i32"
+            "type": "i64"
           },
           {
             "name": "costOfTrades",
@@ -2750,13 +2750,13 @@
           },
           {
             "name": "closingOrders",
-            "type": "u32"
+            "type": "u64"
           },
           {
             "name": "openingOrders",
             "type": {
               "array": [
-                "u32",
+                "u64",
                 2
               ]
             }

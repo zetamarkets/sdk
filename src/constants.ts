@@ -68,3 +68,4 @@ export const VOLATILITY_POINTS = 5;
 export const PLATFORM_PRECISION = 6;
 export const PRICING_PRECISION = 12;
 export const MARGIN_PRECISION = 8;
+export const POSITION_PRECISION = 3;
