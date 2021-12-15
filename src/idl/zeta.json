@@ -3046,141 +3046,131 @@
     },
     {
       "code": 350,
-      "name": "ProductMintSeedsMismatch",
-      "msg": "Product mint seeds mismatch"
-    },
-    {
-      "code": 351,
-      "name": "ZetaMarketVaultSeedsMismatch",
-      "msg": "Zeta market vault seeds mismatch"
-    },
-    {
-      "code": 352,
       "name": "UserTradingFeeWhitelistAccountSeedsMismatch",
       "msg": "User trading fee whitelist account seeds mismatch"
     },
     {
-      "code": 353,
+      "code": 351,
       "name": "MarketIndexesUninitialized",
       "msg": "Market indexes uninitialized"
     },
     {
-      "code": 354,
+      "code": 352,
       "name": "MarketIndexesAlreadyInitialized",
       "msg": "Market indexes already initialized"
     },
     {
-      "code": 355,
+      "code": 353,
       "name": "CannotGetUnsetStrike",
       "msg": "Cannot get unset strike"
     },
     {
-      "code": 356,
+      "code": 354,
       "name": "CannotSetInitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 357,
+      "code": 355,
       "name": "CannotResetUninitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 358,
+      "code": 356,
       "name": "CrankMarginAccountNotMutable",
       "msg": "CrankMarginAccountNotMutable"
     },
     {
-      "code": 359,
+      "code": 357,
       "name": "InvalidAdminSigner",
       "msg": "InvalidAdminSigner"
     },
     {
-      "code": 360,
+      "code": 358,
       "name": "UserHasActiveOrders",
       "msg": "User still has active orders"
     },
     {
-      "code": 361,
+      "code": 359,
       "name": "UserForceCancelInProgress",
       "msg": "User has a force cancel in progress"
     },
     {
-      "code": 362,
+      "code": 360,
       "name": "FailedPriceBandCheck",
       "msg": "Failed price band check"
     },
     {
-      "code": 363,
+      "code": 361,
       "name": "UnsortedOpenOrdersAccounts",
       "msg": "Unsorted open orders accounts"
     },
     {
-      "code": 364,
+      "code": 362,
       "name": "AccountNotMutable",
       "msg": "Account not mutable"
     },
     {
-      "code": 365,
+      "code": 363,
       "name": "AccountDiscriminatorMismatch",
       "msg": "Account discriminator mismatch"
     },
     {
-      "code": 366,
+      "code": 364,
       "name": "InvalidMarketNodeIndex",
       "msg": "Invalid market node index"
     },
     {
-      "code": 367,
+      "code": 365,
       "name": "InvalidMarketNode",
       "msg": "Invalid market node"
     },
     {
-      "code": 368,
+      "code": 366,
       "name": "LUTOutOfBounds",
       "msg": "Lut out of bounds"
     },
     {
-      "code": 369,
+      "code": 367,
       "name": "RebalanceInsuranceInvalidRemainingAccounts",
       "msg": "Rebalance insurance vault with no margin accounts"
     },
     {
-      "code": 370,
+      "code": 368,
       "name": "InvalidMintDecimals",
       "msg": "Invalid mint decimals"
     },
     {
-      "code": 371,
+      "code": 369,
       "name": "InvalidZetaGroupOracle",
       "msg": "Invalid oracle for this zeta group"
     },
     {
-      "code": 372,
+      "code": 370,
       "name": "InvalidZetaGroupDepositMint",
       "msg": "Invalid zeta group deposit mint"
     },
     {
-      "code": 373,
+      "code": 371,
       "name": "InvalidZetaGroupRebalanceMint",
       "msg": "Invalid zeta group rebalance insurance vault mint"
     },
     {
-      "code": 374,
+      "code": 372,
       "name": "InvalidDepositAmount",
       "msg": "Invalid deposit amount"
     },
     {
-      "code": 375,
+      "code": 373,
       "name": "InvalidTokenAccountOwner",
       "msg": "Invalid token account owner"
     },
     {
-      "code": 376,
+      "code": 374,
       "name": "InvalidWithdrawAmount",
       "msg": "Invalid withdraw amount"
     },
     {
-      "code": 377,
+      "code": 375,
       "name": "InvalidPlaceOrderRemainingAccounts",
       "msg": "Invalid number of remaining accounts in place order"
     }
