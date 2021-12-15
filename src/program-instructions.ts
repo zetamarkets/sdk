@@ -754,6 +754,163 @@ export function updateVolatilityNodesIx(
   });
 }
 
+export function initializeZetaStateIx(
+  stateAddress: PublicKey,
+  stateNonce: number,
+  serumAuthority: PublicKey,
+  serumNonce: number,
+  mintAuthority: PublicKey,
+  mintAuthorityNonce: number,
+  params: StateParams
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeZetaState(
+    {
+      stateNonce: stateNonce,
+      serumNonce: serumNonce,
+      mintAuthNonce: mintAuthorityNonce,
+      expiryIntervalSeconds: params.expiryIntervalSeconds,
+      newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
+      strikeInitializationThresholdSeconds:
+        params.strikeInitializationThresholdSeconds,
+      pricingFrequencySeconds: params.pricingFrequencySeconds,
+      insuranceVaultLiquidationPercentage:
+        params.insuranceVaultLiquidationPercentage,
+      nativeTradeFeePercentage: params.nativeTradeFeePercentage,
+      nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
+      nativeWhitelistUnderlyingFeePercentage:
+        params.nativeWhitelistUnderlyingFeePercentage,
+    },
+    {
+      accounts: {
+        state: stateAddress,
+        serumAuthority,
+        mintAuthority,
+        rent: SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        admin: Exchange.provider.wallet.publicKey,
+      },
+    }
+  );
+}
+
+export function updateZetaStateIx(params: StateParams): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaState(
+    {
+      expiryIntervalSeconds: params.expiryIntervalSeconds,
+      newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
+      strikeInitializationThresholdSeconds:
+        params.strikeInitializationThresholdSeconds,
+      pricingFrequencySeconds: params.pricingFrequencySeconds,
+      insuranceVaultLiquidationPercentage:
+        params.insuranceVaultLiquidationPercentage,
+      nativeTradeFeePercentage: params.nativeTradeFeePercentage,
+      nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
+      nativeWhitelistUnderlyingFeePercentage:
+        params.nativeWhitelistUnderlyingFeePercentage,
+    },
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin: Exchange.provider.wallet.publicKey,
+      },
+    }
+  );
+}
+
+export function initializeMarketIndexesIx(
+  marketIndexes: PublicKey,
+  nonce: number
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeMarketIndexes(nonce, {
+    accounts: {
+      state: Exchange.stateAddress,
+      marketIndexes: marketIndexes,
+      admin: Exchange.provider.wallet.publicKey,
+      systemProgram: SystemProgram.programId,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+export function addMarketIndexesIx(
+  marketIndexes: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.addMarketIndexes({
+    accounts: {
+      marketIndexes,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+
+export function initializeMarketStrikesIx(): TransactionInstruction {
+  return Exchange.program.instruction.initializeMarketStrikes({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      oracle: Exchange.zetaGroup.oracle,
+    },
+  });
+}
+
+export async function initializeWhitelistInsuranceAccountIx(
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
+    await utils.getUserWhitelistInsuranceAccount(this.program.programId, user);
+
+  return Exchange.program.instruction.initializeWhitelistInsuranceAccount(
+    whitelistInsuranceNonce,
+    {
+      accounts: {
+        whitelistInsuranceAccount,
+        admin: Exchange.provider.wallet.publicKey,
+        user: user,
+        systemProgram: SystemProgram.programId,
+        state: Exchange.stateAddress,
+      },
+    }
+  );
+}
+
+export async function initializeWhitelistTradingFeesAccountIx(
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  let [whitelistTradingFeesAccount, whitelistTradingFeesNonce] =
+    await utils.getUserWhitelistTradingFeesAccount(
+      Exchange.program.programId,
+      user
+    );
+
+  return Exchange.program.instruction.initializeWhitelistTradingFeesAccount(
+    whitelistTradingFeesNonce,
+    {
+      accounts: {
+        whitelistTradingFeesAccount,
+        admin: Exchange.provider.wallet.publicKey,
+        user: user,
+        systemProgram: SystemProgram.programId,
+        state: Exchange.stateAddress,
+      },
+    }
+  );
+}
+
+export function settlePositionsIx(
+  expirationTs: anchor.BN,
+  settlementPda: PublicKey,
+  nonce: number,
+  marginAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.settlePositions(expirationTs, nonce, {
+    accounts: {
+      zetaGroup: Exchange.zetaGroupAddress,
+      settlementAccount: settlementPda,
+    },
+    remainingAccounts: marginAccounts,
+  });
+}
+
 export type StateParams = {
   readonly expiryIntervalSeconds: number;
   readonly newExpiryThresholdSeconds: number;

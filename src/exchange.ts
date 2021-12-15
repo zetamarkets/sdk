@@ -26,22 +26,7 @@ import { Network } from "./network";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { MarginParams, DummyWallet, Wallet } from "./types";
-import {
-  InitializeZetaGroupPricingArgs,
-  UpdateMarginParametersArgs,
-  initializeZetaMarketTxs,
-  initializeZetaGroupIx,
-  initializeMarketNodeIx,
-  retreatMarketNodesIx,
-  updatePricingIx,
-  updatePricingParametersIx,
-  updateMarginParametersIx,
-  updateVolatilityNodesIx,
-  UpdatePricingParametersArgs,
-  StateParams,
-  rebalanceInsuranceVaultIx,
-} from "./program-instructions";
-
+import * as instructions from "./program-instructions";
 export class Exchange {
   /**
    * Whether the object has been loaded.
@@ -274,7 +259,7 @@ export class Exchange {
     network: Network,
     connection: Connection,
     wallet: Wallet,
-    params: StateParams,
+    params: instructions.StateParams,
     opts?: ConfirmOptions
   ) {
     exchange.init(programId, network, connection, wallet, opts);
@@ -287,36 +272,19 @@ export class Exchange {
       programId
     );
 
+    let tx = new Transaction().add(
+      instructions.initializeZetaStateIx(
+        state,
+        stateNonce,
+        serumAuthority,
+        serumNonce,
+        mintAuthority,
+        mintAuthorityNonce,
+        params
+      )
+    );
     try {
-      await exchange.program.rpc.initializeZetaState(
-        {
-          stateNonce: stateNonce,
-          serumNonce: serumNonce,
-          mintAuthNonce: mintAuthorityNonce,
-          expiryIntervalSeconds: params.expiryIntervalSeconds,
-          newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
-          strikeInitializationThresholdSeconds:
-            params.strikeInitializationThresholdSeconds,
-          pricingFrequencySeconds: params.pricingFrequencySeconds,
-          insuranceVaultLiquidationPercentage:
-            params.insuranceVaultLiquidationPercentage,
-          nativeTradeFeePercentage: params.nativeTradeFeePercentage,
-          nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
-          nativeWhitelistUnderlyingFeePercentage:
-            params.nativeWhitelistUnderlyingFeePercentage,
-        },
-        {
-          accounts: {
-            state,
-            serumAuthority,
-            mintAuthority,
-            rent: SYSVAR_RENT_PUBKEY,
-            systemProgram: SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            admin: wallet.publicKey,
-          },
-        }
-      );
+      await utils.processTransaction(this._provider, tx);
     } catch (e) {
       console.error(`Initialize zeta state failed: ${e}`);
     }
@@ -455,7 +423,9 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     let indexes = [...Array(constants.ACTIVE_MARKETS).keys()];
     await Promise.all(
       indexes.map(async (index: number) => {
-        let tx = new Transaction().add(await initializeMarketNodeIx(index));
+        let tx = new Transaction().add(
+          await instructions.initializeMarketNodeIx(index)
+        );
         await utils.processTransaction(this._provider, tx);
       })
     );
@@ -466,8 +436,8 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    */
   public async initializeZetaGroup(
     oracle: PublicKey,
-    pricingArgs: InitializeZetaGroupPricingArgs,
-    marginArgs: UpdateMarginParametersArgs,
+    pricingArgs: instructions.InitializeZetaGroupPricingArgs,
+    marginArgs: instructions.UpdateMarginParametersArgs,
     callback?: (type: EventType, data: any) => void
   ) {
     // TODO fix to be dynamic once we support more than 1 underlying.
@@ -508,7 +478,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     this._socializedLossAccountAddress = socializedLossAccount;
 
     let tx = new Transaction().add(
-      await initializeZetaGroupIx(
+      await instructions.initializeZetaGroupIx(
         underlyingMint,
         oracle,
         pricingArgs,
@@ -537,36 +507,21 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   /**
    * Update the expiry state variables for the program.
    */
-  public async updateZetaState(params: StateParams) {
-    await this.program.rpc.updateZetaState(
-      {
-        expiryIntervalSeconds: params.expiryIntervalSeconds,
-        newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
-        strikeInitializationThresholdSeconds:
-          params.strikeInitializationThresholdSeconds,
-        pricingFrequencySeconds: params.pricingFrequencySeconds,
-        insuranceVaultLiquidationPercentage:
-          params.insuranceVaultLiquidationPercentage,
-        nativeTradeFeePercentage: params.nativeTradeFeePercentage,
-        nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
-        nativeWhitelistUnderlyingFeePercentage:
-          params.nativeWhitelistUnderlyingFeePercentage,
-      },
-      {
-        accounts: {
-          state: this._stateAddress,
-          admin: this._provider.wallet.publicKey,
-        },
-      }
-    );
+  public async updateZetaState(params: instructions.StateParams) {
+    let tx = new Transaction().add(instructions.updateZetaStateIx(params));
+    await utils.processTransaction(this._provider, tx);
     await this.updateState();
   }
 
   /**
    * Update the pricing parameters for a zeta group.
    */
-  public async updatePricingParameters(args: UpdatePricingParametersArgs) {
-    let tx = new Transaction().add(updatePricingParametersIx(args));
+  public async updatePricingParameters(
+    args: instructions.UpdatePricingParametersArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.updatePricingParametersIx(args)
+    );
     await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
   }
@@ -574,8 +529,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   /**
    * Update the margin parameters for a zeta group.
    */
-  public async updateMarginParameters(args: UpdateMarginParametersArgs) {
-    let tx = new Transaction().add(updateMarginParametersIx(args));
+  public async updateMarginParameters(
+    args: instructions.UpdateMarginParametersArgs
+  ) {
+    let tx = new Transaction().add(instructions.updateMarginParametersIx(args));
     await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
   }
@@ -589,7 +546,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
       );
     }
-    let tx = new Transaction().add(updateVolatilityNodesIx(nodes));
+    let tx = new Transaction().add(instructions.updateVolatilityNodesIx(nodes));
     await utils.processTransaction(this._provider, tx);
   }
 
@@ -605,33 +562,27 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
 
     console.log("Initializing market indexes.");
 
+    let tx = new Transaction().add(
+      instructions.initializeMarketIndexesIx(marketIndexes, marketIndexesNonce)
+    );
     try {
-      await this.program.rpc.initializeMarketIndexes(marketIndexesNonce, {
-        accounts: {
-          state: this._stateAddress,
-          marketIndexes,
-          admin: this._provider.wallet.publicKey,
-          systemProgram: SystemProgram.programId,
-          zetaGroup: this._zetaGroupAddress,
-        },
-      });
+      await utils.processTransaction(this._provider, tx);
     } catch (e) {
       console.error(`Initialize market indexes failed: ${e}`);
     }
 
     // We initialize 50 indexes at a time in the program.
+    let tx2 = new Transaction().add(
+      instructions.addMarketIndexesIx(marketIndexes)
+    );
+
     for (
       var i = 0;
       i < constants.TOTAL_MARKETS;
       i += constants.MARKET_INDEX_LIMIT
     ) {
       try {
-        await this._program.rpc.addMarketIndexes({
-          accounts: {
-            marketIndexes,
-            zetaGroup: this._zetaGroupAddress,
-          },
-        });
+        await utils.processTransaction(this._provider, tx2);
       } catch (e) {
         console.error(`Add market indexes failed: ${e}`);
       }
@@ -657,7 +608,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         const bids = anchor.web3.Keypair.generate();
         const asks = anchor.web3.Keypair.generate();
 
-        let [tx, tx2] = await initializeZetaMarketTxs(
+        let [tx, tx2] = await instructions.initializeZetaMarketTxs(
           i,
           marketIndexesAccount.indexes[i],
           requestQueue.publicKey,
@@ -671,7 +622,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         if (this.network != Network.LOCALNET) {
           // Validate that the market hasn't already been initialized
           // So no sol is wasted on unnecessary accounts.
-          const [market, marketNonce] = await utils.getMarketUninitialized(
+          const [market, _marketNonce] = await utils.getMarketUninitialized(
             this.programId,
             this._zetaGroupAddress,
             marketIndexesAccount.indexes[i]
@@ -712,13 +663,8 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * Will throw if it is not strike initialization time.
    */
   public async initializeMarketStrikes() {
-    await this.program.rpc.initializeMarketStrikes({
-      accounts: {
-        state: this.stateAddress,
-        zetaGroup: this.zetaGroupAddress,
-        oracle: this.zetaGroup.oracle,
-      },
-    });
+    let tx = new Transaction().add(instructions.initializeMarketStrikesIx());
+    await utils.processTransaction(this._provider, tx);
   }
 
   /**
@@ -744,7 +690,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * Update pricing for an expiry index.
    */
   public async updatePricing(expiryIndex: number) {
-    let tx = new Transaction().add(updatePricingIx(expiryIndex));
+    let tx = new Transaction().add(instructions.updatePricingIx(expiryIndex));
     await utils.processTransaction(this._provider, tx);
   }
 
@@ -752,7 +698,9 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * Retreat volatility surface and interest rates for an expiry index.
    */
   public async retreatMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(retreatMarketNodesIx(expiryIndex));
+    let tx = new Transaction().add(
+      instructions.retreatMarketNodesIx(expiryIndex)
+    );
     await utils.processTransaction(this._provider, tx);
   }
 
@@ -879,48 +827,20 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * @param user user pubkey to be whitelisted for our insurance vault
    */
   public async whitelistUserForInsuranceVault(user: PublicKey) {
-    let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
-      await utils.getUserWhitelistInsuranceAccount(
-        this.program.programId,
-        user
-      );
-
-    await this._program.rpc.initializeWhitelistInsuranceAccount(
-      whitelistInsuranceNonce,
-      {
-        accounts: {
-          whitelistInsuranceAccount,
-          admin: this._provider.wallet.publicKey,
-          user,
-          systemProgram: SystemProgram.programId,
-          state: this._stateAddress,
-        },
-      }
+    let tx = new Transaction().add(
+      await instructions.initializeWhitelistInsuranceAccountIx(user)
     );
+    await utils.processTransaction(this._provider, tx);
   }
 
   /**
    * @param user user pubkey to be whitelisted for trading fees
    */
   public async whitelistUserForTradingFees(user: PublicKey) {
-    let [whitelistTradingFeesAccount, whitelistTradingFeesNonce] =
-      await utils.getUserWhitelistTradingFeesAccount(
-        this.program.programId,
-        user
-      );
-
-    await this._program.rpc.initializeWhitelistTradingFeesAccount(
-      whitelistTradingFeesNonce,
-      {
-        accounts: {
-          whitelistTradingFeesAccount,
-          admin: this._provider.wallet.publicKey,
-          user,
-          systemProgram: SystemProgram.programId,
-          state: this._stateAddress,
-        },
-      }
+    let tx = new Transaction().add(
+      await instructions.initializeWhitelistTradingFeesAccountIx(user)
     );
+    await utils.processTransaction(this._provider, tx);
   }
   /**
    *
@@ -935,7 +855,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     ) {
       let tx = new Transaction();
       let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
-      tx.add(await rebalanceInsuranceVaultIx(slice));
+      tx.add(await instructions.rebalanceInsuranceVaultIx(slice));
       txs.push(tx);
     }
     try {
@@ -1016,6 +936,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
       ),
     };
   }
+
+  /**
+   * Halt state functionality
+   */
 }
 
 // Exchange singleton.
