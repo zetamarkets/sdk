@@ -4,6 +4,7 @@ import {
   MAX_CANCELS_PER_TX,
   DEFAULT_CLIENT_POLL_INTERVAL,
   DEFAULT_CLIENT_TIMER_INTERVAL,
+  POSITION_PRECISION,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent } from "./program-types";
@@ -404,7 +405,7 @@ export class Client {
     let orderIx = placeOrderIx(
       marketIndex,
       price,
-      size,
+      size * Math.pow(10, POSITION_PRECISION),
       side,
       clientOrderId,
       this.marginAccountAddress,
@@ -516,7 +517,7 @@ export class Client {
       placeOrderIx(
         marketIndex,
         newOrderPrice,
-        newOrderSize,
+        newOrderSize * Math.pow(10, POSITION_PRECISION),
         newOrderSide,
         clientOrderId,
         this.marginAccountAddress,
