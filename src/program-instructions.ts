@@ -216,6 +216,7 @@ export async function placeOrderIx(
           },
         ]
       : [];
+
   return Exchange.program.instruction.placeOrder(
     new anchor.BN(price),
     new anchor.BN(size),
@@ -248,6 +249,11 @@ export async function placeOrderIx(
         },
         oracle: Exchange.zetaGroup.oracle,
         marketNode: Exchange.greeks.nodeKeys[marketIndex],
+        marketMint:
+          side == Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
+        mintAuthority: Exchange.mintAuthority,
       },
       remainingAccounts,
     }

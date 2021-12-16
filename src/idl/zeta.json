@@ -1161,6 +1161,16 @@
           "name": "marketNode",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "marketMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3133,5 +3143,8 @@
       "name": "InvalidPlaceOrderRemainingAccounts",
       "msg": "Invalid number of remaining accounts in place order"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "ZETAXyu4bSyZEjfrF3aqpmLW7mgpAS38R1wGHPmqt5d"
+  }
 }

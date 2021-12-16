@@ -90,15 +90,18 @@ export class ZetaGroupMarkets {
   /**
    * Returns the options market given an expiry index and options kind.
    */
-  public getOptionsMarketByExpiryIndex(expiryIndex: number, kind: Kind): Market[] {
+  public getOptionsMarketByExpiryIndex(
+    expiryIndex: number,
+    kind: Kind
+  ): Market[] {
     let markets = this.getMarketsByExpiryIndex(expiryIndex);
     switch (kind) {
-        case Kind.CALL:
-            return markets.slice(0, NUM_STRIKES);
-        case Kind.PUT:
-            return markets.slice(NUM_STRIKES, 2 * NUM_STRIKES);
-        default:
-            throw Error("Options market kind not supported, must be CALL or PUT");
+      case Kind.CALL:
+        return markets.slice(0, NUM_STRIKES);
+      case Kind.PUT:
+        return markets.slice(NUM_STRIKES, 2 * NUM_STRIKES);
+      default:
+        throw Error("Options market kind not supported, must be CALL or PUT");
     }
   }
 
@@ -114,22 +117,26 @@ export class ZetaGroupMarkets {
     return market;
   }
 
-  public getMarketByExpiryKindStrike(expiryIndex: number, kind: Kind, strike?: number): Market | undefined {
-      let markets = this.getMarketsByExpiryIndex(expiryIndex);
-      let marketsKind: Array<Market>;
-      if (kind === Kind.CALL || kind === Kind.PUT) {
-          if (strike === undefined) {
-              throw new Error("Strike must be specified for options markets");
-          }
-          marketsKind = this.getOptionsMarketByExpiryIndex(expiryIndex, kind);
-      } else if (kind === Kind.FUTURE) {
-          return this.getFuturesMarketByExpiryIndex(expiryIndex);
-      } else {
-          throw new Error("Only CALL, PUT, FUTURE kinds are supported");
+  public getMarketByExpiryKindStrike(
+    expiryIndex: number,
+    kind: Kind,
+    strike?: number
+  ): Market | undefined {
+    let markets = this.getMarketsByExpiryIndex(expiryIndex);
+    let marketsKind: Array<Market>;
+    if (kind === Kind.CALL || kind === Kind.PUT) {
+      if (strike === undefined) {
+        throw new Error("Strike must be specified for options markets");
       }
+      marketsKind = this.getOptionsMarketByExpiryIndex(expiryIndex, kind);
+    } else if (kind === Kind.FUTURE) {
+      return this.getFuturesMarketByExpiryIndex(expiryIndex);
+    } else {
+      throw new Error("Only CALL, PUT, FUTURE kinds are supported");
+    }
 
-      let market = marketsKind.filter( (x) => x.strike == strike);
-      return markets.length == 0 ? undefined : markets[0];
+    let market = marketsKind.filter((x) => x.strike == strike);
+    return markets.length == 0 ? undefined : markets[0];
   }
 
   private constructor() {
