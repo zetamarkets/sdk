@@ -560,7 +560,7 @@ export class Market {
     let orders = this.getMarketOrders();
 
     // Assumption of similar MAX number of instructions as regular cancel
-    let ixs = await getCancelInstructions(orders, true);
+    let ixs = await getCancelAllIxs(orders, true);
 
     let txs = [];
     for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {
@@ -583,7 +583,7 @@ export class Market {
     await this.updateOrderbook();
     let orders = this.getMarketOrders();
 
-    let ixs = await getCancelInstructions(orders, false);
+    let ixs = await getCancelAllIxs(orders, false);
     let txs = [];
 
     for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {

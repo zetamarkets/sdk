@@ -933,7 +933,7 @@ export function getMutMarketAccounts(marketIndex: number): Object[] {
   ];
 }
 
-export async function getCancelInstructions(
+export async function getCancelAllIxs(
   orders: any[],
   expiration: boolean
 ): Promise<TransactionInstruction[]> {
