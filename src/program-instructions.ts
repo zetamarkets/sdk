@@ -249,10 +249,10 @@ export async function placeOrderIx(
         },
         oracle: Exchange.zetaGroup.oracle,
         marketNode: Exchange.greeks.nodeKeys[marketIndex],
-        baseMint: marketData.serumMarket.baseMintAddress,
-        quoteMint: marketData.serumMarket.quoteMintAddress,
-        zetaBaseVault: marketData.baseVault,
-        zetaQuoteVault: marketData.quoteVault,
+        marketMint:
+          side == Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
       },
       remainingAccounts,

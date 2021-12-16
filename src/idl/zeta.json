@@ -1163,22 +1163,7 @@
           "isSigner": false
         },
         {
-          "name": "baseMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "quoteMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaBaseVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaQuoteVault",
+          "name": "marketMint",
           "isMut": true,
           "isSigner": false
         },
