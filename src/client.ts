@@ -351,7 +351,7 @@ export class Client {
   public async withdraw(amount: number): Promise<TransactionSignature> {
     let tx = new Transaction();
     tx.add(
-      await withdrawIx(
+      withdrawIx(
         amount,
         this._marginAccountAddress,
         this._usdcAccountAddress,
@@ -393,7 +393,7 @@ export class Client {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx = await placeOrderIx(
+    let orderIx = placeOrderIx(
       marketIndex,
       price,
       size,
@@ -434,7 +434,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let index = Exchange.markets.getMarketIndex(market);
-    let ix = await cancelOrderIx(
+    let ix = cancelOrderIx(
       index,
       this.publicKey,
       this._marginAccountAddress,
@@ -468,7 +468,7 @@ export class Client {
     let marketIndex = Exchange.markets.getMarketIndex(market);
     let ixs = [];
     ixs.push(
-      await cancelOrderIx(
+      cancelOrderIx(
         marketIndex,
         this.publicKey,
         this._marginAccountAddress,
@@ -478,7 +478,7 @@ export class Client {
       )
     );
     ixs.push(
-      await placeOrderIx(
+      placeOrderIx(
         marketIndex,
         newOrderPrice,
         newOrderSize,

@@ -26,8 +26,13 @@ import {
   getPriceFromSerumOrderKey,
   sleep,
   convertNativeBNToDecimal,
+  getCancelInstructions,
 } from "./utils";
-import { crankMarketIx, cancelExpiredOrderIx } from "./program-instructions";
+import {
+  cancelOrderHaltedIx,
+  crankMarketIx,
+  cancelExpiredOrderIx,
+} from "./program-instructions";
 import {
   Level,
   DepthOrderbook,
@@ -90,15 +95,18 @@ export class ZetaGroupMarkets {
   /**
    * Returns the options market given an expiry index and options kind.
    */
-  public getOptionsMarketByExpiryIndex(expiryIndex: number, kind: Kind): Market[] {
+  public getOptionsMarketByExpiryIndex(
+    expiryIndex: number,
+    kind: Kind
+  ): Market[] {
     let markets = this.getMarketsByExpiryIndex(expiryIndex);
     switch (kind) {
-        case Kind.CALL:
-            return markets.slice(0, NUM_STRIKES);
-        case Kind.PUT:
-            return markets.slice(NUM_STRIKES, 2 * NUM_STRIKES);
-        default:
-            throw Error("Options market kind not supported, must be CALL or PUT");
+      case Kind.CALL:
+        return markets.slice(0, NUM_STRIKES);
+      case Kind.PUT:
+        return markets.slice(NUM_STRIKES, 2 * NUM_STRIKES);
+      default:
+        throw Error("Options market kind not supported, must be CALL or PUT");
     }
   }
 
@@ -114,22 +122,26 @@ export class ZetaGroupMarkets {
     return market;
   }
 
-  public getMarketByExpiryKindStrike(expiryIndex: number, kind: Kind, strike?: number): Market | undefined {
-      let markets = this.getMarketsByExpiryIndex(expiryIndex);
-      let marketsKind: Array<Market>;
-      if (kind === Kind.CALL || kind === Kind.PUT) {
-          if (strike === undefined) {
-              throw new Error("Strike must be specified for options markets");
-          }
-          marketsKind = this.getOptionsMarketByExpiryIndex(expiryIndex, kind);
-      } else if (kind === Kind.FUTURE) {
-          return this.getFuturesMarketByExpiryIndex(expiryIndex);
-      } else {
-          throw new Error("Only CALL, PUT, FUTURE kinds are supported");
+  public getMarketByExpiryKindStrike(
+    expiryIndex: number,
+    kind: Kind,
+    strike?: number
+  ): Market | undefined {
+    let markets = this.getMarketsByExpiryIndex(expiryIndex);
+    let marketsKind: Array<Market>;
+    if (kind === Kind.CALL || kind === Kind.PUT) {
+      if (strike === undefined) {
+        throw new Error("Strike must be specified for options markets");
       }
+      marketsKind = this.getOptionsMarketByExpiryIndex(expiryIndex, kind);
+    } else if (kind === Kind.FUTURE) {
+      return this.getFuturesMarketByExpiryIndex(expiryIndex);
+    } else {
+      throw new Error("Only CALL, PUT, FUTURE kinds are supported");
+    }
 
-      let market = marketsKind.filter( (x) => x.strike == strike);
-      return markets.length == 0 ? undefined : markets[0];
+    let market = marketsKind.filter((x) => x.strike == strike);
+    return markets.length == 0 ? undefined : markets[0];
   }
 
   private constructor() {
@@ -548,36 +560,7 @@ export class Market {
     let orders = this.getMarketOrders();
 
     // Assumption of similar MAX number of instructions as regular cancel
-    let ixs = [];
-
-    await Promise.all(
-      orders.map(async (order) => {
-        const [openOrdersMap, _openOrdersMapNonce] = await getOpenOrdersMap(
-          Exchange.programId,
-          order.owner
-        );
-
-        let openOrdersMapInfo =
-          (await Exchange.program.account.openOrdersMap.fetch(
-            openOrdersMap
-          )) as OpenOrdersMap;
-
-        const [marginAccount, _marginNonce] = await getMarginAccount(
-          Exchange.programId,
-          Exchange.zetaGroupAddress,
-          openOrdersMapInfo.userKey
-        );
-
-        let ix = await cancelExpiredOrderIx(
-          this._marketIndex,
-          marginAccount,
-          order.owner,
-          order.orderId,
-          order.side
-        );
-        ixs.push(ix);
-      })
-    );
+    let ixs = await getCancelInstructions(orders, true);
 
     let txs = [];
     for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {
@@ -592,7 +575,28 @@ export class Market {
         await processTransaction(Exchange.provider, tx);
       })
     );
+  }
 
-    await sleep(1000);
+  public async cancelAllOrdersHalted() {
+    Exchange.assertHalted();
+
+    await this.updateOrderbook();
+    let orders = this.getMarketOrders();
+
+    let ixs = await getCancelInstructions(orders, false);
+    let txs = [];
+
+    for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {
+      let tx = new Transaction();
+      let slice = ixs.slice(i, i + MAX_CANCELS_PER_TX);
+      slice.forEach((ix) => tx.add(ix));
+      txs.push(tx);
+    }
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        await processTransaction(Exchange.provider, tx);
+      })
+    );
   }
 }

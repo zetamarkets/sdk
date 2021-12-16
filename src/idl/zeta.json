@@ -214,6 +214,11 @@
           "isSigner": false
         },
         {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -304,7 +309,7 @@
       ]
     },
     {
-      "name": "updateInterest",
+      "name": "updateInterestRate",
       "accounts": [
         {
           "name": "state",
@@ -2680,10 +2685,6 @@
           {
             "name": "spotPrice",
             "type": "u64"
-          },
-          {
-            "name": "expo",
-            "type": "u32"
           },
           {
             "name": "timestamp",

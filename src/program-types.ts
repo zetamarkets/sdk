@@ -63,7 +63,7 @@ export interface HaltState {
   timestamp: anchor.BN;
   markPricesSet: Array<boolean>;
   _markPricesSetPadding: Array<boolean>;
-  markedNodesCleaned: Array<boolean>;
+  marketNodesCleaned: Array<boolean>;
   _marketNodesCleanedPadding: Array<boolean>;
   marketCleaned: Array<boolean>;
   _marketCleanedPadding: Array<boolean>;

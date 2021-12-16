@@ -86,12 +86,12 @@ export async function depositIx(
  * @param usdcAccount
  * @param userKey
  */
-export async function depositInsuranceVaultIx(
+export function depositInsuranceVaultIx(
   amount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.depositInsuranceVault(
     new anchor.BN(amount),
     {
@@ -109,12 +109,12 @@ export async function depositInsuranceVaultIx(
   );
 }
 
-export async function withdrawInsuranceVaultIx(
+export function withdrawInsuranceVaultIx(
   percentageAmount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.withdrawInsuranceVault(
     new anchor.BN(percentageAmount),
     {
@@ -133,12 +133,12 @@ export async function withdrawInsuranceVaultIx(
 /**
  * @param amount the native amount to withdraw (6dp)
  */
-export async function withdrawIx(
+export function withdrawIx(
   amount: number,
   marginAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.withdraw(new anchor.BN(amount), {
     accounts: {
       state: Exchange.stateAddress,
@@ -195,7 +195,7 @@ export async function initializeOpenOrdersIx(
   ];
 }
 
-export async function placeOrderIx(
+export function placeOrderIx(
   marketIndex: number,
   price: number,
   size: number,
@@ -204,7 +204,7 @@ export async function placeOrderIx(
   authority: PublicKey,
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
@@ -254,14 +254,14 @@ export async function placeOrderIx(
   );
 }
 
-export async function cancelOrderIx(
+export function cancelOrderIx(
   marketIndex: number,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
   side: Side
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrder(
     toProgramSide(side),
@@ -286,13 +286,13 @@ export async function cancelOrderIx(
   );
 }
 
-export async function cancelExpiredOrderIx(
+export function cancelExpiredOrderIx(
   marketIndex: number,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
   side: Side
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelExpiredOrder(
     toProgramSide(side),
@@ -571,9 +571,9 @@ export async function initializeZetaGroupIx(
   );
 }
 
-export async function rebalanceInsuranceVaultIx(
+export function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
@@ -893,26 +893,26 @@ export function settlePositionsHaltedIx(
 }
 
 export function cleanZetaMarketsIx(
-  marginAccounts: any[]
+  marketAccounts: any[]
 ): TransactionInstruction {
   return Exchange.program.instruction.cleanZetaMarkets({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
     },
-    remainingAccounts: marginAccounts,
+    remainingAccounts: marketAccounts,
   });
 }
 
 export function cleanZetaMarketsHaltedIx(
-  marginAccounts: any[]
+  marketAccounts: any[]
 ): TransactionInstruction {
   return Exchange.program.instruction.cleanZetaMarketsHalted({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
     },
-    remainingAccounts: marginAccounts,
+    remainingAccounts: marketAccounts,
   });
 }
 
@@ -982,31 +982,39 @@ export function cancelOrderHaltedIx(
   );
 }
 
-export function haltZetaGroupIx(): TransactionInstruction {
+export function haltZetaGroupIx(
+  zetaGroupAddress: PublicKey
+): TransactionInstruction {
   return Exchange.program.instruction.haltZetaGroup({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
       admin: Exchange.provider.wallet.publicKey,
     },
   });
 }
 
-export function unhaltZetaGroupIx(): TransactionInstruction {
+export function unhaltZetaGroupIx(
+  zetaGroupAddress: PublicKey
+): TransactionInstruction {
   return Exchange.program.instruction.unhaltZetaGroup({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: zetaGroupAddress,
       admin: Exchange.provider.wallet.publicKey,
     },
   });
 }
 
-export function updateHaltStateIx(): TransactionInstruction {
-  return Exchange.program.instruction.updateHaltState({
+export function updateHaltStateIx(
+  zetaGroupAddress: PublicKey,
+  args: UpdateHaltStateArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateHaltState(args, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: zetaGroupAddress,
       admin: Exchange.provider.wallet.publicKey,
     },
   });
@@ -1036,6 +1044,11 @@ export function updateInterestRateIx(
       admin: Exchange.provider.wallet.publicKey,
     },
   });
+}
+
+export interface UpdateHaltStateArgs {
+  spotPrice: anchor.BN;
+  timestamp: anchor.BN;
 }
 
 export interface UpdateVolatilityArgs {

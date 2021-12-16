@@ -228,6 +228,10 @@ export class Exchange {
     return this._zetaGroup.expirySeries[this._zetaGroup.frontExpiryIndex];
   }
 
+  public get halted(): boolean {
+    return this._zetaGroup.haltState.halted;
+  }
+
   private init(
     programId: PublicKey,
     network: Network,
@@ -855,7 +859,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     ) {
       let tx = new Transaction();
       let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
-      tx.add(await instructions.rebalanceInsuranceVaultIx(slice));
+      tx.add(instructions.rebalanceInsuranceVaultIx(slice));
       txs.push(tx);
     }
     try {
@@ -938,8 +942,88 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   }
 
   /**
-   * Halt state functionality
+   * Halt zeta group functionality.
    */
+
+  public assertHalted() {
+    if (!this.zetaGroup.haltState.halted) {
+      throw "Zeta group not halted.";
+    }
+  }
+
+  public async haltZetaGroup(zetaGroupAddress: PublicKey) {
+    let tx = new Transaction().add(
+      instructions.haltZetaGroupIx(zetaGroupAddress)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async unhaltZetaGroup(zetaGroupAddress: PublicKey) {
+    let tx = new Transaction().add(
+      instructions.unhaltZetaGroupIx(zetaGroupAddress)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async updateHaltState(
+    zetaGroupAddress: PublicKey,
+    args: instructions.UpdateHaltStateArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.updateHaltStateIx(zetaGroupAddress, args)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async settlePositionsHalted(marginAccounts: any[]) {
+    let tx = new Transaction().add(
+      instructions.settlePositionsHaltedIx(marginAccounts)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async cancelAllOrdersHalted() {
+    this.assertHalted();
+    await Promise.all(
+      this._markets.markets.map(async (market) => {
+        await market.cancelAllOrdersHalted();
+      })
+    );
+  }
+
+  public async cleanZetaMarketsHalted() {
+    this.assertHalted();
+    let marketAccounts = await Promise.all(
+      this._markets.markets.map(async (market) => {
+        return utils.getMutMarketAccounts(market.marketIndex);
+      })
+    );
+    await utils.cleanZetaMarketsHalted(marketAccounts);
+  }
+
+  public async updatePricingHalted(expiryIndex: number) {
+    let tx = new Transaction().add(
+      instructions.updatePricingHaltedIx(expiryIndex)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async cleanMarketNodes(expiryIndex: number) {
+    let tx = new Transaction().add(
+      instructions.cleanMarketNodesIx(expiryIndex)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async updateVolatility(args: instructions.UpdateVolatilityArgs) {
+    let tx = new Transaction().add(instructions.updateVolatilityIx(args));
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async updateInterestRate(args: instructions.UpdateInterestRateArgs) {
+    let tx = new Transaction().add(instructions.updateInterestRateIx(args));
+    await utils.processTransaction(this._provider, tx);
+  }
 }
 
 // Exchange singleton.
