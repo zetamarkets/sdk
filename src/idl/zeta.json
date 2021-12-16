@@ -1396,6 +1396,16 @@
           "name": "marketNode",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "marketMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3598,5 +3608,8 @@
       "name": "HaltMarketNodesNotCleaned",
       "msg": "Halt market nodes not cleaned"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "ZETAXyu4bSyZEjfrF3aqpmLW7mgpAS38R1wGHPmqt5d"
+  }
 }

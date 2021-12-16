@@ -829,6 +829,9 @@ export async function crankMarket(
 ) {
   let market = Exchange.markets.markets[marketIndex];
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
+  if (eventQueue.length == 0) {
+    return;
+  }
   const openOrdersSet = new Set();
   for (var i = 0; i < eventQueue.length; i++) {
     openOrdersSet.add(eventQueue[i].openOrders.toString());
