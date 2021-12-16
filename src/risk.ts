@@ -7,7 +7,11 @@ import {
   MarginAccountState,
   MarginParams,
 } from "./types";
-import { MARGIN_PRECISION, ACTIVE_MARKETS } from "./constants";
+import {
+  MARGIN_PRECISION,
+  ACTIVE_MARKETS,
+  POSITION_PRECISION,
+} from "./constants";
 import { MarginAccount } from "./program-types";
 import { convertNativeBNToDecimal } from "./utils";
 
@@ -52,19 +56,28 @@ export class RiskCalculator {
     }
     if (size > 0) {
       if (marginType == MarginType.INITIAL) {
-        return size * this._marginRequirements[productIndex].initialLong;
+        return (
+          (size * this._marginRequirements[productIndex].initialLong) /
+          Math.pow(10, POSITION_PRECISION)
+        );
       } else {
-        return size * this._marginRequirements[productIndex].maintenanceLong;
+        return (
+          (size * this._marginRequirements[productIndex].maintenanceLong) /
+          Math.pow(10, POSITION_PRECISION)
+        );
       }
     } else {
       if (marginType == MarginType.INITIAL) {
         return (
-          Math.abs(size) * this._marginRequirements[productIndex].initialShort
+          (Math.abs(size) *
+            this._marginRequirements[productIndex].initialShort) /
+          Math.pow(10, POSITION_PRECISION)
         );
       } else {
         return (
-          Math.abs(size) *
-          this._marginRequirements[productIndex].maintenanceShort
+          (Math.abs(size) *
+            this._marginRequirements[productIndex].maintenanceShort) /
+          Math.pow(10, POSITION_PRECISION)
         );
       }
     }
