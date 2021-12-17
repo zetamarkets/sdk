@@ -63,6 +63,8 @@ export interface Order {
   orderId: BN;
   // Open orders account that owns the order.
   owner: PublicKey;
+  // Client order id.
+  clientOrderId: BN;
 }
 
 export function orderEquals(

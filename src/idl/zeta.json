@@ -1422,6 +1422,12 @@
           "type": {
             "defined": "Side"
           }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
         }
       ]
     },
@@ -1571,6 +1577,77 @@
         {
           "name": "orderId",
           "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderByClientOrderId",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
         }
       ]
     },
@@ -3585,26 +3662,31 @@
     },
     {
       "code": 376,
+      "name": "ClientOrderIdCannotBeZero",
+      "msg": "ClientOrderIdCannotBeZero"
+    },
+    {
+      "code": 377,
       "name": "ZetaGroupHalted",
       "msg": "Zeta group halted"
     },
     {
-      "code": 377,
+      "code": 378,
       "name": "ZetaGroupNotHalted",
       "msg": "Zeta group not halted"
     },
     {
-      "code": 378,
+      "code": 379,
       "name": "HaltMarkPriceNotSet",
       "msg": "Halt mark price not set"
     },
     {
-      "code": 379,
+      "code": 380,
       "name": "HaltMarketsNotCleaned",
       "msg": "Halt markets not cleaned"
     },
     {
-      "code": 380,
+      "code": 381,
       "name": "HaltMarketNodesNotCleaned",
       "msg": "Halt market nodes not cleaned"
     }
