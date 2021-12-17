@@ -26,7 +26,7 @@ import {
   getPriceFromSerumOrderKey,
   sleep,
   convertNativeBNToDecimal,
-  getCancelInstructions,
+  getCancelAllIxs,
 } from "./utils";
 import {
   cancelOrderHaltedIx,
