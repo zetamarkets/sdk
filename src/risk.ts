@@ -127,8 +127,9 @@ export class RiskCalculator {
             convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
+      console.log("pnl =", pnl);
     }
-    return pnl;
+    return pnl / Math.pow(10, POSITION_PRECISION);
   }
 
   /**
