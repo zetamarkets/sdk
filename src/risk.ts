@@ -118,18 +118,19 @@ export class RiskCalculator {
       }
       if (position.position.toNumber() > 0) {
         pnl +=
-          position.position.toNumber() *
-            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) -
+          (position.position.toNumber() *
+            convertNativeBNToDecimal(Exchange.greeks.markPrices[i])) /
+            Math.pow(10, POSITION_PRECISION) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
-          position.position.toNumber() *
-            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
+          (position.position.toNumber() *
+            convertNativeBNToDecimal(Exchange.greeks.markPrices[i])) /
+            Math.pow(10, POSITION_PRECISION) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
-      console.log("pnl =", pnl);
     }
-    return pnl / Math.pow(10, POSITION_PRECISION);
+    return pnl;
   }
 
   /**
@@ -246,7 +247,9 @@ export function calculateLiquidationPrice(
     return 0;
   }
   let availableBalance = accountBalance - marginRequirement + unrealizedPnl;
-  return markPrice - availableBalance / position;
+  return (
+    markPrice - availableBalance / (position / Math.pow(10, POSITION_PRECISION))
+  );
 }
 
 /**

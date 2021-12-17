@@ -611,7 +611,7 @@ export class Client {
       this._marginAccountAddress,
       market,
       liquidatedMarginAccount,
-      size
+      size * Math.pow(10, POSITION_PRECISION)
     );
     tx.add(ix);
     return await utils.processTransaction(this._provider, tx);
