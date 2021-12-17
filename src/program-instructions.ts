@@ -200,6 +200,7 @@ export async function placeOrderIx(
   price: number,
   size: number,
   side: Side,
+  clientOrderId: number,
   marginAccount: PublicKey,
   authority: PublicKey,
   openOrders: PublicKey,
@@ -221,6 +222,7 @@ export async function placeOrderIx(
     new anchor.BN(price),
     new anchor.BN(size),
     toProgramSide(side),
+    clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     {
       accounts: {
         state: Exchange.stateAddress,
@@ -272,6 +274,36 @@ export async function cancelOrderIx(
   return Exchange.program.instruction.cancelOrder(
     toProgramSide(side),
     orderId,
+    {
+      accounts: {
+        authority: userKey,
+        cancelAccounts: {
+          zetaGroup: Exchange.zetaGroupAddress,
+          state: Exchange.stateAddress,
+          marginAccount,
+          dexProgram: constants.DEX_PID,
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+        },
+      },
+    }
+  );
+}
+
+export async function cancelOrderByClientOrderIdIx(
+  marketIndex: number,
+  userKey: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  clientOrderId: anchor.BN
+): Promise<TransactionInstruction> {
+  let marketData = Exchange.markets.markets[marketIndex];
+  return Exchange.program.instruction.cancelOrderByClientOrderId(
+    clientOrderId,
     {
       accounts: {
         authority: userKey,

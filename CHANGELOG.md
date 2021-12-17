@@ -14,6 +14,8 @@ Version changes are pinned to SDK releases.
 - client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/))
 - risk: Handle new margin calculation parameters being read from `ZetaGroup`. ([#31](https://github.com/zetamarkets/sdk/pull/31))
 - general: Move minting of dex tokens to place_order instead. ([33](https://github.com/zetamarkets/sdk/pull/33))
+- client: Support client order ids for `PlaceOrder` and add `CancelOrderByClientOrderId`.
+- client: Add client order id to `Order`.
 
 ## [0.8.3] 2021-12-08
 

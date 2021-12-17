@@ -1187,6 +1187,12 @@
           "type": {
             "defined": "Side"
           }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
         }
       ]
     },
@@ -1264,6 +1270,77 @@
         {
           "name": "orderId",
           "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderByClientOrderId",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
         }
       ]
     },
@@ -3143,8 +3220,5 @@
       "name": "InvalidPlaceOrderRemainingAccounts",
       "msg": "Invalid number of remaining accounts in place order"
     }
-  ],
-  "metadata": {
-    "address": "ZETAXyu4bSyZEjfrF3aqpmLW7mgpAS38R1wGHPmqt5d"
-  }
+  ]
 }

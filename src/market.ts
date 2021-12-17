@@ -532,6 +532,7 @@ export class Market {
         side: order.side == "buy" ? Side.BID : Side.ASK,
         orderId: order.orderId,
         owner: order.openOrdersAddress,
+        clientOrderId: order.clientId,
       };
     });
   }
@@ -546,6 +547,7 @@ export class Market {
         side: order.side == "buy" ? Side.BID : Side.ASK,
         orderId: order.orderId,
         owner: order.openOrdersAddress,
+        clientOrderId: order.clientId,
       };
     });
   }

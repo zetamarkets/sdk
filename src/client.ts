@@ -23,6 +23,7 @@ import {
   depositIx,
   withdrawIx,
   cancelOrderIx,
+  cancelOrderByClientOrderIdIx,
   forceCancelOrdersIx,
   liquidateIx,
 } from "./program-instructions";
@@ -363,16 +364,23 @@ export class Client {
 
   /**
    * Places an order on a zeta market.
-   * @param market the address of the serum market
-   * @param price  the native price of the order (6 d.p as integer)
-   * @param size   the quantity of the order
-   * @param side   the side of the order. bid / ask
+   * @param market          the address of the serum market
+   * @param price           the native price of the order (6 d.p as integer)
+   * @param size            the quantity of the order
+   * @param side            the side of the order. bid / ask
+   * @param clientOrderId   optional: client order id (non 0 value)
+   * NOTE: If duplicate client order ids are used, after a cancel order,
+   * to cancel the second order with the same client order id,
+   * you may need to crank the corresponding event queue to flush that order id
+   * from the user open orders account before cancelling the second order.
+   * (Depending on the order in which the order was cancelled).
    */
   public async placeOrder(
     market: PublicKey,
     price: number,
     size: number,
-    side: Side
+    side: Side,
+    clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -398,6 +406,7 @@ export class Client {
       price,
       size,
       side,
+      clientOrderId,
       this.marginAccountAddress,
       this.publicKey,
       openOrdersPda,
@@ -426,7 +435,6 @@ export class Client {
    * @param orderId    the order id of the order.
    * @param side       the side of the order. bid / ask.
    */
-  // TODO: Could probably derive side from this._orders.
   public async cancelOrder(
     market: PublicKey,
     orderId: anchor.BN,
@@ -441,6 +449,32 @@ export class Client {
       this._openOrdersAccounts[index],
       orderId,
       side
+    );
+    tx.add(ix);
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Cancels a user order by client order id.
+   * It will only cancel the FIRST
+   * @param market          the market address of the order to be cancelled.
+   * @param clientOrderId   the client order id of the order. (Non zero value).
+   */
+  public async cancelOrderByClientOrderId(
+    market: PublicKey,
+    clientOrderId: number
+  ): Promise<TransactionSignature> {
+    if (clientOrderId == 0) {
+      throw Error("Client order id cannot be 0.");
+    }
+    let tx = new Transaction();
+    let index = Exchange.markets.getMarketIndex(market);
+    let ix = await cancelOrderByClientOrderIdIx(
+      index,
+      this.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[index],
+      new anchor.BN(clientOrderId)
     );
     tx.add(ix);
     return await utils.processTransaction(this._provider, tx);
@@ -462,7 +496,8 @@ export class Client {
     cancelSide: Side,
     newOrderPrice: number,
     newOrderSize: number,
-    newOrderSide: Side
+    newOrderSide: Side,
+    clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -483,6 +518,7 @@ export class Client {
         newOrderPrice,
         newOrderSize,
         newOrderSide,
+        clientOrderId,
         this.marginAccountAddress,
         this.publicKey,
         this._openOrdersAccounts[marketIndex],
