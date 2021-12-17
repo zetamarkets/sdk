@@ -139,7 +139,7 @@ export class InsuranceClient {
       );
     }
     tx.add(
-      await depositInsuranceVaultIx(
+      depositInsuranceVaultIx(
         amount,
         this._insuranceDepositAccountAddress,
         this._usdcAccountAddress,
@@ -165,7 +165,7 @@ export class InsuranceClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     tx.add(
-      await withdrawInsuranceVaultIx(
+      withdrawInsuranceVaultIx(
         percentageAmount,
         this._insuranceDepositAccountAddress,
         this._usdcAccountAddress,

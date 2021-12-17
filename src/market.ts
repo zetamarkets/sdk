@@ -26,8 +26,13 @@ import {
   getPriceFromSerumOrderKey,
   sleep,
   convertNativeBNToDecimal,
+  getCancelAllIxs,
 } from "./utils";
-import { crankMarketIx, cancelExpiredOrderIx } from "./program-instructions";
+import {
+  cancelOrderHaltedIx,
+  crankMarketIx,
+  cancelExpiredOrderIx,
+} from "./program-instructions";
 import {
   Level,
   DepthOrderbook,
@@ -555,36 +560,7 @@ export class Market {
     let orders = this.getMarketOrders();
 
     // Assumption of similar MAX number of instructions as regular cancel
-    let ixs = [];
-
-    await Promise.all(
-      orders.map(async (order) => {
-        const [openOrdersMap, _openOrdersMapNonce] = await getOpenOrdersMap(
-          Exchange.programId,
-          order.owner
-        );
-
-        let openOrdersMapInfo =
-          (await Exchange.program.account.openOrdersMap.fetch(
-            openOrdersMap
-          )) as OpenOrdersMap;
-
-        const [marginAccount, _marginNonce] = await getMarginAccount(
-          Exchange.programId,
-          Exchange.zetaGroupAddress,
-          openOrdersMapInfo.userKey
-        );
-
-        let ix = await cancelExpiredOrderIx(
-          this._marketIndex,
-          marginAccount,
-          order.owner,
-          order.orderId,
-          order.side
-        );
-        ixs.push(ix);
-      })
-    );
+    let ixs = await getCancelAllIxs(orders, true);
 
     let txs = [];
     for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {
@@ -599,7 +575,28 @@ export class Market {
         await processTransaction(Exchange.provider, tx);
       })
     );
+  }
 
-    await sleep(1000);
+  public async cancelAllOrdersHalted() {
+    Exchange.assertHalted();
+
+    await this.updateOrderbook();
+    let orders = this.getMarketOrders();
+
+    let ixs = await getCancelAllIxs(orders, false);
+    let txs = [];
+
+    for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {
+      let tx = new Transaction();
+      let slice = ixs.slice(i, i + MAX_CANCELS_PER_TX);
+      slice.forEach((ix) => tx.add(ix));
+      txs.push(tx);
+    }
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        await processTransaction(Exchange.provider, tx);
+      })
+    );
   }
 }
