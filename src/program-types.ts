@@ -57,22 +57,35 @@ export interface MarginParameters {
   optionBasePercentageShortMaintenance: anchor.BN;
 }
 
+export interface HaltState {
+  halted: boolean;
+  spotPrice: anchor.BN;
+  timestamp: anchor.BN;
+  markPricesSet: Array<boolean>;
+  _markPricesSetPadding: Array<boolean>;
+  marketNodesCleaned: Array<boolean>;
+  _marketNodesCleanedPadding: Array<boolean>;
+  marketCleaned: Array<boolean>;
+  _marketCleanedPadding: Array<boolean>;
+}
+
 export interface ZetaGroup {
   nonce: number;
+  vaultNonce: number;
+  insuranceVaultNonce: number;
   frontExpiryIndex: number;
+  haltState: HaltState;
   underlyingMint: PublicKey;
   oracle: PublicKey;
   greeks: PublicKey;
   pricingParameters: PricingParameters;
   marginParameters: MarginParameters;
-  padding: Array<number>;
   products: Array<Product>;
   _productsPadding: Array<Product>;
   expirySeries: Array<ExpirySeries>;
   _expirySeriesPadding: Array<ExpirySeries>;
-  vaultNonce: number;
-  insuranceVaultNonce: number;
   totalInsuranceVaultDeposits: anchor.BN;
+  padding: Array<number>;
 }
 
 export interface Product {

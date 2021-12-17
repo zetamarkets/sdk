@@ -27,7 +27,13 @@ import { parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { Market } from "./market";
 import { OpenOrdersMap } from "./program-types";
-import { crankMarketIx } from "./program-instructions";
+import {
+  cancelExpiredOrderIx,
+  cancelOrderHaltedIx,
+  cleanZetaMarketsIx,
+  cleanZetaMarketsHaltedIx,
+  crankMarketIx,
+} from "./program-instructions";
 import { Decimal } from "./decimal";
 
 export async function getState(
@@ -740,18 +746,28 @@ export async function cleanZetaMarkets(marketAccountTuples: any[]) {
   ) {
     let tx = new Transaction();
     let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
-    tx.add(
-      await Exchange.program.instruction.cleanZetaMarkets({
-        accounts: {
-          state: Exchange.stateAddress,
-          zetaGroup: Exchange.zetaGroupAddress,
-        },
-        remainingAccounts: slice.flat(),
-      })
-    );
+    tx.add(cleanZetaMarketsIx(slice.flat()));
     txs.push(tx);
   }
+  await Promise.all(
+    txs.map(async (tx) => {
+      await processTransaction(Exchange.provider, tx);
+    })
+  );
+}
 
+export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
+  let txs: Transaction[] = [];
+  for (
+    var i = 0;
+    i < marketAccountTuples.length;
+    i += constants.CLEAN_MARKET_LIMIT
+  ) {
+    let tx = new Transaction();
+    let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
+    tx.add(cleanZetaMarketsHaltedIx(slice.flat()));
+    txs.push(tx);
+  }
   await Promise.all(
     txs.map(async (tx) => {
       await processTransaction(Exchange.provider, tx);
@@ -799,7 +815,7 @@ export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
   await Promise.all(
     txs.map(async (tx) => {
       let txSig = await processTransaction(Exchange.provider, tx);
-      console.log(`Settling user: ${txSig}`);
+      console.log(`Settling users - TxId: ${txSig}`);
     })
   );
 }
@@ -898,4 +914,65 @@ export function getMostRecentExpiredIndex() {
   } else {
     return Exchange.markets.frontExpiryIndex - 1;
   }
+}
+
+export function getMutMarketAccounts(marketIndex: number): Object[] {
+  let market = Exchange.markets.markets[marketIndex];
+  return [
+    { pubkey: market.address, isSigner: false, isWritable: false },
+    {
+      pubkey: market.serumMarket.decoded.bids,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: market.serumMarket.decoded.asks,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+}
+
+export async function getCancelAllIxs(
+  orders: any[],
+  expiration: boolean
+): Promise<TransactionInstruction[]> {
+  let ixs: TransactionInstruction[] = [];
+  await Promise.all(
+    orders.map(async (order) => {
+      const [openOrdersMap, _openOrdersMapNonce] = await getOpenOrdersMap(
+        Exchange.programId,
+        order.owner
+      );
+
+      let openOrdersMapInfo =
+        (await Exchange.program.account.openOrdersMap.fetch(
+          openOrdersMap
+        )) as OpenOrdersMap;
+
+      const [marginAccount, _marginNonce] = await getMarginAccount(
+        Exchange.programId,
+        Exchange.zetaGroupAddress,
+        openOrdersMapInfo.userKey
+      );
+
+      let ix = expiration
+        ? cancelExpiredOrderIx(
+            order.marketIndex,
+            marginAccount,
+            order.owner,
+            order.orderId,
+            order.side
+          )
+        : cancelOrderHaltedIx(
+            order.marketIndex,
+            marginAccount,
+            order.owner,
+            order.orderId,
+            order.side
+          );
+      ixs.push(ix);
+    })
+  );
+  return ixs;
 }

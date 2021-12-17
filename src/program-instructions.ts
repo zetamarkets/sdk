@@ -86,12 +86,12 @@ export async function depositIx(
  * @param usdcAccount
  * @param userKey
  */
-export async function depositInsuranceVaultIx(
+export function depositInsuranceVaultIx(
   amount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.depositInsuranceVault(
     new anchor.BN(amount),
     {
@@ -109,12 +109,12 @@ export async function depositInsuranceVaultIx(
   );
 }
 
-export async function withdrawInsuranceVaultIx(
+export function withdrawInsuranceVaultIx(
   percentageAmount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.withdrawInsuranceVault(
     new anchor.BN(percentageAmount),
     {
@@ -133,12 +133,12 @@ export async function withdrawInsuranceVaultIx(
 /**
  * @param amount the native amount to withdraw (6dp)
  */
-export async function withdrawIx(
+export function withdrawIx(
   amount: number,
   marginAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.withdraw(new anchor.BN(amount), {
     accounts: {
       state: Exchange.stateAddress,
@@ -195,7 +195,7 @@ export async function initializeOpenOrdersIx(
   ];
 }
 
-export async function placeOrderIx(
+export function placeOrderIx(
   marketIndex: number,
   price: number,
   size: number,
@@ -205,7 +205,7 @@ export async function placeOrderIx(
   authority: PublicKey,
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
@@ -262,14 +262,14 @@ export async function placeOrderIx(
   );
 }
 
-export async function cancelOrderIx(
+export function cancelOrderIx(
   marketIndex: number,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
   side: Side
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrder(
     toProgramSide(side),
@@ -294,13 +294,13 @@ export async function cancelOrderIx(
   );
 }
 
-export async function cancelOrderByClientOrderIdIx(
+export function cancelOrderByClientOrderIdIx(
   marketIndex: number,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   clientOrderId: anchor.BN
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrderByClientOrderId(
     clientOrderId,
@@ -324,13 +324,13 @@ export async function cancelOrderByClientOrderIdIx(
   );
 }
 
-export async function cancelExpiredOrderIx(
+export function cancelExpiredOrderIx(
   marketIndex: number,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
   side: Side
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelExpiredOrder(
     toProgramSide(side),
@@ -355,11 +355,11 @@ export async function cancelExpiredOrderIx(
 }
 
 export function forceCancelOrdersIx(
-  market: PublicKey,
+  marketIndex: number,
   marginAccount: PublicKey,
   openOrders: PublicKey
 ): TransactionInstruction {
-  let marketData = Exchange.markets.getMarket(market);
+  let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.forceCancelOrders({
     accounts: {
       greeks: Exchange.zetaGroup.greeks,
@@ -371,7 +371,7 @@ export function forceCancelOrdersIx(
         dexProgram: constants.DEX_PID,
         serumAuthority: Exchange.serumAuthority,
         openOrders,
-        market,
+        market: marketData.address,
         bids: marketData.serumMarket.decoded.bids,
         asks: marketData.serumMarket.decoded.asks,
         eventQueue: marketData.serumMarket.decoded.eventQueue,
@@ -515,39 +515,6 @@ export async function initializeZetaMarketTxs(
   return [tx, tx2];
 }
 
-export interface UpdatePricingParametersArgs {
-  optionTradeNormalizer: anchor.BN;
-  futureTradeNormalizer: anchor.BN;
-  maxVolatilityRetreat: anchor.BN;
-  maxInterestRetreat: anchor.BN;
-  maxDelta: anchor.BN;
-  minDelta: anchor.BN;
-}
-
-export interface InitializeZetaGroupPricingArgs {
-  interestRate: anchor.BN;
-  volatility: Array<anchor.BN>;
-  optionTradeNormalizer: anchor.BN;
-  futureTradeNormalizer: anchor.BN;
-  maxVolatilityRetreat: anchor.BN;
-  maxInterestRetreat: anchor.BN;
-  minDelta: anchor.BN;
-  maxDelta: anchor.BN;
-}
-
-export interface UpdateMarginParametersArgs {
-  futureMarginInitial: anchor.BN;
-  futureMarginMaintenance: anchor.BN;
-  optionMarkPercentageLongInitial: anchor.BN;
-  optionSpotPercentageLongInitial: anchor.BN;
-  optionSpotPercentageShortInitial: anchor.BN;
-  optionBasePercentageShortInitial: anchor.BN;
-  optionMarkPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageShortMaintenance: anchor.BN;
-  optionBasePercentageShortMaintenance: anchor.BN;
-}
-
 export async function initializeZetaGroupIx(
   underlyingMint: PublicKey,
   oracle: PublicKey,
@@ -642,9 +609,9 @@ export async function initializeZetaGroupIx(
   );
 }
 
-export async function rebalanceInsuranceVaultIx(
+export function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       zetaGroup: Exchange.zetaGroupAddress,
@@ -792,13 +759,386 @@ export function updateVolatilityNodesIx(
   });
 }
 
-export type StateParams = {
-  readonly expiryIntervalSeconds: number;
-  readonly newExpiryThresholdSeconds: number;
-  readonly strikeInitializationThresholdSeconds: number;
-  readonly pricingFrequencySeconds: number;
-  readonly insuranceVaultLiquidationPercentage: number;
-  readonly nativeTradeFeePercentage: anchor.BN;
-  readonly nativeUnderlyingFeePercentage: anchor.BN;
-  readonly nativeWhitelistUnderlyingFeePercentage: anchor.BN;
-};
+export function initializeZetaStateIx(
+  stateAddress: PublicKey,
+  stateNonce: number,
+  serumAuthority: PublicKey,
+  serumNonce: number,
+  mintAuthority: PublicKey,
+  mintAuthorityNonce: number,
+  params: StateParams
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeZetaState(
+    {
+      stateNonce: stateNonce,
+      serumNonce: serumNonce,
+      mintAuthNonce: mintAuthorityNonce,
+      expiryIntervalSeconds: params.expiryIntervalSeconds,
+      newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
+      strikeInitializationThresholdSeconds:
+        params.strikeInitializationThresholdSeconds,
+      pricingFrequencySeconds: params.pricingFrequencySeconds,
+      insuranceVaultLiquidationPercentage:
+        params.insuranceVaultLiquidationPercentage,
+      nativeTradeFeePercentage: params.nativeTradeFeePercentage,
+      nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
+      nativeWhitelistUnderlyingFeePercentage:
+        params.nativeWhitelistUnderlyingFeePercentage,
+    },
+    {
+      accounts: {
+        state: stateAddress,
+        serumAuthority,
+        mintAuthority,
+        rent: SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        admin: Exchange.provider.wallet.publicKey,
+      },
+    }
+  );
+}
+
+export function updateZetaStateIx(params: StateParams): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaState(
+    {
+      expiryIntervalSeconds: params.expiryIntervalSeconds,
+      newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
+      strikeInitializationThresholdSeconds:
+        params.strikeInitializationThresholdSeconds,
+      pricingFrequencySeconds: params.pricingFrequencySeconds,
+      insuranceVaultLiquidationPercentage:
+        params.insuranceVaultLiquidationPercentage,
+      nativeTradeFeePercentage: params.nativeTradeFeePercentage,
+      nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
+      nativeWhitelistUnderlyingFeePercentage:
+        params.nativeWhitelistUnderlyingFeePercentage,
+    },
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin: Exchange.provider.wallet.publicKey,
+      },
+    }
+  );
+}
+
+export function initializeMarketIndexesIx(
+  marketIndexes: PublicKey,
+  nonce: number
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeMarketIndexes(nonce, {
+    accounts: {
+      state: Exchange.stateAddress,
+      marketIndexes: marketIndexes,
+      admin: Exchange.provider.wallet.publicKey,
+      systemProgram: SystemProgram.programId,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+export function addMarketIndexesIx(
+  marketIndexes: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.addMarketIndexes({
+    accounts: {
+      marketIndexes,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+
+export function initializeMarketStrikesIx(): TransactionInstruction {
+  return Exchange.program.instruction.initializeMarketStrikes({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      oracle: Exchange.zetaGroup.oracle,
+    },
+  });
+}
+
+export async function initializeWhitelistInsuranceAccountIx(
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
+    await utils.getUserWhitelistInsuranceAccount(this.program.programId, user);
+
+  return Exchange.program.instruction.initializeWhitelistInsuranceAccount(
+    whitelistInsuranceNonce,
+    {
+      accounts: {
+        whitelistInsuranceAccount,
+        admin: Exchange.provider.wallet.publicKey,
+        user: user,
+        systemProgram: SystemProgram.programId,
+        state: Exchange.stateAddress,
+      },
+    }
+  );
+}
+
+export async function initializeWhitelistTradingFeesAccountIx(
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  let [whitelistTradingFeesAccount, whitelistTradingFeesNonce] =
+    await utils.getUserWhitelistTradingFeesAccount(
+      Exchange.program.programId,
+      user
+    );
+
+  return Exchange.program.instruction.initializeWhitelistTradingFeesAccount(
+    whitelistTradingFeesNonce,
+    {
+      accounts: {
+        whitelistTradingFeesAccount,
+        admin: Exchange.provider.wallet.publicKey,
+        user: user,
+        systemProgram: SystemProgram.programId,
+        state: Exchange.stateAddress,
+      },
+    }
+  );
+}
+
+export function settlePositionsIx(
+  expirationTs: anchor.BN,
+  settlementPda: PublicKey,
+  nonce: number,
+  marginAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.settlePositions(expirationTs, nonce, {
+    accounts: {
+      zetaGroup: Exchange.zetaGroupAddress,
+      settlementAccount: settlementPda,
+    },
+    remainingAccounts: marginAccounts,
+  });
+}
+
+export function settlePositionsHaltedIx(
+  marginAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.settlePositionsHalted({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+    remainingAccounts: marginAccounts,
+  });
+}
+
+export function cleanZetaMarketsIx(
+  marketAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.cleanZetaMarkets({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+    remainingAccounts: marketAccounts,
+  });
+}
+
+export function cleanZetaMarketsHaltedIx(
+  marketAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.cleanZetaMarketsHalted({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+    remainingAccounts: marketAccounts,
+  });
+}
+
+export function updatePricingHaltedIx(
+  expiryIndex: number
+): TransactionInstruction {
+  return Exchange.program.instruction.updatePricingHalted(expiryIndex, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function cleanMarketNodesIx(
+  expiryIndex: number
+): TransactionInstruction {
+  let head = expiryIndex * constants.PRODUCTS_PER_EXPIRY;
+  let remainingAccounts = Exchange.greeks.nodeKeys
+    .map((x: PublicKey) => {
+      return {
+        pubkey: x,
+        isSigner: false,
+        isWritable: true,
+      };
+    })
+    .slice(head, head + constants.PRODUCTS_PER_EXPIRY);
+
+  return Exchange.program.instruction.cleanMarketNodes(expiryIndex, {
+    accounts: {
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+    },
+    remainingAccounts,
+  });
+}
+
+export function cancelOrderHaltedIx(
+  marketIndex: number,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  orderId: anchor.BN,
+  side: Side
+): TransactionInstruction {
+  let marketData = Exchange.markets.markets[marketIndex];
+  return Exchange.program.instruction.cancelOrderHalted(
+    toProgramSide(side),
+    orderId,
+    {
+      accounts: {
+        cancelAccounts: {
+          zetaGroup: Exchange.zetaGroupAddress,
+          state: Exchange.stateAddress,
+          marginAccount,
+          dexProgram: constants.DEX_PID,
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+        },
+      },
+    }
+  );
+}
+
+export function haltZetaGroupIx(
+  zetaGroupAddress: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.haltZetaGroup({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function unhaltZetaGroupIx(
+  zetaGroupAddress: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.unhaltZetaGroup({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function updateHaltStateIx(
+  zetaGroupAddress: PublicKey,
+  args: UpdateHaltStateArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateHaltState(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function updateVolatilityIx(
+  args: UpdateVolatilityArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateVolatility(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      greeks: Exchange.greeksAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function updateInterestRateIx(
+  args: UpdateInterestRateArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateInterestRate(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      greeks: Exchange.greeksAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export interface UpdateHaltStateArgs {
+  spotPrice: anchor.BN;
+  timestamp: anchor.BN;
+}
+
+export interface UpdateVolatilityArgs {
+  expiryIndex: number;
+  volatility: Array<anchor.BN>;
+}
+
+export interface UpdateInterestRateArgs {
+  expiryIndex: number;
+  interestRate: anchor.BN;
+}
+
+export interface StateParams {
+  expiryIntervalSeconds: number;
+  newExpiryThresholdSeconds: number;
+  strikeInitializationThresholdSeconds: number;
+  pricingFrequencySeconds: number;
+  insuranceVaultLiquidationPercentage: number;
+  nativeTradeFeePercentage: anchor.BN;
+  nativeUnderlyingFeePercentage: anchor.BN;
+  nativeWhitelistUnderlyingFeePercentage: anchor.BN;
+}
+
+export interface UpdatePricingParametersArgs {
+  optionTradeNormalizer: anchor.BN;
+  futureTradeNormalizer: anchor.BN;
+  maxVolatilityRetreat: anchor.BN;
+  maxInterestRetreat: anchor.BN;
+  maxDelta: anchor.BN;
+  minDelta: anchor.BN;
+}
+
+export interface InitializeZetaGroupPricingArgs {
+  interestRate: anchor.BN;
+  volatility: Array<anchor.BN>;
+  optionTradeNormalizer: anchor.BN;
+  futureTradeNormalizer: anchor.BN;
+  maxVolatilityRetreat: anchor.BN;
+  maxInterestRetreat: anchor.BN;
+  minDelta: anchor.BN;
+  maxDelta: anchor.BN;
+}
+
+export interface UpdateMarginParametersArgs {
+  futureMarginInitial: anchor.BN;
+  futureMarginMaintenance: anchor.BN;
+  optionMarkPercentageLongInitial: anchor.BN;
+  optionSpotPercentageLongInitial: anchor.BN;
+  optionSpotPercentageShortInitial: anchor.BN;
+  optionBasePercentageShortInitial: anchor.BN;
+  optionMarkPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageLongMaintenance: anchor.BN;
+  optionSpotPercentageShortMaintenance: anchor.BN;
+  optionBasePercentageShortMaintenance: anchor.BN;
+}

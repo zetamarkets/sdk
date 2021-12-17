@@ -16,6 +16,12 @@ Version changes are pinned to SDK releases.
 - general: Move minting of dex tokens to place_order instead. ([33](https://github.com/zetamarkets/sdk/pull/33))
 - client: Support client order ids for `PlaceOrder` and add `CancelOrderByClientOrderId`. ([33](https://github.com/zetamarkets/sdk/pull/33))
 - client: Add client order id to `Order`. ([33](https://github.com/zetamarkets/sdk/pull/33))
+- refactor: Replace program rpc calls with TransactionInstructions. ([34](https://github.com/zetamarkets/sdk/pull/34))
+- general: Support platform halt functionality. ([34](https://github.com/zetamarkets/sdk/pull/34))
+
+### Breaking
+
+- utils: `convertNativeBNToDecimal` now takes in an optional argument for the number of fixed point precision.
 
 ## [0.8.3] 2021-12-08
 
