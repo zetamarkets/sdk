@@ -18,6 +18,7 @@ Version changes are pinned to SDK releases.
 - client: Add client order id to `Order`. ([33](https://github.com/zetamarkets/sdk/pull/33))
 - refactor: Replace program rpc calls with TransactionInstructions. ([34](https://github.com/zetamarkets/sdk/pull/34))
 - general: Support platform halt functionality. ([34](https://github.com/zetamarkets/sdk/pull/34))
+- general: Making lot size more minute in execution and tick sizes. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 
 ### Breaking
 
