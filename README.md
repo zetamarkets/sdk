@@ -252,12 +252,17 @@ Set via `Exchange.markets.orderbookDepth = N`.
 Placing an order.
 
 - Placing an order on a new market (market index) will create a serum `OpenOrders` account. This is handled by the SDK.
+- The minimum price is $0.0001.
+- The minimum trade tick size is 0.001.
 
 ```ts
 // We need to convert price to the native spl token amount (6.dp)
 // utils.convertDecimalToNativeInteger(8) == (8*10^6)
 const orderPrice = utils.convertDecimalToNativeInteger(8);
-const orderLots = 1;
+
+// We need to convert to our native option lot size.
+// utils.convertDecimalToNativeLotSize(1) == (1*10^3)
+const orderLots = utils.convertDecimalToNativeLotSize(1);
 
 // Place a bid order.
 await client.placeOrder(

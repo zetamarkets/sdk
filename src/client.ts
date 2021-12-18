@@ -4,6 +4,7 @@ import {
   MAX_CANCELS_PER_TX,
   DEFAULT_CLIENT_POLL_INTERVAL,
   DEFAULT_CLIENT_TIMER_INTERVAL,
+  POSITION_PRECISION,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent } from "./program-types";
@@ -366,7 +367,7 @@ export class Client {
    * Places an order on a zeta market.
    * @param market          the address of the serum market
    * @param price           the native price of the order (6 d.p as integer)
-   * @param size            the quantity of the order
+   * @param size            the quantity of the order (3 d.p)
    * @param side            the side of the order. bid / ask
    * @param clientOrderId   optional: client order id (non 0 value)
    * NOTE: If duplicate client order ids are used, after a cancel order,
@@ -485,11 +486,10 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p)
-   * @param newOrderSize   the quantity of the order
+   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderSize   the quantity of the order (3 d.p) as integer
    * @param newOrderside   the side of the order. bid / ask
    */
-  // TODO: Could probably derive side from this._orders.
   public async cancelAndPlaceOrder(
     market: PublicKey,
     orderId: anchor.BN,
@@ -597,7 +597,7 @@ export class Client {
    * Calls liquidate on another user
    * @param market
    * @param liquidatedMarginAccount
-   * @param size
+   * @param size                        the quantity of the order (3 d.p)
    */
   public async liquidate(
     market: PublicKey,
@@ -652,9 +652,9 @@ export class Client {
     for (var i = 0; i < this._marginAccount.positions.length; i++) {
       let position = this._marginAccount.positions[i];
       if (
-        position.position !== 0 ||
-        position.openingOrders[0] != 0 ||
-        position.openingOrders[1] != 0
+        position.position.toNumber() !== 0 ||
+        position.openingOrders[0].toNumber() != 0 ||
+        position.openingOrders[1].toNumber() != 0
       ) {
         indexes.push(i);
       }
@@ -680,11 +680,13 @@ export class Client {
   private updatePositions() {
     let positions: Position[] = [];
     for (var i = 0; i < this._marginAccount.positions.length; i++) {
-      if (this._marginAccount.positions[i].position != 0) {
+      if (this._marginAccount.positions[i].position.toNumber() != 0) {
         positions.push({
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
-          position: this._marginAccount.positions[i].position,
+          position: utils.convertNativeLotSizeToDecimal(
+            this._marginAccount.positions[i].position.toNumber()
+          ),
           costOfTrades: utils.convertNativeBNToDecimal(
             this._marginAccount.positions[i].costOfTrades
           ),

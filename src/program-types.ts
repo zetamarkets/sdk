@@ -14,6 +14,7 @@ export interface State {
   newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
+  liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
   nativeTradeFeePercentage: anchor.BN;
   nativeUnderlyingFeePercentage: anchor.BN;
@@ -111,10 +112,10 @@ export interface OpenOrdersMap {
 }
 
 export interface Position {
-  position: number;
+  position: anchor.BN;
   costOfTrades: anchor.BN;
-  closingOrders: number;
-  openingOrders: [number, number];
+  closingOrders: anchor.BN;
+  openingOrders: [anchor.BN, anchor.BN];
 }
 
 export interface MarginAccount {

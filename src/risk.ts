@@ -7,9 +7,16 @@ import {
   MarginAccountState,
   MarginParams,
 } from "./types";
-import { MARGIN_PRECISION, ACTIVE_MARKETS } from "./constants";
+import {
+  MARGIN_PRECISION,
+  ACTIVE_MARKETS,
+  POSITION_PRECISION,
+} from "./constants";
 import { MarginAccount } from "./program-types";
-import { convertNativeBNToDecimal } from "./utils";
+import {
+  convertNativeBNToDecimal,
+  convertNativeLotSizeToDecimal,
+} from "./utils";
 
 export class RiskCalculator {
   /**
@@ -100,17 +107,17 @@ export class RiskCalculator {
     let pnl = 0;
     for (var i = 0; i < marginAccount.positions.length; i++) {
       let position = marginAccount.positions[i];
-      if (position.position == 0) {
+      if (position.position.toNumber() == 0) {
         continue;
       }
-      if (position.position > 0) {
+      if (position.position.toNumber() > 0) {
         pnl +=
-          position.position *
+          convertNativeLotSizeToDecimal(position.position.toNumber()) *
             convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
-          position.position *
+          convertNativeLotSizeToDecimal(position.position.toNumber()) *
             convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
@@ -126,20 +133,23 @@ export class RiskCalculator {
     let margin = 0;
     for (var i = 0; i < marginAccount.positions.length; i++) {
       let position = marginAccount.positions[i];
-      if (position.openingOrders[0] == 0 && position.openingOrders[1] == 0) {
+      if (
+        position.openingOrders[0].toNumber() == 0 &&
+        position.openingOrders[1].toNumber() == 0
+      ) {
         continue;
       }
       let marginPerMarket =
         this.getMarginRequirement(
           i,
           // Positive for buys.
-          position.openingOrders[0],
+          convertNativeLotSizeToDecimal(position.openingOrders[0].toNumber()),
           MarginType.INITIAL
         ) +
         this.getMarginRequirement(
           i,
           // Negative for sells.
-          -position.openingOrders[1],
+          convertNativeLotSizeToDecimal(-position.openingOrders[1]),
           MarginType.INITIAL
         );
       if (marginPerMarket !== undefined) {
@@ -157,13 +167,13 @@ export class RiskCalculator {
     let margin = 0;
     for (var i = 0; i < marginAccount.positions.length; i++) {
       let position = marginAccount.positions[i];
-      if (position.position == 0) {
+      if (position.position.toNumber() == 0) {
         continue;
       }
       let _ = this.getMarginRequirement(
         i,
         // This is signed.
-        position.position,
+        convertNativeLotSizeToDecimal(position.position.toNumber()),
         MarginType.MAINTENANCE
       );
       if (_ !== undefined) {

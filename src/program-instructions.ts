@@ -768,6 +768,7 @@ export function initializeZetaStateIx(
   mintAuthorityNonce: number,
   params: StateParams
 ): TransactionInstruction {
+  console.log(params);
   return Exchange.program.instruction.initializeZetaState(
     {
       stateNonce: stateNonce,
@@ -778,6 +779,7 @@ export function initializeZetaStateIx(
       strikeInitializationThresholdSeconds:
         params.strikeInitializationThresholdSeconds,
       pricingFrequencySeconds: params.pricingFrequencySeconds,
+      liquidatorLiquidationPercentage: params.liquidatorLiquidationPercentage,
       insuranceVaultLiquidationPercentage:
         params.insuranceVaultLiquidationPercentage,
       nativeTradeFeePercentage: params.nativeTradeFeePercentage,
@@ -807,6 +809,7 @@ export function updateZetaStateIx(params: StateParams): TransactionInstruction {
       strikeInitializationThresholdSeconds:
         params.strikeInitializationThresholdSeconds,
       pricingFrequencySeconds: params.pricingFrequencySeconds,
+      liquidatorLiquidationPercentage: params.liquidatorLiquidationPercentage,
       insuranceVaultLiquidationPercentage:
         params.insuranceVaultLiquidationPercentage,
       nativeTradeFeePercentage: params.nativeTradeFeePercentage,
@@ -862,7 +865,10 @@ export async function initializeWhitelistInsuranceAccountIx(
   user: PublicKey
 ): Promise<TransactionInstruction> {
   let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
-    await utils.getUserWhitelistInsuranceAccount(this.program.programId, user);
+    await utils.getUserWhitelistInsuranceAccount(
+      Exchange.program.programId,
+      user
+    );
 
   return Exchange.program.instruction.initializeWhitelistInsuranceAccount(
     whitelistInsuranceNonce,
@@ -1104,6 +1110,7 @@ export interface StateParams {
   newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
+  liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
   nativeTradeFeePercentage: anchor.BN;
   nativeUnderlyingFeePercentage: anchor.BN;
