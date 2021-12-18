@@ -490,7 +490,6 @@ export class Client {
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
    * @param newOrderside   the side of the order. bid / ask
    */
-  // TODO: Could probably derive side from this._orders.
   public async cancelAndPlaceOrder(
     market: PublicKey,
     orderId: anchor.BN,
