@@ -405,7 +405,7 @@ export class Client {
     let orderIx = placeOrderIx(
       marketIndex,
       price,
-      size * Math.pow(10, POSITION_PRECISION),
+      size,
       side,
       clientOrderId,
       this.marginAccountAddress,
@@ -517,7 +517,7 @@ export class Client {
       placeOrderIx(
         marketIndex,
         newOrderPrice,
-        newOrderSize * Math.pow(10, POSITION_PRECISION),
+        newOrderSize,
         newOrderSide,
         clientOrderId,
         this.marginAccountAddress,
@@ -685,7 +685,9 @@ export class Client {
         positions.push({
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
-          position: this._marginAccount.positions[i].position.toNumber(),
+          position: utils.convertNativeLotSizeToDecimal(
+            this._marginAccount.positions[i].position.toNumber()
+          ),
           costOfTrades: utils.convertNativeBNToDecimal(
             this._marginAccount.positions[i].costOfTrades
           ),

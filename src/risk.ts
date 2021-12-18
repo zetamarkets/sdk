@@ -13,7 +13,10 @@ import {
   POSITION_PRECISION,
 } from "./constants";
 import { MarginAccount } from "./program-types";
-import { convertNativeBNToDecimal } from "./utils";
+import {
+  convertNativeBNToDecimal,
+  convertNativeLotSizeToDecimal,
+} from "./utils";
 
 export class RiskCalculator {
   /**
@@ -56,28 +59,19 @@ export class RiskCalculator {
     }
     if (size > 0) {
       if (marginType == MarginType.INITIAL) {
-        return (
-          (size * this._marginRequirements[productIndex].initialLong) /
-          Math.pow(10, POSITION_PRECISION)
-        );
+        return size * this._marginRequirements[productIndex].initialLong;
       } else {
-        return (
-          (size * this._marginRequirements[productIndex].maintenanceLong) /
-          Math.pow(10, POSITION_PRECISION)
-        );
+        return size * this._marginRequirements[productIndex].maintenanceLong;
       }
     } else {
       if (marginType == MarginType.INITIAL) {
         return (
-          (Math.abs(size) *
-            this._marginRequirements[productIndex].initialShort) /
-          Math.pow(10, POSITION_PRECISION)
+          Math.abs(size) * this._marginRequirements[productIndex].initialShort
         );
       } else {
         return (
-          (Math.abs(size) *
-            this._marginRequirements[productIndex].maintenanceShort) /
-          Math.pow(10, POSITION_PRECISION)
+          Math.abs(size) *
+          this._marginRequirements[productIndex].maintenanceShort
         );
       }
     }
@@ -118,15 +112,13 @@ export class RiskCalculator {
       }
       if (position.position.toNumber() > 0) {
         pnl +=
-          (position.position.toNumber() *
-            convertNativeBNToDecimal(Exchange.greeks.markPrices[i])) /
-            Math.pow(10, POSITION_PRECISION) -
+          convertNativeLotSizeToDecimal(position.position.toNumber()) *
+            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
-          (position.position.toNumber() *
-            convertNativeBNToDecimal(Exchange.greeks.markPrices[i])) /
-            Math.pow(10, POSITION_PRECISION) +
+          convertNativeLotSizeToDecimal(position.position.toNumber()) *
+            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
     }
@@ -151,13 +143,13 @@ export class RiskCalculator {
         this.getMarginRequirement(
           i,
           // Positive for buys.
-          position.openingOrders[0].toNumber(),
+          convertNativeLotSizeToDecimal(position.openingOrders[0].toNumber()),
           MarginType.INITIAL
         ) +
         this.getMarginRequirement(
           i,
           // Negative for sells.
-          -position.openingOrders[1],
+          convertNativeLotSizeToDecimal(-position.openingOrders[1]),
           MarginType.INITIAL
         );
       if (marginPerMarket !== undefined) {
@@ -181,7 +173,7 @@ export class RiskCalculator {
       let _ = this.getMarginRequirement(
         i,
         // This is signed.
-        position.position.toNumber(),
+        convertNativeLotSizeToDecimal(position.position.toNumber()),
         MarginType.MAINTENANCE
       );
       if (_ !== undefined) {
@@ -247,9 +239,7 @@ export function calculateLiquidationPrice(
     return 0;
   }
   let availableBalance = accountBalance - marginRequirement + unrealizedPnl;
-  return (
-    markPrice - availableBalance / (position / Math.pow(10, POSITION_PRECISION))
-  );
+  return markPrice - availableBalance / position;
 }
 
 /**

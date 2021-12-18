@@ -26,6 +26,7 @@ import {
   getPriceFromSerumOrderKey,
   sleep,
   convertNativeBNToDecimal,
+  convertNativeLotSizeToDecimal,
   getCancelAllIxs,
 } from "./utils";
 import {
@@ -505,7 +506,9 @@ export class Market {
         ([priceLots, sizeLots]) => {
           return {
             price: this._serumMarket.priceLotsToNumber(priceLots),
-            size: this._serumMarket.baseSizeLotsToNumber(sizeLots),
+            size: convertNativeLotSizeToDecimal(
+              this._serumMarket.baseSizeLotsToNumber(sizeLots)
+            ),
           };
         }
       );

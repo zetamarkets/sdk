@@ -2959,6 +2959,10 @@
             "type": "u32"
           },
           {
+            "name": "liquidatorLiquidationPercentage",
+            "type": "u32"
+          },
+          {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
           },
@@ -3698,5 +3702,8 @@
       "name": "HaltMarketNodesNotCleaned",
       "msg": "Halt market nodes not cleaned"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "ZETAXyu4bSyZEjfrF3aqpmLW7mgpAS38R1wGHPmqt5d"
+  }
 }

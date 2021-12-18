@@ -425,6 +425,22 @@ export function convertNativeBNToDecimal(
   );
 }
 
+/**
+ * Converts a native lot size where 1 unit = 0.001 lots to human readable decimal
+ * @param amount
+ */
+export function convertNativeLotSizeToDecimal(amount: number): number {
+  return amount / Math.pow(10, constants.POSITION_PRECISION);
+}
+
+/**
+ * Converts a native lot size where 1 unit = 0.001 lots to human readable decimal
+ * @param amount
+ */
+export function convertDecimalToNativeLotSize(amount: number): number {
+  return amount * Math.pow(10, constants.POSITION_PRECISION);
+}
+
 export async function getTokenMint(
   connection: Connection,
   key: PublicKey
