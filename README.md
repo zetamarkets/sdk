@@ -261,7 +261,7 @@ Placing an order.
 const orderPrice = utils.convertDecimalToNativeInteger(8);
 
 // We need to convert to our native option lot size.
-// utils.convertDecimalToNativeLotSize(1) == (10^3)
+// utils.convertDecimalToNativeLotSize(1) == (1*10^3)
 const orderLots = utils.convertDecimalToNativeLotSize(1);
 
 // Place a bid order.
