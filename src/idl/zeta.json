@@ -2135,6 +2135,10 @@
             "type": "u32"
           },
           {
+            "name": "liquidatorLiquidationPercentage",
+            "type": "u32"
+          },
+          {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
           },
@@ -2892,6 +2896,10 @@
           },
           {
             "name": "pricingFrequencySeconds",
+            "type": "u32"
+          },
+          {
+            "name": "liquidatorLiquidationPercentage",
             "type": "u32"
           },
           {

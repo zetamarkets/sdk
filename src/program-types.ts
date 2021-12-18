@@ -14,6 +14,7 @@ export interface State {
   newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
+  liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
   nativeTradeFeePercentage: anchor.BN;
   nativeUnderlyingFeePercentage: anchor.BN;
