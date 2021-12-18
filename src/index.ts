@@ -8,6 +8,7 @@ import { idlErrors as Errors } from "./errors";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Wallet } from "@project-serum/anchor";
+import { Market } from "./market";
 
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -35,4 +36,5 @@ export {
   events,
   idl,
   Wallet,
+  Market,
 };
