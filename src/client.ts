@@ -367,7 +367,7 @@ export class Client {
    * Places an order on a zeta market.
    * @param market          the address of the serum market
    * @param price           the native price of the order (6 d.p as integer)
-   * @param size            the quantity of the order
+   * @param size            the quantity of the order (3 d.p)
    * @param side            the side of the order. bid / ask
    * @param clientOrderId   optional: client order id (non 0 value)
    * NOTE: If duplicate client order ids are used, after a cancel order,
@@ -486,8 +486,8 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p)
-   * @param newOrderSize   the quantity of the order
+   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderSize   the quantity of the order (3 d.p) as integer
    * @param newOrderside   the side of the order. bid / ask
    */
   // TODO: Could probably derive side from this._orders.
@@ -598,7 +598,7 @@ export class Client {
    * Calls liquidate on another user
    * @param market
    * @param liquidatedMarginAccount
-   * @param size
+   * @param size                        the quantity of the order (3 d.p)
    */
   public async liquidate(
     market: PublicKey,
@@ -611,7 +611,7 @@ export class Client {
       this._marginAccountAddress,
       market,
       liquidatedMarginAccount,
-      size * Math.pow(10, POSITION_PRECISION)
+      size
     );
     tx.add(ix);
     return await utils.processTransaction(this._provider, tx);

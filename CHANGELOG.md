@@ -22,6 +22,8 @@ Version changes are pinned to SDK releases.
 
 ### Breaking
 
+- general: Minimum price increment is now 0.0001 for both options and futures. ([#35](https://github.com/zetamarkets/sdk/pull/35))
+- general: Minimum trade tick size is now 0.001 for both options and futures. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - utils: `convertNativeBNToDecimal` now takes in an optional argument for the number of fixed point precision.
 
 ## [0.8.3] 2021-12-08
