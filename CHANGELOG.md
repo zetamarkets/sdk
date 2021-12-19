@@ -21,6 +21,7 @@ Version changes are pinned to SDK releases.
 - general: Making lot size more minute in execution and tick sizes. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - utils : Add `convertNativeLotSizeToDecimal` and `convertDecimalToNativeLotSize` for new lot size changes. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - program-types: `MarginAccount` fields `position`, `openingOrders` and `closingOrders` are now represented as a BN instead of number. ([#35](https://github.com/zetamarkets/sdk/pull/35))
+- general: Add padding to `Greeks`, `MarginAccount` and `State` accounts.
 
 ### Breaking
 
