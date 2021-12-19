@@ -13,14 +13,15 @@ Version changes are pinned to SDK releases.
 - general: Changed pkg manager from npm to yarn. ([#30](https://github.com/zetamarkets/sdk/pull/30))
 - client: Add whitelist trading functionality for reduced fees. ([#24](https://github.com/zetamarkets/sdk/pull/24/))
 - risk: Handle new margin calculation parameters being read from `ZetaGroup`. ([#31](https://github.com/zetamarkets/sdk/pull/31))
-- general: Move minting of dex tokens to place_order instead. ([33](https://github.com/zetamarkets/sdk/pull/33))
-- client: Support client order ids for `PlaceOrder` and add `CancelOrderByClientOrderId`. ([33](https://github.com/zetamarkets/sdk/pull/33))
-- client: Add client order id to `Order`. ([33](https://github.com/zetamarkets/sdk/pull/33))
-- refactor: Replace program rpc calls with TransactionInstructions. ([34](https://github.com/zetamarkets/sdk/pull/34))
-- general: Support platform halt functionality. ([34](https://github.com/zetamarkets/sdk/pull/34))
+- general: Move minting of dex tokens to place_order instead. ([#33](https://github.com/zetamarkets/sdk/pull/33))
+- client: Support client order ids for `PlaceOrder` and add `CancelOrderByClientOrderId`. ([#33](https://github.com/zetamarkets/sdk/pull/33))
+- client: Add client order id to `Order`. ([#33](https://github.com/zetamarkets/sdk/pull/33))
+- refactor: Replace program rpc calls with TransactionInstructions. ([#34](https://github.com/zetamarkets/sdk/pull/34))
+- general: Support platform halt functionality. ([#34](https://github.com/zetamarkets/sdk/pull/34))
 - general: Making lot size more minute in execution and tick sizes. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - utils : Add `convertNativeLotSizeToDecimal` and `convertDecimalToNativeLotSize` for new lot size changes. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - program-types: `MarginAccount` fields `position`, `openingOrders` and `closingOrders` are now represented as a BN instead of number. ([#35](https://github.com/zetamarkets/sdk/pull/35))
+- general: Add padding to `Greeks`, `MarginAccount` and `State` accounts. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 
 ### Breaking
 
