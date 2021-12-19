@@ -19,6 +19,7 @@ export interface State {
   nativeTradeFeePercentage: anchor.BN;
   nativeUnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
+  padding: Array<number>;
 }
 
 export interface MarketIndexes {
@@ -130,6 +131,7 @@ export interface MarginAccount {
   _positionsPadding: Array<Position>;
 
   rebalanceAmount: anchor.BN;
+  padding: Array<number>;
 }
 
 export interface Greeks {
@@ -148,6 +150,7 @@ export interface Greeks {
   volatility: Array<anchor.BN>;
   _volatilityPadding: Array<anchor.BN>;
   nodeKeys: Array<PublicKey>;
+  padding: Array<number>;
 }
 
 export interface MarketNode {

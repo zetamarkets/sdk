@@ -2052,6 +2052,15 @@
                 138
               ]
             }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                1647
+              ]
+            }
           }
         ]
       }
@@ -2153,6 +2162,15 @@
           {
             "name": "nativeWhitelistUnderlyingFeePercentage",
             "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                171
+              ]
+            }
           }
         ]
       }
@@ -2294,7 +2312,7 @@
             "type": {
               "array": [
                 "u8",
-                122
+                1135
               ]
             }
           }
@@ -2394,6 +2412,15 @@
           {
             "name": "rebalanceAmount",
             "type": "i64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                388
+              ]
+            }
           }
         ]
       }
