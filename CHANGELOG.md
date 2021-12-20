@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.9.1] 2021-12-20
+
+- client: bugfix - `client.orders` size is represented in Decimals.
+
 ## [0.9.0] 2021-12-20
 
 - exchange: Add whitelist trading fees account initialization. ([#24](https://github.com/zetamarkets/sdk/pull/24))
