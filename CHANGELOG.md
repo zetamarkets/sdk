@@ -28,6 +28,7 @@ Version changes are pinned to SDK releases.
 - utils : Add `convertNativeLotSizeToDecimal` and `convertDecimalToNativeLotSize` for new lot size changes. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - program-types: `MarginAccount` fields `position`, `openingOrders` and `closingOrders` are now represented as a BN instead of number. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - general: Add padding to `Greeks`, `MarginAccount` and `State` accounts. ([#35](https://github.com/zetamarkets/sdk/pull/35))
+- client: Deposit limit for non white-listed users. ([#40](https://github.com/zetamarkets/sdk/pull/40))
 
 ### Breaking
 
@@ -35,6 +36,7 @@ Version changes are pinned to SDK releases.
 - general: Minimum trade tick size is now 0.001 for both options and futures. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - client: `placeOrder`, `liquidate` and `cancelAndPlaceOrder` now expect the native integer size as the argument for size. i.e. trading 1.000 options will require you to pass in 1_000 or `convertDecimalToNativeLotSize(1)`. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - utils: `convertNativeBNToDecimal` now takes in an optional argument for the number of fixed point precision.
+- client: Users can only deposit a max of $1000 unless they are previously whitelisted. ([#40](https://github.com/zetamarkets/sdk/pull/40))
 
 ## [0.8.3] 2021-12-08
 
