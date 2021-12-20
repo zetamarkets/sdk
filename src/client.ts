@@ -541,7 +541,7 @@ export class Client {
       let marketIndex = Exchange.markets.getMarketIndex(
         cancelArguments[i].market
       );
-      let ix = await cancelOrderIx(
+      let ix = cancelOrderIx(
         marketIndex,
         this.publicKey,
         this._marginAccountAddress,
