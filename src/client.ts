@@ -256,7 +256,7 @@ export class Client {
       await client._program.account.whitelistDepositAccount.fetch(
         whitelistDepositAddress
       );
-      console.log("User is whitelisted for deposits into zeta.");
+      console.log("User is whitelisted for unlimited deposits into zeta.");
       client._whitelistDepositAddress = whitelistDepositAddress;
     } catch (e) {}
 

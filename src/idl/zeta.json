@@ -944,6 +944,16 @@
           "name": "state",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3809,8 +3819,5 @@
       "name": "HaltMarketNodesNotCleaned",
       "msg": "Halt market nodes not cleaned"
     }
-  ],
-  "metadata": {
-    "address": "ZETAXyu4bSyZEjfrF3aqpmLW7mgpAS38R1wGHPmqt5d"
-  }
+  ]
 }

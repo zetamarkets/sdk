@@ -885,6 +885,13 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   }
 
   /**
+   * Helper function to get the deposit limits
+   */
+  public async getDepositLimit() {
+    return utils.convertNativeBNToDecimal(this.state.nativeDepositLimit);
+  }
+
+  /**
    * Close the websockets.
    */
   public async close() {
