@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.9.2] 2021-12-20
+
+- utils: bugfix - Floating point error in `convertDecimalToNativeInteger`. ([#42](https://github.com/zetamarkets/sdk/pull/42))
+
 ## [0.9.1] 2021-12-20
 
 - client: bugfix - `client.orders` size is represented in Decimals. ([#42](https://github.com/zetamarkets/sdk/pull/42))
