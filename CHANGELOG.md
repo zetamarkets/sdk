@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [0.9.2] 2021-12-20
+## [0.9.2] 2021-12-23
 
 - utils: bugfix - Floating point error in `convertDecimalToNativeInteger`. ([#43](https://github.com/zetamarkets/sdk/pull/43))
 
