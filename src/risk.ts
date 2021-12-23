@@ -362,8 +362,8 @@ export function calculateShortOptionMargin(
 ): number {
   let basePercentageShort =
     marginType == MarginType.INITIAL
-      ? Exchange.marginParams.optionBasePercentageShortInitial
-      : Exchange.marginParams.optionBasePercentageShortMaintenance;
+      ? Exchange.marginParams.optionDynamicPercentageShortInitial
+      : Exchange.marginParams.optionDynamicPercentageShortMaintenance;
 
   let spotPricePercentageShort =
     marginType == MarginType.INITIAL

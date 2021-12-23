@@ -52,11 +52,11 @@ export interface MarginParameters {
   optionMarkPercentageLongInitial: anchor.BN;
   optionSpotPercentageLongInitial: anchor.BN;
   optionSpotPercentageShortInitial: anchor.BN;
-  optionBasePercentageShortInitial: anchor.BN;
+  optionDynamicPercentageShortInitial: anchor.BN;
   optionMarkPercentageLongMaintenance: anchor.BN;
   optionSpotPercentageLongMaintenance: anchor.BN;
   optionSpotPercentageShortMaintenance: anchor.BN;
-  optionBasePercentageShortMaintenance: anchor.BN;
+  optionDynamicPercentageShortMaintenance: anchor.BN;
 }
 
 export interface HaltState {

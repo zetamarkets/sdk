@@ -2671,7 +2671,7 @@
             "type": "u64"
           },
           {
-            "name": "optionBasePercentageShortInitial",
+            "name": "optionDynamicPercentageShortInitial",
             "type": "u64"
           },
           {
@@ -2687,7 +2687,7 @@
             "type": "u64"
           },
           {
-            "name": "optionBasePercentageShortMaintenance",
+            "name": "optionDynamicPercentageShortMaintenance",
             "type": "u64"
           }
         ]
@@ -3066,7 +3066,7 @@
             "type": "u64"
           },
           {
-            "name": "optionBasePercentageShortInitial",
+            "name": "optionDynamicPercentageShortInitial",
             "type": "u64"
           },
           {
@@ -3082,7 +3082,7 @@
             "type": "u64"
           },
           {
-            "name": "optionBasePercentageShortMaintenance",
+            "name": "optionDynamicPercentageShortMaintenance",
             "type": "u64"
           }
         ]
@@ -3175,7 +3175,7 @@
             "type": "u64"
           },
           {
-            "name": "optionBasePercentageShortInitial",
+            "name": "optionDynamicPercentageShortInitial",
             "type": "u64"
           },
           {
@@ -3191,7 +3191,7 @@
             "type": "u64"
           },
           {
-            "name": "optionBasePercentageShortMaintenance",
+            "name": "optionDynamicPercentageShortMaintenance",
             "type": "u64"
           }
         ]
