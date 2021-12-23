@@ -5,6 +5,9 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- general: Rename margin parameters to be more intuitive from `optionBase` to optionDynamic`.
+- exchange: Fix race condition on `Exchange.load` that would result in NaN margin requirements temporarily.
+
 ## [0.9.2] 2021-12-23
 
 - utils: bugfix - Floating point error in `convertDecimalToNativeInteger`. ([#43](https://github.com/zetamarkets/sdk/pull/43))

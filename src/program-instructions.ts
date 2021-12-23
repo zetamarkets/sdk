@@ -576,16 +576,16 @@ export async function initializeZetaGroupIx(
         marginArgs.optionSpotPercentageLongInitial,
       optionSpotPercentageShortInitial:
         marginArgs.optionSpotPercentageShortInitial,
-      optionBasePercentageShortInitial:
-        marginArgs.optionBasePercentageShortInitial,
+      optionDynamicPercentageShortInitial:
+        marginArgs.optionDynamicPercentageShortInitial,
       optionMarkPercentageLongMaintenance:
         marginArgs.optionMarkPercentageLongMaintenance,
       optionSpotPercentageLongMaintenance:
         marginArgs.optionSpotPercentageLongMaintenance,
       optionSpotPercentageShortMaintenance:
         marginArgs.optionSpotPercentageShortMaintenance,
-      optionBasePercentageShortMaintenance:
-        marginArgs.optionBasePercentageShortMaintenance,
+      optionDynamicPercentageShortMaintenance:
+        marginArgs.optionDynamicPercentageShortMaintenance,
     },
     {
       accounts: {
@@ -1143,9 +1143,9 @@ export interface UpdateMarginParametersArgs {
   optionMarkPercentageLongInitial: anchor.BN;
   optionSpotPercentageLongInitial: anchor.BN;
   optionSpotPercentageShortInitial: anchor.BN;
-  optionBasePercentageShortInitial: anchor.BN;
+  optionDynamicPercentageShortInitial: anchor.BN;
   optionMarkPercentageLongMaintenance: anchor.BN;
   optionSpotPercentageLongMaintenance: anchor.BN;
   optionSpotPercentageShortMaintenance: anchor.BN;
-  optionBasePercentageShortMaintenance: anchor.BN;
+  optionDynamicPercentageShortMaintenance: anchor.BN;
 }
