@@ -409,7 +409,9 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
  * Converts a decimal number to native fixed point integer of precision 6.
  */
 export function convertDecimalToNativeInteger(amount: number): number {
-  return Math.floor(amount * Math.pow(10, constants.PLATFORM_PRECISION));
+  return parseInt(
+    (amount * Math.pow(10, constants.PLATFORM_PRECISION)).toFixed(0)
+  );
 }
 
 /**
@@ -451,7 +453,9 @@ export function convertNativeLotSizeToDecimal(amount: number): number {
  * @param amount
  */
 export function convertDecimalToNativeLotSize(amount: number): number {
-  return amount * Math.pow(10, constants.POSITION_PRECISION);
+  return parseInt(
+    (amount * Math.pow(10, constants.POSITION_PRECISION)).toFixed(0)
+  );
 }
 
 export async function getTokenMint(

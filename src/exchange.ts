@@ -361,6 +361,7 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
 
     exchange._zetaGroupAddress = zetaGroup;
 
+    await exchange.subscribeOracle(callback);
     await exchange.updateState();
     await exchange.updateZetaGroup();
 
@@ -411,7 +412,6 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     exchange.subscribeGreeks(callback);
 
     await exchange.subscribeClock(callback);
-    await exchange.subscribeOracle(callback);
 
     exchange._isInitialized = true;
 
@@ -935,8 +935,8 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         this.zetaGroup.marginParameters.optionSpotPercentageShortInitial,
         constants.MARGIN_PRECISION
       ),
-      optionBasePercentageShortInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionBasePercentageShortInitial,
+      optionDynamicPercentageShortInitial: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionDynamicPercentageShortInitial,
         constants.MARGIN_PRECISION
       ),
       optionMarkPercentageLongMaintenance: utils.convertNativeBNToDecimal(
@@ -951,8 +951,8 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         this.zetaGroup.marginParameters.optionSpotPercentageShortMaintenance,
         constants.MARGIN_PRECISION
       ),
-      optionBasePercentageShortMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionBasePercentageShortMaintenance,
+      optionDynamicPercentageShortMaintenance: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionDynamicPercentageShortMaintenance,
         constants.MARGIN_PRECISION
       ),
     };

@@ -157,9 +157,9 @@ export interface MarginParams {
   optionMarkPercentageLongInitial: number;
   optionSpotPercentageLongInitial: number;
   optionSpotPercentageShortInitial: number;
-  optionBasePercentageShortInitial: number;
+  optionDynamicPercentageShortInitial: number;
   optionMarkPercentageLongMaintenance: number;
   optionSpotPercentageLongMaintenance: number;
   optionSpotPercentageShortMaintenance: number;
-  optionBasePercentageShortMaintenance: number;
+  optionDynamicPercentageShortMaintenance: number;
 }
