@@ -176,9 +176,11 @@ export interface ProductGreeks {
 export interface TradeEvent {
   marginAccount: PublicKey;
   index: number;
-  price: anchor.BN;
-  size: number;
+  costOfTrades: anchor.BN;
+  size: anchor.BN;
   isBid: boolean;
+  clientOrderId: anchor.BN;
+  orderId: anchor.BN;
 }
 
 export interface InsuranceDepositAccount {

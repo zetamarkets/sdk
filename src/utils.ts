@@ -26,6 +26,7 @@ import * as constants from "./constants";
 import { parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { Market } from "./market";
+import { TradeEvent } from "./program-types";
 import { OpenOrdersMap } from "./program-types";
 import {
   cancelExpiredOrderIx,
@@ -399,6 +400,17 @@ export function convertDecimalToNativeInteger(amount: number): number {
   return parseInt(
     (amount * Math.pow(10, constants.PLATFORM_PRECISION)).toFixed(0)
   );
+}
+
+/**
+ * Returns the trade event price. This may return a number that
+ * divides perfectly by tick size (0.0001) if your order traded
+ * against orders at different prices.
+ */
+export function getTradeEventPrice(event: TradeEvent): number {
+  let decimalCostOfTrades = convertNativeBNToDecimal(event.costOfTrades);
+  let decimalSize = convertNativeLotSizeToDecimal(event.size.toNumber());
+  return decimalCostOfTrades / decimalSize;
 }
 
 /**

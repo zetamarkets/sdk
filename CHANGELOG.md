@@ -7,6 +7,12 @@ Version changes are pinned to SDK releases.
 
 - general: Rename margin parameters to be more intuitive from `optionBase` to `optionDynamic`. ([#44](https://github.com/zetamarkets/sdk/pull/44))
 - exchange: Fix race condition on `Exchange.load` that would result in NaN margin requirements temporarily. ([#44444ttps://github.com/zetamarkets/sdk/pull/44))
+- events: Trade event now emits `orderId` and `clientOrderId` if set, otherwise it is 0. These are represented in BN.
+
+### Breaking
+
+- events: TradeEvent now emits `costOfTrades` instead of `price`. Users can use `utils.getTradeEventPrice(event)` to get the trade price. If your order was a taker and traded against multiple orders in the one insert, the TradeEvent will aggregate across each execution. As a result, the trade price returned is just the average trade price across the total taker size.
+- events: TradeEvent size is now a BN.
 
 ## [0.9.2] 2021-12-23
 
