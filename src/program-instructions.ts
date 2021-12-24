@@ -64,8 +64,19 @@ export async function depositIx(
   amount: number,
   marginAccount: PublicKey,
   usdcAccount: PublicKey,
-  userKey: PublicKey
+  userKey: PublicKey,
+  whitelistDepositAccount: PublicKey | undefined
 ): Promise<TransactionInstruction> {
+  let remainingAccounts =
+    whitelistDepositAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistDepositAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
   // TODO: Probably use mint to find decimal places in future.
   return Exchange.program.instruction.deposit(new anchor.BN(amount), {
     accounts: {
@@ -76,7 +87,10 @@ export async function depositIx(
       socializedLossAccount: Exchange.socializedLossAccountAddress,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
+      state: Exchange.stateAddress,
+      greeks: Exchange.zetaGroup.greeks,
     },
+    remainingAccounts,
   });
 }
 
@@ -768,7 +782,6 @@ export function initializeZetaStateIx(
   mintAuthorityNonce: number,
   params: StateParams
 ): TransactionInstruction {
-  console.log(params);
   return Exchange.program.instruction.initializeZetaState(
     {
       stateNonce: stateNonce,
@@ -786,6 +799,7 @@ export function initializeZetaStateIx(
       nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
       nativeWhitelistUnderlyingFeePercentage:
         params.nativeWhitelistUnderlyingFeePercentage,
+      nativeDepositLimit: params.nativeDepositLimit,
     },
     {
       accounts: {
@@ -816,6 +830,7 @@ export function updateZetaStateIx(params: StateParams): TransactionInstruction {
       nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
       nativeWhitelistUnderlyingFeePercentage:
         params.nativeWhitelistUnderlyingFeePercentage,
+      nativeDepositLimit: params.nativeDepositLimit,
     },
     {
       accounts: {
@@ -859,6 +874,29 @@ export function initializeMarketStrikesIx(): TransactionInstruction {
       oracle: Exchange.zetaGroup.oracle,
     },
   });
+}
+
+export async function initializeWhitelistDepositAccountIx(
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  let [whitelistDepositAccount, whitelistDepositNonce] =
+    await utils.getUserWhitelistDepositAccount(
+      Exchange.program.programId,
+      user
+    );
+
+  return Exchange.program.instruction.initializeWhitelistDepositAccount(
+    whitelistDepositNonce,
+    {
+      accounts: {
+        whitelistDepositAccount,
+        admin: Exchange.provider.wallet.publicKey,
+        user: user,
+        systemProgram: SystemProgram.programId,
+        state: Exchange.stateAddress,
+      },
+    }
+  );
 }
 
 export async function initializeWhitelistInsuranceAccountIx(
@@ -1115,6 +1153,7 @@ export interface StateParams {
   nativeTradeFeePercentage: anchor.BN;
   nativeUnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
+  nativeDepositLimit: anchor.BN;
 }
 
 export interface UpdatePricingParametersArgs {

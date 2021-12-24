@@ -205,6 +205,19 @@ export async function getUserInsuranceDepositAccount(
   );
 }
 
+export async function getUserWhitelistDepositAccount(
+  programId: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("whitelist-deposit")),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getUserWhitelistInsuranceAccount(
   programId: PublicKey,
   userKey: PublicKey

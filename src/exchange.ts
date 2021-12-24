@@ -828,6 +828,16 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   }
 
   /**
+   * @param user user pubkey to be whitelisted for uncapped deposit
+   */
+  public async whitelistUserForDeposit(user: PublicKey) {
+    let tx = new Transaction().add(
+      await instructions.initializeWhitelistDepositAccountIx(user)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
    * @param user user pubkey to be whitelisted for our insurance vault
    */
   public async whitelistUserForInsuranceVault(user: PublicKey) {
@@ -872,6 +882,13 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     } catch (e) {
       console.log(`Error in rebalancing the insurance vault ${e}`);
     }
+  }
+
+  /**
+   * Helper function to get the deposit limits
+   */
+  public async getDepositLimit() {
+    return utils.convertNativeBNToDecimal(this.state.nativeDepositLimit);
   }
 
   /**
