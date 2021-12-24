@@ -125,6 +125,11 @@ export class Client {
   private _pendingUpdate: boolean;
 
   /**
+   * whitelist deposit account.
+   */
+  private _whitelistDepositAddress: PublicKey | undefined;
+
+  /**
    * whitelist trading fees account.
    */
   private _whitelistTradingFeesAddress: PublicKey | undefined;
@@ -241,6 +246,20 @@ export class Client {
       client._pendingUpdate = true;
     }
 
+    client._whitelistDepositAddress = undefined;
+    try {
+      let [whitelistDepositAddress, _whitelistTradingFeesNonce] =
+        await utils.getUserWhitelistDepositAccount(
+          Exchange.programId,
+          wallet.publicKey
+        );
+      await client._program.account.whitelistDepositAccount.fetch(
+        whitelistDepositAddress
+      );
+      console.log("User is whitelisted for unlimited deposits into zeta.");
+      client._whitelistDepositAddress = whitelistDepositAddress;
+    } catch (e) {}
+
     client._whitelistTradingFeesAddress = undefined;
     try {
       let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
@@ -335,7 +354,8 @@ export class Client {
         amount,
         this._marginAccountAddress,
         this._usdcAccountAddress,
-        this.publicKey
+        this.publicKey,
+        this._whitelistDepositAddress
       )
     );
     let txId = await utils.processTransaction(this._provider, tx);

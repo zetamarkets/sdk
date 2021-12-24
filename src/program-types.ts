@@ -19,6 +19,7 @@ export interface State {
   nativeTradeFeePercentage: anchor.BN;
   nativeUnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
+  nativeDepositLimit: anchor.BN;
   padding: Array<number>;
 }
 
