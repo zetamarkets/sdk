@@ -89,7 +89,6 @@ export async function depositIx(
       tokenProgram: TOKEN_PROGRAM_ID,
       state: Exchange.stateAddress,
       greeks: Exchange.zetaGroup.greeks,
-      oracle: Exchange.zetaGroup.oracle,
     },
     remainingAccounts,
   });

@@ -949,11 +949,6 @@
           "name": "greeks",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
