@@ -7,6 +7,10 @@ Version changes are pinned to SDK releases.
 
 - general: Rename margin parameters to be more intuitive from `optionBase` to `optionDynamic`. ([#44](https://github.com/zetamarkets/sdk/pull/44))
 - exchange: Fix race condition on `Exchange.load` that would result in NaN margin requirements temporarily. ([#44444ttps://github.com/zetamarkets/sdk/pull/44))
+- client: Deposit limit for non white-listed users. ([#40](https://github.com/zetamarkets/sdk/pull/40))
+
+### Breaking
+
 - client: Users can only deposit up to a threshold where their balance + unrealized_pnl + new deposit < deposit limit unless they are previously whitelisted. Deposit limit can be found in the `Exchange.state` account. ([#40](https://github.com/zetamarkets/sdk/pull/40))
 
 ## [0.9.2] 2021-12-23
@@ -36,7 +40,6 @@ Version changes are pinned to SDK releases.
 - utils : Add `convertNativeLotSizeToDecimal` and `convertDecimalToNativeLotSize` for new lot size changes. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - program-types: `MarginAccount` fields `position`, `openingOrders` and `closingOrders` are now represented as a BN instead of number. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - general: Add padding to `Greeks`, `MarginAccount` and `State` accounts. ([#35](https://github.com/zetamarkets/sdk/pull/35))
-- client: Deposit limit for non white-listed users. ([#40](https://github.com/zetamarkets/sdk/pull/40))
 
 ### Breaking
 
