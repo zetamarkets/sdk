@@ -12,7 +12,7 @@ Version changes are pinned to SDK releases.
 
 ### Breaking
 
-- events: TradeEvent now emits `costOfTrades` instead of `price`. Users can use `utils.getTradeEventPrice(event)` to get the trade price. If your order was a taker and traded against multiple orders in the one insert, the TradeEvent will aggregate across each execution. As a result, the trade price returned is just the average trade price across the total taker size. ([#45](https://github.com/zetamarkets/sdk/pull/45))
+- events: TradeEvent now emits `costOfTrades` instead of `price`. Users can use `utils.getTradeEventPrice(event)` to get the trade price. If your order was a taker and traded against multiple orders in the one insert, the TradeEvent will aggregate across each execution. As a result, the trade price returned is the average trade price across the total taker size. ([#45](https://github.com/zetamarkets/sdk/pull/45))
 - events: TradeEvent size is now a BN. ([#45](https://github.com/zetamarkets/sdk/pull/45))
 - client: Users can only deposit up to a threshold where their balance + unrealized_pnl + new deposit < deposit limit unless they are previously whitelisted. Deposit limit can be found in the `Exchange.state` account. ([#40](https://github.com/zetamarkets/sdk/pull/40))
 
