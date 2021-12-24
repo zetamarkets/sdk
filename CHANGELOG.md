@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 - general: Rename margin parameters to be more intuitive from `optionBase` to `optionDynamic`. ([#44](https://github.com/zetamarkets/sdk/pull/44))
 - exchange: Fix race condition on `Exchange.load` that would result in NaN margin requirements temporarily. ([#44444ttps://github.com/zetamarkets/sdk/pull/44))
+- client: Users can only deposit up to a threshold where their balance + unrealized_pnl + new deposit < deposit limit unless they are previously whitelisted. Deposit limit can be found in the `Exchange.state` account. ([#40](https://github.com/zetamarkets/sdk/pull/40))
 
 ## [0.9.2] 2021-12-23
 
@@ -43,7 +44,6 @@ Version changes are pinned to SDK releases.
 - general: Minimum trade tick size is now 0.001 for both options and futures. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - client: `placeOrder`, `liquidate` and `cancelAndPlaceOrder` now expect the native integer size as the argument for size. i.e. trading 1.000 options will require you to pass in 1_000 or `convertDecimalToNativeLotSize(1)`. ([#35](https://github.com/zetamarkets/sdk/pull/35))
 - utils: `convertNativeBNToDecimal` now takes in an optional argument for the number of fixed point precision.
-- client: Users can only deposit up to aq threshold where their available balance + new deposit < deposit limit unless they are previously whitelisted. deposit limit can be found in state. ([#40](https://github.com/zetamarkets/sdk/pull/40))
 
 ## [0.8.3] 2021-12-08
 
