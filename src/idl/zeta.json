@@ -3371,18 +3371,28 @@
           "index": false
         },
         {
-          "name": "price",
+          "name": "size",
           "type": "u64",
           "index": false
         },
         {
-          "name": "size",
-          "type": "u32",
+          "name": "costOfTrades",
+          "type": "u64",
           "index": false
         },
         {
           "name": "isBid",
           "type": "bool",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
           "index": false
         }
       ]
