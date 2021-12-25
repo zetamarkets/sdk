@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- examples: Added a cranking example that calls all of zeta's permisionless functions with documenation that explains it. ([]())
+
 ## [0.9.3] 2021-12-24
 
 - general: Rename margin parameters to be more intuitive from `optionBase` to `optionDynamic`. ([#44](https://github.com/zetamarkets/sdk/pull/44))
