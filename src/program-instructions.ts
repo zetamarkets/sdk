@@ -1128,6 +1128,19 @@ export function updateInterestRateIx(
   });
 }
 
+export function updateAdminIx(
+  admin: PublicKey,
+  newAdmin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateAdmin({
+    accounts: {
+      state: Exchange.stateAddress,
+      admin: Exchange.provider.wallet.publicKey,
+      newAdmin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
 export interface UpdateHaltStateArgs {
   spotPrice: anchor.BN;
   timestamp: anchor.BN;
