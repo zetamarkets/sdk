@@ -3,8 +3,6 @@
 There are multiple permissionless instructions that `crank` or keep the zeta platform in an up to date state.
 This example runs all the necessary instructions.
 
-Zeta will add rewards in the future for calling these instructions, similar to keeper bots.
-
 1. Crank event queue.
 - This will process maker fill events to ensure that user margin accounts are in the correct state after trades occur.
 
