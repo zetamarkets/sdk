@@ -40,7 +40,7 @@ async function main() {
   // We load the exchange with a valid wallet containing SOL to call permissionless zeta functions.
   await Exchange.load(
     PROGRAM_ID,
-    Network.DEVNET,
+    Network.DEVNET, // or MAINNET
     connection,
     utils.defaultCommitment(),
     wallet,
