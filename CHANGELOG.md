@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- examples: Added a cranking example that calls all of zeta's permisionless functions with documenation that explains it. ([#47](https://github.com/zetamarkets/sdk/pull/47))
+- examples: Added a cranking example that calls all of zeta's permissionless instructions with relevant documentation. ([#47](https://github.com/zetamarkets/sdk/pull/47))
 
 ## [0.9.3] 2021-12-24
 
