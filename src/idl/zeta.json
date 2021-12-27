@@ -2751,6 +2751,10 @@
           {
             "name": "optionDynamicPercentageShortMaintenance",
             "type": "u64"
+          },
+          {
+            "name": "optionShortPutCapPercentage",
+            "type": "u64"
           }
         ]
       }
@@ -3154,6 +3158,10 @@
           {
             "name": "optionDynamicPercentageShortMaintenance",
             "type": "u64"
+          },
+          {
+            "name": "optionShortPutCapPercentage",
+            "type": "u64"
           }
         ]
       }
@@ -3262,6 +3270,10 @@
           },
           {
             "name": "optionDynamicPercentageShortMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "optionShortPutCapPercentage",
             "type": "u64"
           }
         ]

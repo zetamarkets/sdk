@@ -343,9 +343,21 @@ export function calculateOptionMargin(
 
   return {
     initialLong,
-    initialShort,
+    initialShort:
+      kind == Kind.PUT
+        ? Math.min(
+            initialShort,
+            Exchange.marginParams.optionShortPutCapPercentage * strike
+          )
+        : initialShort,
     maintenanceLong,
-    maintenanceShort,
+    maintenanceShort:
+      kind == Kind.PUT
+        ? Math.min(
+            maintenanceShort,
+            Exchange.marginParams.optionShortPutCapPercentage * strike
+          )
+        : maintenanceShort,
   };
 }
 

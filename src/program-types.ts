@@ -58,6 +58,7 @@ export interface MarginParameters {
   optionSpotPercentageLongMaintenance: anchor.BN;
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
+  optionShortPutCapPercentage: anchor.BN;
 }
 
 export interface HaltState {
