@@ -512,7 +512,9 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    * Update the expiry state variables for the program.
    */
   public async updateZetaState(params: instructions.StateParams) {
-    let tx = new Transaction().add(instructions.updateZetaStateIx(params));
+    let tx = new Transaction().add(
+      instructions.updateZetaStateIx(params, this._provider.wallet.publicKey)
+    );
     await utils.processTransaction(this._provider, tx);
     await this.updateState();
   }
@@ -524,7 +526,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     args: instructions.UpdatePricingParametersArgs
   ) {
     let tx = new Transaction().add(
-      instructions.updatePricingParametersIx(args)
+      instructions.updatePricingParametersIx(
+        args,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
@@ -536,7 +541,12 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   public async updateMarginParameters(
     args: instructions.UpdateMarginParametersArgs
   ) {
-    let tx = new Transaction().add(instructions.updateMarginParametersIx(args));
+    let tx = new Transaction().add(
+      instructions.updateMarginParametersIx(
+        args,
+        this._provider.wallet.publicKey
+      )
+    );
     await utils.processTransaction(this._provider, tx);
     await this.updateZetaGroup();
   }
@@ -550,7 +560,12 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
       );
     }
-    let tx = new Transaction().add(instructions.updateVolatilityNodesIx(nodes));
+    let tx = new Transaction().add(
+      instructions.updateVolatilityNodesIx(
+        nodes,
+        this._provider.wallet.publicKey
+      )
+    );
     await utils.processTransaction(this._provider, tx);
   }
 
@@ -611,6 +626,12 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         const eventQueue = anchor.web3.Keypair.generate();
         const bids = anchor.web3.Keypair.generate();
         const asks = anchor.web3.Keypair.generate();
+
+        // Store the keypairs locally.
+        utils.writeKeypair(`rq-${i}.json`, requestQueue);
+        utils.writeKeypair(`eq-${i}.json`, eventQueue);
+        utils.writeKeypair(`bids-${i}.json`, bids);
+        utils.writeKeypair(`asks-${i}.json`, asks);
 
         let [tx, tx2] = await instructions.initializeZetaMarketTxs(
           i,
@@ -832,7 +853,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    */
   public async whitelistUserForDeposit(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistDepositAccountIx(user)
+      await instructions.initializeWhitelistDepositAccountIx(
+        user,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
   }
@@ -842,7 +866,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    */
   public async whitelistUserForInsuranceVault(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistInsuranceAccountIx(user)
+      await instructions.initializeWhitelistInsuranceAccountIx(
+        user,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
   }
@@ -852,7 +879,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
    */
   public async whitelistUserForTradingFees(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistTradingFeesAccountIx(user)
+      await instructions.initializeWhitelistTradingFeesAccountIx(
+        user,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
   }
@@ -970,14 +1000,20 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
 
   public async haltZetaGroup(zetaGroupAddress: PublicKey) {
     let tx = new Transaction().add(
-      instructions.haltZetaGroupIx(zetaGroupAddress)
+      instructions.haltZetaGroupIx(
+        zetaGroupAddress,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
   }
 
   public async unhaltZetaGroup(zetaGroupAddress: PublicKey) {
     let tx = new Transaction().add(
-      instructions.unhaltZetaGroupIx(zetaGroupAddress)
+      instructions.unhaltZetaGroupIx(
+        zetaGroupAddress,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
   }
@@ -987,16 +1023,26 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
     args: instructions.UpdateHaltStateArgs
   ) {
     let tx = new Transaction().add(
-      instructions.updateHaltStateIx(zetaGroupAddress, args)
+      instructions.updateHaltStateIx(
+        zetaGroupAddress,
+        args,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
   }
 
   public async settlePositionsHalted(marginAccounts: any[]) {
-    let tx = new Transaction().add(
-      instructions.settlePositionsHaltedIx(marginAccounts)
+    let txs = instructions.settlePositionsHaltedTxs(
+      marginAccounts,
+      this._provider.wallet.publicKey
     );
-    await utils.processTransaction(this._provider, tx);
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        await utils.processTransaction(this._provider, tx);
+      })
+    );
   }
 
   public async cancelAllOrdersHalted() {
@@ -1020,7 +1066,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
 
   public async updatePricingHalted(expiryIndex: number) {
     let tx = new Transaction().add(
-      instructions.updatePricingHaltedIx(expiryIndex)
+      instructions.updatePricingHaltedIx(
+        expiryIndex,
+        this._provider.wallet.publicKey
+      )
     );
     await utils.processTransaction(this._provider, tx);
   }
@@ -1033,12 +1082,16 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
   }
 
   public async updateVolatility(args: instructions.UpdateVolatilityArgs) {
-    let tx = new Transaction().add(instructions.updateVolatilityIx(args));
+    let tx = new Transaction().add(
+      instructions.updateVolatilityIx(args, this._provider.wallet.publicKey)
+    );
     await utils.processTransaction(this._provider, tx);
   }
 
   public async updateInterestRate(args: instructions.UpdateInterestRateArgs) {
-    let tx = new Transaction().add(instructions.updateInterestRateIx(args));
+    let tx = new Transaction().add(
+      instructions.updateInterestRateIx(args, this._provider.wallet.publicKey)
+    );
     await utils.processTransaction(this._provider, tx);
   }
 }

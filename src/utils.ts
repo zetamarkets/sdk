@@ -1,5 +1,6 @@
 import * as anchor from "@project-serum/anchor";
 import {
+  Keypair,
   ConfirmOptions,
   PublicKey,
   Connection,
@@ -22,10 +23,10 @@ import {
 import BufferLayout from "buffer-layout";
 const BN = anchor.BN;
 
+import * as fs from "fs";
 import * as constants from "./constants";
 import { parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
-import { Market } from "./market";
 import { TradeEvent } from "./program-types";
 import { OpenOrdersMap } from "./program-types";
 import {
@@ -1020,4 +1021,9 @@ export async function getCancelAllIxs(
     })
   );
   return ixs;
+}
+
+export async function writeKeypair(filename: string, keypair: Keypair) {
+  let secret = "[" + keypair.secretKey.toString() + "]";
+  fs.writeFileSync(filename, secret);
 }

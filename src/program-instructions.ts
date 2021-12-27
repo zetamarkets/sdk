@@ -737,38 +737,41 @@ export function updatePricingIx(expiryIndex: number): TransactionInstruction {
 }
 
 export function updatePricingParametersIx(
-  args: UpdatePricingParametersArgs
+  args: UpdatePricingParametersArgs,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updatePricingParameters(args, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
 
 export function updateMarginParametersIx(
-  args: UpdateMarginParametersArgs
+  args: UpdateMarginParametersArgs,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateMarginParameters(args, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
 
 export function updateVolatilityNodesIx(
-  nodes: Array<anchor.BN>
+  nodes: Array<anchor.BN>,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateVolatilityNodes(nodes, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
       greeks: Exchange.greeksAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
@@ -815,7 +818,10 @@ export function initializeZetaStateIx(
   );
 }
 
-export function updateZetaStateIx(params: StateParams): TransactionInstruction {
+export function updateZetaStateIx(
+  params: StateParams,
+  admin: PublicKey
+): TransactionInstruction {
   return Exchange.program.instruction.updateZetaState(
     {
       expiryIntervalSeconds: params.expiryIntervalSeconds,
@@ -835,7 +841,7 @@ export function updateZetaStateIx(params: StateParams): TransactionInstruction {
     {
       accounts: {
         state: Exchange.stateAddress,
-        admin: Exchange.provider.wallet.publicKey,
+        admin,
       },
     }
   );
@@ -877,7 +883,8 @@ export function initializeMarketStrikesIx(): TransactionInstruction {
 }
 
 export async function initializeWhitelistDepositAccountIx(
-  user: PublicKey
+  user: PublicKey,
+  admin: PublicKey
 ): Promise<TransactionInstruction> {
   let [whitelistDepositAccount, whitelistDepositNonce] =
     await utils.getUserWhitelistDepositAccount(
@@ -890,7 +897,7 @@ export async function initializeWhitelistDepositAccountIx(
     {
       accounts: {
         whitelistDepositAccount,
-        admin: Exchange.provider.wallet.publicKey,
+        admin,
         user: user,
         systemProgram: SystemProgram.programId,
         state: Exchange.stateAddress,
@@ -900,7 +907,8 @@ export async function initializeWhitelistDepositAccountIx(
 }
 
 export async function initializeWhitelistInsuranceAccountIx(
-  user: PublicKey
+  user: PublicKey,
+  admin: PublicKey
 ): Promise<TransactionInstruction> {
   let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
     await utils.getUserWhitelistInsuranceAccount(
@@ -913,7 +921,7 @@ export async function initializeWhitelistInsuranceAccountIx(
     {
       accounts: {
         whitelistInsuranceAccount,
-        admin: Exchange.provider.wallet.publicKey,
+        admin,
         user: user,
         systemProgram: SystemProgram.programId,
         state: Exchange.stateAddress,
@@ -923,7 +931,8 @@ export async function initializeWhitelistInsuranceAccountIx(
 }
 
 export async function initializeWhitelistTradingFeesAccountIx(
-  user: PublicKey
+  user: PublicKey,
+  admin: PublicKey
 ): Promise<TransactionInstruction> {
   let [whitelistTradingFeesAccount, whitelistTradingFeesNonce] =
     await utils.getUserWhitelistTradingFeesAccount(
@@ -936,13 +945,32 @@ export async function initializeWhitelistTradingFeesAccountIx(
     {
       accounts: {
         whitelistTradingFeesAccount,
-        admin: Exchange.provider.wallet.publicKey,
+        admin,
         user: user,
         systemProgram: SystemProgram.programId,
         state: Exchange.stateAddress,
       },
     }
   );
+}
+
+export function settlePositionsTxs(
+  expirationTs: anchor.BN,
+  settlementPda: PublicKey,
+  nonce: number,
+  marginAccounts: any[]
+): Transaction[] {
+  let txs = [];
+  for (
+    var i = 0;
+    i < marginAccounts.length;
+    i += constants.MAX_SETTLEMENT_ACCOUNTS
+  ) {
+    let tx = new Transaction();
+    let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
+    tx.add(settlePositionsIx(expirationTs, settlementPda, nonce, slice));
+  }
+  return txs;
 }
 
 export function settlePositionsIx(
@@ -960,15 +988,33 @@ export function settlePositionsIx(
   });
 }
 
+export function settlePositionsHaltedTxs(
+  marginAccounts: any[],
+  admin: PublicKey
+): Transaction[] {
+  let txs = [];
+  for (
+    var i = 0;
+    i < marginAccounts.length;
+    i += constants.MAX_SETTLEMENT_ACCOUNTS
+  ) {
+    let tx = new Transaction();
+    let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
+    tx.add(settlePositionsHaltedIx(slice, admin));
+  }
+  return txs;
+}
+
 export function settlePositionsHaltedIx(
-  marginAccounts: any[]
+  marginAccounts: any[],
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.settlePositionsHalted({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
       greeks: Exchange.greeksAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
     remainingAccounts: marginAccounts,
   });
@@ -999,14 +1045,15 @@ export function cleanZetaMarketsHaltedIx(
 }
 
 export function updatePricingHaltedIx(
-  expiryIndex: number
+  expiryIndex: number,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updatePricingHalted(expiryIndex, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
       greeks: Exchange.greeksAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
@@ -1065,65 +1112,70 @@ export function cancelOrderHaltedIx(
 }
 
 export function haltZetaGroupIx(
-  zetaGroupAddress: PublicKey
+  zetaGroupAddress: PublicKey,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.haltZetaGroup({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: zetaGroupAddress,
       greeks: Exchange.greeksAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
 
 export function unhaltZetaGroupIx(
-  zetaGroupAddress: PublicKey
+  zetaGroupAddress: PublicKey,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.unhaltZetaGroup({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: zetaGroupAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
 
 export function updateHaltStateIx(
   zetaGroupAddress: PublicKey,
-  args: UpdateHaltStateArgs
+  args: UpdateHaltStateArgs,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateHaltState(args, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: zetaGroupAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
 
 export function updateVolatilityIx(
-  args: UpdateVolatilityArgs
+  args: UpdateVolatilityArgs,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateVolatility(args, {
     accounts: {
       state: Exchange.stateAddress,
       greeks: Exchange.greeksAddress,
       zetaGroup: Exchange.zetaGroupAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
 
 export function updateInterestRateIx(
-  args: UpdateInterestRateArgs
+  args: UpdateInterestRateArgs,
+  admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateInterestRate(args, {
     accounts: {
       state: Exchange.stateAddress,
       greeks: Exchange.greeksAddress,
       zetaGroup: Exchange.zetaGroupAddress,
-      admin: Exchange.provider.wallet.publicKey,
+      admin,
     },
   });
 }
@@ -1135,8 +1187,8 @@ export function updateAdminIx(
   return Exchange.program.instruction.updateAdmin({
     accounts: {
       state: Exchange.stateAddress,
-      admin: Exchange.provider.wallet.publicKey,
-      newAdmin: Exchange.provider.wallet.publicKey,
+      admin,
+      newAdmin,
     },
   });
 }
