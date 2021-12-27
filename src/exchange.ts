@@ -628,10 +628,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         const asks = anchor.web3.Keypair.generate();
 
         // Store the keypairs locally.
-        utils.writeKeypair(`rq-${i}.json`, requestQueue);
-        utils.writeKeypair(`eq-${i}.json`, eventQueue);
-        utils.writeKeypair(`bids-${i}.json`, bids);
-        utils.writeKeypair(`asks-${i}.json`, asks);
+        utils.writeKeypair(`keys/rq-${i}.json`, requestQueue);
+        utils.writeKeypair(`keys/eq-${i}.json`, eventQueue);
+        utils.writeKeypair(`keys/bids-${i}.json`, bids);
+        utils.writeKeypair(`keys/asks-${i}.json`, asks);
 
         let [tx, tx2] = await instructions.initializeZetaMarketTxs(
           i,
