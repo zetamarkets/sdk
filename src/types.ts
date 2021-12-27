@@ -162,4 +162,5 @@ export interface MarginParams {
   optionSpotPercentageLongMaintenance: number;
   optionSpotPercentageShortMaintenance: number;
   optionDynamicPercentageShortMaintenance: number;
+  optionShortPutCapPercentage: number;
 }

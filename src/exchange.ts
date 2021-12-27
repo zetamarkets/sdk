@@ -985,6 +985,10 @@ insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage
         this.zetaGroup.marginParameters.optionDynamicPercentageShortMaintenance,
         constants.MARGIN_PRECISION
       ),
+      optionShortPutCapPercentage: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.optionShortPutCapPercentage,
+        constants.MARGIN_PRECISION
+      ),
     };
   }
 

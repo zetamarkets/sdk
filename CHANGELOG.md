@@ -6,6 +6,8 @@ Version changes are pinned to SDK releases.
 ## [Unreleased]
 
 - examples: Added a cranking example that calls all of zeta's permissionless instructions with relevant documentation. ([#47](https://github.com/zetamarkets/sdk/pull/47))
+- risk: Added in new calculations for short put margin requirements. ([#49](https://github.com/zetamarkets/sdk/pull/49))
+- exchange: New margin parameter for MarginParameters account. ([#49](https://github.com/zetamarkets/sdk/pull/49))
 
 ## [0.9.3] 2021-12-24
 

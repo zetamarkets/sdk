@@ -600,6 +600,7 @@ export async function initializeZetaGroupIx(
         marginArgs.optionSpotPercentageShortMaintenance,
       optionDynamicPercentageShortMaintenance:
         marginArgs.optionDynamicPercentageShortMaintenance,
+      optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
     },
     {
       accounts: {
@@ -1252,4 +1253,5 @@ export interface UpdateMarginParametersArgs {
   optionSpotPercentageLongMaintenance: anchor.BN;
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
+  optionShortPutCapPercentage: anchor.BN;
 }
