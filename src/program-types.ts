@@ -45,6 +45,7 @@ export interface PricingParameters {
   maxInterestRetreat: AnchorDecimal;
   minDelta: anchor.BN;
   maxDelta: anchor.BN;
+  padding: Array<number>;
 }
 
 export interface MarginParameters {
@@ -58,6 +59,8 @@ export interface MarginParameters {
   optionSpotPercentageLongMaintenance: anchor.BN;
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
+  optionShortPutCapPercentage: anchor.BN;
+  padding: Array<number>;
 }
 
 export interface HaltState {
