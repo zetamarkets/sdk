@@ -2362,7 +2362,7 @@
             "type": {
               "array": [
                 "u8",
-                1135
+                1063
               ]
             }
           }
@@ -2703,6 +2703,15 @@
           {
             "name": "minDelta",
             "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           }
         ]
       }
@@ -2755,6 +2764,15 @@
           {
             "name": "optionShortPutCapPercentage",
             "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           }
         ]
       }
