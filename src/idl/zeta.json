@@ -2567,6 +2567,10 @@
           {
             "name": "nonce",
             "type": "u8"
+          },
+          {
+            "name": "userKey",
+            "type": "publicKey"
           }
         ]
       }
@@ -2579,6 +2583,10 @@
           {
             "name": "nonce",
             "type": "u8"
+          },
+          {
+            "name": "userKey",
+            "type": "publicKey"
           }
         ]
       }
@@ -2607,6 +2615,10 @@
           {
             "name": "nonce",
             "type": "u8"
+          },
+          {
+            "name": "userKey",
+            "type": "publicKey"
           }
         ]
       }
