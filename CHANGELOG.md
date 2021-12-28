@@ -9,6 +9,8 @@ Version changes are pinned to SDK releases.
 - risk: Added in new calculations for short put margin requirements. ([#49](https://github.com/zetamarkets/sdk/pull/49))
 - exchange: New margin parameter for MarginParameters account. ([#49](https://github.com/zetamarkets/sdk/pull/49))
 - exchange: Add new instruction to update admin. ([#48](https://github.com/zetamarkets/sdk/pull/48))
+- market: Add `getBidOrders` and `getAskOrders` for market. ([#50](https://github.com/zetamarkets/sdk/pull/50))
+- client: Add `initializeOpenOrdersAccount` for independent open orders account creation. ([#50](https://github.com/zetamarkets/sdk/pull/50))
 
 ## [0.9.3] 2021-12-24
 

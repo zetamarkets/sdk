@@ -553,7 +553,7 @@ export class Client {
    * Initializes a user open orders account for a given market.
    * This is handled atomically by place order but can be used by clients to initialize it independent of placing an order.
    */
-  public async initializeOpenOrder(
+  public async initializeOpenOrdersAccount(
     market: PublicKey
   ): Promise<TransactionSignature> {
     let marketIndex = Exchange.markets.getMarketIndex(market);
