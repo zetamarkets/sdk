@@ -610,6 +610,49 @@
       "args": []
     },
     {
+      "name": "expireSeriesOverride",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "settlementAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "ExpireSeriesOverrideArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "expireSeries",
       "accounts": [
         {
@@ -2235,11 +2278,15 @@
             "type": "u64"
           },
           {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                163
+                159
               ]
             }
           }
@@ -2954,6 +3001,22 @@
       }
     },
     {
+      "name": "ExpireSeriesOverrideArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "settlementNonce",
+            "type": "u8"
+          },
+          {
+            "name": "settlementPrice",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitializeMarketArgs",
       "type": {
         "kind": "struct",
@@ -3053,6 +3116,10 @@
           {
             "name": "nativeDepositLimit",
             "type": "u64"
+          },
+          {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
           }
         ]
       }
@@ -3117,6 +3184,10 @@
           {
             "name": "nativeDepositLimit",
             "type": "u64"
+          },
+          {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
           }
         ]
       }
@@ -3874,6 +3945,11 @@
       "code": 384,
       "name": "HaltMarketNodesNotCleaned",
       "msg": "Halt market nodes not cleaned"
+    },
+    {
+      "code": 385,
+      "name": "CannotExpireOptionsAfterExpirationThreshold",
+      "msg": "Cannot expire options after expiration threshold"
     }
   ]
 }

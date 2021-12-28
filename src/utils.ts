@@ -936,7 +936,7 @@ export async function expireSeries(expiryTs: anchor.BN) {
   );
 
   // TODO add some looping mechanism if called early.
-  await Exchange.program.rpc.expireSeries(settlementNonce, {
+  let ix = Exchange.program.instruction.expireSeries(settlementNonce, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
@@ -948,7 +948,8 @@ export async function expireSeries(expiryTs: anchor.BN) {
     },
   });
 
-  return settlement;
+  let tx = new Transaction().add(ix);
+  await processTransaction(Exchange.provider, tx);
 }
 
 /**
