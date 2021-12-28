@@ -804,6 +804,7 @@ export function initializeZetaStateIx(
       nativeWhitelistUnderlyingFeePercentage:
         params.nativeWhitelistUnderlyingFeePercentage,
       nativeDepositLimit: params.nativeDepositLimit,
+      expirationThresholdSeconds: params.expirationThresholdSeconds,
     },
     {
       accounts: {
@@ -1193,6 +1194,28 @@ export function updateAdminIx(
   });
 }
 
+export function expireSeriesOverrideIx(
+  admin: PublicKey,
+  settlementAccount: PublicKey,
+  args: ExpireSeriesOverrideArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.expireSeriesOverride(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      settlementAccount: settlementAccount,
+      admin: admin,
+      systemProgram: SystemProgram.programId,
+      greeks: Exchange.greeksAddress,
+    },
+  });
+}
+
+export interface ExpireSeriesOverrideArgs {
+  settlementNonce: number;
+  settlementPrice: anchor.BN;
+}
+
 export interface UpdateHaltStateArgs {
   spotPrice: anchor.BN;
   timestamp: anchor.BN;
@@ -1219,6 +1242,7 @@ export interface StateParams {
   nativeUnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
+  expirationThresholdSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {
