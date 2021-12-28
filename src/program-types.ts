@@ -20,6 +20,7 @@ export interface State {
   nativeUnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
+  expirationThresholdSeconds: number;
   padding: Array<number>;
 }
 

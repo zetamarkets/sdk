@@ -12,6 +12,7 @@ Version changes are pinned to SDK releases.
 - market: Add `getBidOrders` and `getAskOrders` for market. ([#50](https://github.com/zetamarkets/sdk/pull/50))
 - client: Add `initializeOpenOrdersAccount` for independent open orders account creation. ([#50](https://github.com/zetamarkets/sdk/pull/50))
 - general: Add user keys to whitelist accounts. ([#53](https://github.com/zetamarkets/sdk/pull/539))
+- exchange: Add `expireSeriesOverride` instruction. ([#52](https://github.com/zetamarkets/sdk/pull/52))
 
 ## [0.9.3] 2021-12-24
 

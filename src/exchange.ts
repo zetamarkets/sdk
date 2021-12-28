@@ -306,7 +306,8 @@ expiryIntervalSeconds=${params.expiryIntervalSeconds},
 newExpiryThresholdSeconds=${params.newExpiryThresholdSeconds},
 strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}
 pricingFrequencySeconds=${params.pricingFrequencySeconds}
-insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage}`
+insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage}
+expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     );
   }
 

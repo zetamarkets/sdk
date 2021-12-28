@@ -786,66 +786,33 @@ export function initializeZetaStateIx(
   mintAuthorityNonce: number,
   params: StateParams
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeZetaState(
-    {
-      stateNonce: stateNonce,
-      serumNonce: serumNonce,
-      mintAuthNonce: mintAuthorityNonce,
-      expiryIntervalSeconds: params.expiryIntervalSeconds,
-      newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
-      strikeInitializationThresholdSeconds:
-        params.strikeInitializationThresholdSeconds,
-      pricingFrequencySeconds: params.pricingFrequencySeconds,
-      liquidatorLiquidationPercentage: params.liquidatorLiquidationPercentage,
-      insuranceVaultLiquidationPercentage:
-        params.insuranceVaultLiquidationPercentage,
-      nativeTradeFeePercentage: params.nativeTradeFeePercentage,
-      nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
-      nativeWhitelistUnderlyingFeePercentage:
-        params.nativeWhitelistUnderlyingFeePercentage,
-      nativeDepositLimit: params.nativeDepositLimit,
+  let args: Object = params;
+  args["stateNonce"] = stateNonce;
+  args["serumNonce"] = serumNonce;
+  args["mintAuthNonce"] = mintAuthorityNonce;
+  return Exchange.program.instruction.initializeZetaState(args, {
+    accounts: {
+      state: stateAddress,
+      serumAuthority,
+      mintAuthority,
+      rent: SYSVAR_RENT_PUBKEY,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      admin: Exchange.provider.wallet.publicKey,
     },
-    {
-      accounts: {
-        state: stateAddress,
-        serumAuthority,
-        mintAuthority,
-        rent: SYSVAR_RENT_PUBKEY,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        admin: Exchange.provider.wallet.publicKey,
-      },
-    }
-  );
+  });
 }
 
 export function updateZetaStateIx(
   params: StateParams,
   admin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.updateZetaState(
-    {
-      expiryIntervalSeconds: params.expiryIntervalSeconds,
-      newExpiryThresholdSeconds: params.newExpiryThresholdSeconds,
-      strikeInitializationThresholdSeconds:
-        params.strikeInitializationThresholdSeconds,
-      pricingFrequencySeconds: params.pricingFrequencySeconds,
-      liquidatorLiquidationPercentage: params.liquidatorLiquidationPercentage,
-      insuranceVaultLiquidationPercentage:
-        params.insuranceVaultLiquidationPercentage,
-      nativeTradeFeePercentage: params.nativeTradeFeePercentage,
-      nativeUnderlyingFeePercentage: params.nativeUnderlyingFeePercentage,
-      nativeWhitelistUnderlyingFeePercentage:
-        params.nativeWhitelistUnderlyingFeePercentage,
-      nativeDepositLimit: params.nativeDepositLimit,
+  return Exchange.program.instruction.updateZetaState(params, {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
     },
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        admin,
-      },
-    }
-  );
+  });
 }
 
 export function initializeMarketIndexesIx(
@@ -1193,6 +1160,28 @@ export function updateAdminIx(
   });
 }
 
+export function expireSeriesOverrideIx(
+  admin: PublicKey,
+  settlementAccount: PublicKey,
+  args: ExpireSeriesOverrideArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.expireSeriesOverride(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      settlementAccount: settlementAccount,
+      admin: admin,
+      systemProgram: SystemProgram.programId,
+      greeks: Exchange.greeksAddress,
+    },
+  });
+}
+
+export interface ExpireSeriesOverrideArgs {
+  settlementNonce: number;
+  settlementPrice: anchor.BN;
+}
+
 export interface UpdateHaltStateArgs {
   spotPrice: anchor.BN;
   timestamp: anchor.BN;
@@ -1219,6 +1208,7 @@ export interface StateParams {
   nativeUnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
+  expirationThresholdSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {
