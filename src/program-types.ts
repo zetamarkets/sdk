@@ -194,6 +194,12 @@ export interface InsuranceDepositAccount {
 
 export interface WhitelistInsuranceAccount {
   nonce: number;
+  userKey: PublicKey;
+}
+
+export interface WhitelistDepositAccount {
+  nonce: number;
+  userKey: PublicKey;
 }
 
 export interface SocializedLossAccount {
@@ -203,4 +209,5 @@ export interface SocializedLossAccount {
 
 export interface WhitelistTradingFeesAccount {
   nonce: number;
+  userKey: PublicKey;
 }
