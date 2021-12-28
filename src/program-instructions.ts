@@ -999,9 +999,8 @@ export function settlePositionsHaltedTxs(
     i < marginAccounts.length;
     i += constants.MAX_SETTLEMENT_ACCOUNTS
   ) {
-    let tx = new Transaction();
     let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
-    tx.add(settlePositionsHaltedIx(slice, admin));
+    txs.push(new Transaction().add(settlePositionsHaltedIx(slice, admin)));
   }
   return txs;
 }
