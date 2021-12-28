@@ -526,37 +526,45 @@ export class Market {
     return topLevel;
   }
 
+  static convertOrder(market: Market, order: any): Order {
+    return {
+      marketIndex: market.marketIndex,
+      market: market.address,
+      price: order.price,
+      size: convertNativeLotSizeToDecimal(order.size),
+      side: order.side == "buy" ? Side.BID : Side.ASK,
+      orderId: order.orderId,
+      owner: order.openOrdersAddress,
+      clientOrderId: order.clientId,
+    };
+  }
+
   public getOrdersForAccount(openOrdersAddress: PublicKey): Order[] {
     let orders = [...this._bids, ...this._asks].filter((order) =>
       order.openOrdersAddress.equals(openOrdersAddress)
     );
 
     return orders.map((order) => {
-      return {
-        marketIndex: this._marketIndex,
-        market: this._address,
-        price: order.price,
-        size: convertNativeLotSizeToDecimal(order.size),
-        side: order.side == "buy" ? Side.BID : Side.ASK,
-        orderId: order.orderId,
-        owner: order.openOrdersAddress,
-        clientOrderId: order.clientId,
-      };
+      return Market.convertOrder(this, order);
     });
   }
 
   public getMarketOrders(): Order[] {
     return [...this._bids, ...this._asks].map((order) => {
-      return {
-        marketIndex: this._marketIndex,
-        market: this._address,
-        price: order.price,
-        size: convertNativeLotSizeToDecimal(order.size),
-        side: order.side == "buy" ? Side.BID : Side.ASK,
-        orderId: order.orderId,
-        owner: order.openOrdersAddress,
-        clientOrderId: order.clientId,
-      };
+      return Market.convertOrder(this, order);
+    });
+  }
+
+  public getBidOrders(): Order[] {
+    console.log("*");
+    return [...this._bids].map((order) => {
+      return Market.convertOrder(this, order);
+    });
+  }
+
+  public getAskOrders(): Order[] {
+    return [...this._asks].map((order) => {
+      return Market.convertOrder(this, order);
     });
   }
 
