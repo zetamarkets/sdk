@@ -550,6 +550,30 @@ export class Client {
   }
 
   /**
+   * Initializes a user open orders account for a given market.
+   * This is handled atomically by place order but can be used by clients to initialize it independent of placing an order.
+   */
+  public async initializeOpenOrder(
+    market: PublicKey
+  ): Promise<TransactionSignature> {
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+    if (!this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      throw Error("User already has an open orders account for market!");
+    }
+
+    let [initIx, openOrdersPda] = await initializeOpenOrdersIx(
+      market,
+      this.publicKey,
+      this.marginAccountAddress
+    );
+
+    let tx = new Transaction().add(initIx);
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+    return txId;
+  }
+
+  /**
    * Cancels a user order by orderId and atomically places an order
    * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
    */
@@ -646,7 +670,7 @@ export class Client {
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
-      let ix = await cancelOrderIx(
+      let ix = cancelOrderIx(
         order.marketIndex,
         this.publicKey,
         this._marginAccountAddress,
