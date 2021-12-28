@@ -3184,6 +3184,10 @@
           {
             "name": "nativeDepositLimit",
             "type": "u64"
+          },
+          {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
           }
         ]
       }
