@@ -941,6 +941,7 @@ export function settlePositionsTxs(
     let tx = new Transaction();
     let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
     tx.add(settlePositionsIx(expirationTs, settlementPda, nonce, slice));
+    txs.push(tx);
   }
   return txs;
 }
