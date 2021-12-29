@@ -2785,13 +2785,20 @@
             "type": "u64"
           },
           {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
+            "name": "minVolatility",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatility",
+            "type": "u64"
+          },
+          {
+            "name": "minInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxInterestRate",
+            "type": "i64"
           }
         ]
       }
@@ -3232,6 +3239,22 @@
           {
             "name": "maxDelta",
             "type": "u64"
+          },
+          {
+            "name": "minInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "minVolatility",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatility",
+            "type": "u64"
           }
         ]
       }
@@ -3352,6 +3375,22 @@
           },
           {
             "name": "minDelta",
+            "type": "u64"
+          },
+          {
+            "name": "minInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "minVolatility",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatility",
             "type": "u64"
           },
           {

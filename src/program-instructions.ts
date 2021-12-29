@@ -582,6 +582,10 @@ export async function initializeZetaGroupIx(
       maxInterestRetreat: pricingArgs.maxInterestRetreat,
       maxDelta: pricingArgs.maxDelta,
       minDelta: pricingArgs.minDelta,
+      minInterestRate: pricingArgs.minInterestRate,
+      maxInterestRate: pricingArgs.maxInterestRate,
+      minVolatility: pricingArgs.minVolatility,
+      maxVolatility: pricingArgs.maxVolatility,
       futureMarginInitial: marginArgs.futureMarginInitial,
       futureMarginMaintenance: marginArgs.futureMarginMaintenance,
       optionMarkPercentageLongInitial:
@@ -1218,6 +1222,10 @@ export interface UpdatePricingParametersArgs {
   maxInterestRetreat: anchor.BN;
   maxDelta: anchor.BN;
   minDelta: anchor.BN;
+  minInterestRate: anchor.BN;
+  maxInterestRate: anchor.BN;
+  minVolatility: anchor.BN;
+  maxVolatility: anchor.BN;
 }
 
 export interface InitializeZetaGroupPricingArgs {
@@ -1229,6 +1237,10 @@ export interface InitializeZetaGroupPricingArgs {
   maxInterestRetreat: anchor.BN;
   minDelta: anchor.BN;
   maxDelta: anchor.BN;
+  minInterestRate: anchor.BN;
+  maxInterestRate: anchor.BN;
+  minVolatility: anchor.BN;
+  maxVolatility: anchor.BN;
 }
 
 export interface UpdateMarginParametersArgs {
