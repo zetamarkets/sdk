@@ -46,7 +46,10 @@ export interface PricingParameters {
   maxInterestRetreat: AnchorDecimal;
   minDelta: anchor.BN;
   maxDelta: anchor.BN;
-  padding: Array<number>;
+  minInterestRate: anchor.BN;
+  maxInterestRate: anchor.BN;
+  minVolatility: anchor.BN;
+  maxVolatility: anchor.BN;
 }
 
 export interface MarginParameters {
