@@ -193,7 +193,7 @@ export async function initializeOpenOrdersIx(
         accounts: {
           state: Exchange.stateAddress,
           zetaGroup: Exchange.zetaGroupAddress,
-          dexProgram: constants.DEX_PID,
+          dexProgram: constants.DEX_PID[Exchange.network],
           systemProgram: SystemProgram.programId,
           openOrders: openOrdersPda,
           marginAccount: marginAccount,
@@ -243,7 +243,7 @@ export function placeOrderIx(
         zetaGroup: Exchange.zetaGroupAddress,
         marginAccount: marginAccount,
         authority: authority,
-        dexProgram: constants.DEX_PID,
+        dexProgram: constants.DEX_PID[Exchange.network],
         tokenProgram: TOKEN_PROGRAM_ID,
         serumAuthority: Exchange.serumAuthority,
         greeks: Exchange.zetaGroup.greeks,
@@ -295,7 +295,7 @@ export function cancelOrderIx(
           zetaGroup: Exchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
-          dexProgram: constants.DEX_PID,
+          dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
@@ -325,7 +325,7 @@ export function cancelOrderByClientOrderIdIx(
           zetaGroup: Exchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
-          dexProgram: constants.DEX_PID,
+          dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
@@ -355,7 +355,7 @@ export function cancelExpiredOrderIx(
           zetaGroup: Exchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
-          dexProgram: constants.DEX_PID,
+          dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
@@ -382,7 +382,7 @@ export function forceCancelOrdersIx(
         zetaGroup: Exchange.zetaGroupAddress,
         state: Exchange.stateAddress,
         marginAccount,
-        dexProgram: constants.DEX_PID,
+        dexProgram: constants.DEX_PID[Exchange.network],
         serumAuthority: Exchange.serumAuthority,
         openOrders,
         market: marketData.address,
@@ -411,7 +411,7 @@ export async function initializeZetaMarketTxs(
 
   const [vaultOwner, vaultSignerNonce] = await utils.getSerumVaultOwnerAndNonce(
     market,
-    constants.DEX_PID
+    constants.DEX_PID[Exchange.network]
   );
 
   const [baseMint, baseMintNonce] = await utils.getBaseMint(
@@ -451,7 +451,7 @@ export async function initializeZetaMarketTxs(
           5120 + 12
         ),
       space: 5120 + 12,
-      programId: constants.DEX_PID,
+      programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
       fromPubkey: Exchange.provider.wallet.publicKey,
@@ -461,7 +461,7 @@ export async function initializeZetaMarketTxs(
           262144 + 12
         ),
       space: 262144 + 12,
-      programId: constants.DEX_PID,
+      programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
       fromPubkey: Exchange.provider.wallet.publicKey,
@@ -471,7 +471,7 @@ export async function initializeZetaMarketTxs(
           65536 + 12
         ),
       space: 65536 + 12,
-      programId: constants.DEX_PID,
+      programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
       fromPubkey: Exchange.provider.wallet.publicKey,
@@ -481,7 +481,7 @@ export async function initializeZetaMarketTxs(
           65536 + 12
         ),
       space: 65536 + 12,
-      programId: constants.DEX_PID,
+      programId: constants.DEX_PID[Exchange.network],
     })
   );
 
@@ -518,7 +518,7 @@ export async function initializeZetaMarketTxs(
           vaultOwner,
           mintAuthority: Exchange.mintAuthority,
           serumAuthority: Exchange.serumAuthority,
-          dexProgram: constants.DEX_PID,
+          dexProgram: constants.DEX_PID[Exchange.network],
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
           rent: SYSVAR_RENT_PUBKEY,
@@ -1069,7 +1069,7 @@ export function cancelOrderHaltedIx(
           zetaGroup: Exchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
-          dexProgram: constants.DEX_PID,
+          dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,

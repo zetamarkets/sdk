@@ -85,7 +85,7 @@ export async function getOpenOrders(
   return await anchor.web3.PublicKey.findProgramAddress(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("open-orders")),
-      constants.DEX_PID.toBuffer(),
+      constants.DEX_PID[Exchange.network].toBuffer(),
       market.toBuffer(),
       userKey.toBuffer(),
     ],
@@ -102,7 +102,7 @@ export async function createOpenOrdersAddress(
   return await PublicKey.createProgramAddress(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("open-orders")),
-      constants.DEX_PID.toBuffer(),
+      constants.DEX_PID[Exchange.network].toBuffer(),
       market.toBuffer(),
       userKey.toBuffer(),
       Buffer.from([nonce]),
@@ -921,7 +921,7 @@ export async function crankMarket(
     crankMarketIx(
       market.address,
       market.serumMarket.decoded.eventQueue,
-      constants.DEX_PID,
+      constants.DEX_PID[Exchange.network],
       remainingAccounts
     )
   );

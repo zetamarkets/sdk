@@ -212,7 +212,7 @@ export class ZetaGroupMarkets {
             Exchange.connection,
             marketAddr,
             { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
-            DEX_PID
+            DEX_PID[Exchange.network]
           );
           let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
             Exchange.programId,
