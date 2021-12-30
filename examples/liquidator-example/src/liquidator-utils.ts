@@ -17,13 +17,13 @@ export async function findAccountsAtRisk(
         return;
       }
       console.log(
-        `[ACCOUNT_AT_RISK] ACCOUNT: ${account.publicKey.toString()} BALANCE: ${
+        `[ACCOUNT_AT_RISK] [ACCOUNT]: ${account.publicKey.toString()} [BALANCE]: ${
           marginAccountState.balance
-        } INITIAL ${marginAccountState.initialMargin} MAINTENANCE: ${
+        } [INITIAL] ${marginAccountState.initialMargin} [MAINTENANCE]: ${
           marginAccountState.maintenanceMargin
-        } TOTAL ${marginAccountState.totalMargin} UNREALIZED PNL: ${
+        } [TOTAL] ${marginAccountState.totalMargin} [UNREALIZED PNL] ${
           marginAccountState.unrealizedPnl
-        } AVAILABLE BALANCE: ${marginAccountState.availableBalance}`
+        } [AVAILABLE BALANCE] ${marginAccountState.availableBalance}`
       );
       accountsAtRisk.push(account);
     })
@@ -54,9 +54,9 @@ export async function findLiquidatableAccounts(
         return;
       }
       console.log(
-        `[LIQUIDATABLE ACCOUNT] ACCOUNT: ${account.publicKey.toString()} BALANCE: ${
+        `[LIQUIDATABLE ACCOUNT] [ACCOUNT] ${account.publicKey.toString()} [BALANCE] ${
           marginAccountState.balance
-        } AVAILABLE BALANCE POST CANCELS: ${adjustedAvailableBalance}`
+        } [ADJUSTED AVAILABLE BALANCE] ${adjustedAvailableBalance}`
       );
       liquidatableAccounts.push(account);
     })
@@ -141,7 +141,7 @@ export async function liquidateAccounts(
         position > 0
       );
 
-      const size = Math.min(marginConstrainedSize, position);
+      const size = Math.min(marginConstrainedSize, Math.abs(position));
       const side = position > 0 ? "Bid" : "Ask";
 
       console.log(
@@ -161,7 +161,7 @@ export async function liquidateAccounts(
           size +
           " [MAX CAPACITY WITH MARGIN] " +
           marginConstrainedSize +
-          " [TOTAL SIZE AVAILABLE TO BE LIQUIDATED] " +
+          " [AVAILABLE SIZE] " +
           Math.abs(position)
       );
       try {
