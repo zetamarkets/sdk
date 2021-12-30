@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- risk: Remove redundant calculation in `getMarginAccountState`.
+- risk: Remove redundant calculation in `getMarginAccountState`. ([#59](https://github.com/zetamarkets/sdk/pull/59))
 
 ## [0.9.5] 2021-12-29
 
