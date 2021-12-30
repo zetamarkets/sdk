@@ -68,11 +68,11 @@ echo private_key=`cat bot-key.json` >> .env
 
 | Key         |                    Value                     | Explanation|
 | ----------- | :------------------------------------------: |:------:|
-| check_interval_ms |5000            | The frequency in milliseconds that the script will scan for liquidatable accounts
-| connection | https://api.devnet.solana.com |The network to connect to! This is the public devnet endpoint |
-| program_id  | GWo1BP35YkiSsD8qmGYLzVT5R8eMA31W6naXUoBtsDEg | Zeta's Program ID |
-| private_key  | [insert your private key here] | The private key you will use for your liquidator client|
-| server_url | server.zeta.markets | The private key you will use for your liquidator client|
+| check_interval_ms |5000            | The frequency in milliseconds that the script will scan for liquidatable accounts. |
+| connection | https://api.devnet.solana.com | The rpc endpoint to connect to. |
+| program_id  | GWo1BP35YkiSsD8qmGYLzVT5R8eMA31W6naXUoBtsDEg | Zeta's Program ID. |
+| private_key  | [insert your private key here] | The private key you will use for your liquidator client. |
+| server_url | server.zeta.markets | The server endpoint to airdrop devnet usdc. |
 
 # Install dependencies
 ```sh
