@@ -46,7 +46,6 @@ export async function scanMarginAccounts() {
   let liquidatableAccounts: anchor.ProgramAccount[] =
     await findLiquidatableAccounts(accountsAtRisk);
 
-  console.log(`Liquidatable accounts: ${liquidatableAccounts}`);
   await liquidateAccounts(client, liquidatableAccounts);
 
   // Display the latest client state.
