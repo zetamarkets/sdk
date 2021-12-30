@@ -581,12 +581,10 @@ export async function processTransaction(
     if (translatedErr !== null) {
       throw translatedErr;
     }
-
     let customErr = parseCustomError(err);
     if (customErr != null) {
       throw customErr;
     }
-
     throw err;
   }
 }
