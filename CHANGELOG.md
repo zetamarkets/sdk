@@ -10,6 +10,7 @@ Version changes are pinned to SDK releases.
 ## [0.9.5] 2021-12-29
 
 - program-types: Add fields to `PricingParameters`. ([#56](https://github.com/zetamarkets/sdk/pull/56))
+- examples: Add basic liquidator example. ([#60](https://github.com/zetamarkets/sdk/pull/60))
 
 ## [0.9.4] 2021-12-29
 
