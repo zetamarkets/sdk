@@ -6,9 +6,11 @@ export const MINTS = {
 
 export const UNDERLYINGS = [MINTS["SOL"]];
 
-export const DEX_PID = new PublicKey(
-  "5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"
-);
+export const DEX_PID = {
+  localnet: new PublicKey("5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"),
+  devnet: new PublicKey("5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"),
+  mainnet: new PublicKey("zDEXqXEG7gAyxb1Kg9mK5fPnUdENCGKzWrM21RMdWRq"),
+};
 
 export const MAX_CANCELS_PER_TX = 4;
 export const MAX_GREEK_UPDATES_PER_TX = 20;

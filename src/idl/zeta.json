@@ -91,6 +91,34 @@
       ]
     },
     {
+      "name": "overrideExpiry",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "OverrideExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeMarginAccount",
       "accounts": [
         {
@@ -3155,6 +3183,26 @@
           {
             "name": "index",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OverrideExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIndex",
+            "type": "u8"
+          },
+          {
+            "name": "activeTs",
+            "type": "u64"
+          },
+          {
+            "name": "expiryTs",
+            "type": "u64"
           }
         ]
       }
