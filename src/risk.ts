@@ -205,7 +205,7 @@ export class RiskCalculator {
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
-    let totalMargin = this.calculateTotalMargin(marginAccount);
+    let totalMargin = initialMargin + maintenanceMargin;
     let availableBalance: number = balance + unrealizedPnl - totalMargin;
     return {
       balance,
