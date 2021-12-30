@@ -75,15 +75,14 @@ echo private_key=`cat bot-key.json` >> .env
 | server_url | server.zeta.markets | The private key you will use for your liquidator client|
 
 # Install dependencies
+```sh
 npm install
+```
 
-# Create a Zeta DEX Margin Account and deposit USDC
-To do this, either head over to the [Zeta's Devnet](https://devnet.zeta.markets) or use [Zeta's SDK](https://github.com/zetamarkets/sdk) and use the client.deposit method.
-
-Or if you're lazy... make sure you have some USDC handy and the Zeta liquidator scripts should deposit a tiny amount of USDC (0.001) to initialize a margin account for you.
-
-# Hit the ground running!
-To run a full liquidator use npm run full-liquidator.
+# Run script
+```
+npm run start
+```
 
 # Contribute to the Repo
 Please reach out on Zeta's Discord or Twitter if you're interested in joining Zeta's awesome open source community and contributing code!
@@ -91,4 +90,3 @@ Please reach out on Zeta's Discord or Twitter if you're interested in joining Ze
 ## Licensing
 
 [Apache 2.0](./LICENSE).
-```
