@@ -2192,11 +2192,20 @@
             }
           },
           {
+            "name": "haltForcePricing",
+            "type": {
+              "array": [
+                "bool",
+                6
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1647
+                1641
               ]
             }
           }
