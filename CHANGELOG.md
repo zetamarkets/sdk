@@ -6,6 +6,7 @@ Version changes are pinned to SDK releases.
 ## [Unreleased]
 
 - risk: Remove redundant calculation in `getMarginAccountState`. ([#59](https://github.com/zetamarkets/sdk/pull/59))
+- program-types: Add force halt pricing field to `Greeks`. ([#63](https://github.com/zetamarkets/sdk/pull/63))
 
 ## [0.9.5] 2021-12-29
 

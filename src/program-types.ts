@@ -158,6 +158,7 @@ export interface Greeks {
   volatility: Array<anchor.BN>;
   _volatilityPadding: Array<anchor.BN>;
   nodeKeys: Array<PublicKey>;
+  haltForcePricing: Array<boolean>;
   padding: Array<number>;
 }
 
