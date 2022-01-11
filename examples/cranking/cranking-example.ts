@@ -11,6 +11,21 @@ import {
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 
+let network: Network;
+switch (process.env["network"]) {
+  case "localnet":
+    network = Network.LOCALNET;
+    break;
+  case "devnet":
+    network = Network.DEVNET;
+    break;
+  case "mainnet":
+    network = Network.MAINNET;
+    break;
+  default:
+    throw Error("Unsupported network type!");
+}
+
 const NETWORK_URL = process.env["network_url"]!;
 const PROGRAM_ID = new PublicKey(process.env["program_id"]);
 let crankingMarkets = new Array(constants.ACTIVE_MARKETS).fill(false);
@@ -27,20 +42,23 @@ async function main() {
 
   // Load from private_key stored in .env file.
   // const privateKey = Keypair.fromSecretKey(
-  //  new Uint8Array(JSON.parse(Buffer.from(process.env.private_key).toString()))
-  //);
+  //   new Uint8Array(JSON.parse(Buffer.from(process.env.private_key).toString()))
+  // );
   // const wallet = new Wallet(privateKey);
 
   // Create a solana web3 connection to devnet.
   const connection = new Connection(NETWORK_URL, utils.defaultCommitment());
 
   // Airdropping SOL.
-  await connection.requestAirdrop(wallet.publicKey, 100000000);
+  // Only able to be done on localnet/devnet.
+  if (network != Network.MAINNET) {
+    await connection.requestAirdrop(wallet.publicKey, 100000000);
+  }
 
   // We load the exchange with a valid wallet containing SOL to call permissionless zeta functions.
   await Exchange.load(
     PROGRAM_ID,
-    Network.DEVNET, // or MAINNET
+    network,
     connection,
     utils.defaultCommitment(),
     wallet,
