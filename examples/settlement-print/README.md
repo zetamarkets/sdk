@@ -4,7 +4,7 @@ This should show how to find previous settlement prints for a given underlying a
 
 You will need to specify the expiration timestamp in the code.
 
-This example specifies the print for `Fri Jan 07 2022 16:00:00 GMT+0800` for $SOL options.
+This example specifies the print for `Fri Jan 07 2022 16:00:00 GMT+0800` for `$SOL` options.
 
 ```sh
 npm install
