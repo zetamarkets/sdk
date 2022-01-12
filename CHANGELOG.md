@@ -8,9 +8,9 @@ Version changes are pinned to SDK releases.
 - risk: Remove redundant calculation in `getMarginAccountState`. ([#59](https://github.com/zetamarkets/sdk/pull/59))
 - program-types: Add force halt pricing field to `Greeks`. ([#63](https://github.com/zetamarkets/sdk/pull/63))
 - examples: Fix cranking example. ([#63](https://github.com/zetamarkets/sdk/pull/64))
-- examples: Add example to display settlement prints. ([#63](https://github.com/zetamarkets/sdk/pull/64))
-- subscription: Add `subscription` to allow for websocket subscription to all program accounts of a particular type. Currently only supports `MarginAccount`.
-- examples: Add subscription example.
+- examples: Add example to display settlement prints. ([#64](https://github.com/zetamarkets/sdk/pull/64))
+- subscription: Add `subscription` to allow for websocket subscription to all program accounts of a particular type. Currently only supports `MarginAccount`. ([#71](https://github.com/zetamarkets/sdk/pull/71))
+- examples: Add subscription example. ([#71](https://github.com/zetamarkets/sdk/pull/71))
 
 ## [0.9.5] 2021-12-29
 
