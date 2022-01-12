@@ -17,6 +17,7 @@ import * as instructions from "./program-instructions";
 import * as programTypes from "./program-types";
 import * as risk from "./risk";
 import * as events from "./events";
+import * as subscription from "./subscription";
 
 export {
   utils,
@@ -37,4 +38,5 @@ export {
   idl,
   Wallet,
   Market,
+  subscription,
 };
