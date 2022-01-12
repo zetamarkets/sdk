@@ -40,7 +40,5 @@ export function subscribeProgramAccounts<T>(
     ]
   );
 
-  console.log(subscriptionId);
-
   Exchange.addProgramSubscriptionId(subscriptionId);
 }
