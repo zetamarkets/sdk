@@ -232,6 +232,8 @@ export class Exchange {
     return this._zetaGroup.haltState.halted;
   }
 
+  private _programSubscriptionIds: number[] = [];
+
   private init(
     programId: PublicKey,
     network: Network,
@@ -922,6 +924,10 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     return utils.convertNativeBNToDecimal(this.state.nativeDepositLimit);
   }
 
+  public addProgramSubscriptionId(id: number) {
+    this._programSubscriptionIds.push(id);
+  }
+
   /**
    * Close the websockets.
    */
@@ -933,12 +939,18 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     }
     this._eventEmitters = [];
     if (this._clockSubscriptionId !== undefined) {
-      await this._provider.connection.removeAccountChangeListener(
+      await this.connection.removeAccountChangeListener(
         this._clockSubscriptionId
       );
       this._clockSubscriptionId = undefined;
     }
     await this._oracle.close();
+    for (var i = 0; i < this._programSubscriptionIds.length; i++) {
+      await this.connection.removeProgramAccountChangeListener(
+        this._programSubscriptionIds[i]
+      );
+    }
+    this._programSubscriptionIds = [];
   }
 
   public updateMarginParams() {
