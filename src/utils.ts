@@ -1028,7 +1028,9 @@ export async function writeKeypair(filename: string, keypair: Keypair) {
   fs.writeFileSync(filename, secret);
 }
 
-export async function getAllProgramAccountAddresses(): Promise<PublicKey[]> {
+export async function getAllProgramAccountAddresses(
+  accountType: ProgramAccountType
+): Promise<PublicKey[]> {
   let noDataAccounts = await Exchange.provider.connection.getProgramAccounts(
     Exchange.programId,
     {
@@ -1042,7 +1044,7 @@ export async function getAllProgramAccountAddresses(): Promise<PublicKey[]> {
           memcmp: {
             offset: 0,
             bytes: bs58.encode(
-              anchor.AccountsCoder.accountDiscriminator("MarginAccount")
+              anchor.AccountsCoder.accountDiscriminator(accountType)
             ),
           },
         },
