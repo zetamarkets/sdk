@@ -61,7 +61,7 @@ export async function scanMarginAccounts() {
 
 async function main() {
   let connection: Connection = new Connection(process.env.connection, {
-    commitment: "processed",
+    commitment: "confirmed",
     disableRetryOnRateLimit: true,
   });
 

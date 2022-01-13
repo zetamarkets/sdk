@@ -247,7 +247,7 @@ export class Exchange {
     this._provider = new anchor.Provider(
       connection,
       wallet,
-      opts || utils.defaultCommitment()
+      opts || utils.commitmentConfig(connection.commitment)
     );
     this._network = network;
     this._program = new anchor.Program(
@@ -740,7 +740,8 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
 
   private subscribeZetaGroup(callback?: (type: EventType, data: any) => void) {
     let eventEmitter = this._program.account.zetaGroup.subscribe(
-      this._zetaGroupAddress
+      this._zetaGroupAddress,
+      this._provider.connection.commitment
     );
 
     eventEmitter.on("change", async (zetaGroup: ZetaGroup) => {
@@ -782,7 +783,8 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
         } catch (e) {
           console.log(`Exchange polling failed. Error: ${e}`);
         }
-      }
+      },
+      this._provider.connection.commitment
     );
     let accountInfo = await this._provider.connection.getAccountInfo(
       SYSVAR_CLOCK_PUBKEY
@@ -796,7 +798,8 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     }
 
     let eventEmitter = this._program.account.greeks.subscribe(
-      this._zetaGroup.greeks
+      this._zetaGroup.greeks,
+      this._provider.connection.commitment
     );
 
     eventEmitter.on("change", async (greeks: Greeks) => {

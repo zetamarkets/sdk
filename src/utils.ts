@@ -1,5 +1,6 @@
 import * as anchor from "@project-serum/anchor";
 import {
+  Commitment,
   Keypair,
   ConfirmOptions,
   PublicKey,
@@ -546,8 +547,16 @@ export async function getAssociatedTokenAddress(
 export function defaultCommitment(): ConfirmOptions {
   return {
     skipPreflight: false,
-    preflightCommitment: "processed",
-    commitment: "processed",
+    preflightCommitment: "confirmed",
+    commitment: "confirmed",
+  };
+}
+
+export function commitmentConfig(commitment: Commitment): ConfirmOptions {
+  return {
+    skipPreflight: false,
+    preflightCommitment: commitment,
+    commitment,
   };
 }
 
@@ -574,7 +583,7 @@ export async function processTransaction(
     let txSig = await sendAndConfirmRawTransaction(
       provider.connection,
       tx.serialize(),
-      opts || defaultCommitment()
+      opts || commitmentConfig(provider.connection.commitment)
     );
     return txSig;
   } catch (err) {

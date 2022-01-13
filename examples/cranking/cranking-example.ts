@@ -47,7 +47,7 @@ async function main() {
   // const wallet = new Wallet(privateKey);
 
   // Create a solana web3 connection to devnet.
-  const connection = new Connection(NETWORK_URL, utils.defaultCommitment());
+  const connection = new Connection(NETWORK_URL, "confirmed");
 
   // Airdropping SOL.
   // Only able to be done on localnet/devnet.
