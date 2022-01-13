@@ -1,6 +1,7 @@
 import { Connection, AccountInfo, Context } from "@solana/web3.js";
 import { parsePythData, Price } from "./oracle-utils";
 import { Network } from "./network";
+import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
 
 export class Oracle {
@@ -53,7 +54,8 @@ export class Oracle {
           };
           this._data.set(feed, oracleData);
           this._callback(oracleData);
-        }
+        },
+        Exchange.provider.connection.commitment
       );
       this._subscriptionIds.set(feed, subscriptionId);
 

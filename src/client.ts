@@ -202,7 +202,8 @@ export class Client {
     client._marginAccountAddress = marginAccountAddress;
 
     client._eventEmitter = client._program.account.marginAccount.subscribe(
-      client.marginAccountAddress
+      client.marginAccountAddress,
+      client._provider.connection.commitment
     );
 
     client._callback = callback;
