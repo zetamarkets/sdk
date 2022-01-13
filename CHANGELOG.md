@@ -11,6 +11,7 @@ Version changes are pinned to SDK releases.
 - examples: Add example to display settlement prints. ([#64](https://github.com/zetamarkets/sdk/pull/64))
 - subscription: Add `subscription` to allow for websocket subscription to all program accounts of a particular type. Currently only supports `MarginAccount`. ([#71](https://github.com/zetamarkets/sdk/pull/71))
 - examples: Add subscription example. ([#71](https://github.com/zetamarkets/sdk/pull/71))
+- utils: Add a function to fetch all the addresses for a certain program account. Currently only supports `MarginAccount`. ([#72](https://github.com/zetamarkets/sdk/pull/72))
 
 ## [0.9.5] 2021-12-29
 

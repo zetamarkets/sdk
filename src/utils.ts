@@ -22,13 +22,14 @@ import {
 } from "@solana/spl-token";
 import BufferLayout from "buffer-layout";
 const BN = anchor.BN;
+import * as bs58 from "bs58";
 
 import * as fs from "fs";
 import * as constants from "./constants";
 import { parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
-import { TradeEvent } from "./program-types";
-import { OpenOrdersMap } from "./program-types";
+import { TradeEvent, OpenOrdersMap } from "./program-types";
+import { ProgramAccountType } from "./types";
 import {
   cancelExpiredOrderIx,
   cancelOrderHaltedIx,
@@ -1025,4 +1026,35 @@ export async function getCancelAllIxs(
 export async function writeKeypair(filename: string, keypair: Keypair) {
   let secret = "[" + keypair.secretKey.toString() + "]";
   fs.writeFileSync(filename, secret);
+}
+
+export async function getAllProgramAccountAddresses(
+  accountType: ProgramAccountType
+): Promise<PublicKey[]> {
+  let noDataAccounts = await Exchange.provider.connection.getProgramAccounts(
+    Exchange.programId,
+    {
+      commitment: Exchange.provider.connection.commitment,
+      dataSlice: {
+        offset: 0,
+        length: 0,
+      },
+      filters: [
+        {
+          memcmp: {
+            offset: 0,
+            bytes: bs58.encode(
+              anchor.AccountsCoder.accountDiscriminator(accountType)
+            ),
+          },
+        },
+      ],
+    }
+  );
+
+  let pubkeys: PublicKey[] = [];
+  for (let i = 0; i < noDataAccounts.length; i++) {
+    pubkeys.push(noDataAccounts[i].pubkey);
+  }
+  return pubkeys;
 }
