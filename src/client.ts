@@ -551,6 +551,52 @@ export class Client {
   }
 
   /**
+   * Cancels a user order by client order id and atomically places an order by new client order id.
+   * @param market                  the market address of the order to be cancelled and new order.
+   * @param cancelClientOrderId     the client order id of the order to be cancelled.
+   * @param newOrderprice           the native price of the order (6 d.p) as integer
+   * @param newOrderSize            the quantity of the order (3 d.p) as integer
+   * @param newOrderSide            the side of the order. bid / ask
+   * @param newOrderClientOrderId   the client order id for the new order
+   */
+  public async cancelAndPlaceOrderByClientOrderId(
+    market: PublicKey,
+    cancelClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: Side,
+    newOrderClientOrderId: number
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let ixs = [];
+    ixs.push(
+      cancelOrderByClientOrderIdIx(
+        marketIndex,
+        this.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        new anchor.BN(cancelClientOrderId)
+      )
+    );
+    ixs.push(
+      placeOrderIx(
+        marketIndex,
+        newOrderPrice,
+        newOrderSize,
+        newOrderSide,
+        newOrderClientOrderId,
+        this.marginAccountAddress,
+        this.publicKey,
+        this._openOrdersAccounts[marketIndex],
+        this._whitelistTradingFeesAddress
+      )
+    );
+    ixs.forEach((ix) => tx.add(ix));
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
    * Initializes a user open orders account for a given market.
    * This is handled atomically by place order but can be used by clients to initialize it independent of placing an order.
    */
