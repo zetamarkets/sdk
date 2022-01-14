@@ -12,8 +12,12 @@ Version changes are pinned to SDK releases.
 - subscription: Add `subscription` to allow for websocket subscription to all program accounts of a particular type. Currently only supports `MarginAccount`. ([#71](https://github.com/zetamarkets/sdk/pull/71))
 - examples: Add subscription example. ([#71](https://github.com/zetamarkets/sdk/pull/71))
 - utils: Add a function to fetch all the addresses for a certain program account. Currently only supports `MarginAccount`. ([#72](https://github.com/zetamarkets/sdk/pull/72))
-- general: Modify default commitment levels to confirmed.
-- client: Add `cancelAndPlaceOrderByClientOrderId`.
+- general: Modify default commitment levels to confirmed. ([#73](https://github.com/zetamarkets/sdk/pull/73))
+- client: Add `cancelAndPlaceOrderByClientOrderId`. ([#73](https://github.com/zetamarkets/sdk/pull/73))
+- exchange: Add clock slot. ([#74](https://github.com/zetamarkets/sdk/pull/74))
+- client: Optimise polling such that only one `updateState` can be called at all times. Pending updates are batched to the next timer tick. ([#74](https://github.com/zetamarkets/sdk/pull/74))
+- client: Reduce DEFAULT_CLIENT_TIMER_INTERVAL to 1 for more frequent pending update refreshes. ([#74](https://github.com/zetamarkets/sdk/pull/74))
+- market: Remove orderbook depth. Always store the full orderbook size. ([#74](https://github.com/zetamarkets/sdk/pull/74))
 
 ## [0.9.5] 2021-12-29
 
