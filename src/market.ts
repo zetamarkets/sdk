@@ -438,17 +438,6 @@ export class Market {
   }
   private _strike: number;
 
-  /**
-   * The depth of the orderbook loaded, default set to 5
-   */
-  public get orderbookDepth(): number {
-    return this._orderbookDepth;
-  }
-  public set orderbookDepth(depth: number) {
-    this._orderbookDepth = depth;
-  }
-  private _orderbookDepth: number;
-
   public constructor(
     marketIndex: number,
     expiryIndex: number,
@@ -468,7 +457,6 @@ export class Market {
     this._baseVault = baseVault;
     this._serumMarket = serumMarket;
     this._strike = 0;
-    this._orderbookDepth = DEFAULT_ORDERBOOK_DEPTH;
     this._orderbook = { bids: [], asks: [] };
   }
 
@@ -495,8 +483,6 @@ export class Market {
         const price = getPriceFromSerumOrderKey(key);
         if (levels.length > 0 && levels[levels.length - 1][0].eq(price)) {
           levels[levels.length - 1][1].iadd(quantity);
-        } else if (levels.length === this._orderbookDepth) {
-          break;
         } else {
           levels.push([price, new anchor.BN(quantity.toNumber())]);
         }

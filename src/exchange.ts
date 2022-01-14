@@ -25,7 +25,7 @@ import { EventType } from "./events";
 import { Network } from "./network";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
-import { MarginParams, DummyWallet, Wallet } from "./types";
+import { ClockData, MarginParams, DummyWallet, Wallet } from "./types";
 import * as instructions from "./program-instructions";
 export class Exchange {
   /**
@@ -169,6 +169,14 @@ export class Exchange {
     return this._clockTimestamp;
   }
   private _clockTimestamp: number;
+
+  /**
+   * Stores the latest clock slot from clock subscription.
+   */
+  public get clockSlot(): number {
+    return this._clockSlot;
+  }
+  private _clockSlot: number;
   /**
    * Websocket subscription id for clock.
    */
@@ -765,6 +773,11 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     this._eventEmitters.push(eventEmitter);
   }
 
+  private setClockData(data: ClockData) {
+    this._clockTimestamp = data.timestamp;
+    this._clockSlot = data.slot;
+  }
+
   private async subscribeClock(
     callback?: (type: EventType, data: any) => void
   ) {
@@ -774,7 +787,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     this._clockSubscriptionId = this._provider.connection.onAccountChange(
       SYSVAR_CLOCK_PUBKEY,
       async (accountInfo: AccountInfo<Buffer>, _context: any) => {
-        this._clockTimestamp = utils.getClockTimestamp(accountInfo);
+        this.setClockData(utils.getClockData(accountInfo));
         if (callback !== undefined) {
           callback(EventType.CLOCK, null);
         }
@@ -789,7 +802,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     let accountInfo = await this._provider.connection.getAccountInfo(
       SYSVAR_CLOCK_PUBKEY
     );
-    this._clockTimestamp = utils.getClockTimestamp(accountInfo);
+    this.setClockData(utils.getClockData(accountInfo));
   }
 
   private subscribeGreeks(callback?: (type: EventType, data: any) => void) {
