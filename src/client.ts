@@ -14,9 +14,11 @@ import {
   ConfirmOptions,
   Transaction,
   TransactionSignature,
+  AccountInfo,
+  Context,
 } from "@solana/web3.js";
 import idl from "./idl/zeta.json";
-import { Wallet, CancelArgs } from "./types";
+import { ProgramAccountType, Wallet, CancelArgs } from "./types";
 import {
   initializeMarginAccountTx,
   initializeOpenOrdersIx,
@@ -125,6 +127,11 @@ export class Client {
   private _pendingUpdate: boolean;
 
   /**
+   * The context slot of the pending update.
+   */
+  private _pendingUpdateSlot: number = 0;
+
+  /**
    * whitelist deposit account.
    */
   private _whitelistDepositAddress: PublicKey | undefined;
@@ -152,6 +159,8 @@ export class Client {
    * User passed callback on load, stored for polling.
    */
   private _callback: (type: EventType, data: any) => void;
+
+  private _updatingState: boolean = false;
 
   private constructor(
     connection: Connection,
@@ -199,30 +208,36 @@ export class Client {
         Exchange.zetaGroupAddress,
         wallet.publicKey
       );
-    client._marginAccountAddress = marginAccountAddress;
 
-    client._eventEmitter = client._program.account.marginAccount.subscribe(
-      client.marginAccountAddress,
-      client._provider.connection.commitment
-    );
+    client._marginAccountAddress = marginAccountAddress;
 
     client._callback = callback;
 
-    client._eventEmitter.on("change", async (marginAccount: MarginAccount) => {
-      client._marginAccount = marginAccount;
-      if (!throttle) {
+    connection.onAccountChange(
+      client._marginAccountAddress,
+      async (accountInfo: AccountInfo<Buffer>, context: Context) => {
+        client._marginAccount = client._program.coder.accounts.decode(
+          ProgramAccountType.MarginAccount,
+          accountInfo.data
+        );
+
+        if (throttle || client._updatingState) {
+          client._pendingUpdate = true;
+          client._pendingUpdateSlot = context.slot;
+          return;
+        }
+
         await client.updateState(false);
         client._lastUpdateTimestamp = Exchange.clockTimestamp;
-      } else {
-        client._pendingUpdate = true;
-      }
 
-      if (callback !== undefined) {
-        callback(EventType.USER, null);
-      }
+        if (callback !== undefined) {
+          callback(EventType.USER, context.slot);
+        }
 
-      await client.updateOpenOrdersAddresses();
-    });
+        await client.updateOpenOrdersAddresses();
+      },
+      connection.commitment
+    );
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
@@ -306,8 +321,14 @@ export class Client {
         this._pendingUpdate
       ) {
         try {
+          if (this._updatingState) {
+            return;
+          }
+          let latestSlot = this._pendingUpdateSlot;
           await this.updateState();
-          this._pendingUpdate = false;
+          if (latestSlot == this._pendingUpdateSlot) {
+            this._pendingUpdate = false;
+          }
           this._lastUpdateTimestamp = Exchange.clockTimestamp;
           if (this._callback !== undefined) {
             this._callback(EventType.USER, null);
@@ -323,12 +344,17 @@ export class Client {
    * Polls the margin account for the latest state.
    */
   public async updateState(fetch = true) {
+    if (this._updatingState) {
+      return;
+    }
+    this._updatingState = true;
     if (fetch) {
       try {
         this._marginAccount = (await this._program.account.marginAccount.fetch(
           this._marginAccountAddress
         )) as MarginAccount;
       } catch (e) {
+        this._updatingState = false;
         return;
       }
     }
@@ -336,6 +362,7 @@ export class Client {
       await this.updateOrders();
       this.updatePositions();
     }
+    this._updatingState = false;
   }
 
   /**

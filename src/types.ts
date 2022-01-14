@@ -169,3 +169,8 @@ export interface MarginParams {
 export enum ProgramAccountType {
   MarginAccount = "MarginAccount",
 }
+
+export interface ClockData {
+  timestamp: number;
+  slot: number;
+}

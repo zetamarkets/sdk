@@ -30,7 +30,7 @@ import * as constants from "./constants";
 import { parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { TradeEvent, OpenOrdersMap } from "./program-types";
-import { ProgramAccountType } from "./types";
+import { ClockData, ProgramAccountType } from "./types";
 import {
   cancelExpiredOrderIx,
   cancelOrderHaltedIx,
@@ -615,9 +615,12 @@ const SystemClockLayout = BufferLayout.struct([
   int64("unixTimestamp"),
 ]);
 
-export function getClockTimestamp(accountInfo: AccountInfo<Buffer>): number {
+export function getClockData(accountInfo: AccountInfo<Buffer>): ClockData {
   let info = SystemClockLayout.decode(accountInfo.data);
-  return Number(info.unixTimestamp.readBigInt64LE(0));
+  return {
+    timestamp: Number(info.unixTimestamp.readBigInt64LE(0)),
+    slot: Number(info.slot.readBigInt64LE(0)),
+  };
 }
 
 export function getPriceFromSerumOrderKey(key: anchor.BN): anchor.BN {
