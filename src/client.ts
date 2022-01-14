@@ -326,6 +326,8 @@ export class Client {
           }
           let latestSlot = this._pendingUpdateSlot;
           await this.updateState();
+          // If there was a margin account websocket callback, we want to
+          // trigger an `updateState` on the next timer tick.
           if (latestSlot == this._pendingUpdateSlot) {
             this._pendingUpdate = false;
           }
