@@ -231,7 +231,7 @@ export class Client {
         client._lastUpdateTimestamp = Exchange.clockTimestamp;
 
         if (callback !== undefined) {
-          callback(EventType.USER, context.slot);
+          callback(EventType.USER, null);
         }
 
         await client.updateOpenOrdersAddresses();
