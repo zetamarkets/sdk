@@ -1,4 +1,4 @@
-import { Connection, AccountInfo, Context } from "@solana/web3.js";
+import { PublicKey, Connection, AccountInfo, Context } from "@solana/web3.js";
 import { parsePythData, Price } from "./oracle-utils";
 import { Network } from "./network";
 import { exchange as Exchange } from "./exchange";
@@ -28,6 +28,13 @@ export class Oracle {
       return null;
     }
     return this._data.get(feed);
+  }
+
+  // Allows fetching of any pyth oracle price.
+  public async fetchPrice(oracleKey: PublicKey): Promise<number> {
+    let accountInfo = await this._connection.getAccountInfo(oracleKey);
+    let priceData = parsePythData(accountInfo.data);
+    return priceData.price;
   }
 
   public async subscribePriceFeeds(callback: (price: OraclePrice) => void) {
