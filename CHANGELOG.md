@@ -20,7 +20,7 @@ Version changes are pinned to SDK releases.
 - client: Optimise polling such that only one `updateState` can be called at all times. Pending updates are batched to the next timer tick. ([#74](https://github.com/zetamarkets/sdk/pull/74))
 - client: Reduce DEFAULT_CLIENT_TIMER_INTERVAL to 1 for more frequent pending update refreshes. ([#74](https://github.com/zetamarkets/sdk/pull/74))
 - market: Remove orderbook depth. Always store the full orderbook size. ([#74](https://github.com/zetamarkets/sdk/pull/74))
-- oracle: Allow oracle object to decode any pyth address. ([#74](https://github.com/zetamarkets/sdk/pull/74))
+- oracle: Allow oracle object to decode any pyth address. ([#77](https://github.com/zetamarkets/sdk/pull/77))
 
 ## [0.9.5] 2021-12-29
 
