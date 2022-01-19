@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.10.1] 2022-01-19
+
+- exchange: Close sets initialized flag to false so it can be reloaded. ([#80](https://github.com/zetamarkets/sdk/pull/80))
+
 ## [0.10.0] 2022-01-17
 
 - risk: Remove redundant calculation in `getMarginAccountState`. ([#59](https://github.com/zetamarkets/sdk/pull/59))

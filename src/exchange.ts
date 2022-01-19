@@ -967,6 +967,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
       );
     }
     this._programSubscriptionIds = [];
+    this._isInitialized = false;
   }
 
   public updateMarginParams() {
