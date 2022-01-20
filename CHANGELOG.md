@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.10.2] 2022-01-21
+
+- utils: `getClockData` now uses local `readBigInt64LE` to fix browser compatibility issues.
+
 ## [0.10.1] 2022-01-19
 
 - exchange: Close sets initialized flag to false so it can be reloaded. ([#80](https://github.com/zetamarkets/sdk/pull/80))
