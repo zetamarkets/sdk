@@ -39,6 +39,7 @@ import {
   crankMarketIx,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
+import { readBigInt64LE } from "./oracle-utils";
 
 export async function getState(
   programId: PublicKey
@@ -618,8 +619,8 @@ const SystemClockLayout = BufferLayout.struct([
 export function getClockData(accountInfo: AccountInfo<Buffer>): ClockData {
   let info = SystemClockLayout.decode(accountInfo.data);
   return {
-    timestamp: Number(info.unixTimestamp.readBigInt64LE(0)),
-    slot: Number(info.slot.readBigInt64LE(0)),
+    timestamp: Number(readBigInt64LE(info.unixTimestamp, 0)),
+    slot: Number(readBigInt64LE(info.slot, 0)),
   };
 }
 
