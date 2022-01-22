@@ -857,6 +857,12 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     await this._markets.handlePolling(callback);
   }
 
+  public async updateExchangeState() {
+    await this.updateState();
+    await this.updateZetaGroup();
+    this._markets.updateExpirySeries();
+  }
+
   /**
    * @param index   market index to get mark price.
    */
