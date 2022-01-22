@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.10.3] 2022-01-22
+
+- utils: Add `updateExchangeState` to exchange to allow for state refresh without websocket. ([#82](https://github.com/zetamarkets/sdk/pull/82))
+
 ## [0.10.2] 2022-01-21
 
 - utils: `getClockData` now uses local `readBigInt64LE` to fix browser compatibility issues.
