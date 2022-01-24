@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.10.4] 2022-01-24
+
 - error: Add handling for a few native errors i.e. insufficient lamports and unconfirmed tx.
 - error: Unconfirmed transaction error passes back an error object with transactionSignature as a field in data.
 
