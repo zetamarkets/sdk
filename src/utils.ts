@@ -27,7 +27,7 @@ import * as bs58 from "bs58";
 
 import * as fs from "fs";
 import * as constants from "./constants";
-import { parseCustomError, idlErrors } from "./errors";
+import { NativeError, parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { TradeEvent, OpenOrdersMap } from "./program-types";
 import { ClockData, ProgramAccountType } from "./types";
@@ -596,6 +596,12 @@ export async function processTransaction(
     if (customErr != null) {
       throw customErr;
     }
+
+    let nativeErr = NativeError.parse(err);
+    if (nativeErr != null) {
+      throw nativeErr;
+    }
+
     throw err;
   }
 }

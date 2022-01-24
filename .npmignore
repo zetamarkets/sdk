@@ -1,3 +1,6 @@
 node_modules/*
 **/node_modules/*
 /docs/
+examples/futures-quoter/
+examples/refresh/
+examples/trade-events/

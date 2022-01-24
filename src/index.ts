@@ -4,12 +4,12 @@ import { Client } from "./client";
 import { InsuranceClient } from "./insurance-client";
 import { Network } from "./network";
 import { Decimal } from "./decimal";
-import { idlErrors as Errors } from "./errors";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Wallet } from "@project-serum/anchor";
 import { Market } from "./market";
 
+import * as errors from "./errors";
 import * as utils from "./utils";
 import * as constants from "./constants";
 import * as types from "./types";
@@ -29,7 +29,7 @@ export {
   instructions,
   InsuranceClient,
   Network,
-  Errors,
+  errors,
   Oracle,
   OraclePrice,
   programTypes,
