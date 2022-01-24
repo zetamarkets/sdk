@@ -119,6 +119,10 @@ export class NativeError extends Error {
       return null;
     }
   }
+
+  public toString(): string {
+    return this.msg;
+  }
 }
 
 export const idlErrors = parseIdlErrors(idl as anchor.Idl);
