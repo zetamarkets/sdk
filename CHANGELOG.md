@@ -5,6 +5,9 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- error: Add handling for a few native errors i.e. insufficient lamports and unconfirmed tx.
+- error: Unconfirmed transaction error passes back an error object with transactionSignature as a field in data.
+
 ## [0.10.3] 2022-01-22
 
 - utils: Add `updateExchangeState` to exchange to allow for state refresh without websocket. ([#82](https://github.com/zetamarkets/sdk/pull/82))
