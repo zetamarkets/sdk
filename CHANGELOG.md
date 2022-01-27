@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- client: Fix client margin account subscriptions. ([#84](https://github.com/zetamarkets/sdk/pull/84))
+
 ## [0.10.4] 2022-01-24
 
 - error: Add handling for a few native errors i.e. insufficient lamports and unconfirmed tx. ([#83](https://github.com/zetamarkets/sdk/pull/83))
