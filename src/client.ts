@@ -213,8 +213,6 @@ export class Client {
     client._marginAccountSubscriptionId = connection.onAccountChange(
       client._marginAccountAddress,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
-        console.log("[Margin account change detected]");
-
         client._marginAccount = client._program.coder.accounts.decode(
           ProgramAccountType.MarginAccount,
           accountInfo.data
@@ -234,8 +232,6 @@ export class Client {
         }
 
         await client.updateOpenOrdersAddresses();
-
-        console.log("[margin account change callback ended]");
       },
       connection.commitment
     );
