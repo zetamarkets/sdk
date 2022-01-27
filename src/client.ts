@@ -102,11 +102,6 @@ export class Client {
   private _positions: Position[];
 
   /**
-   * The event emitter for the margin account subscription.
-   */
-  private _eventEmitter: any;
-
-  /**
    * The listener for trade events.
    */
   private _tradeEventListener: any;
@@ -140,6 +135,8 @@ export class Client {
    * whitelist trading fees account.
    */
   private _whitelistTradingFeesAddress: PublicKey | undefined;
+
+  private _marginAccountSubscriptionId: number = undefined;
 
   /**
    * Polling interval.
@@ -213,7 +210,7 @@ export class Client {
 
     client._callback = callback;
 
-    connection.onAccountChange(
+    client._marginAccountSubscriptionId = connection.onAccountChange(
       client._marginAccountAddress,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
         console.log("[Margin account change detected]");
@@ -369,7 +366,6 @@ export class Client {
       this.updatePositions();
     }
 
-    console.log("[update state]", this._marginAccount.positions[5]);
     this._updatingState = false;
   }
 
@@ -864,10 +860,13 @@ export class Client {
    * Closes the client websocket subscription to margin account.
    */
   public async close() {
-    await this._program.account.marginAccount.unsubscribe(
-      this._marginAccountAddress
-    );
-    this._eventEmitter.removeListener("change");
+    if (this._marginAccountSubscriptionId !== undefined) {
+      await this._provider.connection.removeAccountChangeListener(
+        this._marginAccountSubscriptionId
+      );
+      this._marginAccountSubscriptionId = undefined;
+    }
+
     if (this._tradeEventListener !== undefined) {
       await this._program.removeEventListener(this._tradeEventListener);
     }
