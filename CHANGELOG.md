@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- client: Fix client margin account subscriptions.
+- client: Fix client margin account subscriptions. ([#84](https://github.com/zetamarkets/sdk/pull/84))
 
 ## [0.10.4] 2022-01-24
 
