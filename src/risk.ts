@@ -127,6 +127,8 @@ export class RiskCalculator {
 
   /**
    * Returns the total initial margin requirement for a given account.
+   * Does not inclue position, should be used for calculating liquidation
+   * available balance
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
@@ -152,6 +154,53 @@ export class RiskCalculator {
           convertNativeLotSizeToDecimal(-position.openingOrders[1]),
           MarginType.INITIAL
         );
+
+      if (marginPerMarket !== undefined) {
+        margin += marginPerMarket;
+      }
+    }
+    return margin;
+  }
+
+  /**
+   * Returns the total initial margin requirement for a given account.
+   * This inclues initial margin on positions which is used for
+   * Place order, Withdrawal and Force Cancels
+   * @param marginAccount   the user's MarginAccount.
+   */
+  public calculateTotalInitialMarginWithPosition(
+    marginAccount: MarginAccount
+  ): number {
+    let margin = 0;
+    for (var i = 0; i < marginAccount.positions.length; i++) {
+      let position = marginAccount.positions[i];
+      if (
+        position.openingOrders[0].toNumber() == 0 &&
+        position.openingOrders[1].toNumber() == 0 &&
+        position.position.toNumber() == 0
+      ) {
+        continue;
+      }
+      let marginPerMarket =
+        this.getMarginRequirement(
+          i,
+          // Positive for buys.
+          convertNativeLotSizeToDecimal(position.openingOrders[0].toNumber()),
+          MarginType.INITIAL
+        ) +
+        this.getMarginRequirement(
+          i,
+          // Negative for sells.
+          convertNativeLotSizeToDecimal(-position.openingOrders[1]),
+          MarginType.INITIAL
+        ) +
+        this.getMarginRequirement(
+          i,
+          // Position is signed
+          convertNativeLotSizeToDecimal(position.position.toNumber()),
+          MarginType.INITIAL
+        );
+
       if (marginPerMarket !== undefined) {
         margin += marginPerMarket;
       }
@@ -161,6 +210,8 @@ export class RiskCalculator {
 
   /**
    * Returns the total maintenance margin requirement for a given account.
+   * This only uses maintennace margin on positions and is used for
+   * Liquidation
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
@@ -203,17 +254,23 @@ export class RiskCalculator {
   ): MarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
-    let initialMargin = this.calculateTotalInitialMargin(marginAccount);
+    let initialMargin =
+      this.calculateTotalInitialMarginWithPosition(marginAccount);
+    let initialMarginLiquidation =
+      this.calculateTotalInitialMargin(marginAccount);
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
-    let totalMargin = initialMargin + maintenanceMargin;
-    let availableBalance: number = balance + unrealizedPnl - totalMargin;
+    let totalMarginLiquidation = initialMarginLiquidation + maintenanceMargin;
+    let availableBalance: number = balance + unrealizedPnl - initialMargin;
+    let availableBalanceLiquidation: number =
+      balance + unrealizedPnl - totalMarginLiquidation;
     return {
       balance,
       initialMargin,
       maintenanceMargin,
-      totalMargin,
+      totalMarginLiquidation,
       unrealizedPnl,
       availableBalance,
+      availableBalanceLiquidation,
     };
   }
 }
