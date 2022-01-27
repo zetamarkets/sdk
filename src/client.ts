@@ -216,6 +216,8 @@ export class Client {
     connection.onAccountChange(
       client._marginAccountAddress,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
+        console.log("[Margin account change detected]");
+
         client._marginAccount = client._program.coder.accounts.decode(
           ProgramAccountType.MarginAccount,
           accountInfo.data
@@ -235,6 +237,8 @@ export class Client {
         }
 
         await client.updateOpenOrdersAddresses();
+
+        console.log("[margin account change callback ended]");
       },
       connection.commitment
     );
@@ -364,6 +368,8 @@ export class Client {
       await this.updateOrders();
       this.updatePositions();
     }
+
+    console.log("[update state]", this._marginAccount.positions[5]);
     this._updatingState = false;
   }
 

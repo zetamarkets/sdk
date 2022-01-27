@@ -127,50 +127,11 @@ export class RiskCalculator {
 
   /**
    * Returns the total initial margin requirement for a given account.
-   * Does not inclue position, should be used for calculating liquidation
-   * available balance
-   * @param marginAccount   the user's MarginAccount.
-   */
-  public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
-    let margin = 0;
-    for (var i = 0; i < marginAccount.positions.length; i++) {
-      let position = marginAccount.positions[i];
-      if (
-        position.openingOrders[0].toNumber() == 0 &&
-        position.openingOrders[1].toNumber() == 0
-      ) {
-        continue;
-      }
-      let marginPerMarket =
-        this.getMarginRequirement(
-          i,
-          // Positive for buys.
-          convertNativeLotSizeToDecimal(position.openingOrders[0].toNumber()),
-          MarginType.INITIAL
-        ) +
-        this.getMarginRequirement(
-          i,
-          // Negative for sells.
-          convertNativeLotSizeToDecimal(-position.openingOrders[1]),
-          MarginType.INITIAL
-        );
-
-      if (marginPerMarket !== undefined) {
-        margin += marginPerMarket;
-      }
-    }
-    return margin;
-  }
-
-  /**
-   * Returns the total initial margin requirement for a given account.
    * This inclues initial margin on positions which is used for
    * Place order, Withdrawal and Force Cancels
    * @param marginAccount   the user's MarginAccount.
    */
-  public calculateTotalInitialMarginWithPosition(
-    marginAccount: MarginAccount
-  ): number {
+  public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
     let margin = 0;
     for (var i = 0; i < marginAccount.positions.length; i++) {
       let position = marginAccount.positions[i];
@@ -254,20 +215,15 @@ export class RiskCalculator {
   ): MarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
-    let initialMargin =
-      this.calculateTotalInitialMarginWithPosition(marginAccount);
-    let initialMarginLiquidation =
-      this.calculateTotalInitialMargin(marginAccount);
+    let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
-    let totalMarginLiquidation = initialMarginLiquidation + maintenanceMargin;
     let availableBalance: number = balance + unrealizedPnl - initialMargin;
     let availableBalanceLiquidation: number =
-      balance + unrealizedPnl - totalMarginLiquidation;
+      balance + unrealizedPnl - maintenanceMargin;
     return {
       balance,
       initialMargin,
       maintenanceMargin,
-      totalMarginLiquidation,
       unrealizedPnl,
       availableBalance,
       availableBalanceLiquidation,

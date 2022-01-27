@@ -140,7 +140,6 @@ export interface MarginAccountState {
   balance: number;
   initialMargin: number;
   maintenanceMargin: number;
-  totalMarginLiquidation: number;
   unrealizedPnl: number;
   availableBalance: number;
   availableBalanceLiquidation: number;
