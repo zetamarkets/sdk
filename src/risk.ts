@@ -149,7 +149,7 @@ export class RiskCalculator {
         this.getMarginRequirement(
           i,
           // Negative for sells.
-          convertNativeLotSizeToDecimal(-position.openingOrders[1]),
+          -convertNativeLotSizeToDecimal(position.openingOrders[1].toNumber()),
           MarginType.INITIAL
         );
       if (marginPerMarket !== undefined) {
