@@ -46,17 +46,16 @@ export async function findLiquidatableAccounts(
       );
 
       // We assume the accounts passed in have had their open orders cancelled.
-      // Therefore we can add back the initial margin calculated from their
-      // current margin account state.
-      let adjustedAvailableBalance =
-        marginAccountState.availableBalance + marginAccountState.initialMargin;
-      if (adjustedAvailableBalance >= 0) {
+      // Therefore can just use availableBalanceLiquidation which assumes 0 open orders.
+      if (marginAccountState.availableBalanceLiquidation >= 0) {
         return;
       }
       console.log(
         `[LIQUIDATABLE ACCOUNT] [ACCOUNT] ${account.publicKey.toString()} [BALANCE] ${
           marginAccountState.balance
-        } [ADJUSTED AVAILABLE BALANCE] ${adjustedAvailableBalance}`
+        } [AVAILABLE BALANCE MAINTENANCE] ${
+          marginAccountState.availableBalanceLiquidation
+        }`
       );
       liquidatableAccounts.push(account);
     })

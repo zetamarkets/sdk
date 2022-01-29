@@ -1,17 +1,11 @@
 import { exchange as Exchange } from "./exchange";
-import { BN } from "@project-serum/anchor";
 import {
   Kind,
   MarginType,
   MarginRequirement,
   MarginAccountState,
-  MarginParams,
 } from "./types";
-import {
-  MARGIN_PRECISION,
-  ACTIVE_MARKETS,
-  POSITION_PRECISION,
-} from "./constants";
+import { ACTIVE_MARKETS } from "./constants";
 import { MarginAccount } from "./program-types";
 import {
   convertNativeBNToDecimal,
@@ -171,8 +165,8 @@ export class RiskCalculator {
 
   /**
    * Returns the total maintenance margin requirement for a given account.
-   * This only uses maintennace margin on positions and is used for
-   * Liquidation
+   * This only uses maintenance margin on positions and is used for
+   * liquidations.
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
@@ -182,28 +176,17 @@ export class RiskCalculator {
       if (position.position.toNumber() == 0) {
         continue;
       }
-      let _ = this.getMarginRequirement(
+      let positionMargin = this.getMarginRequirement(
         i,
         // This is signed.
         convertNativeLotSizeToDecimal(position.position.toNumber()),
         MarginType.MAINTENANCE
       );
-      if (_ !== undefined) {
-        margin += _;
+      if (positionMargin !== undefined) {
+        margin += positionMargin;
       }
     }
     return margin;
-  }
-
-  /**
-   * Returns the total margin requirement for a given account.
-   * @param marginAccount   the user's MarginAccount.
-   */
-  public calculateTotalMargin(marginAccount: MarginAccount): number {
-    return (
-      this.calculateTotalInitialMargin(marginAccount) +
-      this.calculateTotalMaintenanceMargin(marginAccount)
-    );
   }
 
   /**
