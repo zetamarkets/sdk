@@ -102,6 +102,11 @@ export class Client {
   private _positions: Position[];
 
   /**
+   * The subscription id for the margin account subscription.
+   */
+  private _marginAccountSubscriptionId: number = undefined;
+
+  /**
    * The listener for trade events.
    */
   private _tradeEventListener: any;
@@ -135,8 +140,6 @@ export class Client {
    * whitelist trading fees account.
    */
   private _whitelistTradingFeesAddress: PublicKey | undefined;
-
-  private _marginAccountSubscriptionId: number = undefined;
 
   /**
    * Polling interval.
@@ -862,12 +865,13 @@ export class Client {
       );
       this._marginAccountSubscriptionId = undefined;
     }
-
     if (this._tradeEventListener !== undefined) {
       await this._program.removeEventListener(this._tradeEventListener);
+      this._tradeEventListener = undefined;
     }
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);
+      this._pollIntervalId = undefined;
     }
   }
 }
