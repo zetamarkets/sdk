@@ -136,28 +136,36 @@ export class RiskCalculator {
       ) {
         continue;
       }
-      let marginPerMarket =
+
+      let longLots = convertNativeLotSizeToDecimal(
+        position.openingOrders[0].toNumber()
+      );
+
+      let shortLots = convertNativeLotSizeToDecimal(
+        position.openingOrders[1].toNumber()
+      );
+
+      if (position.position.toNumber() >= 0) {
+        longLots += Math.abs(position.position.toNumber());
+      } else {
+        shortLots += Math.abs(position.position.toNumber());
+      }
+
+      let marginForMarket =
         this.getMarginRequirement(
           i,
           // Positive for buys.
-          convertNativeLotSizeToDecimal(position.openingOrders[0].toNumber()),
+          longLots,
           MarginType.INITIAL
         ) +
         this.getMarginRequirement(
           i,
           // Negative for sells.
-          -convertNativeLotSizeToDecimal(position.openingOrders[1].toNumber()),
-          MarginType.INITIAL
-        ) +
-        this.getMarginRequirement(
-          i,
-          // Position is signed
-          convertNativeLotSizeToDecimal(position.position.toNumber()),
+          -shortLots,
           MarginType.INITIAL
         );
-
-      if (marginPerMarket !== undefined) {
-        margin += marginPerMarket;
+      if (marginForMarket !== undefined) {
+        margin += marginForMarket;
       }
     }
     return margin;
