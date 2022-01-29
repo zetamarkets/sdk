@@ -145,10 +145,14 @@ export class RiskCalculator {
         position.openingOrders[1].toNumber()
       );
 
-      if (position.position.toNumber() >= 0) {
-        longLots += Math.abs(position.position.toNumber());
-      } else {
-        shortLots += Math.abs(position.position.toNumber());
+      if (position.position.toNumber() > 0) {
+        longLots += Math.abs(
+          convertNativeLotSizeToDecimal(position.position.toNumber())
+        );
+      } else if (position.position.toNumber() < 0) {
+        shortLots += Math.abs(
+          convertNativeLotSizeToDecimal(position.position.toNumber())
+        );
       }
 
       let marginForMarket =
@@ -208,16 +212,17 @@ export class RiskCalculator {
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
-    let availableBalance: number = balance + unrealizedPnl - initialMargin;
-    let availableBalanceLiquidation: number =
+    let availableBalanceInitial: number =
+      balance + unrealizedPnl - initialMargin;
+    let availableBalanceMaintenance: number =
       balance + unrealizedPnl - maintenanceMargin;
     return {
       balance,
       initialMargin,
       maintenanceMargin,
       unrealizedPnl,
-      availableBalance,
-      availableBalanceLiquidation,
+      availableBalanceInitial,
+      availableBalanceMaintenance,
     };
   }
 }

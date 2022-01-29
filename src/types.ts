@@ -141,8 +141,8 @@ export interface MarginAccountState {
   initialMargin: number;
   maintenanceMargin: number;
   unrealizedPnl: number;
-  availableBalance: number;
-  availableBalanceLiquidation: number;
+  availableBalanceInitial: number;
+  availableBalanceMaintenance: number;
 }
 
 export interface CancelArgs {
