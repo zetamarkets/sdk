@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- risk: Change margin calculations to reflect new changes. ([#85](https://github.com/zetamarkets/sdk/pull/85))
+- risk: Change margin calculations to reflect new changes. See https://zetamarkets.gitbook.io/zeta/zeta-protocol/collateral-framework ([#85](https://github.com/zetamarkets/sdk/pull/85))
 - example: Update liquidator example in line with margin changes. ([#85](https://github.com/zetamarkets/sdk/pull/85))
 
 ### Breaking
