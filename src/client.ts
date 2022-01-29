@@ -345,8 +345,8 @@ export class Client {
   /**
    * Polls the margin account for the latest state.
    */
-  public async updateState(fetch = true) {
-    if (this._updatingState) {
+  public async updateState(fetch = true, force = false) {
+    if (this._updatingState && !force) {
       return;
     }
     this._updatingState = true;
@@ -364,6 +364,7 @@ export class Client {
       await this.updateOrders();
       this.updatePositions();
     }
+
     this._updatingState = false;
   }
 

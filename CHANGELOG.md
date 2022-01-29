@@ -5,6 +5,14 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- risk: Change margin calculations to reflect new changes. ([#85](https://github.com/zetamarkets/sdk/pull/85))
+- example: Update liquidator example in line with margin changes. ([#85](https://github.com/zetamarkets/sdk/pull/85))
+
+### Breaking
+
+- risk: All user actions now check initial margin requirements across all open orders and positions. See changes in `risk.ts`. ([#85](https://github.com/zetamarkets/sdk/pull/85))
+- risk: `MarginAccountState` - `availableBalance` has been deprecated. Use `availableBalanceInitial` to check a margin account's available balance for placing orders, withdrawing and liquidating other users. Use `availableBalanceMaintenance` to see if a user can be liquidated. ([#85](https://github.com/zetamarkets/sdk/pull/85))
+
 ## [0.10.5] 2022-01-29
 
 - client: Fix client margin account subscriptions. ([#84](https://github.com/zetamarkets/sdk/pull/84))

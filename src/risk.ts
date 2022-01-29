@@ -1,17 +1,11 @@
 import { exchange as Exchange } from "./exchange";
-import { BN } from "@project-serum/anchor";
 import {
   Kind,
   MarginType,
   MarginRequirement,
   MarginAccountState,
-  MarginParams,
 } from "./types";
-import {
-  MARGIN_PRECISION,
-  ACTIVE_MARKETS,
-  POSITION_PRECISION,
-} from "./constants";
+import { ACTIVE_MARKETS } from "./constants";
 import { MarginAccount } from "./program-types";
 import {
   convertNativeBNToDecimal,
@@ -127,6 +121,8 @@ export class RiskCalculator {
 
   /**
    * Returns the total initial margin requirement for a given account.
+   * This inclues initial margin on positions which is used for
+   * Place order, Withdrawal and Force Cancels
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
@@ -135,25 +131,45 @@ export class RiskCalculator {
       let position = marginAccount.positions[i];
       if (
         position.openingOrders[0].toNumber() == 0 &&
-        position.openingOrders[1].toNumber() == 0
+        position.openingOrders[1].toNumber() == 0 &&
+        position.position.toNumber() == 0
       ) {
         continue;
       }
-      let marginPerMarket =
+
+      let longLots = convertNativeLotSizeToDecimal(
+        position.openingOrders[0].toNumber()
+      );
+
+      let shortLots = convertNativeLotSizeToDecimal(
+        position.openingOrders[1].toNumber()
+      );
+
+      if (position.position.toNumber() > 0) {
+        longLots += Math.abs(
+          convertNativeLotSizeToDecimal(position.position.toNumber())
+        );
+      } else if (position.position.toNumber() < 0) {
+        shortLots += Math.abs(
+          convertNativeLotSizeToDecimal(position.position.toNumber())
+        );
+      }
+
+      let marginForMarket =
         this.getMarginRequirement(
           i,
           // Positive for buys.
-          convertNativeLotSizeToDecimal(position.openingOrders[0].toNumber()),
+          longLots,
           MarginType.INITIAL
         ) +
         this.getMarginRequirement(
           i,
           // Negative for sells.
-          -convertNativeLotSizeToDecimal(position.openingOrders[1].toNumber()),
+          -shortLots,
           MarginType.INITIAL
         );
-      if (marginPerMarket !== undefined) {
-        margin += marginPerMarket;
+      if (marginForMarket !== undefined) {
+        margin += marginForMarket;
       }
     }
     return margin;
@@ -161,6 +177,8 @@ export class RiskCalculator {
 
   /**
    * Returns the total maintenance margin requirement for a given account.
+   * This only uses maintenance margin on positions and is used for
+   * liquidations.
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
@@ -170,28 +188,17 @@ export class RiskCalculator {
       if (position.position.toNumber() == 0) {
         continue;
       }
-      let _ = this.getMarginRequirement(
+      let positionMargin = this.getMarginRequirement(
         i,
         // This is signed.
         convertNativeLotSizeToDecimal(position.position.toNumber()),
         MarginType.MAINTENANCE
       );
-      if (_ !== undefined) {
-        margin += _;
+      if (positionMargin !== undefined) {
+        margin += positionMargin;
       }
     }
     return margin;
-  }
-
-  /**
-   * Returns the total margin requirement for a given account.
-   * @param marginAccount   the user's MarginAccount.
-   */
-  public calculateTotalMargin(marginAccount: MarginAccount): number {
-    return (
-      this.calculateTotalInitialMargin(marginAccount) +
-      this.calculateTotalMaintenanceMargin(marginAccount)
-    );
   }
 
   /**
@@ -205,15 +212,17 @@ export class RiskCalculator {
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
-    let totalMargin = initialMargin + maintenanceMargin;
-    let availableBalance: number = balance + unrealizedPnl - totalMargin;
+    let availableBalanceInitial: number =
+      balance + unrealizedPnl - initialMargin;
+    let availableBalanceMaintenance: number =
+      balance + unrealizedPnl - maintenanceMargin;
     return {
       balance,
       initialMargin,
       maintenanceMargin,
-      totalMargin,
       unrealizedPnl,
-      availableBalance,
+      availableBalanceInitial,
+      availableBalanceMaintenance,
     };
   }
 }

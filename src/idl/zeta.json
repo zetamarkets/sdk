@@ -3584,6 +3584,20 @@
           }
         ]
       }
+    },
+    {
+      "name": "MarginRequirement",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Initial"
+          },
+          {
+            "name": "Maintenance"
+          }
+        ]
+      }
     }
   ],
   "events": [

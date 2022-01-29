@@ -13,7 +13,7 @@ export async function findAccountsAtRisk(
       let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
         account.account as programTypes.MarginAccount
       );
-      if (marginAccountState.availableBalance >= 0) {
+      if (marginAccountState.availableBalanceInitial >= 0) {
         return;
       }
       console.log(
@@ -21,9 +21,13 @@ export async function findAccountsAtRisk(
           marginAccountState.balance
         } [INITIAL] ${marginAccountState.initialMargin} [MAINTENANCE]: ${
           marginAccountState.maintenanceMargin
-        } [TOTAL] ${marginAccountState.totalMargin} [UNREALIZED PNL] ${
+        } [UNREALIZED PNL] ${
           marginAccountState.unrealizedPnl
-        } [AVAILABLE BALANCE] ${marginAccountState.availableBalance}`
+        } [AVAILABLE BALANCE INITIAL] ${
+          marginAccountState.availableBalanceInitial
+        } [AVAILABLE BALANCE MAINTENANCE] ${
+          marginAccountState.availableBalanceMaintenance
+        }`
       );
       accountsAtRisk.push(account);
     })
@@ -46,17 +50,16 @@ export async function findLiquidatableAccounts(
       );
 
       // We assume the accounts passed in have had their open orders cancelled.
-      // Therefore we can add back the initial margin calculated from their
-      // current margin account state.
-      let adjustedAvailableBalance =
-        marginAccountState.availableBalance + marginAccountState.initialMargin;
-      if (adjustedAvailableBalance >= 0) {
+      // Therefore can just use availableBalanceLiquidation which assumes 0 open orders.
+      if (marginAccountState.availableBalanceMaintenance >= 0) {
         return;
       }
       console.log(
         `[LIQUIDATABLE ACCOUNT] [ACCOUNT] ${account.publicKey.toString()} [BALANCE] ${
           marginAccountState.balance
-        } [ADJUSTED AVAILABLE BALANCE] ${adjustedAvailableBalance}`
+        } [AVAILABLE BALANCE MAINTENANCE] ${
+          marginAccountState.availableBalanceMaintenance
+        }`
       );
       liquidatableAccounts.push(account);
     })
@@ -136,7 +139,7 @@ export async function liquidateAccounts(
       );
 
       let marginConstrainedSize = calculateMaxLiquidationNativeSize(
-        clientState.availableBalance,
+        clientState.availableBalanceInitial,
         marketIndex,
         position > 0
       );
