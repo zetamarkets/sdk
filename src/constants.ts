@@ -16,7 +16,7 @@ export const MAX_CANCELS_PER_TX = 4;
 export const MAX_GREEK_UPDATES_PER_TX = 20;
 export const MAX_SETTLEMENT_ACCOUNTS = 20;
 export const MAX_REBALANCE_ACCOUNTS = 20;
-export const MAX_SETTLE_ACCOUNTS = 15;
+export const MAX_SETTLE_ACCOUNTS = 5;
 export const MARKET_INDEX_LIMIT = 40;
 // 3 accounts per set * 9 = 27 + 2 = 29 accounts.
 export const CLEAN_MARKET_LIMIT = 9;
