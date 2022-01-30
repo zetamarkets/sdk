@@ -1182,6 +1182,73 @@ export function expireSeriesOverrideIx(
   });
 }
 
+export function settleDexFundsTxs(
+  marketKey: PublicKey,
+  vaultOwner: PublicKey,
+  remainingAccounts: any[]
+): Transaction[] {
+  let market = Exchange.markets.getMarket(marketKey);
+  let accounts = {
+    state: Exchange.stateAddress,
+    market: market.address,
+    zetaBaseVault: market.baseVault,
+    zetaQuoteVault: market.quoteVault,
+    dexBaseVault: market.serumMarket.decoded.baseVault,
+    dexQuoteVault: market.serumMarket.decoded.quoteVault,
+    vaultOwner,
+    mintAuthority: Exchange.mintAuthority,
+    serumAuthority: Exchange.serumAuthority,
+    dexProgram: constants.DEX_PID[Exchange.network],
+    tokenProgram: TOKEN_PROGRAM_ID,
+  };
+
+  let txs: Transaction[] = [];
+  for (
+    var j = 0;
+    j < remainingAccounts.length;
+    j += constants.MAX_SETTLE_ACCOUNTS
+  ) {
+    let tx = new Transaction();
+    let slice = remainingAccounts.slice(j, j + constants.MAX_SETTLE_ACCOUNTS);
+    tx.add(
+      Exchange.program.instruction.settleDexFunds({
+        accounts,
+        remainingAccounts: slice,
+      })
+    );
+    txs.push(tx);
+  }
+  return txs;
+}
+
+export function burnVaultTokenTx(marketKey: PublicKey): Transaction {
+  let market = Exchange.markets.getMarket(marketKey);
+  let tx = new Transaction();
+  tx.add(
+    Exchange.program.instruction.burnVaultTokens({
+      accounts: {
+        state: Exchange.stateAddress,
+        mint: market.serumMarket.decoded.quoteMint,
+        vault: market.quoteVault,
+        serumAuthority: Exchange.serumAuthority,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    })
+  );
+  tx.add(
+    Exchange.program.instruction.burnVaultTokens({
+      accounts: {
+        state: Exchange.stateAddress,
+        mint: market.serumMarket.decoded.baseMint,
+        vault: market.baseVault,
+        serumAuthority: Exchange.serumAuthority,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    })
+  );
+  return tx;
+}
+
 export interface ExpireSeriesOverrideArgs {
   settlementNonce: number;
   settlementPrice: anchor.BN;

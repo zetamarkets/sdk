@@ -29,7 +29,7 @@ import * as fs from "fs";
 import * as constants from "./constants";
 import { NativeError, parseCustomError, idlErrors } from "./errors";
 import { exchange as Exchange } from "./exchange";
-import { TradeEvent, OpenOrdersMap } from "./program-types";
+import { MarginAccount, TradeEvent, OpenOrdersMap } from "./program-types";
 import { ClockData, ProgramAccountType } from "./types";
 import {
   cancelExpiredOrderIx,
@@ -37,6 +37,8 @@ import {
   cleanZetaMarketsIx,
   cleanZetaMarketsHaltedIx,
   crankMarketIx,
+  settleDexFundsTxs,
+  burnVaultTokenTx,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -1076,4 +1078,70 @@ export async function getAllProgramAccountAddresses(
     pubkeys.push(noDataAccounts[i].pubkey);
   }
   return pubkeys;
+}
+
+export async function getAllOpenOrdersAccountsByMarket(): Promise<
+  Map<number, Array<PublicKey>>
+> {
+  let openOrdersByMarketIndex = new Map<number, Array<PublicKey>>();
+  for (var i = 0; i < Exchange.markets.markets.length; i++) {
+    openOrdersByMarketIndex.set(i, []);
+  }
+
+  let marginAccounts = await Exchange.program.account.marginAccount.all();
+  await Promise.all(
+    marginAccounts.map(async (acc) => {
+      let marginAccount = acc.account as MarginAccount;
+      for (var i = 0; i < Exchange.markets.markets.length; i++) {
+        let nonce = marginAccount.openOrdersNonce[i];
+        if (nonce == 0) {
+          continue;
+        }
+        let [openOrders, _nonce] = await getOpenOrders(
+          Exchange.programId,
+          Exchange.markets.markets[i].address,
+          marginAccount.authority
+        );
+        openOrdersByMarketIndex.get(i).push(openOrders);
+      }
+    })
+  );
+  return openOrdersByMarketIndex;
+}
+
+export async function settleAndBurnVaultTokens(provider: anchor.Provider) {
+  let openOrdersByMarketIndex = await getAllOpenOrdersAccountsByMarket();
+  for (var i = 0; i < Exchange.markets.markets.length; i++) {
+    console.log(`Burning tokens for market index ${i}`);
+    let market = Exchange.markets.markets[i];
+    let openOrders = openOrdersByMarketIndex.get(i);
+    let remainingAccounts = openOrders.map((key) => {
+      return { pubkey: key, isSigner: false, isWritable: true };
+    });
+
+    const [vaultOwner, _vaultSignerNonce] = await getSerumVaultOwnerAndNonce(
+      market.address,
+      constants.DEX_PID[Exchange.network]
+    );
+
+    let txs = settleDexFundsTxs(market.address, vaultOwner, remainingAccounts);
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        await processTransaction(provider, tx);
+      })
+    );
+
+    let burnTx = burnVaultTokenTx(market.address);
+    await processTransaction(provider, burnTx);
+  }
+}
+
+export async function burnVaultTokens(provider: anchor.Provider) {
+  for (var i = 0; i < Exchange.markets.markets.length; i++) {
+    console.log(`Burning tokens for market index ${i}`);
+    let market = Exchange.markets.markets[i];
+    let burnTx = burnVaultTokenTx(market.address);
+    await processTransaction(provider, burnTx);
+  }
 }
