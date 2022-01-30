@@ -1109,6 +1109,38 @@ export async function getAllOpenOrdersAccountsByMarket(): Promise<
   return openOrdersByMarketIndex;
 }
 
+export async function settleAndBurnVaultTokensByMarket(
+  provider: anchor.Provider,
+  openOrdersByMarketIndex: Map<number, Array<PublicKey>>,
+  marketIndex: number
+) {
+  console.log(`Burning tokens for market index ${marketIndex}`);
+  let market = Exchange.markets.markets[marketIndex];
+  let openOrders = openOrdersByMarketIndex.get(marketIndex);
+  let remainingAccounts = openOrders.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+
+  const [vaultOwner, _vaultSignerNonce] = await getSerumVaultOwnerAndNonce(
+    market.address,
+    constants.DEX_PID[Exchange.network]
+  );
+
+  let txs = settleDexFundsTxs(market.address, vaultOwner, remainingAccounts);
+
+  for (var j = 0; j < txs.length; j += 5) {
+    let txSlice = txs.slice(j, j + 5);
+    await Promise.all(
+      txSlice.map(async (tx) => {
+        await processTransaction(provider, tx);
+      })
+    );
+  }
+
+  let burnTx = burnVaultTokenTx(market.address);
+  await processTransaction(provider, burnTx);
+}
+
 export async function settleAndBurnVaultTokens(provider: anchor.Provider) {
   let openOrdersByMarketIndex = await getAllOpenOrdersAccountsByMarket();
   for (var i = 0; i < Exchange.markets.markets.length; i++) {
@@ -1126,11 +1158,14 @@ export async function settleAndBurnVaultTokens(provider: anchor.Provider) {
 
     let txs = settleDexFundsTxs(market.address, vaultOwner, remainingAccounts);
 
-    await Promise.all(
-      txs.map(async (tx) => {
-        await processTransaction(provider, tx);
-      })
-    );
+    for (var j = 0; j < txs.length; j += 5) {
+      let txSlice = txs.slice(j, j + 5);
+      await Promise.all(
+        txSlice.map(async (tx) => {
+          await processTransaction(provider, tx);
+        })
+      );
+    }
 
     let burnTx = burnVaultTokenTx(market.address);
     await processTransaction(provider, burnTx);
