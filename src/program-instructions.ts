@@ -1203,9 +1203,13 @@ export function settleDexFundsTxs(
   };
 
   let txs: Transaction[] = [];
-  for (var j = 0; j < remainingAccounts.length; j += 15) {
+  for (
+    var j = 0;
+    j < remainingAccounts.length;
+    j += constants.MAX_SETTLE_ACCOUNTS
+  ) {
     let tx = new Transaction();
-    let slice = remainingAccounts.slice(j, j + 15);
+    let slice = remainingAccounts.slice(j, j + constants.MAX_SETTLE_ACCOUNTS);
     tx.add(
       Exchange.program.instruction.settleDexFunds({
         accounts,
