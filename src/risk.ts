@@ -202,6 +202,64 @@ export class RiskCalculator {
   }
 
   /**
+   * Returns the total maintenance margin requirement for a given account including orders.
+   * This calculates maintenance margin across all positions and orders.
+   * This value is used to determine margin when sending a closing order only.
+   * @param marginAccount   the user's MarginAccount.
+   */
+  public calculateTotalMaintenanceMarginIncludingOrders(
+    marginAccount: MarginAccount
+  ): number {
+    let margin = 0;
+    for (var i = 0; i < marginAccount.positions.length; i++) {
+      let position = marginAccount.positions[i];
+      if (
+        position.openingOrders[0].toNumber() == 0 &&
+        position.openingOrders[1].toNumber() == 0 &&
+        position.position.toNumber() == 0
+      ) {
+        continue;
+      }
+
+      let longLots = convertNativeLotSizeToDecimal(
+        position.openingOrders[0].toNumber()
+      );
+
+      let shortLots = convertNativeLotSizeToDecimal(
+        position.openingOrders[1].toNumber()
+      );
+
+      if (position.position.toNumber() > 0) {
+        longLots += Math.abs(
+          convertNativeLotSizeToDecimal(position.position.toNumber())
+        );
+      } else if (position.position.toNumber() < 0) {
+        shortLots += Math.abs(
+          convertNativeLotSizeToDecimal(position.position.toNumber())
+        );
+      }
+
+      let marginForMarket =
+        this.getMarginRequirement(
+          i,
+          // Positive for buys.
+          longLots,
+          MarginType.MAINTENANCE
+        ) +
+        this.getMarginRequirement(
+          i,
+          // Negative for sells.
+          -shortLots,
+          MarginType.MAINTENANCE
+        );
+      if (marginForMarket !== undefined) {
+        margin += marginForMarket;
+      }
+    }
+    return margin;
+  }
+
+  /**
    * Returns the aggregate margin account state.
    * @param marginAccount   the user's MarginAccount.
    */
