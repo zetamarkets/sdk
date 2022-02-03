@@ -693,10 +693,12 @@ export function getGreeksIndex(marketIndex: number): number {
 }
 
 export function displayState() {
+  
   let orderedIndexes = [
     Exchange.zetaGroup.frontExpiryIndex,
     getMostRecentExpiredIndex(),
   ];
+  //Text variable is used to write json locally
   let text = "["
 
   console.log(`[EXCHANGE] Saving Data in GetData.Json`);
