@@ -1,4 +1,5 @@
 import * as anchor from "@project-serum/anchor";
+var {writeFileSync} = require("fs");
 import {
   Commitment,
   Keypair,
@@ -696,22 +697,23 @@ export function displayState() {
     Exchange.zetaGroup.frontExpiryIndex,
     getMostRecentExpiredIndex(),
   ];
+  let text = "["
 
-  console.log(`[EXCHANGE] Display market state...`);
+  console.log(`[EXCHANGE] Saving Data in GetData.Json`);
   for (var i = 0; i < orderedIndexes.length; i++) {
     let index = orderedIndexes[i];
+
     let expirySeries = Exchange.markets.expirySeries[index];
-    console.log(
-      `Expiration @ ${new Date(
-        expirySeries.expiryTs * 1000
-      )} Live: ${expirySeries.isLive()}`
-    );
+    
     let interestRate = convertNativeBNToDecimal(
       Exchange.greeks.interestRate[index],
       constants.PRICING_PRECISION
     );
-    console.log(`Interest rate: ${interestRate}`);
+    
     let markets = Exchange.markets.getMarketsByExpiryIndex(index);
+    text =text+`{"Expiration":"${new Date(
+        expirySeries.expiryTs * 1000
+      )}","Interest Rate":"${interestRate}","Markets":[` ;
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
       let greeksIndex = getGreeksIndex(market.marketIndex);
@@ -731,15 +733,17 @@ export function displayState() {
         Exchange.greeks.productGreeks[greeksIndex].vega
       ).toNumber();
 
-      console.log(
-        `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
-          market.strike
-        } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
-          2
-        )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
-      );
+      text=text+`{"INDEX": "${market.marketIndex}" ,"KIND": "${market.kind}","STRIKE": "${market.strike}", "MARK_PRICE":"${markPrice.toFixed(6)}", "DELTA": "${delta.toFixed(2)}", "IV": "${sigma.toFixed(6)}", "VEGA": "${vega.toFixed(6)}"},`;
+      
     }
+    text=text.slice(0, -1)+"]},";
+    
   }
+  text=text.slice(0, -1)+"]";
+  writeFileSync("../GetData.json", text);
+  
+
+
 }
 
 export async function getMarginFromOpenOrders(
