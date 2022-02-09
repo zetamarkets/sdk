@@ -155,6 +155,27 @@
       ]
     },
     {
+      "name": "closeMarginAccount",
+      "accounts": [
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initializeMarketIndexes",
       "accounts": [
         {
@@ -1274,6 +1295,57 @@
       ]
     },
     {
+      "name": "closeOpenOrders",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersMap",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initializeWhitelistDepositAccount",
       "accounts": [
         {
@@ -1559,6 +1631,12 @@
           "name": "side",
           "type": {
             "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
           }
         },
         {
@@ -3661,6 +3739,20 @@
       }
     },
     {
+      "name": "OrderType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Limit"
+          },
+          {
+            "name": "PostOnly"
+          }
+        ]
+      }
+    },
+    {
       "name": "Side",
       "type": {
         "kind": "enum",
@@ -3687,6 +3779,9 @@
           },
           {
             "name": "Maintenance"
+          },
+          {
+            "name": "MaintenanceIncludingOrders"
           }
         ]
       }
@@ -4164,6 +4259,34 @@
       "code": 385,
       "name": "CannotExpireOptionsAfterExpirationThreshold",
       "msg": "Cannot expire options after expiration threshold"
+    },
+    {
+      "code": 386,
+      "name": "PostOnlyInCross",
+      "msg": "Post only order in cross"
+    },
+    {
+      "code": 387,
+      "name": "InvalidOpenOrdersMapOwner",
+      "msg": "Invalid open orders map owner"
+    },
+    {
+      "code": 388,
+      "name": "AccountDidNotSerialize",
+      "msg": "Failed to serialize the account"
+    },
+    {
+      "code": 389,
+      "name": "OpenOrdersWithNonEmptyPositions",
+      "msg": "Cannot close open orders account with non empty positions"
+    },
+    {
+      "code": 390,
+      "name": "CannotCloseNonEmptyMarginAccount",
+      "msg": "Cannot close margin account that is not empty"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
+  }
 }

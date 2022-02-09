@@ -4,7 +4,9 @@ import {
   MAX_CANCELS_PER_TX,
   DEFAULT_CLIENT_POLL_INTERVAL,
   DEFAULT_CLIENT_TIMER_INTERVAL,
-  POSITION_PRECISION,
+  DEX_PID,
+  MAX_DEX_SETTLE_IX_PER_TX,
+  MAX_CLOSE_OPEN_ORDERS_ACCOUNT_IX_PER_TX,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent } from "./program-types";
@@ -18,10 +20,20 @@ import {
   Context,
 } from "@solana/web3.js";
 import idl from "./idl/zeta.json";
-import { ProgramAccountType, Wallet, CancelArgs } from "./types";
+import {
+  ProgramAccountType,
+  Wallet,
+  CancelArgs,
+  OrderType,
+  Position,
+  Order,
+  Side,
+} from "./types";
 import {
   initializeMarginAccountTx,
+  closeMarginAccountIx,
   initializeOpenOrdersIx,
+  closeOpenOrdersIx,
   placeOrderIx,
   depositIx,
   withdrawIx,
@@ -29,9 +41,10 @@ import {
   cancelOrderByClientOrderIdIx,
   forceCancelOrdersIx,
   liquidateIx,
+  settleDexFundsIx,
+  settleDexFundsTxs,
 } from "./program-instructions";
 
-import { Position, Order, Side } from "./types";
 import { EventType } from "./events";
 
 export class Client {
@@ -399,6 +412,23 @@ export class Client {
   }
 
   /**
+   * Closes a client's margin account
+   */
+  public async closeMarginAccount(): Promise<TransactionSignature> {
+    if (this._marginAccount === null) {
+      throw Error("User has no margin account to close");
+    }
+
+    let tx = new Transaction();
+    tx.add(closeMarginAccountIx(this.publicKey, this._marginAccountAddress));
+    let txId = await utils.processTransaction(this._provider, tx);
+    console.log(`[CLOSE MARGIN ACCOUNT] Transaction: ${txId}`);
+
+    this._marginAccount = null;
+    return txId;
+  }
+
+  /**
    * @param amount  the native amount to withdraw (6 dp)
    */
   public async withdraw(amount: number): Promise<TransactionSignature> {
@@ -420,6 +450,7 @@ export class Client {
    * @param price           the native price of the order (6 d.p as integer)
    * @param size            the quantity of the order (3 d.p)
    * @param side            the side of the order. bid / ask
+   * @param orderType       the type of the order. limit / ioc / post-only
    * @param clientOrderId   optional: client order id (non 0 value)
    * NOTE: If duplicate client order ids are used, after a cancel order,
    * to cancel the second order with the same client order id,
@@ -432,6 +463,7 @@ export class Client {
     price: number,
     size: number,
     side: Side,
+    orderType: OrderType,
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
@@ -458,6 +490,7 @@ export class Client {
       price,
       size,
       side,
+      orderType,
       clientOrderId,
       this.marginAccountAddress,
       this.publicKey,
@@ -540,6 +573,7 @@ export class Client {
    * @param newOrderprice  the native price of the order (6 d.p) as integer
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
    * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderType   the type of the order, limit / ioc / post-only
    */
   public async cancelAndPlaceOrder(
     market: PublicKey,
@@ -548,6 +582,7 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: Side,
+    newOrderType: OrderType,
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
@@ -569,6 +604,7 @@ export class Client {
         newOrderPrice,
         newOrderSize,
         newOrderSide,
+        newOrderType,
         clientOrderId,
         this.marginAccountAddress,
         this.publicKey,
@@ -587,6 +623,7 @@ export class Client {
    * @param newOrderprice           the native price of the order (6 d.p) as integer
    * @param newOrderSize            the quantity of the order (3 d.p) as integer
    * @param newOrderSide            the side of the order. bid / ask
+   * @param newOrderType   the type of the order, limit / ioc / post-only
    * @param newOrderClientOrderId   the client order id for the new order
    */
   public async cancelAndPlaceOrderByClientOrderId(
@@ -595,6 +632,7 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: Side,
+    newOrderType: OrderType,
     newOrderClientOrderId: number
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
@@ -615,6 +653,7 @@ export class Client {
         newOrderPrice,
         newOrderSize,
         newOrderSide,
+        newOrderType,
         newOrderClientOrderId,
         this.marginAccountAddress,
         this.publicKey,
@@ -651,7 +690,111 @@ export class Client {
   }
 
   /**
-   * Cancels a user order by orderId and atomically places an order
+   * Closes a user open orders account for a given market.
+   */
+  public async closeOpenOrdersAccount(
+    market: PublicKey
+  ): Promise<TransactionSignature> {
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      throw Error("User has no open orders account for this market!");
+    }
+
+    const [vaultOwner, _vaultSignerNonce] =
+      await utils.getSerumVaultOwnerAndNonce(market, DEX_PID[Exchange.network]);
+
+    let tx = new Transaction();
+    tx.add(
+      settleDexFundsIx(
+        market,
+        vaultOwner,
+        this._openOrdersAccounts[marketIndex]
+      )
+    );
+
+    tx.add(
+      await closeOpenOrdersIx(
+        market,
+        this.publicKey,
+        this.marginAccountAddress,
+        this._openOrdersAccounts[marketIndex]
+      )
+    );
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = PublicKey.default;
+    return txId;
+  }
+
+  /**
+   * Closes multiple user open orders account for a given set of markets.
+   * Cannot pass in multiple of the same market address
+   */
+  public async closeMultipleOpenOrdersAccount(
+    markets: PublicKey[]
+  ): Promise<TransactionSignature[]> {
+    let settleIxs = [];
+    let closeIxs = [];
+    for (var i = 0; i < markets.length; i++) {
+      let market = markets[i];
+      let marketIndex = Exchange.markets.getMarketIndex(market);
+      if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+        throw Error("User has no open orders account for this market!");
+      }
+
+      const [vaultOwner, _vaultSignerNonce] =
+        await utils.getSerumVaultOwnerAndNonce(
+          market,
+          DEX_PID[Exchange.network]
+        );
+
+      settleIxs.push(
+        settleDexFundsIx(
+          market,
+          vaultOwner,
+          this._openOrdersAccounts[marketIndex]
+        )
+      );
+      closeIxs.push(
+        await closeOpenOrdersIx(
+          market,
+          this.publicKey,
+          this.marginAccountAddress,
+          this._openOrdersAccounts[marketIndex]
+        )
+      );
+    }
+
+    let txIds: string[] = [];
+
+    let settleTxs = utils.splitIxsIntoTx(settleIxs, MAX_DEX_SETTLE_IX_PER_TX);
+    await Promise.all(
+      settleTxs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._provider, tx));
+      })
+    );
+
+    let closeTxs = utils.splitIxsIntoTx(
+      closeIxs,
+      MAX_CLOSE_OPEN_ORDERS_ACCOUNT_IX_PER_TX
+    );
+    await Promise.all(
+      closeTxs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._provider, tx));
+      })
+    );
+
+    // Reset openOrdersAccount keys
+    for (var i = 0; i < markets.length; i++) {
+      let market = markets[i];
+      let marketIndex = Exchange.markets.getMarketIndex(market);
+      this._openOrdersAccounts[marketIndex] = PublicKey.default;
+    }
+
+    return txIds;
+  }
+
+  /**
+   * Cancels multiple user orders by orderId
    * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
    */
   public async cancelMultipleOrders(

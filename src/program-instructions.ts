@@ -9,7 +9,7 @@ import {
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import * as utils from "./utils";
 import * as anchor from "@project-serum/anchor";
-import { Side, toProgramSide } from "./types";
+import { OrderType, Side, toProgramOrderType, toProgramSide } from "./types";
 import * as constants from "./constants";
 
 export async function initializeMarginAccountTx(
@@ -33,6 +33,19 @@ export async function initializeMarginAccountTx(
     })
   );
   return tx;
+}
+
+export function closeMarginAccountIx(
+  userKey: PublicKey,
+  marginAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.closeMarginAccount({
+    accounts: {
+      marginAccount,
+      authority: userKey,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
 }
 
 export async function initializeInsuranceDepositAccountIx(
@@ -209,11 +222,38 @@ export async function initializeOpenOrdersIx(
   ];
 }
 
+export async function closeOpenOrdersIx(
+  market: PublicKey,
+  userKey: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey
+): Promise<TransactionInstruction> {
+  const [openOrdersMap, _openOrdersMapNonce] = await utils.getOpenOrdersMap(
+    Exchange.programId,
+    openOrders
+  );
+
+  return Exchange.program.instruction.closeOpenOrders({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      dexProgram: constants.DEX_PID[Exchange.network],
+      openOrders,
+      marginAccount: marginAccount,
+      authority: userKey,
+      market: market,
+      serumAuthority: Exchange.serumAuthority,
+      openOrdersMap,
+    },
+  });
+}
+
 export function placeOrderIx(
   marketIndex: number,
   price: number,
   size: number,
   side: Side,
+  orderType: OrderType,
   clientOrderId: number,
   marginAccount: PublicKey,
   authority: PublicKey,
@@ -236,6 +276,7 @@ export function placeOrderIx(
     new anchor.BN(price),
     new anchor.BN(size),
     toProgramSide(side),
+    toProgramOrderType(orderType),
     clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     {
       accounts: {
@@ -1219,6 +1260,38 @@ export function settleDexFundsTxs(
     txs.push(tx);
   }
   return txs;
+}
+
+export function settleDexFundsIx(
+  marketKey: PublicKey,
+  vaultOwner: PublicKey,
+  openOrders: PublicKey
+): TransactionInstruction {
+  let market = Exchange.markets.getMarket(marketKey);
+  let accounts = {
+    state: Exchange.stateAddress,
+    market: market.address,
+    zetaBaseVault: market.baseVault,
+    zetaQuoteVault: market.quoteVault,
+    dexBaseVault: market.serumMarket.decoded.baseVault,
+    dexQuoteVault: market.serumMarket.decoded.quoteVault,
+    vaultOwner,
+    mintAuthority: Exchange.mintAuthority,
+    serumAuthority: Exchange.serumAuthority,
+    dexProgram: constants.DEX_PID[Exchange.network],
+    tokenProgram: TOKEN_PROGRAM_ID,
+  };
+  let remainingAccounts = [
+    {
+      pubkey: openOrders,
+      isSigner: false,
+      isWritable: true,
+    },
+  ];
+  return Exchange.program.instruction.settleDexFunds({
+    accounts,
+    remainingAccounts,
+  });
 }
 
 export function burnVaultTokenTx(marketKey: PublicKey): Transaction {
