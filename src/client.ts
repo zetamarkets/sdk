@@ -42,7 +42,6 @@ import {
   forceCancelOrdersIx,
   liquidateIx,
   settleDexFundsIx,
-  settleDexFundsTxs,
 } from "./program-instructions";
 
 import { EventType } from "./events";
@@ -623,7 +622,7 @@ export class Client {
    * @param newOrderprice           the native price of the order (6 d.p) as integer
    * @param newOrderSize            the quantity of the order (3 d.p) as integer
    * @param newOrderSide            the side of the order. bid / ask
-   * @param newOrderType   the type of the order, limit / ioc / post-only
+   * @param newOrderType            the type of the order, limit / ioc / post-only
    * @param newOrderClientOrderId   the client order id for the new order
    */
   public async cancelAndPlaceOrderByClientOrderId(
