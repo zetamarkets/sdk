@@ -253,7 +253,6 @@ export function placeOrderIx(
   price: number,
   size: number,
   side: Side,
-  orderType: OrderType,
   clientOrderId: number,
   marginAccount: PublicKey,
   authority: PublicKey,
@@ -273,6 +272,74 @@ export function placeOrderIx(
       : [];
 
   return Exchange.program.instruction.placeOrder(
+    new anchor.BN(price),
+    new anchor.BN(size),
+    toProgramSide(side),
+    clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: Exchange.zetaGroupAddress,
+        marginAccount: marginAccount,
+        authority: authority,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        tokenProgram: TOKEN_PROGRAM_ID,
+        serumAuthority: Exchange.serumAuthority,
+        greeks: Exchange.zetaGroup.greeks,
+        openOrders: openOrders,
+        rent: SYSVAR_RENT_PUBKEY,
+        marketAccounts: {
+          market: marketData.serumMarket.decoded.ownAddress,
+          requestQueue: marketData.serumMarket.decoded.requestQueue,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          coinVault: marketData.serumMarket.decoded.baseVault,
+          pcVault: marketData.serumMarket.decoded.quoteVault,
+          // User params.
+          orderPayerTokenAccount:
+            side == Side.BID ? marketData.quoteVault : marketData.baseVault,
+          coinWallet: marketData.baseVault,
+          pcWallet: marketData.quoteVault,
+        },
+        oracle: Exchange.zetaGroup.oracle,
+        marketNode: Exchange.greeks.nodeKeys[marketIndex],
+        marketMint:
+          side == Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
+        mintAuthority: Exchange.mintAuthority,
+      },
+      remainingAccounts,
+    }
+  );
+}
+
+export function placeOrderV2Ix(
+  marketIndex: number,
+  price: number,
+  size: number,
+  side: Side,
+  orderType: OrderType,
+  clientOrderId: number,
+  marginAccount: PublicKey,
+  authority: PublicKey,
+  openOrders: PublicKey,
+  whitelistTradingFeesAccount: PublicKey | undefined
+): TransactionInstruction {
+  let marketData = Exchange.markets.markets[marketIndex];
+  let remainingAccounts =
+    whitelistTradingFeesAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistTradingFeesAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+
+  return Exchange.program.instruction.placeOrderV2(
     new anchor.BN(price),
     new anchor.BN(size),
     toProgramSide(side),
