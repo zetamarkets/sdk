@@ -5,8 +5,6 @@ import {
   DEFAULT_CLIENT_POLL_INTERVAL,
   DEFAULT_CLIENT_TIMER_INTERVAL,
   DEX_PID,
-  MAX_DEX_SETTLE_IX_PER_TX,
-  MAX_CLOSE_OPEN_ORDERS_ACCOUNT_IX_PER_TX,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent } from "./program-types";
@@ -18,6 +16,7 @@ import {
   TransactionSignature,
   AccountInfo,
   Context,
+  TransactionInstruction,
 } from "@solana/web3.js";
 import idl from "./idl/zeta.json";
 import {
@@ -893,53 +892,39 @@ export class Client {
   public async closeMultipleOpenOrdersAccount(
     markets: PublicKey[]
   ): Promise<TransactionSignature[]> {
-    let settleIxs = [];
-    let closeIxs = [];
+    let combinedIxs: TransactionInstruction[] = [];
     for (var i = 0; i < markets.length; i++) {
       let market = markets[i];
       let marketIndex = Exchange.markets.getMarketIndex(market);
       if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
         throw Error("User has no open orders account for this market!");
       }
-
       const [vaultOwner, _vaultSignerNonce] =
         await utils.getSerumVaultOwnerAndNonce(
           market,
           DEX_PID[Exchange.network]
         );
-
-      settleIxs.push(
-        settleDexFundsIx(
-          market,
-          vaultOwner,
-          this._openOrdersAccounts[marketIndex]
-        )
+      let settleIx = settleDexFundsIx(
+        market,
+        vaultOwner,
+        this._openOrdersAccounts[marketIndex]
       );
-      closeIxs.push(
-        await closeOpenOrdersIx(
-          market,
-          this.publicKey,
-          this.marginAccountAddress,
-          this._openOrdersAccounts[marketIndex]
-        )
+      let closeIx = await closeOpenOrdersIx(
+        market,
+        this.publicKey,
+        this.marginAccountAddress,
+        this._openOrdersAccounts[marketIndex]
       );
+      combinedIxs.push(settleIx);
+      combinedIxs.push(closeIx);
     }
 
     let txIds: string[] = [];
 
-    let settleTxs = utils.splitIxsIntoTx(settleIxs, MAX_DEX_SETTLE_IX_PER_TX);
-    await Promise.all(
-      settleTxs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
-      })
-    );
+    let combinedTxs = utils.splitIxsIntoTx(combinedIxs, 4);
 
-    let closeTxs = utils.splitIxsIntoTx(
-      closeIxs,
-      MAX_CLOSE_OPEN_ORDERS_ACCOUNT_IX_PER_TX
-    );
     await Promise.all(
-      closeTxs.map(async (tx) => {
+      combinedTxs.map(async (tx) => {
         txIds.push(await utils.processTransaction(this._provider, tx));
       })
     );
