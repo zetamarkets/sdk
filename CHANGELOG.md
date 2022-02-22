@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
 ## [Unreleased]
-- utils: Slight improvement to open orders account fetching. ()()
+- utils: Slight improvement to open orders account fetching. ([#94](https://github.com/zetamarkets/sdk/pull/94))
 
 ## [0.11.0] 2022-02-02
 
