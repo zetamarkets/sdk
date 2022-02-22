@@ -1097,10 +1097,11 @@ export async function getAllOpenOrdersAccountsByMarket(): Promise<
         if (nonce == 0) {
           continue;
         }
-        let [openOrders, _nonce] = await getOpenOrders(
+        let openOrders = await createOpenOrdersAddress(
           Exchange.programId,
           Exchange.markets.markets[i].address,
-          marginAccount.authority
+          marginAccount.authority,
+          nonce
         );
         openOrdersByMarketIndex.get(i).push(openOrders);
       }
