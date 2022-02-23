@@ -1343,7 +1343,12 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "initializeWhitelistDepositAccount",

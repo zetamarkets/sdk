@@ -228,12 +228,12 @@ export async function closeOpenOrdersIx(
   marginAccount: PublicKey,
   openOrders: PublicKey
 ): Promise<TransactionInstruction> {
-  const [openOrdersMap, _openOrdersMapNonce] = await utils.getOpenOrdersMap(
+  const [openOrdersMap, openOrdersMapNonce] = await utils.getOpenOrdersMap(
     Exchange.programId,
     openOrders
   );
 
-  return Exchange.program.instruction.closeOpenOrders({
+  return Exchange.program.instruction.closeOpenOrders(openOrdersMapNonce, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.zetaGroupAddress,
