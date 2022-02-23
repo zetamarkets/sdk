@@ -651,8 +651,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
-    let ixs = [];
-    ixs.push(
+    tx.add(
       cancelOrderIx(
         marketIndex,
         this.publicKey,
@@ -662,7 +661,7 @@ export class Client {
         cancelSide
       )
     );
-    ixs.push(
+    tx.add(
       placeOrderIx(
         marketIndex,
         newOrderPrice,
@@ -675,7 +674,6 @@ export class Client {
         this._whitelistTradingFeesAddress
       )
     );
-    ixs.forEach((ix) => tx.add(ix));
     return await utils.processTransaction(this._provider, tx);
   }
 
@@ -701,8 +699,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
-    let ixs = [];
-    ixs.push(
+    tx.add(
       cancelOrderIx(
         marketIndex,
         this.publicKey,
@@ -712,7 +709,7 @@ export class Client {
         cancelSide
       )
     );
-    ixs.push(
+    tx.add(
       placeOrderV2Ix(
         marketIndex,
         newOrderPrice,
@@ -726,7 +723,6 @@ export class Client {
         this._whitelistTradingFeesAddress
       )
     );
-    ixs.forEach((ix) => tx.add(ix));
     return await utils.processTransaction(this._provider, tx);
   }
 
@@ -749,8 +745,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
-    let ixs = [];
-    ixs.push(
+    tx.add(
       cancelOrderByClientOrderIdIx(
         marketIndex,
         this.publicKey,
@@ -759,7 +754,7 @@ export class Client {
         new anchor.BN(cancelClientOrderId)
       )
     );
-    ixs.push(
+    tx.add(
       placeOrderIx(
         marketIndex,
         newOrderPrice,
@@ -772,7 +767,6 @@ export class Client {
         this._whitelistTradingFeesAddress
       )
     );
-    ixs.forEach((ix) => tx.add(ix));
     return await utils.processTransaction(this._provider, tx);
   }
 
@@ -797,8 +791,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
-    let ixs = [];
-    ixs.push(
+    tx.add(
       cancelOrderByClientOrderIdIx(
         marketIndex,
         this.publicKey,
@@ -807,7 +800,7 @@ export class Client {
         new anchor.BN(cancelClientOrderId)
       )
     );
-    ixs.push(
+    tx.add(
       placeOrderV2Ix(
         marketIndex,
         newOrderPrice,
@@ -821,7 +814,6 @@ export class Client {
         this._whitelistTradingFeesAddress
       )
     );
-    ixs.forEach((ix) => tx.add(ix));
     return await utils.processTransaction(this._provider, tx);
   }
 
