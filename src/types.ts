@@ -1,6 +1,6 @@
 import * as anchor from "@project-serum/anchor";
 import { BN } from "@project-serum/anchor";
-import { AccountInfo, PublicKey, Transaction } from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 
 /**
  * Wallet interface for objects that can be used to sign provider transactions.
@@ -25,6 +25,18 @@ export class DummyWallet implements Wallet {
   get publicKey(): PublicKey {
     throw Error("Not supported by dummy wallet!");
   }
+}
+
+export enum OrderType {
+  LIMIT,
+  POSTONLY,
+  FILLORKILL,
+}
+
+export function toProgramOrderType(orderType: OrderType) {
+  if (orderType == OrderType.LIMIT) return { limit: {} };
+  if (orderType == OrderType.POSTONLY) return { postOnly: {} };
+  if (orderType == OrderType.FILLORKILL) return { fillOrKill: {} };
 }
 
 export enum Side {

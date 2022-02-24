@@ -5,6 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+
+## [0.12.0] 2022-02-23
+
+- client: Add in functionality to close a margin account, close an open orders account and close multiple open orders accounts. ([#93](https://github.com/zetamarkets/sdk/pull/93))
+- general: Add in functionality to accomodate for extra order types (post-only & fill-or-kill). ([#93](https://github.com/zetamarkets/sdk/pull/93))
+- general: Add in placeOrderV2 to allow order type to be specified. ([#93](https://github.com/zetamarkets/sdk/pull/93))
+
 ## [0.11.0] 2022-02-02
 
 - risk: Change margin calculations to reflect new changes. See https://zetamarkets.gitbook.io/zeta/zeta-protocol/collateral-framework ([#85](https://github.com/zetamarkets/sdk/pull/85))
