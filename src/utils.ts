@@ -644,7 +644,9 @@ export function splitIxsIntoTx(
   for (var i = 0; i < ixs.length; i += ixsPerTx) {
     let tx = new Transaction();
     let slice = ixs.slice(i, i + ixsPerTx);
-    slice.forEach((ix) => tx.add(ix));
+    for (let j = 0; j < slice.length; j++) {
+      tx.add(slice[j]);
+    }
     txs.push(tx);
   }
   return txs;

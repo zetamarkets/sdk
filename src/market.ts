@@ -28,6 +28,7 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
   getCancelAllIxs,
+  splitIxsIntoTx,
 } from "./utils";
 import {
   cancelOrderHaltedIx,
@@ -560,14 +561,7 @@ export class Market {
 
     // Assumption of similar MAX number of instructions as regular cancel
     let ixs = await getCancelAllIxs(orders, true);
-
-    let txs = [];
-    for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {
-      let tx = new Transaction();
-      let slice = ixs.slice(i, i + MAX_CANCELS_PER_TX);
-      slice.forEach((ix) => tx.add(ix));
-      txs.push(tx);
-    }
+    let txs = splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
 
     await Promise.all(
       txs.map(async (tx) => {
@@ -581,17 +575,8 @@ export class Market {
 
     await this.updateOrderbook();
     let orders = this.getMarketOrders();
-
     let ixs = await getCancelAllIxs(orders, false);
-    let txs = [];
-
-    for (var i = 0; i < ixs.length; i += MAX_CANCELS_PER_TX) {
-      let tx = new Transaction();
-      let slice = ixs.slice(i, i + MAX_CANCELS_PER_TX);
-      slice.forEach((ix) => tx.add(ix));
-      txs.push(tx);
-    }
-
+    let txs = splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
     await Promise.all(
       txs.map(async (tx) => {
         await processTransaction(Exchange.provider, tx);
