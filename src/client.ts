@@ -1,6 +1,7 @@
 import * as anchor from "@project-serum/anchor";
 import * as utils from "./utils";
 import {
+  MAX_SETTLE_AND_CLOSE_PER_TX,
   MAX_CANCELS_PER_TX,
   DEFAULT_CLIENT_POLL_INTERVAL,
   DEFAULT_CLIENT_TIMER_INTERVAL,
@@ -913,7 +914,10 @@ export class Client {
 
     let txIds: string[] = [];
 
-    let combinedTxs = utils.splitIxsIntoTx(combinedIxs, 4);
+    let combinedTxs = utils.splitIxsIntoTx(
+      combinedIxs,
+      MAX_SETTLE_AND_CLOSE_PER_TX
+    );
 
     await Promise.all(
       combinedTxs.map(async (tx) => {
