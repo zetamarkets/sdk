@@ -5,6 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- exchange: greek and oracle callback after margin requirements are updated.
 
 ## [0.12.0] 2022-02-23
 

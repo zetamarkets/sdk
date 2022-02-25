@@ -817,10 +817,12 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
 
     eventEmitter.on("change", async (greeks: Greeks) => {
       this._greeks = greeks;
+      if (this._isInitialized) {
+        this._riskCalculator.updateMarginRequirements();
+      }
       if (callback !== undefined) {
         callback(EventType.GREEKS, null);
       }
-      this._riskCalculator.updateMarginRequirements();
     });
 
     this._eventEmitters.push(eventEmitter);
@@ -830,11 +832,11 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     callback?: (type: EventType, data: any) => void
   ) {
     await this._oracle.subscribePriceFeeds((price: OraclePrice) => {
-      if (callback !== undefined) {
-        callback(EventType.ORACLE, price);
-      }
       if (this._isInitialized) {
         this._riskCalculator.updateMarginRequirements();
+      }
+      if (callback !== undefined) {
+        callback(EventType.ORACLE, price);
       }
     });
   }
