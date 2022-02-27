@@ -152,6 +152,9 @@ export class Client {
   /**
    * whitelist trading fees account.
    */
+  public get whitelistTradingFeesAddress(): PublicKey | undefined {
+    return this._whitelistTradingFeesAddress;
+  }
   private _whitelistTradingFeesAddress: PublicKey | undefined;
 
   /**

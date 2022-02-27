@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.12.2] 2022-02-27
+
+- client: expose client address.
+
 ## [0.12.1] 2022-02-25
 
 - exchange: greek and oracle callback after margin requirements are updated.
