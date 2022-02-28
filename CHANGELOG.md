@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [0.12.3] 2022-02-28
 
-- client: expose provider as client provider might not be the same as exchange provider.
+- client: expose provider as client provider might not be the same as exchange provider. ([#97](https://github.com/zetamarkets/sdk/pull/97))
 
 ## [0.12.2] 2022-02-27
 
