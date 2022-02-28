@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.12.4] 2022-02-28
+
+- client: Add functionality to withdraw and close margin account in single transaction. ([#98](https://github.com/zetamarkets/sdk/pull/98))
+
 ## [0.12.3] 2022-02-28
 
 - client: expose provider as client provider might not be the same as exchange provider. ([#97](https://github.com/zetamarkets/sdk/pull/97))
