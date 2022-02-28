@@ -58,6 +58,9 @@ export class Client {
   /**
    * Anchor provider for client, including wallet.
    */
+  public get provider(): anchor.Provider {
+    return this._provider;
+  }
   private _provider: anchor.Provider;
 
   /**
