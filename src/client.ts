@@ -451,6 +451,26 @@ export class Client {
   }
 
   /**
+   * Withdraws the entirety of the client's margin account and then closes it.
+   */
+  public async withdrawAndCloseMarginAccount(): Promise<TransactionSignature> {
+    if (this._marginAccount === null) {
+      throw Error("User has no margin account to withdraw or close.");
+    }
+    let tx = new Transaction();
+    tx.add(
+      withdrawIx(
+        this._marginAccount.balance.toNumber(),
+        this._marginAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    tx.add(closeMarginAccountIx(this.publicKey, this._marginAccountAddress));
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
    * Places an order on a zeta market.
    * @param market          the address of the serum market
    * @param price           the native price of the order (6 d.p as integer)
