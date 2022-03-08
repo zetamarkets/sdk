@@ -14,7 +14,8 @@ export function subscribeProgramAccounts<T>(
   accountType: ProgramAccountType,
   callback?: (data: AccountSubscriptionData<T>) => void
 ) {
-  const discriminator = anchor.AccountsCoder.accountDiscriminator(accountType);
+  const discriminator =
+    anchor.BorshAccountsCoder.accountDiscriminator(accountType);
 
   const subscriptionId = Exchange.connection.onProgramAccountChange(
     Exchange.programId,

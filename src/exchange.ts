@@ -1,15 +1,12 @@
 import * as anchor from "@project-serum/anchor";
 import {
-  SYSVAR_RENT_PUBKEY,
   PublicKey,
-  SystemProgram,
   Transaction,
   Connection,
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
   AccountInfo,
 } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import * as utils from "./utils";
 import * as constants from "./constants";
 import {
@@ -25,6 +22,7 @@ import { EventType } from "./events";
 import { Network } from "./network";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
+import { Zeta } from "./types/zeta";
 import { ClockData, MarginParams, DummyWallet, Wallet } from "./types";
 import * as instructions from "./program-instructions";
 export class Exchange {
@@ -47,10 +45,10 @@ export class Exchange {
   /**
    * Anchor program instance.
    */
-  public get program(): anchor.Program {
+  public get program(): anchor.Program<Zeta> {
     return this._program;
   }
-  private _program: anchor.Program;
+  private _program: anchor.Program<Zeta>;
 
   public get programId(): PublicKey {
     return this._program.programId;
@@ -262,7 +260,7 @@ export class Exchange {
       idl as anchor.Idl,
       programId,
       this._provider
-    );
+    ) as anchor.Program<Zeta>;
     this._oracle = new Oracle(this._network, connection);
     this._riskCalculator = new RiskCalculator();
     this._lastPollTimestamp = 0;

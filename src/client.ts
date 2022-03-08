@@ -20,6 +20,7 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import idl from "./idl/zeta.json";
+import { Zeta } from "./types/zeta";
 import {
   ProgramAccountType,
   Wallet,
@@ -191,7 +192,7 @@ export class Client {
       idl as anchor.Idl,
       Exchange.programId,
       this._provider
-    );
+    ) as anchor.Program<Zeta>;
 
     this._openOrdersAccounts = Array(Exchange.zetaGroup.products.length).fill(
       PublicKey.default

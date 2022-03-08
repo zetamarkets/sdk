@@ -758,7 +758,8 @@ export function liquidateIx(
   liquidatedMarginAccount: PublicKey,
   size: number
 ): TransactionInstruction {
-  return Exchange.program.instruction.liquidate(new anchor.BN(size), {
+  let liquidateSize: any = new anchor.BN(size);
+  return Exchange.program.instruction.liquidate(liquidateSize, {
     accounts: {
       state: Exchange.stateAddress,
       liquidator,
@@ -898,7 +899,7 @@ export function initializeZetaStateIx(
   mintAuthorityNonce: number,
   params: StateParams
 ): TransactionInstruction {
-  let args: Object = params;
+  let args: any = params;
   args["stateNonce"] = stateNonce;
   args["serumNonce"] = serumNonce;
   args["mintAuthNonce"] = mintAuthorityNonce;
