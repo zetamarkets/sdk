@@ -165,7 +165,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "zetaGroup",
@@ -4450,8 +4450,5 @@
       "name": "CannotCloseNonEmptyMarginAccount",
       "msg": "Cannot close margin account that is not empty"
     }
-  ],
-  "metadata": {
-    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
-  }
+  ]
 }

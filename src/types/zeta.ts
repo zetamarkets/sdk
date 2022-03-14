@@ -165,7 +165,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "zetaGroup",
@@ -4620,7 +4620,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "zetaGroup",
