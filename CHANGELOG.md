@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.13.0] 2022-03-13
+
 - anchor: bump to v0.22.1. ([#98](https://github.com/zetamarkets/sdk/pull/98))
 
 ## [0.12.4] 2022-02-28
