@@ -72,11 +72,11 @@ export interface HaltState {
   spotPrice: anchor.BN;
   timestamp: anchor.BN;
   markPricesSet: Array<boolean>;
-  _markPricesSetPadding: Array<boolean>;
+  markPricesSetPadding: Array<boolean>;
   marketNodesCleaned: Array<boolean>;
-  _marketNodesCleanedPadding: Array<boolean>;
+  marketNodesCleanedPadding: Array<boolean>;
   marketCleaned: Array<boolean>;
-  _marketCleanedPadding: Array<boolean>;
+  marketCleanedPadding: Array<boolean>;
 }
 
 export interface ZetaGroup {
@@ -91,9 +91,9 @@ export interface ZetaGroup {
   pricingParameters: PricingParameters;
   marginParameters: MarginParameters;
   products: Array<Product>;
-  _productsPadding: Array<Product>;
+  productsPadding: Array<Product>;
   expirySeries: Array<ExpirySeries>;
-  _expirySeriesPadding: Array<ExpirySeries>;
+  expirySeriesPadding: Array<ExpirySeries>;
   totalInsuranceVaultDeposits: anchor.BN;
   padding: Array<number>;
 }
@@ -136,7 +136,7 @@ export interface MarginAccount {
   openOrdersNonce: Array<number>;
   seriesExpiry: Array<anchor.BN>;
   positions: Array<Position>;
-  _positionsPadding: Array<Position>;
+  positionsPadding: Array<Position>;
 
   rebalanceAmount: anchor.BN;
   padding: Array<number>;
@@ -145,18 +145,18 @@ export interface MarginAccount {
 export interface Greeks {
   nonce: number;
   markPrices: Array<anchor.BN>;
-  _markPricesPadding: Array<anchor.BN>;
+  markPricesPadding: Array<anchor.BN>;
   productGreeks: Array<ProductGreeks>;
-  _productGreeksPadding: Array<ProductGreeks>;
+  productGreeksPadding: Array<ProductGreeks>;
   updateTimestamp: Array<anchor.BN>;
-  _updateTimestampPadding: Array<anchor.BN>;
+  updateTimestampPadding: Array<anchor.BN>;
   retreatExpirationTimestamp: Array<anchor.BN>;
-  _retreatExpirationTimestampPadding: Array<anchor.BN>;
+  retreatExpirationTimestampPadding: Array<anchor.BN>;
   interestRate: Array<anchor.BN>;
-  _interestRatePadding: Array<anchor.BN>;
+  interestRatePadding: Array<anchor.BN>;
   nodes: Array<anchor.BN>;
   volatility: Array<anchor.BN>;
-  _volatilityPadding: Array<anchor.BN>;
+  volatilityPadding: Array<anchor.BN>;
   nodeKeys: Array<PublicKey>;
   haltForcePricing: Array<boolean>;
   padding: Array<number>;

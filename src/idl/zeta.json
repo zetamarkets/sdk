@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.1.0",
   "name": "zeta",
   "instructions": [
     {
@@ -165,7 +165,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "zetaGroup",
@@ -441,7 +441,7 @@
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         }
       ],
@@ -767,7 +767,7 @@
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
@@ -1325,7 +1325,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "market",
@@ -3991,462 +3991,462 @@
   ],
   "errors": [
     {
-      "code": 300,
+      "code": 6000,
       "name": "DepositOverflow",
       "msg": "Deposit overflow"
     },
     {
-      "code": 301,
+      "code": 6001,
       "name": "Unreachable",
       "msg": "Unreachable"
     },
     {
-      "code": 302,
+      "code": 6002,
       "name": "FailedInitialMarginRequirement",
       "msg": "Failed initial margin requirement"
     },
     {
-      "code": 303,
+      "code": 6003,
       "name": "LiquidatorFailedMarginRequirement",
       "msg": "Liquidator failed margin requirement"
     },
     {
-      "code": 304,
+      "code": 6004,
       "name": "CannotLiquidateOwnAccount",
       "msg": "Cannot liquidate own account"
     },
     {
-      "code": 305,
+      "code": 6005,
       "name": "CrankInvalidRemainingAccounts",
       "msg": "Invalid cranking remaining accounts"
     },
     {
-      "code": 306,
+      "code": 6006,
       "name": "IncorrectTickSize",
       "msg": "Incorrect tick size"
     },
     {
-      "code": 307,
+      "code": 6007,
       "name": "ZeroPrice",
       "msg": "ZeroPrice"
     },
     {
-      "code": 308,
+      "code": 6008,
       "name": "ZeroSize",
       "msg": "ZeroSize"
     },
     {
-      "code": 309,
+      "code": 6009,
       "name": "ZeroWithdrawableBalance",
       "msg": "Zero withdrawable balance"
     },
     {
-      "code": 310,
+      "code": 6010,
       "name": "DepositAmountExceeded",
       "msg": "Deposit amount exceeds limit and user is not whitelisted"
     },
     {
-      "code": 311,
+      "code": 6011,
       "name": "WithdrawalAmountExceedsWithdrawableBalance",
       "msg": "Withdrawal amount exceeds withdrawable balance"
     },
     {
-      "code": 312,
+      "code": 6012,
       "name": "AccountHasSufficientMarginPostCancels",
       "msg": "Account has sufficient margin post cancels"
     },
     {
-      "code": 313,
+      "code": 6013,
       "name": "OverBankrupt",
       "msg": "Over bankrupt"
     },
     {
-      "code": 314,
+      "code": 6014,
       "name": "AccountHasSufficientMargin",
       "msg": "Account has sufficient margin"
     },
     {
-      "code": 315,
+      "code": 6015,
       "name": "UserHasNoActiveOrders",
       "msg": "User has no active orders"
     },
     {
-      "code": 316,
+      "code": 6016,
       "name": "InvalidExpirationInterval",
       "msg": "Invalid expiration interval"
     },
     {
-      "code": 317,
+      "code": 6017,
       "name": "ProductMarketsAlreadyInitialized",
       "msg": "Product markets already initialized"
     },
     {
-      "code": 318,
+      "code": 6018,
       "name": "InvalidProductMarketKey",
       "msg": "Invalid product market key"
     },
     {
-      "code": 319,
+      "code": 6019,
       "name": "MarketNotLive",
       "msg": "Market not live"
     },
     {
-      "code": 320,
+      "code": 6020,
       "name": "MarketPricingNotReady",
       "msg": "Market pricing not ready"
     },
     {
-      "code": 321,
+      "code": 6021,
       "name": "UserHasRemainingOrdersOnExpiredMarket",
       "msg": "User has remaining orders on expired market"
     },
     {
-      "code": 322,
+      "code": 6022,
       "name": "InvalidSeriesExpiration",
       "msg": "Invalid series expiration"
     },
     {
-      "code": 323,
+      "code": 6023,
       "name": "InvalidExpiredOrderCancel",
       "msg": "Invalid expired order cancel"
     },
     {
-      "code": 324,
+      "code": 6024,
       "name": "NoMarketsToAdd",
       "msg": "No markets to add"
     },
     {
-      "code": 325,
+      "code": 6025,
       "name": "UserHasUnsettledPositions",
       "msg": "User has unsettled positions"
     },
     {
-      "code": 326,
+      "code": 6026,
       "name": "NoMarginAccountsToSettle",
       "msg": "No margin accounts to settle"
     },
     {
-      "code": 327,
+      "code": 6027,
       "name": "CannotSettleUserWithActiveOrders",
       "msg": "Cannot settle users with active orders"
     },
     {
-      "code": 328,
+      "code": 6028,
       "name": "OrderbookNotEmpty",
       "msg": "Orderbook not empty"
     },
     {
-      "code": 329,
+      "code": 6029,
       "name": "InvalidNumberOfAccounts",
       "msg": "Invalid number of accounts"
     },
     {
-      "code": 330,
+      "code": 6030,
       "name": "InvalidMarketAccounts",
       "msg": "Bids or Asks don't match the Market"
     },
     {
-      "code": 331,
+      "code": 6031,
       "name": "ProductStrikeUninitialized",
       "msg": "Product strike uninitialized"
     },
     {
-      "code": 332,
+      "code": 6032,
       "name": "PricingNotUpToDate",
       "msg": "Pricing not up to date"
     },
     {
-      "code": 333,
+      "code": 6033,
       "name": "RetreatsAreStale",
       "msg": "Retreats are stale"
     },
     {
-      "code": 334,
+      "code": 6034,
       "name": "ProductDirty",
       "msg": "Product dirty"
     },
     {
-      "code": 335,
+      "code": 6035,
       "name": "ProductStrikesInitialized",
       "msg": "Product strikes initialized"
     },
     {
-      "code": 336,
+      "code": 6036,
       "name": "StrikeInitializationNotReady",
       "msg": "Strike initialization not ready"
     },
     {
-      "code": 337,
+      "code": 6037,
       "name": "UnsupportedKind",
       "msg": "Unsupported kind"
     },
     {
-      "code": 338,
+      "code": 6038,
       "name": "InvalidZetaGroup",
       "msg": "Invalid zeta group"
     },
     {
-      "code": 339,
+      "code": 6039,
       "name": "InvalidMarginAccount",
       "msg": "Invalid margin account"
     },
     {
-      "code": 340,
+      "code": 6040,
       "name": "InvalidGreeksAccount",
       "msg": "Invalid greeks account"
     },
     {
-      "code": 341,
+      "code": 6041,
       "name": "InvalidSettlementAccount",
       "msg": "Invalid settlement account"
     },
     {
-      "code": 342,
+      "code": 6042,
       "name": "InvalidCancelAuthority",
       "msg": "Invalid cancel authority"
     },
     {
-      "code": 343,
+      "code": 6043,
       "name": "CannotUpdatePricingAfterExpiry",
       "msg": "Cannot update pricing after expiry"
     },
     {
-      "code": 344,
+      "code": 6044,
       "name": "LoadAccountDiscriminatorAlreadySet",
       "msg": "Account discriminator already set"
     },
     {
-      "code": 345,
+      "code": 6045,
       "name": "AccountAlreadyInitialized",
       "msg": "Account already initialized"
     },
     {
-      "code": 346,
+      "code": 6046,
       "name": "GreeksAccountSeedsMismatch",
       "msg": "Greeks account seeds mismatch"
     },
     {
-      "code": 347,
+      "code": 6047,
       "name": "ZetaGroupAccountSeedsMismatch",
       "msg": "Zeta group account seeds mismatch"
     },
     {
-      "code": 348,
+      "code": 6048,
       "name": "MarginAccountSeedsMismatch",
       "msg": "Margin account seeds mismatch"
     },
     {
-      "code": 349,
+      "code": 6049,
       "name": "OpenOrdersAccountSeedsMismatch",
       "msg": "Open orders account seeds mismatch"
     },
     {
-      "code": 350,
+      "code": 6050,
       "name": "MarketNodeAccountSeedsMismatch",
       "msg": "Market node seeds mismatch"
     },
     {
-      "code": 351,
+      "code": 6051,
       "name": "UserTradingFeeWhitelistAccountSeedsMismatch",
       "msg": "User trading fee whitelist account seeds mismatch"
     },
     {
-      "code": 352,
+      "code": 6052,
       "name": "UserDepositWhitelistAccountSeedsMismatch",
       "msg": "User deposit whitelist account seeds mismatch"
     },
     {
-      "code": 353,
+      "code": 6053,
       "name": "MarketIndexesUninitialized",
       "msg": "Market indexes uninitialized"
     },
     {
-      "code": 354,
+      "code": 6054,
       "name": "MarketIndexesAlreadyInitialized",
       "msg": "Market indexes already initialized"
     },
     {
-      "code": 355,
+      "code": 6055,
       "name": "CannotGetUnsetStrike",
       "msg": "Cannot get unset strike"
     },
     {
-      "code": 356,
+      "code": 6056,
       "name": "CannotSetInitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 357,
+      "code": 6057,
       "name": "CannotResetUninitializedStrike",
       "msg": "Cannot set initialized strike"
     },
     {
-      "code": 358,
+      "code": 6058,
       "name": "CrankMarginAccountNotMutable",
       "msg": "CrankMarginAccountNotMutable"
     },
     {
-      "code": 359,
+      "code": 6059,
       "name": "InvalidAdminSigner",
       "msg": "InvalidAdminSigner"
     },
     {
-      "code": 360,
+      "code": 6060,
       "name": "UserHasActiveOrders",
       "msg": "User still has active orders"
     },
     {
-      "code": 361,
+      "code": 6061,
       "name": "UserForceCancelInProgress",
       "msg": "User has a force cancel in progress"
     },
     {
-      "code": 362,
+      "code": 6062,
       "name": "FailedPriceBandCheck",
       "msg": "Failed price band check"
     },
     {
-      "code": 363,
+      "code": 6063,
       "name": "UnsortedOpenOrdersAccounts",
       "msg": "Unsorted open orders accounts"
     },
     {
-      "code": 364,
+      "code": 6064,
       "name": "AccountNotMutable",
       "msg": "Account not mutable"
     },
     {
-      "code": 365,
+      "code": 6065,
       "name": "AccountDiscriminatorMismatch",
       "msg": "Account discriminator mismatch"
     },
     {
-      "code": 366,
+      "code": 6066,
       "name": "InvalidMarketNodeIndex",
       "msg": "Invalid market node index"
     },
     {
-      "code": 367,
+      "code": 6067,
       "name": "InvalidMarketNode",
       "msg": "Invalid market node"
     },
     {
-      "code": 368,
+      "code": 6068,
       "name": "LUTOutOfBounds",
       "msg": "Lut out of bounds"
     },
     {
-      "code": 369,
+      "code": 6069,
       "name": "RebalanceInsuranceInvalidRemainingAccounts",
       "msg": "Rebalance insurance vault with no margin accounts"
     },
     {
-      "code": 370,
+      "code": 6070,
       "name": "InvalidMintDecimals",
       "msg": "Invalid mint decimals"
     },
     {
-      "code": 371,
+      "code": 6071,
       "name": "InvalidZetaGroupOracle",
       "msg": "Invalid oracle for this zeta group"
     },
     {
-      "code": 372,
+      "code": 6072,
       "name": "InvalidZetaGroupDepositMint",
       "msg": "Invalid zeta group deposit mint"
     },
     {
-      "code": 373,
+      "code": 6073,
       "name": "InvalidZetaGroupRebalanceMint",
       "msg": "Invalid zeta group rebalance insurance vault mint"
     },
     {
-      "code": 374,
+      "code": 6074,
       "name": "InvalidDepositAmount",
       "msg": "Invalid deposit amount"
     },
     {
-      "code": 375,
+      "code": 6075,
       "name": "InvalidTokenAccountOwner",
       "msg": "Invalid token account owner"
     },
     {
-      "code": 376,
+      "code": 6076,
       "name": "InvalidWithdrawAmount",
       "msg": "Invalid withdraw amount"
     },
     {
-      "code": 377,
+      "code": 6077,
       "name": "InvalidDepositRemainingAccounts",
       "msg": "Invalid number of remaining accounts in deposit"
     },
     {
-      "code": 378,
+      "code": 6078,
       "name": "InvalidPlaceOrderRemainingAccounts",
       "msg": "Invalid number of remaining accounts in place order"
     },
     {
-      "code": 379,
+      "code": 6079,
       "name": "ClientOrderIdCannotBeZero",
       "msg": "ClientOrderIdCannotBeZero"
     },
     {
-      "code": 380,
+      "code": 6080,
       "name": "ZetaGroupHalted",
       "msg": "Zeta group halted"
     },
     {
-      "code": 381,
+      "code": 6081,
       "name": "ZetaGroupNotHalted",
       "msg": "Zeta group not halted"
     },
     {
-      "code": 382,
+      "code": 6082,
       "name": "HaltMarkPriceNotSet",
       "msg": "Halt mark price not set"
     },
     {
-      "code": 383,
+      "code": 6083,
       "name": "HaltMarketsNotCleaned",
       "msg": "Halt markets not cleaned"
     },
     {
-      "code": 384,
+      "code": 6084,
       "name": "HaltMarketNodesNotCleaned",
       "msg": "Halt market nodes not cleaned"
     },
     {
-      "code": 385,
+      "code": 6085,
       "name": "CannotExpireOptionsAfterExpirationThreshold",
       "msg": "Cannot expire options after expiration threshold"
     },
     {
-      "code": 386,
+      "code": 6086,
       "name": "PostOnlyInCross",
       "msg": "Post only order in cross"
     },
     {
-      "code": 387,
+      "code": 6087,
       "name": "FillOrKillNotFullSize",
       "msg": "Fill or kill order was not filled for full size"
     },
     {
-      "code": 388,
+      "code": 6088,
       "name": "InvalidOpenOrdersMapOwner",
       "msg": "Invalid open orders map owner"
     },
     {
-      "code": 389,
+      "code": 6089,
       "name": "AccountDidNotSerialize",
       "msg": "Failed to serialize the account"
     },
     {
-      "code": 390,
+      "code": 6090,
       "name": "OpenOrdersWithNonEmptyPositions",
       "msg": "Cannot close open orders account with non empty positions"
     },
     {
-      "code": 391,
+      "code": 6091,
       "name": "CannotCloseNonEmptyMarginAccount",
       "msg": "Cannot close margin account that is not empty"
     }

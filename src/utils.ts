@@ -1067,7 +1067,7 @@ export async function getAllProgramAccountAddresses(
           memcmp: {
             offset: 0,
             bytes: bs58.encode(
-              anchor.AccountsCoder.accountDiscriminator(accountType)
+              anchor.BorshAccountsCoder.accountDiscriminator(accountType)
             ),
           },
         },
