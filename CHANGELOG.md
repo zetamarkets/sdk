@@ -9,6 +9,10 @@ Version changes are pinned to SDK releases.
 
 - anchor: bump to v0.22.1. ([#98](https://github.com/zetamarkets/sdk/pull/98))
 
+### Breaking
+
+- errors: New anchor release maps program errors from 6000, instead of 300. Errors won't map correctly without upgrading to this version.
+
 ## [0.12.4] 2022-02-28
 
 - client: Add functionality to withdraw and close margin account in single transaction. ([#98](https://github.com/zetamarkets/sdk/pull/98))
