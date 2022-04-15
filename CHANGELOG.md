@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- program: Mark greek accounts as immutable in certain instructions.
+
 ## [0.13.0] 2022-03-13
 
 - anchor: bump to v0.22.1. ([#98](https://github.com/zetamarkets/sdk/pull/98))

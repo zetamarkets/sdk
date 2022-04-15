@@ -1162,7 +1162,7 @@
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1534,7 +1534,7 @@
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1686,7 +1686,7 @@
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2101,7 +2101,7 @@
       "accounts": [
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2254,7 +2254,7 @@
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {

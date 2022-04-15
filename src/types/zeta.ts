@@ -1162,7 +1162,7 @@ export type Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1534,7 +1534,7 @@ export type Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1686,7 +1686,7 @@ export type Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2101,7 +2101,7 @@ export type Zeta = {
       "accounts": [
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2254,7 +2254,7 @@ export type Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -5617,7 +5617,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -5989,7 +5989,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -6141,7 +6141,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -6556,7 +6556,7 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -6709,7 +6709,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "greeks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
