@@ -638,6 +638,34 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "overrideSeriesExpiry",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "OverrideSeriesExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeMarketStrikes",
       "accounts": [
         {
@@ -3538,6 +3566,22 @@ export type Zeta = {
           },
           {
             "name": "expiryTs",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OverrideSeriesExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
             "type": "u64"
           }
         ]
@@ -5093,6 +5137,34 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "overrideSeriesExpiry",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "OverrideSeriesExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeMarketStrikes",
       "accounts": [
         {
@@ -7993,6 +8065,22 @@ export const IDL: Zeta = {
           },
           {
             "name": "expiryTs",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OverrideSeriesExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
             "type": "u64"
           }
         ]

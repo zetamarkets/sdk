@@ -1390,6 +1390,24 @@ export function burnVaultTokenTx(marketKey: PublicKey): Transaction {
   return tx;
 }
 
+export function overrideSeriesExpiryIx(
+  marginAccount: PublicKey,
+  args: OverrideSeriesExpiryArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.overrideSeriesExpiry(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin: Exchange.state.admin,
+      marginAccount: marginAccount,
+    },
+  });
+}
+
+export interface OverrideSeriesExpiryArgs {
+  index: number;
+  timestamp: anchor.BN;
+}
+
 export interface ExpireSeriesOverrideArgs {
   settlementNonce: number;
   settlementPrice: anchor.BN;
