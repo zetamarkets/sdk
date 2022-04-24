@@ -180,6 +180,7 @@ export interface MarginParams {
 // Only support margin accounts for now.
 export enum ProgramAccountType {
   MarginAccount = "MarginAccount",
+  SpreadAccount = "SpreadAccount",
 }
 
 export interface ClockData {

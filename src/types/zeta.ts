@@ -736,34 +736,6 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "overrideSeriesExpiry",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "OverrideSeriesExpiryArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "initializeMarketStrikes",
       "accounts": [
         {
@@ -2507,6 +2479,11 @@ export type Zeta = {
       "name": "positionMovement",
       "accounts": [
         {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": false,
           "isSigner": false
@@ -3826,22 +3803,6 @@ export type Zeta = {
       }
     },
     {
-      "name": "OverrideSeriesExpiryArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "index",
-            "type": "u8"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "UpdateStateArgs",
       "type": {
         "kind": "struct",
@@ -4825,6 +4786,11 @@ export type Zeta = {
       "code": 6100,
       "name": "InvalidMovement",
       "msg": "Invalid movement"
+    },
+    {
+      "code": 6101,
+      "name": "MovementOnExpiredSeries",
+      "msg": "Movement on expired series"
     }
   ]
 };
@@ -5567,34 +5533,6 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "overrideSeriesExpiry",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "OverrideSeriesExpiryArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "initializeMarketStrikes",
       "accounts": [
         {
@@ -7338,6 +7276,11 @@ export const IDL: Zeta = {
       "name": "positionMovement",
       "accounts": [
         {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": false,
           "isSigner": false
@@ -8657,22 +8600,6 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "OverrideSeriesExpiryArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "index",
-            "type": "u8"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "UpdateStateArgs",
       "type": {
         "kind": "struct",
@@ -9656,6 +9583,11 @@ export const IDL: Zeta = {
       "code": 6100,
       "name": "InvalidMovement",
       "msg": "Invalid movement"
+    },
+    {
+      "code": 6101,
+      "name": "MovementOnExpiredSeries",
+      "msg": "Movement on expired series"
     }
   ]
 };

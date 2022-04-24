@@ -343,6 +343,21 @@ export async function getMarginAccount(
   );
 }
 
+export async function getSpreadAccount(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("spread")),
+      zetaGroup.toBuffer(),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getMarketUninitialized(
   programId: PublicKey,
   zetaGroup: PublicKey,

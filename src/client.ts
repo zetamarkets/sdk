@@ -8,7 +8,7 @@ import {
   DEX_PID,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
-import { MarginAccount, TradeEvent } from "./program-types";
+import { SpreadAccount, MarginAccount, TradeEvent } from "./program-types";
 import {
   PublicKey,
   Connection,
@@ -29,6 +29,7 @@ import {
   Position,
   Order,
   Side,
+  MovementType,
 } from "./types";
 import {
   initializeMarginAccountTx,
@@ -44,6 +45,11 @@ import {
   forceCancelOrdersIx,
   liquidateIx,
   settleDexFundsIx,
+  initializeSpreadAccountIx,
+  closeSpreadAccountIx,
+  positionMovementIx,
+  transferExcessSpreadBalanceIx,
+  PositionMovementArg,
 } from "./program-instructions";
 
 import { EventType } from "./events";
@@ -86,6 +92,22 @@ export class Client {
   private _marginAccountAddress: PublicKey;
 
   /**
+   * Stores the user margin account state.
+   */
+  public get spreadAccount(): SpreadAccount | null {
+    return this._spreadAccount;
+  }
+  private _spreadAccount: SpreadAccount | null;
+
+  /**
+   * Client margin account address.
+   */
+  public get spreadAccountAddress(): PublicKey {
+    return this._spreadAccountAddress;
+  }
+  private _spreadAccountAddress: PublicKey;
+
+  /**
    * Client usdc account address.
    */
   public get usdcAccountAddress(): PublicKey {
@@ -119,9 +141,22 @@ export class Client {
   private _positions: Position[];
 
   /**
+   * Returns a list of user current spread account positions.
+   */
+  public get spreadPositions(): Position[] {
+    return this._spreadPositions;
+  }
+  private _spreadPositions: Position[];
+
+  /**
    * The subscription id for the margin account subscription.
    */
   private _marginAccountSubscriptionId: number = undefined;
+
+  /**
+   * The subscription id for the spread account subscription.
+   */
+  private _spreadAccountSubscriptionId: number = undefined;
 
   /**
    * The listener for trade events.
@@ -176,67 +211,6 @@ export class Client {
   private _pollInterval: number = DEFAULT_CLIENT_POLL_INTERVAL;
 
   /**
-   * Getter functions for raw user margin account state.
-   */
-
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
-  public getMarginPositionSize(
-    index: number,
-    decimal: boolean = false
-  ): number {
-    let size =
-      this.marginAccount.productLedgers[index].position.size.toNumber();
-    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
-  }
-
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
-  public getMarginCostOfTrades(
-    index: number,
-    decimal: boolean = false
-  ): number {
-    let costOfTrades =
-      this.marginAccount.productLedgers[index].position.costOfTrades.toNumber();
-    return decimal
-      ? utils.convertNativeIntegerToDecimal(costOfTrades)
-      : costOfTrades;
-  }
-
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
-  public getOpeningOrders(
-    index: number,
-    side: Side,
-    decimal: boolean = false
-  ): number {
-    let orderIndex = side == Side.BID ? 0 : 1;
-    let size =
-      this.marginAccount.productLedgers[index].orderState.openingOrders[
-        orderIndex
-      ].toNumber();
-    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
-  }
-
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
-  public getClosingOrders(index: number, decimal: boolean = true): number {
-    let size =
-      this.marginAccount.productLedgers[
-        index
-      ].orderState.closingOrders.toNumber();
-    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
-  }
-
-  /**
    * User passed callback on load, stored for polling.
    */
   private _callback: (type: EventType, data: any) => void;
@@ -264,6 +238,7 @@ export class Client {
     this._lastUpdateTimestamp = 0;
     this._pendingUpdate = false;
     this._marginAccount = null;
+    this._spreadAccount = null;
   }
 
   /**
@@ -290,7 +265,15 @@ export class Client {
         wallet.publicKey
       );
 
+    let [spreadAccountAddress, _spreadAccountNonce] =
+      await utils.getSpreadAccount(
+        Exchange.programId,
+        Exchange.zetaGroupAddress,
+        wallet.publicKey
+      );
+
     client._marginAccountAddress = marginAccountAddress;
+    client._spreadAccountAddress = spreadAccountAddress;
 
     client._callback = callback;
 
@@ -320,27 +303,51 @@ export class Client {
       connection.commitment
     );
 
+    client._spreadAccountSubscriptionId = connection.onAccountChange(
+      client._spreadAccountAddress,
+      async (accountInfo: AccountInfo<Buffer>, _context: Context) => {
+        client._spreadAccount = client._program.coder.accounts.decode(
+          ProgramAccountType.SpreadAccount,
+          accountInfo.data
+        );
+
+        client.updateSpreadPositions();
+
+        if (callback !== undefined) {
+          callback(EventType.USER, null);
+        }
+      },
+      connection.commitment
+    );
+
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
       wallet.publicKey
     );
 
-    // Update state without awaiting for updateOrders()
     try {
       client._marginAccount =
         (await client._program.account.marginAccount.fetch(
           client._marginAccountAddress
         )) as MarginAccount;
-    } catch (e) {
-      console.log("User does not have a margin account.");
-    }
 
-    if (client.marginAccount !== null) {
       // Set open order pdas for initialized accounts.
       await client.updateOpenOrdersAddresses();
       client.updatePositions();
       // We don't update orders here to make load faster.
       client._pendingUpdate = true;
+    } catch (e) {
+      console.log("User does not have a margin account.");
+    }
+
+    try {
+      client._spreadAccount =
+        (await client._program.account.spreadAccount.fetch(
+          client._spreadAccountAddress
+        )) as SpreadAccount;
+      client.updateSpreadPositions();
+    } catch (e) {
+      console.log("User does not have a spread account.");
     }
 
     client._whitelistDepositAddress = undefined;
@@ -440,10 +447,21 @@ export class Client {
         this._updatingState = false;
         return;
       }
+
+      try {
+        this._spreadAccount = (await this._program.account.spreadAccount.fetch(
+          this._spreadAccountAddress
+        )) as SpreadAccount;
+      } catch (e) {}
     }
+
     if (this._marginAccount !== null) {
       await this.updateOrders();
       this.updatePositions();
+    }
+
+    if (this._spreadAccount !== null) {
+      this.updateSpreadPositions();
     }
 
     this._updatingState = false;
@@ -493,6 +511,37 @@ export class Client {
     console.log(`[CLOSE MARGIN ACCOUNT] Transaction: ${txId}`);
 
     this._marginAccount = null;
+    return txId;
+  }
+
+  /**
+   * Closes a client's spread account
+   */
+  public async closeSpreadAccount(): Promise<TransactionSignature> {
+    if (this._spreadAccount === null) {
+      throw Error("User has no spread account to close");
+    }
+
+    let tx = new Transaction();
+    tx.add(
+      transferExcessSpreadBalanceIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this._spreadAccountAddress,
+        this.publicKey
+      )
+    );
+    tx.add(
+      closeSpreadAccountIx(
+        Exchange.zetaGroupAddress,
+        this.publicKey,
+        this._spreadAccountAddress
+      )
+    );
+    let txId = await utils.processTransaction(this._provider, tx);
+    console.log(`[CLOSE SPREAD ACCOUNT] Transaction: ${txId}`);
+
+    this._spreadAccount = null;
     return txId;
   }
 
@@ -1141,6 +1190,60 @@ export class Client {
     return txIds;
   }
 
+  /**
+   * Moves positions to and from spread and margin account, based on the type.
+   * @param movementType    - type of movement
+   * @param movements       - vector of position movements
+   */
+  public async positionMovement(
+    movementType: MovementType,
+    movements: PositionMovementArg[]
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    this.assertHasMarginAccount();
+
+    if (this.spreadAccount == null) {
+      console.log("User has no spread account. Creating spread account...");
+      tx.add(
+        initializeSpreadAccountIx(
+          Exchange.zetaGroupAddress,
+          this.spreadAccountAddress,
+          this.publicKey
+        )
+      );
+    }
+
+    tx.add(
+      positionMovementIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this.spreadAccountAddress,
+        this.publicKey,
+        Exchange.greeksAddress,
+        Exchange.zetaGroup.oracle,
+        movementType,
+        movements
+      )
+    );
+
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Transfers any non required balance in the spread account to margin account.
+   */
+  public async transferExcessSpreadBalance(): Promise<TransactionSignature> {
+    let tx = new Transaction().add(
+      transferExcessSpreadBalanceIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this.spreadAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
   private getRelevantMarketIndexes(): number[] {
     let indexes = [];
     for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
@@ -1190,6 +1293,25 @@ export class Client {
     this._positions = positions;
   }
 
+  private updateSpreadPositions() {
+    let positions: Position[] = [];
+    for (var i = 0; i < this._spreadAccount.positions.length; i++) {
+      if (this._spreadAccount.positions[i].size.toNumber() != 0) {
+        positions.push({
+          marketIndex: i,
+          market: Exchange.zetaGroup.products[i].market,
+          position: utils.convertNativeLotSizeToDecimal(
+            this._spreadAccount.positions[i].size.toNumber()
+          ),
+          costOfTrades: utils.convertNativeBNToDecimal(
+            this._spreadAccount.positions[i].costOfTrades
+          ),
+        });
+      }
+    }
+    this._spreadPositions = positions;
+  }
+
   private async usdcAccountCheck() {
     try {
       let tokenAccountInfo = await utils.getTokenAccountInfo(
@@ -1235,6 +1357,98 @@ export class Client {
   }
 
   /**
+   * Getter functions for raw user margin account state.
+   */
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getMarginPositionSize(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let size =
+      this.marginAccount.productLedgers[index].position.size.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getMarginCostOfTrades(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let costOfTrades =
+      this.marginAccount.productLedgers[index].position.costOfTrades.toNumber();
+    return decimal
+      ? utils.convertNativeIntegerToDecimal(costOfTrades)
+      : costOfTrades;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getOpeningOrders(
+    index: number,
+    side: Side,
+    decimal: boolean = false
+  ): number {
+    let orderIndex = side == Side.BID ? 0 : 1;
+    let size =
+      this.marginAccount.productLedgers[index].orderState.openingOrders[
+        orderIndex
+      ].toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getClosingOrders(index: number, decimal: boolean = true): number {
+    let size =
+      this.marginAccount.productLedgers[
+        index
+      ].orderState.closingOrders.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * Getter functions for raw user spread account state.
+   */
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getSpreadPositionSize(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let size = this.spreadAccount.positions[index].size.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getSpreadCostOfTrades(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let costOfTrades =
+      this.spreadAccount.positions[index].costOfTrades.toNumber();
+    return decimal
+      ? utils.convertNativeIntegerToDecimal(costOfTrades)
+      : costOfTrades;
+  }
+
+  /**
    * Closes the client websocket subscription to margin account.
    */
   public async close() {
@@ -1244,10 +1458,19 @@ export class Client {
       );
       this._marginAccountSubscriptionId = undefined;
     }
+
+    if (this._spreadAccountSubscriptionId !== undefined) {
+      await this._provider.connection.removeAccountChangeListener(
+        this._spreadAccountSubscriptionId
+      );
+      this._spreadAccountSubscriptionId = undefined;
+    }
+
     if (this._tradeEventListener !== undefined) {
       await this._program.removeEventListener(this._tradeEventListener);
       this._tradeEventListener = undefined;
     }
+
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);
       this._pollIntervalId = undefined;

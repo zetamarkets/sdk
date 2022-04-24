@@ -9,7 +9,14 @@ import {
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import * as utils from "./utils";
 import * as anchor from "@project-serum/anchor";
-import { OrderType, Side, toProgramOrderType, toProgramSide } from "./types";
+import {
+  MovementType,
+  OrderType,
+  Side,
+  toProgramOrderType,
+  toProgramSide,
+  toProgramMovementType,
+} from "./types";
 import * as constants from "./constants";
 
 export async function initializeMarginAccountTx(
@@ -1291,6 +1298,79 @@ export function expireSeriesOverrideIx(
   });
 }
 
+export function initializeSpreadAccountIx(
+  zetaGroup: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeSpreadAccount({
+    accounts: {
+      zetaGroup,
+      spreadAccount,
+      authority: user,
+      zetaProgram: Exchange.programId,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function closeSpreadAccountIx(
+  zetaGroup: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.closeSpreadAccount({
+    accounts: {
+      zetaGroup,
+      spreadAccount,
+      authority: user,
+    },
+  });
+}
+
+export function positionMovementIx(
+  zetaGroup: PublicKey,
+  marginAccount: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey,
+  greeks: PublicKey,
+  oracle: PublicKey,
+  movementType: MovementType,
+  movements: PositionMovementArg[]
+): TransactionInstruction {
+  return Exchange.program.instruction.positionMovement(
+    toProgramMovementType(movementType),
+    movements,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup,
+        marginAccount,
+        spreadAccount,
+        authority: user,
+        greeks,
+        oracle,
+      },
+    }
+  );
+}
+
+export function transferExcessSpreadBalanceIx(
+  zetaGroup: PublicKey,
+  marginAccount: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.transferExcessSpreadBalance({
+    accounts: {
+      zetaGroup,
+      marginAccount,
+      spreadAccount,
+      authority: user,
+    },
+  });
+}
+
 export function settleDexFundsTxs(
   marketKey: PublicKey,
   vaultOwner: PublicKey,
@@ -1464,4 +1544,9 @@ export interface UpdateMarginParametersArgs {
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
   optionShortPutCapPercentage: anchor.BN;
+}
+
+export interface PositionMovementArg {
+  index: number;
+  size: anchor.BN;
 }
