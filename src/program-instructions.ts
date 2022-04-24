@@ -16,13 +16,13 @@ export async function initializeMarginAccountTx(
   userKey: PublicKey
 ): Promise<Transaction> {
   let tx = new Transaction();
-  const [marginAccount, nonce] = await utils.getMarginAccount(
+  const [marginAccount, _nonce] = await utils.getMarginAccount(
     Exchange.programId,
     Exchange.zetaGroupAddress,
     userKey
   );
   tx.add(
-    Exchange.program.instruction.initializeMarginAccount(nonce, {
+    Exchange.program.instruction.initializeMarginAccount({
       accounts: {
         zetaGroup: Exchange.zetaGroupAddress,
         marginAccount: marginAccount,

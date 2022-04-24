@@ -99,19 +99,20 @@ export class RiskCalculator {
    */
   public calculateUnrealizedPnl(marginAccount: MarginAccount): number {
     let pnl = 0;
-    for (var i = 0; i < marginAccount.positions.length; i++) {
-      let position = marginAccount.positions[i];
-      if (position.position.toNumber() == 0) {
+    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
+      let position = marginAccount.productLedgers[i].position;
+      let size = position.size.toNumber();
+      if (size == 0) {
         continue;
       }
-      if (position.position.toNumber() > 0) {
+      if (size > 0) {
         pnl +=
-          convertNativeLotSizeToDecimal(position.position.toNumber()) *
+          convertNativeLotSizeToDecimal(size) *
             convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
-          convertNativeLotSizeToDecimal(position.position.toNumber()) *
+          convertNativeLotSizeToDecimal(size) *
             convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
@@ -127,32 +128,22 @@ export class RiskCalculator {
    */
   public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
     let margin = 0;
-    for (var i = 0; i < marginAccount.positions.length; i++) {
-      let position = marginAccount.positions[i];
-      if (
-        position.openingOrders[0].toNumber() == 0 &&
-        position.openingOrders[1].toNumber() == 0 &&
-        position.position.toNumber() == 0
-      ) {
+    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
+      let ledger = marginAccount.productLedgers[i];
+      let size = ledger.position.size.toNumber();
+      let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
+      let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+      if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
         continue;
       }
 
-      let longLots = convertNativeLotSizeToDecimal(
-        position.openingOrders[0].toNumber()
-      );
+      let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
+      let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
-      let shortLots = convertNativeLotSizeToDecimal(
-        position.openingOrders[1].toNumber()
-      );
-
-      if (position.position.toNumber() > 0) {
-        longLots += Math.abs(
-          convertNativeLotSizeToDecimal(position.position.toNumber())
-        );
-      } else if (position.position.toNumber() < 0) {
-        shortLots += Math.abs(
-          convertNativeLotSizeToDecimal(position.position.toNumber())
-        );
+      if (size > 0) {
+        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      } else if (size < 0) {
+        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
       }
 
       let marginForMarket =
@@ -183,15 +174,16 @@ export class RiskCalculator {
    */
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
     let margin = 0;
-    for (var i = 0; i < marginAccount.positions.length; i++) {
-      let position = marginAccount.positions[i];
-      if (position.position.toNumber() == 0) {
+    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
+      let position = marginAccount.productLedgers[i].position;
+      let size = position.size.toNumber();
+      if (size == 0) {
         continue;
       }
       let positionMargin = this.getMarginRequirement(
         i,
         // This is signed.
-        convertNativeLotSizeToDecimal(position.position.toNumber()),
+        convertNativeLotSizeToDecimal(size),
         MarginType.MAINTENANCE
       );
       if (positionMargin !== undefined) {
@@ -211,32 +203,22 @@ export class RiskCalculator {
     marginAccount: MarginAccount
   ): number {
     let margin = 0;
-    for (var i = 0; i < marginAccount.positions.length; i++) {
-      let position = marginAccount.positions[i];
-      if (
-        position.openingOrders[0].toNumber() == 0 &&
-        position.openingOrders[1].toNumber() == 0 &&
-        position.position.toNumber() == 0
-      ) {
+    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
+      let ledger = marginAccount.productLedgers[i];
+      let size = ledger.position.size.toNumber();
+      let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
+      let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+      if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
         continue;
       }
 
-      let longLots = convertNativeLotSizeToDecimal(
-        position.openingOrders[0].toNumber()
-      );
+      let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
+      let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
-      let shortLots = convertNativeLotSizeToDecimal(
-        position.openingOrders[1].toNumber()
-      );
-
-      if (position.position.toNumber() > 0) {
-        longLots += Math.abs(
-          convertNativeLotSizeToDecimal(position.position.toNumber())
-        );
-      } else if (position.position.toNumber() < 0) {
-        shortLots += Math.abs(
-          convertNativeLotSizeToDecimal(position.position.toNumber())
-        );
+      if (size > 0) {
+        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      } else if (size < 0) {
+        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
       }
 
       let marginForMarket =

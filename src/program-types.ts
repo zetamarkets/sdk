@@ -121,10 +121,18 @@ export interface OpenOrdersMap {
 }
 
 export interface Position {
-  position: anchor.BN;
+  size: anchor.BN;
   costOfTrades: anchor.BN;
+}
+
+export interface OrderState {
   closingOrders: anchor.BN;
   openingOrders: [anchor.BN, anchor.BN];
+}
+
+export interface ProductLedger {
+  position: Position;
+  orderState: OrderState;
 }
 
 export interface MarginAccount {
@@ -135,11 +143,21 @@ export interface MarginAccount {
 
   openOrdersNonce: Array<number>;
   seriesExpiry: Array<anchor.BN>;
-  positions: Array<Position>;
-  positionsPadding: Array<Position>;
+  productLedgers: Array<ProductLedger>;
+  productLedgersPadding: Array<ProductLedger>;
 
   rebalanceAmount: anchor.BN;
   padding: Array<number>;
+}
+
+export interface SpreadAccount {
+  authority: PublicKey;
+  nonce: number;
+  balance: anchor.BN;
+  seriesExpiry: Array<anchor.BN>;
+  positions: Array<Position>;
+  positionsPadding: Array<Position>;
+  // padding: Array<number>;
 }
 
 export interface Greeks {

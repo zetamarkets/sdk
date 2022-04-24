@@ -186,3 +186,14 @@ export interface ClockData {
   timestamp: number;
   slot: number;
 }
+
+export enum MovementType {
+  LOCK = 1,
+  UNLOCK = 2,
+}
+
+export function toProgramMovementType(movementType: MovementType) {
+  if (movementType == MovementType.LOCK) return { lock: {} };
+  if (movementType == MovementType.UNLOCK) return { unlock: {} };
+  throw Error("Invalid side");
+}

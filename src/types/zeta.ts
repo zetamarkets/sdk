@@ -147,18 +147,65 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "initializeSpreadAccount",
+      "accounts": [
         {
-          "name": "nonce",
-          "type": "u8"
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "closeMarginAccount",
       "accounts": [
         {
           "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeSpreadAccount",
+      "accounts": [
+        {
+          "name": "spreadAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -636,6 +683,85 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "settleSpreadPositions",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "settlementAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "expiryTs",
+          "type": "u64"
+        },
+        {
+          "name": "settlementNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "settleSpreadPositionsHalted",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "overrideSeriesExpiry",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "OverrideSeriesExpiryArgs"
+          }
+        }
+      ]
     },
     {
       "name": "initializeMarketStrikes",
@@ -2376,6 +2502,83 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "positionMovement",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "movementType",
+          "type": {
+            "defined": "MovementType"
+          }
+        },
+        {
+          "name": "movements",
+          "type": {
+            "vec": {
+              "defined": "PositionMovementArg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transferExcessSpreadBalance",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -2831,6 +3034,57 @@ export type Zeta = {
       }
     },
     {
+      "name": "spreadAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "seriesExpiry",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
+          },
+          {
+            "name": "positions",
+            "type": {
+              "array": [
+                {
+                  "defined": "Position"
+                },
+                46
+              ]
+            }
+          },
+          {
+            "name": "positionsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Position"
+                },
+                92
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "marginAccount",
       "type": {
         "kind": "struct",
@@ -2870,22 +3124,22 @@ export type Zeta = {
             }
           },
           {
-            "name": "positions",
+            "name": "productLedgers",
             "type": {
               "array": [
                 {
-                  "defined": "Position"
+                  "defined": "ProductLedger"
                 },
                 46
               ]
             }
           },
           {
-            "name": "positionsPadding",
+            "name": "productLedgersPadding",
             "type": {
               "array": [
                 {
-                  "defined": "Position"
+                  "defined": "ProductLedger"
                 },
                 92
               ]
@@ -3307,13 +3561,21 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "position",
+            "name": "size",
             "type": "i64"
           },
           {
             "name": "costOfTrades",
             "type": "u64"
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderState",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "closingOrders",
             "type": "u64"
@@ -3325,6 +3587,26 @@ export type Zeta = {
                 "u64",
                 2
               ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProductLedger",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "position",
+            "type": {
+              "defined": "Position"
+            }
+          },
+          {
+            "name": "orderState",
+            "type": {
+              "defined": "OrderState"
             }
           }
         ]
@@ -3538,6 +3820,22 @@ export type Zeta = {
           },
           {
             "name": "expiryTs",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OverrideSeriesExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
             "type": "u64"
           }
         ]
@@ -3853,6 +4151,22 @@ export type Zeta = {
       }
     },
     {
+      "name": "PositionMovementArg",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "size",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExpirySeriesStatus",
       "type": {
         "kind": "enum",
@@ -3925,6 +4239,23 @@ export type Zeta = {
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MovementType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Undefined"
+          },
+          {
+            "name": "Lock"
+          },
+          {
+            "name": "Unlock"
           }
         ]
       }
@@ -4449,6 +4780,51 @@ export type Zeta = {
       "code": 6091,
       "name": "CannotCloseNonEmptyMarginAccount",
       "msg": "Cannot close margin account that is not empty"
+    },
+    {
+      "code": 6092,
+      "name": "NakedShortCallIsNotAllowed",
+      "msg": "Naked short call is not allowed"
+    },
+    {
+      "code": 6093,
+      "name": "InvalidSpreadAccount",
+      "msg": "Invalid spread account"
+    },
+    {
+      "code": 6094,
+      "name": "CannotCloseNonEmptySpreadAccount",
+      "msg": "Cannot close non empty spread account"
+    },
+    {
+      "code": 6095,
+      "name": "SpreadAccountSeedsMismatch",
+      "msg": "Spread account seeds mismatch"
+    },
+    {
+      "code": 6096,
+      "name": "SpreadAccountHasUnsettledPositions",
+      "msg": "Spread account seeds mismatch"
+    },
+    {
+      "code": 6097,
+      "name": "SpreadAccountInvalidExpirySeriesState",
+      "msg": "Spread account invalid expiry series state"
+    },
+    {
+      "code": 6098,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6099,
+      "name": "FailedMaintenanceMarginRequirement",
+      "msg": "Failed maintenance margin requirement"
+    },
+    {
+      "code": 6100,
+      "name": "InvalidMovement",
+      "msg": "Invalid movement"
     }
   ]
 };
@@ -4602,18 +4978,65 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "initializeSpreadAccount",
+      "accounts": [
         {
-          "name": "nonce",
-          "type": "u8"
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "closeMarginAccount",
       "accounts": [
         {
           "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeSpreadAccount",
+      "accounts": [
+        {
+          "name": "spreadAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -5091,6 +5514,85 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "settleSpreadPositions",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "settlementAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "expiryTs",
+          "type": "u64"
+        },
+        {
+          "name": "settlementNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "settleSpreadPositionsHalted",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "overrideSeriesExpiry",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "OverrideSeriesExpiryArgs"
+          }
+        }
+      ]
     },
     {
       "name": "initializeMarketStrikes",
@@ -6831,6 +7333,83 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "positionMovement",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "movementType",
+          "type": {
+            "defined": "MovementType"
+          }
+        },
+        {
+          "name": "movements",
+          "type": {
+            "vec": {
+              "defined": "PositionMovementArg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transferExcessSpreadBalance",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -7286,6 +7865,57 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "spreadAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "seriesExpiry",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
+          },
+          {
+            "name": "positions",
+            "type": {
+              "array": [
+                {
+                  "defined": "Position"
+                },
+                46
+              ]
+            }
+          },
+          {
+            "name": "positionsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Position"
+                },
+                92
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "marginAccount",
       "type": {
         "kind": "struct",
@@ -7325,22 +7955,22 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "positions",
+            "name": "productLedgers",
             "type": {
               "array": [
                 {
-                  "defined": "Position"
+                  "defined": "ProductLedger"
                 },
                 46
               ]
             }
           },
           {
-            "name": "positionsPadding",
+            "name": "productLedgersPadding",
             "type": {
               "array": [
                 {
-                  "defined": "Position"
+                  "defined": "ProductLedger"
                 },
                 92
               ]
@@ -7762,13 +8392,21 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "position",
+            "name": "size",
             "type": "i64"
           },
           {
             "name": "costOfTrades",
             "type": "u64"
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderState",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "closingOrders",
             "type": "u64"
@@ -7780,6 +8418,26 @@ export const IDL: Zeta = {
                 "u64",
                 2
               ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProductLedger",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "position",
+            "type": {
+              "defined": "Position"
+            }
+          },
+          {
+            "name": "orderState",
+            "type": {
+              "defined": "OrderState"
             }
           }
         ]
@@ -7993,6 +8651,22 @@ export const IDL: Zeta = {
           },
           {
             "name": "expiryTs",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OverrideSeriesExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
             "type": "u64"
           }
         ]
@@ -8308,6 +8982,22 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "PositionMovementArg",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "size",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExpirySeriesStatus",
       "type": {
         "kind": "enum",
@@ -8380,6 +9070,23 @@ export const IDL: Zeta = {
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MovementType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Undefined"
+          },
+          {
+            "name": "Lock"
+          },
+          {
+            "name": "Unlock"
           }
         ]
       }
@@ -8904,6 +9611,51 @@ export const IDL: Zeta = {
       "code": 6091,
       "name": "CannotCloseNonEmptyMarginAccount",
       "msg": "Cannot close margin account that is not empty"
+    },
+    {
+      "code": 6092,
+      "name": "NakedShortCallIsNotAllowed",
+      "msg": "Naked short call is not allowed"
+    },
+    {
+      "code": 6093,
+      "name": "InvalidSpreadAccount",
+      "msg": "Invalid spread account"
+    },
+    {
+      "code": 6094,
+      "name": "CannotCloseNonEmptySpreadAccount",
+      "msg": "Cannot close non empty spread account"
+    },
+    {
+      "code": 6095,
+      "name": "SpreadAccountSeedsMismatch",
+      "msg": "Spread account seeds mismatch"
+    },
+    {
+      "code": 6096,
+      "name": "SpreadAccountHasUnsettledPositions",
+      "msg": "Spread account seeds mismatch"
+    },
+    {
+      "code": 6097,
+      "name": "SpreadAccountInvalidExpirySeriesState",
+      "msg": "Spread account invalid expiry series state"
+    },
+    {
+      "code": 6098,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6099,
+      "name": "FailedMaintenanceMarginRequirement",
+      "msg": "Failed maintenance margin requirement"
+    },
+    {
+      "code": 6100,
+      "name": "InvalidMovement",
+      "msg": "Invalid movement"
     }
   ]
 };

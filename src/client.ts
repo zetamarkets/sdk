@@ -176,6 +176,67 @@ export class Client {
   private _pollInterval: number = DEFAULT_CLIENT_POLL_INTERVAL;
 
   /**
+   * Getter functions for raw user margin account state.
+   */
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getMarginPositionSize(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let size =
+      this.marginAccount.productLedgers[index].position.size.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getMarginCostOfTrades(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let costOfTrades =
+      this.marginAccount.productLedgers[index].position.costOfTrades.toNumber();
+    return decimal
+      ? utils.convertNativeIntegerToDecimal(costOfTrades)
+      : costOfTrades;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getOpeningOrders(
+    index: number,
+    side: Side,
+    decimal: boolean = false
+  ): number {
+    let orderIndex = side == Side.BID ? 0 : 1;
+    let size =
+      this.marginAccount.productLedgers[index].orderState.openingOrders[
+        orderIndex
+      ].toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getClosingOrders(index: number, decimal: boolean = true): number {
+    let size =
+      this.marginAccount.productLedgers[
+        index
+      ].orderState.closingOrders.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
    * User passed callback on load, stored for polling.
    */
   private _callback: (type: EventType, data: any) => void;
@@ -1082,12 +1143,12 @@ export class Client {
 
   private getRelevantMarketIndexes(): number[] {
     let indexes = [];
-    for (var i = 0; i < this._marginAccount.positions.length; i++) {
-      let position = this._marginAccount.positions[i];
+    for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
+      let ledger = this._marginAccount.productLedgers[i];
       if (
-        position.position.toNumber() !== 0 ||
-        position.openingOrders[0].toNumber() != 0 ||
-        position.openingOrders[1].toNumber() != 0
+        ledger.position.size.toNumber() !== 0 ||
+        ledger.orderState.openingOrders[0].toNumber() != 0 ||
+        ledger.orderState.openingOrders[1].toNumber() != 0
       ) {
         indexes.push(i);
       }
@@ -1112,16 +1173,16 @@ export class Client {
 
   private updatePositions() {
     let positions: Position[] = [];
-    for (var i = 0; i < this._marginAccount.positions.length; i++) {
-      if (this._marginAccount.positions[i].position.toNumber() != 0) {
+    for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
+      if (this._marginAccount.productLedgers[i].position.size.toNumber() != 0) {
         positions.push({
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
           position: utils.convertNativeLotSizeToDecimal(
-            this._marginAccount.positions[i].position.toNumber()
+            this._marginAccount.productLedgers[i].position.size.toNumber()
           ),
           costOfTrades: utils.convertNativeBNToDecimal(
-            this._marginAccount.positions[i].costOfTrades
+            this._marginAccount.productLedgers[i].position.costOfTrades
           ),
         });
       }
@@ -1165,6 +1226,12 @@ export class Client {
         }
       })
     );
+  }
+
+  private assertHasMarginAccount() {
+    if (this.marginAccount == null) {
+      throw Error("Margin account doesn't exist!");
+    }
   }
 
   /**
