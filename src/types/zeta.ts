@@ -4774,8 +4774,8 @@ export type Zeta = {
     },
     {
       "code": 6098,
-      "name": "InsufficientFunds",
-      "msg": "Insufficient funds"
+      "name": "InsufficientFundsToCollateralizeSpreadAccount",
+      "msg": "Insufficient funds to collateralize spread account"
     },
     {
       "code": 6099,
@@ -4791,6 +4791,11 @@ export type Zeta = {
       "code": 6101,
       "name": "MovementOnExpiredSeries",
       "msg": "Movement on expired series"
+    },
+    {
+      "code": 6102,
+      "name": "InvalidMovementSize",
+      "msg": "Invalid movement size"
     }
   ]
 };
@@ -9571,8 +9576,8 @@ export const IDL: Zeta = {
     },
     {
       "code": 6098,
-      "name": "InsufficientFunds",
-      "msg": "Insufficient funds"
+      "name": "InsufficientFundsToCollateralizeSpreadAccount",
+      "msg": "Insufficient funds to collateralize spread account"
     },
     {
       "code": 6099,
@@ -9588,6 +9593,11 @@ export const IDL: Zeta = {
       "code": 6101,
       "name": "MovementOnExpiredSeries",
       "msg": "Movement on expired series"
+    },
+    {
+      "code": 6102,
+      "name": "InvalidMovementSize",
+      "msg": "Invalid movement size"
     }
   ]
 };

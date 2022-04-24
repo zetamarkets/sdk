@@ -4774,8 +4774,8 @@
     },
     {
       "code": 6098,
-      "name": "InsufficientFunds",
-      "msg": "Insufficient funds"
+      "name": "InsufficientFundsToCollateralizeSpreadAccount",
+      "msg": "Insufficient funds to collateralize spread account"
     },
     {
       "code": 6099,
@@ -4791,9 +4791,11 @@
       "code": 6101,
       "name": "MovementOnExpiredSeries",
       "msg": "Movement on expired series"
+    },
+    {
+      "code": 6102,
+      "name": "InvalidMovementSize",
+      "msg": "Invalid movement size"
     }
-  ],
-  "metadata": {
-    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
-  }
+  ]
 }
