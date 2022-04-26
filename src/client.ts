@@ -37,6 +37,7 @@ import {
   closeOpenOrdersIx,
   placeOrderIx,
   placeOrderV2Ix,
+  placeOrderV3Ix,
   depositIx,
   withdrawIx,
   cancelOrderIx,
@@ -609,6 +610,79 @@ export class Client {
   }
 
   /**
+   * Places an order on a zeta market.
+   * @param market          the address of the serum market
+   * @param price           the native price of the order (6 d.p as integer)
+   * @param size            the quantity of the order (3 d.p)
+   * @param side            the side of the order. bid / ask
+   * @param orderType       the type of the order. limit / ioc / post-only
+   * @param clientOrderId   optional: client order id (non 0 value)
+   * @param tag             optional: the string tag corresponding to who is inserting
+   * NOTE: If duplicate client order ids are used, after a cancel order,
+   * to cancel the second order with the same client order id,
+   * you may need to crank the corresponding event queue to flush that order id
+   * from the user open orders account before cancelling the second order.
+   * (Depending on the order in which the order was cancelled).
+   */
+   public async placeOrderV3(
+    market: PublicKey,
+    price: number,
+    size: number,
+    side: Side,
+    orderType: OrderType,
+    clientOrderId = 0,
+    tag: String = "SDK",
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
+      let [initIx, _openOrdersPda] = await initializeOpenOrdersIx(
+        market,
+        this.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
+    }
+
+    let orderIx = placeOrderV3Ix(
+      marketIndex,
+      price,
+      size,
+      side,
+      orderType,
+      clientOrderId,
+      tag,
+      this.marginAccountAddress,
+      this.publicKey,
+      openOrdersPda,
+      this._whitelistTradingFeesAddress
+    );
+
+    tx.add(orderIx);
+
+    let txId: TransactionSignature;
+    try {
+      this._openOrdersAccounts[marketIndex] = openOrdersPda;
+      txId = await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      // If we were initializing open orders in the same tx.
+      if (tx.instructions.length > 1) {
+        this._openOrdersAccounts[marketIndex] = PublicKey.default;
+      }
+      throw e;
+    }
+    return txId;
+  }
+
+  /**
    * Cancels a user order by orderId
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
@@ -745,6 +819,57 @@ export class Client {
         newOrderSide,
         newOrderType,
         clientOrderId,
+        this.marginAccountAddress,
+        this.publicKey,
+        this._openOrdersAccounts[marketIndex],
+        this._whitelistTradingFeesAddress
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Cancels a user order by orderId and atomically places an order
+   * @param market     the market address of the order to be cancelled.
+   * @param orderId    the order id of the order.
+   * @param cancelSide       the side of the order. bid / ask.
+   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderSize   the quantity of the order (3 d.p) as integer
+   * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderType   the type of the order, limit / ioc / post-only
+   */
+   public async cancelAndPlaceOrderV3(
+    market: PublicKey,
+    orderId: anchor.BN,
+    cancelSide: Side,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: Side,
+    newOrderType: OrderType,
+    newOrderTag: String = "SDK",
+    clientOrderId = 0
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+    tx.add(
+      cancelOrderIx(
+        marketIndex,
+        this.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        orderId,
+        cancelSide
+      )
+    );
+    tx.add(
+      placeOrderV3Ix(
+        marketIndex,
+        newOrderPrice,
+        newOrderSize,
+        newOrderSide,
+        newOrderType,
+        clientOrderId,
+        newOrderTag,
         this.marginAccountAddress,
         this.publicKey,
         this._openOrdersAccounts[marketIndex],
