@@ -2281,7 +2281,7 @@ export type Zeta = {
       "args": [
         {
           "name": "size",
-          "type": "u32"
+          "type": "u64"
         }
       ]
     },
@@ -6736,7 +6736,7 @@ export const IDL: Zeta = {
       "args": [
         {
           "name": "size",
-          "type": "u32"
+          "type": "u64"
         }
       ]
     },

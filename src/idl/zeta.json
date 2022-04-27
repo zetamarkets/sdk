@@ -2281,7 +2281,7 @@
       "args": [
         {
           "name": "size",
-          "type": "u32"
+          "type": "u64"
         }
       ]
     },
