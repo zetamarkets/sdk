@@ -5,6 +5,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   SystemProgram,
   Transaction,
+  AccountMeta,
 } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import * as utils from "./utils";
@@ -1066,7 +1067,7 @@ export function settlePositionsIx(
   expirationTs: anchor.BN,
   settlementPda: PublicKey,
   nonce: number,
-  marginAccounts: any[]
+  marginAccounts: AccountMeta[]
 ): TransactionInstruction {
   return Exchange.program.instruction.settlePositions(expirationTs, nonce, {
     accounts: {
@@ -1075,6 +1076,25 @@ export function settlePositionsIx(
     },
     remainingAccounts: marginAccounts,
   });
+}
+
+export function settleSpreadPositionsIx(
+  expirationTs: anchor.BN,
+  settlementPda: PublicKey,
+  nonce: number,
+  spreadAccounts: AccountMeta[]
+): TransactionInstruction {
+  return Exchange.program.instruction.settleSpreadPositions(
+    expirationTs,
+    nonce,
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        settlementAccount: settlementPda,
+      },
+      remainingAccounts: spreadAccounts,
+    }
+  );
 }
 
 export function settlePositionsHaltedTxs(

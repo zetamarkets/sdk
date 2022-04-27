@@ -39,6 +39,8 @@ import {
   crankMarketIx,
   settleDexFundsTxs,
   burnVaultTokenTx,
+  settlePositionsIx,
+  settleSpreadPositionsIx,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -858,16 +860,17 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
   );
 }
 
-export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
+export async function settleUsers(
+  userAccounts: any[],
+  expiryTs: anchor.BN,
+  accountType: ProgramAccountType = ProgramAccountType.MarginAccount
+) {
   let [settlement, settlementNonce] = await getSettlement(
     Exchange.programId,
     Exchange.zetaGroup.underlyingMint,
     expiryTs
   );
 
-  // TODO this is naive, the program will throw if user has active
-  // orders for this expiration timestamp.
-  // Maybe add a check, otherwise, make sure clean option markets works.
   let remainingAccounts = userAccounts.map((acc) => {
     return { pubkey: acc.publicKey, isSigner: false, isWritable: true };
   });
@@ -884,13 +887,9 @@ export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
       i + constants.MAX_SETTLEMENT_ACCOUNTS
     );
     tx.add(
-      Exchange.program.instruction.settlePositions(expiryTs, settlementNonce, {
-        accounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
-          settlementAccount: settlement,
-        },
-        remainingAccounts: slice,
-      })
+      accountType == ProgramAccountType.MarginAccount
+        ? settlePositionsIx(expiryTs, settlement, settlementNonce, slice)
+        : settleSpreadPositionsIx(expiryTs, settlement, settlementNonce, slice)
     );
     txs.push(tx);
   }
@@ -1196,4 +1195,27 @@ export async function burnVaultTokens(provider: anchor.Provider) {
     let burnTx = burnVaultTokenTx(market.address);
     await processTransaction(provider, burnTx);
   }
+}
+
+export async function cancelExpiredOrdersAndCleanMarkets(expiryIndex: number) {
+  let marketsToClean = Exchange.markets.getMarketsByExpiryIndex(expiryIndex);
+  let marketAccounts = await Promise.all(
+    marketsToClean.map(async (market) => {
+      await market.cancelAllExpiredOrders();
+      return [
+        { pubkey: market.address, isSigner: false, isWritable: false },
+        {
+          pubkey: market.serumMarket.decoded.bids,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: market.serumMarket.decoded.asks,
+          isSigner: false,
+          isWritable: false,
+        },
+      ];
+    })
+  );
+  await cleanZetaMarkets(marketAccounts);
 }

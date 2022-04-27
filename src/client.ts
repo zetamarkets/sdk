@@ -394,7 +394,7 @@ export class Client {
   }
 
   /**
-   * @param desired interval for client polling.
+   * @param timerInterval   desired interval for client polling.
    */
   private setPolling(timerInterval: number) {
     if (this._pollIntervalId !== undefined) {
@@ -534,8 +534,8 @@ export class Client {
     tx.add(
       closeSpreadAccountIx(
         Exchange.zetaGroupAddress,
-        this.publicKey,
-        this._spreadAccountAddress
+        this._spreadAccountAddress,
+        this.publicKey
       )
     );
     let txId = await utils.processTransaction(this._provider, tx);
@@ -634,17 +634,9 @@ export class Client {
 
     tx.add(orderIx);
 
-    let txId: TransactionSignature;
-    try {
-      this._openOrdersAccounts[marketIndex] = openOrdersPda;
-      txId = await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      // If we were initializing open orders in the same tx.
-      if (tx.instructions.length > 1) {
-        this._openOrdersAccounts[marketIndex] = PublicKey.default;
-      }
-      throw e;
-    }
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+
     return txId;
   }
 
@@ -704,17 +696,97 @@ export class Client {
 
     tx.add(orderIx);
 
-    let txId: TransactionSignature;
-    try {
-      this._openOrdersAccounts[marketIndex] = openOrdersPda;
-      txId = await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      // If we were initializing open orders in the same tx.
-      if (tx.instructions.length > 1) {
-        this._openOrdersAccounts[marketIndex] = PublicKey.default;
-      }
-      throw e;
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+
+    return txId;
+  }
+
+  /**
+   * Places a fill or kill  order on a zeta market.
+   * If successful - it will lock the full size into a user's spread account.
+   * It will create the spread account if the user didn't have one already.
+   * @param market          the address of the serum market
+   * @param price           the native price of the order (6 d.p as integer)
+   * @param size            the quantity of the order (3 d.p)
+   * @param side            the side of the order. bid / ask
+   */
+  public async placeOrderAndLockPosition(
+    market: PublicKey,
+    price: number,
+    size: number,
+    side: Side
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
+      let [initIx, _openOrdersPda] = await initializeOpenOrdersIx(
+        market,
+        this.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
+
+    let orderIx = placeOrderV2Ix(
+      marketIndex,
+      price,
+      size,
+      side,
+      OrderType.FILLORKILL,
+      0, // Default to none for now.
+      this.marginAccountAddress,
+      this.publicKey,
+      openOrdersPda,
+      this._whitelistTradingFeesAddress
+    );
+
+    tx.add(orderIx);
+
+    if (this.spreadAccount == null) {
+      console.log("User has no spread account. Creating spread account...");
+      tx.add(
+        initializeSpreadAccountIx(
+          Exchange.zetaGroupAddress,
+          this.spreadAccountAddress,
+          this.publicKey
+        )
+      );
+    }
+
+    let movementSize = side == Side.BID ? size : -size;
+    let movements: PositionMovementArg[] = [
+      {
+        index: marketIndex,
+        size: new anchor.BN(movementSize),
+      },
+    ];
+
+    tx.add(
+      positionMovementIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this.spreadAccountAddress,
+        this.publicKey,
+        Exchange.greeksAddress,
+        Exchange.zetaGroup.oracle,
+        MovementType.LOCK,
+        movements
+      )
+    );
+
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+
     return txId;
   }
 
@@ -774,9 +846,9 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderPrice  the native price of the order (6 d.p) as integer
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderSide   the side of the order. bid / ask
    */
   public async cancelAndPlaceOrder(
     market: PublicKey,
@@ -820,9 +892,9 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderPrice  the native price of the order (6 d.p) as integer
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderSide   the side of the order. bid / ask
    * @param newOrderType   the type of the order, limit / ioc / post-only
    */
   public async cancelAndPlaceOrderV2(
@@ -868,7 +940,7 @@ export class Client {
    * Cancels a user order by client order id and atomically places an order by new client order id.
    * @param market                  the market address of the order to be cancelled and new order.
    * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderprice           the native price of the order (6 d.p) as integer
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
    * @param newOrderSize            the quantity of the order (3 d.p) as integer
    * @param newOrderSide            the side of the order. bid / ask
    * @param newOrderClientOrderId   the client order id for the new order
@@ -912,7 +984,7 @@ export class Client {
    * Cancels a user order by client order id and atomically places an order by new client order id.
    * @param market                  the market address of the order to be cancelled and new order.
    * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderprice           the native price of the order (6 d.p) as integer
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
    * @param newOrderSize            the quantity of the order (3 d.p) as integer
    * @param newOrderSide            the side of the order. bid / ask
    * @param newOrderType            the type of the order, limit / ioc / post-only
