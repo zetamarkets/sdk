@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- program: Change liquidate() size argument from u32 to u64.
+- program: Change liquidate() size argument in program from u32 to u64. ([#103](https://github.com/zetamarkets/sdk/pull/103))
 - program: Mark greek accounts as immutable in certain instructions.
 
 ## [0.13.0] 2022-03-13
