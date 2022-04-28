@@ -28,6 +28,7 @@ export const CRANK_ACCOUNT_LIMIT = 12;
 export const MARKET_LOAD_LIMIT = 12;
 
 export const DEFAULT_ORDERBOOK_DEPTH = 5;
+export const MAX_ORDER_TAG_LENGTH = 4;
 
 export const PYTH_PRICE_FEEDS = {
   localnet: {
