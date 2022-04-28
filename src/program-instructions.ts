@@ -397,6 +397,11 @@ export function placeOrderV3Ix(
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
+  if (tag.length > constants.MAX_ORDER_TAG_LENGTH) {
+    throw Error(
+      `Tag is too long! Max length = ${constants.MAX_ORDER_TAG_LENGTH}`
+    );
+  }
   let marketData = Exchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined

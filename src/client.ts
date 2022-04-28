@@ -624,14 +624,14 @@ export class Client {
    * from the user open orders account before cancelling the second order.
    * (Depending on the order in which the order was cancelled).
    */
-   public async placeOrderV3(
+  public async placeOrderV3(
     market: PublicKey,
     price: number,
     size: number,
     side: Side,
     orderType: OrderType,
     clientOrderId = 0,
-    tag: String = "SDK",
+    tag: String = "SDK"
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -788,6 +788,7 @@ export class Client {
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
    * @param newOrderside   the side of the order. bid / ask
    * @param newOrderType   the type of the order, limit / ioc / post-only
+   * @param clientOrderId   optional: client order id (non 0 value)
    */
   public async cancelAndPlaceOrderV2(
     market: PublicKey,
@@ -837,8 +838,10 @@ export class Client {
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
    * @param newOrderside   the side of the order. bid / ask
    * @param newOrderType   the type of the order, limit / ioc / post-only
+   * @param clientOrderId   optional: client order id (non 0 value)
+   * @param tag             optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-   public async cancelAndPlaceOrderV3(
+  public async cancelAndPlaceOrderV3(
     market: PublicKey,
     orderId: anchor.BN,
     cancelSide: Side,
@@ -846,8 +849,8 @@ export class Client {
     newOrderSize: number,
     newOrderSide: Side,
     newOrderType: OrderType,
-    newOrderTag: String = "SDK",
-    clientOrderId = 0
+    clientOrderId = 0,
+    newOrderTag: String = "SDK"
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
