@@ -177,7 +177,6 @@ export interface MarginParams {
   optionShortPutCapPercentage: number;
 }
 
-// Only support margin accounts for now.
 export enum ProgramAccountType {
   MarginAccount = "MarginAccount",
   SpreadAccount = "SpreadAccount",

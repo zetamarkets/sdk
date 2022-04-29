@@ -861,7 +861,7 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
 }
 
 export async function settleUsers(
-  userAccounts: any[],
+  keys: PublicKey[],
   expiryTs: anchor.BN,
   accountType: ProgramAccountType = ProgramAccountType.MarginAccount
 ) {
@@ -871,8 +871,8 @@ export async function settleUsers(
     expiryTs
   );
 
-  let remainingAccounts = userAccounts.map((acc) => {
-    return { pubkey: acc.publicKey, isSigner: false, isWritable: true };
+  let remainingAccounts = keys.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
   });
 
   let txs = [];
