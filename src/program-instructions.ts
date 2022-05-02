@@ -1173,8 +1173,26 @@ export function settleSpreadPositionsIx(
   );
 }
 
+export function settleSpreadPositionsHaltedTxs(
+  spreadAccounts: AccountMeta[],
+  admin: PublicKey
+): Transaction[] {
+  let txs = [];
+  for (
+    var i = 0;
+    i < spreadAccounts.length;
+    i += constants.MAX_SETTLEMENT_ACCOUNTS
+  ) {
+    let slice = spreadAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
+    txs.push(
+      new Transaction().add(settleSpreadPositionsHaltedIx(slice, admin))
+    );
+  }
+  return txs;
+}
+
 export function settlePositionsHaltedTxs(
-  marginAccounts: any[],
+  marginAccounts: AccountMeta[],
   admin: PublicKey
 ): Transaction[] {
   let txs = [];
@@ -1190,7 +1208,7 @@ export function settlePositionsHaltedTxs(
 }
 
 export function settlePositionsHaltedIx(
-  marginAccounts: any[],
+  marginAccounts: AccountMeta[],
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.settlePositionsHalted({
@@ -1201,6 +1219,21 @@ export function settlePositionsHaltedIx(
       admin,
     },
     remainingAccounts: marginAccounts,
+  });
+}
+
+export function settleSpreadPositionsHaltedIx(
+  spreadAccounts: AccountMeta[],
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.settleSpreadPositionsHalted({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin,
+    },
+    remainingAccounts: spreadAccounts,
   });
 }
 

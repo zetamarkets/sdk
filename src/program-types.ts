@@ -200,16 +200,6 @@ export interface ProductGreeks {
   volatility: AnchorDecimal;
 }
 
-export interface TradeEvent {
-  marginAccount: PublicKey;
-  index: number;
-  costOfTrades: anchor.BN;
-  size: anchor.BN;
-  isBid: boolean;
-  clientOrderId: anchor.BN;
-  orderId: anchor.BN;
-}
-
 export interface InsuranceDepositAccount {
   nonce: number;
   amount: anchor.BN;
@@ -233,4 +223,21 @@ export interface SocializedLossAccount {
 export interface WhitelistTradingFeesAccount {
   nonce: number;
   userKey: PublicKey;
+}
+
+export interface TradeEvent {
+  marginAccount: PublicKey;
+  index: number;
+  costOfTrades: anchor.BN;
+  size: anchor.BN;
+  isBid: boolean;
+  clientOrderId: anchor.BN;
+  orderId: anchor.BN;
+}
+
+export interface PositionMovementEvent {
+  // Positive if movement from margin into spread, else negative.
+  netBalanceTransfer: anchor.BN;
+  marginAccountBalance: anchor.BN;
+  spreadAccountBalance: anchor.BN;
 }

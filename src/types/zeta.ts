@@ -4443,6 +4443,26 @@ export type Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "PositionMovementEvent",
+      "fields": [
+        {
+          "name": "netBalanceTransfer",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "marginAccountBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "spreadAccountBalance",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -4965,6 +4985,16 @@ export type Zeta = {
       "code": 6103,
       "name": "InvalidMovementSize",
       "msg": "Invalid movement size"
+    },
+    {
+      "code": 6104,
+      "name": "ExceededMaxPositionMovements",
+      "msg": "Exceeded max position movements"
+    },
+    {
+      "code": 6105,
+      "name": "ExceededMaxSpreadAccountContracts",
+      "msg": "Exceeded max spread account contracts"
     }
   ]
 };
@@ -9414,6 +9444,26 @@ export const IDL: Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "PositionMovementEvent",
+      "fields": [
+        {
+          "name": "netBalanceTransfer",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "marginAccountBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "spreadAccountBalance",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -9936,6 +9986,16 @@ export const IDL: Zeta = {
       "code": 6103,
       "name": "InvalidMovementSize",
       "msg": "Invalid movement size"
+    },
+    {
+      "code": 6104,
+      "name": "ExceededMaxPositionMovements",
+      "msg": "Exceeded max position movements"
+    },
+    {
+      "code": 6105,
+      "name": "ExceededMaxSpreadAccountContracts",
+      "msg": "Exceeded max spread account contracts"
     }
   ]
 };

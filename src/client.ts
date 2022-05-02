@@ -3,12 +3,19 @@ import * as utils from "./utils";
 import {
   MAX_SETTLE_AND_CLOSE_PER_TX,
   MAX_CANCELS_PER_TX,
+  MAX_POSITION_MOVEMENTS,
   DEFAULT_CLIENT_POLL_INTERVAL,
   DEFAULT_CLIENT_TIMER_INTERVAL,
   DEX_PID,
+  DEFAULT_ORDER_TAG,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
-import { SpreadAccount, MarginAccount, TradeEvent } from "./program-types";
+import {
+  SpreadAccount,
+  MarginAccount,
+  TradeEvent,
+  PositionMovementEvent,
+} from "./program-types";
 import {
   PublicKey,
   Connection,
@@ -716,7 +723,8 @@ export class Client {
     market: PublicKey,
     price: number,
     size: number,
-    side: Side
+    side: Side,
+    tag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
 
@@ -738,13 +746,14 @@ export class Client {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx = placeOrderV2Ix(
+    let orderIx = placeOrderV3Ix(
       marketIndex,
       price,
       size,
       side,
       OrderType.FILLORKILL,
       0, // Default to none for now.
+      tag,
       this.marginAccountAddress,
       this.publicKey,
       openOrdersPda,
@@ -813,7 +822,7 @@ export class Client {
     side: Side,
     orderType: OrderType,
     clientOrderId = 0,
-    tag: String = "SDK"
+    tag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -1008,12 +1017,12 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderPrice  the native price of the order (6 d.p) as integer
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderSide   the side of the order. bid / ask
    * @param newOrderType   the type of the order, limit / ioc / post-only
    * @param clientOrderId   optional: client order id (non 0 value)
-   * @param tag             optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
   public async cancelAndPlaceOrderV3(
     market: PublicKey,
@@ -1024,7 +1033,7 @@ export class Client {
     newOrderSide: Side,
     newOrderType: OrderType,
     clientOrderId = 0,
-    newOrderTag: String = "SDK"
+    newOrderTag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -1391,6 +1400,12 @@ export class Client {
     movementType: MovementType,
     movements: PositionMovementArg[]
   ): Promise<TransactionSignature> {
+    if (movements.length > MAX_POSITION_MOVEMENTS) {
+      throw new Error(
+        `Max position movements exceeded. Max = ${MAX_POSITION_MOVEMENTS} < ${movements.length}`
+      );
+    }
+
     let tx = new Transaction();
     this.assertHasMarginAccount();
 
@@ -1419,6 +1434,62 @@ export class Client {
     );
 
     return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Moves positions to and from spread and margin account, based on the type.
+   * @param movementType    - type of movement
+   * @param movements       - vector of position movements
+   */
+  public async simulatePositionMovement(
+    movementType: MovementType,
+    movements: PositionMovementArg[]
+  ): Promise<PositionMovementEvent> {
+    if (movements.length > MAX_POSITION_MOVEMENTS) {
+      throw new Error(
+        `Max position movements exceeded. Max = ${MAX_POSITION_MOVEMENTS} < ${movements.length}`
+      );
+    }
+
+    let tx = new Transaction();
+    this.assertHasMarginAccount();
+
+    if (this.spreadAccount == null) {
+      console.log("User has no spread account. Creating spread account...");
+      tx.add(
+        initializeSpreadAccountIx(
+          Exchange.zetaGroupAddress,
+          this.spreadAccountAddress,
+          this.publicKey
+        )
+      );
+    }
+
+    tx.add(
+      positionMovementIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this.spreadAccountAddress,
+        this.publicKey,
+        Exchange.greeksAddress,
+        Exchange.zetaGroup.oracle,
+        movementType,
+        movements
+      )
+    );
+
+    let response = await this.provider.simulate(tx);
+    let parser = new anchor.EventParser(
+      Exchange.programId,
+      Exchange.program.coder
+    );
+
+    let events = [];
+    parser.parseLogs(response.value.logs, (event) => {
+      events.push(event);
+    });
+
+    return events[0].data;
   }
 
   /**
@@ -1473,7 +1544,7 @@ export class Client {
         positions.push({
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
-          position: utils.convertNativeLotSizeToDecimal(
+          size: utils.convertNativeLotSizeToDecimal(
             this._marginAccount.productLedgers[i].position.size.toNumber()
           ),
           costOfTrades: utils.convertNativeBNToDecimal(
@@ -1492,7 +1563,7 @@ export class Client {
         positions.push({
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
-          position: utils.convertNativeLotSizeToDecimal(
+          size: utils.convertNativeLotSizeToDecimal(
             this._spreadAccount.positions[i].size.toNumber()
           ),
           costOfTrades: utils.convertNativeBNToDecimal(

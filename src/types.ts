@@ -102,7 +102,7 @@ export function orderEquals(
 export interface Position {
   marketIndex: number;
   market: PublicKey;
-  position: number;
+  size: number;
   costOfTrades: number;
 }
 
@@ -110,7 +110,7 @@ export function positionEquals(a: Position, b: Position): boolean {
   return (
     a.marketIndex === b.marketIndex &&
     a.market.equals(b.market) &&
-    a.position === b.position &&
+    a.size === b.size &&
     a.costOfTrades === b.costOfTrades
   );
 }
