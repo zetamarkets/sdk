@@ -37,11 +37,15 @@ export class Oracle {
     return priceData.price;
   }
 
-  public async subscribePriceFeeds(callback: (price: OraclePrice) => void) {
+  public async subscribePriceFeeds(
+    underlyingMint: PublicKey,
+    callback: (price: OraclePrice) => void
+  ) {
     if (this._callback != undefined) {
-      throw Error("Oracle price feeds already subscribed to!");
+      throw Error("Oracle price feed already subscribed to!");
     }
     this._callback = callback;
+
     let feeds = Object.keys(constants.PYTH_PRICE_FEEDS[this._network]);
     for (var i = 0; i < feeds.length; i++) {
       let feed = feeds[i];

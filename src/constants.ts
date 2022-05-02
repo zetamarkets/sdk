@@ -1,10 +1,17 @@
 import { PublicKey } from "@solana/web3.js";
 
 export const MINTS = {
-  SOL: new PublicKey("So11111111111111111111111111111111111111112"),
+  localnet: {
+    SOL: new PublicKey("So11111111111111111111111111111111111111112"),
+    MOCK_BTC: new PublicKey("HNeqq5M15PXizSS9eityxCWwK4KidbsMwRi4jvEH72c2"),
+  },
+  devnet: {
+    SOL: new PublicKey("So11111111111111111111111111111111111111112"),
+  },
+  mainnet: {
+    SOL: new PublicKey("So11111111111111111111111111111111111111112"),
+  },
 };
-
-export const UNDERLYINGS = [MINTS["SOL"]];
 
 export const DEX_PID = {
   localnet: new PublicKey("5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"),
@@ -33,6 +40,7 @@ export const MAX_ORDER_TAG_LENGTH = 4;
 export const PYTH_PRICE_FEEDS = {
   localnet: {
     "SOL/USD": new PublicKey("2pRCJksgaoKRMqBfa7NTdd6tLYe9wbDFGCcCCZ6si3F7"),
+    "BTC/USD": new PublicKey("9WD5hzrwEtwbYyZ34BRnrSS11TzD7PTMyszKV5Ur4JxJ"),
   },
   devnet: {
     "SOL/USD": new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),

@@ -328,6 +328,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     network: Network,
     connection: Connection,
     opts: ConfirmOptions,
+    zetaGroupIndex: number,
     wallet = new DummyWallet(),
     throttleMs = 0,
     callback?: (event: EventType, data: any) => void
@@ -357,7 +358,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     // TODO: Use constants since we only have 1 underlying for now.
     const [underlying, _underlyingNonce] = await utils.getUnderlying(
       programId,
-      0
+      zetaGroupIndex
     );
 
     let underlyingAccount: any =
@@ -370,7 +371,9 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
 
     exchange._zetaGroupAddress = zetaGroup;
 
-    await exchange.subscribeOracle(callback);
+    try {
+      await exchange.subscribeOracle(underlyingAccount.mint, callback);
+    } catch (e) {}
     await exchange.updateState();
     await exchange.updateZetaGroup();
 
@@ -451,13 +454,9 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     oracle: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
+    underlyingMint: PublicKey,
     callback?: (type: EventType, data: any) => void
   ) {
-    // TODO fix to be dynamic once we support more than 1 underlying.
-    // TODO if deployment breaks midway, this won't necessarily represent the index you want to initialize.
-    // let underlyingIndex = this.state.numUnderlyings;
-    let underlyingMint = constants.UNDERLYINGS[0];
-
     const [zetaGroup, _zetaGroupNonce] = await utils.getZetaGroup(
       this.program.programId,
       underlyingMint
@@ -514,7 +513,9 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     this.subscribeZetaGroup(callback);
     this.subscribeClock(callback);
     this.subscribeGreeks(callback);
-    await this.subscribeOracle(callback);
+    try {
+      await this.subscribeOracle(underlyingMint, callback);
+    } catch (e) {}
   }
 
   /**
@@ -827,16 +828,20 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
   }
 
   private async subscribeOracle(
+    underlyingMint: PublicKey,
     callback?: (type: EventType, data: any) => void
   ) {
-    await this._oracle.subscribePriceFeeds((price: OraclePrice) => {
-      if (this._isInitialized) {
-        this._riskCalculator.updateMarginRequirements();
+    await this._oracle.subscribePriceFeeds(
+      underlyingMint,
+      (price: OraclePrice) => {
+        if (this._isInitialized) {
+          this._riskCalculator.updateMarginRequirements();
+        }
+        if (callback !== undefined) {
+          callback(EventType.ORACLE, price);
+        }
       }
-      if (callback !== undefined) {
-        callback(EventType.ORACLE, price);
-      }
-    });
+    );
   }
 
   private async handlePolling(

@@ -42,6 +42,7 @@ import {
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
+import { Network } from "./network";
 
 export async function getState(
   programId: PublicKey
