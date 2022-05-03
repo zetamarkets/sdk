@@ -9,7 +9,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "cp -r ../../target/idl/zeta.json ./src/idl/zeta.json && cp -r ../../target/types/zeta.ts ./src/types/. && ./node_modules/.bin/tsc",
-    "docs": "typedoc --tsconfig ./tsconfig.json && cp ./logo.png ./docs/logo.png"
+    "docs": "typedoc --tsconfig ./tsconfig.json && cp ./logo.png ./docs/logo.png",
+    "build-no-idl": "./node_modules/.bin/tsc"
   },
   "dependencies": {
     "@project-serum/anchor": "0.22.1",
