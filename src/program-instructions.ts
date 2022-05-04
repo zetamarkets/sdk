@@ -1631,6 +1631,7 @@ export interface StateParams {
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
+  positionMovementFeeBps: number;
 }
 
 export interface UpdatePricingParametersArgs {

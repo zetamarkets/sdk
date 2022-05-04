@@ -78,3 +78,4 @@ export const POSITION_PRECISION = 3;
 export const DEFAULT_ORDER_TAG = "SDK";
 
 export const MAX_POSITION_MOVEMENTS = 10;
+export const BPS_DENOMINATOR = 10_000;

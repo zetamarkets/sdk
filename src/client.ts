@@ -1672,7 +1672,7 @@ export class Client {
    * @param index - market index.
    * @param decimal - whether to convert to readable decimal.
    */
-  public getClosingOrders(index: number, decimal: boolean = true): number {
+  public getClosingOrders(index: number, decimal: boolean = false): number {
     let size =
       this.marginAccount.productLedgers[
         index

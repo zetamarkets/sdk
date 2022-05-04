@@ -41,6 +41,7 @@ import {
   burnVaultTokenTx,
   settlePositionsIx,
   settleSpreadPositionsIx,
+  PositionMovementArg,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -1264,4 +1265,29 @@ export async function cancelExpiredOrdersAndCleanMarkets(expiryIndex: number) {
     })
   );
   await cleanZetaMarkets(marketAccounts);
+}
+
+/**
+ * Calculates the total movement fees for a set of movements.
+ * @param movements   list of position movements.
+ * @param spotPrice   spot price in decimal
+ * @param feeBps      fees charged in bps
+ * @param decimal     whether to return fees in decimal or native integer (defaults to native integer)
+ */
+export function calculateMovementFees(
+  movements: PositionMovementArg[],
+  spotPrice: number,
+  feeBps: number,
+  decimal: boolean = false
+): number {
+  let fees = 0;
+  let totalContracts = 0;
+  for (var i = 0; i < movements.length; i++) {
+    totalContracts += convertNativeLotSizeToDecimal(
+      Math.abs(movements[i].size.toNumber())
+    );
+  }
+  let notionalValue = totalContracts * spotPrice;
+  let fee = (notionalValue * feeBps) / constants.BPS_DENOMINATOR;
+  return decimal ? fee : convertDecimalToNativeInteger(fee);
 }

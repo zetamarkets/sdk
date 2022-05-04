@@ -2990,11 +2990,15 @@
             "type": "u32"
           },
           {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                159
+                158
               ]
             }
           }
@@ -3926,6 +3930,10 @@
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -4014,6 +4022,10 @@
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -4459,6 +4471,11 @@
         },
         {
           "name": "spreadAccountBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "movementFees",
           "type": "u64",
           "index": false
         }

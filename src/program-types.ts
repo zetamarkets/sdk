@@ -21,6 +21,7 @@ export interface State {
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
+  positionMovementFeeBps: number;
   padding: Array<number>;
 }
 
@@ -240,4 +241,5 @@ export interface PositionMovementEvent {
   netBalanceTransfer: anchor.BN;
   marginAccountBalance: anchor.BN;
   spreadAccountBalance: anchor.BN;
+  movementFees: anchor.BN;
 }

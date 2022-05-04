@@ -2990,11 +2990,15 @@ export type Zeta = {
             "type": "u32"
           },
           {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                159
+                158
               ]
             }
           }
@@ -3926,6 +3930,10 @@ export type Zeta = {
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -4014,6 +4022,10 @@ export type Zeta = {
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -4459,6 +4471,11 @@ export type Zeta = {
         },
         {
           "name": "spreadAccountBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "movementFees",
           "type": "u64",
           "index": false
         }
@@ -7991,11 +8008,15 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                159
+                158
               ]
             }
           }
@@ -8927,6 +8948,10 @@ export const IDL: Zeta = {
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -9015,6 +9040,10 @@ export const IDL: Zeta = {
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -9460,6 +9489,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "spreadAccountBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "movementFees",
           "type": "u64",
           "index": false
         }
