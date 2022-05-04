@@ -3225,6 +3225,15 @@ export type Zeta = {
                 92
               ]
             }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                263
+              ]
+            }
           }
         ]
       }
@@ -8241,6 +8250,15 @@ export const IDL: Zeta = {
                   "defined": "Position"
                 },
                 92
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                263
               ]
             }
           }

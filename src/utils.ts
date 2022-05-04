@@ -626,52 +626,6 @@ export async function processTransaction(
   }
 }
 
-/*
-export async function simulateTransaction(
-  provider: anchor.Provider,
-  tx: Transaction,
-  signers?: Array<Signer>,
-  opts?: ConfirmOptions
-) {
-  let resp;
-  try {
-    resp = await provider.simulate(tx, signers, opts);
-  } catch (err) {
-    let translatedErr = anchor.ProgramError.parse(err, idlErrors);
-    if (translatedErr !== null) {
-      throw translatedErr;
-    }
-    let customErr = parseCustomError(err);
-    if (customErr != null) {
-      throw customErr;
-    }
-
-    let nativeErr = NativeError.parse(err);
-    if (nativeErr != null) {
-      throw nativeErr;
-    }
-    throw err;
-  }
-  if (resp === undefined) {
-    throw new Error("Unable to simulate transaction");
-  }
-  const logs = resp.logs;
-  if (!logs) {
-    throw new Error("Simulated logs not found");
-  }
-
-  const events: Event<IdlEvent, IdlTypes<IDL>>[] = [];
-  let parser = new anchor.EventParser(
-    Exchange.programId,
-    Exchange.program.coder
-  );
-  parser.parseLogs(logs, (event) => {
-    events.push(event);
-  });
-  return { events, raw: logs };
-}
-*/
-
 const uint64 = (property = "uint64") => {
   return BufferLayout.blob(8, property);
 };

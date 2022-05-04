@@ -158,7 +158,7 @@ export interface SpreadAccount {
   seriesExpiry: Array<anchor.BN>;
   positions: Array<Position>;
   positionsPadding: Array<Position>;
-  // padding: Array<number>;
+  padding: Array<number>;
 }
 
 export interface Greeks {
