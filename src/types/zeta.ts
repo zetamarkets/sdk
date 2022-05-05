@@ -4499,6 +4499,26 @@ export type Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "PlaceOrderEvent",
+      "fields": [
+        {
+          "name": "fee",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oraclePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -9533,6 +9553,26 @@ export const IDL: Zeta = {
         {
           "name": "movementFees",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PlaceOrderEvent",
+      "fields": [
+        {
+          "name": "fee",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "oraclePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
           "index": false
         }
       ]
