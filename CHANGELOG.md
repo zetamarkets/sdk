@@ -13,7 +13,7 @@ Version changes are pinned to SDK releases.
 
 ### Breaking
 
-- instruction: `InitializeMarginAccount` now explicitly specifies the payer for composability reasons.
+- instruction: `InitializeMarginAccount` now explicitly specifies the payer for composability reasons. ([#108](https://github.com/zetamarkets/sdk/pull/108))
 - instruction: `InitializeMarginAccount` no longer requires a nonce to be passed in for the PDA generation. ([#102](https://github.com/zetamarkets/sdk/pull/102))
 - client: SDK type `Position` field `position` has been renamed to `size`. ([#102](https://github.com/zetamarkets/sdk/pull/102))
 - program-types: Smart contract type `Position` field `position` has been renamed to `size`. ([#102](https://github.com/zetamarkets/sdk/pull/102))
