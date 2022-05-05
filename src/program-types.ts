@@ -226,6 +226,12 @@ export interface WhitelistTradingFeesAccount {
   userKey: PublicKey;
 }
 
+export interface PlaceOrderEvent {
+  fee: anchor.BN;
+  oraclePrice: anchor.BN;
+  orderId: anchor.BN;
+}
+
 export interface TradeEvent {
   marginAccount: PublicKey;
   index: number;
