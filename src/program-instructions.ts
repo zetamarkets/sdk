@@ -20,27 +20,21 @@ import {
 } from "./types";
 import * as constants from "./constants";
 
-export async function initializeMarginAccountTx(
-  userKey: PublicKey
-): Promise<Transaction> {
-  let tx = new Transaction();
-  const [marginAccount, _nonce] = await utils.getMarginAccount(
-    Exchange.programId,
-    Exchange.zetaGroupAddress,
-    userKey
-  );
-  tx.add(
-    Exchange.program.instruction.initializeMarginAccount({
-      accounts: {
-        zetaGroup: Exchange.zetaGroupAddress,
-        marginAccount: marginAccount,
-        authority: userKey,
-        zetaProgram: Exchange.programId,
-        systemProgram: SystemProgram.programId,
-      },
-    })
-  );
-  return tx;
+export function initializeMarginAccountIx(
+  zetaGroup: PublicKey,
+  marginAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeMarginAccount({
+    accounts: {
+      zetaGroup,
+      marginAccount,
+      authority: user,
+      payer: user,
+      zetaProgram: Exchange.programId,
+      systemProgram: SystemProgram.programId,
+    },
+  });
 }
 
 export function closeMarginAccountIx(
@@ -1437,6 +1431,7 @@ export function initializeSpreadAccountIx(
       zetaGroup,
       spreadAccount,
       authority: user,
+      payer: user,
       zetaProgram: Exchange.programId,
       systemProgram: SystemProgram.programId,
     },
