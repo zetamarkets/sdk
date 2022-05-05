@@ -39,7 +39,7 @@ import {
   MovementType,
 } from "./types";
 import {
-  initializeMarginAccountTx,
+  initializeMarginAccountIx,
   closeMarginAccountIx,
   initializeOpenOrdersIx,
   closeOpenOrdersIx,
@@ -485,7 +485,13 @@ export class Client {
     let tx = new Transaction();
     if (this._marginAccount === null) {
       console.log("User has no margin account. Creating margin account...");
-      tx = await initializeMarginAccountTx(this.publicKey);
+      tx.add(
+        initializeMarginAccountIx(
+          Exchange.zetaGroupAddress,
+          this._marginAccountAddress,
+          this.publicKey
+        )
+      );
     }
     tx.add(
       await depositIx(
