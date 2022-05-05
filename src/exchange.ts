@@ -25,6 +25,13 @@ import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
 import { ClockData, MarginParams, DummyWallet, Wallet } from "./types";
 import * as instructions from "./program-instructions";
+
+export enum Underlying {
+  SOL,
+  BTC,
+  LUNA
+}
+
 export class Exchange {
   /**
    * Whether the object has been loaded.
@@ -81,6 +88,11 @@ export class Exchange {
   }
   private _zetaGroup: ZetaGroup;
 
+
+  public getUnderlying(): Underlying {
+    return this._underlying;
+  }
+  private _underlying:  Underlying;
   // Program global addresses that will remain constant.
 
   /**
@@ -328,7 +340,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     network: Network,
     connection: Connection,
     opts: ConfirmOptions,
-    zetaGroupIndex: number,
+    underlyingType: Underlying,
     wallet = new DummyWallet(),
     throttleMs = 0,
     callback?: (event: EventType, data: any) => void
@@ -355,10 +367,9 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     exchange._serumAuthority = serumAuthority;
 
     // Load zeta group.
-    // TODO: Use constants since we only have 1 underlying for now.
     const [underlying, _underlyingNonce] = await utils.getUnderlying(
       programId,
-      zetaGroupIndex
+      underlyingType
     );
 
     let underlyingAccount: any =
@@ -412,6 +423,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
       exchange.zetaGroupAddress
     );
 
+    exchange._underlying = underlyingType;
     exchange._greeksAddress = greeks;
     exchange._markets = await ZetaGroupMarkets.load(opts, throttleMs);
     exchange._greeks = (await exchange.program.account.greeks.fetch(
@@ -419,12 +431,14 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     )) as Greeks;
     exchange._riskCalculator.updateMarginRequirements();
 
+
     // Set callbacks.
     exchange.subscribeZetaGroup(callback);
     exchange.subscribeGreeks(callback);
 
     await exchange.subscribeClock(callback);
 
+    console.log("Setting Exchange as initialised ..... Underlying is: ", underlyingType);
     exchange._isInitialized = true;
 
     console.log(
