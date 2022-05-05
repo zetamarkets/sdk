@@ -5,24 +5,32 @@ import {
   SYSVAR_RENT_PUBKEY,
   SystemProgram,
   Transaction,
+  AccountMeta,
 } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import * as utils from "./utils";
 import * as anchor from "@project-serum/anchor";
-import { OrderType, Side, toProgramOrderType, toProgramSide } from "./types";
+import {
+  MovementType,
+  OrderType,
+  Side,
+  toProgramOrderType,
+  toProgramSide,
+  toProgramMovementType,
+} from "./types";
 import * as constants from "./constants";
 
 export async function initializeMarginAccountTx(
   userKey: PublicKey
 ): Promise<Transaction> {
   let tx = new Transaction();
-  const [marginAccount, nonce] = await utils.getMarginAccount(
+  const [marginAccount, _nonce] = await utils.getMarginAccount(
     Exchange.programId,
     Exchange.zetaGroupAddress,
     userKey
   );
   tx.add(
-    Exchange.program.instruction.initializeMarginAccount(nonce, {
+    Exchange.program.instruction.initializeMarginAccount({
       accounts: {
         zetaGroup: Exchange.zetaGroupAddress,
         marginAccount: marginAccount,
@@ -1135,7 +1143,7 @@ export function settlePositionsIx(
   expirationTs: anchor.BN,
   settlementPda: PublicKey,
   nonce: number,
-  marginAccounts: any[]
+  marginAccounts: AccountMeta[]
 ): TransactionInstruction {
   return Exchange.program.instruction.settlePositions(expirationTs, nonce, {
     accounts: {
@@ -1146,8 +1154,45 @@ export function settlePositionsIx(
   });
 }
 
+export function settleSpreadPositionsIx(
+  expirationTs: anchor.BN,
+  settlementPda: PublicKey,
+  nonce: number,
+  spreadAccounts: AccountMeta[]
+): TransactionInstruction {
+  return Exchange.program.instruction.settleSpreadPositions(
+    expirationTs,
+    nonce,
+    {
+      accounts: {
+        zetaGroup: Exchange.zetaGroupAddress,
+        settlementAccount: settlementPda,
+      },
+      remainingAccounts: spreadAccounts,
+    }
+  );
+}
+
+export function settleSpreadPositionsHaltedTxs(
+  spreadAccounts: AccountMeta[],
+  admin: PublicKey
+): Transaction[] {
+  let txs = [];
+  for (
+    var i = 0;
+    i < spreadAccounts.length;
+    i += constants.MAX_SETTLEMENT_ACCOUNTS
+  ) {
+    let slice = spreadAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
+    txs.push(
+      new Transaction().add(settleSpreadPositionsHaltedIx(slice, admin))
+    );
+  }
+  return txs;
+}
+
 export function settlePositionsHaltedTxs(
-  marginAccounts: any[],
+  marginAccounts: AccountMeta[],
   admin: PublicKey
 ): Transaction[] {
   let txs = [];
@@ -1163,7 +1208,7 @@ export function settlePositionsHaltedTxs(
 }
 
 export function settlePositionsHaltedIx(
-  marginAccounts: any[],
+  marginAccounts: AccountMeta[],
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.settlePositionsHalted({
@@ -1174,6 +1219,21 @@ export function settlePositionsHaltedIx(
       admin,
     },
     remainingAccounts: marginAccounts,
+  });
+}
+
+export function settleSpreadPositionsHaltedIx(
+  spreadAccounts: AccountMeta[],
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.settleSpreadPositionsHalted({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: Exchange.greeksAddress,
+      admin,
+    },
+    remainingAccounts: spreadAccounts,
   });
 }
 
@@ -1367,6 +1427,79 @@ export function expireSeriesOverrideIx(
   });
 }
 
+export function initializeSpreadAccountIx(
+  zetaGroup: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeSpreadAccount({
+    accounts: {
+      zetaGroup,
+      spreadAccount,
+      authority: user,
+      zetaProgram: Exchange.programId,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function closeSpreadAccountIx(
+  zetaGroup: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.closeSpreadAccount({
+    accounts: {
+      zetaGroup,
+      spreadAccount,
+      authority: user,
+    },
+  });
+}
+
+export function positionMovementIx(
+  zetaGroup: PublicKey,
+  marginAccount: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey,
+  greeks: PublicKey,
+  oracle: PublicKey,
+  movementType: MovementType,
+  movements: PositionMovementArg[]
+): TransactionInstruction {
+  return Exchange.program.instruction.positionMovement(
+    toProgramMovementType(movementType),
+    movements,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup,
+        marginAccount,
+        spreadAccount,
+        authority: user,
+        greeks,
+        oracle,
+      },
+    }
+  );
+}
+
+export function transferExcessSpreadBalanceIx(
+  zetaGroup: PublicKey,
+  marginAccount: PublicKey,
+  spreadAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.transferExcessSpreadBalance({
+    accounts: {
+      zetaGroup,
+      marginAccount,
+      spreadAccount,
+      authority: user,
+    },
+  });
+}
+
 export function settleDexFundsTxs(
   marketKey: PublicKey,
   vaultOwner: PublicKey,
@@ -1498,6 +1631,7 @@ export interface StateParams {
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
+  positionMovementFeeBps: number;
 }
 
 export interface UpdatePricingParametersArgs {
@@ -1540,4 +1674,9 @@ export interface UpdateMarginParametersArgs {
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
   optionShortPutCapPercentage: anchor.BN;
+}
+
+export interface PositionMovementArg {
+  index: number;
+  size: anchor.BN;
 }

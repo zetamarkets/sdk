@@ -39,6 +39,9 @@ import {
   crankMarketIx,
   settleDexFundsTxs,
   burnVaultTokenTx,
+  settlePositionsIx,
+  settleSpreadPositionsIx,
+  PositionMovementArg,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -336,6 +339,21 @@ export async function getMarginAccount(
   return await anchor.web3.PublicKey.findProgramAddress(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("margin")),
+      zetaGroup.toBuffer(),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function getSpreadAccount(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("spread")),
       zetaGroup.toBuffer(),
       userKey.toBuffer(),
     ],
@@ -843,18 +861,19 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
   );
 }
 
-export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
+export async function settleUsers(
+  keys: PublicKey[],
+  expiryTs: anchor.BN,
+  accountType: ProgramAccountType = ProgramAccountType.MarginAccount
+) {
   let [settlement, settlementNonce] = await getSettlement(
     Exchange.programId,
     Exchange.zetaGroup.underlyingMint,
     expiryTs
   );
 
-  // TODO this is naive, the program will throw if user has active
-  // orders for this expiration timestamp.
-  // Maybe add a check, otherwise, make sure clean option markets works.
-  let remainingAccounts = userAccounts.map((acc) => {
-    return { pubkey: acc.publicKey, isSigner: false, isWritable: true };
+  let remainingAccounts = keys.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
   });
 
   let txs = [];
@@ -869,13 +888,9 @@ export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
       i + constants.MAX_SETTLEMENT_ACCOUNTS
     );
     tx.add(
-      Exchange.program.instruction.settlePositions(expiryTs, settlementNonce, {
-        accounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
-          settlementAccount: settlement,
-        },
-        remainingAccounts: slice,
-      })
+      accountType == ProgramAccountType.MarginAccount
+        ? settlePositionsIx(expiryTs, settlement, settlementNonce, slice)
+        : settleSpreadPositionsIx(expiryTs, settlement, settlementNonce, slice)
     );
     txs.push(tx);
   }
@@ -1181,4 +1196,52 @@ export async function burnVaultTokens(provider: anchor.Provider) {
     let burnTx = burnVaultTokenTx(market.address);
     await processTransaction(provider, burnTx);
   }
+}
+
+export async function cancelExpiredOrdersAndCleanMarkets(expiryIndex: number) {
+  let marketsToClean = Exchange.markets.getMarketsByExpiryIndex(expiryIndex);
+  let marketAccounts = await Promise.all(
+    marketsToClean.map(async (market) => {
+      await market.cancelAllExpiredOrders();
+      return [
+        { pubkey: market.address, isSigner: false, isWritable: false },
+        {
+          pubkey: market.serumMarket.decoded.bids,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: market.serumMarket.decoded.asks,
+          isSigner: false,
+          isWritable: false,
+        },
+      ];
+    })
+  );
+  await cleanZetaMarkets(marketAccounts);
+}
+
+/**
+ * Calculates the total movement fees for a set of movements.
+ * @param movements   list of position movements.
+ * @param spotPrice   spot price in decimal
+ * @param feeBps      fees charged in bps
+ * @param decimal     whether to return fees in decimal or native integer (defaults to native integer)
+ */
+export function calculateMovementFees(
+  movements: PositionMovementArg[],
+  spotPrice: number,
+  feeBps: number,
+  decimal: boolean = false
+): number {
+  let fees = 0;
+  let totalContracts = 0;
+  for (var i = 0; i < movements.length; i++) {
+    totalContracts += convertNativeLotSizeToDecimal(
+      Math.abs(movements[i].size.toNumber())
+    );
+  }
+  let notionalValue = totalContracts * spotPrice;
+  let fee = (notionalValue * feeBps) / constants.BPS_DENOMINATOR;
+  return decimal ? fee : convertDecimalToNativeInteger(fee);
 }

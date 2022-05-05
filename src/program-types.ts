@@ -21,6 +21,7 @@ export interface State {
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
+  positionMovementFeeBps: number;
   padding: Array<number>;
 }
 
@@ -121,10 +122,18 @@ export interface OpenOrdersMap {
 }
 
 export interface Position {
-  position: anchor.BN;
+  size: anchor.BN;
   costOfTrades: anchor.BN;
+}
+
+export interface OrderState {
   closingOrders: anchor.BN;
   openingOrders: [anchor.BN, anchor.BN];
+}
+
+export interface ProductLedger {
+  position: Position;
+  orderState: OrderState;
 }
 
 export interface MarginAccount {
@@ -135,10 +144,20 @@ export interface MarginAccount {
 
   openOrdersNonce: Array<number>;
   seriesExpiry: Array<anchor.BN>;
-  positions: Array<Position>;
-  positionsPadding: Array<Position>;
+  productLedgers: Array<ProductLedger>;
+  productLedgersPadding: Array<ProductLedger>;
 
   rebalanceAmount: anchor.BN;
+  padding: Array<number>;
+}
+
+export interface SpreadAccount {
+  authority: PublicKey;
+  nonce: number;
+  balance: anchor.BN;
+  seriesExpiry: Array<anchor.BN>;
+  positions: Array<Position>;
+  positionsPadding: Array<Position>;
   padding: Array<number>;
 }
 
@@ -182,16 +201,6 @@ export interface ProductGreeks {
   volatility: AnchorDecimal;
 }
 
-export interface TradeEvent {
-  marginAccount: PublicKey;
-  index: number;
-  costOfTrades: anchor.BN;
-  size: anchor.BN;
-  isBid: boolean;
-  clientOrderId: anchor.BN;
-  orderId: anchor.BN;
-}
-
 export interface InsuranceDepositAccount {
   nonce: number;
   amount: anchor.BN;
@@ -215,4 +224,22 @@ export interface SocializedLossAccount {
 export interface WhitelistTradingFeesAccount {
   nonce: number;
   userKey: PublicKey;
+}
+
+export interface TradeEvent {
+  marginAccount: PublicKey;
+  index: number;
+  costOfTrades: anchor.BN;
+  size: anchor.BN;
+  isBid: boolean;
+  clientOrderId: anchor.BN;
+  orderId: anchor.BN;
+}
+
+export interface PositionMovementEvent {
+  // Positive if movement from margin into spread, else negative.
+  netBalanceTransfer: anchor.BN;
+  marginAccountBalance: anchor.BN;
+  spreadAccountBalance: anchor.BN;
+  movementFees: anchor.BN;
 }

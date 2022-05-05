@@ -74,3 +74,8 @@ export const PLATFORM_PRECISION = 6;
 export const PRICING_PRECISION = 12;
 export const MARGIN_PRECISION = 8;
 export const POSITION_PRECISION = 3;
+
+export const DEFAULT_ORDER_TAG = "SDK";
+
+export const MAX_POSITION_MOVEMENTS = 10;
+export const BPS_DENOMINATOR = 10_000;

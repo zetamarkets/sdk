@@ -147,18 +147,65 @@
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "initializeSpreadAccount",
+      "accounts": [
         {
-          "name": "nonce",
-          "type": "u8"
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "closeMarginAccount",
       "accounts": [
         {
           "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeSpreadAccount",
+      "accounts": [
+        {
+          "name": "spreadAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -613,6 +660,57 @@
     },
     {
       "name": "settlePositionsHalted",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "settleSpreadPositions",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "settlementAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "expiryTs",
+          "type": "u64"
+        },
+        {
+          "name": "settlementNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "settleSpreadPositionsHalted",
       "accounts": [
         {
           "name": "state",
@@ -2540,6 +2638,88 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "positionMovement",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "movementType",
+          "type": {
+            "defined": "MovementType"
+          }
+        },
+        {
+          "name": "movements",
+          "type": {
+            "vec": {
+              "defined": "PositionMovementArg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transferExcessSpreadBalance",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -2810,11 +2990,15 @@
             "type": "u32"
           },
           {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                159
+                158
               ]
             }
           }
@@ -2995,6 +3179,66 @@
       }
     },
     {
+      "name": "SpreadAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "seriesExpiry",
+            "type": {
+              "array": [
+                "u64",
+                6
+              ]
+            }
+          },
+          {
+            "name": "positions",
+            "type": {
+              "array": [
+                {
+                  "defined": "Position"
+                },
+                46
+              ]
+            }
+          },
+          {
+            "name": "positionsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Position"
+                },
+                92
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                263
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginAccount",
       "type": {
         "kind": "struct",
@@ -3034,22 +3278,22 @@
             }
           },
           {
-            "name": "positions",
+            "name": "productLedgers",
             "type": {
               "array": [
                 {
-                  "defined": "Position"
+                  "defined": "ProductLedger"
                 },
                 46
               ]
             }
           },
           {
-            "name": "positionsPadding",
+            "name": "productLedgersPadding",
             "type": {
               "array": [
                 {
-                  "defined": "Position"
+                  "defined": "ProductLedger"
                 },
                 92
               ]
@@ -3471,13 +3715,21 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "position",
+            "name": "size",
             "type": "i64"
           },
           {
             "name": "costOfTrades",
             "type": "u64"
-          },
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderState",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "closingOrders",
             "type": "u64"
@@ -3489,6 +3741,26 @@
                 "u64",
                 2
               ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProductLedger",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "position",
+            "type": {
+              "defined": "Position"
+            }
+          },
+          {
+            "name": "orderState",
+            "type": {
+              "defined": "OrderState"
             }
           }
         ]
@@ -3667,6 +3939,10 @@
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -3755,6 +4031,10 @@
           {
             "name": "expirationThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
           }
         ]
       }
@@ -4017,6 +4297,22 @@
       }
     },
     {
+      "name": "PositionMovementArg",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "size",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExpirySeriesStatus",
       "type": {
         "kind": "enum",
@@ -4094,6 +4390,23 @@
       }
     },
     {
+      "name": "MovementType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Undefined"
+          },
+          {
+            "name": "Lock"
+          },
+          {
+            "name": "Unlock"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -4148,6 +4461,31 @@
         {
           "name": "orderId",
           "type": "u128",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "PositionMovementEvent",
+      "fields": [
+        {
+          "name": "netBalanceTransfer",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "marginAccountBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "spreadAccountBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "movementFees",
+          "type": "u64",
           "index": false
         }
       ]
@@ -4617,7 +4955,72 @@
     {
       "code": 6092,
       "name": "InvalidTagLength",
-      "msg": "Invalid order tag length, too long"
+      "msg": "Invalid tag length"
+    },
+    {
+      "code": 6093,
+      "name": "NakedShortCallIsNotAllowed",
+      "msg": "Naked short call is not allowed"
+    },
+    {
+      "code": 6094,
+      "name": "InvalidSpreadAccount",
+      "msg": "Invalid spread account"
+    },
+    {
+      "code": 6095,
+      "name": "CannotCloseNonEmptySpreadAccount",
+      "msg": "Cannot close non empty spread account"
+    },
+    {
+      "code": 6096,
+      "name": "SpreadAccountSeedsMismatch",
+      "msg": "Spread account seeds mismatch"
+    },
+    {
+      "code": 6097,
+      "name": "SpreadAccountHasUnsettledPositions",
+      "msg": "Spread account seeds mismatch"
+    },
+    {
+      "code": 6098,
+      "name": "SpreadAccountInvalidExpirySeriesState",
+      "msg": "Spread account invalid expiry series state"
+    },
+    {
+      "code": 6099,
+      "name": "InsufficientFundsToCollateralizeSpreadAccount",
+      "msg": "Insufficient funds to collateralize spread account"
+    },
+    {
+      "code": 6100,
+      "name": "FailedMaintenanceMarginRequirement",
+      "msg": "Failed maintenance margin requirement"
+    },
+    {
+      "code": 6101,
+      "name": "InvalidMovement",
+      "msg": "Invalid movement"
+    },
+    {
+      "code": 6102,
+      "name": "MovementOnExpiredSeries",
+      "msg": "Movement on expired series"
+    },
+    {
+      "code": 6103,
+      "name": "InvalidMovementSize",
+      "msg": "Invalid movement size"
+    },
+    {
+      "code": 6104,
+      "name": "ExceededMaxPositionMovements",
+      "msg": "Exceeded max position movements"
+    },
+    {
+      "code": 6105,
+      "name": "ExceededMaxSpreadAccountContracts",
+      "msg": "Exceeded max spread account contracts"
     }
   ]
 }

@@ -6,6 +6,7 @@ import {
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
   AccountInfo,
+  AccountMeta,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -1072,9 +1073,22 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     await utils.processTransaction(this._provider, tx);
   }
 
-  public async settlePositionsHalted(marginAccounts: any[]) {
+  public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
     let txs = instructions.settlePositionsHaltedTxs(
       marginAccounts,
+      this._provider.wallet.publicKey
+    );
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        await utils.processTransaction(this._provider, tx);
+      })
+    );
+  }
+
+  public async settleSpreadPositionsHalted(spreadAccounts: AccountMeta[]) {
+    let txs = instructions.settleSpreadPositionsHaltedTxs(
+      spreadAccounts,
       this._provider.wallet.publicKey
     );
 
