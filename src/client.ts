@@ -497,11 +497,6 @@ export class Client {
       )
     );
     let txId = await utils.processTransaction(this._provider, tx);
-    console.log(
-      `[DEPOSIT] $${utils.convertNativeIntegerToDecimal(
-        amount
-      )}. Transaction: ${txId}`
-    );
     return txId;
   }
 
@@ -513,11 +508,10 @@ export class Client {
       throw Error("User has no margin account to close");
     }
 
-    let tx = new Transaction();
-    tx.add(closeMarginAccountIx(this.publicKey, this._marginAccountAddress));
+    let tx = new Transaction().add(
+      closeMarginAccountIx(this.publicKey, this._marginAccountAddress)
+    );
     let txId = await utils.processTransaction(this._provider, tx);
-    console.log(`[CLOSE MARGIN ACCOUNT] Transaction: ${txId}`);
-
     this._marginAccount = null;
     return txId;
   }
@@ -547,8 +541,6 @@ export class Client {
       )
     );
     let txId = await utils.processTransaction(this._provider, tx);
-    console.log(`[CLOSE SPREAD ACCOUNT] Transaction: ${txId}`);
-
     this._spreadAccount = null;
     return txId;
   }
