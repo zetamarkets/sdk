@@ -127,14 +127,14 @@ export type Zeta = {
           isSigner: false;
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          name: "authority";
+          isMut: false;
+          isSigner: true;
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer";
+          isMut: true;
+          isSigner: true;
         },
         {
           name: "zetaProgram";
@@ -163,20 +163,14 @@ export type Zeta = {
           isSigner: false;
         },
         {
-<<<<<<< HEAD
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          name: "authority";
+          isMut: false;
+          isSigner: true;
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-=======
-          name: "authority";
+          name: "payer";
           isMut: true;
           isSigner: true;
->>>>>>> 4559dba (SDK changes for new PlaceOrderEvent)
         },
         {
           name: "zetaProgram";
@@ -4397,6 +4391,26 @@ export type Zeta = {
           index: false;
         }
       ];
+    },
+    {
+      name: "PlaceOrderEvent";
+      fields: [
+        {
+          name: "fee";
+          type: "u64";
+          index: false;
+        },
+        {
+          name: "oraclePrice";
+          type: "u64";
+          index: false;
+        },
+        {
+          name: "orderId";
+          type: "u128";
+          index: false;
+        }
+      ];
     }
   ];
   errors: [
@@ -5062,20 +5076,14 @@ export const IDL: Zeta = {
           isSigner: false,
         },
         {
-<<<<<<< HEAD
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          name: "authority",
+          isMut: false,
+          isSigner: true,
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-=======
-          name: "authority",
+          name: "payer",
           isMut: true,
           isSigner: true,
->>>>>>> 4559dba (SDK changes for new PlaceOrderEvent)
         },
         {
           name: "zetaProgram",
@@ -5104,14 +5112,14 @@ export const IDL: Zeta = {
           isSigner: false,
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          name: "authority",
+          isMut: false,
+          isSigner: true,
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer",
+          isMut: true,
+          isSigner: true,
         },
         {
           name: "zetaProgram",
@@ -9329,6 +9337,26 @@ export const IDL: Zeta = {
         {
           name: "movementFees",
           type: "u64",
+          index: false,
+        },
+      ],
+    },
+    {
+      name: "PlaceOrderEvent",
+      fields: [
+        {
+          name: "fee",
+          type: "u64",
+          index: false,
+        },
+        {
+          name: "oraclePrice",
+          type: "u64",
+          index: false,
+        },
+        {
+          name: "orderId",
+          type: "u128",
           index: false,
         },
       ],
