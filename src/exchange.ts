@@ -58,13 +58,13 @@ export class Exchange {
   /**
    * Anchor provider instance.
    */
-  public get provider(): anchor.Provider {
+  public get provider(): anchor.AnchorProvider {
     return this._provider;
   }
   public get connection(): Connection {
     return this._provider.connection;
   }
-  private _provider: anchor.Provider;
+  private _provider: anchor.AnchorProvider;
 
   /**
    * Account storing zeta state.
@@ -251,7 +251,7 @@ export class Exchange {
     if (exchange.isInitialized) {
       throw "Exchange already initialized";
     }
-    this._provider = new anchor.Provider(
+    this._provider = new anchor.AnchorProvider(
       connection,
       wallet,
       opts || utils.commitmentConfig(connection.commitment)
@@ -673,13 +673,13 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
           console.log(`Market ${i} already initialized. Skipping...`);
         } else {
           try {
-            await this.provider.send(tx, [
+            await this.provider.sendAndConfirm(tx, [
               requestQueue,
               eventQueue,
               bids,
               asks,
             ]);
-            await this.provider.send(tx2);
+            await this.provider.sendAndConfirm(tx2);
           } catch (e) {
             console.error(`Initialize zeta market ${i} failed: ${e}`);
           }
