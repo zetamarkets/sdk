@@ -149,19 +149,20 @@ export class NativeAnchorError extends Error {
   constructor(
     readonly code: number,
     readonly msg: string,
-    readonly logs: string[]
+    readonly logs: string[],
+    readonly errorLogs: string[]
   ) {
-    super();
+    super(errorLogs.join("\n"));
   }
 
   public static parse(error: anchor.AnchorError): NativeAnchorError {
-    let code = error.error.errorCode.number;
-    let msg = error.error.errorMessage;
-    return new NativeAnchorError(
+    let err = new NativeAnchorError(
       error.error.errorCode.number,
       error.error.errorMessage,
-      error.logs
+      error.logs,
+      error.errorLogs
     );
+    return err;
   }
 
   public toString(): string {
