@@ -11,6 +11,8 @@ Version changes are pinned to SDK releases.
 - program: Mark greek accounts as immutable in certain instructions.
 - program: Add support for spread accounts. ([#102](https://github.com/zetamarkets/sdk/pull/102))
 - client: Added helper getter functions for user margin account and spread account state. ([#102](https://github.com/zetamarkets/sdk/pull/102))
+- anchor: Bump to 0.24.2. ([#110](https://github.com/zetamarkets/sdk/pull/110))
+- errors: Parse anchor `AnchorError` to local `NativeAnchorError` to standardise error fields. ([#110](https://github.com/zetamarkets/sdk/pull/110))
 
 ### Breaking
 

@@ -673,13 +673,13 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
           console.log(`Market ${i} already initialized. Skipping...`);
         } else {
           try {
-            await this.provider.sendAndConfirm(tx, [
+            await utils.processTransaction(this.provider, tx, [
               requestQueue,
               eventQueue,
               bids,
               asks,
             ]);
-            await this.provider.sendAndConfirm(tx2);
+            await utils.processTransaction(this.provider, tx2);
           } catch (e) {
             console.error(`Initialize zeta market ${i} failed: ${e}`);
           }
