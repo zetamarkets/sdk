@@ -593,10 +593,7 @@ export async function simulateTransaction(
   try {
     response = await provider.simulate(tx);
   } catch (err) {
-    console.log(`Error: ${err}`);
-    console.log(`JSON Error: ${JSON.stringify(err)}`);
     let parsedErr = parseError(err);
-    console.log(`Simulate parsed err: ${parsedErr}`);
     throw parsedErr;
   }
 
