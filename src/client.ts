@@ -1398,39 +1398,7 @@ export class Client {
     movementType: MovementType,
     movements: PositionMovementArg[]
   ): Promise<TransactionSignature> {
-    if (movements.length > MAX_POSITION_MOVEMENTS) {
-      throw new Error(
-        `Max position movements exceeded. Max = ${MAX_POSITION_MOVEMENTS} < ${movements.length}`
-      );
-    }
-
-    let tx = new Transaction();
-    this.assertHasMarginAccount();
-
-    if (this.spreadAccount == null) {
-      console.log("User has no spread account. Creating spread account...");
-      tx.add(
-        initializeSpreadAccountIx(
-          Exchange.zetaGroupAddress,
-          this.spreadAccountAddress,
-          this.publicKey
-        )
-      );
-    }
-
-    tx.add(
-      positionMovementIx(
-        Exchange.zetaGroupAddress,
-        this.marginAccountAddress,
-        this.spreadAccountAddress,
-        this.publicKey,
-        Exchange.greeksAddress,
-        Exchange.zetaGroup.oracle,
-        movementType,
-        movements
-      )
-    );
-
+    let tx = this.getPositionMovementTx(movementType, movements);
     return await utils.processTransaction(this._provider, tx);
   }
 
@@ -1443,6 +1411,29 @@ export class Client {
     movementType: MovementType,
     movements: PositionMovementArg[]
   ): Promise<PositionMovementEvent> {
+    let tx = this.getPositionMovementTx(movementType, movements);
+    let response = await utils.simulateTransaction(this.provider, tx);
+
+    let events = response.events;
+    let positionMovementEvent = undefined;
+    for (var i = 0; i < events.length; i++) {
+      if (events[i].name == "PositionMovementEvent") {
+        positionMovementEvent = events[i].data;
+        break;
+      }
+    }
+
+    if (positionMovementEvent == undefined) {
+      throw new Error("Failed to simulate position movement.");
+    }
+
+    return positionMovementEvent;
+  }
+
+  private getPositionMovementTx(
+    movementType: MovementType,
+    movements: PositionMovementArg[]
+  ): Transaction {
     if (movements.length > MAX_POSITION_MOVEMENTS) {
       throw new Error(
         `Max position movements exceeded. Max = ${MAX_POSITION_MOVEMENTS} < ${movements.length}`
@@ -1476,18 +1467,7 @@ export class Client {
       )
     );
 
-    let response = await this.provider.simulate(tx);
-    let parser = new anchor.EventParser(
-      Exchange.programId,
-      Exchange.program.coder
-    );
-
-    let events = [];
-    parser.parseLogs(response.logs, (event) => {
-      events.push(event);
-    });
-
-    return events[0].data;
+    return tx;
   }
 
   /**
