@@ -585,6 +585,37 @@ export function commitmentConfig(commitment: Commitment): ConfirmOptions {
     commitment,
   };
 }
+export async function simulateTransaction(
+  provider: anchor.AnchorProvider,
+  tx: Transaction
+) {
+  let response: any;
+  try {
+    response = await provider.simulate(tx);
+  } catch (err) {
+    parseAndThrowError(err);
+  }
+
+  if (response === undefined) {
+    throw new Error("Unable to simulate transaction");
+  }
+  const logs = response.logs;
+  if (!logs) {
+    throw new Error("Simulated logs not found");
+  }
+
+  let parser = new anchor.EventParser(
+    Exchange.programId,
+    Exchange.program.coder
+  );
+
+  let events = [];
+  parser.parseLogs(response.logs, (event) => {
+    events.push(event);
+  });
+
+  return { events, raw: logs };
+}
 
 export async function processTransaction(
   provider: anchor.AnchorProvider,
@@ -613,29 +644,33 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
-    const anchorError = anchor.AnchorError.parse(err.logs);
-    if (anchorError) {
-      // Parse Anchor error into another type such that it's consistent.
-      throw NativeAnchorError.parse(anchorError);
-    }
-
-    const programError = anchor.ProgramError.parse(err, idlErrors);
-    if (programError) {
-      throw programError;
-    }
-
-    let customErr = parseCustomError(err);
-    if (customErr != null) {
-      throw customErr;
-    }
-
-    let nativeErr = NativeError.parse(err);
-    if (nativeErr != null) {
-      throw nativeErr;
-    }
-
-    throw err;
+    parseAndThrowError(err);
   }
+}
+
+export function parseAndThrowError(err: any) {
+  const anchorError = anchor.AnchorError.parse(err.logs);
+  if (anchorError) {
+    // Parse Anchor error into another type such that it's consistent.
+    throw NativeAnchorError.parse(anchorError);
+  }
+
+  const programError = anchor.ProgramError.parse(err, idlErrors);
+  if (programError) {
+    throw programError;
+  }
+
+  let customErr = parseCustomError(err);
+  if (customErr != null) {
+    throw customErr;
+  }
+
+  let nativeErr = NativeError.parse(err);
+  if (nativeErr != null) {
+    throw nativeErr;
+  }
+
+  throw err;
 }
 
 const uint64 = (property = "uint64") => {
