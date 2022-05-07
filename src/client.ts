@@ -1412,14 +1412,9 @@ export class Client {
     movements: PositionMovementArg[]
   ): Promise<PositionMovementEvent> {
     let tx = this.getPositionMovementTx(movementType, movements);
-    let response;
-    try {
-      response = await utils.simulateTransaction(this.provider, tx);
-    } catch (err) {
-      throw err;
-    }
-    let events = response.events;
+    let response = await utils.simulateTransaction(this.provider, tx);
 
+    let events = response.events;
     let positionMovementEvent = undefined;
     for (var i = 0; i < events.length; i++) {
       if (events[i].name == "PositionMovementEvent") {
@@ -1431,6 +1426,7 @@ export class Client {
     if (positionMovementEvent == undefined) {
       throw new Error("Failed to simulate position movement.");
     }
+
     return positionMovementEvent;
   }
 
