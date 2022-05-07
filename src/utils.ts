@@ -593,7 +593,11 @@ export async function simulateTransaction(
   try {
     response = await provider.simulate(tx);
   } catch (err) {
-    parseAndThrowError(err);
+    console.log(`Error: ${err}`);
+    console.log(`JSON Error: ${JSON.stringify(err)}`);
+    let parsedErr = parseError(err);
+    console.log(`Simulate parsed err: ${parsedErr}`);
+    throw parsedErr;
   }
 
   if (response === undefined) {
@@ -644,33 +648,41 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
-    parseAndThrowError(err);
+    let parsedErr = parseError(err);
+    throw parsedErr;
   }
 }
 
-export function parseAndThrowError(err: any) {
+export function parseError(err: any) {
   const anchorError = anchor.AnchorError.parse(err.logs);
   if (anchorError) {
     // Parse Anchor error into another type such that it's consistent.
-    throw NativeAnchorError.parse(anchorError);
+    return NativeAnchorError.parse(anchorError);
   }
 
   const programError = anchor.ProgramError.parse(err, idlErrors);
   if (programError) {
-    throw programError;
+    return programError;
   }
 
   let customErr = parseCustomError(err);
   if (customErr != null) {
-    throw customErr;
+    return customErr;
   }
 
   let nativeErr = NativeError.parse(err);
   if (nativeErr != null) {
-    throw nativeErr;
+    return nativeErr;
   }
 
-  throw err;
+  if (err.simulationResponse) {
+    let simulatedError = anchor.AnchorError.parse(err.simulationResponse.logs);
+    if (simulatedError) {
+      return NativeAnchorError.parse(simulatedError);
+    }
+  }
+
+  return err;
 }
 
 const uint64 = (property = "uint64") => {
