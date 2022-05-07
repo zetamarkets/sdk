@@ -73,10 +73,10 @@ export class Client {
   /**
    * Anchor provider for client, including wallet.
    */
-  public get provider(): anchor.Provider {
+  public get provider(): anchor.AnchorProvider {
     return this._provider;
   }
-  private _provider: anchor.Provider;
+  private _provider: anchor.AnchorProvider;
 
   /**
    * Anchor program wrapper for the IDL.
@@ -230,7 +230,7 @@ export class Client {
     wallet: Wallet,
     opts: ConfirmOptions
   ) {
-    this._provider = new anchor.Provider(connection, wallet, opts);
+    this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._program = new anchor.Program(
       idl as anchor.Idl,
       Exchange.programId,
@@ -337,7 +337,7 @@ export class Client {
       client._marginAccount =
         (await client._program.account.marginAccount.fetch(
           client._marginAccountAddress
-        )) as MarginAccount;
+        )) as unknown as MarginAccount;
 
       // Set open order pdas for initialized accounts.
       await client.updateOpenOrdersAddresses();
@@ -352,7 +352,7 @@ export class Client {
       client._spreadAccount =
         (await client._program.account.spreadAccount.fetch(
           client._spreadAccountAddress
-        )) as SpreadAccount;
+        )) as unknown as SpreadAccount;
       client.updateSpreadPositions();
     } catch (e) {
       console.log("User does not have a spread account.");
@@ -450,7 +450,7 @@ export class Client {
       try {
         this._marginAccount = (await this._program.account.marginAccount.fetch(
           this._marginAccountAddress
-        )) as MarginAccount;
+        )) as unknown as MarginAccount;
       } catch (e) {
         this._updatingState = false;
         return;
@@ -459,7 +459,7 @@ export class Client {
       try {
         this._spreadAccount = (await this._program.account.spreadAccount.fetch(
           this._spreadAccountAddress
-        )) as SpreadAccount;
+        )) as unknown as SpreadAccount;
       } catch (e) {}
     }
 
@@ -1314,7 +1314,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let marginAccount = (await this._program.account.marginAccount.fetch(
       marginAccountToCancel
-    )) as MarginAccount;
+    )) as unknown as MarginAccount;
 
     let marketIndex = Exchange.markets.getMarketIndex(market);
 
@@ -1483,7 +1483,7 @@ export class Client {
     );
 
     let events = [];
-    parser.parseLogs(response.value.logs, (event) => {
+    parser.parseLogs(response.logs, (event) => {
       events.push(event);
     });
 

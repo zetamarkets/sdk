@@ -141,12 +141,10 @@ export interface MarginAccount {
   nonce: number;
   balance: anchor.BN;
   forceCancelFlag: boolean;
-
   openOrdersNonce: Array<number>;
   seriesExpiry: Array<anchor.BN>;
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
-
   rebalanceAmount: anchor.BN;
   padding: Array<number>;
 }

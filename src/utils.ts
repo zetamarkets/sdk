@@ -27,7 +27,12 @@ import * as bs58 from "bs58";
 
 import * as fs from "fs";
 import * as constants from "./constants";
-import { NativeError, parseCustomError, idlErrors } from "./errors";
+import {
+  NativeAnchorError,
+  NativeError,
+  parseCustomError,
+  idlErrors,
+} from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent, OpenOrdersMap } from "./program-types";
 import { ClockData, ProgramAccountType } from "./types";
@@ -582,7 +587,7 @@ export function commitmentConfig(commitment: Commitment): ConfirmOptions {
 }
 
 export async function processTransaction(
-  provider: anchor.Provider,
+  provider: anchor.AnchorProvider,
   tx: Transaction,
   signers?: Array<Signer>,
   opts?: ConfirmOptions
@@ -608,10 +613,17 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
-    let translatedErr = anchor.ProgramError.parse(err, idlErrors);
-    if (translatedErr !== null) {
-      throw translatedErr;
+    const anchorError = anchor.AnchorError.parse(err.logs);
+    if (anchorError) {
+      // Parse Anchor error into another type such that it's consistent.
+      throw NativeAnchorError.parse(anchorError);
     }
+
+    const programError = anchor.ProgramError.parse(err, idlErrors);
+    if (programError) {
+      throw programError;
+    }
+
     let customErr = parseCustomError(err);
     if (customErr != null) {
       throw customErr;
@@ -1127,7 +1139,7 @@ export async function getAllOpenOrdersAccountsByMarket(): Promise<
 }
 
 export async function settleAndBurnVaultTokensByMarket(
-  provider: anchor.Provider,
+  provider: anchor.AnchorProvider,
   openOrdersByMarketIndex: Map<number, Array<PublicKey>>,
   marketIndex: number
 ) {
@@ -1158,7 +1170,9 @@ export async function settleAndBurnVaultTokensByMarket(
   await processTransaction(provider, burnTx);
 }
 
-export async function settleAndBurnVaultTokens(provider: anchor.Provider) {
+export async function settleAndBurnVaultTokens(
+  provider: anchor.AnchorProvider
+) {
   let openOrdersByMarketIndex = await getAllOpenOrdersAccountsByMarket();
   for (var i = 0; i < Exchange.markets.markets.length; i++) {
     console.log(`Burning tokens for market index ${i}`);
@@ -1189,7 +1203,7 @@ export async function settleAndBurnVaultTokens(provider: anchor.Provider) {
   }
 }
 
-export async function burnVaultTokens(provider: anchor.Provider) {
+export async function burnVaultTokens(provider: anchor.AnchorProvider) {
   for (var i = 0; i < Exchange.markets.markets.length; i++) {
     console.log(`Burning tokens for market index ${i}`);
     let market = Exchange.markets.markets[i];
