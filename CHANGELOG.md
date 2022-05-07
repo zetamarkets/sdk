@@ -14,6 +14,7 @@ Version changes are pinned to SDK releases.
 - anchor: Bump to 0.24.2. ([#110](https://github.com/zetamarkets/sdk/pull/110))
 - errors: Parse anchor `AnchorError` to local `NativeAnchorError` to standardise error fields. ([#110](https://github.com/zetamarkets/sdk/pull/110))
 - errors: Refactor error handling and parse simulation errors. ([#111](https://github.com/zetamarkets/sdk/pull/111))
+- client: Expose whitelist deposit address.
 
 ### Breaking
 
