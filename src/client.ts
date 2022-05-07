@@ -194,6 +194,9 @@ export class Client {
   /**
    * whitelist deposit account.
    */
+  public get whitelistDepositAddress(): PublicKey | undefined {
+    return this._whitelistDepositAddress;
+  }
   private _whitelistDepositAddress: PublicKey | undefined;
 
   /**
