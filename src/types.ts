@@ -186,3 +186,10 @@ export interface ClockData {
   timestamp: number;
   slot: number;
 }
+
+// Ordered in underlying sequence number.
+export enum Asset {
+  SOL = 0,
+  BTC = 1,
+  LUNA = 2,
+}
