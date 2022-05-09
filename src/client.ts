@@ -49,6 +49,7 @@ import {
   depositIx,
   withdrawIx,
   cancelOrderIx,
+  cancelOrderNoErrorIx,
   cancelOrderByClientOrderIdIx,
   forceCancelOrdersIx,
   liquidateIx,
@@ -880,6 +881,31 @@ export class Client {
     let tx = new Transaction();
     let index = Exchange.markets.getMarketIndex(market);
     let ix = cancelOrderIx(
+      index,
+      this.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[index],
+      orderId,
+      side
+    );
+    tx.add(ix);
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Cancels a user order by orderId, ignoring any errors that occur
+   * @param market     the market address of the order to be cancelled.
+   * @param orderId    the order id of the order.
+   * @param side       the side of the order. bid / ask.
+   */
+  public async cancelOrderNoError(
+    market: PublicKey,
+    orderId: anchor.BN,
+    side: Side
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let index = Exchange.markets.getMarketIndex(market);
+    let ix = cancelOrderNoErrorIx(
       index,
       this.publicKey,
       this._marginAccountAddress,
