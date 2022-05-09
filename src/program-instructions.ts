@@ -556,6 +556,36 @@ export function cancelOrderByClientOrderIdIx(
   );
 }
 
+export function cancelOrderByClientOrderIdNoErrorIx(
+  marketIndex: number,
+  userKey: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  clientOrderId: anchor.BN
+): TransactionInstruction {
+  let marketData = Exchange.markets.markets[marketIndex];
+  return Exchange.program.instruction.cancelOrderByClientOrderIdNoError(
+    clientOrderId,
+    {
+      accounts: {
+        authority: userKey,
+        cancelAccounts: {
+          zetaGroup: Exchange.zetaGroupAddress,
+          state: Exchange.stateAddress,
+          marginAccount,
+          dexProgram: constants.DEX_PID[Exchange.network],
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+        },
+      },
+    }
+  );
+}
+
 export function cancelExpiredOrderIx(
   marketIndex: number,
   marginAccount: PublicKey,

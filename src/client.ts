@@ -51,6 +51,7 @@ import {
   cancelOrderIx,
   cancelOrderNoErrorIx,
   cancelOrderByClientOrderIdIx,
+  cancelOrderByClientOrderIdNoErrorIx,
   forceCancelOrdersIx,
   liquidateIx,
   settleDexFundsIx,
@@ -933,6 +934,32 @@ export class Client {
     let tx = new Transaction();
     let index = Exchange.markets.getMarketIndex(market);
     let ix = cancelOrderByClientOrderIdIx(
+      index,
+      this.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[index],
+      new anchor.BN(clientOrderId)
+    );
+    tx.add(ix);
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Cancels a user order by client order id.
+   * It will only cancel the FIRST
+   * @param market          the market address of the order to be cancelled.
+   * @param clientOrderId   the client order id of the order. (Non zero value).
+   */
+  public async cancelOrderByClientOrderIdNoError(
+    market: PublicKey,
+    clientOrderId: number
+  ): Promise<TransactionSignature> {
+    if (clientOrderId == 0) {
+      return;
+    }
+    let tx = new Transaction();
+    let index = Exchange.markets.getMarketIndex(market);
+    let ix = cancelOrderByClientOrderIdNoErrorIx(
       index,
       this.publicKey,
       this._marginAccountAddress,
