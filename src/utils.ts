@@ -27,7 +27,12 @@ import * as bs58 from "bs58";
 
 import * as fs from "fs";
 import * as constants from "./constants";
-import { NativeError, parseCustomError, idlErrors } from "./errors";
+import {
+  NativeAnchorError,
+  NativeError,
+  parseCustomError,
+  idlErrors,
+} from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent, OpenOrdersMap } from "./program-types";
 import { ClockData, ProgramAccountType } from "./types";
@@ -39,6 +44,9 @@ import {
   crankMarketIx,
   settleDexFundsTxs,
   burnVaultTokenTx,
+  settlePositionsIx,
+  settleSpreadPositionsIx,
+  PositionMovementArg,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -344,6 +352,21 @@ export async function getMarginAccount(
   );
 }
 
+export async function getSpreadAccount(
+  programId: PublicKey,
+  zetaGroup: PublicKey,
+  userKey: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("spread")),
+      zetaGroup.toBuffer(),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getMarketUninitialized(
   programId: PublicKey,
   zetaGroup: PublicKey,
@@ -563,9 +586,41 @@ export function commitmentConfig(commitment: Commitment): ConfirmOptions {
     commitment,
   };
 }
+export async function simulateTransaction(
+  provider: anchor.AnchorProvider,
+  tx: Transaction
+) {
+  let response: any;
+  try {
+    response = await provider.simulate(tx);
+  } catch (err) {
+    let parsedErr = parseError(err);
+    throw parsedErr;
+  }
+
+  if (response === undefined) {
+    throw new Error("Unable to simulate transaction");
+  }
+  const logs = response.logs;
+  if (!logs) {
+    throw new Error("Simulated logs not found");
+  }
+
+  let parser = new anchor.EventParser(
+    Exchange.programId,
+    Exchange.program.coder
+  );
+
+  let events = [];
+  parser.parseLogs(response.logs, (event) => {
+    events.push(event);
+  });
+
+  return { events, raw: logs };
+}
 
 export async function processTransaction(
-  provider: anchor.Provider,
+  provider: anchor.AnchorProvider,
   tx: Transaction,
   signers?: Array<Signer>,
   opts?: ConfirmOptions
@@ -591,22 +646,41 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
-    let translatedErr = anchor.ProgramError.parse(err, idlErrors);
-    if (translatedErr !== null) {
-      throw translatedErr;
-    }
-    let customErr = parseCustomError(err);
-    if (customErr != null) {
-      throw customErr;
-    }
-
-    let nativeErr = NativeError.parse(err);
-    if (nativeErr != null) {
-      throw nativeErr;
-    }
-
-    throw err;
+    let parsedErr = parseError(err);
+    throw parsedErr;
   }
+}
+
+export function parseError(err: any) {
+  const anchorError = anchor.AnchorError.parse(err.logs);
+  if (anchorError) {
+    // Parse Anchor error into another type such that it's consistent.
+    return NativeAnchorError.parse(anchorError);
+  }
+
+  const programError = anchor.ProgramError.parse(err, idlErrors);
+  if (programError) {
+    return programError;
+  }
+
+  let customErr = parseCustomError(err);
+  if (customErr != null) {
+    return customErr;
+  }
+
+  let nativeErr = NativeError.parse(err);
+  if (nativeErr != null) {
+    return nativeErr;
+  }
+
+  if (err.simulationResponse) {
+    let simulatedError = anchor.AnchorError.parse(err.simulationResponse.logs);
+    if (simulatedError) {
+      return NativeAnchorError.parse(simulatedError);
+    }
+  }
+
+  return err;
 }
 
 const uint64 = (property = "uint64") => {
@@ -844,18 +918,19 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
   );
 }
 
-export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
+export async function settleUsers(
+  keys: PublicKey[],
+  expiryTs: anchor.BN,
+  accountType: ProgramAccountType = ProgramAccountType.MarginAccount
+) {
   let [settlement, settlementNonce] = await getSettlement(
     Exchange.programId,
     Exchange.zetaGroup.underlyingMint,
     expiryTs
   );
 
-  // TODO this is naive, the program will throw if user has active
-  // orders for this expiration timestamp.
-  // Maybe add a check, otherwise, make sure clean option markets works.
-  let remainingAccounts = userAccounts.map((acc) => {
-    return { pubkey: acc.publicKey, isSigner: false, isWritable: true };
+  let remainingAccounts = keys.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
   });
 
   let txs = [];
@@ -870,13 +945,9 @@ export async function settleUsers(userAccounts: any[], expiryTs: anchor.BN) {
       i + constants.MAX_SETTLEMENT_ACCOUNTS
     );
     tx.add(
-      Exchange.program.instruction.settlePositions(expiryTs, settlementNonce, {
-        accounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
-          settlementAccount: settlement,
-        },
-        remainingAccounts: slice,
-      })
+      accountType == ProgramAccountType.MarginAccount
+        ? settlePositionsIx(expiryTs, settlement, settlementNonce, slice)
+        : settleSpreadPositionsIx(expiryTs, settlement, settlementNonce, slice)
     );
     txs.push(tx);
   }
@@ -1113,7 +1184,7 @@ export async function getAllOpenOrdersAccountsByMarket(): Promise<
 }
 
 export async function settleAndBurnVaultTokensByMarket(
-  provider: anchor.Provider,
+  provider: anchor.AnchorProvider,
   openOrdersByMarketIndex: Map<number, Array<PublicKey>>,
   marketIndex: number
 ) {
@@ -1144,7 +1215,9 @@ export async function settleAndBurnVaultTokensByMarket(
   await processTransaction(provider, burnTx);
 }
 
-export async function settleAndBurnVaultTokens(provider: anchor.Provider) {
+export async function settleAndBurnVaultTokens(
+  provider: anchor.AnchorProvider
+) {
   let openOrdersByMarketIndex = await getAllOpenOrdersAccountsByMarket();
   for (var i = 0; i < Exchange.markets.markets.length; i++) {
     console.log(`Burning tokens for market index ${i}`);
@@ -1175,11 +1248,59 @@ export async function settleAndBurnVaultTokens(provider: anchor.Provider) {
   }
 }
 
-export async function burnVaultTokens(provider: anchor.Provider) {
+export async function burnVaultTokens(provider: anchor.AnchorProvider) {
   for (var i = 0; i < Exchange.markets.markets.length; i++) {
     console.log(`Burning tokens for market index ${i}`);
     let market = Exchange.markets.markets[i];
     let burnTx = burnVaultTokenTx(market.address);
     await processTransaction(provider, burnTx);
   }
+}
+
+export async function cancelExpiredOrdersAndCleanMarkets(expiryIndex: number) {
+  let marketsToClean = Exchange.markets.getMarketsByExpiryIndex(expiryIndex);
+  let marketAccounts = await Promise.all(
+    marketsToClean.map(async (market) => {
+      await market.cancelAllExpiredOrders();
+      return [
+        { pubkey: market.address, isSigner: false, isWritable: false },
+        {
+          pubkey: market.serumMarket.decoded.bids,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: market.serumMarket.decoded.asks,
+          isSigner: false,
+          isWritable: false,
+        },
+      ];
+    })
+  );
+  await cleanZetaMarkets(marketAccounts);
+}
+
+/**
+ * Calculates the total movement fees for a set of movements.
+ * @param movements   list of position movements.
+ * @param spotPrice   spot price in decimal
+ * @param feeBps      fees charged in bps
+ * @param decimal     whether to return fees in decimal or native integer (defaults to native integer)
+ */
+export function calculateMovementFees(
+  movements: PositionMovementArg[],
+  spotPrice: number,
+  feeBps: number,
+  decimal: boolean = false
+): number {
+  let fees = 0;
+  let totalContracts = 0;
+  for (var i = 0; i < movements.length; i++) {
+    totalContracts += convertNativeLotSizeToDecimal(
+      Math.abs(movements[i].size.toNumber())
+    );
+  }
+  let notionalValue = totalContracts * spotPrice;
+  let fee = (notionalValue * feeBps) / constants.BPS_DENOMINATOR;
+  return decimal ? fee : convertDecimalToNativeInteger(fee);
 }

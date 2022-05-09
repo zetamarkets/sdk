@@ -102,7 +102,7 @@ export function orderEquals(
 export interface Position {
   marketIndex: number;
   market: PublicKey;
-  position: number;
+  size: number;
   costOfTrades: number;
 }
 
@@ -110,7 +110,7 @@ export function positionEquals(a: Position, b: Position): boolean {
   return (
     a.marketIndex === b.marketIndex &&
     a.market.equals(b.market) &&
-    a.position === b.position &&
+    a.size === b.size &&
     a.costOfTrades === b.costOfTrades
   );
 }
@@ -177,9 +177,9 @@ export interface MarginParams {
   optionShortPutCapPercentage: number;
 }
 
-// Only support margin accounts for now.
 export enum ProgramAccountType {
   MarginAccount = "MarginAccount",
+  SpreadAccount = "SpreadAccount",
 }
 
 export interface ClockData {
@@ -192,4 +192,15 @@ export enum Asset {
   SOL = 0,
   BTC = 1,
   LUNA = 2,
+}
+
+export enum MovementType {
+  LOCK = 1,
+  UNLOCK = 2,
+}
+
+export function toProgramMovementType(movementType: MovementType) {
+  if (movementType == MovementType.LOCK) return { lock: {} };
+  if (movementType == MovementType.UNLOCK) return { unlock: {} };
+  throw Error("Invalid side");
 }

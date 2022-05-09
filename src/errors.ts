@@ -68,11 +68,7 @@ export function parseCustomError(untranslatedError: string) {
   // Parse user error.
   let errorMsg = DEX_ERRORS.get(errorCode);
   if (errorMsg !== undefined) {
-    return new anchor.ProgramError(
-      errorCode,
-      errorMsg,
-      errorCode + ": " + errorMsg
-    );
+    return new anchor.ProgramError(errorCode, errorMsg);
   }
   return null;
 }
@@ -118,6 +114,55 @@ export class NativeError extends Error {
     } catch (e) {
       return null;
     }
+  }
+
+  public toString(): string {
+    return this.msg;
+  }
+}
+
+/**
+ * Example Anchor error.
+    {
+      errorLogs: [
+        'Program log: AnchorError thrown in programs/zeta/src/lib.rs:1008. Error Code: StrikeInitializationNotReady. Error Number: 6036. Error Message: Strike initialization not ready.'
+      ],
+      logs: [
+        'Program BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7 invoke [1]',
+        'Program log: Instruction: InitializeMarketStrikes',
+        'Program log: ClockTs=1651837190, StrikeInitTs=1651837207',
+        'Program log: AnchorError thrown in programs/zeta/src/lib.rs:1008. Error Code: StrikeInitializationNotReady. Error Number: 6036. Error Message: Strike initialization not ready.',
+        'Program BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7 consumed 7006 of 1400000 compute units',
+        'Program BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7 failed: custom program error: 0x1794'
+      ],
+      error: {
+        errorCode: { code: 'StrikeInitializationNotReady', number: 6036 },
+        errorMessage: 'Strike initialization not ready',
+        comparedValues: undefined,
+        origin: { file: 'programs/zeta/src/lib.rs', line: 1008 }
+      },
+      _programErrorStack: ProgramErrorStack { stack: [ [PublicKey] ] }
+    }
+ * Anchor error is rich but in information but breaks the assumptions on errors by existing clients.
+ */
+export class NativeAnchorError extends Error {
+  constructor(
+    readonly code: number,
+    readonly msg: string,
+    readonly logs: string[],
+    readonly errorLogs: string[]
+  ) {
+    super(errorLogs.join("\n"));
+  }
+
+  public static parse(error: anchor.AnchorError): NativeAnchorError {
+    let err = new NativeAnchorError(
+      error.error.errorCode.number,
+      error.error.errorMessage,
+      error.logs,
+      error.errorLogs
+    );
+    return err;
   }
 
   public toString(): string {

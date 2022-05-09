@@ -3,12 +3,19 @@ import * as utils from "./utils";
 import {
   MAX_SETTLE_AND_CLOSE_PER_TX,
   MAX_CANCELS_PER_TX,
+  MAX_POSITION_MOVEMENTS,
   DEFAULT_CLIENT_POLL_INTERVAL,
   DEFAULT_CLIENT_TIMER_INTERVAL,
   DEX_PID,
+  DEFAULT_ORDER_TAG,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
-import { MarginAccount, TradeEvent } from "./program-types";
+import {
+  SpreadAccount,
+  MarginAccount,
+  TradeEvent,
+  PositionMovementEvent,
+} from "./program-types";
 import {
   PublicKey,
   Connection,
@@ -29,9 +36,10 @@ import {
   Position,
   Order,
   Side,
+  MovementType,
 } from "./types";
 import {
-  initializeMarginAccountTx,
+  initializeMarginAccountIx,
   closeMarginAccountIx,
   initializeOpenOrdersIx,
   closeOpenOrdersIx,
@@ -45,6 +53,11 @@ import {
   forceCancelOrdersIx,
   liquidateIx,
   settleDexFundsIx,
+  initializeSpreadAccountIx,
+  closeSpreadAccountIx,
+  positionMovementIx,
+  transferExcessSpreadBalanceIx,
+  PositionMovementArg,
 } from "./program-instructions";
 
 import { EventType } from "./events";
@@ -60,10 +73,10 @@ export class Client {
   /**
    * Anchor provider for client, including wallet.
    */
-  public get provider(): anchor.Provider {
+  public get provider(): anchor.AnchorProvider {
     return this._provider;
   }
-  private _provider: anchor.Provider;
+  private _provider: anchor.AnchorProvider;
 
   /**
    * Anchor program wrapper for the IDL.
@@ -85,6 +98,22 @@ export class Client {
     return this._marginAccountAddress;
   }
   private _marginAccountAddress: PublicKey;
+
+  /**
+   * Stores the user margin account state.
+   */
+  public get spreadAccount(): SpreadAccount | null {
+    return this._spreadAccount;
+  }
+  private _spreadAccount: SpreadAccount | null;
+
+  /**
+   * Client margin account address.
+   */
+  public get spreadAccountAddress(): PublicKey {
+    return this._spreadAccountAddress;
+  }
+  private _spreadAccountAddress: PublicKey;
 
   /**
    * Client usdc account address.
@@ -120,9 +149,22 @@ export class Client {
   private _positions: Position[];
 
   /**
+   * Returns a list of user current spread account positions.
+   */
+  public get spreadPositions(): Position[] {
+    return this._spreadPositions;
+  }
+  private _spreadPositions: Position[];
+
+  /**
    * The subscription id for the margin account subscription.
    */
   private _marginAccountSubscriptionId: number = undefined;
+
+  /**
+   * The subscription id for the spread account subscription.
+   */
+  private _spreadAccountSubscriptionId: number = undefined;
 
   /**
    * The listener for trade events.
@@ -152,6 +194,9 @@ export class Client {
   /**
    * whitelist deposit account.
    */
+  public get whitelistDepositAddress(): PublicKey | undefined {
+    return this._whitelistDepositAddress;
+  }
   private _whitelistDepositAddress: PublicKey | undefined;
 
   /**
@@ -188,7 +233,7 @@ export class Client {
     wallet: Wallet,
     opts: ConfirmOptions
   ) {
-    this._provider = new anchor.Provider(connection, wallet, opts);
+    this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._program = new anchor.Program(
       idl as anchor.Idl,
       Exchange.programId,
@@ -204,6 +249,7 @@ export class Client {
     this._lastUpdateTimestamp = 0;
     this._pendingUpdate = false;
     this._marginAccount = null;
+    this._spreadAccount = null;
   }
 
   /**
@@ -230,7 +276,15 @@ export class Client {
         wallet.publicKey
       );
 
+    let [spreadAccountAddress, _spreadAccountNonce] =
+      await utils.getSpreadAccount(
+        Exchange.programId,
+        Exchange.zetaGroupAddress,
+        wallet.publicKey
+      );
+
     client._marginAccountAddress = marginAccountAddress;
+    client._spreadAccountAddress = spreadAccountAddress;
 
     client._callback = callback;
 
@@ -260,27 +314,51 @@ export class Client {
       connection.commitment
     );
 
+    client._spreadAccountSubscriptionId = connection.onAccountChange(
+      client._spreadAccountAddress,
+      async (accountInfo: AccountInfo<Buffer>, _context: Context) => {
+        client._spreadAccount = client._program.coder.accounts.decode(
+          ProgramAccountType.SpreadAccount,
+          accountInfo.data
+        );
+
+        client.updateSpreadPositions();
+
+        if (callback !== undefined) {
+          callback(EventType.USER, null);
+        }
+      },
+      connection.commitment
+    );
+
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
       wallet.publicKey
     );
 
-    // Update state without awaiting for updateOrders()
     try {
       client._marginAccount =
         (await client._program.account.marginAccount.fetch(
           client._marginAccountAddress
-        )) as MarginAccount;
-    } catch (e) {
-      console.log("User does not have a margin account.");
-    }
+        )) as unknown as MarginAccount;
 
-    if (client.marginAccount !== null) {
       // Set open order pdas for initialized accounts.
       await client.updateOpenOrdersAddresses();
       client.updatePositions();
       // We don't update orders here to make load faster.
       client._pendingUpdate = true;
+    } catch (e) {
+      console.log("User does not have a margin account.");
+    }
+
+    try {
+      client._spreadAccount =
+        (await client._program.account.spreadAccount.fetch(
+          client._spreadAccountAddress
+        )) as unknown as SpreadAccount;
+      client.updateSpreadPositions();
+    } catch (e) {
+      console.log("User does not have a spread account.");
     }
 
     client._whitelistDepositAddress = undefined;
@@ -327,7 +405,7 @@ export class Client {
   }
 
   /**
-   * @param desired interval for client polling.
+   * @param timerInterval   desired interval for client polling.
    */
   private setPolling(timerInterval: number) {
     if (this._pollIntervalId !== undefined) {
@@ -375,15 +453,26 @@ export class Client {
       try {
         this._marginAccount = (await this._program.account.marginAccount.fetch(
           this._marginAccountAddress
-        )) as MarginAccount;
+        )) as unknown as MarginAccount;
       } catch (e) {
         this._updatingState = false;
         return;
       }
+
+      try {
+        this._spreadAccount = (await this._program.account.spreadAccount.fetch(
+          this._spreadAccountAddress
+        )) as unknown as SpreadAccount;
+      } catch (e) {}
     }
+
     if (this._marginAccount !== null) {
       await this.updateOrders();
       this.updatePositions();
+    }
+
+    if (this._spreadAccount !== null) {
+      this.updateSpreadPositions();
     }
 
     this._updatingState = false;
@@ -399,7 +488,13 @@ export class Client {
     let tx = new Transaction();
     if (this._marginAccount === null) {
       console.log("User has no margin account. Creating margin account...");
-      tx = await initializeMarginAccountTx(this.publicKey);
+      tx.add(
+        initializeMarginAccountIx(
+          Exchange.zetaGroupAddress,
+          this._marginAccountAddress,
+          this.publicKey
+        )
+      );
     }
     tx.add(
       await depositIx(
@@ -411,11 +506,6 @@ export class Client {
       )
     );
     let txId = await utils.processTransaction(this._provider, tx);
-    console.log(
-      `[DEPOSIT] $${utils.convertNativeIntegerToDecimal(
-        amount
-      )}. Transaction: ${txId}`
-    );
     return txId;
   }
 
@@ -427,12 +517,40 @@ export class Client {
       throw Error("User has no margin account to close");
     }
 
-    let tx = new Transaction();
-    tx.add(closeMarginAccountIx(this.publicKey, this._marginAccountAddress));
+    let tx = new Transaction().add(
+      closeMarginAccountIx(this.publicKey, this._marginAccountAddress)
+    );
     let txId = await utils.processTransaction(this._provider, tx);
-    console.log(`[CLOSE MARGIN ACCOUNT] Transaction: ${txId}`);
-
     this._marginAccount = null;
+    return txId;
+  }
+
+  /**
+   * Closes a client's spread account
+   */
+  public async closeSpreadAccount(): Promise<TransactionSignature> {
+    if (this._spreadAccount === null) {
+      throw Error("User has no spread account to close");
+    }
+
+    let tx = new Transaction();
+    tx.add(
+      transferExcessSpreadBalanceIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this._spreadAccountAddress,
+        this.publicKey
+      )
+    );
+    tx.add(
+      closeSpreadAccountIx(
+        Exchange.zetaGroupAddress,
+        this._spreadAccountAddress,
+        this.publicKey
+      )
+    );
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._spreadAccount = null;
     return txId;
   }
 
@@ -525,17 +643,9 @@ export class Client {
 
     tx.add(orderIx);
 
-    let txId: TransactionSignature;
-    try {
-      this._openOrdersAccounts[marketIndex] = openOrdersPda;
-      txId = await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      // If we were initializing open orders in the same tx.
-      if (tx.instructions.length > 1) {
-        this._openOrdersAccounts[marketIndex] = PublicKey.default;
-      }
-      throw e;
-    }
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+
     return txId;
   }
 
@@ -595,17 +705,99 @@ export class Client {
 
     tx.add(orderIx);
 
-    let txId: TransactionSignature;
-    try {
-      this._openOrdersAccounts[marketIndex] = openOrdersPda;
-      txId = await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      // If we were initializing open orders in the same tx.
-      if (tx.instructions.length > 1) {
-        this._openOrdersAccounts[marketIndex] = PublicKey.default;
-      }
-      throw e;
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+
+    return txId;
+  }
+
+  /**
+   * Places a fill or kill  order on a zeta market.
+   * If successful - it will lock the full size into a user's spread account.
+   * It will create the spread account if the user didn't have one already.
+   * @param market          the address of the serum market
+   * @param price           the native price of the order (6 d.p as integer)
+   * @param size            the quantity of the order (3 d.p)
+   * @param side            the side of the order. bid / ask
+   */
+  public async placeOrderAndLockPosition(
+    market: PublicKey,
+    price: number,
+    size: number,
+    side: Side,
+    tag: String = DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
+      let [initIx, _openOrdersPda] = await initializeOpenOrdersIx(
+        market,
+        this.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
+
+    let orderIx = placeOrderV3Ix(
+      marketIndex,
+      price,
+      size,
+      side,
+      OrderType.FILLORKILL,
+      0, // Default to none for now.
+      tag,
+      this.marginAccountAddress,
+      this.publicKey,
+      openOrdersPda,
+      this._whitelistTradingFeesAddress
+    );
+
+    tx.add(orderIx);
+
+    if (this.spreadAccount == null) {
+      console.log("User has no spread account. Creating spread account...");
+      tx.add(
+        initializeSpreadAccountIx(
+          Exchange.zetaGroupAddress,
+          this.spreadAccountAddress,
+          this.publicKey
+        )
+      );
+    }
+
+    let movementSize = side == Side.BID ? size : -size;
+    let movements: PositionMovementArg[] = [
+      {
+        index: marketIndex,
+        size: new anchor.BN(movementSize),
+      },
+    ];
+
+    tx.add(
+      positionMovementIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this.spreadAccountAddress,
+        this.publicKey,
+        Exchange.greeksAddress,
+        Exchange.zetaGroup.oracle,
+        MovementType.LOCK,
+        movements
+      )
+    );
+
+    let txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+
     return txId;
   }
 
@@ -631,7 +823,7 @@ export class Client {
     side: Side,
     orderType: OrderType,
     clientOrderId = 0,
-    tag: String = "SDK"
+    tag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -669,16 +861,8 @@ export class Client {
     tx.add(orderIx);
 
     let txId: TransactionSignature;
-    try {
-      this._openOrdersAccounts[marketIndex] = openOrdersPda;
-      txId = await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      // If we were initializing open orders in the same tx.
-      if (tx.instructions.length > 1) {
-        this._openOrdersAccounts[marketIndex] = PublicKey.default;
-      }
-      throw e;
-    }
+    txId = await utils.processTransaction(this._provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
   }
 
@@ -738,9 +922,9 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderPrice  the native price of the order (6 d.p) as integer
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderSide   the side of the order. bid / ask
    */
   public async cancelAndPlaceOrder(
     market: PublicKey,
@@ -784,9 +968,9 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderPrice  the native price of the order (6 d.p) as integer
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderSide   the side of the order. bid / ask
    * @param newOrderType   the type of the order, limit / ioc / post-only
    * @param clientOrderId   optional: client order id (non 0 value)
    */
@@ -834,12 +1018,12 @@ export class Client {
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.
    * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderprice  the native price of the order (6 d.p) as integer
+   * @param newOrderPrice  the native price of the order (6 d.p) as integer
    * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderside   the side of the order. bid / ask
+   * @param newOrderSide   the side of the order. bid / ask
    * @param newOrderType   the type of the order, limit / ioc / post-only
    * @param clientOrderId   optional: client order id (non 0 value)
-   * @param tag             optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
   public async cancelAndPlaceOrderV3(
     market: PublicKey,
@@ -850,7 +1034,7 @@ export class Client {
     newOrderSide: Side,
     newOrderType: OrderType,
     clientOrderId = 0,
-    newOrderTag: String = "SDK"
+    newOrderTag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -886,7 +1070,7 @@ export class Client {
    * Cancels a user order by client order id and atomically places an order by new client order id.
    * @param market                  the market address of the order to be cancelled and new order.
    * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderprice           the native price of the order (6 d.p) as integer
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
    * @param newOrderSize            the quantity of the order (3 d.p) as integer
    * @param newOrderSide            the side of the order. bid / ask
    * @param newOrderClientOrderId   the client order id for the new order
@@ -930,7 +1114,7 @@ export class Client {
    * Cancels a user order by client order id and atomically places an order by new client order id.
    * @param market                  the market address of the order to be cancelled and new order.
    * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderprice           the native price of the order (6 d.p) as integer
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
    * @param newOrderSize            the quantity of the order (3 d.p) as integer
    * @param newOrderSide            the side of the order. bid / ask
    * @param newOrderType            the type of the order, limit / ioc / post-only
@@ -1133,7 +1317,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let marginAccount = (await this._program.account.marginAccount.fetch(
       marginAccountToCancel
-    )) as MarginAccount;
+    )) as unknown as MarginAccount;
 
     let marketIndex = Exchange.markets.getMarketIndex(market);
 
@@ -1208,14 +1392,110 @@ export class Client {
     return txIds;
   }
 
+  /**
+   * Moves positions to and from spread and margin account, based on the type.
+   * @param movementType    - type of movement
+   * @param movements       - vector of position movements
+   */
+  public async positionMovement(
+    movementType: MovementType,
+    movements: PositionMovementArg[]
+  ): Promise<TransactionSignature> {
+    let tx = this.getPositionMovementTx(movementType, movements);
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Moves positions to and from spread and margin account, based on the type.
+   * @param movementType    - type of movement
+   * @param movements       - vector of position movements
+   */
+  public async simulatePositionMovement(
+    movementType: MovementType,
+    movements: PositionMovementArg[]
+  ): Promise<PositionMovementEvent> {
+    let tx = this.getPositionMovementTx(movementType, movements);
+    let response = await utils.simulateTransaction(this.provider, tx);
+
+    let events = response.events;
+    let positionMovementEvent = undefined;
+    for (var i = 0; i < events.length; i++) {
+      if (events[i].name == "PositionMovementEvent") {
+        positionMovementEvent = events[i].data;
+        break;
+      }
+    }
+
+    if (positionMovementEvent == undefined) {
+      throw new Error("Failed to simulate position movement.");
+    }
+
+    return positionMovementEvent;
+  }
+
+  private getPositionMovementTx(
+    movementType: MovementType,
+    movements: PositionMovementArg[]
+  ): Transaction {
+    if (movements.length > MAX_POSITION_MOVEMENTS) {
+      throw new Error(
+        `Max position movements exceeded. Max = ${MAX_POSITION_MOVEMENTS} < ${movements.length}`
+      );
+    }
+
+    let tx = new Transaction();
+    this.assertHasMarginAccount();
+
+    if (this.spreadAccount == null) {
+      console.log("User has no spread account. Creating spread account...");
+      tx.add(
+        initializeSpreadAccountIx(
+          Exchange.zetaGroupAddress,
+          this.spreadAccountAddress,
+          this.publicKey
+        )
+      );
+    }
+
+    tx.add(
+      positionMovementIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this.spreadAccountAddress,
+        this.publicKey,
+        Exchange.greeksAddress,
+        Exchange.zetaGroup.oracle,
+        movementType,
+        movements
+      )
+    );
+
+    return tx;
+  }
+
+  /**
+   * Transfers any non required balance in the spread account to margin account.
+   */
+  public async transferExcessSpreadBalance(): Promise<TransactionSignature> {
+    let tx = new Transaction().add(
+      transferExcessSpreadBalanceIx(
+        Exchange.zetaGroupAddress,
+        this.marginAccountAddress,
+        this.spreadAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
   private getRelevantMarketIndexes(): number[] {
     let indexes = [];
-    for (var i = 0; i < this._marginAccount.positions.length; i++) {
-      let position = this._marginAccount.positions[i];
+    for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
+      let ledger = this._marginAccount.productLedgers[i];
       if (
-        position.position.toNumber() !== 0 ||
-        position.openingOrders[0].toNumber() != 0 ||
-        position.openingOrders[1].toNumber() != 0
+        ledger.position.size.toNumber() !== 0 ||
+        ledger.orderState.openingOrders[0].toNumber() != 0 ||
+        ledger.orderState.openingOrders[1].toNumber() != 0
       ) {
         indexes.push(i);
       }
@@ -1240,21 +1520,40 @@ export class Client {
 
   private updatePositions() {
     let positions: Position[] = [];
-    for (var i = 0; i < this._marginAccount.positions.length; i++) {
-      if (this._marginAccount.positions[i].position.toNumber() != 0) {
+    for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
+      if (this._marginAccount.productLedgers[i].position.size.toNumber() != 0) {
         positions.push({
           marketIndex: i,
           market: Exchange.zetaGroup.products[i].market,
-          position: utils.convertNativeLotSizeToDecimal(
-            this._marginAccount.positions[i].position.toNumber()
+          size: utils.convertNativeLotSizeToDecimal(
+            this._marginAccount.productLedgers[i].position.size.toNumber()
           ),
           costOfTrades: utils.convertNativeBNToDecimal(
-            this._marginAccount.positions[i].costOfTrades
+            this._marginAccount.productLedgers[i].position.costOfTrades
           ),
         });
       }
     }
     this._positions = positions;
+  }
+
+  private updateSpreadPositions() {
+    let positions: Position[] = [];
+    for (var i = 0; i < this._spreadAccount.positions.length; i++) {
+      if (this._spreadAccount.positions[i].size.toNumber() != 0) {
+        positions.push({
+          marketIndex: i,
+          market: Exchange.zetaGroup.products[i].market,
+          size: utils.convertNativeLotSizeToDecimal(
+            this._spreadAccount.positions[i].size.toNumber()
+          ),
+          costOfTrades: utils.convertNativeBNToDecimal(
+            this._spreadAccount.positions[i].costOfTrades
+          ),
+        });
+      }
+    }
+    this._spreadPositions = positions;
   }
 
   private async usdcAccountCheck() {
@@ -1295,6 +1594,104 @@ export class Client {
     );
   }
 
+  private assertHasMarginAccount() {
+    if (this.marginAccount == null) {
+      throw Error("Margin account doesn't exist!");
+    }
+  }
+
+  /**
+   * Getter functions for raw user margin account state.
+   */
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getMarginPositionSize(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let size =
+      this.marginAccount.productLedgers[index].position.size.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getMarginCostOfTrades(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let costOfTrades =
+      this.marginAccount.productLedgers[index].position.costOfTrades.toNumber();
+    return decimal
+      ? utils.convertNativeIntegerToDecimal(costOfTrades)
+      : costOfTrades;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getOpeningOrders(
+    index: number,
+    side: Side,
+    decimal: boolean = false
+  ): number {
+    let orderIndex = side == Side.BID ? 0 : 1;
+    let size =
+      this.marginAccount.productLedgers[index].orderState.openingOrders[
+        orderIndex
+      ].toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getClosingOrders(index: number, decimal: boolean = false): number {
+    let size =
+      this.marginAccount.productLedgers[
+        index
+      ].orderState.closingOrders.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * Getter functions for raw user spread account state.
+   */
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getSpreadPositionSize(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let size = this.spreadAccount.positions[index].size.toNumber();
+    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  }
+
+  /**
+   * @param index - market index.
+   * @param decimal - whether to convert to readable decimal.
+   */
+  public getSpreadCostOfTrades(
+    index: number,
+    decimal: boolean = false
+  ): number {
+    let costOfTrades =
+      this.spreadAccount.positions[index].costOfTrades.toNumber();
+    return decimal
+      ? utils.convertNativeIntegerToDecimal(costOfTrades)
+      : costOfTrades;
+  }
+
   /**
    * Closes the client websocket subscription to margin account.
    */
@@ -1305,10 +1702,19 @@ export class Client {
       );
       this._marginAccountSubscriptionId = undefined;
     }
+
+    if (this._spreadAccountSubscriptionId !== undefined) {
+      await this._provider.connection.removeAccountChangeListener(
+        this._spreadAccountSubscriptionId
+      );
+      this._spreadAccountSubscriptionId = undefined;
+    }
+
     if (this._tradeEventListener !== undefined) {
       await this._program.removeEventListener(this._tradeEventListener);
       this._tradeEventListener = undefined;
     }
+
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);
       this._pollIntervalId = undefined;

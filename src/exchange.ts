@@ -6,6 +6,7 @@ import {
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
   AccountInfo,
+  AccountMeta,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -58,13 +59,13 @@ export class Exchange {
   /**
    * Anchor provider instance.
    */
-  public get provider(): anchor.Provider {
+  public get provider(): anchor.AnchorProvider {
     return this._provider;
   }
   public get connection(): Connection {
     return this._provider.connection;
   }
-  private _provider: anchor.Provider;
+  private _provider: anchor.AnchorProvider;
 
   /**
    * Account storing zeta state.
@@ -255,7 +256,7 @@ export class Exchange {
     if (exchange.isInitialized) {
       throw "Exchange already initialized";
     }
-    this._provider = new anchor.Provider(
+    this._provider = new anchor.AnchorProvider(
       connection,
       wallet,
       opts || utils.commitmentConfig(connection.commitment)
@@ -682,13 +683,13 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
           console.log(`Market ${i} already initialized. Skipping...`);
         } else {
           try {
-            await this.provider.send(tx, [
+            await utils.processTransaction(this.provider, tx, [
               requestQueue,
               eventQueue,
               bids,
               asks,
             ]);
-            await this.provider.send(tx2);
+            await utils.processTransaction(this.provider, tx2);
           } catch (e) {
             console.error(`Initialize zeta market ${i} failed: ${e}`);
           }
@@ -1086,9 +1087,22 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     await utils.processTransaction(this._provider, tx);
   }
 
-  public async settlePositionsHalted(marginAccounts: any[]) {
+  public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
     let txs = instructions.settlePositionsHaltedTxs(
       marginAccounts,
+      this._provider.wallet.publicKey
+    );
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        await utils.processTransaction(this._provider, tx);
+      })
+    );
+  }
+
+  public async settleSpreadPositionsHalted(spreadAccounts: AccountMeta[]) {
+    let txs = instructions.settleSpreadPositionsHaltedTxs(
+      spreadAccounts,
       this._provider.wallet.publicKey
     );
 

@@ -31,7 +31,7 @@ export class InsuranceClient {
   /**
    * Anchor provider for client, including wallet.
    */
-  private _provider: anchor.Provider;
+  private _provider: anchor.AnchorProvider;
 
   /**
    * Anchor program wrapper for the IDL.
@@ -75,7 +75,7 @@ export class InsuranceClient {
     wallet: Wallet,
     opts: ConfirmOptions
   ) {
-    this._provider = new anchor.Provider(connection, wallet, opts);
+    this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._program = new anchor.Program(
       idl as anchor.Idl,
       Exchange.programId,
@@ -186,7 +186,7 @@ export class InsuranceClient {
       this._insuranceDepositAccount =
         (await this._program.account.insuranceDepositAccount.fetch(
           this._insuranceDepositAccountAddress
-        )) as InsuranceDepositAccount;
+        )) as unknown as InsuranceDepositAccount;
     } catch (e) {
       console.log(
         "User has no insurance deposit account. Please deposit into the insurance vault if you are whitelisted."
@@ -222,7 +222,7 @@ export class InsuranceClient {
     try {
       (await this._program.account.whitelistInsuranceAccount.fetch(
         whitelistInsuranceAccountAddress
-      )) as WhitelistInsuranceAccount;
+      )) as unknown as WhitelistInsuranceAccount;
     } catch (e) {
       throw Error("User is not white listed for the insurance vault.");
     }

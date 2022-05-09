@@ -5,9 +5,29 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.14.0]
+
+- events: Add new event PlaceOrderEvent. ([#107](https://github.com/zetamarkets/sdk/pull/107))
 - program: Add new instruction PlaceOrderV3. ([#104](https://github.com/zetamarkets/sdk/pull/104))
 - program: Change liquidate() size argument in program from u32 to u64. ([#103](https://github.com/zetamarkets/sdk/pull/103))
 - program: Mark greek accounts as immutable in certain instructions.
+- program: Add support for spread accounts. ([#102](https://github.com/zetamarkets/sdk/pull/102))
+- client: Added helper getter functions for user margin account and spread account state. ([#102](https://github.com/zetamarkets/sdk/pull/102))
+- anchor: Bump to 0.24.2. ([#110](https://github.com/zetamarkets/sdk/pull/110))
+- errors: Parse anchor `AnchorError` to local `NativeAnchorError` to standardise error fields. ([#110](https://github.com/zetamarkets/sdk/pull/110))
+- errors: Refactor error handling and parse simulation errors. ([#111](https://github.com/zetamarkets/sdk/pull/111))
+- client: Expose whitelist deposit address. ([#112](https://github.com/zetamarkets/sdk/pull/112))
+
+### Breaking
+
+- instruction: `InitializeMarginAccount` now explicitly specifies the payer for composability reasons. ([#108](https://github.com/zetamarkets/sdk/pull/108))
+- instruction: `InitializeMarginAccount` no longer requires a nonce to be passed in for the PDA generation. ([#102](https://github.com/zetamarkets/sdk/pull/102))
+- client: SDK type `Position` field `position` has been renamed to `size`. ([#102](https://github.com/zetamarkets/sdk/pull/102))
+- program-types: Smart contract type `Position` field `position` has been renamed to `size`. ([#102](https://github.com/zetamarkets/sdk/pull/102))
+- program-types: `MarginAccount` field `positions` of type `Position` has been renamed to `productLedgers` of type `ProductLedger` that contains a `Position` and a `OrderState`. `Position` contains `size` and `costOfTrades` and `OrderState` contains opening and closing order data. ([#102](https://github.com/zetamarkets/sdk/pull/102))
+
+Note: As the memory layout of Zeta accounts has not changed, merely refactored or renamed, using an older version of the SDK for existing accounts is not breaking as it will still deserialize correctly. Updating to the latest SDK will let users access the newest features and improvements.
+- The only breaking portion is calling `InitializeMarginAccount` on new account deposits.
 
 ## [0.13.0] 2022-03-13
 
