@@ -1178,7 +1178,7 @@ export class Client {
     newOrderSide: Side,
     newOrderType: OrderType,
     newOrderClientOrderId: number,
-    newOrderTag: String
+    newOrderTag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
@@ -1229,7 +1229,7 @@ export class Client {
     newOrderSide: Side,
     newOrderType: OrderType,
     newOrderClientOrderId: number,
-    newOrderTag: String
+    newOrderTag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = Exchange.markets.getMarketIndex(market);
