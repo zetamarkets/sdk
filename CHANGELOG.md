@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- oracle: Add lastUpdatedTime and pollPrice() to Oracle. ([#115](https://github.com/zetamarkets/sdk/pull/115))
+
 ## [0.14.0]
 
 - events: Add new event PlaceOrderEvent. ([#107](https://github.com/zetamarkets/sdk/pull/107))
