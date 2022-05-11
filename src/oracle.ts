@@ -41,6 +41,27 @@ export class Oracle {
     return priceData.price;
   }
 
+  // Fetch and update an oracle price manually
+  public async pollPrice(feed: string, triggerCallback = true) {
+    if (!(feed in constants.PYTH_PRICE_FEEDS[this._network])) {
+      throw Error("Invalid Oracle feed!");
+    }
+
+    let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][feed];
+    let accountInfo = await this._connection.getAccountInfo(priceAddress);
+    let priceData = parsePythData(accountInfo.data);
+    let oracleData = {
+      feed,
+      price: priceData.price,
+      lastUpdatedTime: Exchange.clockTimestamp,
+    };
+    this._data.set(feed, oracleData);
+
+    if (triggerCallback) {
+      this._callback(oracleData);
+    }
+  }
+
   public async subscribePriceFeeds(callback: (price: OraclePrice) => void) {
     if (this._callback != undefined) {
       throw Error("Oracle price feeds already subscribed to!");
@@ -55,10 +76,6 @@ export class Oracle {
         priceAddress,
         (accountInfo: AccountInfo<Buffer>, _context: Context) => {
           let priceData = parsePythData(accountInfo.data);
-          let currPrice = this._data.get(feed);
-          if (currPrice !== undefined && currPrice.price === priceData.price) {
-            return;
-          }
           let oracleData = {
             feed,
             price: priceData.price,
@@ -73,14 +90,7 @@ export class Oracle {
 
       // TODO set this so localnet has data for the oracle
       // Remove once there is an oracle simulator.
-      let accountInfo = await this._connection.getAccountInfo(priceAddress);
-      let priceData = parsePythData(accountInfo.data);
-      let oracleData = {
-        feed,
-        price: priceData.price,
-        lastUpdatedTime: Exchange.clockTimestamp,
-      };
-      this._data.set(feed, oracleData);
+      this.pollPrice(feed, false);
     }
   }
 
