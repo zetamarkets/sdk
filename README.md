@@ -496,7 +496,7 @@ ORACLE:
 export interface OraclePrice {
   feed: string; // The feed's name i.e. SOL/USD
   price: number; // i.e. 1000.23
-  lastUpdatedTimeMs: number; // Milliseconds since Linux epoch
+  lastUpdatedTime: number; // Seconds since Linux epoch
 }
 ```
 

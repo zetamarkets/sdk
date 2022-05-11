@@ -30,8 +30,8 @@ export class Oracle {
     return this._data.get(feed);
   }
 
-  public getPriceAgeMs(feed: string): number {
-    return Date.now() - this.getPrice(feed).lastUpdatedTimeMs;
+  public getPriceAge(feed: string): number {
+    return Date.now() / 1000 - this.getPrice(feed).lastUpdatedTime;
   }
 
   // Allows fetching of any pyth oracle price.
@@ -62,7 +62,7 @@ export class Oracle {
           let oracleData = {
             feed,
             price: priceData.price,
-            lastUpdatedTimeMs: Exchange.clockTimestamp,
+            lastUpdatedTime: Exchange.clockTimestamp,
           };
           this._data.set(feed, oracleData);
           this._callback(oracleData);
@@ -78,7 +78,7 @@ export class Oracle {
       let oracleData = {
         feed,
         price: priceData.price,
-        lastUpdatedTimeMs: Exchange.clockTimestamp,
+        lastUpdatedTime: Exchange.clockTimestamp,
       };
       this._data.set(feed, oracleData);
     }
@@ -94,5 +94,5 @@ export class Oracle {
 export interface OraclePrice {
   feed: string;
   price: number;
-  lastUpdatedTimeMs: number;
+  lastUpdatedTime: number;
 }
