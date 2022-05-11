@@ -83,7 +83,10 @@ export class Exchange {
   }
   private _zetaGroup: ZetaGroup;
 
-  public getAsset(): Asset {
+  /**
+   * The asset loaded to the exchange.
+   */
+  public get asset(): Asset {
     return this._asset;
   }
   private _asset: Asset;
@@ -313,16 +316,6 @@ export class Exchange {
     exchange._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
 
     await exchange.updateState();
-    console.log(`Initialized zeta state!`);
-    console.log(
-      `Params:
-expiryIntervalSeconds=${params.expiryIntervalSeconds},
-newExpiryThresholdSeconds=${params.newExpiryThresholdSeconds},
-strikeInitializationThresholdSeconds=${params.strikeInitializationThresholdSeconds}
-pricingFrequencySeconds=${params.pricingFrequencySeconds}
-insuranceVaultLiquidationPercentage=${params.insuranceVaultLiquidationPercentage}
-expirationThresholdSeconds=${params.expirationThresholdSeconds}`
-    );
   }
 
   /**
@@ -377,8 +370,9 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     exchange._zetaGroupAddress = zetaGroup;
 
     try {
-      await exchange.subscribeOracle(underlyingAccount.mint, callback);
+      await exchange.subscribeOracle(callback);
     } catch (e) {}
+
     await exchange.updateState();
     await exchange.updateZetaGroup();
 
@@ -524,7 +518,7 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     this.subscribeClock(callback);
     this.subscribeGreeks(callback);
     try {
-      await this.subscribeOracle(underlyingMint, callback);
+      await this.subscribeOracle(callback);
     } catch (e) {}
   }
 
@@ -838,11 +832,10 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
   }
 
   private async subscribeOracle(
-    underlyingMint: PublicKey,
     callback?: (type: EventType, data: any) => void
   ) {
     await this._oracle.subscribePriceFeeds(
-      underlyingMint,
+      [this.asset], // TODO pass in list later.
       (price: OraclePrice) => {
         if (this._isInitialized) {
           this._riskCalculator.updateMarginRequirements();

@@ -41,9 +41,13 @@ export const PYTH_PRICE_FEEDS = {
   },
   devnet: {
     "SOL/USD": new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
+    "BTC/USD": new PublicKey("HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J"),
+    "LUNA/USD": new PublicKey("8PugCXTAHLM9kfLSQWe2njE5pzAgUdpPk3Nx5zSm7BD3"),
   },
   mainnet: {
     "SOL/USD": new PublicKey("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG"),
+    "BTC/USD": new PublicKey("GVXRSBjFk6e6J3NbVPXohDJetcTjaeeuykUpbQF8UoMU"),
+    "LUNA/USD": new PublicKey("5bmWuR1dgP4avtGYMNKLuxumZTVKGgoN2BCMXWDNL9nY"),
   },
 };
 

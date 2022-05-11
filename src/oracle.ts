@@ -3,6 +3,8 @@ import { parsePythData, Price } from "./oracle-utils";
 import { Network } from "./network";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
+import { Asset } from "./types";
+import { assetToOracleFeed } from "./utils";
 
 export class Oracle {
   private _connection: Connection;
@@ -38,7 +40,7 @@ export class Oracle {
   }
 
   public async subscribePriceFeeds(
-    underlyingMint: PublicKey,
+    assets: Asset[],
     callback: (price: OraclePrice) => void
   ) {
     if (this._callback != undefined) {
@@ -46,9 +48,8 @@ export class Oracle {
     }
     this._callback = callback;
 
-    let feeds = Object.keys(constants.PYTH_PRICE_FEEDS[this._network]);
-    for (var i = 0; i < feeds.length; i++) {
-      let feed = feeds[i];
+    for (var i = 0; i < assets.length; i++) {
+      let feed = assetToOracleFeed(assets[i]);
       console.log(`Oracle subscribing to feed ${feed}`);
       let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][feed];
       let subscriptionId = this._connection.onAccountChange(
@@ -70,8 +71,6 @@ export class Oracle {
       );
       this._subscriptionIds.set(feed, subscriptionId);
 
-      // TODO set this so localnet has data for the oracle
-      // Remove once there is an oracle simulator.
       let accountInfo = await this._connection.getAccountInfo(priceAddress);
       let priceData = parsePythData(accountInfo.data);
       let oracleData = {
