@@ -7,9 +7,11 @@ import {
   Network,
   utils,
   types,
+  events,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import fetch from "node-fetch";
+import { sleep } from "../cranking/cranking-example";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
@@ -17,6 +19,14 @@ const PROGRAM_ID = new PublicKey(process.env["program_id"]);
 const STARTING_BALANCE = 10_000;
 
 console.log(NETWORK_URL);
+
+async function callback(eventType: events.EventType, data: any) {
+  switch (eventType) {
+    case events.EventType.ORACLE:
+      console.log(Exchange.oracle.getPrice(data.feed));
+      break;
+  }
+}
 
 async function main() {
   // Generate a new keypair for wallet otherwise load from a private key.
@@ -46,7 +56,9 @@ async function main() {
     // Exchange wallet can be ignored for normal clients.
     undefined,
     // ThrottleMs - increase if you are running into rate limit issues on startup.
-    0
+    0,
+    // Callback
+    callback
   );
 
   const client = await Client.load(
@@ -55,6 +67,8 @@ async function main() {
     utils.defaultCommitment(),
     undefined
   );
+
+  await sleep(500);
 
   await client.deposit(utils.convertDecimalToNativeInteger(STARTING_BALANCE));
 
