@@ -4517,6 +4517,11 @@ export type Zeta = {
           "name": "orderId",
           "type": "u128",
           "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
+          "index": false
         }
       ]
     }
@@ -9573,6 +9578,11 @@ export const IDL: Zeta = {
         {
           "name": "orderId",
           "type": "u128",
+          "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
           "index": false
         }
       ]
