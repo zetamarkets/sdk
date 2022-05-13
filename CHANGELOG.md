@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- events: Add isTaker boolean to PlaceOrderEvent. ([#116](https://github.com/zetamarkets/sdk/pull/116))
+
 ## [0.14.0]
 
 - events: Add new event PlaceOrderEvent. ([#107](https://github.com/zetamarkets/sdk/pull/107))
