@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 - oracle: `OraclePrice` now contains `lastUpdatedTime` which is seconds since Linux epoch. `GetPriceAge` can be called to get the time between `now` and `lastUpdatedTime`. (([#115](https://github.com/zetamarkets/sdk/pull/115)))
 - oracle: Now has explicit `pollPrice` function to fetch the latest oracle price manually. (([#115](https://github.com/zetamarkets/sdk/pull/115)))
+- events: Add isTaker boolean to PlaceOrderEvent. ([#116](https://github.com/zetamarkets/sdk/pull/116))
 
 ## [0.14.0]
 
