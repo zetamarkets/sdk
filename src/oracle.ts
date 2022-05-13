@@ -77,6 +77,10 @@ export class Oracle {
         priceAddress,
         (accountInfo: AccountInfo<Buffer>, _context: Context) => {
           let priceData = parsePythData(accountInfo.data);
+          let currPrice = this._data.get(feed);
+          if (currPrice !== undefined && currPrice.price === priceData.price) {
+            return;
+          }
           let oracleData = {
             feed,
             price: priceData.price,
