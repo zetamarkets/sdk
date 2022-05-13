@@ -60,6 +60,7 @@ export class Oracle {
     if (triggerCallback) {
       this._callback(oracleData);
     }
+    return oracleData;
   }
 
   public async subscribePriceFeeds(callback: (price: OraclePrice) => void) {
