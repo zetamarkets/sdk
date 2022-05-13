@@ -54,6 +54,7 @@ export class Oracle {
       feed,
       price: priceData.price,
       lastUpdatedTime: Exchange.clockTimestamp,
+      lastUpdatedSlot: priceData.publishSlot,
     };
     this._data.set(feed, oracleData);
 
@@ -85,6 +86,7 @@ export class Oracle {
             feed,
             price: priceData.price,
             lastUpdatedTime: Exchange.clockTimestamp,
+            lastUpdatedSlot: priceData.publishSlot,
           };
           this._data.set(feed, oracleData);
           this._callback(oracleData);
@@ -95,7 +97,7 @@ export class Oracle {
 
       // TODO set this so localnet has data for the oracle
       // Remove once there is an oracle simulator.
-      this.pollPrice(feed, false);
+      await this.pollPrice(feed, false);
     }
   }
 
@@ -110,4 +112,5 @@ export interface OraclePrice {
   feed: string;
   price: number;
   lastUpdatedTime: number;
+  lastUpdatedSlot: bigint;
 }
