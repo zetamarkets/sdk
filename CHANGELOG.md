@@ -5,7 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- oracle: Add lastUpdatedTime and pollPrice() to Oracle. ([#115](https://github.com/zetamarkets/sdk/pull/115))
+- oracle: `OraclePrice` now contains `lastUpdatedTime` which is seconds since Linux epoch. `GetPriceAge` can be called to get the time between `now` and `lastUpdatedTime`. (([#115](https://github.com/zetamarkets/sdk/pull/115)))
+- oracle: Now has explicit `pollPrice` function to fetch the latest oracle price manually. (([#115](https://github.com/zetamarkets/sdk/pull/115)))
 
 ## [0.14.0]
 
@@ -29,6 +30,7 @@ Version changes are pinned to SDK releases.
 - program-types: `MarginAccount` field `positions` of type `Position` has been renamed to `productLedgers` of type `ProductLedger` that contains a `Position` and a `OrderState`. `Position` contains `size` and `costOfTrades` and `OrderState` contains opening and closing order data. ([#102](https://github.com/zetamarkets/sdk/pull/102))
 
 Note: As the memory layout of Zeta accounts has not changed, merely refactored or renamed, using an older version of the SDK for existing accounts is not breaking as it will still deserialize correctly. Updating to the latest SDK will let users access the newest features and improvements.
+
 - The only breaking portion is calling `InitializeMarginAccount` on new account deposits.
 
 ## [0.13.0] 2022-03-13
