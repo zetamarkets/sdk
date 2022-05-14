@@ -42,7 +42,10 @@ export class Oracle {
   }
 
   // Fetch and update an oracle price manually
-  public async pollPrice(feed: string, triggerCallback = true) {
+  public async pollPrice(
+    feed: string,
+    triggerCallback = true
+  ): Promise<OraclePrice> {
     if (!(feed in constants.PYTH_PRICE_FEEDS[this._network])) {
       throw Error("Invalid Oracle feed!");
     }
