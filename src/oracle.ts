@@ -30,11 +30,41 @@ export class Oracle {
     return this._data.get(feed);
   }
 
+  public getPriceAge(feed: string): number {
+    return Date.now() / 1000 - this.getPrice(feed).lastUpdatedTime;
+  }
+
   // Allows fetching of any pyth oracle price.
   public async fetchPrice(oracleKey: PublicKey): Promise<number> {
     let accountInfo = await this._connection.getAccountInfo(oracleKey);
     let priceData = parsePythData(accountInfo.data);
     return priceData.price;
+  }
+
+  // Fetch and update an oracle price manually
+  public async pollPrice(
+    feed: string,
+    triggerCallback = true
+  ): Promise<OraclePrice> {
+    if (!(feed in constants.PYTH_PRICE_FEEDS[this._network])) {
+      throw Error("Invalid Oracle feed!");
+    }
+
+    let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][feed];
+    let accountInfo = await this._connection.getAccountInfo(priceAddress);
+    let priceData = parsePythData(accountInfo.data);
+    let oracleData = {
+      feed,
+      price: priceData.price,
+      lastUpdatedTime: Exchange.clockTimestamp,
+      lastUpdatedSlot: priceData.publishSlot,
+    };
+    this._data.set(feed, oracleData);
+
+    if (triggerCallback) {
+      this._callback(oracleData);
+    }
+    return oracleData;
   }
 
   public async subscribePriceFeeds(callback: (price: OraclePrice) => void) {
@@ -58,6 +88,8 @@ export class Oracle {
           let oracleData = {
             feed,
             price: priceData.price,
+            lastUpdatedTime: Exchange.clockTimestamp,
+            lastUpdatedSlot: priceData.publishSlot,
           };
           this._data.set(feed, oracleData);
           this._callback(oracleData);
@@ -68,13 +100,7 @@ export class Oracle {
 
       // TODO set this so localnet has data for the oracle
       // Remove once there is an oracle simulator.
-      let accountInfo = await this._connection.getAccountInfo(priceAddress);
-      let priceData = parsePythData(accountInfo.data);
-      let oracleData = {
-        feed,
-        price: priceData.price,
-      };
-      this._data.set(feed, oracleData);
+      await this.pollPrice(feed, false);
     }
   }
 
@@ -88,4 +114,6 @@ export class Oracle {
 export interface OraclePrice {
   feed: string;
   price: number;
+  lastUpdatedTime: number;
+  lastUpdatedSlot: bigint;
 }
