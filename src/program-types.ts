@@ -228,6 +228,7 @@ export interface PlaceOrderEvent {
   fee: anchor.BN;
   oraclePrice: anchor.BN;
   orderId: anchor.BN;
+  isTaker: boolean;
 }
 
 export interface TradeEvent {
