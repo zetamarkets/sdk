@@ -24,8 +24,18 @@ import { Network } from "./network";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
-import { ClockData, MarginParams, DummyWallet, Wallet, Asset } from "./types";
+import {
+  ClockData,
+  MarginParams,
+  DummyWallet,
+  Wallet,
+  Asset,
+  assetToName,
+} from "./types";
 import * as instructions from "./program-instructions";
+import * as fs from "fs";
+import { LedgerWalletProvider } from "./ledger/ledger";
+import { getLedgerWallet } from "./ledger/wallet";
 
 export class Exchange {
   /**
@@ -206,6 +216,22 @@ export class Exchange {
     return this._marginParams;
   }
   private _marginParams: MarginParams;
+
+  public get ledgerWallet(): LedgerWalletProvider {
+    return this._ledgerWallet;
+  }
+  private _ledgerWallet: LedgerWalletProvider;
+
+  public get useLedger(): boolean {
+    return this._useLedger;
+  }
+
+  public async useLedgerMode() {
+    this._useLedger = true;
+    this._ledgerWallet = await getLedgerWallet();
+  }
+
+  private _useLedger: boolean = false;
 
   /**
    * @param interval   How often to poll zeta group and state in seconds.
@@ -458,12 +484,15 @@ export class Exchange {
     oracle: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
-    underlyingMint: PublicKey,
+    asset: Asset,
     callback?: (type: EventType, data: any) => void
   ) {
+    this._asset = asset;
+    let underlyingMint = constants.MINTS[asset];
+
     const [zetaGroup, _zetaGroupNonce] = await utils.getZetaGroup(
       this.program.programId,
-      underlyingMint
+      constants.MINTS[asset]
     );
     this._zetaGroupAddress = zetaGroup;
 
@@ -502,9 +531,16 @@ export class Exchange {
       )
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        [],
+        utils.defaultCommitment(),
+        this.useLedger
+      );
     } catch (e) {
       console.error(`Initialize zeta group failed: ${e}`);
+      console.log(JSON.stringify(e));
     }
 
     await this.updateZetaGroup();
@@ -599,9 +635,16 @@ export class Exchange {
       instructions.initializeMarketIndexesIx(marketIndexes, marketIndexesNonce)
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        [],
+        utils.defaultCommitment(),
+        this.useLedger
+      );
     } catch (e) {
       console.error(`Initialize market indexes failed: ${e}`);
+      console.log(JSON.stringify(e));
     }
 
     // We initialize 50 indexes at a time in the program.
@@ -615,8 +658,15 @@ export class Exchange {
       i += constants.MARKET_INDEX_LIMIT
     ) {
       try {
-        await utils.processTransaction(this._provider, tx2);
+        await utils.processTransaction(
+          this._provider,
+          tx2,
+          [],
+          utils.defaultCommitment(),
+          this.useLedger
+        );
       } catch (e) {
+        console.log(JSON.stringify(e));
         console.error(`Add market indexes failed: ${e}`);
       }
     }
@@ -630,72 +680,113 @@ export class Exchange {
     }
 
     let indexes = [...Array(this.zetaGroup.products.length).keys()];
-    await Promise.all(
-      indexes.map(async (i) => {
-        console.log(
-          `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
-        );
-
-        const requestQueue = anchor.web3.Keypair.generate();
-        const eventQueue = anchor.web3.Keypair.generate();
-        const bids = anchor.web3.Keypair.generate();
-        const asks = anchor.web3.Keypair.generate();
-
-        // Store the keypairs locally.
-        utils.writeKeypair(`keys/rq-${i}.json`, requestQueue);
-        utils.writeKeypair(`keys/eq-${i}.json`, eventQueue);
-        utils.writeKeypair(`keys/bids-${i}.json`, bids);
-        utils.writeKeypair(`keys/asks-${i}.json`, asks);
-
-        let [tx, tx2] = await instructions.initializeZetaMarketTxs(
-          i,
-          marketIndexesAccount.indexes[i],
-          requestQueue.publicKey,
-          eventQueue.publicKey,
-          bids.publicKey,
-          asks.publicKey,
-          marketIndexes
-        );
-
-        let initialized = false;
-        if (this.network != Network.LOCALNET) {
-          // Validate that the market hasn't already been initialized
-          // So no sol is wasted on unnecessary accounts.
-          const [market, _marketNonce] = await utils.getMarketUninitialized(
-            this.programId,
-            this._zetaGroupAddress,
-            marketIndexesAccount.indexes[i]
+    if (!this.useLedger) {
+      await Promise.all(
+        indexes.map(async (i) => {
+          await this.initializeZetaMarket(
+            i,
+            marketIndexes,
+            marketIndexesAccount
           );
-
-          let info = await this.provider.connection.getAccountInfo(market);
-          if (info !== null) {
-            initialized = true;
-          }
-        }
-
-        if (initialized) {
-          console.log(`Market ${i} already initialized. Skipping...`);
-        } else {
-          try {
-            await utils.processTransaction(this.provider, tx, [
-              requestQueue,
-              eventQueue,
-              bids,
-              asks,
-            ]);
-            await utils.processTransaction(this.provider, tx2);
-          } catch (e) {
-            console.error(`Initialize zeta market ${i} failed: ${e}`);
-          }
-        }
-      })
-    );
+        })
+      );
+    } else {
+      for (var i = 0; i < this.zetaGroup.products.length; i++) {
+        await this.initializeZetaMarket(i, marketIndexes, marketIndexesAccount);
+      }
+    }
 
     console.log("Market initialization complete!");
     await this.updateZetaGroup();
 
     this._markets = await ZetaGroupMarkets.load(utils.defaultCommitment(), 0);
     this._isInitialized = true;
+  }
+
+  private async initializeZetaMarket(
+    i: number,
+    marketIndexes: PublicKey,
+    marketIndexesAccount: MarketIndexes
+  ) {
+    console.log(
+      `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
+    );
+
+    const homedir = require("os").homedir();
+    let dir = `${homedir}/keys/${assetToName(this.asset)}`;
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    const requestQueue = utils.getOrCreateKeypair(`${dir}/rq-${i}.json`);
+    const eventQueue = utils.getOrCreateKeypair(`${dir}/eq-${i}.json`);
+    const bids = utils.getOrCreateKeypair(`${dir}/bids-${i}.json`);
+    const asks = utils.getOrCreateKeypair(`${dir}/asks-${i}.json`);
+
+    let [tx, tx2] = await instructions.initializeZetaMarketTxs(
+      i,
+      marketIndexesAccount.indexes[i],
+      requestQueue.publicKey,
+      eventQueue.publicKey,
+      bids.publicKey,
+      asks.publicKey,
+      marketIndexes
+    );
+
+    let marketInitialized = false;
+    let accountsInitialized = false;
+    if (this.network != Network.LOCALNET) {
+      // Validate that the market hasn't already been initialized
+      // So no sol is wasted on unnecessary accounts.
+      const [market, _marketNonce] = await utils.getMarketUninitialized(
+        this.programId,
+        this._zetaGroupAddress,
+        marketIndexesAccount.indexes[i]
+      );
+
+      let info = await this.provider.connection.getAccountInfo(market);
+      if (info !== null) {
+        marketInitialized = true;
+      }
+
+      info = await this.provider.connection.getAccountInfo(bids.publicKey);
+      if (info !== null) {
+        accountsInitialized = true;
+      }
+    }
+
+    if (accountsInitialized) {
+      console.log(`Market ${i} serum accounts already initialized...`);
+    } else {
+      try {
+        await utils.processTransaction(this.provider, tx, [
+          requestQueue,
+          eventQueue,
+          bids,
+          asks,
+        ]);
+      } catch (e) {
+        console.error(
+          `Initialize zeta market serum accounts ${i} failed: ${e}`
+        );
+      }
+    }
+
+    if (marketInitialized) {
+      console.log(`Market ${i} already initialized. Skipping...`);
+    } else {
+      try {
+        await utils.processTransaction(
+          this.provider,
+          tx2,
+          [],
+          utils.defaultCommitment(),
+          this.useLedger
+        );
+      } catch (e) {
+        console.error(`Initialize zeta market ${i} failed: ${e}`);
+      }
+    }
   }
 
   /**

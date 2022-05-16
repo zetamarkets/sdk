@@ -689,7 +689,7 @@ export async function initializeZetaMarketTxs(
           state: Exchange.stateAddress,
           marketIndexes: marketIndexes,
           zetaGroup: Exchange.zetaGroupAddress,
-          admin: Exchange.provider.wallet.publicKey,
+          admin: Exchange.state.admin,
           market,
           requestQueue: requestQueue,
           eventQueue: eventQueue,
@@ -795,7 +795,7 @@ export async function initializeZetaGroupIx(
     {
       accounts: {
         state: Exchange.stateAddress,
-        admin: Exchange.provider.wallet.publicKey,
+        admin: Exchange.state.admin,
         systemProgram: SystemProgram.programId,
         underlyingMint,
         zetaProgram: Exchange.programId,
@@ -1014,7 +1014,7 @@ export function initializeMarketIndexesIx(
     accounts: {
       state: Exchange.stateAddress,
       marketIndexes: marketIndexes,
-      admin: Exchange.provider.wallet.publicKey,
+      admin: Exchange.state.admin,
       systemProgram: SystemProgram.programId,
       zetaGroup: Exchange.zetaGroupAddress,
     },
@@ -1594,6 +1594,19 @@ export function burnVaultTokenTx(marketKey: PublicKey): Transaction {
   return tx;
 }
 
+export function overrideExpiryIx(
+  zetaGroup: PublicKey,
+  args: OverrideExpiryArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.overrideExpiry(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin: Exchange.state.admin,
+      zetaGroup,
+    },
+  });
+}
+
 export interface ExpireSeriesOverrideArgs {
   settlementNonce: number;
   settlementPrice: anchor.BN;
@@ -1674,4 +1687,10 @@ export interface UpdateMarginParametersArgs {
 export interface PositionMovementArg {
   index: number;
   size: anchor.BN;
+}
+
+export interface OverrideExpiryArgs {
+  expiryIndex: number;
+  activeTs: anchor.BN;
+  expiryTs: anchor.BN;
 }

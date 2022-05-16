@@ -51,6 +51,7 @@ import {
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
 import { Network } from "./network";
+import { signAndSendLedger } from "./ledger/wallet";
 
 export async function getState(
   programId: PublicKey
@@ -623,27 +624,37 @@ export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
   signers?: Array<Signer>,
-  opts?: ConfirmOptions
+  opts?: ConfirmOptions,
+  useLedger: boolean = false
 ): Promise<TransactionSignature> {
-  const blockhash = await provider.connection.getRecentBlockhash();
-  tx.recentBlockhash = blockhash.blockhash;
-  tx.feePayer = provider.wallet.publicKey;
-  tx = await provider.wallet.signTransaction(tx);
-  if (signers === undefined) {
-    signers = [];
-  }
-  signers
-    .filter((s) => s !== undefined)
-    .forEach((kp) => {
-      tx.partialSign(kp);
-    });
-
   try {
-    let txSig = await sendAndConfirmRawTransaction(
-      provider.connection,
-      tx.serialize(),
-      opts || commitmentConfig(provider.connection.commitment)
-    );
+    let txSig: TransactionSignature;
+    if (useLedger) {
+      txSig = await signAndSendLedger(
+        tx,
+        provider.connection,
+        Exchange.ledgerWallet
+      );
+    } else {
+      const blockhash = await provider.connection.getRecentBlockhash();
+      tx.recentBlockhash = blockhash.blockhash;
+      tx.feePayer = provider.wallet.publicKey;
+      tx = await provider.wallet.signTransaction(tx);
+      if (signers === undefined) {
+        signers = [];
+      }
+      signers
+        .filter((s) => s !== undefined)
+        .forEach((kp) => {
+          tx.partialSign(kp);
+        });
+
+      txSig = await sendAndConfirmRawTransaction(
+        provider.connection,
+        tx.serialize(),
+        opts || commitmentConfig(provider.connection.commitment)
+      );
+    }
     return txSig;
   } catch (err) {
     let parsedErr = parseError(err);
@@ -1312,4 +1323,25 @@ export function getAssetMint(assetType: Asset): PublicKey {
 export function assetToOracleFeed(asset: Asset) {
   let name = assetToName(asset);
   return `${name}/USD`;
+}
+
+export function getOrCreateKeypair(filename: string): Keypair {
+  let keypair: Keypair;
+  if (fs.existsSync(filename)) {
+    // File exists.
+    keypair = Keypair.fromSecretKey(
+      Buffer.from(
+        JSON.parse(
+          fs.readFileSync(filename, {
+            encoding: "utf-8",
+          })
+        )
+      )
+    );
+  } else {
+    // File does not exist
+    keypair = Keypair.generate();
+    writeKeypair(filename, keypair);
+  }
+  return keypair;
 }
