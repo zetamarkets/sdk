@@ -248,3 +248,10 @@ export interface PositionMovementEvent {
   spreadAccountBalance: anchor.BN;
   movementFees: anchor.BN;
 }
+
+export interface LiquidationEvent {
+  liquidatorReward: anchor.BN;
+  insuranceReward: anchor.BN;
+  size: anchor.BN;
+  remainingBalance: anchor.BN;
+}

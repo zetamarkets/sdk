@@ -4672,6 +4672,31 @@ export type Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "LiquidationEvent",
+      "fields": [
+        {
+          "name": "liquidatorReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "insuranceReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingBalance",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -9879,6 +9904,31 @@ export const IDL: Zeta = {
         {
           "name": "isTaker",
           "type": "bool",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "LiquidationEvent",
+      "fields": [
+        {
+          "name": "liquidatorReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "insuranceReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingBalance",
+          "type": "u64",
           "index": false
         }
       ]
