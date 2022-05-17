@@ -445,14 +445,12 @@ export class Exchange {
 
     await exchange.subscribeClock(callback);
 
-    console.log(
-      "Setting Exchange as initialised ..... Underlying is: ",
-      assetType
-    );
     exchange._isInitialized = true;
 
     console.log(
-      `Exchange loaded @ ${new Date(exchange.clockTimestamp * 1000)}`
+      `${assetToName(exchange.asset)} Exchange loaded @ ${new Date(
+        exchange.clockTimestamp * 1000
+      )}`
     );
   }
 
