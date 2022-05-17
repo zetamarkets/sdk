@@ -534,7 +534,6 @@ export class Exchange {
       );
     } catch (e) {
       console.error(`Initialize zeta group failed: ${e}`);
-      console.log(JSON.stringify(e));
     }
 
     await this.updateZetaGroup();
@@ -638,7 +637,6 @@ export class Exchange {
       );
     } catch (e) {
       console.error(`Initialize market indexes failed: ${e}`);
-      console.log(JSON.stringify(e));
     }
 
     // We initialize 50 indexes at a time in the program.
@@ -660,7 +658,6 @@ export class Exchange {
           this.useLedger
         );
       } catch (e) {
-        console.log(JSON.stringify(e));
         console.error(`Add market indexes failed: ${e}`);
       }
     }
@@ -774,7 +771,7 @@ export class Exchange {
           this.provider,
           tx2,
           [],
-          utils.defaultCommitment(),
+          utils.commitmentConfig(this.connection.commitment),
           this.useLedger
         );
       } catch (e) {

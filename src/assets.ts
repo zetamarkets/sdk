@@ -13,6 +13,12 @@ export function assetToName(asset: Asset) {
   throw Error("Invalid asset");
 }
 
+export function nameToAsset(name: string) {
+  if (name == "SOL") return Asset.SOL;
+  if (name == "BTC") return Asset.BTC;
+  throw Error("Invalid asset");
+}
+
 export function getAssetMint(assetType: Asset): PublicKey {
   return constants.MINTS[assetType];
 }
