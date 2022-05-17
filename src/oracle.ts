@@ -3,8 +3,7 @@ import { parsePythData, Price } from "./oracle-utils";
 import { Network } from "./network";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
-import { Asset } from "./types";
-import { assetToOracleFeed } from "./utils";
+import { Asset, assetToOracleFeed } from "./assets";
 
 export class Oracle {
   private _connection: Connection;

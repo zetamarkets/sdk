@@ -187,20 +187,6 @@ export interface ClockData {
   slot: number;
 }
 
-// Ordered in underlying sequence number.
-export enum Asset {
-  SOL = 0,
-  BTC = 1,
-  LUNA = 2,
-}
-
-export function assetToName(asset: Asset) {
-  if (asset == Asset.SOL) return "SOL";
-  if (asset == Asset.BTC) return "BTC";
-  if (asset == Asset.LUNA) return "LUNA";
-  throw Error("Invalid asset");
-}
-
 export enum MovementType {
   LOCK = 1,
   UNLOCK = 2,

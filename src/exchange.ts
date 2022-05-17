@@ -24,14 +24,8 @@ import { Network } from "./network";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
-import {
-  ClockData,
-  MarginParams,
-  DummyWallet,
-  Wallet,
-  Asset,
-  assetToName,
-} from "./types";
+import { ClockData, MarginParams, DummyWallet, Wallet } from "./types";
+import { Asset, assetToName } from "./assets";
 import * as instructions from "./program-instructions";
 import * as fs from "fs";
 import { LedgerWalletProvider } from "./ledger/ledger";

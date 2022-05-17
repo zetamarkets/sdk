@@ -24,7 +24,7 @@ import {
 import BufferLayout from "buffer-layout";
 const BN = anchor.BN;
 import * as bs58 from "bs58";
-import { assetToName } from "./types";
+import { Asset, assetToName } from "./assets";
 import * as fs from "fs";
 import * as constants from "./constants";
 import {
@@ -35,7 +35,7 @@ import {
 } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent, OpenOrdersMap } from "./program-types";
-import { ClockData, ProgramAccountType, Asset } from "./types";
+import { ClockData, ProgramAccountType } from "./types";
 import {
   cancelExpiredOrderIx,
   cancelOrderHaltedIx,
@@ -1314,15 +1314,6 @@ export function calculateMovementFees(
   let notionalValue = totalContracts * spotPrice;
   let fee = (notionalValue * feeBps) / constants.BPS_DENOMINATOR;
   return decimal ? fee : convertDecimalToNativeInteger(fee);
-}
-
-export function getAssetMint(assetType: Asset): PublicKey {
-  return constants.MINTS[assetType];
-}
-
-export function assetToOracleFeed(asset: Asset) {
-  let name = assetToName(asset);
-  return `${name}/USD`;
 }
 
 export function getOrCreateKeypair(filename: string): Keypair {
