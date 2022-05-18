@@ -1221,7 +1221,7 @@ export class Client {
    * @param newOrderClientOrderId   the client order id for the new order
    * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-  public async ReplaceByClientOrderIdV3(
+  public async replaceByClientOrderIdV3(
     market: PublicKey,
     cancelClientOrderId: number,
     newOrderPrice: number,
