@@ -49,7 +49,9 @@ import {
   depositIx,
   withdrawIx,
   cancelOrderIx,
+  cancelOrderNoErrorIx,
   cancelOrderByClientOrderIdIx,
+  cancelOrderByClientOrderIdNoErrorIx,
   forceCancelOrdersIx,
   liquidateIx,
   settleDexFundsIx,
@@ -1158,6 +1160,107 @@ export class Client {
   }
 
   /**
+   * Cancels a user order by client order id and atomically places an order by new client order id.
+   * @param market                  the market address of the order to be cancelled and new order.
+   * @param cancelClientOrderId     the client order id of the order to be cancelled.
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
+   * @param newOrderSize            the quantity of the order (3 d.p) as integer
+   * @param newOrderSide            the side of the order. bid / ask
+   * @param newOrderType            the type of the order, limit / ioc / post-only
+   * @param newOrderClientOrderId   the client order id for the new order
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   */
+  public async cancelAndPlaceOrderByClientOrderIdV3(
+    market: PublicKey,
+    cancelClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: Side,
+    newOrderType: OrderType,
+    newOrderClientOrderId: number,
+    newOrderTag: String = DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+    tx.add(
+      cancelOrderByClientOrderIdIx(
+        marketIndex,
+        this.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        new anchor.BN(cancelClientOrderId)
+      )
+    );
+    tx.add(
+      placeOrderV3Ix(
+        marketIndex,
+        newOrderPrice,
+        newOrderSize,
+        newOrderSide,
+        newOrderType,
+        newOrderClientOrderId,
+        newOrderTag,
+        this.marginAccountAddress,
+        this.publicKey,
+        this._openOrdersAccounts[marketIndex],
+        this._whitelistTradingFeesAddress
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
+   * Cancels a user order by client order id and atomically places an order by new client order id.
+   * Uses the 'NoError' cancel instruction, so a failed cancellation won't prohibit the placeOrder
+   * @param market                  the market address of the order to be cancelled and new order.
+   * @param cancelClientOrderId     the client order id of the order to be cancelled.
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
+   * @param newOrderSize            the quantity of the order (3 d.p) as integer
+   * @param newOrderSide            the side of the order. bid / ask
+   * @param newOrderType            the type of the order, limit / ioc / post-only
+   * @param newOrderClientOrderId   the client order id for the new order
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   */
+  public async replaceByClientOrderIdV3(
+    market: PublicKey,
+    cancelClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: Side,
+    newOrderType: OrderType,
+    newOrderClientOrderId: number,
+    newOrderTag: String = DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = Exchange.markets.getMarketIndex(market);
+    tx.add(
+      cancelOrderByClientOrderIdNoErrorIx(
+        marketIndex,
+        this.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        new anchor.BN(cancelClientOrderId)
+      )
+    );
+    tx.add(
+      placeOrderV3Ix(
+        marketIndex,
+        newOrderPrice,
+        newOrderSize,
+        newOrderSide,
+        newOrderType,
+        newOrderClientOrderId,
+        newOrderTag,
+        this.marginAccountAddress,
+        this.publicKey,
+        this._openOrdersAccounts[marketIndex],
+        this._whitelistTradingFeesAddress
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  /**
    * Initializes a user open orders account for a given market.
    * This is handled atomically by place order but can be used by clients to initialize it independent of placing an order.
    */
@@ -1307,6 +1410,38 @@ export class Client {
   }
 
   /**
+   * Cancels multiple user orders by orderId
+   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
+   */
+  public async cancelMultipleOrdersNoError(
+    cancelArguments: CancelArgs[]
+  ): Promise<TransactionSignature[]> {
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let marketIndex = Exchange.markets.getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = cancelOrderNoErrorIx(
+        marketIndex,
+        this.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._provider, tx));
+      })
+    );
+    return txIds;
+  }
+
+  /**
    * Calls force cancel on another user's orders
    * @param market  Market to cancel orders on
    * @param marginAccountToCancel Users to be force-cancelled's margin account
@@ -1372,6 +1507,37 @@ export class Client {
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
       let ix = cancelOrderIx(
+        order.marketIndex,
+        this.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[order.marketIndex],
+        order.orderId,
+        order.side
+      );
+      ixs.push(ix);
+    }
+
+    let txs = utils.splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._provider, tx));
+      })
+    );
+    return txIds;
+  }
+
+  /**
+   * Cancels all active user orders, but will not crash if some cancels fail
+   */
+  public async cancelAllOrdersNoError(): Promise<TransactionSignature[]> {
+    // Can only fit 6 cancels worth of accounts per transaction.
+    // on 4 separate markets
+    // Compute is fine.
+    let ixs = [];
+    for (var i = 0; i < this._orders.length; i++) {
+      let order = this._orders[i];
+      let ix = cancelOrderNoErrorIx(
         order.marketIndex,
         this.publicKey,
         this._marginAccountAddress,

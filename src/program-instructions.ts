@@ -494,6 +494,38 @@ export function cancelOrderIx(
   );
 }
 
+export function cancelOrderNoErrorIx(
+  marketIndex: number,
+  userKey: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  orderId: anchor.BN,
+  side: Side
+): TransactionInstruction {
+  let marketData = Exchange.markets.markets[marketIndex];
+  return Exchange.program.instruction.cancelOrderNoError(
+    toProgramSide(side),
+    orderId,
+    {
+      accounts: {
+        authority: userKey,
+        cancelAccounts: {
+          zetaGroup: Exchange.zetaGroupAddress,
+          state: Exchange.stateAddress,
+          marginAccount,
+          dexProgram: constants.DEX_PID[Exchange.network],
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+        },
+      },
+    }
+  );
+}
+
 export function cancelOrderByClientOrderIdIx(
   marketIndex: number,
   userKey: PublicKey,
@@ -503,6 +535,36 @@ export function cancelOrderByClientOrderIdIx(
 ): TransactionInstruction {
   let marketData = Exchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrderByClientOrderId(
+    clientOrderId,
+    {
+      accounts: {
+        authority: userKey,
+        cancelAccounts: {
+          zetaGroup: Exchange.zetaGroupAddress,
+          state: Exchange.stateAddress,
+          marginAccount,
+          dexProgram: constants.DEX_PID[Exchange.network],
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+        },
+      },
+    }
+  );
+}
+
+export function cancelOrderByClientOrderIdNoErrorIx(
+  marketIndex: number,
+  userKey: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  clientOrderId: anchor.BN
+): TransactionInstruction {
+  let marketData = Exchange.markets.markets[marketIndex];
+  return Exchange.program.instruction.cancelOrderByClientOrderIdNoError(
     clientOrderId,
     {
       accounts: {
