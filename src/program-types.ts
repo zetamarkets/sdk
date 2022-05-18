@@ -252,6 +252,10 @@ export interface PositionMovementEvent {
 export interface LiquidationEvent {
   liquidatorReward: anchor.BN;
   insuranceReward: anchor.BN;
+  costOfTrades: anchor.BN;
   size: anchor.BN;
-  remainingBalance: anchor.BN;
+  remainingLiquidateeBalance: anchor.BN;
+  remainingLiquidatorBalance: anchor.BN;
+  markPrice: anchor.BN;
+  underlyingPrice: anchor.BN;
 }

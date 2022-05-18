@@ -4687,12 +4687,32 @@ export type Zeta = {
           "index": false
         },
         {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "size",
           "type": "u64",
           "index": false
         },
         {
-          "name": "remainingBalance",
+          "name": "remainingLiquidateeBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidatorBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "markPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "underlyingPrice",
           "type": "u64",
           "index": false
         }
@@ -9922,12 +9942,32 @@ export const IDL: Zeta = {
           "index": false
         },
         {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
           "name": "size",
           "type": "u64",
           "index": false
         },
         {
-          "name": "remainingBalance",
+          "name": "remainingLiquidateeBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidatorBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "markPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "underlyingPrice",
           "type": "u64",
           "index": false
         }
