@@ -50,8 +50,6 @@ import {
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
-import { Network } from "./network";
-import { signAndSendLedger } from "./ledger/wallet";
 
 export async function getState(
   programId: PublicKey
@@ -627,34 +625,31 @@ export async function processTransaction(
   opts?: ConfirmOptions,
   useLedger: boolean = false
 ): Promise<TransactionSignature> {
-  try {
-    let txSig: TransactionSignature;
-    if (useLedger) {
-      txSig = await signAndSendLedger(
-        tx,
-        provider.connection,
-        Exchange.ledgerWallet
-      );
-    } else {
-      const blockhash = await provider.connection.getRecentBlockhash();
-      tx.recentBlockhash = blockhash.blockhash;
-      tx.feePayer = provider.wallet.publicKey;
-      tx = await provider.wallet.signTransaction(tx);
-      if (signers === undefined) {
-        signers = [];
-      }
-      signers
-        .filter((s) => s !== undefined)
-        .forEach((kp) => {
-          tx.partialSign(kp);
-        });
+  let txSig: TransactionSignature;
+  const blockhash = await provider.connection.getRecentBlockhash();
+  tx.recentBlockhash = blockhash.blockhash;
+  tx.feePayer = provider.wallet.publicKey;
+  if (signers === undefined) {
+    signers = [];
+  }
+  signers
+    .filter((s) => s !== undefined)
+    .forEach((kp) => {
+      tx.partialSign(kp);
+    });
 
-      txSig = await sendAndConfirmRawTransaction(
-        provider.connection,
-        tx.serialize(),
-        opts || commitmentConfig(provider.connection.commitment)
-      );
-    }
+  if (useLedger) {
+    tx = await Exchange.ledgerWallet.signTransaction(tx);
+  } else {
+    tx = await provider.wallet.signTransaction(tx);
+  }
+
+  try {
+    txSig = await sendAndConfirmRawTransaction(
+      provider.connection,
+      tx.serialize(),
+      opts || commitmentConfig(provider.connection.commitment)
+    );
     return txSig;
   } catch (err) {
     let parsedErr = parseError(err);

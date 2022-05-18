@@ -28,8 +28,7 @@ import { ClockData, MarginParams, DummyWallet, Wallet } from "./types";
 import { Asset, assetToName } from "./assets";
 import * as instructions from "./program-instructions";
 import * as fs from "fs";
-import { LedgerWalletProvider } from "./ledger/ledger";
-import { getLedgerWallet } from "./ledger/wallet";
+import * as os from "os";
 
 export class Exchange {
   /**
@@ -211,18 +210,18 @@ export class Exchange {
   }
   private _marginParams: MarginParams;
 
-  public get ledgerWallet(): LedgerWalletProvider {
+  public get ledgerWallet(): any {
     return this._ledgerWallet;
   }
-  private _ledgerWallet: LedgerWalletProvider;
+  private _ledgerWallet: any;
 
   public get useLedger(): boolean {
     return this._useLedger;
   }
 
-  public async useLedgerMode() {
+  public setLedgerWallet(wallet: any) {
     this._useLedger = true;
-    this._ledgerWallet = await getLedgerWallet();
+    this._ledgerWallet = wallet;
   }
 
   private _useLedger: boolean = false;
@@ -701,7 +700,7 @@ export class Exchange {
       `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
     );
 
-    const homedir = require("os").homedir();
+    const homedir = os.homedir();
     let dir = `${homedir}/keys/${assetToName(this.asset)}`;
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
