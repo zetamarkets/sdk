@@ -102,7 +102,7 @@ export class Oracle {
       );
 
       this._subscriptionIds.set(feed, subscriptionId);
-      await this.pollPrice(feed, false);
+      await this.pollPrice(feed, true);
     }
   }
 

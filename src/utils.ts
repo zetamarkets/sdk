@@ -35,6 +35,7 @@ import {
 } from "./errors";
 import { exchange as Exchange } from "./exchange";
 import { MarginAccount, TradeEvent, OpenOrdersMap } from "./program-types";
+import { Network } from "./network";
 import { ClockData, ProgramAccountType } from "./types";
 import {
   cancelExpiredOrderIx,
@@ -1330,4 +1331,11 @@ export function getOrCreateKeypair(filename: string): Keypair {
     writeKeypair(filename, keypair);
   }
   return keypair;
+}
+
+export function toNetwork(network: string): Network {
+  if (network == "localnet") return Network.LOCALNET;
+  if (network == "devnet") return Network.DEVNET;
+  if (network == "mainnet") return Network.MAINNET;
+  throw Error("Invalid network");
 }

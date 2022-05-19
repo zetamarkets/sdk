@@ -358,6 +358,7 @@ export class Exchange {
     }
 
     exchange.init(programId, network, connection, wallet, opts);
+    exchange._asset = assetType;
 
     // Load variables from state.
     const [mintAuthority, _mintAuthorityNonce] = await utils.getMintAuthority(
@@ -388,10 +389,7 @@ export class Exchange {
 
     exchange._zetaGroupAddress = zetaGroup;
 
-    try {
-      await exchange.subscribeOracle(callback);
-    } catch (e) {}
-
+    await exchange.subscribeOracle(callback);
     await exchange.updateState();
     await exchange.updateZetaGroup();
 
@@ -430,7 +428,6 @@ export class Exchange {
       exchange.zetaGroupAddress
     );
 
-    exchange._asset = assetType;
     exchange._greeksAddress = greeks;
     exchange._markets = await ZetaGroupMarkets.load(opts, throttleMs);
     exchange._greeks = (await exchange.program.account.greeks.fetch(
@@ -543,9 +540,7 @@ export class Exchange {
     this.subscribeZetaGroup(callback);
     this.subscribeClock(callback);
     this.subscribeGreeks(callback);
-    try {
-      await this.subscribeOracle(callback);
-    } catch (e) {}
+    await this.subscribeOracle(callback);
   }
 
   /**
