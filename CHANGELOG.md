@@ -8,6 +8,7 @@ Version changes are pinned to SDK releases.
 - client: Add new instructions ReplaceByClientOrderId, CancelAllOrdersNoError and CancelMultipleOrdersNoError. ([#114](https://github.com/zetamarkets/sdk/pull/114))
 
 
+- events: Add new event LiquidationEvent. ([#118](https://github.com/zetamarkets/sdk/pull/118))
 - events: Add isTaker boolean to PlaceOrderEvent. ([#116](https://github.com/zetamarkets/sdk/pull/116))
 
 ## [0.14.1]
