@@ -11,6 +11,7 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
+import { assetToOracleFeed } from "./assets";
 
 export class RiskCalculator {
   /**
@@ -30,7 +31,9 @@ export class RiskCalculator {
     if (Exchange.greeks === undefined || Exchange.oracle === undefined) {
       return;
     }
-    let oraclePrice = Exchange.oracle.getPrice("SOL/USD");
+    let oraclePrice = Exchange.oracle.getPrice(
+      assetToOracleFeed(Exchange.asset)
+    );
     let spotPrice = oraclePrice === null ? 0 : oraclePrice.price;
     for (var i = 0; i < this._marginRequirements.length; i++) {
       this._marginRequirements[i] = calculateProductMargin(i, spotPrice);
