@@ -4672,51 +4672,6 @@
           "index": false
         }
       ]
-    },
-    {
-      "name": "LiquidationEvent",
-      "fields": [
-        {
-          "name": "liquidatorReward",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "insuranceReward",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "costOfTrades",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "size",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "remainingLiquidateeBalance",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "remainingLiquidatorBalance",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "markPrice",
-          "type": "u64",
-          "index": false
-        },
-        {
-          "name": "underlyingPrice",
-          "type": "u64",
-          "index": false
-        }
-      ]
     }
   ],
   "errors": [
@@ -5082,176 +5037,171 @@
     },
     {
       "code": 6072,
-      "name": "OraclePriceIsInvalid",
-      "msg": "Fetched oracle price is invalid"
-    },
-    {
-      "code": 6073,
       "name": "InvalidZetaGroupDepositMint",
       "msg": "Invalid zeta group deposit mint"
     },
     {
-      "code": 6074,
+      "code": 6073,
       "name": "InvalidZetaGroupRebalanceMint",
       "msg": "Invalid zeta group rebalance insurance vault mint"
     },
     {
-      "code": 6075,
+      "code": 6074,
       "name": "InvalidDepositAmount",
       "msg": "Invalid deposit amount"
     },
     {
-      "code": 6076,
+      "code": 6075,
       "name": "InvalidTokenAccountOwner",
       "msg": "Invalid token account owner"
     },
     {
-      "code": 6077,
+      "code": 6076,
       "name": "InvalidWithdrawAmount",
       "msg": "Invalid withdraw amount"
     },
     {
-      "code": 6078,
+      "code": 6077,
       "name": "InvalidDepositRemainingAccounts",
       "msg": "Invalid number of remaining accounts in deposit"
     },
     {
-      "code": 6079,
+      "code": 6078,
       "name": "InvalidPlaceOrderRemainingAccounts",
       "msg": "Invalid number of remaining accounts in place order"
     },
     {
-      "code": 6080,
+      "code": 6079,
       "name": "ClientOrderIdCannotBeZero",
       "msg": "ClientOrderIdCannotBeZero"
     },
     {
-      "code": 6081,
+      "code": 6080,
       "name": "ZetaGroupHalted",
       "msg": "Zeta group halted"
     },
     {
-      "code": 6082,
+      "code": 6081,
       "name": "ZetaGroupNotHalted",
       "msg": "Zeta group not halted"
     },
     {
-      "code": 6083,
+      "code": 6082,
       "name": "HaltMarkPriceNotSet",
       "msg": "Halt mark price not set"
     },
     {
-      "code": 6084,
+      "code": 6083,
       "name": "HaltMarketsNotCleaned",
       "msg": "Halt markets not cleaned"
     },
     {
-      "code": 6085,
+      "code": 6084,
       "name": "HaltMarketNodesNotCleaned",
       "msg": "Halt market nodes not cleaned"
     },
     {
-      "code": 6086,
+      "code": 6085,
       "name": "CannotExpireOptionsAfterExpirationThreshold",
       "msg": "Cannot expire options after expiration threshold"
     },
     {
-      "code": 6087,
+      "code": 6086,
       "name": "PostOnlyInCross",
       "msg": "Post only order in cross"
     },
     {
-      "code": 6088,
+      "code": 6087,
       "name": "FillOrKillNotFullSize",
       "msg": "Fill or kill order was not filled for full size"
     },
     {
-      "code": 6089,
+      "code": 6088,
       "name": "InvalidOpenOrdersMapOwner",
       "msg": "Invalid open orders map owner"
     },
     {
-      "code": 6090,
+      "code": 6089,
       "name": "AccountDidNotSerialize",
       "msg": "Failed to serialize the account"
     },
     {
-      "code": 6091,
+      "code": 6090,
       "name": "OpenOrdersWithNonEmptyPositions",
       "msg": "Cannot close open orders account with non empty positions"
     },
     {
-      "code": 6092,
+      "code": 6091,
       "name": "CannotCloseNonEmptyMarginAccount",
       "msg": "Cannot close margin account that is not empty"
     },
     {
-      "code": 6093,
+      "code": 6092,
       "name": "InvalidTagLength",
       "msg": "Invalid tag length"
     },
     {
-      "code": 6094,
+      "code": 6093,
       "name": "NakedShortCallIsNotAllowed",
       "msg": "Naked short call is not allowed"
     },
     {
-      "code": 6095,
+      "code": 6094,
       "name": "InvalidSpreadAccount",
       "msg": "Invalid spread account"
     },
     {
-      "code": 6096,
+      "code": 6095,
       "name": "CannotCloseNonEmptySpreadAccount",
       "msg": "Cannot close non empty spread account"
     },
     {
-      "code": 6097,
+      "code": 6096,
       "name": "SpreadAccountSeedsMismatch",
       "msg": "Spread account seeds mismatch"
     },
     {
-      "code": 6098,
+      "code": 6097,
       "name": "SpreadAccountHasUnsettledPositions",
       "msg": "Spread account seeds mismatch"
     },
     {
-      "code": 6099,
+      "code": 6098,
       "name": "SpreadAccountInvalidExpirySeriesState",
       "msg": "Spread account invalid expiry series state"
     },
     {
-      "code": 6100,
+      "code": 6099,
       "name": "InsufficientFundsToCollateralizeSpreadAccount",
       "msg": "Insufficient funds to collateralize spread account"
     },
     {
-      "code": 6101,
+      "code": 6100,
       "name": "FailedMaintenanceMarginRequirement",
       "msg": "Failed maintenance margin requirement"
     },
     {
-      "code": 6102,
+      "code": 6101,
       "name": "InvalidMovement",
       "msg": "Invalid movement"
     },
     {
-      "code": 6103,
+      "code": 6102,
       "name": "MovementOnExpiredSeries",
       "msg": "Movement on expired series"
     },
     {
-      "code": 6104,
+      "code": 6103,
       "name": "InvalidMovementSize",
       "msg": "Invalid movement size"
     },
     {
-      "code": 6105,
+      "code": 6104,
       "name": "ExceededMaxPositionMovements",
       "msg": "Exceeded max position movements"
     },
     {
-      "code": 6106,
+      "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
     }
