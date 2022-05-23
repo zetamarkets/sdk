@@ -8,9 +8,6 @@ Version changes are pinned to SDK releases.
 - program: Add new NoError cancel instructions. ([#114](https://github.com/zetamarkets/sdk/pull/114))
 - client: Add new instructions ReplaceByClientOrderId, CancelAllOrdersNoError and CancelMultipleOrdersNoError. ([#114](https://github.com/zetamarkets/sdk/pull/114))
 
-
-- events: Add isTaker boolean to PlaceOrderEvent. ([#116](https://github.com/zetamarkets/sdk/pull/116))
-
 ## [0.14.1]
 
 - oracle: `OraclePrice` now contains `lastUpdatedTime` which is seconds since Linux epoch. `GetPriceAge` can be called to get the time between `now` and `lastUpdatedTime`. (([#115](https://github.com/zetamarkets/sdk/pull/115)))
