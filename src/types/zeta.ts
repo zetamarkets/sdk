@@ -2154,6 +2154,83 @@ export type Zeta = {
       ]
     },
     {
+      "name": "cancelOrderNoError",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
       "name": "cancelOrderHalted",
       "accounts": [
         {
@@ -2227,6 +2304,77 @@ export type Zeta = {
     },
     {
       "name": "cancelOrderByClientOrderId",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderByClientOrderIdNoError",
       "accounts": [
         {
           "name": "authority",
@@ -5056,6 +5204,11 @@ export type Zeta = {
       "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
+    },
+    {
+      "code": 6106,
+      "name": "OraclePriceIsInvalid",
+      "msg": "Fetched oracle price is invalid"
     }
   ]
 };
@@ -7216,6 +7369,83 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "cancelOrderNoError",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
       "name": "cancelOrderHalted",
       "accounts": [
         {
@@ -7289,6 +7519,77 @@ export const IDL: Zeta = {
     },
     {
       "name": "cancelOrderByClientOrderId",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderByClientOrderIdNoError",
       "accounts": [
         {
           "name": "authority",
@@ -10118,6 +10419,11 @@ export const IDL: Zeta = {
       "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
+    },
+    {
+      "code": 6106,
+      "name": "OraclePriceIsInvalid",
+      "msg": "Fetched oracle price is invalid"
     }
   ]
 };

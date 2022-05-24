@@ -9,7 +9,7 @@ import {
   DEX_PID,
   DEFAULT_ORDER_TAG,
 } from "./constants";
-import { exchange as Exchange } from "./exchange";
+import { Exchange, exchange as ExchangeSingleton } from "./exchange";
 import {
   SpreadAccount,
   MarginAccount,
@@ -98,6 +98,14 @@ export class Client {
     return this._marginAccountAddress;
   }
   private _marginAccountAddress: PublicKey;
+
+  /**
+   * Client's exchange.
+   */
+  public get exchange(): Exchange {
+    return this._exchange;
+  }
+  private _exchange: Exchange;
 
   /**
    * Stores the user margin account state.
@@ -236,13 +244,13 @@ export class Client {
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._program = new anchor.Program(
       idl as anchor.Idl,
-      Exchange.programId,
+      ExchangeSingleton.programId,
       this._provider
     ) as anchor.Program<Zeta>;
 
-    this._openOrdersAccounts = Array(Exchange.zetaGroup.products.length).fill(
-      PublicKey.default
-    );
+    this._openOrdersAccounts = Array(
+      ExchangeSingleton.zetaGroup.products.length
+    ).fill(PublicKey.default);
 
     this._positions = [];
     this._orders = [];
@@ -263,6 +271,7 @@ export class Client {
   public static async load(
     connection: Connection,
     wallet: Wallet,
+    exchange: Exchange,
     opts: ConfirmOptions = utils.defaultCommitment(),
     callback: (type: EventType, data: any) => void = undefined,
     throttle: boolean = false
@@ -271,20 +280,22 @@ export class Client {
     let client = new Client(connection, wallet, opts);
     let [marginAccountAddress, _marginAccountNonce] =
       await utils.getMarginAccount(
-        Exchange.programId,
-        Exchange.zetaGroupAddress,
+        exchange.programId,
+        exchange.zetaGroupAddress,
         wallet.publicKey
       );
 
     let [spreadAccountAddress, _spreadAccountNonce] =
       await utils.getSpreadAccount(
-        Exchange.programId,
-        Exchange.zetaGroupAddress,
+        exchange.programId,
+        exchange.zetaGroupAddress,
         wallet.publicKey
       );
 
     client._marginAccountAddress = marginAccountAddress;
     client._spreadAccountAddress = spreadAccountAddress;
+
+    client._exchange = exchange;
 
     client._callback = callback;
 
@@ -303,7 +314,7 @@ export class Client {
         }
 
         await client.updateState(false);
-        client._lastUpdateTimestamp = Exchange.clockTimestamp;
+        client._lastUpdateTimestamp = exchange.clockTimestamp;
 
         if (callback !== undefined) {
           callback(EventType.USER, null);
@@ -332,7 +343,7 @@ export class Client {
     );
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
-      Exchange.usdcMintAddress,
+      exchange.usdcMintAddress,
       wallet.publicKey
     );
 
@@ -365,7 +376,7 @@ export class Client {
     try {
       let [whitelistDepositAddress, _whitelistTradingFeesNonce] =
         await utils.getUserWhitelistDepositAccount(
-          Exchange.programId,
+          exchange.programId,
           wallet.publicKey
         );
       await client._program.account.whitelistDepositAccount.fetch(
@@ -379,7 +390,7 @@ export class Client {
     try {
       let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
         await utils.getUserWhitelistTradingFeesAccount(
-          Exchange.programId,
+          exchange.programId,
           wallet.publicKey
         );
       await client._program.account.whitelistTradingFeesAccount.fetch(
@@ -415,7 +426,7 @@ export class Client {
 
     this._pollIntervalId = setInterval(async () => {
       if (
-        Exchange.clockTimestamp >
+        ExchangeSingleton.clockTimestamp >
           this._lastUpdateTimestamp + this._pollInterval ||
         this._pendingUpdate
       ) {
@@ -430,7 +441,7 @@ export class Client {
           if (latestSlot == this._pendingUpdateSlot) {
             this._pendingUpdate = false;
           }
-          this._lastUpdateTimestamp = Exchange.clockTimestamp;
+          this._lastUpdateTimestamp = ExchangeSingleton.clockTimestamp;
           if (this._callback !== undefined) {
             this._callback(EventType.USER, null);
           }
@@ -490,7 +501,7 @@ export class Client {
       console.log("User has no margin account. Creating margin account...");
       tx.add(
         initializeMarginAccountIx(
-          Exchange.zetaGroupAddress,
+          this._exchange.zetaGroupAddress,
           this._marginAccountAddress,
           this.publicKey
         )
@@ -536,7 +547,7 @@ export class Client {
     let tx = new Transaction();
     tx.add(
       transferExcessSpreadBalanceIx(
-        Exchange.zetaGroupAddress,
+        ExchangeSingleton.zetaGroupAddress,
         this.marginAccountAddress,
         this._spreadAccountAddress,
         this.publicKey
@@ -544,7 +555,7 @@ export class Client {
     );
     tx.add(
       closeSpreadAccountIx(
-        Exchange.zetaGroupAddress,
+        ExchangeSingleton.zetaGroupAddress,
         this._spreadAccountAddress,
         this.publicKey
       )
@@ -611,7 +622,7 @@ export class Client {
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
 
     let openOrdersPda = null;
     if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
@@ -672,7 +683,7 @@ export class Client {
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
 
     let openOrdersPda = null;
     if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
@@ -729,7 +740,7 @@ export class Client {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
 
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
 
     let openOrdersPda = null;
     if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
@@ -767,7 +778,7 @@ export class Client {
       console.log("User has no spread account. Creating spread account...");
       tx.add(
         initializeSpreadAccountIx(
-          Exchange.zetaGroupAddress,
+          ExchangeSingleton.zetaGroupAddress,
           this.spreadAccountAddress,
           this.publicKey
         )
@@ -784,12 +795,12 @@ export class Client {
 
     tx.add(
       positionMovementIx(
-        Exchange.zetaGroupAddress,
+        ExchangeSingleton.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
         this.publicKey,
-        Exchange.greeksAddress,
-        Exchange.zetaGroup.oracle,
+        ExchangeSingleton.greeksAddress,
+        ExchangeSingleton.zetaGroup.oracle,
         MovementType.LOCK,
         movements
       )
@@ -826,7 +837,7 @@ export class Client {
     tag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
 
     let openOrdersPda = null;
     if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
@@ -878,7 +889,7 @@ export class Client {
     side: Side
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let index = Exchange.markets.getMarketIndex(market);
+    let index = ExchangeSingleton.markets.getMarketIndex(market);
     let ix = cancelOrderIx(
       index,
       this.publicKey,
@@ -905,7 +916,7 @@ export class Client {
       throw Error("Client order id cannot be 0.");
     }
     let tx = new Transaction();
-    let index = Exchange.markets.getMarketIndex(market);
+    let index = ExchangeSingleton.markets.getMarketIndex(market);
     let ix = cancelOrderByClientOrderIdIx(
       index,
       this.publicKey,
@@ -936,7 +947,7 @@ export class Client {
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
     tx.add(
       cancelOrderIx(
         marketIndex,
@@ -985,7 +996,7 @@ export class Client {
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
     tx.add(
       cancelOrderIx(
         marketIndex,
@@ -1037,7 +1048,7 @@ export class Client {
     newOrderTag: String = DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
     tx.add(
       cancelOrderIx(
         marketIndex,
@@ -1084,7 +1095,7 @@ export class Client {
     newOrderClientOrderId: number
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
     tx.add(
       cancelOrderByClientOrderIdIx(
         marketIndex,
@@ -1130,7 +1141,7 @@ export class Client {
     newOrderClientOrderId: number
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
     tx.add(
       cancelOrderByClientOrderIdIx(
         marketIndex,
@@ -1164,7 +1175,7 @@ export class Client {
   public async initializeOpenOrdersAccount(
     market: PublicKey
   ): Promise<TransactionSignature> {
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
     if (!this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
       throw Error("User already has an open orders account for market!");
     }
@@ -1187,13 +1198,16 @@ export class Client {
   public async closeOpenOrdersAccount(
     market: PublicKey
   ): Promise<TransactionSignature> {
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
     if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
       throw Error("User has no open orders account for this market!");
     }
 
     const [vaultOwner, _vaultSignerNonce] =
-      await utils.getSerumVaultOwnerAndNonce(market, DEX_PID[Exchange.network]);
+      await utils.getSerumVaultOwnerAndNonce(
+        market,
+        DEX_PID[ExchangeSingleton.network]
+      );
 
     let tx = new Transaction();
     tx.add(
@@ -1227,14 +1241,14 @@ export class Client {
     let combinedIxs: TransactionInstruction[] = [];
     for (var i = 0; i < markets.length; i++) {
       let market = markets[i];
-      let marketIndex = Exchange.markets.getMarketIndex(market);
+      let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
       if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
         throw Error("User has no open orders account for this market!");
       }
       const [vaultOwner, _vaultSignerNonce] =
         await utils.getSerumVaultOwnerAndNonce(
           market,
-          DEX_PID[Exchange.network]
+          DEX_PID[ExchangeSingleton.network]
         );
       let settleIx = settleDexFundsIx(
         market,
@@ -1267,7 +1281,7 @@ export class Client {
     // Reset openOrdersAccount keys
     for (var i = 0; i < markets.length; i++) {
       let market = markets[i];
-      let marketIndex = Exchange.markets.getMarketIndex(market);
+      let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
       this._openOrdersAccounts[marketIndex] = PublicKey.default;
     }
 
@@ -1283,7 +1297,7 @@ export class Client {
   ): Promise<TransactionSignature[]> {
     let ixs = [];
     for (var i = 0; i < cancelArguments.length; i++) {
-      let marketIndex = Exchange.markets.getMarketIndex(
+      let marketIndex = ExchangeSingleton.markets.getMarketIndex(
         cancelArguments[i].market
       );
       let ix = cancelOrderIx(
@@ -1319,10 +1333,10 @@ export class Client {
       marginAccountToCancel
     )) as unknown as MarginAccount;
 
-    let marketIndex = Exchange.markets.getMarketIndex(market);
+    let marketIndex = ExchangeSingleton.markets.getMarketIndex(market);
 
     let openOrdersAccountToCancel = await utils.createOpenOrdersAddress(
-      Exchange.programId,
+      ExchangeSingleton.programId,
       market,
       marginAccount.authority,
       marginAccount.openOrdersNonce[marketIndex]
@@ -1450,7 +1464,7 @@ export class Client {
       console.log("User has no spread account. Creating spread account...");
       tx.add(
         initializeSpreadAccountIx(
-          Exchange.zetaGroupAddress,
+          ExchangeSingleton.zetaGroupAddress,
           this.spreadAccountAddress,
           this.publicKey
         )
@@ -1459,12 +1473,12 @@ export class Client {
 
     tx.add(
       positionMovementIx(
-        Exchange.zetaGroupAddress,
+        ExchangeSingleton.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
         this.publicKey,
-        Exchange.greeksAddress,
-        Exchange.zetaGroup.oracle,
+        ExchangeSingleton.greeksAddress,
+        ExchangeSingleton.zetaGroup.oracle,
         movementType,
         movements
       )
@@ -1479,7 +1493,7 @@ export class Client {
   public async transferExcessSpreadBalance(): Promise<TransactionSignature> {
     let tx = new Transaction().add(
       transferExcessSpreadBalanceIx(
-        Exchange.zetaGroupAddress,
+        ExchangeSingleton.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
         this.publicKey
@@ -1507,9 +1521,9 @@ export class Client {
     let orders = [];
     await Promise.all(
       [...this.getRelevantMarketIndexes()].map(async (i) => {
-        await Exchange.markets.markets[i].updateOrderbook();
+        await ExchangeSingleton.markets.markets[i].updateOrderbook();
         orders.push(
-          Exchange.markets.markets[i].getOrdersForAccount(
+          ExchangeSingleton.markets.markets[i].getOrdersForAccount(
             this._openOrdersAccounts[i]
           )
         );
@@ -1524,7 +1538,7 @@ export class Client {
       if (this._marginAccount.productLedgers[i].position.size.toNumber() != 0) {
         positions.push({
           marketIndex: i,
-          market: Exchange.zetaGroup.products[i].market,
+          market: ExchangeSingleton.zetaGroup.products[i].market,
           size: utils.convertNativeLotSizeToDecimal(
             this._marginAccount.productLedgers[i].position.size.toNumber()
           ),
@@ -1543,7 +1557,7 @@ export class Client {
       if (this._spreadAccount.positions[i].size.toNumber() != 0) {
         positions.push({
           marketIndex: i,
-          market: Exchange.zetaGroup.products[i].market,
+          market: ExchangeSingleton.zetaGroup.products[i].market,
           size: utils.convertNativeLotSizeToDecimal(
             this._spreadAccount.positions[i].size.toNumber()
           ),
@@ -1576,7 +1590,7 @@ export class Client {
 
   private async updateOpenOrdersAddresses() {
     await Promise.all(
-      Exchange.zetaGroup.products.map(async (product, index) => {
+      ExchangeSingleton.zetaGroup.products.map(async (product, index) => {
         if (
           // If the nonce is not zero, we know there is an open orders account.
           this._marginAccount.openOrdersNonce[index] !== 0 &&
@@ -1584,7 +1598,7 @@ export class Client {
           this._openOrdersAccounts[index].equals(PublicKey.default)
         ) {
           let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
-            Exchange.programId,
+            ExchangeSingleton.programId,
             product.market,
             this.publicKey
           );

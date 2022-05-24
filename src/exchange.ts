@@ -87,7 +87,7 @@ export class Exchange {
   private _zetaGroup: ZetaGroup;
 
   /**
-   * The asset loaded to the exchange.
+   * The asset loaded to the this.
    */
   public get asset(): Asset {
     return this._asset;
@@ -275,7 +275,7 @@ export class Exchange {
     wallet: Wallet,
     opts?: ConfirmOptions
   ) {
-    if (exchange.isInitialized) {
+    if (this.isInitialized) {
       throw "Exchange already initialized";
     }
     this._provider = new anchor.AnchorProvider(
@@ -302,7 +302,7 @@ export class Exchange {
     params: instructions.StateParams,
     opts?: ConfirmOptions
   ) {
-    exchange.init(programId, network, connection, wallet, opts);
+    this.init(programId, network, connection, wallet, opts);
 
     const [mintAuthority, mintAuthorityNonce] = await utils.getMintAuthority(
       programId
@@ -329,12 +329,12 @@ export class Exchange {
       console.error(`Initialize zeta state failed: ${e}`);
     }
 
-    exchange._stateAddress = state;
-    exchange._serumAuthority = serumAuthority;
-    exchange._mintAuthority = mintAuthority;
-    exchange._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
+    this._stateAddress = state;
+    this._serumAuthority = serumAuthority;
+    this._mintAuthority = mintAuthority;
+    this._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
 
-    await exchange.updateState();
+    await this.updateState();
   }
 
   /**
@@ -351,14 +351,14 @@ export class Exchange {
     throttleMs = 0,
     callback?: (event: EventType, data: any) => void
   ) {
-    console.info(`Loading exchange.`);
+    console.info(`Loading this.`);
 
-    if (exchange.isInitialized) {
+    if (this.isInitialized) {
       throw "Exchange already loaded.";
     }
 
-    exchange.init(programId, network, connection, wallet, opts);
-    exchange._asset = assetType;
+    this.init(programId, network, connection, wallet, opts);
+    this._asset = assetType;
 
     // Load variables from state.
     const [mintAuthority, _mintAuthorityNonce] = await utils.getMintAuthority(
@@ -369,9 +369,9 @@ export class Exchange {
       programId
     );
 
-    exchange._mintAuthority = mintAuthority;
-    exchange._stateAddress = state;
-    exchange._serumAuthority = serumAuthority;
+    this._mintAuthority = mintAuthority;
+    this._stateAddress = state;
+    this._serumAuthority = serumAuthority;
 
     // Load zeta group.
     const [underlying, _underlyingNonce] = await utils.getUnderlying(
@@ -379,73 +379,69 @@ export class Exchange {
       assetType
     );
 
-    let underlyingAccount: any =
-      await exchange._program.account.underlying.fetch(underlying);
+    let underlyingAccount: any = await this._program.account.underlying.fetch(
+      underlying
+    );
 
     const [zetaGroup, _zetaGroupNonce] = await utils.getZetaGroup(
       programId,
       underlyingAccount.mint
     );
 
-    exchange._zetaGroupAddress = zetaGroup;
+    this._zetaGroupAddress = zetaGroup;
 
-    await exchange.subscribeOracle(callback);
-    await exchange.updateState();
-    await exchange.updateZetaGroup();
+    await this.subscribeOracle(callback);
+    await this.updateState();
+    await this.updateZetaGroup();
 
     const [vaultAddress, _vaultNonce] = await utils.getVault(
-      exchange.programId,
+      this.programId,
       zetaGroup
     );
 
     const [insuranceVaultAddress, _insuranceNonce] =
-      await utils.getZetaInsuranceVault(
-        exchange.programId,
-        exchange.zetaGroupAddress
-      );
+      await utils.getZetaInsuranceVault(this.programId, this.zetaGroupAddress);
 
     const [socializedLossAccount, _socializedLossAccountNonce] =
       await utils.getSocializedLossAccount(
-        exchange.programId,
-        exchange._zetaGroupAddress
+        this.programId,
+        this._zetaGroupAddress
       );
 
-    exchange._vaultAddress = vaultAddress;
-    exchange._insuranceVaultAddress = insuranceVaultAddress;
-    exchange._socializedLossAccountAddress = socializedLossAccount;
-    exchange._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
+    this._vaultAddress = vaultAddress;
+    this._insuranceVaultAddress = insuranceVaultAddress;
+    this._socializedLossAccountAddress = socializedLossAccount;
+    this._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
 
     if (
-      exchange.zetaGroup.products[
-        exchange.zetaGroup.products.length - 1
-      ].market.equals(PublicKey.default)
+      this.zetaGroup.products[this.zetaGroup.products.length - 1].market.equals(
+        PublicKey.default
+      )
     ) {
       throw "Zeta group markets are uninitialized!";
     }
 
     let [greeks, _greeksNonce] = await utils.getGreeks(
-      exchange.programId,
-      exchange.zetaGroupAddress
+      this.programId,
+      this.zetaGroupAddress
     );
 
-    exchange._greeksAddress = greeks;
-    exchange._markets = await ZetaGroupMarkets.load(opts, throttleMs);
-    exchange._greeks = (await exchange.program.account.greeks.fetch(
-      greeks
-    )) as Greeks;
-    exchange._riskCalculator.updateMarginRequirements();
+    this._greeksAddress = greeks;
+    this._markets = await ZetaGroupMarkets.load(opts, throttleMs);
+    this._greeks = (await this.program.account.greeks.fetch(greeks)) as Greeks;
+    this._riskCalculator.updateMarginRequirements();
 
     // Set callbacks.
-    exchange.subscribeZetaGroup(callback);
-    exchange.subscribeGreeks(callback);
+    this.subscribeZetaGroup(callback);
+    this.subscribeGreeks(callback);
 
-    await exchange.subscribeClock(callback);
+    await this.subscribeClock(callback);
 
-    exchange._isInitialized = true;
+    this._isInitialized = true;
 
     console.log(
-      `${assetToName(exchange.asset)} Exchange loaded @ ${new Date(
-        exchange.clockTimestamp * 1000
+      `${assetToName(this.asset)} Exchange loaded @ ${new Date(
+        this.clockTimestamp * 1000
       )}`
     );
   }
@@ -491,22 +487,19 @@ export class Exchange {
     this._greeksAddress = greeks;
 
     const [vaultAddress, _vaultNonce] = await utils.getVault(
-      exchange.programId,
+      this.programId,
       zetaGroup
     );
     this._vaultAddress = vaultAddress;
 
     const [insuranceVaultAddress, _insuranceNonce] =
-      await utils.getZetaInsuranceVault(
-        exchange.programId,
-        exchange.zetaGroupAddress
-      );
+      await utils.getZetaInsuranceVault(this.programId, this.zetaGroupAddress);
     this._insuranceVaultAddress = insuranceVaultAddress;
 
     const [socializedLossAccount, _socializedLossAccountNonce] =
       await utils.getSocializedLossAccount(
-        exchange.programId,
-        exchange._zetaGroupAddress
+        this.programId,
+        this._zetaGroupAddress
       );
     this._socializedLossAccountAddress = socializedLossAccount;
 
@@ -533,9 +526,7 @@ export class Exchange {
     await this.updateZetaGroup();
     await this.updateState();
 
-    this._greeks = (await exchange.program.account.greeks.fetch(
-      greeks
-    )) as Greeks;
+    this._greeks = (await this.program.account.greeks.fetch(greeks)) as Greeks;
 
     this.subscribeZetaGroup(callback);
     this.subscribeClock(callback);
