@@ -201,25 +201,22 @@ export async function initializeOpenOrdersIx(
   );
 
   return [
-    Exchange.program.instruction.initializeOpenOrders(
-      openOrdersNonce,
-      openOrdersMapNonce,
-      {
-        accounts: {
-          state: Exchange.stateAddress,
-          zetaGroup: Exchange.zetaGroupAddress,
-          dexProgram: constants.DEX_PID[Exchange.network],
-          systemProgram: SystemProgram.programId,
-          openOrders: openOrdersPda,
-          marginAccount: marginAccount,
-          authority: userKey,
-          market: market,
-          rent: SYSVAR_RENT_PUBKEY,
-          serumAuthority: Exchange.serumAuthority,
-          openOrdersMap,
-        },
-      }
-    ),
+    Exchange.program.instruction.initializeOpenOrders({
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: Exchange.zetaGroupAddress,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        systemProgram: SystemProgram.programId,
+        openOrders: openOrdersPda,
+        marginAccount: marginAccount,
+        authority: userKey,
+        payer: userKey,
+        market: market,
+        rent: SYSVAR_RENT_PUBKEY,
+        serumAuthority: Exchange.serumAuthority,
+        openOrdersMap,
+      },
+    }),
     openOrdersPda,
   ];
 }

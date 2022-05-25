@@ -1367,6 +1367,11 @@
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1391,16 +1396,7 @@
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "nonce",
-          "type": "u8"
-        },
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeOpenOrders",
@@ -5200,8 +5196,5 @@
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
     }
-  ],
-  "metadata": {
-    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
-  }
+  ]
 }
