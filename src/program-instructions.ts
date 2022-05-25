@@ -189,13 +189,13 @@ export async function initializeOpenOrdersIx(
   userKey: PublicKey,
   marginAccount: PublicKey
 ): Promise<[TransactionInstruction, PublicKey]> {
-  const [openOrdersPda, openOrdersNonce] = await utils.getOpenOrders(
+  const [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
     Exchange.programId,
     market,
     userKey
   );
 
-  const [openOrdersMap, openOrdersMapNonce] = await utils.getOpenOrdersMap(
+  const [openOrdersMap, _openOrdersMapNonce] = await utils.getOpenOrdersMap(
     Exchange.programId,
     openOrdersPda
   );
