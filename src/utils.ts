@@ -775,44 +775,44 @@ export function getGreeksIndex(marketIndex: number): number {
   );
 }
 
-export function displayState(exchange) {
+export function displayState() {
   let orderedIndexes = [
-    exchange.zetaGroup.frontExpiryIndex,
+    Exchange.zetaGroup.frontExpiryIndex,
     getMostRecentExpiredIndex(),
   ];
 
   console.log(`[EXCHANGE] Display market state...`);
   for (var i = 0; i < orderedIndexes.length; i++) {
     let index = orderedIndexes[i];
-    let expirySeries = exchange.markets.expirySeries[index];
+    let expirySeries = Exchange.markets.expirySeries[index];
     console.log(
       `Expiration @ ${new Date(
         expirySeries.expiryTs * 1000
       )} Live: ${expirySeries.isLive()}`
     );
     let interestRate = convertNativeBNToDecimal(
-      exchange.greeks.interestRate[index],
+      Exchange.greeks.interestRate[index],
       constants.PRICING_PRECISION
     );
     console.log(`Interest rate: ${interestRate}`);
-    let markets = exchange.markets.getMarketsByExpiryIndex(index);
+    let markets = Exchange.markets.getMarketsByExpiryIndex(index);
     for (var j = 0; j < markets.length; j++) {
       let market = markets[j];
       let greeksIndex = getGreeksIndex(market.marketIndex);
       let markPrice = convertNativeBNToDecimal(
-        exchange.greeks.markPrices[market.marketIndex]
+        Exchange.greeks.markPrices[market.marketIndex]
       );
       let delta = convertNativeBNToDecimal(
-        exchange.greeks.productGreeks[greeksIndex].delta,
+        Exchange.greeks.productGreeks[greeksIndex].delta,
         constants.PRICING_PRECISION
       );
 
       let sigma = Decimal.fromAnchorDecimal(
-        exchange.greeks.productGreeks[greeksIndex].volatility
+        Exchange.greeks.productGreeks[greeksIndex].volatility
       ).toNumber();
 
       let vega = Decimal.fromAnchorDecimal(
-        exchange.greeks.productGreeks[greeksIndex].vega
+        Exchange.greeks.productGreeks[greeksIndex].vega
       ).toNumber();
 
       console.log(
