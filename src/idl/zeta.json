@@ -5199,9 +5199,11 @@
       "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
+    },
+    {
+      "code": 6106,
+      "name": "OraclePriceIsInvalid",
+      "msg": "Fetched oracle price is invalid"
     }
-  ],
-  "metadata": {
-    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
-  }
+  ]
 }
