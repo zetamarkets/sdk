@@ -4667,6 +4667,51 @@ export type Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "LiquidationEvent",
+      "fields": [
+        {
+          "name": "liquidatorReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "insuranceReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidateeBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidatorBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "markPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "underlyingPrice",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -9874,6 +9919,51 @@ export const IDL: Zeta = {
         {
           "name": "orderId",
           "type": "u128",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "LiquidationEvent",
+      "fields": [
+        {
+          "name": "liquidatorReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "insuranceReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidateeBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidatorBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "markPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "underlyingPrice",
+          "type": "u64",
           "index": false
         }
       ]

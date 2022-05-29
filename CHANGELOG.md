@@ -8,6 +8,7 @@ Version changes are pinned to SDK releases.
 - general: Specify buffer-layout version in package.json. ([#119](https://github.com/zetamarkets/sdk/pull/119))
 - program: Add new NoError cancel instructions. ([#114](https://github.com/zetamarkets/sdk/pull/114))
 - client: Add new instructions ReplaceByClientOrderId, CancelAllOrdersNoError and CancelMultipleOrdersNoError. ([#114](https://github.com/zetamarkets/sdk/pull/114))
+- events: Add new event LiquidationEvent. ([#118](https://github.com/zetamarkets/sdk/pull/118))
 - risk: Add unrealized pnl calculations for spread accounts. ([#119](https://github.com/zetamarkets/sdk/pull/119))
 
 ## [0.14.1]
