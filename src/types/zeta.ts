@@ -4663,6 +4663,51 @@ export type Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "LiquidationEvent",
+      "fields": [
+        {
+          "name": "liquidatorReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "insuranceReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidateeBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidatorBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "markPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "underlyingPrice",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -5195,6 +5240,11 @@ export type Zeta = {
       "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
+    },
+    {
+      "code": 6106,
+      "name": "OraclePriceIsInvalid",
+      "msg": "Fetched oracle price is invalid"
     }
   ]
 };
@@ -9864,6 +9914,51 @@ export const IDL: Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "LiquidationEvent",
+      "fields": [
+        {
+          "name": "liquidatorReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "insuranceReward",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidateeBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "remainingLiquidatorBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "markPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "underlyingPrice",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -10396,6 +10491,11 @@ export const IDL: Zeta = {
       "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
+    },
+    {
+      "code": 6106,
+      "name": "OraclePriceIsInvalid",
+      "msg": "Fetched oracle price is invalid"
     }
   ]
 };
