@@ -4,9 +4,10 @@ import {
   MarginType,
   MarginRequirement,
   MarginAccountState,
+  ProgramAccountType,
 } from "./types";
 import { ACTIVE_MARKETS } from "./constants";
-import { MarginAccount } from "./program-types";
+import { SpreadAccount, MarginAccount } from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
@@ -94,14 +95,20 @@ export class RiskCalculator {
   }
 
   /**
-   * Returns the unrealized pnl for a given MarginAccount
-   * @param marginAccount   the user's MarginAccount.
+   * Returns the unrealized pnl for a given margin or spread account.
+   * @param account the user's spread or margin account.
    */
-  public calculateUnrealizedPnl(marginAccount: MarginAccount): number {
+  public calculateUnrealizedPnl(
+    account: any,
+    accountType: ProgramAccountType = ProgramAccountType.MarginAccount
+  ): number {
     let pnl = 0;
-    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
-      let position = marginAccount.productLedgers[i].position;
-      let size = position.size.toNumber();
+    for (var i = 0; i < ACTIVE_MARKETS; i++) {
+      const position =
+        accountType == ProgramAccountType.MarginAccount
+          ? account.productLedgers[i].position
+          : account.positions[i];
+      const size = position.size.toNumber();
       if (size == 0) {
         continue;
       }
