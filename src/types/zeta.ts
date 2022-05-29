@@ -4665,11 +4665,6 @@ export type Zeta = {
           "name": "orderId",
           "type": "u128",
           "index": false
-        },
-        {
-          "name": "isTaker",
-          "type": "bool",
-          "index": false
         }
       ]
     },
@@ -5249,6 +5244,11 @@ export type Zeta = {
       "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
+    },
+    {
+      "code": 6106,
+      "name": "OraclePriceIsInvalid",
+      "msg": "Fetched oracle price is invalid"
     }
   ]
 };
@@ -9920,11 +9920,6 @@ export const IDL: Zeta = {
           "name": "orderId",
           "type": "u128",
           "index": false
-        },
-        {
-          "name": "isTaker",
-          "type": "bool",
-          "index": false
         }
       ]
     },
@@ -10504,6 +10499,11 @@ export const IDL: Zeta = {
       "code": 6105,
       "name": "ExceededMaxSpreadAccountContracts",
       "msg": "Exceeded max spread account contracts"
+    },
+    {
+      "code": 6106,
+      "name": "OraclePriceIsInvalid",
+      "msg": "Fetched oracle price is invalid"
     }
   ]
 };
