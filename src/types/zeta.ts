@@ -1367,6 +1367,11 @@ export type Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1391,16 +1396,7 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "nonce",
-          "type": "u8"
-        },
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeOpenOrders",
@@ -6622,6 +6618,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -6646,16 +6647,7 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "nonce",
-          "type": "u8"
-        },
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeOpenOrders",

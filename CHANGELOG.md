@@ -11,6 +11,10 @@ Version changes are pinned to SDK releases.
 - events: Add new event LiquidationEvent. ([#118](https://github.com/zetamarkets/sdk/pull/118))
 - risk: Add unrealized pnl calculations for spread accounts. ([#119](https://github.com/zetamarkets/sdk/pull/119))
 
+### Breaking
+
+- instruction: InitializeOpenOrders now takes explicit payer. ([#121](https://github.com/zetamarkets/sdk/pull/121))
+
 ## [0.14.1]
 
 - oracle: `OraclePrice` now contains `lastUpdatedTime` which is seconds since Linux epoch. `GetPriceAge` can be called to get the time between `now` and `lastUpdatedTime`. (([#115](https://github.com/zetamarkets/sdk/pull/115)))

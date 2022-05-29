@@ -189,37 +189,34 @@ export async function initializeOpenOrdersIx(
   userKey: PublicKey,
   marginAccount: PublicKey
 ): Promise<[TransactionInstruction, PublicKey]> {
-  const [openOrdersPda, openOrdersNonce] = await utils.getOpenOrders(
+  const [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
     Exchange.programId,
     market,
     userKey
   );
 
-  const [openOrdersMap, openOrdersMapNonce] = await utils.getOpenOrdersMap(
+  const [openOrdersMap, _openOrdersMapNonce] = await utils.getOpenOrdersMap(
     Exchange.programId,
     openOrdersPda
   );
 
   return [
-    Exchange.program.instruction.initializeOpenOrders(
-      openOrdersNonce,
-      openOrdersMapNonce,
-      {
-        accounts: {
-          state: Exchange.stateAddress,
-          zetaGroup: Exchange.zetaGroupAddress,
-          dexProgram: constants.DEX_PID[Exchange.network],
-          systemProgram: SystemProgram.programId,
-          openOrders: openOrdersPda,
-          marginAccount: marginAccount,
-          authority: userKey,
-          market: market,
-          rent: SYSVAR_RENT_PUBKEY,
-          serumAuthority: Exchange.serumAuthority,
-          openOrdersMap,
-        },
-      }
-    ),
+    Exchange.program.instruction.initializeOpenOrders({
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: Exchange.zetaGroupAddress,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        systemProgram: SystemProgram.programId,
+        openOrders: openOrdersPda,
+        marginAccount: marginAccount,
+        authority: userKey,
+        payer: userKey,
+        market: market,
+        rent: SYSVAR_RENT_PUBKEY,
+        serumAuthority: Exchange.serumAuthority,
+        openOrdersMap,
+      },
+    }),
     openOrdersPda,
   ];
 }

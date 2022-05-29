@@ -1053,7 +1053,10 @@
         {
           "name": "nodes",
           "type": {
-            "array": ["u64", 5]
+            "array": [
+              "u64",
+              5
+            ]
           }
         }
       ]
@@ -1364,6 +1367,11 @@
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1388,16 +1396,7 @@
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "nonce",
-          "type": "u8"
-        },
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeOpenOrders",
@@ -2890,13 +2889,19 @@
           {
             "name": "markPrices",
             "type": {
-              "array": ["u64", 46]
+              "array": [
+                "u64",
+                46
+              ]
             }
           },
           {
             "name": "markPricesPadding",
             "type": {
-              "array": ["u64", 92]
+              "array": [
+                "u64",
+                92
+              ]
             }
           },
           {
@@ -2924,73 +2929,109 @@
           {
             "name": "updateTimestamp",
             "type": {
-              "array": ["u64", 2]
+              "array": [
+                "u64",
+                2
+              ]
             }
           },
           {
             "name": "updateTimestampPadding",
             "type": {
-              "array": ["u64", 4]
+              "array": [
+                "u64",
+                4
+              ]
             }
           },
           {
             "name": "retreatExpirationTimestamp",
             "type": {
-              "array": ["u64", 2]
+              "array": [
+                "u64",
+                2
+              ]
             }
           },
           {
             "name": "retreatExpirationTimestampPadding",
             "type": {
-              "array": ["u64", 4]
+              "array": [
+                "u64",
+                4
+              ]
             }
           },
           {
             "name": "interestRate",
             "type": {
-              "array": ["i64", 2]
+              "array": [
+                "i64",
+                2
+              ]
             }
           },
           {
             "name": "interestRatePadding",
             "type": {
-              "array": ["i64", 4]
+              "array": [
+                "i64",
+                4
+              ]
             }
           },
           {
             "name": "nodes",
             "type": {
-              "array": ["u64", 5]
+              "array": [
+                "u64",
+                5
+              ]
             }
           },
           {
             "name": "volatility",
             "type": {
-              "array": ["u64", 10]
+              "array": [
+                "u64",
+                10
+              ]
             }
           },
           {
             "name": "volatilityPadding",
             "type": {
-              "array": ["u64", 20]
+              "array": [
+                "u64",
+                20
+              ]
             }
           },
           {
             "name": "nodeKeys",
             "type": {
-              "array": ["publicKey", 138]
+              "array": [
+                "publicKey",
+                138
+              ]
             }
           },
           {
             "name": "haltForcePricing",
             "type": {
-              "array": ["bool", 6]
+              "array": [
+                "bool",
+                6
+              ]
             }
           },
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 1641]
+              "array": [
+                "u8",
+                1641
+              ]
             }
           }
         ]
@@ -3012,7 +3053,10 @@
           {
             "name": "indexes",
             "type": {
-              "array": ["u8", 138]
+              "array": [
+                "u8",
+                138
+              ]
             }
           }
         ]
@@ -3106,7 +3150,10 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 158]
+              "array": [
+                "u8",
+                158
+              ]
             }
           }
         ]
@@ -3136,7 +3183,10 @@
           {
             "name": "strikes",
             "type": {
-              "array": ["u64", 23]
+              "array": [
+                "u64",
+                23
+              ]
             }
           }
         ]
@@ -3244,7 +3294,10 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 1063]
+              "array": [
+                "u8",
+                1063
+              ]
             }
           }
         ]
@@ -3266,7 +3319,10 @@
           {
             "name": "nodeUpdates",
             "type": {
-              "array": ["i64", 5]
+              "array": [
+                "i64",
+                5
+              ]
             }
           },
           {
@@ -3296,7 +3352,10 @@
           {
             "name": "seriesExpiry",
             "type": {
-              "array": ["u64", 6]
+              "array": [
+                "u64",
+                6
+              ]
             }
           },
           {
@@ -3324,7 +3383,10 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 263]
+              "array": [
+                "u8",
+                263
+              ]
             }
           }
         ]
@@ -3354,13 +3416,19 @@
           {
             "name": "openOrdersNonce",
             "type": {
-              "array": ["u8", 138]
+              "array": [
+                "u8",
+                138
+              ]
             }
           },
           {
             "name": "seriesExpiry",
             "type": {
-              "array": ["u64", 6]
+              "array": [
+                "u64",
+                6
+              ]
             }
           },
           {
@@ -3392,7 +3460,10 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 388]
+              "array": [
+                "u8",
+                388
+              ]
             }
           }
         ]
@@ -3548,37 +3619,55 @@
           {
             "name": "markPricesSet",
             "type": {
-              "array": ["bool", 2]
+              "array": [
+                "bool",
+                2
+              ]
             }
           },
           {
             "name": "markPricesSetPadding",
             "type": {
-              "array": ["bool", 4]
+              "array": [
+                "bool",
+                4
+              ]
             }
           },
           {
             "name": "marketNodesCleaned",
             "type": {
-              "array": ["bool", 2]
+              "array": [
+                "bool",
+                2
+              ]
             }
           },
           {
             "name": "marketNodesCleanedPadding",
             "type": {
-              "array": ["bool", 4]
+              "array": [
+                "bool",
+                4
+              ]
             }
           },
           {
             "name": "marketCleaned",
             "type": {
-              "array": ["bool", 46]
+              "array": [
+                "bool",
+                46
+              ]
             }
           },
           {
             "name": "marketCleanedPadding",
             "type": {
-              "array": ["bool", 92]
+              "array": [
+                "bool",
+                92
+              ]
             }
           }
         ]
@@ -3692,7 +3781,10 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 32]
+              "array": [
+                "u8",
+                32
+              ]
             }
           }
         ]
@@ -3718,7 +3810,10 @@
           {
             "name": "padding",
             "type": {
-              "array": ["u8", 15]
+              "array": [
+                "u8",
+                15
+              ]
             }
           }
         ]
@@ -3796,7 +3891,10 @@
           {
             "name": "openingOrders",
             "type": {
-              "array": ["u64", 2]
+              "array": [
+                "u64",
+                2
+              ]
             }
           }
         ]
@@ -3850,7 +3948,10 @@
           {
             "name": "volatility",
             "type": {
-              "array": ["u64", 5]
+              "array": [
+                "u64",
+                5
+              ]
             }
           }
         ]
@@ -4228,7 +4329,10 @@
           {
             "name": "volatility",
             "type": {
-              "array": ["u64", 5]
+              "array": [
+                "u64",
+                5
+              ]
             }
           },
           {
