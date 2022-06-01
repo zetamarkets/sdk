@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.14.2]
+
 - general: Specify buffer-layout version in package.json. ([#119](https://github.com/zetamarkets/sdk/pull/119))
 - program: Add new NoError cancel instructions. ([#114](https://github.com/zetamarkets/sdk/pull/114))
 - client: Add new instructions ReplaceByClientOrderId, CancelAllOrdersNoError and CancelMultipleOrdersNoError. ([#114](https://github.com/zetamarkets/sdk/pull/114))
@@ -13,7 +15,7 @@ Version changes are pinned to SDK releases.
 
 ### Breaking
 
-- instruction: InitializeOpenOrders now takes explicit payer. ([#121](https://github.com/zetamarkets/sdk/pull/121))
+- instruction: InitializeOpenOrders now takes explicit payer. This affects placing an order on a new market. ([#121](https://github.com/zetamarkets/sdk/pull/121))
 
 ## [0.14.1]
 
