@@ -15,7 +15,7 @@ Version changes are pinned to SDK releases.
 
 ### Breaking
 
-- instruction: InitializeOpenOrders now takes explicit payer. This affects placing an order on a new market. ([#121](https://github.com/zetamarkets/sdk/pull/121))
+- instruction: `InitializeOpenOrders` now takes explicit payer. This affects placing an order on a new market. ([#121](https://github.com/zetamarkets/sdk/pull/121))
 
 ## [0.14.1]
 
