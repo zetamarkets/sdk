@@ -19,13 +19,15 @@ import {
   toProgramMovementType,
 } from "./types";
 import * as constants from "./constants";
+import { types } from ".";
 
 export function initializeMarginAccountIx(
+  args: types.InitializeMarginAccountArgs,
   zetaGroup: PublicKey,
   marginAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeMarginAccount({
+  return Exchange.program.instruction.initializeMarginAccount(args, {
     accounts: {
       zetaGroup,
       marginAccount,
@@ -1481,11 +1483,12 @@ export function expireSeriesOverrideIx(
 }
 
 export function initializeSpreadAccountIx(
+  args: types.InitializeSpreadAccountArgs,
   zetaGroup: PublicKey,
   spreadAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeSpreadAccount({
+  return Exchange.program.instruction.initializeSpreadAccount(args, {
     accounts: {
       zetaGroup,
       spreadAccount,
