@@ -152,7 +152,14 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "initializeSpreadAccount",
@@ -188,7 +195,14 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -3381,11 +3395,17 @@ export type Zeta = {
             }
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                262
               ]
             }
           }
@@ -3458,11 +3478,17 @@ export type Zeta = {
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                387
               ]
             }
           }
@@ -4539,6 +4565,20 @@ export type Zeta = {
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Asset",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "BTC"
           }
         ]
       }
@@ -5403,7 +5443,14 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "initializeSpreadAccount",
@@ -5439,7 +5486,14 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -8632,11 +8686,17 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                262
               ]
             }
           }
@@ -8709,11 +8769,17 @@ export const IDL: Zeta = {
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                387
               ]
             }
           }
@@ -9790,6 +9856,20 @@ export const IDL: Zeta = {
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Asset",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "BTC"
           }
         ]
       }

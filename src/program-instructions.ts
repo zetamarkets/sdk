@@ -20,23 +20,27 @@ import {
 } from "./types";
 import * as constants from "./constants";
 import { types } from ".";
+import * as assets from "./assets";
 
 export function initializeMarginAccountIx(
-  args: types.InitializeMarginAccountArgs,
+  asset: assets.Asset,
   zetaGroup: PublicKey,
   marginAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeMarginAccount(args, {
-    accounts: {
-      zetaGroup,
-      marginAccount,
-      authority: user,
-      payer: user,
-      zetaProgram: Exchange.programId,
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return Exchange.program.instruction.initializeMarginAccount(
+    assets.toProgramAsset(asset),
+    {
+      accounts: {
+        zetaGroup,
+        marginAccount,
+        authority: user,
+        payer: user,
+        zetaProgram: Exchange.programId,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function closeMarginAccountIx(
@@ -1483,21 +1487,24 @@ export function expireSeriesOverrideIx(
 }
 
 export function initializeSpreadAccountIx(
-  args: types.InitializeSpreadAccountArgs,
+  asset: assets.Asset,
   zetaGroup: PublicKey,
   spreadAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeSpreadAccount(args, {
-    accounts: {
-      zetaGroup,
-      spreadAccount,
-      authority: user,
-      payer: user,
-      zetaProgram: Exchange.programId,
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return Exchange.program.instruction.initializeSpreadAccount(
+    assets.toProgramAsset(asset),
+    {
+      accounts: {
+        zetaGroup,
+        spreadAccount,
+        authority: user,
+        payer: user,
+        zetaProgram: Exchange.programId,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function closeSpreadAccountIx(

@@ -146,7 +146,7 @@ export interface MarginAccount {
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
   rebalanceAmount: anchor.BN;
-  asset: number;
+  asset: any;
   padding: Array<number>;
 }
 
@@ -157,7 +157,7 @@ export interface SpreadAccount {
   seriesExpiry: Array<anchor.BN>;
   positions: Array<Position>;
   positionsPadding: Array<Position>;
-  asset: number;
+  asset: any;
   padding: Array<number>;
 }
 

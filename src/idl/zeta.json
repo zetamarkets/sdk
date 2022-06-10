@@ -152,7 +152,14 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "initializeSpreadAccount",
@@ -188,7 +195,14 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -3381,11 +3395,17 @@
             }
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                262
               ]
             }
           }
@@ -3458,11 +3478,17 @@
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                387
               ]
             }
           }
@@ -4539,6 +4565,20 @@
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Asset",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "BTC"
           }
         ]
       }

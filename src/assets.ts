@@ -34,3 +34,9 @@ export function assetToOracleFeed(asset: Asset) {
   let name = assetToName(asset);
   return `${name}/USD`;
 }
+
+export function toProgramAsset(asset: Asset) {
+  if (asset == Asset.SOL) return { sol: {} };
+  if (asset == Asset.BTC) return { sol: {} };
+  throw Error("Invalid asset");
+}

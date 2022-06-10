@@ -64,6 +64,8 @@ import {
 
 import { EventType } from "./events";
 
+import * as assets from "./assets";
+
 export class Client {
   /**
    * Returns the user wallet public key.
@@ -492,6 +494,7 @@ export class Client {
       console.log("User has no margin account. Creating margin account...");
       tx.add(
         initializeMarginAccountIx(
+          assets.Asset.SOL, // TODO change with full multiunderlying PR
           Exchange.zetaGroupAddress,
           this._marginAccountAddress,
           this.publicKey
@@ -769,6 +772,7 @@ export class Client {
       console.log("User has no spread account. Creating spread account...");
       tx.add(
         initializeSpreadAccountIx(
+          assets.Asset.SOL, // TODO change with full multiunderlying PR
           Exchange.zetaGroupAddress,
           this.spreadAccountAddress,
           this.publicKey
@@ -1616,6 +1620,7 @@ export class Client {
       console.log("User has no spread account. Creating spread account...");
       tx.add(
         initializeSpreadAccountIx(
+          assets.Asset.SOL, // TODO change with full multiunderlying PR
           Exchange.zetaGroupAddress,
           this.spreadAccountAddress,
           this.publicKey
