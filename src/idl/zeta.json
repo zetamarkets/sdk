@@ -110,11 +110,6 @@
           "isSigner": false
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
           "name": "marginAccount",
           "isMut": true,
           "isSigner": false
@@ -129,11 +124,6 @@
           "name": "zetaGroup",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
         },
         {
           "name": "spreadAccount",

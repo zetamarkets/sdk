@@ -96,6 +96,7 @@ export interface ZetaGroup {
   expirySeries: Array<ExpirySeries>;
   expirySeriesPadding: Array<ExpirySeries>;
   totalInsuranceVaultDeposits: anchor.BN;
+  asset: any;
   padding: Array<number>;
 }
 

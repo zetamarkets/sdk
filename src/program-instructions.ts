@@ -883,12 +883,10 @@ export function refreshZetaGroupAssetIx(): TransactionInstruction {
 
 export function refreshMarginAccountAssetIx(
   marginAccount: PublicKey,
-  user: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.refreshMarginAccountAsset({
     accounts: {
       marginAccount: marginAccount,
-      authority: user,
       zetaGroup: Exchange.zetaGroupAddress,
     },
   });
@@ -896,12 +894,10 @@ export function refreshMarginAccountAssetIx(
 
 export function refreshSpreadAccountAssetIx(
   spreadAccount: PublicKey,
-  user: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.refreshSpreadAccountAsset({
     accounts: {
       spreadAccount: spreadAccount,
-      authority: user,
       zetaGroup: Exchange.zetaGroupAddress,
     },
   });

@@ -1315,18 +1315,16 @@ export async function refreshZetaGroupAsset() {
 
 export async function refreshMarginAccountAsset(
   marginAccount: PublicKey,
-  user: PublicKey
 ) {
   let tx = new Transaction();
-  tx.add(refreshMarginAccountAssetIx(marginAccount, user));
+  tx.add(refreshMarginAccountAssetIx(marginAccount));
   await processTransaction(Exchange.provider, tx);
 }
 
 export async function refreshSpreadAccountAsset(
   spreadAccount: PublicKey,
-  user: PublicKey
 ) {
   let tx = new Transaction();
-  tx.add(refreshSpreadAccountAssetIx(spreadAccount, user));
+  tx.add(refreshSpreadAccountAssetIx(spreadAccount));
   await processTransaction(Exchange.provider, tx);
 }
