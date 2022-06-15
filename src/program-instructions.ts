@@ -23,24 +23,20 @@ import { types } from ".";
 import * as assets from "./assets";
 
 export function initializeMarginAccountIx(
-  asset: assets.Asset,
   zetaGroup: PublicKey,
   marginAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeMarginAccount(
-    assets.toProgramAsset(asset),
-    {
-      accounts: {
-        zetaGroup,
-        marginAccount,
-        authority: user,
-        payer: user,
-        zetaProgram: Exchange.programId,
-        systemProgram: SystemProgram.programId,
-      },
-    }
-  );
+  return Exchange.program.instruction.initializeMarginAccount({
+    accounts: {
+      zetaGroup,
+      marginAccount,
+      authority: user,
+      payer: user,
+      zetaProgram: Exchange.programId,
+      systemProgram: SystemProgram.programId,
+    },
+  });
 }
 
 export function closeMarginAccountIx(
@@ -879,6 +875,38 @@ export async function initializeZetaGroupIx(
   );
 }
 
+export function refreshZetaGroupAssetIx(): TransactionInstruction {
+  return Exchange.program.instruction.refreshZetaGroupAsset({
+    accounts: { zetaGroup: Exchange.zetaGroupAddress },
+  });
+}
+
+export function refreshMarginAccountAssetIx(
+  marginAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.refreshMarginAccountAsset({
+    accounts: {
+      marginAccount: marginAccount,
+      authority: user,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+
+export function refreshSpreadAccountAssetIx(
+  spreadAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.refreshSpreadAccountAsset({
+    accounts: {
+      spreadAccount: spreadAccount,
+      authority: user,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+
 export function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
 ): TransactionInstruction {
@@ -1487,24 +1515,20 @@ export function expireSeriesOverrideIx(
 }
 
 export function initializeSpreadAccountIx(
-  asset: assets.Asset,
   zetaGroup: PublicKey,
   spreadAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeSpreadAccount(
-    assets.toProgramAsset(asset),
-    {
-      accounts: {
-        zetaGroup,
-        spreadAccount,
-        authority: user,
-        payer: user,
-        zetaProgram: Exchange.programId,
-        systemProgram: SystemProgram.programId,
-      },
-    }
-  );
+  return Exchange.program.instruction.initializeSpreadAccount({
+    accounts: {
+      zetaGroup,
+      spreadAccount,
+      authority: user,
+      payer: user,
+      zetaProgram: Exchange.programId,
+      systemProgram: SystemProgram.programId,
+    },
+  });
 }
 
 export function closeSpreadAccountIx(

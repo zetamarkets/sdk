@@ -47,6 +47,9 @@ import {
   settlePositionsIx,
   settleSpreadPositionsIx,
   PositionMovementArg,
+  refreshZetaGroupAssetIx,
+  refreshMarginAccountAssetIx,
+  refreshSpreadAccountAssetIx,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -1302,4 +1305,28 @@ export function calculateMovementFees(
   let notionalValue = totalContracts * spotPrice;
   let fee = (notionalValue * feeBps) / constants.BPS_DENOMINATOR;
   return decimal ? fee : convertDecimalToNativeInteger(fee);
+}
+
+export async function refreshZetaGroupAsset() {
+  let tx = new Transaction();
+  tx.add(refreshZetaGroupAssetIx());
+  await processTransaction(Exchange.provider, tx);
+}
+
+export async function refreshMarginAccountAsset(
+  marginAccount: PublicKey,
+  user: PublicKey
+) {
+  let tx = new Transaction();
+  tx.add(refreshMarginAccountAssetIx(marginAccount, user));
+  await processTransaction(Exchange.provider, tx);
+}
+
+export async function refreshSpreadAccountAsset(
+  spreadAccount: PublicKey,
+  user: PublicKey
+) {
+  let tx = new Transaction();
+  tx.add(refreshSpreadAccountAssetIx(spreadAccount, user));
+  await processTransaction(Exchange.provider, tx);
 }

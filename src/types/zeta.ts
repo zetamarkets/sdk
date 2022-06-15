@@ -91,6 +91,59 @@ export type Zeta = {
       ]
     },
     {
+      "name": "refreshZetaGroupAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refreshMarginAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refreshSpreadAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "overrideExpiry",
       "accounts": [
         {
@@ -152,14 +205,7 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "initializeSpreadAccount",
@@ -195,14 +241,7 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeMarginAccount",
@@ -3306,11 +3345,17 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1063
+                1062
               ]
             }
           }
@@ -5285,6 +5330,11 @@ export type Zeta = {
       "code": 6106,
       "name": "OraclePriceIsInvalid",
       "msg": "Fetched oracle price is invalid"
+    },
+    {
+      "code": 6107,
+      "name": "InvalidUnderlyingMint",
+      "msg": "Provided underlying mint address is invalid"
     }
   ]
 };
@@ -5382,6 +5432,59 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "refreshZetaGroupAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refreshMarginAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refreshSpreadAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "overrideExpiry",
       "accounts": [
         {
@@ -5443,14 +5546,7 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "initializeSpreadAccount",
@@ -5486,14 +5582,7 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeMarginAccount",
@@ -8597,11 +8686,17 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1063
+                1062
               ]
             }
           }
@@ -10576,6 +10671,11 @@ export const IDL: Zeta = {
       "code": 6106,
       "name": "OraclePriceIsInvalid",
       "msg": "Fetched oracle price is invalid"
+    },
+    {
+      "code": 6107,
+      "name": "InvalidUnderlyingMint",
+      "msg": "Provided underlying mint address is invalid"
     }
   ]
 };
