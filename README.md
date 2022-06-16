@@ -334,9 +334,9 @@ await client.placeOrder(
 
 // View our position
 await client.updateState();
-console.log(client.positions);
+console.log(client.marginPositions);
 
-// `client.positions` is a list of positions in market index order.
+// `client.marginPositions` is a list of marginAccount positions in market index order.
 `
 [
   {
