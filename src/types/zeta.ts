@@ -3396,14 +3396,14 @@ export type Zeta = {
           },
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                261
+                262
               ]
             }
           }
@@ -3477,14 +3477,14 @@ export type Zeta = {
           },
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                386
+                387
               ]
             }
           }
@@ -4495,7 +4495,7 @@ export type Zeta = {
         "fields": [
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           }
         ]
       }
@@ -4507,7 +4507,7 @@ export type Zeta = {
         "fields": [
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           }
         ]
       }
@@ -8693,14 +8693,14 @@ export const IDL: Zeta = {
           },
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                261
+                262
               ]
             }
           }
@@ -8774,14 +8774,14 @@ export const IDL: Zeta = {
           },
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                386
+                387
               ]
             }
           }
@@ -9792,7 +9792,7 @@ export const IDL: Zeta = {
         "fields": [
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           }
         ]
       }
@@ -9804,7 +9804,7 @@ export const IDL: Zeta = {
         "fields": [
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           }
         ]
       }

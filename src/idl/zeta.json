@@ -3396,14 +3396,14 @@
           },
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                261
+                262
               ]
             }
           }
@@ -3477,14 +3477,14 @@
           },
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                386
+                387
               ]
             }
           }
@@ -4495,7 +4495,7 @@
         "fields": [
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           }
         ]
       }
@@ -4507,7 +4507,7 @@
         "fields": [
           {
             "name": "asset",
-            "type": "u16"
+            "type": "u8"
           }
         ]
       }
@@ -5292,8 +5292,5 @@
       "name": "OraclePriceIsInvalid",
       "msg": "Fetched oracle price is invalid"
     }
-  ],
-  "metadata": {
-    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
-  }
+  ]
 }

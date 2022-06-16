@@ -214,7 +214,7 @@ export class Exchange {
     opts: ConfirmOptions
   ) {
     if (this.isSetup) {
-      throw "Exchange already initialized";
+      throw "Exchange already setup";
     }
     this._assets = assets;
     this._provider = new anchor.AnchorProvider(
@@ -310,11 +310,11 @@ export class Exchange {
     throttleMs = 0,
     callback?: (asset: Asset, event: EventType, data: any) => void
   ) {
-    if (this.isSetup) {
+    if (this.isInitialized) {
       throw "Exchange already loaded";
     }
 
-    if (!this.isInitialized) {
+    if (!this.isSetup) {
       await this.initialize(
         assets,
         programId,
