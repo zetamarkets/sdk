@@ -152,7 +152,14 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarginAccountArgs"
+          }
+        }
+      ]
     },
     {
       "name": "initializeSpreadAccount",
@@ -188,7 +195,14 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeSpreadAccountArgs"
+          }
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -3381,11 +3395,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "asset",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                261
               ]
             }
           }
@@ -3458,11 +3476,15 @@ export type Zeta = {
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                386
               ]
             }
           }
@@ -4462,6 +4484,30 @@ export type Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarginAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeSpreadAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "u16"
           }
         ]
       }
@@ -5403,7 +5449,14 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarginAccountArgs"
+          }
+        }
+      ]
     },
     {
       "name": "initializeSpreadAccount",
@@ -5439,7 +5492,14 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeSpreadAccountArgs"
+          }
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -8632,11 +8692,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "asset",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                261
               ]
             }
           }
@@ -8709,11 +8773,15 @@ export const IDL: Zeta = {
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                386
               ]
             }
           }
@@ -9713,6 +9781,30 @@ export const IDL: Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarginAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeSpreadAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "u16"
           }
         ]
       }

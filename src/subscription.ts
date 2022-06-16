@@ -1,8 +1,9 @@
-import { exchange as Exchange } from "./exchange";
-import { ProgramAccountType } from "./types";
+import * as types from "./types";
 import { PublicKey, Context, KeyedAccountInfo } from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
 import * as bs58 from "bs58";
+import { Asset } from "./assets";
+import { exchange as Exchange } from "./exchange";
 
 export interface AccountSubscriptionData<T> {
   key: PublicKey;
@@ -11,7 +12,8 @@ export interface AccountSubscriptionData<T> {
 }
 
 export function subscribeProgramAccounts<T>(
-  accountType: ProgramAccountType,
+  asset: Asset,
+  accountType: types.ProgramAccountType,
   callback?: (data: AccountSubscriptionData<T>) => void
 ) {
   const discriminator =
@@ -37,5 +39,5 @@ export function subscribeProgramAccounts<T>(
     ]
   );
 
-  Exchange.addProgramSubscriptionId(subscriptionId);
+  Exchange.getSubExchange(asset).addProgramSubscriptionId(subscriptionId);
 }

@@ -7,106 +7,211 @@ import {
   Network,
   utils,
   types,
+  assets,
+  events,
 } from "@zetamarkets/sdk";
-import { PublicKey, Connection, Keypair } from "@solana/web3.js";
+import { PublicKey, Connection, Keypair, SOLANA_SCHEMA } from "@solana/web3.js";
 import fetch from "node-fetch";
+import { airdropUsdc } from "../liquidator-example/src/utils";
+import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import {} from "../../dist/subexchange";
+import { defaultCommitment } from "../../dist/utils";
+// import { Exchange } from "../../src/exchange";
+// import { Asset } from "../../src/assets";
+// import { SubExchange } from "../../src/subexchange";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
-const PROGRAM_ID = new PublicKey(process.env["program_id"]);
-const STARTING_BALANCE = 10_000;
+const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
+const STARTING_BALANCE = 5_000;
 
-console.log(NETWORK_URL);
+async function exchangeCallback(
+  asset: assets.Asset,
+  _eventType: events.EventType,
+  _data: any
+) {
+  console.log(`[ExchangeCallback] Asset=${assets.assetToName(asset)}`);
+}
+
+async function clientCallback(
+  asset: assets.Asset,
+  _eventType: events.EventType,
+  _data: any
+) {
+  console.log(`[ClientCallback] Asset=${assets.assetToName(asset)}`);
+}
+
+export async function welcomeServer() {
+  return await fetch(`${process.env.server_url}/`, {
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function orderbookRequest(
+  asset: assets.Asset,
+  marketIndex: number
+) {
+  let text =
+    `${process.env.server_url}/orderbook?asset=` +
+    assets.assetToName(asset) +
+    "&marketIndex=" +
+    marketIndex;
+  try {
+    return await fetch(text, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 async function main() {
-  // Generate a new keypair for wallet otherwise load from a private key.
-  const userKey = Keypair.generate();
-  const wallet = new Wallet(userKey);
+  // Loads the private key in .env
+  const privateKey = Keypair.fromSecretKey(
+    new Uint8Array(JSON.parse(Buffer.from(process.env.private_key!).toString()))
+  );
+
+  const wallet = new Wallet(privateKey);
 
   // Create a solana web3 connection to devnet.
   const connection: Connection = new Connection(NETWORK_URL, "confirmed");
 
-  // Airdropping SOL.
-  await connection.requestAirdrop(wallet.publicKey, 100000000);
-
-  await fetch(`${SERVER_URL}/faucet/USDC`, {
-    method: "post",
-    body: JSON.stringify({
-      key: wallet.publicKey.toString(),
-      amount: 10_000,
-    }),
-    headers: { "Content-Type": "application/json" },
-  });
-
+  console.time("Full load + placeorder");
+  console.time("SubExchange load");
   await Exchange.load(
+    assets.allAssets(),
     PROGRAM_ID,
     Network.DEVNET,
     connection,
     utils.defaultCommitment(),
-    // Exchange wallet can be ignored for normal clients.
     undefined,
-    // ThrottleMs - increase if you are running into rate limit issues on startup.
-    0
+    undefined
+    // exchangeCallback
   );
-
+  console.timeEnd("SubExchange load");
+  console.time("SubClient load");
   const client = await Client.load(
     connection,
     wallet,
-    utils.defaultCommitment(),
     undefined
+    // clientCallback
   );
+  console.timeEnd("SubClient load");
 
-  await client.deposit(utils.convertDecimalToNativeInteger(STARTING_BALANCE));
+  // await mint(
+  //   connection,
+  //   wallet,
+  //   privateKey,
+  //   client,
+  //   assets.Asset.SOL,
+  //   true
+  // );
+  // await mint(
+  //   connection,
+  //   wallet,
+  //   privateKey,
+  //   client,
+  //   assets.Asset.BTC,
+  //   true
+  // );
 
-  // Display existing exchange state.
   utils.displayState();
 
   // Show current orderbook for a market.
-  // Pick INDEX: 6 KIND: call STRIKE: 235
+  const index = 10;
+  console.time("Update orderbook");
+  await Exchange.updateOrderbook(assets.Asset.SOL, index);
+  await Exchange.updateOrderbook(assets.Asset.BTC, index);
+  console.timeEnd("Update orderbook");
 
-  const index = 2;
-  await Exchange.markets.markets[index].updateOrderbook();
-  console.log(Exchange.markets.markets[index].orderbook);
+  console.log(`SOL market ${index} orderbook:`);
+  console.log(Exchange.getOrderbook(assets.Asset.SOL, index));
+  console.log(`BTC market ${index} orderbook:`);
+  console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
 
-  const orderPrice = utils.convertDecimalToNativeInteger(8);
-  const orderLots = 1;
+  // Place bid orders.
+  console.time("Cancel orders");
+  await client.cancelAllOrders(assets.Asset.SOL);
+  await client.cancelAllOrders(assets.Asset.BTC);
+  console.timeEnd("Cancel orders");
+  console.time("Place order");
 
-  // Place a bid order.
   await client.placeOrder(
-    Exchange.markets.markets[index].address,
-    orderPrice,
-    orderLots,
-    types.Side.BID
+    assets.Asset.SOL,
+    index,
+    utils.convertDecimalToNativeInteger(0.1),
+    100,
+    types.Side.BID,
+    types.OrderType.LIMIT
   );
+  await client.placeOrder(
+    assets.Asset.BTC,
+    index,
+    utils.convertDecimalToNativeInteger(0.1),
+    200,
+    types.Side.BID,
+    types.OrderType.LIMIT
+  );
+  console.timeEnd("Place order");
+  console.timeEnd("Full load + placeorder");
 
-  // See our orders.
-  await client.updateState();
-  console.log(client.orders);
+  console.time("Update state");
+
+  await client.updateState(assets.Asset.SOL);
+  await client.updateState(assets.Asset.BTC);
+  console.log("Margin account positions:", client.marginPositions);
+  console.log("Spread account positions:", client.spreadPositions);
+
+  console.timeEnd("Update state");
 
   // See our order in the orderbook.
   // NOTE: Orderbook depth is capped to what is set, default = 5.
-  // Set via `Exchange.markets.orderbookDepth = N`.
-  console.log(Exchange.markets.markets[index].orderbook);
+  // Set via `Exchange.getSubExchange(assets.Asset.SOL).markets.orderbookDepth = N`.
+
+  await Exchange.updateOrderbook(assets.Asset.SOL, index);
+  await Exchange.updateOrderbook(assets.Asset.BTC, index);
+
+  console.log(`SOL market ${index} orderbook after our orders:`);
+  console.log(Exchange.getOrderbook(assets.Asset.SOL, index));
+  console.log(`BTC market ${index} orderbook after our orders:`);
+  console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
+
+  // Avoid a self-trade
+  // Alternatively call client.cancelAllOrdersAllAssets()
+  await client.cancelAllOrdersNoError(assets.Asset.SOL);
+  await client.cancelAllOrdersNoError(assets.Asset.BTC);
 
   // Place an order in cross with offers to get a position.
   await client.placeOrder(
-    Exchange.markets.markets[index].address,
-    utils.convertDecimalToNativeInteger(10),
-    orderLots,
-    types.Side.BID
+    assets.Asset.BTC,
+    index,
+    utils.convertDecimalToNativeInteger(0.2),
+    100,
+    types.Side.ASK,
+    types.OrderType.LIMIT
   );
 
-  await client.updateState();
-  console.log(client.positions);
+  await client.updateState(assets.Asset.SOL);
+  await client.updateState(assets.Asset.BTC);
+  console.log("Margin account positions:", client.marginPositions);
+  console.log("Spread account positions:", client.spreadPositions);
 
   // Check mark prices for the product.
-  console.log(Exchange.getMarkPrice(index));
+  console.log(
+    "SOL mark price:",
+    Exchange.getMarkPrice(assets.Asset.SOL, index),
+    "BTC mark price:",
+    Exchange.getMarkPrice(assets.Asset.BTC, index)
+  );
 
   // Calculate user margin account state.
-  let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
-    client.marginAccount
-  );
-  console.log(marginAccountState);
+  let marginAccountStateSol = client.getMarginAccountState(assets.Asset.SOL);
+  let marginAccountStateBtc = client.getMarginAccountState(assets.Asset.BTC);
+
+  console.log("BTC Margin account state:", marginAccountStateSol);
+  console.log("SOL Margin account state:", marginAccountStateBtc);
 }
 
 main().catch(console.error.bind(console));

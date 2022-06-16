@@ -152,7 +152,14 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarginAccountArgs"
+          }
+        }
+      ]
     },
     {
       "name": "initializeSpreadAccount",
@@ -188,7 +195,14 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeSpreadAccountArgs"
+          }
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -3381,11 +3395,15 @@
             }
           },
           {
+            "name": "asset",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                261
               ]
             }
           }
@@ -3458,11 +3476,15 @@
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                386
               ]
             }
           }
@@ -4467,6 +4489,30 @@
       }
     },
     {
+      "name": "InitializeMarginAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeSpreadAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExpirySeriesStatus",
       "type": {
         "kind": "enum",
@@ -5246,5 +5292,8 @@
       "name": "OraclePriceIsInvalid",
       "msg": "Fetched oracle price is invalid"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
+  }
 }

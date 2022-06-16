@@ -37,3 +37,26 @@ export enum EventType {
 export interface OrderbookEvent {
   marketIndex: number;
 }
+
+export function eventTypeToString(event: EventType) {
+  switch (event) {
+    case EventType.EXCHANGE:
+      return "EXCHANGE";
+    case EventType.EXPIRY:
+      return "EXPIRY";
+    case EventType.USER:
+      return "USER";
+    case EventType.CLOCK:
+      return "CLOCK";
+    case EventType.GREEKS:
+      return "GREEKS";
+    case EventType.TRADE:
+      return "TRADE";
+    case EventType.ORDERBOOK:
+      return "ORDERBOOK";
+    case EventType.ORACLE:
+      return "ORACLE";
+    default:
+      throw Error("Invalid event type");
+  }
+}
