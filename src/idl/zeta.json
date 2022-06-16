@@ -91,6 +91,49 @@
       ]
     },
     {
+      "name": "refreshZetaGroupAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refreshMarginAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refreshSpreadAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "spreadAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "overrideExpiry",
       "accounts": [
         {
@@ -3306,11 +3349,17 @@
             "type": "u64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1063
+                1062
               ]
             }
           }
@@ -4590,6 +4639,20 @@
       }
     },
     {
+      "name": "Asset",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "BTC"
+          }
+        ]
+      }
+    },
+    {
       "name": "MovementType",
       "type": {
         "kind": "enum",
@@ -5291,6 +5354,11 @@
       "code": 6106,
       "name": "OraclePriceIsInvalid",
       "msg": "Fetched oracle price is invalid"
+    },
+    {
+      "code": 6107,
+      "name": "InvalidUnderlyingMint",
+      "msg": "Provided underlying mint address is invalid"
     }
   ]
 }

@@ -909,6 +909,34 @@ export async function initializeZetaGroupIx(
   );
 }
 
+export function refreshZetaGroupAssetIx(): TransactionInstruction {
+  return Exchange.program.instruction.refreshZetaGroupAsset({
+    accounts: { zetaGroup: Exchange.zetaGroupAddress },
+  });
+}
+
+export function refreshMarginAccountAssetIx(
+  marginAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.refreshMarginAccountAsset({
+    accounts: {
+      marginAccount: marginAccount,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+
+export function refreshSpreadAccountAssetIx(
+  spreadAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.refreshSpreadAccountAsset({
+    accounts: {
+      spreadAccount: spreadAccount,
+      zetaGroup: Exchange.zetaGroupAddress,
+    },
+  });
+}
+
 export function rebalanceInsuranceVaultIx(
   asset: Asset,
   remainingAccounts: any[]

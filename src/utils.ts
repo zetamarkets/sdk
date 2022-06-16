@@ -1424,3 +1424,20 @@ export function toAssets(assetsStr: string[]): Asset[] {
   }
   return assets;
 }
+export async function refreshZetaGroupAsset() {
+  let tx = new Transaction();
+  tx.add(instructions.refreshZetaGroupAssetIx());
+  await processTransaction(Exchange.provider, tx);
+}
+
+export async function refreshMarginAccountAsset(marginAccount: PublicKey) {
+  let tx = new Transaction();
+  tx.add(instructions.refreshMarginAccountAssetIx(marginAccount));
+  await processTransaction(Exchange.provider, tx);
+}
+
+export async function refreshSpreadAccountAsset(spreadAccount: PublicKey) {
+  let tx = new Transaction();
+  tx.add(instructions.refreshSpreadAccountAssetIx(spreadAccount));
+  await processTransaction(Exchange.provider, tx);
+}

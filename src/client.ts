@@ -19,6 +19,8 @@ import { SubClient } from "./subclient";
 import { exchange as Exchange } from "./exchange";
 import * as instructions from "./program-instructions";
 
+import * as assets from "./assets";
+
 export class Client {
   private constructor(
     connection: Connection,
