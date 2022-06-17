@@ -1433,20 +1433,18 @@ export async function refreshZetaGroupAsset(zetaGroup: PublicKey) {
 
 export async function refreshMarginAccountAsset(
   zetaGroup: PublicKey,
-  marginAccount: PublicKey,
-  userProvider: anchor.AnchorProvider
+  marginAccount: PublicKey
 ) {
   let tx = new Transaction();
   tx.add(instructions.refreshMarginAccountAssetIx(zetaGroup, marginAccount));
-  await processTransaction(userProvider, tx);
+  await processTransaction(Exchange.provider, tx);
 }
 
 export async function refreshSpreadAccountAsset(
   zetaGroup: PublicKey,
-  spreadAccount: PublicKey,
-  userProvider: anchor.AnchorProvider
+  spreadAccount: PublicKey
 ) {
   let tx = new Transaction();
   tx.add(instructions.refreshSpreadAccountAssetIx(zetaGroup, spreadAccount));
-  await processTransaction(userProvider, tx);
+  await processTransaction(Exchange.provider, tx);
 }
