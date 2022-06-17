@@ -1194,29 +1194,6 @@ export async function getAllProgramAccountAddresses(
   return pubkeys;
 }
 
-export async function filterMarginAccountsByAsset(
-  asset: Asset,
-  marginAccounts: PublicKey[]
-): Promise<PublicKey[]> {
-  let filteredMarginAccounts = [];
-  for (var marginAccount of marginAccounts) {
-    let data = (
-      await Exchange.provider.connection.getAccountInfo(marginAccount)
-    ).data;
-
-    let decodedData =
-      Exchange.program.account.marginAccount.coder.accounts.decode(
-        types.ProgramAccountType.MarginAccount,
-        data
-      );
-
-    if (decodedData.asset == asset) {
-      filteredMarginAccounts.push(marginAccount);
-    }
-  }
-  return filteredMarginAccounts;
-}
-
 export async function getAllOpenOrdersAccountsByMarket(
   asset: Asset
 ): Promise<Map<number, Array<PublicKey>>> {
