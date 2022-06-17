@@ -3445,7 +3445,9 @@
           },
           {
             "name": "asset",
-            "type": "u8"
+            "type": {
+              "defined": "Asset"
+            }
           },
           {
             "name": "padding",
@@ -3526,7 +3528,9 @@
           },
           {
             "name": "asset",
-            "type": "u8"
+            "type": {
+              "defined": "Asset"
+            }
           },
           {
             "name": "padding",

@@ -909,30 +909,34 @@ export async function initializeZetaGroupIx(
   );
 }
 
-export function refreshZetaGroupAssetIx(): TransactionInstruction {
+export function refreshZetaGroupAssetIx(
+  zetaGroup: PublicKey
+): TransactionInstruction {
   return Exchange.program.instruction.refreshZetaGroupAsset({
-    accounts: { zetaGroup: Exchange.zetaGroupAddress },
+    accounts: { zetaGroup: zetaGroup },
   });
 }
 
 export function refreshMarginAccountAssetIx(
-  marginAccount: PublicKey
+  marginAccount: PublicKey,
+  zetaGroup: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.refreshMarginAccountAsset({
     accounts: {
       marginAccount: marginAccount,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: zetaGroup,
     },
   });
 }
 
 export function refreshSpreadAccountAssetIx(
-  spreadAccount: PublicKey
+  spreadAccount: PublicKey,
+  zetaGroup: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.refreshSpreadAccountAsset({
     accounts: {
       spreadAccount: spreadAccount,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: zetaGroup,
     },
   });
 }

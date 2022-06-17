@@ -34,6 +34,7 @@ import * as instructions from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
 import { decode } from "punycode";
+import { AnchorError } from "@project-serum/anchor";
 
 export async function getState(
   programId: PublicKey
@@ -1424,20 +1425,28 @@ export function toAssets(assetsStr: string[]): Asset[] {
   }
   return assets;
 }
-export async function refreshZetaGroupAsset() {
+export async function refreshZetaGroupAsset(zetaGroup: PublicKey) {
   let tx = new Transaction();
-  tx.add(instructions.refreshZetaGroupAssetIx());
+  tx.add(instructions.refreshZetaGroupAssetIx(zetaGroup));
   await processTransaction(Exchange.provider, tx);
 }
 
-export async function refreshMarginAccountAsset(marginAccount: PublicKey) {
+export async function refreshMarginAccountAsset(
+  zetaGroup: PublicKey,
+  marginAccount: PublicKey,
+  userProvider: anchor.AnchorProvider
+) {
   let tx = new Transaction();
-  tx.add(instructions.refreshMarginAccountAssetIx(marginAccount));
-  await processTransaction(Exchange.provider, tx);
+  tx.add(instructions.refreshMarginAccountAssetIx(zetaGroup, marginAccount));
+  await processTransaction(userProvider, tx);
 }
 
-export async function refreshSpreadAccountAsset(spreadAccount: PublicKey) {
+export async function refreshSpreadAccountAsset(
+  zetaGroup: PublicKey,
+  spreadAccount: PublicKey,
+  userProvider: anchor.AnchorProvider
+) {
   let tx = new Transaction();
-  tx.add(instructions.refreshSpreadAccountAssetIx(spreadAccount));
-  await processTransaction(Exchange.provider, tx);
+  tx.add(instructions.refreshSpreadAccountAssetIx(zetaGroup, spreadAccount));
+  await processTransaction(userProvider, tx);
 }
