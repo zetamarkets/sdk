@@ -92,10 +92,15 @@ export type Zeta = {
     },
     {
       "name": "refreshZetaGroupAsset",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "refreshAccountAsset",
       "accounts": [
         {
           "name": "zetaGroup",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -5461,10 +5466,15 @@ export const IDL: Zeta = {
     },
     {
       "name": "refreshZetaGroupAsset",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "refreshAccountAsset",
       "accounts": [
         {
           "name": "zetaGroup",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         }
       ],
