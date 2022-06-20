@@ -15,12 +15,11 @@ import * as constants from "./constants";
 import { Asset } from "./assets";
 
 export function initializeMarginAccountIx(
-  args: types.InitializeMarginAccountArgs,
   zetaGroup: PublicKey,
   marginAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeMarginAccount(args, {
+  return Exchange.program.instruction.initializeMarginAccount({
     accounts: {
       zetaGroup,
       marginAccount,
@@ -1615,12 +1614,11 @@ export function expireSeriesOverrideIx(
 }
 
 export function initializeSpreadAccountIx(
-  args: types.InitializeSpreadAccountArgs,
   zetaGroup: PublicKey,
   spreadAccount: PublicKey,
   user: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeSpreadAccount(args, {
+  return Exchange.program.instruction.initializeSpreadAccount({
     accounts: {
       zetaGroup,
       spreadAccount,
