@@ -92,42 +92,15 @@ export type Zeta = {
     },
     {
       "name": "refreshZetaGroupAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
+      "accounts": [],
       "args": []
     },
     {
-      "name": "refreshMarginAccountAsset",
+      "name": "refreshAccountAsset",
       "accounts": [
         {
           "name": "zetaGroup",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "refreshSpreadAccountAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
           "isSigner": false
         }
       ],
@@ -5423,42 +5396,15 @@ export const IDL: Zeta = {
     },
     {
       "name": "refreshZetaGroupAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
+      "accounts": [],
       "args": []
     },
     {
-      "name": "refreshMarginAccountAsset",
+      "name": "refreshAccountAsset",
       "accounts": [
         {
           "name": "zetaGroup",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "refreshSpreadAccountAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
           "isSigner": false
         }
       ],

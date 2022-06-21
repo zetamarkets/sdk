@@ -47,9 +47,8 @@ import {
   settlePositionsIx,
   settleSpreadPositionsIx,
   PositionMovementArg,
-  refreshZetaGroupAssetIx,
-  refreshMarginAccountAssetIx,
-  refreshSpreadAccountAssetIx,
+  refreshZetaGroupAssetTx,
+  refreshAccountAssetTx,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -1307,24 +1306,31 @@ export function calculateMovementFees(
   return decimal ? fee : convertDecimalToNativeInteger(fee);
 }
 
-export async function refreshZetaGroupAsset() {
-  let tx = new Transaction();
-  tx.add(refreshZetaGroupAssetIx());
-  await processTransaction(Exchange.provider, tx);
+export async function refreshZetaGroupAsset(zetaGroups: PublicKey[]) {
+  let remainingAccounts = zetaGroups.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+  let txs = refreshZetaGroupAssetTx(remainingAccounts);
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+      console.log(`Refreshing zeta group assets - TxId: ${txSig}`);
+    })
+  );
 }
 
-export async function refreshMarginAccountAsset(
-  marginAccount: PublicKey,
+export async function refreshAccountAsset(
+  zetaGroup: PublicKey,
+  accounts: PublicKey[]
 ) {
-  let tx = new Transaction();
-  tx.add(refreshMarginAccountAssetIx(marginAccount));
-  await processTransaction(Exchange.provider, tx);
-}
-
-export async function refreshSpreadAccountAsset(
-  spreadAccount: PublicKey,
-) {
-  let tx = new Transaction();
-  tx.add(refreshSpreadAccountAssetIx(spreadAccount));
-  await processTransaction(Exchange.provider, tx);
+  let remainingAccounts = accounts.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+  let txs = refreshAccountAssetTx(zetaGroup, remainingAccounts);
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+      console.log(`Refreshing account assets - TxId: ${txSig}`);
+    })
+  );
 }
