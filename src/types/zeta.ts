@@ -4587,6 +4587,12 @@ export type Zeta = {
           },
           {
             "name": "BTC"
+          },
+          {
+            "name": "ETH"
+          },
+          {
+            "name": "UNDEFINED"
           }
         ]
       }
@@ -5293,11 +5299,6 @@ export type Zeta = {
       "code": 6106,
       "name": "OraclePriceIsInvalid",
       "msg": "Fetched oracle price is invalid"
-    },
-    {
-      "code": 6107,
-      "name": "InvalidUnderlyingMint",
-      "msg": "Provided underlying mint address is invalid"
     }
   ]
 };
@@ -9891,6 +9892,12 @@ export const IDL: Zeta = {
           },
           {
             "name": "BTC"
+          },
+          {
+            "name": "ETH"
+          },
+          {
+            "name": "UNDEFINED"
           }
         ]
       }
@@ -10597,11 +10604,6 @@ export const IDL: Zeta = {
       "code": 6106,
       "name": "OraclePriceIsInvalid",
       "msg": "Fetched oracle price is invalid"
-    },
-    {
-      "code": 6107,
-      "name": "InvalidUnderlyingMint",
-      "msg": "Provided underlying mint address is invalid"
     }
   ]
 };

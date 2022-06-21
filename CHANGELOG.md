@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- program: Add Asset to MarginAccount and SpreadAccount. ([#126](https://github.com/zetamarkets/sdk/pull/126))
+- program: Add Asset to MarginAccount, SpreadAccount and ZetaGroup. ([#126](https://github.com/zetamarkets/sdk/pull/126))
 
 ## [0.14.2]
 
