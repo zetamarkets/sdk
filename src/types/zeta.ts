@@ -92,42 +92,15 @@ export type Zeta = {
     },
     {
       "name": "refreshZetaGroupAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
+      "accounts": [],
       "args": []
     },
     {
-      "name": "refreshMarginAccountAsset",
+      "name": "refreshAccountAsset",
       "accounts": [
         {
           "name": "zetaGroup",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "refreshSpreadAccountAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
           "isSigner": false
         }
       ],
@@ -195,14 +168,7 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeMarginAccountArgs"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "initializeSpreadAccount",
@@ -238,14 +204,7 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeSpreadAccountArgs"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeMarginAccount",
@@ -4537,30 +4496,6 @@ export type Zeta = {
           {
             "name": "size",
             "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeMarginAccountArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "asset",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeSpreadAccountArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "asset",
-            "type": "u8"
           }
         ]
       }
@@ -5461,42 +5396,15 @@ export const IDL: Zeta = {
     },
     {
       "name": "refreshZetaGroupAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
+      "accounts": [],
       "args": []
     },
     {
-      "name": "refreshMarginAccountAsset",
+      "name": "refreshAccountAsset",
       "accounts": [
         {
           "name": "zetaGroup",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "refreshSpreadAccountAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
           "isSigner": false
         }
       ],
@@ -5564,14 +5472,7 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeMarginAccountArgs"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "initializeSpreadAccount",
@@ -5607,14 +5508,7 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeSpreadAccountArgs"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeMarginAccount",
@@ -9906,30 +9800,6 @@ export const IDL: Zeta = {
           {
             "name": "size",
             "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeMarginAccountArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "asset",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeSpreadAccountArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "asset",
-            "type": "u8"
           }
         ]
       }

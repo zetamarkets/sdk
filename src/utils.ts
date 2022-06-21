@@ -1402,26 +1402,31 @@ export function toAssets(assetsStr: string[]): Asset[] {
   }
   return assets;
 }
-export async function refreshZetaGroupAsset(zetaGroup: PublicKey) {
-  let tx = new Transaction();
-  tx.add(instructions.refreshZetaGroupAssetIx(zetaGroup));
-  await processTransaction(Exchange.provider, tx);
+export async function refreshZetaGroupAsset(zetaGroups: PublicKey[]) {
+  let remainingAccounts = zetaGroups.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+  let txs = instructions.refreshZetaGroupAssetTx(remainingAccounts);
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+      console.log(`Refreshing zeta group assets - TxId: ${txSig}`);
+    })
+  );
 }
 
-export async function refreshMarginAccountAsset(
+export async function refreshAccountAsset(
   zetaGroup: PublicKey,
-  marginAccount: PublicKey
+  accounts: PublicKey[]
 ) {
-  let tx = new Transaction();
-  tx.add(instructions.refreshMarginAccountAssetIx(zetaGroup, marginAccount));
-  await processTransaction(Exchange.provider, tx);
-}
-
-export async function refreshSpreadAccountAsset(
-  zetaGroup: PublicKey,
-  spreadAccount: PublicKey
-) {
-  let tx = new Transaction();
-  tx.add(instructions.refreshSpreadAccountAssetIx(zetaGroup, spreadAccount));
-  await processTransaction(Exchange.provider, tx);
+  let remainingAccounts = accounts.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+  let txs = instructions.refreshAccountAssetTx(zetaGroup, remainingAccounts);
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+      console.log(`Refreshing account assets - TxId: ${txSig}`);
+    })
+  );
 }

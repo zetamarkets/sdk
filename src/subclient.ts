@@ -378,7 +378,6 @@ export class SubClient {
       console.log("User has no margin account. Creating margin account...");
       tx.add(
         instructions.initializeMarginAccountIx(
-          { asset: this.asset },
           this._subExchange.zetaGroupAddress,
           this._marginAccountAddress,
           this._parentClient.publicKey
@@ -675,7 +674,6 @@ export class SubClient {
       console.log("User has no spread account. Creating spread account...");
       tx.add(
         instructions.initializeSpreadAccountIx(
-          { asset: this.asset },
           subExchange.zetaGroupAddress,
           this.spreadAccountAddress,
           this._parentClient.publicKey
@@ -1573,7 +1571,6 @@ export class SubClient {
       console.log("User has no spread account. Creating spread account...");
       tx.add(
         instructions.initializeSpreadAccountIx(
-          { asset: this.asset },
           subExchange.zetaGroupAddress,
           this.spreadAccountAddress,
           this._parentClient.publicKey
