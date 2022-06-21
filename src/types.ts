@@ -164,14 +164,6 @@ export interface CancelArgs {
   cancelSide: Side;
 }
 
-export interface InitializeMarginAccountArgs {
-  asset: Asset;
-}
-
-export interface InitializeSpreadAccountArgs {
-  asset: Asset;
-}
-
 export interface MarginParams {
   futureMarginInitial: number;
   futureMarginMaintenance: number;
