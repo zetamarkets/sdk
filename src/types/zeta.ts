@@ -91,6 +91,22 @@ export type Zeta = {
       ]
     },
     {
+      "name": "refreshZetaGroupAsset",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "refreshAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "overrideExpiry",
       "accounts": [
         {
@@ -3292,11 +3308,17 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1063
+                1062
               ]
             }
           }
@@ -3381,11 +3403,17 @@ export type Zeta = {
             }
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                262
               ]
             }
           }
@@ -3458,11 +3486,17 @@ export type Zeta = {
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                387
               ]
             }
           }
@@ -4539,6 +4573,26 @@ export type Zeta = {
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Asset",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "BTC"
+          },
+          {
+            "name": "ETH"
+          },
+          {
+            "name": "UNDEFINED"
           }
         ]
       }
@@ -5342,6 +5396,22 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "refreshZetaGroupAsset",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "refreshAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "overrideExpiry",
       "accounts": [
         {
@@ -8543,11 +8613,17 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1063
+                1062
               ]
             }
           }
@@ -8632,11 +8708,17 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                262
               ]
             }
           }
@@ -8709,11 +8791,17 @@ export const IDL: Zeta = {
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                387
               ]
             }
           }
@@ -9790,6 +9878,26 @@ export const IDL: Zeta = {
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Asset",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "BTC"
+          },
+          {
+            "name": "ETH"
+          },
+          {
+            "name": "UNDEFINED"
           }
         ]
       }

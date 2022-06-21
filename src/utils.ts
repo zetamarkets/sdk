@@ -47,6 +47,8 @@ import {
   settlePositionsIx,
   settleSpreadPositionsIx,
   PositionMovementArg,
+  refreshZetaGroupAssetTx,
+  refreshAccountAssetTx,
 } from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
@@ -1302,4 +1304,33 @@ export function calculateMovementFees(
   let notionalValue = totalContracts * spotPrice;
   let fee = (notionalValue * feeBps) / constants.BPS_DENOMINATOR;
   return decimal ? fee : convertDecimalToNativeInteger(fee);
+}
+
+export async function refreshZetaGroupAsset(zetaGroups: PublicKey[]) {
+  let remainingAccounts = zetaGroups.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+  let txs = refreshZetaGroupAssetTx(remainingAccounts);
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+      console.log(`Refreshing zeta group assets - TxId: ${txSig}`);
+    })
+  );
+}
+
+export async function refreshAccountAsset(
+  zetaGroup: PublicKey,
+  accounts: PublicKey[]
+) {
+  let remainingAccounts = accounts.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+  let txs = refreshAccountAssetTx(zetaGroup, remainingAccounts);
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+      console.log(`Refreshing account assets - TxId: ${txSig}`);
+    })
+  );
 }

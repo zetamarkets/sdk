@@ -91,6 +91,22 @@
       ]
     },
     {
+      "name": "refreshZetaGroupAsset",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "refreshAccountAsset",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "overrideExpiry",
       "accounts": [
         {
@@ -3292,11 +3308,17 @@
             "type": "u64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1063
+                1062
               ]
             }
           }
@@ -3381,11 +3403,17 @@
             }
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                263
+                262
               ]
             }
           }
@@ -3458,11 +3486,17 @@
             "type": "i64"
           },
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                388
+                387
               ]
             }
           }
@@ -4539,6 +4573,26 @@
           },
           {
             "name": "Ask"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Asset",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SOL"
+          },
+          {
+            "name": "BTC"
+          },
+          {
+            "name": "ETH"
+          },
+          {
+            "name": "UNDEFINED"
           }
         ]
       }

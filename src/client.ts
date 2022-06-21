@@ -64,6 +64,8 @@ import {
 
 import { EventType } from "./events";
 
+import * as assets from "./assets";
+
 export class Client {
   /**
    * Returns the user wallet public key.
