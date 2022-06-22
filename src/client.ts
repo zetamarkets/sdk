@@ -158,7 +158,7 @@ export class Client {
     return client;
   }
 
-  public addSubClient(asset: Asset, subClient: SubClient) {
+  private addSubClient(asset: Asset, subClient: SubClient) {
     this._subClients.set(asset, subClient);
   }
 

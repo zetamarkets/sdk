@@ -365,7 +365,7 @@ export class Exchange {
     this._isInitialized = true;
   }
 
-  public async addSubExchange(asset: Asset, subExchange: SubExchange) {
+  private async addSubExchange(asset: Asset, subExchange: SubExchange) {
     this._subExchanges.set(asset, subExchange);
   }
 
