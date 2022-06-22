@@ -91,22 +91,6 @@
       ]
     },
     {
-      "name": "refreshZetaGroupAsset",
-      "accounts": [],
-      "args": []
-    },
-    {
-      "name": "refreshAccountAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "overrideExpiry",
       "accounts": [
         {
