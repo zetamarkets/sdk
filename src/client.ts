@@ -21,6 +21,8 @@ import * as instructions from "./program-instructions";
 
 import * as assets from "./assets";
 
+import * as assets from "./assets";
+
 export class Client {
   private constructor(
     connection: Connection,

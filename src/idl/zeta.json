@@ -4587,6 +4587,12 @@
           },
           {
             "name": "BTC"
+          },
+          {
+            "name": "ETH"
+          },
+          {
+            "name": "UNDEFINED"
           }
         ]
       }
