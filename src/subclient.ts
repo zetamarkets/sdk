@@ -166,12 +166,13 @@ export class SubClient {
 
   private _updatingState: boolean = false;
 
-  private constructor(asset: Asset) {
+  private constructor(asset: Asset, parent: Client) {
     this._asset = asset;
     this._subExchange = Exchange.getSubExchange(asset);
     this._openOrdersAccounts = Array(
       this._subExchange.zetaGroup.products.length
     ).fill(PublicKey.default);
+    this._parent = parent;
 
     this._marginPositions = [];
     this._spreadPositions = [];
@@ -198,8 +199,7 @@ export class SubClient {
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false
   ): Promise<SubClient> {
-    let subClient = new SubClient(asset);
-    subClient._parent = parent;
+    let subClient = new SubClient(asset, parent);
     let [marginAccountAddress, _marginAccountNonce] =
       await utils.getMarginAccount(
         Exchange.programId,
