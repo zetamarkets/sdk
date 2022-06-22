@@ -457,13 +457,6 @@ export class Exchange {
     await this.updateState();
   }
 
-  /**
-   * Helper function to get the deposit limits
-   */
-  public async getDepositLimit(): Promise<number> {
-    return utils.convertNativeBNToDecimal(this.state.nativeDepositLimit);
-  }
-
   public async initializeMarketNodes(asset: Asset, zetaGroup: PublicKey) {
     this.getSubExchange(asset).initializeMarketNodes(zetaGroup);
   }
