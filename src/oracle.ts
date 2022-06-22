@@ -107,8 +107,7 @@ export class Oracle {
         );
 
         this._subscriptionIds.set(feed, subscriptionId);
-        // TODO set this so localnet has data for the oracle
-        // Remove once there is an oracle simulator.
+        // Set this so the oracle contains a price on initialization.
         await this.pollPrice(feed, true);
       })
     );
