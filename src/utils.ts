@@ -35,6 +35,7 @@ import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
 import { decode } from "punycode";
 import { AnchorError } from "@project-serum/anchor";
+import { assets } from ".";
 
 export async function getState(
   programId: PublicKey
@@ -1164,8 +1165,37 @@ export async function writeKeypair(filename: string, keypair: Keypair) {
 }
 
 export async function getAllProgramAccountAddresses(
-  accountType: types.ProgramAccountType
+  accountType: types.ProgramAccountType,
+  asset: assets.Asset | undefined
 ): Promise<PublicKey[]> {
+  let filters = [
+    {
+      memcmp: {
+        offset: 0,
+        bytes: bs58.encode(
+          anchor.BorshAccountsCoder.accountDiscriminator(accountType)
+        ),
+      },
+    },
+  ];
+
+  if (asset != undefined) {
+    let assetOffset = 0;
+    // From the account itself in account.rs
+    if (accountType == types.ProgramAccountType.MarginAccount) {
+      assetOffset = 8 + 32 + 1 + 8 + 1 + 138 + 48 + 5520 + 8;
+    } else if (accountType == types.ProgramAccountType.SpreadAccount) {
+      assetOffset = 8 + 32 + 1 + 8 + 48 + 2208 + 92;
+    }
+
+    filters.push({
+      memcmp: {
+        offset: assetOffset,
+        bytes: bs58.encode([asset]),
+      },
+    });
+  }
+
   let noDataAccounts = await Exchange.provider.connection.getProgramAccounts(
     Exchange.programId,
     {
@@ -1174,16 +1204,7 @@ export async function getAllProgramAccountAddresses(
         offset: 0,
         length: 0,
       },
-      filters: [
-        {
-          memcmp: {
-            offset: 0,
-            bytes: bs58.encode(
-              anchor.BorshAccountsCoder.accountDiscriminator(accountType)
-            ),
-          },
-        },
-      ],
+      filters: filters,
     }
   );
 
