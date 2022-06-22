@@ -169,7 +169,6 @@ export class SubExchange {
         Exchange.programId,
         this._zetaGroupAddress
       );
-    this;
 
     this._vaultAddress = vaultAddress;
     this._insuranceVaultAddress = insuranceVaultAddress;
