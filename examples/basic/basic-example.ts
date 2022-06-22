@@ -14,11 +14,6 @@ import { PublicKey, Connection, Keypair, SOLANA_SCHEMA } from "@solana/web3.js";
 import fetch from "node-fetch";
 import { airdropUsdc } from "../liquidator-example/src/utils";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import {} from "../../dist/subexchange";
-import { defaultCommitment } from "../../dist/utils";
-// import { Exchange } from "../../src/exchange";
-// import { Asset } from "../../src/assets";
-// import { SubExchange } from "../../src/subexchange";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
