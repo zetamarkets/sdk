@@ -33,8 +33,6 @@ import * as types from "./types";
 import * as instructions from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
-import { decode } from "punycode";
-import { AnchorError } from "@project-serum/anchor";
 import { assets } from ".";
 
 export async function getState(
