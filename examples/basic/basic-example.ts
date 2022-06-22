@@ -10,10 +10,8 @@ import {
   assets,
   events,
 } from "@zetamarkets/sdk";
-import { PublicKey, Connection, Keypair, SOLANA_SCHEMA } from "@solana/web3.js";
+import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import fetch from "node-fetch";
-import { airdropUsdc } from "../liquidator-example/src/utils";
-import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
