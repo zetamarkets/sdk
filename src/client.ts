@@ -19,39 +19,7 @@ import { SubClient } from "./subclient";
 import { exchange as Exchange } from "./exchange";
 import * as instructions from "./program-instructions";
 
-import * as assets from "./assets";
-
 export class Client {
-  private constructor(
-    connection: Connection,
-    wallet: types.Wallet,
-    opts: ConfirmOptions
-  ) {
-    this._provider = new anchor.AnchorProvider(connection, wallet, opts);
-    this._subClients = new Map();
-  }
-
-  public get subClients(): Map<Asset, SubClient> {
-    return this._subClients;
-  }
-  private _subClients: Map<Asset, SubClient>;
-
-  public get marginPositions(): Map<Asset, types.Position[]> {
-    let positionMap = new Map();
-    for (var subClient of this.subClients) {
-      positionMap.set(subClient[0], subClient[1].marginPositions);
-    }
-    return positionMap;
-  }
-
-  public get spreadPositions(): Map<Asset, types.Position[]> {
-    let positionMap = new Map();
-    for (var subClient of this.subClients) {
-      positionMap.set(subClient[0], subClient[1].spreadPositions);
-    }
-    return positionMap;
-  }
-
   /**
    * Anchor provider instance.
    */
@@ -98,6 +66,36 @@ export class Client {
    * Timer id from SetInterval.
    */
   private _pollIntervalId: any;
+
+  private constructor(
+    connection: Connection,
+    wallet: types.Wallet,
+    opts: ConfirmOptions
+  ) {
+    this._provider = new anchor.AnchorProvider(connection, wallet, opts);
+    this._subClients = new Map();
+  }
+
+  public get subClients(): Map<Asset, SubClient> {
+    return this._subClients;
+  }
+  private _subClients: Map<Asset, SubClient>;
+
+  public get marginPositions(): Map<Asset, types.Position[]> {
+    let positionMap = new Map();
+    for (var subClient of this.subClients) {
+      positionMap.set(subClient[0], subClient[1].marginPositions);
+    }
+    return positionMap;
+  }
+
+  public get spreadPositions(): Map<Asset, types.Position[]> {
+    let positionMap = new Map();
+    for (var subClient of this.subClients) {
+      positionMap.set(subClient[0], subClient[1].spreadPositions);
+    }
+    return positionMap;
+  }
 
   public static async load(
     connection: Connection,
