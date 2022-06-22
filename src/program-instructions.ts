@@ -875,54 +875,6 @@ export async function initializeZetaGroupIx(
   );
 }
 
-export function refreshZetaGroupAssetTx(
-  zetaGroups: AccountMeta[]
-): Transaction[] {
-  let txs = [];
-  for (var i = 0; i < zetaGroups.length; i += constants.MAX_ZETA_GROUPS) {
-    let tx = new Transaction();
-    let slice = zetaGroups.slice(i, i + constants.MAX_ZETA_GROUPS);
-    tx.add(refreshZetaGroupAssetIx(slice));
-    txs.push(tx);
-  }
-  return txs;
-}
-
-export function refreshZetaGroupAssetIx(
-  zetaGroups: AccountMeta[]
-): TransactionInstruction {
-  return Exchange.program.instruction.refreshZetaGroupAsset({
-    remainingAccounts: zetaGroups,
-  });
-}
-
-export function refreshAccountAssetTx(
-  zetaGroup: PublicKey,
-  accounts: AccountMeta[]
-): Transaction[] {
-  let txs = [];
-  for (
-    var i = 0;
-    i < accounts.length;
-    i += constants.MAX_MARGIN_AND_SPREAD_ACCOUNTS
-  ) {
-    let tx = new Transaction();
-    let slice = accounts.slice(i, i + constants.MAX_MARGIN_AND_SPREAD_ACCOUNTS);
-    tx.add(refreshAccountAssetIx(zetaGroup, slice));
-    txs.push(tx);
-  }
-  return txs;
-}
-
-export function refreshAccountAssetIx(
-  zetaGroup: PublicKey,
-  accounts: AccountMeta[]
-): TransactionInstruction {
-  return Exchange.program.instruction.refreshAccountAsset({
-    accounts: { zetaGroup: zetaGroup },
-    remainingAccounts: accounts,
-  });
-}
 export function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
 ): TransactionInstruction {
