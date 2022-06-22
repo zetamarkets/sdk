@@ -151,7 +151,7 @@ export class Client {
           callback,
           throttle
         );
-        await client.addSubClient(asset, subClient);
+        client.addSubClient(asset, subClient);
       })
     );
 
@@ -160,7 +160,7 @@ export class Client {
     return client;
   }
 
-  public async addSubClient(asset: Asset, subClient: SubClient) {
+  public addSubClient(asset: Asset, subClient: SubClient) {
     this._subClients.set(asset, subClient);
   }
 
@@ -237,6 +237,12 @@ export class Client {
     }
   }
 
+  /**
+   * Polls the margin account for the latest state.
+   * @param asset The underlying asset (eg SOL, BTC)
+   * @param fetch Whether to fetch and update _marginAccount and _spreadAccount in the subClient
+   * @param force Whether to forcefully update even though we may be already updating state currently
+   */
   public async updateState(
     asset: Asset = undefined,
     fetch = true,
