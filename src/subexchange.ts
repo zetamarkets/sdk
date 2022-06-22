@@ -662,28 +662,6 @@ export class SubExchange {
     this._programSubscriptionIds.push(id);
   }
 
-  /**
-   * Close the websockets.
-   */
-  public async close() {
-    await Exchange.program.account.zetaGroup.unsubscribe(
-      this._zetaGroupAddress
-    );
-    await Exchange.program.account.greeks.unsubscribe(this._zetaGroup.greeks);
-    for (var i = 0; i < this._eventEmitters.length; i++) {
-      this._eventEmitters[i].removeListener("change");
-    }
-    this._eventEmitters = [];
-    for (var i = 0; i < this._programSubscriptionIds.length; i++) {
-      await Exchange.connection.removeProgramAccountChangeListener(
-        this._programSubscriptionIds[i]
-      );
-    }
-    this._programSubscriptionIds = [];
-    this._isInitialized = false;
-    this._isSetup = false;
-  }
-
   public updateMarginParams() {
     if (this.zetaGroup === undefined) {
       return;
@@ -866,5 +844,27 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  /**
+   * Close the websockets.
+   */
+  public async close() {
+    await Exchange.program.account.zetaGroup.unsubscribe(
+      this._zetaGroupAddress
+    );
+    await Exchange.program.account.greeks.unsubscribe(this._zetaGroup.greeks);
+    for (var i = 0; i < this._eventEmitters.length; i++) {
+      this._eventEmitters[i].removeListener("change");
+    }
+    this._eventEmitters = [];
+    for (var i = 0; i < this._programSubscriptionIds.length; i++) {
+      await Exchange.connection.removeProgramAccountChangeListener(
+        this._programSubscriptionIds[i]
+      );
+    }
+    this._programSubscriptionIds = [];
+    this._isInitialized = false;
+    this._isSetup = false;
   }
 }
