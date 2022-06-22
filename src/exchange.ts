@@ -158,7 +158,7 @@ export class Exchange {
   public get clockTimestamp(): number {
     return this._clockTimestamp;
   }
-  private _clockTimestamp: number = 0;
+  private _clockTimestamp: number = undefined;
 
   /**
    * Stores the latest clock slot from clock subscription.
