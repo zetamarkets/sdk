@@ -1423,31 +1423,3 @@ export function toAssets(assetsStr: string[]): Asset[] {
   }
   return assets;
 }
-export async function refreshZetaGroupAsset(zetaGroups: PublicKey[]) {
-  let remainingAccounts = zetaGroups.map((key) => {
-    return { pubkey: key, isSigner: false, isWritable: true };
-  });
-  let txs = instructions.refreshZetaGroupAssetTx(remainingAccounts);
-  await Promise.all(
-    txs.map(async (tx) => {
-      let txSig = await processTransaction(Exchange.provider, tx);
-      console.log(`Refreshing zeta group assets - TxId: ${txSig}`);
-    })
-  );
-}
-
-export async function refreshAccountAsset(
-  zetaGroup: PublicKey,
-  accounts: PublicKey[]
-) {
-  let remainingAccounts = accounts.map((key) => {
-    return { pubkey: key, isSigner: false, isWritable: true };
-  });
-  let txs = instructions.refreshAccountAssetTx(zetaGroup, remainingAccounts);
-  await Promise.all(
-    txs.map(async (tx) => {
-      let txSig = await processTransaction(Exchange.provider, tx);
-      console.log(`Refreshing account assets - TxId: ${txSig}`);
-    })
-  );
-}

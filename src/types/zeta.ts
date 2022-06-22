@@ -91,22 +91,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "refreshZetaGroupAsset",
-      "accounts": [],
-      "args": []
-    },
-    {
-      "name": "refreshAccountAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "overrideExpiry",
       "accounts": [
         {
@@ -5399,22 +5383,6 @@ export const IDL: Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "refreshZetaGroupAsset",
-      "accounts": [],
-      "args": []
-    },
-    {
-      "name": "refreshAccountAsset",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "overrideExpiry",
