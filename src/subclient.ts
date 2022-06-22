@@ -52,10 +52,10 @@ export class SubClient {
   /**
    * A reference to this subclient's parent, to grab things like usdc and whitelist addresses
    */
-  public get parentClient(): Client {
-    return this._parentClient;
+  public get parent(): Client {
+    return this._parent;
   }
-  private _parentClient: Client;
+  private _parent: Client;
 
   /**
    * A reference to the subExchange corresponding to the same asset this subclient is using,
@@ -192,14 +192,14 @@ export class SubClient {
    */
   public static async load(
     asset: Asset,
-    parentClient: Client,
+    parent: Client,
     connection: Connection,
     wallet: types.Wallet,
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false
   ): Promise<SubClient> {
     let subClient = new SubClient(asset);
-    subClient._parentClient = parentClient;
+    subClient._parent = parent;
     let [marginAccountAddress, _marginAccountNonce] =
       await utils.getMarginAccount(
         Exchange.programId,
@@ -380,7 +380,7 @@ export class SubClient {
         instructions.initializeMarginAccountIx(
           this._subExchange.zetaGroupAddress,
           this._marginAccountAddress,
-          this._parentClient.publicKey
+          this._parent.publicKey
         )
       );
     }
@@ -389,12 +389,12 @@ export class SubClient {
         this.asset,
         amount,
         this._marginAccountAddress,
-        this._parentClient.usdcAccountAddress,
-        this._parentClient.publicKey,
-        this._parentClient.whitelistDepositAddress
+        this._parent.usdcAccountAddress,
+        this._parent.publicKey,
+        this._parent.whitelistDepositAddress
       )
     );
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     return txId;
   }
 
@@ -409,11 +409,11 @@ export class SubClient {
     let tx = new Transaction().add(
       instructions.closeMarginAccountIx(
         this.asset,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress
       )
     );
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     this._marginAccount = null;
     return txId;
   }
@@ -432,17 +432,17 @@ export class SubClient {
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this._spreadAccountAddress,
-        this._parentClient.publicKey
+        this._parent.publicKey
       )
     );
     tx.add(
       instructions.closeSpreadAccountIx(
         subExchange.zetaGroupAddress,
         this._spreadAccountAddress,
-        this._parentClient.publicKey
+        this._parent.publicKey
       )
     );
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     this._spreadAccount = null;
     return txId;
   }
@@ -457,11 +457,11 @@ export class SubClient {
         this.asset,
         amount,
         this._marginAccountAddress,
-        this._parentClient.usdcAccountAddress,
-        this._parentClient.publicKey
+        this._parent.usdcAccountAddress,
+        this._parent.publicKey
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -477,18 +477,18 @@ export class SubClient {
         this.asset,
         this._marginAccount.balance.toNumber(),
         this._marginAccountAddress,
-        this._parentClient.usdcAccountAddress,
-        this._parentClient.publicKey
+        this._parent.usdcAccountAddress,
+        this._parent.publicKey
       )
     );
     tx.add(
       instructions.closeMarginAccountIx(
         this.asset,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -522,7 +522,7 @@ export class SubClient {
       let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
         this.asset,
         market,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -539,14 +539,14 @@ export class SubClient {
       side,
       clientOrderId,
       this.marginAccountAddress,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       openOrdersPda,
-      this._parentClient.whitelistTradingFeesAddress
+      this._parent.whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
 
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
 
     return txId;
@@ -585,7 +585,7 @@ export class SubClient {
       let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
         this.asset,
         market,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -603,14 +603,14 @@ export class SubClient {
       orderType,
       clientOrderId,
       this.marginAccountAddress,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       openOrdersPda,
-      this._parentClient.whitelistTradingFeesAddress
+      this._parent.whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
 
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
 
     return txId;
@@ -644,7 +644,7 @@ export class SubClient {
       let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
         this.asset,
         market,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -663,9 +663,9 @@ export class SubClient {
       0, // Default to none for now.
       tag,
       this.marginAccountAddress,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       openOrdersPda,
-      this._parentClient.whitelistTradingFeesAddress
+      this._parent.whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
@@ -676,7 +676,7 @@ export class SubClient {
         instructions.initializeSpreadAccountIx(
           subExchange.zetaGroupAddress,
           this.spreadAccountAddress,
-          this._parentClient.publicKey
+          this._parent.publicKey
         )
       );
     }
@@ -694,7 +694,7 @@ export class SubClient {
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
         types.MovementType.LOCK,
@@ -702,7 +702,7 @@ export class SubClient {
       )
     );
 
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
 
     return txId;
@@ -746,7 +746,7 @@ export class SubClient {
       let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
         this.asset,
         market,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -765,15 +765,15 @@ export class SubClient {
       clientOrderId,
       tag,
       this.marginAccountAddress,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       openOrdersPda,
-      this._parentClient.whitelistTradingFeesAddress
+      this._parent.whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
 
     let txId: TransactionSignature;
-    txId = await utils.processTransaction(this._parentClient.provider, tx);
+    txId = await utils.processTransaction(this._parent.provider, tx);
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
   }
@@ -794,14 +794,14 @@ export class SubClient {
     let ix = instructions.cancelOrderIx(
       this.asset,
       index,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[index],
       orderId,
       side
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -822,13 +822,13 @@ export class SubClient {
     let ix = instructions.cancelOrderByClientOrderIdIx(
       this.asset,
       index,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[index],
       new anchor.BN(clientOrderId)
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -855,7 +855,7 @@ export class SubClient {
       instructions.cancelOrderIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         orderId,
@@ -871,12 +871,12 @@ export class SubClient {
         newOrderSide,
         clientOrderId,
         this.marginAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
-        this._parentClient.whitelistTradingFeesAddress
+        this._parent.whitelistTradingFeesAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -906,7 +906,7 @@ export class SubClient {
       instructions.cancelOrderIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         orderId,
@@ -923,12 +923,12 @@ export class SubClient {
         newOrderType,
         clientOrderId,
         this.marginAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
-        this._parentClient.whitelistTradingFeesAddress
+        this._parent.whitelistTradingFeesAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -960,7 +960,7 @@ export class SubClient {
       instructions.cancelOrderIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         orderId,
@@ -978,12 +978,12 @@ export class SubClient {
         clientOrderId,
         newOrderTag,
         this.marginAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
-        this._parentClient.whitelistTradingFeesAddress
+        this._parent.whitelistTradingFeesAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1009,7 +1009,7 @@ export class SubClient {
       instructions.cancelOrderByClientOrderIdIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
@@ -1024,12 +1024,12 @@ export class SubClient {
         newOrderSide,
         newOrderClientOrderId,
         this.marginAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
-        this._parentClient.whitelistTradingFeesAddress
+        this._parent.whitelistTradingFeesAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1057,7 +1057,7 @@ export class SubClient {
       instructions.cancelOrderByClientOrderIdIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
@@ -1073,12 +1073,12 @@ export class SubClient {
         newOrderType,
         newOrderClientOrderId,
         this.marginAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
-        this._parentClient.whitelistTradingFeesAddress
+        this._parent.whitelistTradingFeesAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1108,7 +1108,7 @@ export class SubClient {
       instructions.cancelOrderByClientOrderIdIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
@@ -1125,12 +1125,12 @@ export class SubClient {
         newOrderClientOrderId,
         newOrderTag,
         this.marginAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
-        this._parentClient.whitelistTradingFeesAddress
+        this._parent.whitelistTradingFeesAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1161,7 +1161,7 @@ export class SubClient {
       instructions.cancelOrderByClientOrderIdNoErrorIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
@@ -1178,12 +1178,12 @@ export class SubClient {
         newOrderClientOrderId,
         newOrderTag,
         this.marginAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
-        this._parentClient.whitelistTradingFeesAddress
+        this._parent.whitelistTradingFeesAddress
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1201,12 +1201,12 @@ export class SubClient {
     let [initIx, openOrdersPda] = await instructions.initializeOpenOrdersIx(
       this.asset,
       market,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       this.marginAccountAddress
     );
 
     let tx = new Transaction().add(initIx);
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
   }
@@ -1242,12 +1242,12 @@ export class SubClient {
       await instructions.closeOpenOrdersIx(
         this.asset,
         market,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this.marginAccountAddress,
         this._openOrdersAccounts[marketIndex]
       )
     );
-    let txId = await utils.processTransaction(this._parentClient.provider, tx);
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     this._openOrdersAccounts[marketIndex] = PublicKey.default;
     return txId;
   }
@@ -1281,7 +1281,7 @@ export class SubClient {
       let closeIx = await instructions.closeOpenOrdersIx(
         this.asset,
         market,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this.marginAccountAddress,
         this._openOrdersAccounts[marketIndex]
       );
@@ -1298,9 +1298,7 @@ export class SubClient {
 
     await Promise.all(
       combinedTxs.map(async (tx) => {
-        txIds.push(
-          await utils.processTransaction(this._parentClient.provider, tx)
-        );
+        txIds.push(await utils.processTransaction(this._parent.provider, tx));
       })
     );
 
@@ -1329,7 +1327,7 @@ export class SubClient {
       let ix = instructions.cancelOrderIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         cancelArguments[i].orderId,
@@ -1341,9 +1339,7 @@ export class SubClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(
-          await utils.processTransaction(this._parentClient.provider, tx)
-        );
+        txIds.push(await utils.processTransaction(this._parent.provider, tx));
       })
     );
     return txIds;
@@ -1364,7 +1360,7 @@ export class SubClient {
       let ix = instructions.cancelOrderNoErrorIx(
         this.asset,
         marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         cancelArguments[i].orderId,
@@ -1376,9 +1372,7 @@ export class SubClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(
-          await utils.processTransaction(this._parentClient.provider, tx)
-        );
+        txIds.push(await utils.processTransaction(this._parent.provider, tx));
       })
     );
     return txIds;
@@ -1414,7 +1408,7 @@ export class SubClient {
       openOrdersAccountToCancel
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1431,14 +1425,14 @@ export class SubClient {
     let tx = new Transaction();
     let ix = instructions.liquidateIx(
       this.asset,
-      this._parentClient.publicKey,
+      this._parent.publicKey,
       this._marginAccountAddress,
       market,
       liquidatedMarginAccount,
       size
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1454,7 +1448,7 @@ export class SubClient {
       let ix = instructions.cancelOrderIx(
         this.asset,
         order.marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[order.marketIndex],
         order.orderId,
@@ -1467,9 +1461,7 @@ export class SubClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(
-          await utils.processTransaction(this._parentClient.provider, tx)
-        );
+        txIds.push(await utils.processTransaction(this._parent.provider, tx));
       })
     );
     return txIds;
@@ -1488,7 +1480,7 @@ export class SubClient {
       let ix = instructions.cancelOrderNoErrorIx(
         this.asset,
         order.marketIndex,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[order.marketIndex],
         order.orderId,
@@ -1501,9 +1493,7 @@ export class SubClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(
-          await utils.processTransaction(this._parentClient.provider, tx)
-        );
+        txIds.push(await utils.processTransaction(this._parent.provider, tx));
       })
     );
     return txIds;
@@ -1519,7 +1509,7 @@ export class SubClient {
     movements: instructions.PositionMovementArg[]
   ): Promise<TransactionSignature> {
     let tx = this.getPositionMovementTx(movementType, movements);
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   /**
@@ -1532,10 +1522,7 @@ export class SubClient {
     movements: instructions.PositionMovementArg[]
   ): Promise<PositionMovementEvent> {
     let tx = this.getPositionMovementTx(movementType, movements);
-    let response = await utils.simulateTransaction(
-      this._parentClient.provider,
-      tx
-    );
+    let response = await utils.simulateTransaction(this._parent.provider, tx);
 
     let events = response.events;
     let positionMovementEvent = undefined;
@@ -1573,7 +1560,7 @@ export class SubClient {
         instructions.initializeSpreadAccountIx(
           subExchange.zetaGroupAddress,
           this.spreadAccountAddress,
-          this._parentClient.publicKey
+          this._parent.publicKey
         )
       );
     }
@@ -1583,7 +1570,7 @@ export class SubClient {
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
-        this._parentClient.publicKey,
+        this._parent.publicKey,
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
         movementType,
@@ -1603,10 +1590,10 @@ export class SubClient {
         this._subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
-        this._parentClient.publicKey
+        this._parent.publicKey
       )
     );
-    return await utils.processTransaction(this._parentClient.provider, tx);
+    return await utils.processTransaction(this._parent.provider, tx);
   }
 
   private getRelevantMarketIndexes(): number[] {
@@ -1690,7 +1677,7 @@ export class SubClient {
           let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
             Exchange.programId,
             product.market,
-            this._parentClient.publicKey
+            this._parent.publicKey
           );
           this._openOrdersAccounts[index] = openOrdersPda;
         }
@@ -1801,14 +1788,14 @@ export class SubClient {
    */
   public async close() {
     if (this._marginAccountSubscriptionId !== undefined) {
-      await this._parentClient.provider.connection.removeAccountChangeListener(
+      await this._parent.provider.connection.removeAccountChangeListener(
         this._marginAccountSubscriptionId
       );
       this._marginAccountSubscriptionId = undefined;
     }
 
     if (this._spreadAccountSubscriptionId !== undefined) {
-      await this._parentClient.provider.connection.removeAccountChangeListener(
+      await this._parent.provider.connection.removeAccountChangeListener(
         this._spreadAccountSubscriptionId
       );
       this._spreadAccountSubscriptionId = undefined;
