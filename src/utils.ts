@@ -1183,7 +1183,7 @@ export async function getAllProgramAccountAddresses(
     if (accountType == types.ProgramAccountType.MarginAccount) {
       assetOffset = 8 + 32 + 1 + 8 + 1 + 138 + 48 + 5520 + 8;
     } else if (accountType == types.ProgramAccountType.SpreadAccount) {
-      assetOffset = 8 + 32 + 1 + 8 + 48 + 2208 + 92;
+      assetOffset = 8 + 32 + 1 + 8 + 48 + 2208;
     }
 
     filters.push({
