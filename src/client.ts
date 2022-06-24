@@ -293,7 +293,6 @@ export class Client {
 
   public getMarginAccountState(asset: Asset): types.MarginAccountState {
     return Exchange.riskCalculator.getMarginAccountState(
-      asset,
       this.getSubClient(asset).marginAccount
     );
   }

@@ -6,7 +6,7 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
-import { assetToOracleFeed, Asset } from "./assets";
+import { assetToOracleFeed, Asset, fromProgramAsset } from "./assets";
 
 export class RiskCalculator {
   /**
@@ -112,7 +112,6 @@ export class RiskCalculator {
    * @param account the user's spread or margin account.
    */
   public calculateUnrealizedPnl(
-    asset: Asset,
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount
@@ -128,7 +127,9 @@ export class RiskCalculator {
       if (size == 0) {
         continue;
       }
-      let subExchange = Exchange.getSubExchange(asset);
+      let subExchange = Exchange.getSubExchange(
+        fromProgramAsset(account.asset)
+      );
       if (size > 0) {
         pnl +=
           convertNativeLotSizeToDecimal(size) *
@@ -148,13 +149,10 @@ export class RiskCalculator {
    * Returns the total initial margin requirement for a given account.
    * This inclues initial margin on positions which is used for
    * Place order, Withdrawal and Force Cancels
-   * @param asset           underlying asset type.
    * @param marginAccount   the user's MarginAccount.
    */
-  public calculateTotalInitialMargin(
-    asset: Asset,
-    marginAccount: MarginAccount
-  ): number {
+  public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
+    let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let ledger = marginAccount.productLedgers[i];
@@ -203,10 +201,8 @@ export class RiskCalculator {
    * @param asset           underlying asset type
    * @param marginAccount   the user's MarginAccount.
    */
-  public calculateTotalMaintenanceMargin(
-    asset: Asset,
-    marginAccount: MarginAccount
-  ): number {
+  public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
+    let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let position = marginAccount.productLedgers[i].position;
@@ -236,9 +232,9 @@ export class RiskCalculator {
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalMaintenanceMarginIncludingOrders(
-    asset: Asset,
     marginAccount: MarginAccount
   ): number {
+    let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let ledger = marginAccount.productLedgers[i];
@@ -282,20 +278,16 @@ export class RiskCalculator {
 
   /**
    * Returns the aggregate margin account state.
-   * @param asset           underlying asset type
    * @param marginAccount   the user's MarginAccount.
    */
   public getMarginAccountState(
-    asset: Asset,
     marginAccount: MarginAccount
   ): types.MarginAccountState {
+    let asset = fromProgramAsset(marginAccount.asset);
     let balance = convertNativeBNToDecimal(marginAccount.balance);
-    let unrealizedPnl = this.calculateUnrealizedPnl(asset, marginAccount);
-    let initialMargin = this.calculateTotalInitialMargin(asset, marginAccount);
-    let maintenanceMargin = this.calculateTotalMaintenanceMargin(
-      asset,
-      marginAccount
-    );
+    let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
+    let initialMargin = this.calculateTotalInitialMargin(marginAccount);
+    let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
     let availableBalanceInitial: number =
       balance + unrealizedPnl - initialMargin;
     let availableBalanceMaintenance: number =
