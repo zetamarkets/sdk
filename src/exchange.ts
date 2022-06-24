@@ -437,6 +437,16 @@ export class Exchange {
     this.setClockData(utils.getClockData(accountInfo));
   }
 
+  public async updateExchangeState() {
+    await this.updateState();
+    await Promise.all(
+      this.assets.map(async (asset) => {
+        await this.updateZetaGroup(asset);
+        this.getZetaGroupMarkets(asset).updateExpirySeries();
+      })
+    );
+  }
+
   /**
    * Polls the on chain account to update state.
    */
