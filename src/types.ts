@@ -206,3 +206,5 @@ export function toProgramMovementType(movementType: MovementType) {
   if (movementType == MovementType.UNLOCK) return { unlock: {} };
   throw Error("Invalid side");
 }
+
+export type MarketIdentifier = number | PublicKey;
