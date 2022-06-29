@@ -81,22 +81,6 @@ export class Client {
   }
   private _subClients: Map<Asset, SubClient>;
 
-  public get marginPositions(): Map<Asset, types.Position[]> {
-    let positionMap = new Map();
-    for (var subClient of this.subClients) {
-      positionMap.set(subClient[0], subClient[1].marginPositions);
-    }
-    return positionMap;
-  }
-
-  public get spreadPositions(): Map<Asset, types.Position[]> {
-    let positionMap = new Map();
-    for (var subClient of this.subClients) {
-      positionMap.set(subClient[0], subClient[1].spreadPositions);
-    }
-    return positionMap;
-  }
-
   public static async load(
     connection: Connection,
     wallet: types.Wallet,
@@ -550,6 +534,13 @@ export class Client {
     return this.getSubClient(asset).getMarginCostOfTrades(index, decimal);
   }
 
+  public getMarginPositions(asset: Asset) {
+    return this.getSubClient(asset).marginPositions;
+  }
+
+  public getSpreadPositions(asset: Asset) {
+    return this.getSubClient(asset).spreadPositions;
+  }
   public getOrders(asset: Asset) {
     return this.getSubClient(asset).orders;
   }

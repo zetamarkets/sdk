@@ -128,8 +128,6 @@ export class SubExchange {
     return this._zetaGroup.haltState.halted;
   }
 
-  private _programSubscriptionIds: number[] = [];
-
   public async initialize(asset: Asset) {
     if (this.isSetup) {
       throw "SubExchange already initialized.";
@@ -657,10 +655,6 @@ export class SubExchange {
     }
   }
 
-  public addProgramSubscriptionId(id: number) {
-    this._programSubscriptionIds.push(id);
-  }
-
   public updateMarginParams() {
     if (this.zetaGroup === undefined) {
       return;
@@ -857,12 +851,6 @@ export class SubExchange {
       this._eventEmitters[i].removeListener("change");
     }
     this._eventEmitters = [];
-    for (var i = 0; i < this._programSubscriptionIds.length; i++) {
-      await Exchange.connection.removeProgramAccountChangeListener(
-        this._programSubscriptionIds[i]
-      );
-    }
-    this._programSubscriptionIds = [];
     this._isInitialized = false;
     this._isSetup = false;
   }

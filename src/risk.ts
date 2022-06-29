@@ -9,13 +9,6 @@ import {
 import { assetToOracleFeed, Asset, fromProgramAsset } from "./assets";
 
 export class RiskCalculator {
-  /**
-   * Returns the margin requirements for all markets,
-   * indexed by market index.
-   */
-  public get marginRequirement(): Map<Asset, Array<types.MarginRequirement>> {
-    return this._marginRequirements;
-  }
   private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
 
   public constructor(assets: Asset[]) {
@@ -23,6 +16,10 @@ export class RiskCalculator {
     for (var asset of assets) {
       this._marginRequirements.set(asset, new Array(constants.ACTIVE_MARKETS));
     }
+  }
+
+  public getMarginRequirements(asset: Asset): Array<types.MarginRequirement> {
+    return this._marginRequirements.get(asset);
   }
 
   public updateMarginRequirements(asset: Asset) {
@@ -283,7 +280,6 @@ export class RiskCalculator {
   public getMarginAccountState(
     marginAccount: MarginAccount
   ): types.MarginAccountState {
-    let asset = fromProgramAsset(marginAccount.asset);
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);

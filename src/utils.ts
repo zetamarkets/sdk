@@ -1164,7 +1164,7 @@ export async function writeKeypair(filename: string, keypair: Keypair) {
 
 export async function getAllProgramAccountAddresses(
   accountType: types.ProgramAccountType,
-  asset: assets.Asset | undefined
+  asset: assets.Asset = undefined
 ): Promise<PublicKey[]> {
   let filters = [
     {
@@ -1405,13 +1405,6 @@ export function getOrCreateKeypair(filename: string): Keypair {
     writeKeypair(filename, keypair);
   }
   return keypair;
-}
-
-export function toNetwork(network: string): Network {
-  if (network == "localnet") return Network.LOCALNET;
-  if (network == "devnet") return Network.DEVNET;
-  if (network == "mainnet") return Network.MAINNET;
-  throw Error("Invalid network");
 }
 
 export function toAssets(assetsStr: string[]): Asset[] {

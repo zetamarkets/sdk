@@ -571,7 +571,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    orderType: types.OrderType,
+    orderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
@@ -728,7 +728,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    orderType: types.OrderType,
+    orderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
@@ -897,7 +897,7 @@ export class SubClient {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType,
+    newOrderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
@@ -950,7 +950,7 @@ export class SubClient {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType,
+    newOrderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {

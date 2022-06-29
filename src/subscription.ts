@@ -39,5 +39,5 @@ export function subscribeProgramAccounts<T>(
     ]
   );
 
-  Exchange.getSubExchange(asset).addProgramSubscriptionId(subscriptionId);
+  Exchange.addProgramSubscriptionId(subscriptionId);
 }

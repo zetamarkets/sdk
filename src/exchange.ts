@@ -205,13 +205,15 @@ export class Exchange {
 
   private _useLedger: boolean = false;
 
+  private _programSubscriptionIds: number[] = [];
+
   public async initialize(
     assets: Asset[],
     programId: PublicKey,
     network: Network,
     connection: Connection,
-    wallet = new types.DummyWallet(),
-    opts: ConfirmOptions
+    opts: ConfirmOptions,
+    wallet = new types.DummyWallet()
   ) {
     if (this.isSetup) {
       throw "Exchange already setup";
@@ -320,8 +322,8 @@ export class Exchange {
         programId,
         network,
         connection,
-        wallet,
-        opts
+        opts,
+        wallet
       );
     }
 
@@ -435,6 +437,10 @@ export class Exchange {
       SYSVAR_CLOCK_PUBKEY
     );
     this.setClockData(utils.getClockData(accountInfo));
+  }
+
+  public addProgramSubscriptionId(id: number) {
+    this._programSubscriptionIds.push(id);
   }
 
   public async updateExchangeState() {
@@ -585,10 +591,6 @@ export class Exchange {
     await this.getSubExchange(asset).rebalanceInsuranceVault(marginAccounts);
   }
 
-  public addProgramSubscriptionId(asset: Asset, id: number) {
-    this.getSubExchange(asset).addProgramSubscriptionId(id);
-  }
-
   public updateMarginParams(asset: Asset) {
     this.getSubExchange(asset).updateMarginParams();
   }
@@ -673,6 +675,13 @@ export class Exchange {
       );
       this._clockSubscriptionId = undefined;
     }
+
+    for (var i = 0; i < this._programSubscriptionIds.length; i++) {
+      await this.connection.removeProgramAccountChangeListener(
+        this._programSubscriptionIds[i]
+      );
+    }
+    this._programSubscriptionIds = [];
   }
 }
 
