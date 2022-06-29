@@ -193,7 +193,7 @@ export class Client {
     price: number,
     size: number,
     side: types.Side,
-    type: types.OrderType,
+    type: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
@@ -364,7 +364,7 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType,
+    newOrderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
