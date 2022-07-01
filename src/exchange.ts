@@ -372,7 +372,13 @@ export class Exchange {
   }
 
   public getSubExchange(asset: Asset): SubExchange {
-    return this._subExchanges.get(asset);
+    try {
+      return this._subExchanges.get(asset);
+    } catch (_e) {
+      throw Error(
+        `Failed to get subExchange for asset=${asset}, have you called Exchange.load()?`
+      );
+    }
   }
 
   public getAllSubExchanges(): SubExchange[] {
