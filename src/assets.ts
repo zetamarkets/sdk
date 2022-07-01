@@ -53,20 +53,8 @@ export function nameToAsset(name: string) {
   throw Error("Invalid asset");
 }
 
-export function oracleFeedToAsset(feed: string) {
-  if (feed == "SOL/USD") return Asset.SOL;
-  if (feed == "BTC/USD") return Asset.BTC;
-  if (feed == "ETH/USD") return Asset.ETH;
-  throw Error("Invalid asset");
-}
-
 export function getAssetMint(asset: Asset): PublicKey {
   return constants.MINTS[asset];
-}
-
-export function assetToOracleFeed(asset: Asset) {
-  let name = assetToName(asset);
-  return `${name}/USD`;
 }
 
 export function toProgramAsset(asset: Asset) {

@@ -6,7 +6,7 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
-import { assetToOracleFeed, Asset, fromProgramAsset } from "./assets";
+import { Asset, fromProgramAsset } from "./assets";
 
 export class RiskCalculator {
   private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
@@ -29,7 +29,7 @@ export class RiskCalculator {
     ) {
       throw Error("Pricing (greeks and/or oracle) is not initialized");
     }
-    let oraclePrice = Exchange.oracle.getPrice(assetToOracleFeed(asset));
+    let oraclePrice = Exchange.oracle.getPrice(asset);
     let spotPrice = oraclePrice === null ? 0 : oraclePrice.price;
     for (var i = 0; i < this._marginRequirements.get(asset).length; i++) {
       this._marginRequirements.get(asset)[i] = calculateProductMargin(

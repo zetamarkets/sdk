@@ -3,13 +3,14 @@ import { parsePythData, Price } from "./oracle-utils";
 import { Network } from "./network";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
-import { Asset, assetToOracleFeed, oracleFeedToAsset } from "./assets";
+import { Asset, assetToName } from "./assets";
+import { assets } from ".";
 
 export class Oracle {
   private _connection: Connection;
   private _network: Network;
-  private _data: Map<string, OraclePrice>;
-  private _subscriptionIds: Map<string, number>;
+  private _data: Map<assets.Asset, OraclePrice>;
+  private _subscriptionIds: Map<assets.Asset, number>;
   private _callback: (asset: Asset, price: OraclePrice) => void;
 
   public constructor(network: Network, connection: Connection) {
@@ -24,15 +25,15 @@ export class Oracle {
     return Object.keys(constants.PYTH_PRICE_FEEDS[this._network]);
   }
 
-  public getPrice(feed: string): OraclePrice {
-    if (!this._data.has(feed)) {
+  public getPrice(asset: assets.Asset): OraclePrice {
+    if (!this._data.has(asset)) {
       return null;
     }
-    return this._data.get(feed);
+    return this._data.get(asset);
   }
 
-  public getPriceAge(feed: string): number {
-    return Date.now() / 1000 - this.getPrice(feed).lastUpdatedTime;
+  public getPriceAge(asset: assets.Asset): number {
+    return Date.now() / 1000 - this.getPrice(asset).lastUpdatedTime;
   }
 
   // Allows fetching of any pyth oracle price.
@@ -44,24 +45,23 @@ export class Oracle {
 
   // Fetch and update an oracle price manually
   public async pollPrice(
-    feed: string,
+    asset: assets.Asset,
     triggerCallback = true
   ): Promise<OraclePrice> {
-    if (!(feed in constants.PYTH_PRICE_FEEDS[this._network])) {
+    if (!(asset in constants.PYTH_PRICE_FEEDS[this._network])) {
       throw Error("Invalid Oracle feed, no matching pubkey!");
     }
-    let asset = oracleFeedToAsset(feed); // throws if it can't map to a known asset
 
-    let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][feed];
+    let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
     let accountInfo = await this._connection.getAccountInfo(priceAddress);
     let priceData = parsePythData(accountInfo.data);
     let oracleData = {
-      feed,
+      asset,
       price: priceData.price,
       lastUpdatedTime: Exchange.clockTimestamp,
       lastUpdatedSlot: priceData.publishSlot,
     };
-    this._data.set(feed, oracleData);
+    this._data.set(asset, oracleData);
 
     if (triggerCallback) {
       this._callback(asset, oracleData);
@@ -80,14 +80,13 @@ export class Oracle {
 
     await Promise.all(
       assets.map(async (asset) => {
-        let feed = assetToOracleFeed(asset);
-        console.log(`Oracle subscribing to feed ${feed}`);
-        let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][feed];
+        console.log(`Oracle subscribing to feed ${assetToName(asset)}`);
+        let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
         let subscriptionId = this._connection.onAccountChange(
           priceAddress,
           (accountInfo: AccountInfo<Buffer>, _context: Context) => {
             let priceData = parsePythData(accountInfo.data);
-            let currPrice = this._data.get(feed);
+            let currPrice = this._data.get(asset);
             if (
               currPrice !== undefined &&
               currPrice.price === priceData.price
@@ -95,20 +94,20 @@ export class Oracle {
               return;
             }
             let oracleData = {
-              feed,
+              asset,
               price: priceData.price,
               lastUpdatedTime: Exchange.clockTimestamp,
               lastUpdatedSlot: priceData.publishSlot,
             };
-            this._data.set(feed, oracleData);
+            this._data.set(asset, oracleData);
             this._callback(asset, oracleData);
           },
           Exchange.provider.connection.commitment
         );
 
-        this._subscriptionIds.set(feed, subscriptionId);
+        this._subscriptionIds.set(asset, subscriptionId);
         // Set this so the oracle contains a price on initialization.
-        await this.pollPrice(feed, true);
+        await this.pollPrice(asset, true);
       })
     );
   }
@@ -121,7 +120,7 @@ export class Oracle {
 }
 
 export interface OraclePrice {
-  feed: string;
+  asset: assets.Asset;
   price: number;
   lastUpdatedTime: number;
   lastUpdatedSlot: bigint;

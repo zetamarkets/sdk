@@ -438,7 +438,7 @@ You can access the latest oracle prices like so.
 Exchange.oracle.getAvailablePriceFeeds();
 
 // Get the price of a given feed.
-let price = Exchange.oracle.getPrice("SOL/USD");
+let price = Exchange.oracle.getPrice(assets.Asset.SOL);
 ```
 
 See callbacks to update state live.
