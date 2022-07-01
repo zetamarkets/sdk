@@ -372,7 +372,6 @@ export class SubClient {
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
     // Check if the user has a USDC account.
-
     let tx = new Transaction();
     if (this._marginAccount === null) {
       console.log("User has no margin account. Creating margin account...");

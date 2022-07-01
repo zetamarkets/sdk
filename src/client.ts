@@ -4,6 +4,7 @@ import {
   Connection,
   ConfirmOptions,
   TransactionSignature,
+  Transaction,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -18,6 +19,7 @@ import { Asset } from "./assets";
 import { SubClient } from "./subclient";
 import { exchange as Exchange } from "./exchange";
 import * as instructions from "./program-instructions";
+import { assets } from ".";
 
 export class Client {
   /**
@@ -206,6 +208,54 @@ export class Client {
       clientOrderId,
       tag
     );
+  }
+
+  public async migrateFunds(
+    amount: number,
+    withdrawAsset: assets.Asset,
+    depositAsset: assets.Asset
+  ): Promise<TransactionSignature> {
+    await this.usdcAccountCheck();
+    let tx = new Transaction();
+    let withdrawSubClient = this.getSubClient(withdrawAsset);
+    let depositSubClient = this.getSubClient(depositAsset);
+
+    // Create withdraw ix
+    tx.add(
+      instructions.withdrawIx(
+        withdrawAsset,
+        amount,
+        withdrawSubClient.marginAccountAddress,
+        this.usdcAccountAddress,
+        this.publicKey
+      )
+    );
+
+    // Create deposit tx
+    if (depositSubClient.marginAccount === null) {
+      console.log("User has no margin account. Creating margin account...");
+      tx.add(
+        instructions.initializeMarginAccountIx(
+          depositSubClient.subExchange.zetaGroupAddress,
+          depositSubClient.marginAccountAddress,
+          this.publicKey
+        )
+      );
+    }
+    tx.add(
+      await instructions.depositIx(
+        depositAsset,
+        amount,
+        depositSubClient.marginAccountAddress,
+        this.usdcAccountAddress,
+        this.publicKey,
+        this.whitelistDepositAddress
+      )
+    );
+
+    // Send
+    let txId = await utils.processTransaction(this._provider, tx);
+    return txId;
   }
 
   public async deposit(
