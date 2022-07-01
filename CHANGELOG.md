@@ -7,8 +7,11 @@ Version changes are pinned to SDK releases.
 
 ## [0.15.0]
 
-- general: Multiasset support. ([#124](https://github.com/zetamarkets/sdk/pull/124))
 - program: Add Asset to MarginAccount, SpreadAccount and ZetaGroup. ([#126](https://github.com/zetamarkets/sdk/pull/126))
+
+### Breaking
+
+- general: Multiasset support. ([#124](https://github.com/zetamarkets/sdk/pull/124))
 
 ## [0.14.2]
 
