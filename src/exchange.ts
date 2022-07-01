@@ -10,7 +10,7 @@ import {
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
-import { Greeks, State, ZetaGroup } from "./program-types";
+import { Greeks, ProductGreeks, State, ZetaGroup } from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
@@ -665,6 +665,17 @@ export class Exchange {
     args: instructions.UpdateInterestRateArgs
   ) {
     await this.getSubExchange(asset).updateInterestRate(args);
+  }
+
+  public getProductGreeks(
+    asset: Asset,
+    marketIndex: number,
+    expiryIndex: number
+  ): ProductGreeks {
+    return this.getSubExchange(asset).getProductGreeks(
+      marketIndex,
+      expiryIndex
+    );
   }
 
   public async close() {

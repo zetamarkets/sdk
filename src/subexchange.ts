@@ -12,6 +12,7 @@ import {
   ExpirySeries,
   ZetaGroup,
   MarketIndexes,
+  ProductGreeks,
 } from "./program-types";
 import { ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
@@ -837,6 +838,17 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  public getProductGreeks(
+    marketIndex: number,
+    expiryIndex: number
+  ): ProductGreeks {
+    let index =
+      ((marketIndex - expiryIndex * constants.PRODUCTS_PER_EXPIRY) %
+        constants.NUM_STRIKES) +
+      expiryIndex * constants.NUM_STRIKES;
+    return this._greeks.productGreeks[index];
   }
 
   /**
