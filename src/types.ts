@@ -2,6 +2,8 @@ import * as anchor from "@project-serum/anchor";
 import { BN } from "@project-serum/anchor";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { Asset } from "./assets";
+import { objectEquals } from "./utils";
+import { MarginAccount } from "./program-types";
 
 /**
  * Wallet interface for objects that can be used to sign provider transactions.
@@ -197,4 +199,28 @@ export function toProgramMovementType(movementType: MovementType) {
   if (movementType == MovementType.LOCK) return { lock: {} };
   if (movementType == MovementType.UNLOCK) return { unlock: {} };
   throw Error("Invalid side");
+}
+
+export enum MarginAccountType {
+  NORMAL = 0,
+  MARKET_MAKER = 1,
+}
+
+export function fromProgramMarginAccountType(
+  accountType: any
+): MarginAccountType {
+  if (objectEquals(accountType, { normal: {} })) {
+    return MarginAccountType.NORMAL;
+  }
+  if (objectEquals(accountType, { marketMaker: {} })) {
+    return MarginAccountType.MARKET_MAKER;
+  }
+  throw Error("Invalid margin account type");
+}
+
+export function isMarketMaker(marginAccount: MarginAccount) {
+  return (
+    fromProgramMarginAccountType(marginAccount.accountType) ==
+    MarginAccountType.MARKET_MAKER
+  );
 }

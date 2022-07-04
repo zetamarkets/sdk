@@ -2874,6 +2874,32 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "toggleMarketMaker",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "isMarketMaker",
+          "type": "bool"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -3148,11 +3174,15 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                158
+                157
               ]
             }
           }
@@ -3476,11 +3506,17 @@ export type Zeta = {
             }
           },
           {
+            "name": "accountType",
+            "type": {
+              "defined": "MarginAccountType"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                387
+                386
               ]
             }
           }
@@ -4115,6 +4151,10 @@ export type Zeta = {
           {
             "name": "positionMovementFeeBps",
             "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
           }
         ]
       }
@@ -4206,6 +4246,10 @@ export type Zeta = {
           },
           {
             "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
             "type": "u8"
           }
         ]
@@ -4611,6 +4655,23 @@ export type Zeta = {
           },
           {
             "name": "MaintenanceIncludingOrders"
+          },
+          {
+            "name": "MarketMakerConcession"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarginAccountType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Normal"
+          },
+          {
+            "name": "MarketMaker"
           }
         ]
       }
@@ -8163,6 +8224,32 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "toggleMarketMaker",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "isMarketMaker",
+          "type": "bool"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -8437,11 +8524,15 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                158
+                157
               ]
             }
           }
@@ -8765,11 +8856,17 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "accountType",
+            "type": {
+              "defined": "MarginAccountType"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                387
+                386
               ]
             }
           }
@@ -9404,6 +9501,10 @@ export const IDL: Zeta = {
           {
             "name": "positionMovementFeeBps",
             "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
           }
         ]
       }
@@ -9495,6 +9596,10 @@ export const IDL: Zeta = {
           },
           {
             "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
             "type": "u8"
           }
         ]
@@ -9900,6 +10005,23 @@ export const IDL: Zeta = {
           },
           {
             "name": "MaintenanceIncludingOrders"
+          },
+          {
+            "name": "MarketMakerConcession"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarginAccountType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Normal"
+          },
+          {
+            "name": "MarketMaker"
           }
         ]
       }
