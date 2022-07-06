@@ -1655,6 +1655,25 @@ export function burnVaultTokenTx(marketKey: PublicKey): Transaction {
   return tx;
 }
 
+export async function toggleMarketMakerIx(
+  isMarketMaker: boolean,
+  zetaGroup: PublicKey,
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  let [marginAccount, _nonce] = await utils.getMarginAccount(
+    Exchange.programId,
+    zetaGroup,
+    user
+  );
+  return Exchange.program.instruction.toggleMarketMaker(isMarketMaker, {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin: Exchange.state.admin,
+      marginAccount,
+    },
+  });
+}
+
 export interface ExpireSeriesOverrideArgs {
   settlementNonce: number;
   settlementPrice: anchor.BN;
@@ -1688,6 +1707,7 @@ export interface StateParams {
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
+  marginConcessionPercentage: number;
 }
 
 export interface UpdatePricingParametersArgs {

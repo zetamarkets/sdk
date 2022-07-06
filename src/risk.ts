@@ -5,6 +5,7 @@ import {
   MarginRequirement,
   MarginAccountState,
   ProgramAccountType,
+  isMarketMaker,
 } from "./types";
 import { ACTIVE_MARKETS } from "./constants";
 import { SpreadAccount, MarginAccount } from "./program-types";
@@ -52,6 +53,7 @@ export class RiskCalculator {
     if (this._marginRequirements[productIndex] === null) {
       return 0;
     }
+
     if (size > 0) {
       if (marginType == MarginType.INITIAL) {
         return size * this._marginRequirements[productIndex].initialLong;
@@ -129,11 +131,12 @@ export class RiskCalculator {
 
   /**
    * Returns the total initial margin requirement for a given account.
-   * This inclues initial margin on positions which is used for
-   * Place order, Withdrawal and Force Cancels
+   * This includes initial margin on positions which is used for
+   * Place order, withdrawal and force cancels
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
+    let marketMaker = isMarketMaker(marginAccount);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let ledger = marginAccount.productLedgers[i];
@@ -147,10 +150,12 @@ export class RiskCalculator {
       let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
       let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
-      if (size > 0) {
-        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
-      } else if (size < 0) {
-        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      if (!marketMaker) {
+        if (size > 0) {
+          longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        } else if (size < 0) {
+          shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        }
       }
 
       let marginForMarket =
@@ -166,6 +171,19 @@ export class RiskCalculator {
           -shortLots,
           MarginType.INITIAL
         );
+
+      if (marketMaker) {
+        // Mark initial margin to concession (only contains open order margin).
+        marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
+        // Add position margin which doesn't get concessions.
+        marginForMarket += this.getMarginRequirement(
+          i,
+          // This is signed.
+          convertNativeLotSizeToDecimal(size),
+          MarginType.MAINTENANCE
+        );
+      }
+
       if (marginForMarket !== undefined) {
         margin += marginForMarket;
       }

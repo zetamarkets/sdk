@@ -1303,3 +1303,7 @@ export function calculateMovementFees(
   let fee = (notionalValue * feeBps) / constants.BPS_DENOMINATOR;
   return decimal ? fee : convertDecimalToNativeInteger(fee);
 }
+
+export function objectEquals(a: any, b: any): boolean {
+  return JSON.stringify(a) == JSON.stringify(b);
+}
