@@ -5,8 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.14.3]
+
 - program: Add Asset to MarginAccount, SpreadAccount and ZetaGroup. ([#126](https://github.com/zetamarkets/sdk/pull/126))
-- risk: Add functionality for market maker margin concessions.
+- risk: Add functionality for market maker margin concessions. ([#128](https://github.com/zetamarkets/sdk/pull/128))
 
 ## [0.14.2]
 
