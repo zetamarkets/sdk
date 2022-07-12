@@ -464,8 +464,7 @@ export class Client {
       Date.now() / 1000 - this._updatingStateTimestamp >
       UPDATING_STATE_LIMIT_SECONDS
     ) {
-      this._updatingState = false;
-      this._updatingStateTimestamp = undefined;
+      this.toggleUpdateState(false);
       return true;
     }
     return false;
