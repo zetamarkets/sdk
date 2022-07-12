@@ -419,7 +419,14 @@ export class Market {
   }
   private _serumMarket: SerumMarket;
 
+  public set bids(bids: Orderbook) {
+    this._bids = bids;
+  }
   private _bids: Orderbook;
+
+  public set asks(asks: Orderbook) {
+    this._asks = asks;
+  }
   private _asks: Orderbook;
 
   /**
@@ -473,12 +480,14 @@ export class Market {
     }
   }
 
-  // TODO make this call on interval
-  public async updateOrderbook() {
-    [this._bids, this._asks] = await Promise.all([
-      this._serumMarket.loadBids(Exchange.provider.connection),
-      this._serumMarket.loadAsks(Exchange.provider.connection),
-    ]);
+  public async updateOrderbook(loadSerum: boolean = true) {
+    // if not loadSerum, we assume that this._bids and this._asks was set elsewhere manually beforehand
+    if (loadSerum) {
+      [this._bids, this._asks] = await Promise.all([
+        this._serumMarket.loadBids(Exchange.provider.connection),
+        this._serumMarket.loadAsks(Exchange.provider.connection),
+      ]);
+    }
 
     [this._bids, this._asks].map((orderbookSide) => {
       const descending = orderbookSide.isBids ? true : false;
