@@ -509,7 +509,6 @@ export class Exchange {
 
   public async updateAllLiveOrderbooks() {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
-    console.time("Setup address lists");
     let liveMarkets = this._markets.filter((m) => m.expirySeries.isLive());
     let liveMarketAskAddresses = liveMarkets.map(
       (m) => m.serumMarket.asksAddress
@@ -517,20 +516,16 @@ export class Exchange {
     let liveMarketBidAddresses = liveMarkets.map(
       (m) => m.serumMarket.bidsAddress
     );
-    console.timeEnd("Setup address lists");
 
-    console.time("AccountInfo fetch");
     let asksAccountInfos = await this.connection.getMultipleAccountsInfo(
       liveMarketAskAddresses
     );
     let bidsAccountInfos = await this.connection.getMultipleAccountsInfo(
       liveMarketBidAddresses
     );
-    console.timeEnd("AccountInfo fetch");
 
     // A bit of a weird one but we want a map of liveMarkets -> accountInfos because
     // we'll do the following orderbook updates async
-    console.time("Setup liveMarkets maps");
     let liveMarketsToAskAccountInfosMap: Map<
       Market,
       AccountInfo<Buffer>
@@ -543,9 +538,7 @@ export class Exchange {
       liveMarketsToAskAccountInfosMap.set(m, asksAccountInfos[i]);
       liveMarketsToBidAccountInfosMap.set(m, bidsAccountInfos[i]);
     });
-    console.timeEnd("Setup liveMarkets maps");
 
-    console.time("Apply updates");
     await Promise.all(
       liveMarkets.map(async (market) => {
         market.asks = Orderbook.decode(
@@ -559,7 +552,6 @@ export class Exchange {
         market.updateOrderbook(false);
       })
     );
-    console.timeEnd("Apply updates");
   }
 
   public getZetaGroupMarkets(asset: Asset): ZetaGroupMarkets {
