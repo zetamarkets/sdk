@@ -461,20 +461,21 @@ export class Client {
   // Safety to reset this._updatingState
   private checkResetUpdatingState() {
     if (
+      this._updatingState &&
       Date.now() / 1000 - this._updatingStateTimestamp >
-      UPDATING_STATE_LIMIT_SECONDS
+        UPDATING_STATE_LIMIT_SECONDS
     ) {
       this.toggleUpdateState(false);
-      return true;
     }
-    return false;
   }
 
   /**
    * Polls the margin account for the latest state.
    */
   public async updateState(fetch = true, force = false) {
-    if (this._updatingState && !force && !this.checkResetUpdatingState()) {
+    this.checkResetUpdatingState();
+
+    if (this._updatingState && !force) {
       return;
     }
 
