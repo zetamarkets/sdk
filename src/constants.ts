@@ -26,6 +26,7 @@ export const MARKET_INDEX_LIMIT = 18;
 // 3 accounts per set * 9 = 27 + 2 = 29 accounts.
 export const CLEAN_MARKET_LIMIT = 9;
 export const CRANK_ACCOUNT_LIMIT = 12;
+export const MAX_MARKETS_TO_FETCH = 50;
 
 // This is the most we can load per iteration without
 // hitting the rate limit.

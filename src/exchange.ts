@@ -507,49 +507,66 @@ export class Exchange {
 
   public async updateAllOrderbooks(live: boolean = true) {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
-    let liveMarkets = this._markets;
+    let allLiveMarkets = this._markets;
     if (live) {
-      liveMarkets = this._markets.filter((m) => m.expirySeries.isLive());
+      allLiveMarkets = this._markets.filter((m) => m.expirySeries.isLive());
     }
 
-    let liveMarketAskAddresses = liveMarkets.map(
-      (m) => m.serumMarket.asksAddress
-    );
-    let liveMarketBidAddresses = liveMarkets.map(
-      (m) => m.serumMarket.bidsAddress
-    );
-
-    let [asksAccountInfos, bidsAccountInfos] = await Promise.all([
-      await this.connection.getMultipleAccountsInfo(liveMarketAskAddresses),
-      await this.connection.getMultipleAccountsInfo(liveMarketBidAddresses),
-    ]);
-
-    // A bit of a weird one but we want a map of liveMarkets -> accountInfos because
-    // we'll do the following orderbook updates async
-    let liveMarketsToAskAccountInfosMap: Map<
-      Market,
-      AccountInfo<Buffer>
-    > = new Map();
-    let liveMarketsToBidAccountInfosMap: Map<
-      Market,
-      AccountInfo<Buffer>
-    > = new Map();
-    liveMarkets.map((m, i) => {
-      liveMarketsToAskAccountInfosMap.set(m, asksAccountInfos[i]);
-      liveMarketsToBidAccountInfosMap.set(m, bidsAccountInfos[i]);
-    });
+    let liveMarketsSlices: Market[][] = [];
+    for (
+      let i = 0;
+      i < allLiveMarkets.length;
+      i += constants.MAX_MARKETS_TO_FETCH
+    ) {
+      liveMarketsSlices.push(
+        allLiveMarkets.slice(i, i + constants.MAX_MARKETS_TO_FETCH)
+      );
+    }
 
     await Promise.all(
-      liveMarkets.map(async (market) => {
-        market.asks = Orderbook.decode(
-          market.serumMarket,
-          liveMarketsToAskAccountInfosMap.get(market).data
+      liveMarketsSlices.map(async (liveMarkets) => {
+        let liveMarketAskAddresses = liveMarkets.map(
+          (m) => m.serumMarket.asksAddress
         );
-        market.bids = Orderbook.decode(
-          market.serumMarket,
-          liveMarketsToBidAccountInfosMap.get(market).data
+        let liveMarketBidAddresses = liveMarkets.map(
+          (m) => m.serumMarket.bidsAddress
         );
-        market.updateOrderbook(false);
+
+        let accountInfos = await this.connection.getMultipleAccountsInfo(
+          liveMarketAskAddresses.concat(liveMarketBidAddresses)
+        );
+        const half = Math.ceil(accountInfos.length / 2);
+        const asksAccountInfos = accountInfos.slice(0, half);
+        const bidsAccountInfos = accountInfos.slice(-half);
+
+        // A bit of a weird one but we want a map of liveMarkets -> accountInfos because
+        // we'll do the following orderbook updates async
+        let liveMarketsToAskAccountInfosMap: Map<
+          Market,
+          AccountInfo<Buffer>
+        > = new Map();
+        let liveMarketsToBidAccountInfosMap: Map<
+          Market,
+          AccountInfo<Buffer>
+        > = new Map();
+        liveMarkets.map((m, i) => {
+          liveMarketsToAskAccountInfosMap.set(m, asksAccountInfos[i]);
+          liveMarketsToBidAccountInfosMap.set(m, bidsAccountInfos[i]);
+        });
+
+        await Promise.all(
+          liveMarkets.map(async (market) => {
+            market.asks = Orderbook.decode(
+              market.serumMarket,
+              liveMarketsToAskAccountInfosMap.get(market).data
+            );
+            market.bids = Orderbook.decode(
+              market.serumMarket,
+              liveMarketsToBidAccountInfosMap.get(market).data
+            );
+            market.updateOrderbook(false);
+          })
+        );
       })
     );
   }
