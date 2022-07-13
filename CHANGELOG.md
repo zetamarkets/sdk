@@ -8,6 +8,7 @@ Version changes are pinned to SDK releases.
 - client: Add extra safety around client state updates. ([#129](https://github.com/zetamarkets/sdk/pull/129))
 - client: Add referral logic for client.
 - program: Add instruction logic for referrals.
+- events: Cancel events.
 
 ## [0.14.3]
 
