@@ -4904,6 +4904,55 @@ export type Zeta = {
           "index": false
         }
       ]
+    },
+    {
+      "name": "CancelEvent",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marketIndex",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          },
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -10347,6 +10396,55 @@ export const IDL: Zeta = {
         },
         {
           "name": "underlyingPrice",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CancelEvent",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marketIndex",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          },
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
           "type": "u64",
           "index": false
         }
