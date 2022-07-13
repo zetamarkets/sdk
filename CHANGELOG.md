@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- client: Add extra safety around client state updates.
+- client: Add extra safety around client state updates. ([#129](https://github.com/zetamarkets/sdk/pull/129))
 
 ## [0.14.3]
 
