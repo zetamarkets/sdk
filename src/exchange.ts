@@ -367,9 +367,7 @@ export class Exchange {
 
     await Promise.all(
       this.assets.map(async (asset) => {
-        this.getMarkets(asset).map(async (market) => {
-          this._markets.push(market);
-        });
+        this._markets = this._markets.concat(this.getMarkets(asset));
       })
     );
 
@@ -507,9 +505,13 @@ export class Exchange {
     await this.getSubExchange(asset).markets.markets[index].updateOrderbook();
   }
 
-  public async updateAllLiveOrderbooks() {
+  public async updateAllOrderbooks(live: boolean = true) {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
-    let liveMarkets = this._markets.filter((m) => m.expirySeries.isLive());
+    let liveMarkets = this._markets;
+    if (live) {
+      liveMarkets = this._markets.filter((m) => m.expirySeries.isLive());
+    }
+
     let liveMarketAskAddresses = liveMarkets.map(
       (m) => m.serumMarket.asksAddress
     );
@@ -517,12 +519,10 @@ export class Exchange {
       (m) => m.serumMarket.bidsAddress
     );
 
-    let asksAccountInfos = await this.connection.getMultipleAccountsInfo(
-      liveMarketAskAddresses
-    );
-    let bidsAccountInfos = await this.connection.getMultipleAccountsInfo(
-      liveMarketBidAddresses
-    );
+    let [asksAccountInfos, bidsAccountInfos] = await Promise.all([
+      await this.connection.getMultipleAccountsInfo(liveMarketAskAddresses),
+      await this.connection.getMultipleAccountsInfo(liveMarketBidAddresses),
+    ]);
 
     // A bit of a weird one but we want a map of liveMarkets -> accountInfos because
     // we'll do the following orderbook updates async
