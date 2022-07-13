@@ -8,6 +8,7 @@ import {
   DEFAULT_CLIENT_TIMER_INTERVAL,
   DEX_PID,
   DEFAULT_ORDER_TAG,
+  UPDATING_STATE_LIMIT_SECONDS,
 } from "./constants";
 import { exchange as Exchange } from "./exchange";
 import {
@@ -232,6 +233,8 @@ export class Client {
 
   private _updatingState: boolean = false;
 
+  private _updatingStateTimestamp: number = undefined;
+
   private constructor(
     connection: Connection,
     wallet: Wallet,
@@ -445,21 +448,46 @@ export class Client {
     }, timerInterval * 1000);
   }
 
+  private toggleUpdateState(toggleOn: boolean) {
+    if (toggleOn) {
+      this._updatingState = true;
+      this._updatingStateTimestamp = Date.now() / 1000;
+    } else {
+      this._updatingState = false;
+      this._updatingStateTimestamp = undefined;
+    }
+  }
+
+  // Safety to reset this._updatingState
+  private checkResetUpdatingState() {
+    if (
+      this._updatingState &&
+      Date.now() / 1000 - this._updatingStateTimestamp >
+        UPDATING_STATE_LIMIT_SECONDS
+    ) {
+      this.toggleUpdateState(false);
+    }
+  }
+
   /**
    * Polls the margin account for the latest state.
    */
   public async updateState(fetch = true, force = false) {
+    this.checkResetUpdatingState();
+
     if (this._updatingState && !force) {
       return;
     }
-    this._updatingState = true;
+
+    this.toggleUpdateState(true);
+
     if (fetch) {
       try {
         this._marginAccount = (await this._program.account.marginAccount.fetch(
           this._marginAccountAddress
         )) as unknown as MarginAccount;
       } catch (e) {
-        this._updatingState = false;
+        this.toggleUpdateState(false);
         return;
       }
 
@@ -470,16 +498,18 @@ export class Client {
       } catch (e) {}
     }
 
-    if (this._marginAccount !== null) {
-      await this.updateOrders();
-      this.updatePositions();
-    }
+    try {
+      if (this._marginAccount !== null) {
+        this.updatePositions();
+        await this.updateOrders();
+      }
 
-    if (this._spreadAccount !== null) {
-      this.updateSpreadPositions();
-    }
+      if (this._spreadAccount !== null) {
+        this.updateSpreadPositions();
+      }
+    } catch (e) {}
 
-    this._updatingState = false;
+    this.toggleUpdateState(false);
   }
 
   /**
