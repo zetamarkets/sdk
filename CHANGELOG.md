@@ -6,6 +6,8 @@ Version changes are pinned to SDK releases.
 ## [Unreleased]
 
 - client: Add extra safety around client state updates. ([#129](https://github.com/zetamarkets/sdk/pull/129))
+- client: Add referral logic for client.
+- program: Add instruction logic for referrals.
 
 ## [0.14.3]
 

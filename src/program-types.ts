@@ -229,6 +229,18 @@ export interface WhitelistTradingFeesAccount {
   userKey: PublicKey;
 }
 
+export interface ReferralAccount {
+  nonce: number;
+  referrer: PublicKey;
+  user: PublicKey;
+  timestamp: anchor.BN;
+}
+
+export interface ReferrerAccount {
+  nonce: number;
+  referrer: PublicKey;
+}
+
 export interface PlaceOrderEvent {
   fee: anchor.BN;
   oraclePrice: anchor.BN;

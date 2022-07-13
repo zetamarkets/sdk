@@ -16,6 +16,7 @@ import {
   MarginAccount,
   TradeEvent,
   PositionMovementEvent,
+  ReferralAccount,
 } from "./program-types";
 import {
   PublicKey,
@@ -40,6 +41,7 @@ import {
   MovementType,
 } from "./types";
 import {
+  referUserIx,
   initializeMarginAccountIx,
   closeMarginAccountIx,
   initializeOpenOrdersIx,
@@ -111,6 +113,15 @@ export class Client {
     return this._spreadAccount;
   }
   private _spreadAccount: SpreadAccount | null;
+
+  /**
+   * Stores the user referral account data.
+   */
+  public get referralAccount(): ReferralAccount | null {
+    return this._referralAccount;
+  }
+  private _referralAccount: ReferralAccount | null;
+  private _referralAccountAddress: PublicKey;
 
   /**
    * Client margin account address.
@@ -257,6 +268,7 @@ export class Client {
     this._pendingUpdate = false;
     this._marginAccount = null;
     this._spreadAccount = null;
+    this._referralAccount = null;
   }
 
   /**
@@ -396,6 +408,24 @@ export class Client {
       client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
     } catch (e) {}
 
+    client._referralAccountAddress = undefined;
+    try {
+      let [referralAccountAddress, _nonce] =
+        await utils.getReferralAccountAddress(
+          Exchange.programId,
+          wallet.publicKey
+        );
+
+      client._referralAccountAddress = referralAccountAddress;
+      client._referralAccount =
+        (await client._program.account.referralAccount.fetch(
+          referralAccountAddress
+        )) as unknown as ReferralAccount;
+      console.log(
+        `User has been referred by ${client._referralAccount.referrer.toString()}.`
+      );
+    } catch (e) {}
+
     if (callback !== undefined) {
       client._tradeEventListener = client._program.addEventListener(
         "TradeEvent",
@@ -409,6 +439,30 @@ export class Client {
 
     client.setPolling(DEFAULT_CLIENT_TIMER_INTERVAL);
     return client;
+  }
+
+  // This is referring itself by another referrer.
+  public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
+    let [referrerAccount] = await utils.getReferrerAccountAddress(
+      Exchange.programId,
+      referrer
+    );
+
+    try {
+      await this._program.account.referrerAccount.fetch(referrerAccount);
+    } catch (e) {
+      throw Error(`Invalid referrer. ${referrer.toString()}`);
+    }
+    let tx = new Transaction().add(
+      await referUserIx(this.provider.wallet.publicKey, referrer)
+    );
+    let txId = await utils.processTransaction(this.provider, tx);
+
+    this._referralAccount = (await this._program.account.referralAccount.fetch(
+      this._referralAccountAddress
+    )) as unknown as ReferralAccount;
+
+    return txId;
   }
 
   /**

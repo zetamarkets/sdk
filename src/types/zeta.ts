@@ -2900,6 +2900,63 @@ export type Zeta = {
           "type": "bool"
         }
       ]
+    },
+    {
+      "name": "initializeReferrerAccount",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referrerAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "referUser",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrerAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -3599,6 +3656,46 @@ export type Zeta = {
           {
             "name": "userKey",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referrerAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referralAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          },
+          {
+            "name": "user",
+            "type": "publicKey"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
           }
         ]
       }
@@ -8250,6 +8347,63 @@ export const IDL: Zeta = {
           "type": "bool"
         }
       ]
+    },
+    {
+      "name": "initializeReferrerAccount",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referrerAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "referUser",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrerAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -8949,6 +9103,46 @@ export const IDL: Zeta = {
           {
             "name": "userKey",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referrerAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referralAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          },
+          {
+            "name": "user",
+            "type": "publicKey"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
           }
         ]
       }
