@@ -427,12 +427,13 @@ export class SubExchange {
       console.log(`Market ${i} serum accounts already initialized...`);
     } else {
       try {
-        await utils.processTransaction(Exchange.provider, tx, [
-          requestQueue,
-          eventQueue,
-          bids,
-          asks,
-        ]);
+        await utils.processTransaction(
+          Exchange.provider,
+          tx,
+          [requestQueue, eventQueue, bids, asks],
+          utils.commitmentConfig(Exchange.connection.commitment),
+          Exchange.useLedger
+        );
       } catch (e) {
         console.error(
           `Initialize zeta market serum accounts ${i} failed: ${e}`

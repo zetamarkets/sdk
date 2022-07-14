@@ -612,7 +612,10 @@ export async function processTransaction(
   let txSig: TransactionSignature;
   const blockhash = await provider.connection.getRecentBlockhash();
   tx.recentBlockhash = blockhash.blockhash;
-  tx.feePayer = provider.wallet.publicKey;
+  tx.feePayer = useLedger
+    ? Exchange.ledgerWallet.publicKey
+    : provider.wallet.publicKey;
+
   if (signers === undefined) {
     signers = [];
   }

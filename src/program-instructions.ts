@@ -720,10 +720,14 @@ export async function initializeZetaMarketTxs(
     quoteMint
   );
 
+  let fromPubkey = Exchange.useLedger
+    ? Exchange.ledgerWallet.publicKey
+    : Exchange.provider.wallet.publicKey;
+
   const tx = new Transaction();
   tx.add(
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: requestQueue,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(
@@ -733,7 +737,7 @@ export async function initializeZetaMarketTxs(
       programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: eventQueue,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(
@@ -743,7 +747,7 @@ export async function initializeZetaMarketTxs(
       programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: bids,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(
@@ -753,7 +757,7 @@ export async function initializeZetaMarketTxs(
       programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: asks,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(

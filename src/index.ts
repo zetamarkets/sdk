@@ -4,7 +4,7 @@ import { SubExchange } from "./subexchange";
 import { SubClient } from "./subclient";
 import { Client } from "./client";
 import { InsuranceClient } from "./insurance-client";
-import * as Network from "./network";
+import { Network } from "./network";
 import { Decimal } from "./decimal";
 import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
