@@ -234,11 +234,15 @@ export interface ReferralAccount {
   referrer: PublicKey;
   user: PublicKey;
   timestamp: anchor.BN;
+  pendingRewards: anchor.BN;
+  claimedRewards: anchor.BN;
 }
 
 export interface ReferrerAccount {
   nonce: number;
   referrer: PublicKey;
+  pendingRewards: anchor.BN;
+  claimedRewards: anchor.BN;
 }
 
 export interface PlaceOrderEvent {
