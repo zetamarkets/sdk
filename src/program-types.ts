@@ -22,6 +22,7 @@ export interface State {
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
+  marginConcessionPercentage: number;
   padding: Array<number>;
 }
 
@@ -148,6 +149,7 @@ export interface MarginAccount {
   productLedgersPadding: Array<ProductLedger>;
   rebalanceAmount: anchor.BN;
   asset: any;
+  accountType: any;
   padding: Array<number>;
 }
 

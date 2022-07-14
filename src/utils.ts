@@ -1414,3 +1414,7 @@ export function toAssets(assetsStr: string[]): Asset[] {
   }
   return assets;
 }
+
+export function objectEquals(a: any, b: any): boolean {
+  return JSON.stringify(a) == JSON.stringify(b);
+}

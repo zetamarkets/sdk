@@ -56,6 +56,7 @@ export class RiskCalculator {
     if (this._marginRequirements.get(asset)[productIndex] === null) {
       return null;
     }
+
     if (size > 0) {
       if (marginType == types.MarginType.INITIAL) {
         return (
@@ -144,12 +145,13 @@ export class RiskCalculator {
 
   /**
    * Returns the total initial margin requirement for a given account.
-   * This inclues initial margin on positions which is used for
-   * Place order, Withdrawal and Force Cancels
+   * This includes initial margin on positions which is used for
+   * Place order, withdrawal and force cancels
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
     let asset = fromProgramAsset(marginAccount.asset);
+    let marketMaker = types.isMarketMaker(marginAccount);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let ledger = marginAccount.productLedgers[i];
@@ -163,10 +165,12 @@ export class RiskCalculator {
       let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
       let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
-      if (size > 0) {
-        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
-      } else if (size < 0) {
-        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      if (!marketMaker) {
+        if (size > 0) {
+          longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        } else if (size < 0) {
+          shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        }
       }
 
       let marginForMarket =
@@ -184,6 +188,20 @@ export class RiskCalculator {
           -shortLots,
           types.MarginType.INITIAL
         );
+
+      if (marketMaker) {
+        // Mark initial margin to concession (only contains open order margin).
+        marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
+        // Add position margin which doesn't get concessions.
+        marginForMarket += this.getMarginRequirement(
+          asset,
+          i,
+          // This is signed.
+          convertNativeLotSizeToDecimal(size),
+          types.MarginType.MAINTENANCE
+        );
+      }
+
       if (marginForMarket !== undefined) {
         margin += marginForMarket;
       }

@@ -7,7 +7,12 @@ Version changes are pinned to SDK releases.
 
 ## [0.15.0]
 
+- client: Add extra safety around client state updates. ([#129](https://github.com/zetamarkets/sdk/pull/129))
+
+## [0.14.3]
+
 - program: Add Asset to MarginAccount, SpreadAccount and ZetaGroup. ([#126](https://github.com/zetamarkets/sdk/pull/126))
+- risk: Add functionality for market maker margin concessions. ([#128](https://github.com/zetamarkets/sdk/pull/128))
 
 ### Breaking
 

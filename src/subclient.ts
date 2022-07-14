@@ -166,6 +166,8 @@ export class SubClient {
 
   private _updatingState: boolean = false;
 
+  private _updatingStateTimestamp: number = undefined;
+
   private constructor(asset: Asset, parent: Client) {
     this._asset = asset;
     this._subExchange = Exchange.getSubExchange(asset);
@@ -328,14 +330,39 @@ export class SubClient {
     }
   }
 
+  private toggleUpdateState(toggleOn: boolean) {
+    if (toggleOn) {
+      this._updatingState = true;
+      this._updatingStateTimestamp = Date.now() / 1000;
+    } else {
+      this._updatingState = false;
+      this._updatingStateTimestamp = undefined;
+    }
+  }
+
+  // Safety to reset this._updatingState
+  private checkResetUpdatingState() {
+    if (
+      this._updatingState &&
+      Date.now() / 1000 - this._updatingStateTimestamp >
+        constants.UPDATING_STATE_LIMIT_SECONDS
+    ) {
+      this.toggleUpdateState(false);
+    }
+  }
+
   /**
    * Polls the margin account for the latest state.
    */
   public async updateState(fetch = true, force = false) {
+    this.checkResetUpdatingState();
+
     if (this._updatingState && !force) {
       return;
     }
-    this._updatingState = true;
+
+    this.toggleUpdateState(true);
+
     if (fetch) {
       try {
         this._marginAccount =
@@ -343,7 +370,7 @@ export class SubClient {
             this._marginAccountAddress
           )) as unknown as MarginAccount;
       } catch (e) {
-        this._updatingState = false;
+        this.toggleUpdateState(false);
         return;
       }
 
@@ -355,16 +382,18 @@ export class SubClient {
       } catch (e) {}
     }
 
-    if (this._marginAccount !== null) {
-      await this.updateOrders();
-      this.updateMarginPositions();
-    }
+    try {
+      if (this._marginAccount !== null) {
+        this.updateMarginPositions();
+        await this.updateOrders();
+      }
 
-    if (this._spreadAccount !== null) {
-      this.updateSpreadPositions();
-    }
+      if (this._spreadAccount !== null) {
+        this.updateSpreadPositions();
+      }
+    } catch (e) {}
 
-    this._updatingState = false;
+    this.toggleUpdateState(false);
   }
 
   /**
