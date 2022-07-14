@@ -4,7 +4,6 @@ import { SubExchange } from "./subexchange";
 import { SubClient } from "./subclient";
 import { Client } from "./client";
 import { InsuranceClient } from "./insurance-client";
-import * as network from "./network";
 import { Network } from "./network";
 import { Decimal } from "./decimal";
 import { Oracle, OraclePrice } from "./oracle";
@@ -12,6 +11,7 @@ import idl from "./idl/zeta.json";
 import { Wallet } from "@project-serum/anchor";
 import { Market } from "./market";
 
+import * as network from "./network";
 import * as assets from "./assets";
 import * as errors from "./errors";
 import * as utils from "./utils";
