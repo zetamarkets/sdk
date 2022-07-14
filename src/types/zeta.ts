@@ -3672,6 +3672,14 @@ export type Zeta = {
           {
             "name": "referrer",
             "type": "publicKey"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedRewards",
+            "type": "u64"
           }
         ]
       }
@@ -3695,6 +3703,14 @@ export type Zeta = {
           },
           {
             "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedRewards",
             "type": "u64"
           }
         ]
@@ -9168,6 +9184,14 @@ export const IDL: Zeta = {
           {
             "name": "referrer",
             "type": "publicKey"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedRewards",
+            "type": "u64"
           }
         ]
       }
@@ -9191,6 +9215,14 @@ export const IDL: Zeta = {
           },
           {
             "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedRewards",
             "type": "u64"
           }
         ]

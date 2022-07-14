@@ -3672,6 +3672,14 @@
           {
             "name": "referrer",
             "type": "publicKey"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedRewards",
+            "type": "u64"
           }
         ]
       }
@@ -3695,6 +3703,14 @@
           },
           {
             "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedRewards",
             "type": "u64"
           }
         ]
