@@ -1148,6 +1148,16 @@ expirationThresholdSeconds=${params.expirationThresholdSeconds}`
     );
     await utils.processTransaction(this._provider, tx);
   }
+
+  public async initializeReferrerAccount(referrer: PublicKey) {
+    let tx = new Transaction().add(
+      await instructions.initializeReferrerAccountIx(
+        referrer,
+        this._provider.wallet.publicKey
+      )
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
 }
 
 // Exchange singleton.

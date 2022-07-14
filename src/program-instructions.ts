@@ -1174,6 +1174,44 @@ export async function initializeWhitelistTradingFeesAccountIx(
   );
 }
 
+export async function referUserIx(
+  user: PublicKey,
+  referrer: PublicKey
+): Promise<TransactionInstruction> {
+  let [referrerAccount, _referrerAccountNonce] =
+    await utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
+
+  let [referralAccount, _referralAccountNonce] =
+    await utils.getReferralAccountAddress(Exchange.program.programId, user);
+
+  return Exchange.program.instruction.referUser({
+    accounts: {
+      user,
+      referrerAccount,
+      referralAccount,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export async function initializeReferrerAccountIx(
+  referrer: PublicKey,
+  admin: PublicKey
+): Promise<TransactionInstruction> {
+  let [referrerAccount, _referrerAccountNonce] =
+    await utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
+
+  return Exchange.program.instruction.initializeReferrerAccount({
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+      referrer,
+      referrerAccount,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
 export function settlePositionsTxs(
   expirationTs: anchor.BN,
   settlementPda: PublicKey,

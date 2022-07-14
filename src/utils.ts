@@ -394,6 +394,29 @@ export async function getSocializedLossAccount(
   );
 }
 
+export async function getReferrerAccountAddress(
+  programId: PublicKey,
+  referrer: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("referrer")),
+      referrer.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function getReferralAccountAddress(
+  programId: PublicKey,
+  user: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("referral")), user.toBuffer()],
+    programId
+  );
+}
+
 /**
  * Returns the expected PDA by serum to own the serum vault
  * Serum uses a u64 as nonce which is not the same as
