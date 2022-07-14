@@ -11,6 +11,7 @@ import idl from "./idl/zeta.json";
 import { Wallet } from "@project-serum/anchor";
 import { Market } from "./market";
 
+import * as network from "./network";
 import * as assets from "./assets";
 import * as errors from "./errors";
 import * as utils from "./utils";
@@ -34,6 +35,7 @@ export {
   Decimal,
   instructions,
   InsuranceClient,
+  network,
   Network,
   errors,
   Oracle,
