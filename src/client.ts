@@ -1,4 +1,12 @@
 import * as anchor from "@project-serum/anchor";
+import * as utils from "./utils";
+import { exchange as Exchange } from "./exchange";
+import {
+  SpreadAccount,
+  MarginAccount,
+  PositionMovementEvent,
+  ReferralAccount,
+} from "./program-types";
 import {
   PublicKey,
   Connection,
@@ -6,18 +14,12 @@ import {
   TransactionSignature,
   Transaction,
 } from "@solana/web3.js";
-import * as utils from "./utils";
 import * as constants from "./constants";
-import {
-  MarginAccount,
-  PositionMovementEvent,
-  SpreadAccount,
-} from "./program-types";
+import { referUserIx } from "./program-instructions";
 import { EventType } from "./events";
 import * as types from "./types";
 import { Asset } from "./assets";
 import { SubClient } from "./subclient";
-import { exchange as Exchange } from "./exchange";
 import * as instructions from "./program-instructions";
 import { assets } from ".";
 
@@ -34,7 +36,16 @@ export class Client {
   private _provider: anchor.AnchorProvider;
 
   /**
-   * Returns the user wallet public key.
+   * Stores the user referral account data.
+   */
+  public get referralAccount(): ReferralAccount | null {
+    return this._referralAccount;
+  }
+  private _referralAccount: ReferralAccount | null;
+  private _referralAccountAddress: PublicKey;
+
+  /**
+   * Client margin account address.
    */
   public get publicKey(): PublicKey {
     return this.provider.wallet.publicKey;
@@ -69,6 +80,10 @@ export class Client {
    */
   private _pollIntervalId: any;
 
+  public get subClients(): Map<Asset, SubClient> {
+    return this._subClients;
+  }
+
   private constructor(
     connection: Connection,
     wallet: types.Wallet,
@@ -76,10 +91,7 @@ export class Client {
   ) {
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._subClients = new Map();
-  }
-
-  public get subClients(): Map<Asset, SubClient> {
-    return this._subClients;
+    this._referralAccount = null;
   }
   private _subClients: Map<Asset, SubClient>;
 
@@ -140,6 +152,23 @@ export class Client {
     );
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
+    client._referralAccountAddress = undefined;
+    try {
+      let [referralAccountAddress, _nonce] =
+        await utils.getReferralAccountAddress(
+          Exchange.programId,
+          wallet.publicKey
+        );
+
+      client._referralAccountAddress = referralAccountAddress;
+      client._referralAccount =
+        (await Exchange.program.account.referralAccount.fetch(
+          referralAccountAddress
+        )) as unknown as ReferralAccount;
+      console.log(
+        `User has been referred by ${client._referralAccount.referrer.toString()}.`
+      );
+    } catch (e) {}
 
     return client;
   }
@@ -154,6 +183,31 @@ export class Client {
 
   public getAllSubClients(): SubClient[] {
     return [...this._subClients.values()];
+    // This is referring itself by another referrer.
+  }
+
+  public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
+    let [referrerAccount] = await utils.getReferrerAccountAddress(
+      Exchange.programId,
+      referrer
+    );
+
+    try {
+      await Exchange.program.account.referrerAccount.fetch(referrerAccount);
+    } catch (e) {
+      throw Error(`Invalid referrer. ${referrer.toString()}`);
+    }
+    let tx = new Transaction().add(
+      await referUserIx(this.provider.wallet.publicKey, referrer)
+    );
+    let txId = await utils.processTransaction(this.provider, tx);
+
+    this._referralAccount =
+      (await Exchange.program.account.referralAccount.fetch(
+        this._referralAccountAddress
+      )) as unknown as ReferralAccount;
+
+    return txId;
   }
 
   /**

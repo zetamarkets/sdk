@@ -53,6 +53,16 @@ export function toProgramSide(side: Side) {
   throw Error("Invalid side");
 }
 
+export function fromProgramSide(side: any): Side {
+  if (objectEquals(side, { bid: {} })) {
+    return Side.BID;
+  }
+  if (objectEquals(side, { ask: {} })) {
+    return Side.ASK;
+  }
+  throw Error("Invalid program side!");
+}
+
 export enum Kind {
   UNINITIALIZED = "uninitialized",
   CALL = "call",
