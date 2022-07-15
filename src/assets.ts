@@ -1,4 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
+import { objectEquals } from "./utils";
 
 // Ordered in underlying sequence number.
 export enum Asset {
@@ -65,8 +66,14 @@ export function toProgramAsset(asset: Asset) {
 }
 
 export function fromProgramAsset(asset: any) {
-  if (asset.sol != undefined) return Asset.SOL;
-  if (asset.btc != undefined) return Asset.BTC;
-  if (asset.eth != undefined) return Asset.ETH;
+  if (objectEquals(asset, { sol: {} })) {
+    return Asset.SOL;
+  }
+  if (objectEquals(asset, { btc: {} })) {
+    return Asset.BTC;
+  }
+  if (objectEquals(asset, { eth: {} })) {
+    return Asset.ETH;
+  }
   throw Error("Invalid asset");
 }
