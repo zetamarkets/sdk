@@ -630,6 +630,10 @@ export class Exchange {
     await this.getSubExchange(asset).updatePricingParameters(args);
   }
 
+  public getMarginParams(asset: Asset) {
+    return this.getSubExchange(asset).marginParams;
+  }
+
   public async updateMarginParameters(
     asset: Asset,
     args: instructions.UpdateMarginParametersArgs
