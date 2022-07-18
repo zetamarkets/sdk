@@ -1,5 +1,12 @@
 import * as anchor from "@project-serum/anchor";
-import { constants, Client, Exchange, programTypes } from "@zetamarkets/sdk";
+import {
+  constants,
+  Client,
+  Exchange,
+  programTypes,
+  assets,
+} from "@zetamarkets/sdk";
+import { asset } from "./liquidator";
 
 export async function findAccountsAtRisk(
   accounts: anchor.ProgramAccount[]
@@ -74,27 +81,29 @@ export async function cancelAllActiveOrders(
   await Promise.all(
     accountsAtRisk.map(async (programAccount) => {
       let marginAccount = programAccount.account as programTypes.MarginAccount;
-      for (var i = 0; i < marginAccount.positions.length; i++) {
+      for (var i = 0; i < marginAccount.productLedgers.length; i++) {
         // If they have any active orders, we can cancel.
-        let position = marginAccount.positions[i];
+        let position = marginAccount.productLedgers[i].orderState;
         if (
           position.openingOrders[0].toNumber() != 0 ||
           position.openingOrders[1].toNumber() != 0 ||
           position.closingOrders.toNumber() != 0
         ) {
+          let market = Exchange.getMarket(asset, i);
           console.log(
             "[FORCE_CANCEL] " +
               programAccount.publicKey.toString() +
               " [KIND] " +
-              Exchange.markets.markets[i].kind +
+              market.kind +
               " [STRIKE] " +
-              Exchange.markets.markets[i].strike +
+              market.strike +
               " [EXPIRY] " +
-              new Date(Exchange.markets.markets[i].expirySeries.expiryTs * 1000)
+              new Date(market.expirySeries.expiryTs * 1000)
           );
           try {
             await client.forceCancelOrders(
-              Exchange.markets.markets[i].address,
+              asset,
+              market.address,
               programAccount.publicKey
             );
           } catch (e) {
@@ -118,16 +127,18 @@ export async function liquidateAccounts(
 
     for (
       var marketIndex = 0;
-      marketIndex < liquidateeMarginAccount.positions.length;
+      marketIndex < liquidateeMarginAccount.productLedgers.length;
       marketIndex++
     ) {
       const position =
-        liquidateeMarginAccount.positions[marketIndex].position.toNumber();
+        liquidateeMarginAccount.productLedgers[
+          marketIndex
+        ].position.size.toNumber();
 
       // Cannot liquidate a position on an expired market.
       if (
         position == 0 ||
-        !Exchange.markets.markets[marketIndex].expirySeries.isLive()
+        !Exchange.getMarket(asset, marketIndex).expirySeries.isLive()
       ) {
         continue;
       }
@@ -135,7 +146,7 @@ export async function liquidateAccounts(
       // Get latest state for your margin account.
       await client.updateState();
       let clientState = Exchange.riskCalculator.getMarginAccountState(
-        client.marginAccount
+        client.getMarginAccount(asset)
       );
 
       let marginConstrainedSize = calculateMaxLiquidationNativeSize(
@@ -147,17 +158,17 @@ export async function liquidateAccounts(
       const size = Math.min(marginConstrainedSize, Math.abs(position));
       const side = position > 0 ? "Bid" : "Ask";
 
+      let market = Exchange.getMarket(asset, marketIndex);
+
       console.log(
         "[LIQUIDATE] " +
           liquidateeKey.toString() +
           " [KIND] " +
-          Exchange.markets.markets[marketIndex].kind +
+          market.kind +
           " [STRIKE] " +
-          Exchange.markets.markets[marketIndex].strike +
+          market.strike +
           " [EXPIRY] " +
-          new Date(
-            Exchange.markets.markets[marketIndex].expirySeries.expiryTs * 1000
-          ) +
+          new Date(market.expirySeries.expiryTs * 1000) +
           " [SIDE] " +
           side +
           " [AMOUNT] " +
@@ -169,7 +180,8 @@ export async function liquidateAccounts(
       );
       try {
         let txId = await client.liquidate(
-          Exchange.markets.markets[marketIndex].address,
+          asset,
+          market.address,
           liquidateeKey,
           size
         );
@@ -195,8 +207,10 @@ export function calculateMaxLiquidationNativeSize(
   // Initial margin requirement per contract in decimals.
   // We use this so you are not at margin requirement limits after liquidation.
   let initialMarginRequirement = long
-    ? Exchange.riskCalculator.marginRequirement[marketIndex].initialLong
-    : Exchange.riskCalculator.marginRequirement[marketIndex].initialShort;
+    ? Exchange.riskCalculator.getMarginRequirements(asset)[marketIndex]
+        .initialLong
+    : Exchange.riskCalculator.getMarginRequirements(asset)[marketIndex]
+        .initialShort;
 
   return parseInt(
     (
