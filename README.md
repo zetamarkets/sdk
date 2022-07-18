@@ -31,7 +31,7 @@ This is the typescript library to interact with our Zeta program smart contract.
 | ----------- | :------------------------------------------: |
 | NETWORK_URL |        https://api.devnet.solana.com         |
 | PROGRAM_ID  | BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7 |
-| SERVER_URL  |         https://server.zeta.markets          |
+| SERVER_URL  |  https://dex-devnet-webserver.zeta.markets   |
 
 ## Mainnet variables
 

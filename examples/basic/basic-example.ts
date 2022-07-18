@@ -61,20 +61,33 @@ export async function orderbookRequest(
 }
 
 async function main() {
-  // Loads the private key in .env
-  const privateKey = Keypair.fromSecretKey(
-    new Uint8Array(JSON.parse(Buffer.from(process.env.private_key!).toString()))
-  );
+  // Generate a new keypair for wallet otherwise load from a private key.
+  const userKey = Keypair.generate();
 
-  const wallet = new Wallet(privateKey);
+  // Loads the private key in .env
+  // const userKey = Keypair.fromSecretKey(
+  //   new Uint8Array(JSON.parse(Buffer.from(process.env.private_key!).toString()))
+  // );
+
+  const wallet = new Wallet(userKey);
 
   // Create a solana web3 connection to devnet.
   const connection: Connection = new Connection(NETWORK_URL, "confirmed");
 
-  console.time("Full load + placeorder");
-  console.time("SubExchange load");
+  // Airdropping SOL.
+  await connection.requestAirdrop(wallet.publicKey, 100000000);
+
+  await fetch(`${SERVER_URL}/faucet/USDC`, {
+    method: "post",
+    body: JSON.stringify({
+      key: wallet.publicKey.toString(),
+      amount: 10_000,
+    }),
+    headers: { "Content-Type": "application/json" },
+  });
+
   await Exchange.load(
-    assets.allAssets(),
+    [assets.Asset.SOL, assets.Asset.BTC],
     PROGRAM_ID,
     Network.DEVNET,
     connection,
@@ -83,128 +96,58 @@ async function main() {
     undefined
     // exchangeCallback
   );
-  console.timeEnd("SubExchange load");
-  console.time("SubClient load");
+
   const client = await Client.load(
     connection,
     wallet,
     undefined
     // clientCallback
   );
-  console.timeEnd("SubClient load");
 
-  // await mint(
-  //   connection,
-  //   wallet,
-  //   privateKey,
-  //   client,
-  //   assets.Asset.SOL,
-  //   true
-  // );
-  // await mint(
-  //   connection,
-  //   wallet,
-  //   privateKey,
-  //   client,
-  //   assets.Asset.BTC,
-  //   true
-  // );
+  await client.deposit(
+    assets.Asset.BTC,
+    utils.convertDecimalToNativeInteger(STARTING_BALANCE)
+  );
 
   utils.displayState();
 
   // Show current orderbook for a market.
   const index = 10;
-  console.time("Update orderbook");
-  await Exchange.updateOrderbook(assets.Asset.SOL, index);
   await Exchange.updateOrderbook(assets.Asset.BTC, index);
-  console.timeEnd("Update orderbook");
-
-  console.log(`SOL market ${index} orderbook:`);
-  console.log(Exchange.getOrderbook(assets.Asset.SOL, index));
   console.log(`BTC market ${index} orderbook:`);
   console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
 
-  // Place bid orders.
-  console.time("Cancel orders");
-  await client.cancelAllOrders(assets.Asset.SOL);
-  await client.cancelAllOrders(assets.Asset.BTC);
-  console.timeEnd("Cancel orders");
-  console.time("Place order");
-
-  await client.placeOrder(
-    assets.Asset.SOL,
-    index,
-    utils.convertDecimalToNativeInteger(0.1),
-    100,
-    types.Side.BID,
-    types.OrderType.LIMIT
-  );
+  // Place bid orders
   await client.placeOrder(
     assets.Asset.BTC,
     index,
     utils.convertDecimalToNativeInteger(0.1),
-    200,
+    utils.convertDecimalToNativeLotSize(2),
     types.Side.BID,
     types.OrderType.LIMIT
   );
-  console.timeEnd("Place order");
-  console.timeEnd("Full load + placeorder");
-
-  console.time("Update state");
-
-  await client.updateState(assets.Asset.SOL);
-  await client.updateState(assets.Asset.BTC);
-  console.log("Margin account positions:", client.marginPositions);
-  console.log("Spread account positions:", client.spreadPositions);
-
-  console.timeEnd("Update state");
 
   // See our order in the orderbook.
-  // NOTE: Orderbook depth is capped to what is set, default = 5.
-  // Set via `Exchange.getSubExchange(assets.Asset.SOL).markets.orderbookDepth = N`.
-
-  await Exchange.updateOrderbook(assets.Asset.SOL, index);
   await Exchange.updateOrderbook(assets.Asset.BTC, index);
-
-  console.log(`SOL market ${index} orderbook after our orders:`);
-  console.log(Exchange.getOrderbook(assets.Asset.SOL, index));
-  console.log(`BTC market ${index} orderbook after our orders:`);
+  console.log(`BTC market ${index} orderbook after our order:`);
   console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
 
-  // Avoid a self-trade
-  // Alternatively call client.cancelAllOrdersAllAssets()
-  await client.cancelAllOrdersNoError(assets.Asset.SOL);
-  await client.cancelAllOrdersNoError(assets.Asset.BTC);
-
-  // Place an order in cross with offers to get a position.
-  await client.placeOrder(
-    assets.Asset.BTC,
-    index,
-    utils.convertDecimalToNativeInteger(0.2),
-    100,
-    types.Side.ASK,
-    types.OrderType.LIMIT
-  );
-
-  await client.updateState(assets.Asset.SOL);
+  // See our positions
   await client.updateState(assets.Asset.BTC);
-  console.log("Margin account positions:", client.marginPositions);
-  console.log("Spread account positions:", client.spreadPositions);
+  console.log(
+    "BTC margin account positions:",
+    client.getMarginPositions(assets.Asset.BTC)
+  );
 
   // Check mark prices for the product.
   console.log(
-    "SOL mark price:",
-    Exchange.getMarkPrice(assets.Asset.SOL, index),
     "BTC mark price:",
     Exchange.getMarkPrice(assets.Asset.BTC, index)
   );
 
   // Calculate user margin account state.
-  let marginAccountStateSol = client.getMarginAccountState(assets.Asset.SOL);
-  let marginAccountStateBtc = client.getMarginAccountState(assets.Asset.BTC);
-
-  console.log("BTC Margin account state:", marginAccountStateSol);
-  console.log("SOL Margin account state:", marginAccountStateBtc);
+  let marginAccountState = client.getMarginAccountState(assets.Asset.BTC);
+  console.log("BTC Margin account state:", marginAccountState);
 }
 
 main().catch(console.error.bind(console));
