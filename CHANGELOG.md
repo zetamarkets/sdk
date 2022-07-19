@@ -9,7 +9,7 @@ Version changes are pinned to SDK releases.
 
 - general: Multiasset support. ([#124](https://github.com/zetamarkets/sdk/pull/124)).
   - A lot of breaking changes, please see below and updated README.md
-  - (TODO INSERT LINK) A guide on how to migrate from older versions to 0.16.0 is available on https://zetamarkets.gitbook.io/zeta/
+  - A guide on how to migrate from older versions to 0.16.0 is available on ([Gitbook](https://zetamarkets.gitbook.io/zeta/build-with-zeta/zeta-sdk/))multi-asset-sdk-guide
 
 ### Breaking
 
