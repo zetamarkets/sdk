@@ -34,32 +34,6 @@ async function clientCallback(
   console.log(`[ClientCallback] Asset=${assets.assetToName(asset)}`);
 }
 
-export async function welcomeServer() {
-  return await fetch(`${process.env.server_url}/`, {
-    method: "post",
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
-export async function orderbookRequest(
-  asset: assets.Asset,
-  marketIndex: number
-) {
-  let text =
-    `${process.env.server_url}/orderbook?asset=` +
-    assets.assetToName(asset) +
-    "&marketIndex=" +
-    marketIndex;
-  try {
-    return await fetch(text, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (e) {
-    console.log(e);
-  }
-}
-
 async function main() {
   // Generate a new keypair for wallet otherwise load from a private key.
   const userKey = Keypair.generate();
