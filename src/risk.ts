@@ -1,74 +1,83 @@
 import { exchange as Exchange } from "./exchange";
-import {
-  Kind,
-  MarginType,
-  MarginRequirement,
-  MarginAccountState,
-  ProgramAccountType,
-  isMarketMaker,
-} from "./types";
-import { ACTIVE_MARKETS } from "./constants";
+import * as types from "./types";
+import * as constants from "./constants";
 import { SpreadAccount, MarginAccount } from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
+import { Asset, fromProgramAsset } from "./assets";
 
 export class RiskCalculator {
-  /**
-   * Returns the margin requirements for all markets,
-   * indexed by market index.
-   */
-  public get marginRequirement(): Array<MarginRequirement> {
-    return this._marginRequirements;
-  }
-  private _marginRequirements: Array<MarginRequirement>;
+  private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
 
-  public constructor() {
-    this._marginRequirements = new Array(ACTIVE_MARKETS);
-  }
-
-  public updateMarginRequirements() {
-    if (Exchange.greeks === undefined || Exchange.oracle === undefined) {
-      return;
+  public constructor(assets: Asset[]) {
+    this._marginRequirements = new Map();
+    for (var asset of assets) {
+      this._marginRequirements.set(asset, new Array(constants.ACTIVE_MARKETS));
     }
-    let oraclePrice = Exchange.oracle.getPrice("SOL/USD");
+  }
+
+  public getMarginRequirements(asset: Asset): Array<types.MarginRequirement> {
+    return this._marginRequirements.get(asset);
+  }
+
+  public updateMarginRequirements(asset: Asset) {
+    if (
+      Exchange.getSubExchange(asset).greeks === undefined ||
+      Exchange.oracle === undefined
+    ) {
+      throw Error("Pricing (greeks and/or oracle) is not initialized");
+    }
+    let oraclePrice = Exchange.oracle.getPrice(asset);
     let spotPrice = oraclePrice === null ? 0 : oraclePrice.price;
-    for (var i = 0; i < this._marginRequirements.length; i++) {
-      this._marginRequirements[i] = calculateProductMargin(i, spotPrice);
+    for (var i = 0; i < this._marginRequirements.get(asset).length; i++) {
+      this._marginRequirements.get(asset)[i] = calculateProductMargin(
+        asset,
+        i,
+        spotPrice
+      );
     }
   }
 
   /**
    * Returns the margin requirement for a given market and size.
+   * @param asset          underlying asset type.
    * @param productIndex   market index of the product to calculate margin for.
    * @param size           signed integer of size for margin requirements (short orders should be negative)
    * @param marginType     type of margin calculation.
    */
   public getMarginRequirement(
+    asset: Asset,
     productIndex: number,
     size: number,
-    marginType: MarginType
+    marginType: types.MarginType
   ): number {
-    if (this._marginRequirements[productIndex] === null) {
-      return 0;
+    if (this._marginRequirements.get(asset)[productIndex] === null) {
+      return null;
     }
 
     if (size > 0) {
-      if (marginType == MarginType.INITIAL) {
-        return size * this._marginRequirements[productIndex].initialLong;
+      if (marginType == types.MarginType.INITIAL) {
+        return (
+          size * this._marginRequirements.get(asset)[productIndex].initialLong
+        );
       } else {
-        return size * this._marginRequirements[productIndex].maintenanceLong;
+        return (
+          size *
+          this._marginRequirements.get(asset)[productIndex].maintenanceLong
+        );
       }
     } else {
-      if (marginType == MarginType.INITIAL) {
+      if (marginType == types.MarginType.INITIAL) {
         return (
-          Math.abs(size) * this._marginRequirements[productIndex].initialShort
+          Math.abs(size) *
+          this._marginRequirements.get(asset)[productIndex].initialShort
         );
       } else {
         return (
           Math.abs(size) *
-          this._marginRequirements[productIndex].maintenanceShort
+          this._marginRequirements.get(asset)[productIndex].maintenanceShort
         );
       }
     }
@@ -102,27 +111,32 @@ export class RiskCalculator {
    */
   public calculateUnrealizedPnl(
     account: any,
-    accountType: ProgramAccountType = ProgramAccountType.MarginAccount
+    accountType: types.ProgramAccountType = types.ProgramAccountType
+      .MarginAccount
   ): number {
     let pnl = 0;
-    for (var i = 0; i < ACTIVE_MARKETS; i++) {
+
+    for (var i = 0; i < constants.ACTIVE_MARKETS; i++) {
       const position =
-        accountType == ProgramAccountType.MarginAccount
+        accountType == types.ProgramAccountType.MarginAccount
           ? account.productLedgers[i].position
           : account.positions[i];
       const size = position.size.toNumber();
       if (size == 0) {
         continue;
       }
+      let subExchange = Exchange.getSubExchange(
+        fromProgramAsset(account.asset)
+      );
       if (size > 0) {
         pnl +=
           convertNativeLotSizeToDecimal(size) *
-            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) -
+            convertNativeBNToDecimal(subExchange.greeks.markPrices[i]) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
           convertNativeLotSizeToDecimal(size) *
-            convertNativeBNToDecimal(Exchange.greeks.markPrices[i]) +
+            convertNativeBNToDecimal(subExchange.greeks.markPrices[i]) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
     }
@@ -136,7 +150,8 @@ export class RiskCalculator {
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
-    let marketMaker = isMarketMaker(marginAccount);
+    let asset = fromProgramAsset(marginAccount.asset);
+    let marketMaker = types.isMarketMaker(marginAccount);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let ledger = marginAccount.productLedgers[i];
@@ -160,16 +175,18 @@ export class RiskCalculator {
 
       let marginForMarket =
         this.getMarginRequirement(
+          asset,
           i,
           // Positive for buys.
           longLots,
-          MarginType.INITIAL
+          types.MarginType.INITIAL
         ) +
         this.getMarginRequirement(
+          asset,
           i,
           // Negative for sells.
           -shortLots,
-          MarginType.INITIAL
+          types.MarginType.INITIAL
         );
 
       if (marketMaker) {
@@ -177,10 +194,11 @@ export class RiskCalculator {
         marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
         // Add position margin which doesn't get concessions.
         marginForMarket += this.getMarginRequirement(
+          asset,
           i,
           // This is signed.
           convertNativeLotSizeToDecimal(size),
-          MarginType.MAINTENANCE
+          types.MarginType.MAINTENANCE
         );
       }
 
@@ -195,9 +213,11 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account.
    * This only uses maintenance margin on positions and is used for
    * liquidations.
+   * @param asset           underlying asset type
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
+    let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let position = marginAccount.productLedgers[i].position;
@@ -206,10 +226,11 @@ export class RiskCalculator {
         continue;
       }
       let positionMargin = this.getMarginRequirement(
+        asset,
         i,
         // This is signed.
         convertNativeLotSizeToDecimal(size),
-        MarginType.MAINTENANCE
+        types.MarginType.MAINTENANCE
       );
       if (positionMargin !== undefined) {
         margin += positionMargin;
@@ -222,11 +243,13 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account including orders.
    * This calculates maintenance margin across all positions and orders.
    * This value is used to determine margin when sending a closing order only.
+   * @param asset           underlying asset type
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalMaintenanceMarginIncludingOrders(
     marginAccount: MarginAccount
   ): number {
+    let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
     for (var i = 0; i < marginAccount.productLedgers.length; i++) {
       let ledger = marginAccount.productLedgers[i];
@@ -248,16 +271,18 @@ export class RiskCalculator {
 
       let marginForMarket =
         this.getMarginRequirement(
+          asset,
           i,
           // Positive for buys.
           longLots,
-          MarginType.MAINTENANCE
+          types.MarginType.MAINTENANCE
         ) +
         this.getMarginRequirement(
+          asset,
           i,
           // Negative for sells.
           -shortLots,
-          MarginType.MAINTENANCE
+          types.MarginType.MAINTENANCE
         );
       if (marginForMarket !== undefined) {
         margin += marginForMarket;
@@ -272,7 +297,7 @@ export class RiskCalculator {
    */
   public getMarginAccountState(
     marginAccount: MarginAccount
-  ): MarginAccountState {
+  ): types.MarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
@@ -323,15 +348,15 @@ export function calculateLiquidationPrice(
  * @param spotPrice     price of the spot.
  */
 export function calculateOtmAmount(
-  kind: Kind,
+  kind: types.Kind,
   strike: number,
   spotPrice: number
 ): number {
   switch (kind) {
-    case Kind.CALL: {
+    case types.Kind.CALL: {
       return Math.max(0, strike - spotPrice);
     }
-    case Kind.PUT: {
+    case types.Kind.PUT: {
       return Math.max(0, spotPrice - strike);
     }
     default:
@@ -341,38 +366,47 @@ export function calculateOtmAmount(
 
 /**
  * Calculates the margin requirement for given market index.
+ * @param asset         underlying asset (SOL, BTC, etc.)
  * @param productIndex  market index of the product.
  * @param spotPrice     price of the spot.
  */
 export function calculateProductMargin(
+  asset: Asset,
   productIndex: number,
   spotPrice: number
-): MarginRequirement {
-  let market = Exchange.markets.markets[productIndex];
+): types.MarginRequirement {
+  let subExchange = Exchange.getSubExchange(asset);
+  let market = subExchange.markets.markets[productIndex];
   if (market.strike == null) {
     return null;
   }
   let kind = market.kind;
   let strike = market.strike;
   let markPrice = convertNativeBNToDecimal(
-    Exchange.greeks.markPrices[productIndex]
+    subExchange.greeks.markPrices[productIndex]
   );
   switch (kind) {
-    case Kind.FUTURE:
-      return calculateFutureMargin(spotPrice);
-    case Kind.CALL:
-    case Kind.PUT:
-      return calculateOptionMargin(spotPrice, markPrice, kind, strike);
+    case types.Kind.FUTURE:
+      return calculateFutureMargin(asset, spotPrice);
+    case types.Kind.CALL:
+    case types.Kind.PUT:
+      return calculateOptionMargin(asset, spotPrice, markPrice, kind, strike);
   }
 }
 
 /**
  * Calculates the margin requirement for a future.
+ * @param asset         underlying asset (SOL, BTC, etc.)
  * @param spotPrice     price of the spot.
  */
-export function calculateFutureMargin(spotPrice: number): MarginRequirement {
-  let initial = spotPrice * Exchange.marginParams.futureMarginInitial;
-  let maintenance = spotPrice * Exchange.marginParams.futureMarginMaintenance;
+export function calculateFutureMargin(
+  asset: Asset,
+  spotPrice: number
+): types.MarginRequirement {
+  let subExchange = Exchange.getSubExchange(asset);
+  let initial = spotPrice * subExchange.marginParams.futureMarginInitial;
+  let maintenance =
+    spotPrice * subExchange.marginParams.futureMarginMaintenance;
   return {
     initialLong: initial,
     initialShort: initial,
@@ -382,54 +416,60 @@ export function calculateFutureMargin(spotPrice: number): MarginRequirement {
 }
 
 /**
+ * @param asset             underlying asset (SOL, BTC, etc.)
  * @param markPrice         mark price of product being calculated.
  * @param spotPrice         spot price of the underlying from oracle.
  * @param strike            strike of the option.
  * @param kind              kind of the option (expect CALL/PUT)
  */
 export function calculateOptionMargin(
+  asset: Asset,
   spotPrice: number,
   markPrice: number,
-  kind: Kind,
+  kind: types.Kind,
   strike: number
-): MarginRequirement {
+): types.MarginRequirement {
   let otmAmount = calculateOtmAmount(kind, strike, spotPrice);
   let initialLong = calculateLongOptionMargin(
+    asset,
     spotPrice,
     markPrice,
-    MarginType.INITIAL
+    types.MarginType.INITIAL
   );
   let initialShort = calculateShortOptionMargin(
+    asset,
     spotPrice,
     otmAmount,
-    MarginType.INITIAL
+    types.MarginType.INITIAL
   );
   let maintenanceLong = calculateLongOptionMargin(
+    asset,
     spotPrice,
     markPrice,
-    MarginType.MAINTENANCE
+    types.MarginType.MAINTENANCE
   );
   let maintenanceShort = calculateShortOptionMargin(
+    asset,
     spotPrice,
     otmAmount,
-    MarginType.MAINTENANCE
+    types.MarginType.MAINTENANCE
   );
-
+  let subExchange = Exchange.getSubExchange(asset);
   return {
     initialLong,
     initialShort:
-      kind == Kind.PUT
+      kind == types.Kind.PUT
         ? Math.min(
             initialShort,
-            Exchange.marginParams.optionShortPutCapPercentage * strike
+            subExchange.marginParams.optionShortPutCapPercentage * strike
           )
         : initialShort,
     maintenanceLong,
     maintenanceShort:
-      kind == Kind.PUT
+      kind == types.Kind.PUT
         ? Math.min(
             maintenanceShort,
-            Exchange.marginParams.optionShortPutCapPercentage * strike
+            subExchange.marginParams.optionShortPutCapPercentage * strike
           )
         : maintenanceShort,
   };
@@ -437,24 +477,27 @@ export function calculateOptionMargin(
 
 /**
  * Calculates the margin requirement for a short option.
+ * @param asset        underlying asset (SOL, BTC, etc.)
  * @param spotPrice    margin account balance.
  * @param otmAmount    otm amount calculated `from calculateOtmAmount`
  * @param marginType   type of margin calculation
  */
 export function calculateShortOptionMargin(
+  asset: Asset,
   spotPrice: number,
   otmAmount: number,
-  marginType: MarginType
+  marginType: types.MarginType
 ): number {
+  let subExchange = Exchange.getSubExchange(asset);
   let basePercentageShort =
-    marginType == MarginType.INITIAL
-      ? Exchange.marginParams.optionDynamicPercentageShortInitial
-      : Exchange.marginParams.optionDynamicPercentageShortMaintenance;
+    marginType == types.MarginType.INITIAL
+      ? subExchange.marginParams.optionDynamicPercentageShortInitial
+      : subExchange.marginParams.optionDynamicPercentageShortMaintenance;
 
   let spotPricePercentageShort =
-    marginType == MarginType.INITIAL
-      ? Exchange.marginParams.optionSpotPercentageShortInitial
-      : Exchange.marginParams.optionSpotPercentageShortMaintenance;
+    marginType == types.MarginType.INITIAL
+      ? subExchange.marginParams.optionSpotPercentageShortInitial
+      : subExchange.marginParams.optionSpotPercentageShortMaintenance;
 
   let dynamicMargin = spotPrice * (basePercentageShort - otmAmount / spotPrice);
   let minMargin = spotPrice * spotPricePercentageShort;
@@ -463,24 +506,27 @@ export function calculateShortOptionMargin(
 
 /**
  * Calculates the margin requirement for a long option.
+ * @param asset        underlying asset (SOL, BTC, etc.)
  * @param spotPrice    margin account balance.
  * @param markPrice    mark price of option from greeks account.
  * @param marginType   type of margin calculation
  */
 export function calculateLongOptionMargin(
+  asset: Asset,
   spotPrice: number,
   markPrice: number,
-  marginType: MarginType
+  marginType: types.MarginType
 ): number {
+  let subExchange = Exchange.getSubExchange(asset);
   let markPercentageLong =
-    marginType == MarginType.INITIAL
-      ? Exchange.marginParams.optionMarkPercentageLongInitial
-      : Exchange.marginParams.optionMarkPercentageLongMaintenance;
+    marginType == types.MarginType.INITIAL
+      ? subExchange.marginParams.optionMarkPercentageLongInitial
+      : subExchange.marginParams.optionMarkPercentageLongMaintenance;
 
   let spotPercentageLong =
-    marginType == MarginType.INITIAL
-      ? Exchange.marginParams.optionSpotPercentageLongInitial
-      : Exchange.marginParams.optionSpotPercentageLongMaintenance;
+    marginType == types.MarginType.INITIAL
+      ? subExchange.marginParams.optionSpotPercentageLongInitial
+      : subExchange.marginParams.optionSpotPercentageLongMaintenance;
 
   return Math.min(
     markPrice * markPercentageLong,

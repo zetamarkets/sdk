@@ -7,20 +7,42 @@ import {
   Network,
   utils,
   types,
+  assets,
+  events,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import fetch from "node-fetch";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
-const PROGRAM_ID = new PublicKey(process.env["program_id"]);
-const STARTING_BALANCE = 10_000;
+const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
+const STARTING_BALANCE = 5_000;
 
-console.log(NETWORK_URL);
+async function exchangeCallback(
+  asset: assets.Asset,
+  _eventType: events.EventType,
+  _data: any
+) {
+  console.log(`[ExchangeCallback] Asset=${assets.assetToName(asset)}`);
+}
+
+async function clientCallback(
+  asset: assets.Asset,
+  _eventType: events.EventType,
+  _data: any
+) {
+  console.log(`[ClientCallback] Asset=${assets.assetToName(asset)}`);
+}
 
 async function main() {
   // Generate a new keypair for wallet otherwise load from a private key.
   const userKey = Keypair.generate();
+
+  // Loads the private key in .env
+  // const userKey = Keypair.fromSecretKey(
+  //   new Uint8Array(JSON.parse(Buffer.from(process.env.private_key!).toString()))
+  // );
+
   const wallet = new Wallet(userKey);
 
   // Create a solana web3 connection to devnet.
@@ -39,74 +61,67 @@ async function main() {
   });
 
   await Exchange.load(
+    [assets.Asset.SOL, assets.Asset.BTC],
     PROGRAM_ID,
     Network.DEVNET,
     connection,
     utils.defaultCommitment(),
-    // Exchange wallet can be ignored for normal clients.
     undefined,
-    // ThrottleMs - increase if you are running into rate limit issues on startup.
-    0
+    undefined
+    // exchangeCallback
   );
 
   const client = await Client.load(
     connection,
     wallet,
-    utils.defaultCommitment(),
     undefined
+    // clientCallback
   );
 
-  await client.deposit(utils.convertDecimalToNativeInteger(STARTING_BALANCE));
+  await client.deposit(
+    assets.Asset.BTC,
+    utils.convertDecimalToNativeInteger(STARTING_BALANCE)
+  );
 
-  // Display existing exchange state.
   utils.displayState();
 
   // Show current orderbook for a market.
-  // Pick INDEX: 6 KIND: call STRIKE: 235
+  const index = 10;
+  await Exchange.updateOrderbook(assets.Asset.BTC, index);
+  console.log(`BTC market ${index} orderbook:`);
+  console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
 
-  const index = 2;
-  await Exchange.markets.markets[index].updateOrderbook();
-  console.log(Exchange.markets.markets[index].orderbook);
-
-  const orderPrice = utils.convertDecimalToNativeInteger(8);
-  const orderLots = 1;
-
-  // Place a bid order.
+  // Place bid orders
   await client.placeOrder(
-    Exchange.markets.markets[index].address,
-    orderPrice,
-    orderLots,
-    types.Side.BID
+    assets.Asset.BTC,
+    index,
+    utils.convertDecimalToNativeInteger(0.1),
+    utils.convertDecimalToNativeLotSize(2),
+    types.Side.BID,
+    types.OrderType.LIMIT
   );
-
-  // See our orders.
-  await client.updateState();
-  console.log(client.orders);
 
   // See our order in the orderbook.
-  // NOTE: Orderbook depth is capped to what is set, default = 5.
-  // Set via `Exchange.markets.orderbookDepth = N`.
-  console.log(Exchange.markets.markets[index].orderbook);
+  await Exchange.updateOrderbook(assets.Asset.BTC, index);
+  console.log(`BTC market ${index} orderbook after our order:`);
+  console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
 
-  // Place an order in cross with offers to get a position.
-  await client.placeOrder(
-    Exchange.markets.markets[index].address,
-    utils.convertDecimalToNativeInteger(10),
-    orderLots,
-    types.Side.BID
+  // See our positions
+  await client.updateState(assets.Asset.BTC);
+  console.log(
+    "BTC margin account positions:",
+    client.getMarginPositions(assets.Asset.BTC)
   );
-
-  await client.updateState();
-  console.log(client.positions);
 
   // Check mark prices for the product.
-  console.log(Exchange.getMarkPrice(index));
+  console.log(
+    "BTC mark price:",
+    Exchange.getMarkPrice(assets.Asset.BTC, index)
+  );
 
   // Calculate user margin account state.
-  let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
-    client.marginAccount
-  );
-  console.log(marginAccountState);
+  let marginAccountState = client.getMarginAccountState(assets.Asset.BTC);
+  console.log("BTC Margin account state:", marginAccountState);
 }
 
 main().catch(console.error.bind(console));

@@ -3,7 +3,28 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [Unreleased]
+## Unreleased
+
+## [0.16.0]
+
+- general: Multiasset support. ([#124](https://github.com/zetamarkets/sdk/pull/124)).
+  - A lot of breaking changes, please see below and updated README.md
+  - A guide on how to migrate from older versions to 0.16.0 is available on ([Gitbook](https://zetamarkets.gitbook.io/zeta/build-with-zeta/zeta-sdk/multi-asset-sdk-guide))
+
+### Breaking
+
+- Most functions now take in Asset as their first argument
+- Most client and exchange functions are now part of subClient and subExchange respectively
+  - You should not need to access these directly, client and exchange will have helper functions for everything
+- Oracle no longer uses string feeds ("SOL/USD") in favour of the Asset enum
+- Exchange and client callbacks now pass back the Asset object
+- client.positions is renamed to .marginPositions for consistency with .spreadPositions
+  - These are both in subclient now due to multiasset changes, but are accessible with client.getMarginPositions() and client.getSpreadPositions()
+- toNetwork() is moved to network.ts
+
+## [0.15.0]
+
+- Skipped 0.15.0 due to versioning issues.
 
 ## [0.14.4]
 

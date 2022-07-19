@@ -4,16 +4,19 @@ import {
   Exchange,
   Network,
   utils,
+  types,
   programTypes,
   subscription,
+  assets,
 } from "@zetamarkets/sdk";
 
 import { PublicKey, Connection } from "@solana/web3.js";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
-const PROGRAM_ID = new PublicKey(process.env["program_id"]);
+const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
 const STARTING_BALANCE = 10_000;
+const assetList = [assets.Asset.SOL, assets.Asset.BTC];
 
 let network: Network;
 
@@ -36,6 +39,7 @@ async function main() {
   const connection = new Connection(NETWORK_URL, "confirmed");
 
   await Exchange.load(
+    assetList,
     PROGRAM_ID,
     network,
     connection,
@@ -47,7 +51,8 @@ async function main() {
   );
 
   subscription.subscribeProgramAccounts<programTypes.MarginAccount>(
-    subscription.ProgramAccountType.MarginAccount,
+    assets.Asset.SOL,
+    types.ProgramAccountType.MarginAccount,
     async (
       data: subscription.AccountSubscriptionData<programTypes.MarginAccount>
     ) => {

@@ -1,27 +1,10 @@
 import * as anchor from "@project-serum/anchor";
 import { Orderbook, Market as SerumMarket } from "@project-serum/serum";
-import {
-  ConfirmOptions,
-  PublicKey,
-  Connection,
-  Transaction,
-} from "@solana/web3.js";
+import { ConfirmOptions, PublicKey } from "@solana/web3.js";
 import { exchange as Exchange } from "./exchange";
-import {
-  DEX_PID,
-  MAX_CANCELS_PER_TX,
-  DEFAULT_ORDERBOOK_DEPTH,
-  CRANK_ACCOUNT_LIMIT,
-  MARKET_LOAD_LIMIT,
-  DEFAULT_MARKET_POLL_INTERVAL,
-  ACTIVE_MARKETS,
-  NUM_STRIKES,
-} from "./constants";
+import * as constants from "./constants";
 import {
   getZetaVault,
-  sortOpenOrderKeys,
-  getOpenOrdersMap,
-  getMarginAccount,
   processTransaction,
   getPriceFromSerumOrderKey,
   sleep,
@@ -30,23 +13,10 @@ import {
   getCancelAllIxs,
   splitIxsIntoTx,
 } from "./utils";
-import {
-  cancelOrderHaltedIx,
-  crankMarketIx,
-  cancelExpiredOrderIx,
-} from "./program-instructions";
-import {
-  Level,
-  DepthOrderbook,
-  TopLevel,
-  Side,
-  Order,
-  Kind,
-  toProductKind,
-} from "./types";
+import * as types from "./types";
 
 import { EventType, OrderbookEvent } from "./events";
-import { OpenOrdersMap } from "./program-types";
+import { Asset } from "./assets";
 
 export class ZetaGroupMarkets {
   /**
@@ -63,6 +33,14 @@ export class ZetaGroupMarkets {
     return this._expirySeries;
   }
   private _expirySeries: Array<ExpirySeries>;
+  /**
+   * The underlying asset this set of markets belong to.
+   */
+  public get asset(): Asset {
+    return this._asset;
+  }
+  private _asset: Asset;
+
   /**
    * The list of markets in the same ordering as the zeta group account
    * They are in sorted order by market address.
@@ -81,7 +59,7 @@ export class ZetaGroupMarkets {
   public get pollInterval(): number {
     return this._pollInterval;
   }
-  private _pollInterval: number = DEFAULT_MARKET_POLL_INTERVAL;
+  private _pollInterval: number = constants.DEFAULT_MARKET_POLL_INTERVAL;
 
   private _lastPollTimestamp: number;
 
@@ -99,14 +77,14 @@ export class ZetaGroupMarkets {
    */
   public getOptionsMarketByExpiryIndex(
     expiryIndex: number,
-    kind: Kind
+    kind: types.Kind
   ): Market[] {
     let markets = this.getMarketsByExpiryIndex(expiryIndex);
     switch (kind) {
-      case Kind.CALL:
-        return markets.slice(0, NUM_STRIKES);
-      case Kind.PUT:
-        return markets.slice(NUM_STRIKES, 2 * NUM_STRIKES);
+      case types.Kind.CALL:
+        return markets.slice(0, constants.NUM_STRIKES);
+      case types.Kind.PUT:
+        return markets.slice(constants.NUM_STRIKES, 2 * constants.NUM_STRIKES);
       default:
         throw Error("Options market kind not supported, must be CALL or PUT");
     }
@@ -118,7 +96,7 @@ export class ZetaGroupMarkets {
   public getFuturesMarketByExpiryIndex(expiryIndex: number): Market {
     let markets = this.getMarketsByExpiryIndex(expiryIndex);
     let market = markets[markets.length - 1];
-    if (market.kind != Kind.FUTURE) {
+    if (market.kind != types.Kind.FUTURE) {
       throw Error("Futures market kind error");
     }
     return market;
@@ -126,17 +104,17 @@ export class ZetaGroupMarkets {
 
   public getMarketByExpiryKindStrike(
     expiryIndex: number,
-    kind: Kind,
+    kind: types.Kind,
     strike?: number
   ): Market | undefined {
     let markets = this.getMarketsByExpiryIndex(expiryIndex);
     let marketsKind: Array<Market>;
-    if (kind === Kind.CALL || kind === Kind.PUT) {
+    if (kind === types.Kind.CALL || kind === types.Kind.PUT) {
       if (strike === undefined) {
         throw new Error("Strike must be specified for options markets");
       }
       marketsKind = this.getOptionsMarketByExpiryIndex(expiryIndex, kind);
-    } else if (kind === Kind.FUTURE) {
+    } else if (kind === types.Kind.FUTURE) {
       return this.getFuturesMarketByExpiryIndex(expiryIndex);
     } else {
       throw new Error("Only CALL, PUT, FUTURE kinds are supported");
@@ -146,9 +124,11 @@ export class ZetaGroupMarkets {
     return markets.length == 0 ? undefined : markets[0];
   }
 
-  private constructor() {
-    this._expirySeries = new Array(Exchange.zetaGroup.expirySeries.length);
-    this._markets = new Array(Exchange.zetaGroup.products.length);
+  private constructor(asset: Asset) {
+    let subExchange = Exchange.getSubExchange(asset);
+    this._asset = asset;
+    this._expirySeries = new Array(subExchange.zetaGroup.expirySeries.length);
+    this._markets = new Array(subExchange.zetaGroup.products.length);
     this._subscribedMarketIndexes = new Set<number>();
     this._lastPollTimestamp = 0;
   }
@@ -165,7 +145,7 @@ export class ZetaGroupMarkets {
   }
 
   public async handlePolling(
-    callback?: (eventType: EventType, data: any) => void
+    callback?: (asset: Asset, eventType: EventType, data: any) => void
   ) {
     if (
       Exchange.clockTimestamp >
@@ -182,7 +162,7 @@ export class ZetaGroupMarkets {
           }
           if (callback !== undefined) {
             let data: OrderbookEvent = { marketIndex: index };
-            callback(EventType.ORDERBOOK, data);
+            callback(this.asset, EventType.ORDERBOOK, data);
           }
         })
       );
@@ -191,29 +171,32 @@ export class ZetaGroupMarkets {
 
   /**
    * Will load a new instance of ZetaGroupMarkets
-   * Should not be called outside of Exchange.
+   * Should not be called outside of SubExchange.
    */
   public static async load(
+    asset: Asset,
     opts: ConfirmOptions,
     throttleMs: number
   ): Promise<ZetaGroupMarkets> {
-    let instance = new ZetaGroupMarkets();
+    let instance = new ZetaGroupMarkets(asset);
+    let subExchange = Exchange.getSubExchange(asset);
+
     let productsPerExpiry = Math.floor(
-      Exchange.zetaGroup.products.length /
-        Exchange.zetaGroup.expirySeries.length
+      subExchange.zetaGroup.products.length /
+        subExchange.zetaGroup.expirySeries.length
     );
 
-    let indexes = [...Array(ACTIVE_MARKETS).keys()];
-    for (var i = 0; i < indexes.length; i += MARKET_LOAD_LIMIT) {
-      let slice = indexes.slice(i, i + MARKET_LOAD_LIMIT);
+    let indexes = [...Array(constants.ACTIVE_MARKETS).keys()];
+    for (var i = 0; i < indexes.length; i += constants.MARKET_LOAD_LIMIT) {
+      let slice = indexes.slice(i, i + constants.MARKET_LOAD_LIMIT);
       await Promise.all(
         slice.map(async (index) => {
-          let marketAddr = Exchange.zetaGroup.products[index].market;
+          let marketAddr = subExchange.zetaGroup.products[index].market;
           let serumMarket = await SerumMarket.load(
             Exchange.connection,
             marketAddr,
             { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
-            DEX_PID[Exchange.network]
+            constants.DEX_PID[Exchange.network]
           );
           let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
             Exchange.programId,
@@ -227,11 +210,12 @@ export class ZetaGroupMarkets {
           let expiryIndex = Math.floor(index / productsPerExpiry);
 
           instance._markets[index] = new Market(
+            asset,
             index,
             expiryIndex,
-            toProductKind(Exchange.zetaGroup.products[index].kind),
+            types.toProductKind(subExchange.zetaGroup.products[index].kind),
             marketAddr,
-            Exchange.zetaGroupAddress,
+            subExchange.zetaGroupAddress,
             quoteVaultAddr,
             baseVaultAddr,
             serumMarket
@@ -247,22 +231,24 @@ export class ZetaGroupMarkets {
   }
 
   /**
-   * Updates the option series state based off state in Exchange.
+   * Updates the option series state based off state in SubExchange.
    */
   public async updateExpirySeries() {
-    for (var i = 0; i < Exchange.zetaGroup.products.length; i++) {
+    let subExchange = Exchange.getSubExchange(this.asset);
+    for (var i = 0; i < subExchange.zetaGroup.products.length; i++) {
       this._markets[i].updateStrike();
     }
 
-    this._frontExpiryIndex = Exchange.zetaGroup.frontExpiryIndex;
-    for (var i = 0; i < Exchange.zetaGroup.expirySeries.length; i++) {
+    this._frontExpiryIndex = subExchange.zetaGroup.frontExpiryIndex;
+    for (var i = 0; i < subExchange.zetaGroup.expirySeries.length; i++) {
       let strikesInitialized =
         this._markets[i * this.productsPerExpiry()].strike != null;
       this._expirySeries[i] = new ExpirySeries(
+        this.asset,
         i,
-        Exchange.zetaGroup.expirySeries[i].activeTs.toNumber(),
-        Exchange.zetaGroup.expirySeries[i].expiryTs.toNumber(),
-        Exchange.zetaGroup.expirySeries[i].dirty,
+        subExchange.zetaGroup.expirySeries[i].activeTs.toNumber(),
+        subExchange.zetaGroup.expirySeries[i].expiryTs.toNumber(),
+        subExchange.zetaGroup.expirySeries[i].dirty,
         strikesInitialized
       );
     }
@@ -319,6 +305,7 @@ export class ZetaGroupMarkets {
 }
 
 export class ExpirySeries {
+  asset: Asset;
   expiryIndex: number;
   activeTs: number;
   expiryTs: number;
@@ -326,12 +313,14 @@ export class ExpirySeries {
   strikesInitialized: boolean;
 
   public constructor(
+    asset: Asset,
     expiryIndex: number,
     activeTs: number,
     expiryTs: number,
     dirty: boolean,
     strikesInitialized: boolean
   ) {
+    this.asset = asset;
     this.expiryIndex = expiryIndex;
     this.activeTs = activeTs;
     this.expiryTs = expiryTs;
@@ -367,17 +356,27 @@ export class Market {
     return this._expiryIndex;
   }
   public get expirySeries(): ExpirySeries {
-    return Exchange.markets.expirySeries[this.expiryIndex];
+    return Exchange.getSubExchange(this.asset).markets.expirySeries[
+      this.expiryIndex
+    ];
   }
   private _expiryIndex: number;
 
   /**
+   * The underlying asset this set of markets belong to.
+   */
+  public get asset(): Asset {
+    return this._asset;
+  }
+  private _asset: Asset;
+
+  /**
    * The type of product this market represents.
    */
-  public get kind(): Kind {
+  public get kind(): types.Kind {
     return this._kind;
   }
-  private _kind: Kind;
+  private _kind: types.Kind;
 
   /**
    * The serum market address.
@@ -420,16 +419,23 @@ export class Market {
   }
   private _serumMarket: SerumMarket;
 
+  public set bids(bids: Orderbook) {
+    this._bids = bids;
+  }
   private _bids: Orderbook;
+
+  public set asks(asks: Orderbook) {
+    this._asks = asks;
+  }
   private _asks: Orderbook;
 
   /**
    * Returns the best N levels for bids and asks
    */
-  public get orderbook(): DepthOrderbook {
+  public get orderbook(): types.DepthOrderbook {
     return this._orderbook;
   }
-  private _orderbook: DepthOrderbook;
+  private _orderbook: types.DepthOrderbook;
 
   /**
    * The strike of this option, modified on new expiry.
@@ -440,15 +446,17 @@ export class Market {
   private _strike: number;
 
   public constructor(
+    asset: Asset,
     marketIndex: number,
     expiryIndex: number,
-    kind: Kind,
+    kind: types.Kind,
     address: PublicKey,
     zetaGroup: PublicKey,
     quoteVault: PublicKey,
     baseVault: PublicKey,
     serumMarket: SerumMarket
   ) {
+    this._asset = asset;
     this._marketIndex = marketIndex;
     this._expiryIndex = expiryIndex;
     this._kind = kind;
@@ -462,7 +470,9 @@ export class Market {
   }
 
   public updateStrike() {
-    let strike = Exchange.zetaGroup.products[this._marketIndex].strike;
+    let strike = Exchange.getSubExchange(this.asset).zetaGroup.products[
+      this._marketIndex
+    ].strike;
     if (!strike.isSet) {
       this._strike = null;
     } else {
@@ -470,12 +480,14 @@ export class Market {
     }
   }
 
-  // TODO make this call on interval
-  public async updateOrderbook() {
-    [this._bids, this._asks] = await Promise.all([
-      this._serumMarket.loadBids(Exchange.provider.connection),
-      this._serumMarket.loadAsks(Exchange.provider.connection),
-    ]);
+  public async updateOrderbook(loadSerum: boolean = true) {
+    // if not loadSerum, we assume that this._bids and this._asks was set elsewhere manually beforehand
+    if (loadSerum) {
+      [this._bids, this._asks] = await Promise.all([
+        this._serumMarket.loadBids(Exchange.provider.connection),
+        this._serumMarket.loadAsks(Exchange.provider.connection),
+      ]);
+    }
 
     [this._bids, this._asks].map((orderbookSide) => {
       const descending = orderbookSide.isBids ? true : false;
@@ -502,8 +514,8 @@ export class Market {
     });
   }
 
-  public getTopLevel(): TopLevel {
-    let topLevel: TopLevel = { bid: null, ask: null };
+  public getTopLevel(): types.TopLevel {
+    let topLevel: types.TopLevel = { bid: null, ask: null };
     if (this._orderbook.bids.length != 0) {
       topLevel.bid = this._orderbook.bids[0];
     }
@@ -513,20 +525,20 @@ export class Market {
     return topLevel;
   }
 
-  static convertOrder(market: Market, order: any): Order {
+  static convertOrder(market: Market, order: any): types.Order {
     return {
       marketIndex: market.marketIndex,
       market: market.address,
       price: order.price,
       size: convertNativeLotSizeToDecimal(order.size),
-      side: order.side == "buy" ? Side.BID : Side.ASK,
+      side: order.side == "buy" ? types.Side.BID : types.Side.ASK,
       orderId: order.orderId,
       owner: order.openOrdersAddress,
       clientOrderId: order.clientId,
     };
   }
 
-  public getOrdersForAccount(openOrdersAddress: PublicKey): Order[] {
+  public getOrdersForAccount(openOrdersAddress: PublicKey): types.Order[] {
     let orders = [...this._bids, ...this._asks].filter((order) =>
       order.openOrdersAddress.equals(openOrdersAddress)
     );
@@ -536,20 +548,20 @@ export class Market {
     });
   }
 
-  public getMarketOrders(): Order[] {
+  public getMarketOrders(): types.Order[] {
     return [...this._bids, ...this._asks].map((order) => {
       return Market.convertOrder(this, order);
     });
   }
 
-  public getBidOrders(): Order[] {
+  public getBidOrders(): types.Order[] {
     console.log("*");
     return [...this._bids].map((order) => {
       return Market.convertOrder(this, order);
     });
   }
 
-  public getAskOrders(): Order[] {
+  public getAskOrders(): types.Order[] {
     return [...this._asks].map((order) => {
       return Market.convertOrder(this, order);
     });
@@ -560,8 +572,8 @@ export class Market {
     let orders = this.getMarketOrders();
 
     // Assumption of similar MAX number of instructions as regular cancel
-    let ixs = await getCancelAllIxs(orders, true);
-    let txs = splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
+    let ixs = await getCancelAllIxs(this.asset, orders, true);
+    let txs = splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
 
     await Promise.all(
       txs.map(async (tx) => {
@@ -571,12 +583,12 @@ export class Market {
   }
 
   public async cancelAllOrdersHalted() {
-    Exchange.assertHalted();
+    Exchange.getSubExchange(this.asset).assertHalted();
 
     await this.updateOrderbook();
     let orders = this.getMarketOrders();
-    let ixs = await getCancelAllIxs(orders, false);
-    let txs = splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
+    let ixs = await getCancelAllIxs(this.asset, orders, false);
+    let txs = splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
     await Promise.all(
       txs.map(async (tx) => {
         await processTransaction(Exchange.provider, tx);

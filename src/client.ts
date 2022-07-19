@@ -1,20 +1,9 @@
 import * as anchor from "@project-serum/anchor";
 import * as utils from "./utils";
-import {
-  MAX_SETTLE_AND_CLOSE_PER_TX,
-  MAX_CANCELS_PER_TX,
-  MAX_POSITION_MOVEMENTS,
-  DEFAULT_CLIENT_POLL_INTERVAL,
-  DEFAULT_CLIENT_TIMER_INTERVAL,
-  DEX_PID,
-  DEFAULT_ORDER_TAG,
-  UPDATING_STATE_LIMIT_SECONDS,
-} from "./constants";
 import { exchange as Exchange } from "./exchange";
 import {
   SpreadAccount,
   MarginAccount,
-  TradeEvent,
   PositionMovementEvent,
   ReferralAccount,
 } from "./program-types";
@@ -22,97 +11,29 @@ import {
   PublicKey,
   Connection,
   ConfirmOptions,
-  Transaction,
   TransactionSignature,
-  AccountInfo,
-  Context,
-  TransactionInstruction,
+  Transaction,
 } from "@solana/web3.js";
-import idl from "./idl/zeta.json";
-import { Zeta } from "./types/zeta";
-import {
-  ProgramAccountType,
-  Wallet,
-  CancelArgs,
-  OrderType,
-  Position,
-  Order,
-  Side,
-  MovementType,
-} from "./types";
-import {
-  referUserIx,
-  initializeMarginAccountIx,
-  closeMarginAccountIx,
-  initializeOpenOrdersIx,
-  closeOpenOrdersIx,
-  placeOrderIx,
-  placeOrderV2Ix,
-  placeOrderV3Ix,
-  depositIx,
-  withdrawIx,
-  cancelOrderIx,
-  cancelOrderNoErrorIx,
-  cancelOrderByClientOrderIdIx,
-  cancelOrderByClientOrderIdNoErrorIx,
-  forceCancelOrdersIx,
-  liquidateIx,
-  settleDexFundsIx,
-  initializeSpreadAccountIx,
-  closeSpreadAccountIx,
-  positionMovementIx,
-  transferExcessSpreadBalanceIx,
-  PositionMovementArg,
-} from "./program-instructions";
-
+import * as constants from "./constants";
+import { referUserIx } from "./program-instructions";
 import { EventType } from "./events";
-
-import * as assets from "./assets";
+import * as types from "./types";
+import { Asset } from "./assets";
+import { SubClient } from "./subclient";
+import * as instructions from "./program-instructions";
+import { assets } from ".";
 
 export class Client {
   /**
-   * Returns the user wallet public key.
-   */
-  public get publicKey(): PublicKey {
-    return this._provider.wallet.publicKey;
-  }
-
-  /**
-   * Anchor provider for client, including wallet.
+   * Anchor provider instance.
    */
   public get provider(): anchor.AnchorProvider {
     return this._provider;
   }
+  public get connection(): Connection {
+    return this._provider.connection;
+  }
   private _provider: anchor.AnchorProvider;
-
-  /**
-   * Anchor program wrapper for the IDL.
-   */
-  private _program: anchor.Program;
-
-  /**
-   * Stores the user margin account state.
-   */
-  public get marginAccount(): MarginAccount | null {
-    return this._marginAccount;
-  }
-  private _marginAccount: MarginAccount | null;
-
-  /**
-   * Client margin account address.
-   */
-  public get marginAccountAddress(): PublicKey {
-    return this._marginAccountAddress;
-  }
-  private _marginAccountAddress: PublicKey;
-
-  /**
-   * Stores the user margin account state.
-   */
-  public get spreadAccount(): SpreadAccount | null {
-    return this._spreadAccount;
-  }
-  private _spreadAccount: SpreadAccount | null;
 
   /**
    * Stores the user referral account data.
@@ -126,10 +47,9 @@ export class Client {
   /**
    * Client margin account address.
    */
-  public get spreadAccountAddress(): PublicKey {
-    return this._spreadAccountAddress;
+  public get publicKey(): PublicKey {
+    return this.provider.wallet.publicKey;
   }
-  private _spreadAccountAddress: PublicKey;
 
   /**
    * Client usdc account address.
@@ -138,74 +58,6 @@ export class Client {
     return this._usdcAccountAddress;
   }
   private _usdcAccountAddress: PublicKey;
-
-  /**
-   * User open order addresses.
-   * If a user hasn't initialized it, it is set to PublicKey.default
-   */
-  public get openOrdersAccounts(): PublicKey[] {
-    return this._openOrdersAccounts;
-  }
-  private _openOrdersAccounts: PublicKey[];
-
-  /**
-   * Returns a list of the user's current orders.
-   */
-  public get orders(): Order[] {
-    return this._orders;
-  }
-  private _orders: Order[];
-
-  /**
-   * Returns a list of user current positions.
-   */
-  public get positions(): Position[] {
-    return this._positions;
-  }
-  private _positions: Position[];
-
-  /**
-   * Returns a list of user current spread account positions.
-   */
-  public get spreadPositions(): Position[] {
-    return this._spreadPositions;
-  }
-  private _spreadPositions: Position[];
-
-  /**
-   * The subscription id for the margin account subscription.
-   */
-  private _marginAccountSubscriptionId: number = undefined;
-
-  /**
-   * The subscription id for the spread account subscription.
-   */
-  private _spreadAccountSubscriptionId: number = undefined;
-
-  /**
-   * The listener for trade events.
-   */
-  private _tradeEventListener: any;
-
-  /**
-   * Timer id from SetInterval.
-   */
-  private _pollIntervalId: any;
-
-  /**
-   * Last update timestamp.
-   */
-  private _lastUpdateTimestamp: number;
-
-  /**
-   * Pending update.
-   */
-  private _pendingUpdate: boolean;
-
-  /**
-   * The context slot of the pending update.
-   */
-  private _pendingUpdateSlot: number = 0;
 
   /**
    * whitelist deposit account.
@@ -224,161 +76,38 @@ export class Client {
   private _whitelistTradingFeesAddress: PublicKey | undefined;
 
   /**
-   * Polling interval.
+   * Timer id from SetInterval.
    */
-  public get pollInterval(): number {
-    return this._pollInterval;
+  private _pollIntervalId: any;
+
+  public get subClients(): Map<Asset, SubClient> {
+    return this._subClients;
   }
-  public set pollInterval(interval: number) {
-    if (interval < 0) {
-      throw Error("Polling interval invalid!");
-    }
-    this._pollInterval = interval;
-  }
-  private _pollInterval: number = DEFAULT_CLIENT_POLL_INTERVAL;
-
-  /**
-   * User passed callback on load, stored for polling.
-   */
-  private _callback: (type: EventType, data: any) => void;
-
-  private _updatingState: boolean = false;
-
-  private _updatingStateTimestamp: number = undefined;
 
   private constructor(
     connection: Connection,
-    wallet: Wallet,
+    wallet: types.Wallet,
     opts: ConfirmOptions
   ) {
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
-    this._program = new anchor.Program(
-      idl as anchor.Idl,
-      Exchange.programId,
-      this._provider
-    ) as anchor.Program<Zeta>;
-
-    this._openOrdersAccounts = Array(Exchange.zetaGroup.products.length).fill(
-      PublicKey.default
-    );
-
-    this._positions = [];
-    this._orders = [];
-    this._lastUpdateTimestamp = 0;
-    this._pendingUpdate = false;
-    this._marginAccount = null;
-    this._spreadAccount = null;
+    this._subClients = new Map();
     this._referralAccount = null;
   }
+  private _subClients: Map<Asset, SubClient>;
 
-  /**
-   * Returns a new instance of Client, based off state in the Exchange singleton.
-   * Requires the Exchange to be in a valid state to succeed.
-   *
-   * @param throttle    Defaults to true.
-   *                    If set to false, margin account callbacks will also call
-   *                    `updateState` instead of waiting for the poll.
-   */
   public static async load(
     connection: Connection,
-    wallet: Wallet,
+    wallet: types.Wallet,
     opts: ConfirmOptions = utils.defaultCommitment(),
-    callback: (type: EventType, data: any) => void = undefined,
+    callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false
   ): Promise<Client> {
-    console.log(`Loading client: ${wallet.publicKey.toString()}`);
     let client = new Client(connection, wallet, opts);
-    let [marginAccountAddress, _marginAccountNonce] =
-      await utils.getMarginAccount(
-        Exchange.programId,
-        Exchange.zetaGroupAddress,
-        wallet.publicKey
-      );
-
-    let [spreadAccountAddress, _spreadAccountNonce] =
-      await utils.getSpreadAccount(
-        Exchange.programId,
-        Exchange.zetaGroupAddress,
-        wallet.publicKey
-      );
-
-    client._marginAccountAddress = marginAccountAddress;
-    client._spreadAccountAddress = spreadAccountAddress;
-
-    client._callback = callback;
-
-    client._marginAccountSubscriptionId = connection.onAccountChange(
-      client._marginAccountAddress,
-      async (accountInfo: AccountInfo<Buffer>, context: Context) => {
-        client._marginAccount = client._program.coder.accounts.decode(
-          ProgramAccountType.MarginAccount,
-          accountInfo.data
-        );
-
-        if (throttle || client._updatingState) {
-          client._pendingUpdate = true;
-          client._pendingUpdateSlot = context.slot;
-          return;
-        }
-
-        await client.updateState(false);
-        client._lastUpdateTimestamp = Exchange.clockTimestamp;
-
-        if (callback !== undefined) {
-          callback(EventType.USER, null);
-        }
-
-        await client.updateOpenOrdersAddresses();
-      },
-      connection.commitment
-    );
-
-    client._spreadAccountSubscriptionId = connection.onAccountChange(
-      client._spreadAccountAddress,
-      async (accountInfo: AccountInfo<Buffer>, _context: Context) => {
-        client._spreadAccount = client._program.coder.accounts.decode(
-          ProgramAccountType.SpreadAccount,
-          accountInfo.data
-        );
-
-        client.updateSpreadPositions();
-
-        if (callback !== undefined) {
-          callback(EventType.USER, null);
-        }
-      },
-      connection.commitment
-    );
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
       wallet.publicKey
     );
-
-    try {
-      client._marginAccount =
-        (await client._program.account.marginAccount.fetch(
-          client._marginAccountAddress
-        )) as unknown as MarginAccount;
-
-      // Set open order pdas for initialized accounts.
-      await client.updateOpenOrdersAddresses();
-      client.updatePositions();
-      // We don't update orders here to make load faster.
-      client._pendingUpdate = true;
-    } catch (e) {
-      console.log("User does not have a margin account.");
-    }
-
-    try {
-      client._spreadAccount =
-        (await client._program.account.spreadAccount.fetch(
-          client._spreadAccountAddress
-        )) as unknown as SpreadAccount;
-      client.updateSpreadPositions();
-    } catch (e) {
-      console.log("User does not have a spread account.");
-    }
 
     client._whitelistDepositAddress = undefined;
     try {
@@ -387,7 +116,7 @@ export class Client {
           Exchange.programId,
           wallet.publicKey
         );
-      await client._program.account.whitelistDepositAccount.fetch(
+      await Exchange.program.account.whitelistDepositAccount.fetch(
         whitelistDepositAddress
       );
       console.log("User is whitelisted for unlimited deposits into zeta.");
@@ -401,13 +130,28 @@ export class Client {
           Exchange.programId,
           wallet.publicKey
         );
-      await client._program.account.whitelistTradingFeesAccount.fetch(
+      await Exchange.program.account.whitelistTradingFeesAccount.fetch(
         whitelistTradingFeesAddress
       );
       console.log("User is whitelisted for trading fees.");
       client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
     } catch (e) {}
 
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
+        const subClient = await SubClient.load(
+          asset,
+          client,
+          connection,
+          wallet,
+          callback,
+          throttle
+        );
+        client.addSubClient(asset, subClient);
+      })
+    );
+
+    client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
     client._referralAccountAddress = undefined;
     try {
       let [referralAccountAddress, _nonce] =
@@ -418,7 +162,7 @@ export class Client {
 
       client._referralAccountAddress = referralAccountAddress;
       client._referralAccount =
-        (await client._program.account.referralAccount.fetch(
+        (await Exchange.program.account.referralAccount.fetch(
           referralAccountAddress
         )) as unknown as ReferralAccount;
       console.log(
@@ -426,22 +170,22 @@ export class Client {
       );
     } catch (e) {}
 
-    if (callback !== undefined) {
-      client._tradeEventListener = client._program.addEventListener(
-        "TradeEvent",
-        (event: TradeEvent, _slot) => {
-          if (event.marginAccount.equals(marginAccountAddress)) {
-            callback(EventType.TRADE, event);
-          }
-        }
-      );
-    }
-
-    client.setPolling(DEFAULT_CLIENT_TIMER_INTERVAL);
     return client;
   }
 
-  // This is referring itself by another referrer.
+  private addSubClient(asset: Asset, subClient: SubClient) {
+    this._subClients.set(asset, subClient);
+  }
+
+  public getSubClient(asset: Asset): SubClient {
+    return this._subClients.get(asset);
+  }
+
+  public getAllSubClients(): SubClient[] {
+    return [...this._subClients.values()];
+    // This is referring itself by another referrer.
+  }
+
   public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
     let [referrerAccount] = await utils.getReferrerAccountAddress(
       Exchange.programId,
@@ -449,7 +193,7 @@ export class Client {
     );
 
     try {
-      await this._program.account.referrerAccount.fetch(referrerAccount);
+      await Exchange.program.account.referrerAccount.fetch(referrerAccount);
     } catch (e) {
       throw Error(`Invalid referrer. ${referrer.toString()}`);
     }
@@ -458,15 +202,16 @@ export class Client {
     );
     let txId = await utils.processTransaction(this.provider, tx);
 
-    this._referralAccount = (await this._program.account.referralAccount.fetch(
-      this._referralAccountAddress
-    )) as unknown as ReferralAccount;
+    this._referralAccount =
+      (await Exchange.program.account.referralAccount.fetch(
+        this._referralAccountAddress
+      )) as unknown as ReferralAccount;
 
     return txId;
   }
 
   /**
-   * @param timerInterval   desired interval for client polling.
+   * @param timerInterval   desired interval for subClient polling.
    */
   private setPolling(timerInterval: number) {
     if (this._pollIntervalId !== undefined) {
@@ -475,1337 +220,102 @@ export class Client {
     }
 
     this._pollIntervalId = setInterval(async () => {
-      if (
-        Exchange.clockTimestamp >
-          this._lastUpdateTimestamp + this._pollInterval ||
-        this._pendingUpdate
-      ) {
-        try {
-          if (this._updatingState) {
-            return;
-          }
-          let latestSlot = this._pendingUpdateSlot;
-          await this.updateState();
-          // If there was a margin account websocket callback, we want to
-          // trigger an `updateState` on the next timer tick.
-          if (latestSlot == this._pendingUpdateSlot) {
-            this._pendingUpdate = false;
-          }
-          this._lastUpdateTimestamp = Exchange.clockTimestamp;
-          if (this._callback !== undefined) {
-            this._callback(EventType.USER, null);
-          }
-        } catch (e) {
-          console.log(`Client poll update failed. Error: ${e}`);
-        }
-      }
+      await Promise.all(
+        this.getAllSubClients().map(async (subClient) => {
+          subClient.pollUpdate();
+        })
+      );
     }, timerInterval * 1000);
   }
 
-  private toggleUpdateState(toggleOn: boolean) {
-    if (toggleOn) {
-      this._updatingState = true;
-      this._updatingStateTimestamp = Date.now() / 1000;
+  public marketIdentifierToPublicKey(
+    asset: Asset,
+    market: types.MarketIdentifier
+  ) {
+    // marketIndex is either number or PublicKey
+    let marketPubkey: PublicKey;
+    if (typeof market == "number") {
+      marketPubkey =
+        Exchange.getSubExchange(asset).markets.markets[market].address;
     } else {
-      this._updatingState = false;
-      this._updatingStateTimestamp = undefined;
+      marketPubkey = market;
     }
+    return marketPubkey;
   }
 
-  // Safety to reset this._updatingState
-  private checkResetUpdatingState() {
-    if (
-      this._updatingState &&
-      Date.now() / 1000 - this._updatingStateTimestamp >
-        UPDATING_STATE_LIMIT_SECONDS
-    ) {
-      this.toggleUpdateState(false);
-    }
+  public async placeOrder(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    price: number,
+    size: number,
+    side: types.Side,
+    type: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).placeOrderV3(
+      this.marketIdentifierToPublicKey(asset, market),
+      price,
+      size,
+      side,
+      type,
+      clientOrderId,
+      tag
+    );
   }
 
-  /**
-   * Polls the margin account for the latest state.
-   */
-  public async updateState(fetch = true, force = false) {
-    this.checkResetUpdatingState();
-
-    if (this._updatingState && !force) {
-      return;
-    }
-
-    this.toggleUpdateState(true);
-
-    if (fetch) {
-      try {
-        this._marginAccount = (await this._program.account.marginAccount.fetch(
-          this._marginAccountAddress
-        )) as unknown as MarginAccount;
-      } catch (e) {
-        this.toggleUpdateState(false);
-        return;
-      }
-
-      try {
-        this._spreadAccount = (await this._program.account.spreadAccount.fetch(
-          this._spreadAccountAddress
-        )) as unknown as SpreadAccount;
-      } catch (e) {}
-    }
-
-    try {
-      if (this._marginAccount !== null) {
-        this.updatePositions();
-        await this.updateOrders();
-      }
-
-      if (this._spreadAccount !== null) {
-        this.updateSpreadPositions();
-      }
-    } catch (e) {}
-
-    this.toggleUpdateState(false);
-  }
-
-  /**
-   * @param amount  the native amount to deposit (6 decimals fixed point)
-   */
-  public async deposit(amount: number): Promise<TransactionSignature> {
-    // Check if the user has a USDC account.
+  public async migrateFunds(
+    amount: number,
+    withdrawAsset: assets.Asset,
+    depositAsset: assets.Asset
+  ): Promise<TransactionSignature> {
     await this.usdcAccountCheck();
-
     let tx = new Transaction();
-    if (this._marginAccount === null) {
+    let withdrawSubClient = this.getSubClient(withdrawAsset);
+    let depositSubClient = this.getSubClient(depositAsset);
+
+    // Create withdraw ix
+    tx.add(
+      instructions.withdrawIx(
+        withdrawAsset,
+        amount,
+        withdrawSubClient.marginAccountAddress,
+        this.usdcAccountAddress,
+        this.publicKey
+      )
+    );
+
+    // Create deposit tx
+    if (depositSubClient.marginAccount === null) {
       console.log("User has no margin account. Creating margin account...");
       tx.add(
-        initializeMarginAccountIx(
-          Exchange.zetaGroupAddress,
-          this._marginAccountAddress,
+        instructions.initializeMarginAccountIx(
+          depositSubClient.subExchange.zetaGroupAddress,
+          depositSubClient.marginAccountAddress,
           this.publicKey
         )
       );
     }
     tx.add(
-      await depositIx(
+      await instructions.depositIx(
+        depositAsset,
         amount,
-        this._marginAccountAddress,
-        this._usdcAccountAddress,
+        depositSubClient.marginAccountAddress,
+        this.usdcAccountAddress,
         this.publicKey,
-        this._whitelistDepositAddress
+        this.whitelistDepositAddress
       )
     );
-    let txId = await utils.processTransaction(this._provider, tx);
-    return txId;
-  }
 
-  /**
-   * Closes a client's margin account
-   */
-  public async closeMarginAccount(): Promise<TransactionSignature> {
-    if (this._marginAccount === null) {
-      throw Error("User has no margin account to close");
-    }
-
-    let tx = new Transaction().add(
-      closeMarginAccountIx(this.publicKey, this._marginAccountAddress)
-    );
-    let txId = await utils.processTransaction(this._provider, tx);
-    this._marginAccount = null;
-    return txId;
-  }
-
-  /**
-   * Closes a client's spread account
-   */
-  public async closeSpreadAccount(): Promise<TransactionSignature> {
-    if (this._spreadAccount === null) {
-      throw Error("User has no spread account to close");
-    }
-
-    let tx = new Transaction();
-    tx.add(
-      transferExcessSpreadBalanceIx(
-        Exchange.zetaGroupAddress,
-        this.marginAccountAddress,
-        this._spreadAccountAddress,
-        this.publicKey
-      )
-    );
-    tx.add(
-      closeSpreadAccountIx(
-        Exchange.zetaGroupAddress,
-        this._spreadAccountAddress,
-        this.publicKey
-      )
-    );
-    let txId = await utils.processTransaction(this._provider, tx);
-    this._spreadAccount = null;
-    return txId;
-  }
-
-  /**
-   * @param amount  the native amount to withdraw (6 dp)
-   */
-  public async withdraw(amount: number): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    tx.add(
-      withdrawIx(
-        amount,
-        this._marginAccountAddress,
-        this._usdcAccountAddress,
-        this.publicKey
-      )
-    );
     return await utils.processTransaction(this._provider, tx);
   }
 
-  /**
-   * Withdraws the entirety of the client's margin account and then closes it.
-   */
-  public async withdrawAndCloseMarginAccount(): Promise<TransactionSignature> {
-    if (this._marginAccount === null) {
-      throw Error("User has no margin account to withdraw or close.");
-    }
-    let tx = new Transaction();
-    tx.add(
-      withdrawIx(
-        this._marginAccount.balance.toNumber(),
-        this._marginAccountAddress,
-        this._usdcAccountAddress,
-        this.publicKey
-      )
-    );
-    tx.add(closeMarginAccountIx(this.publicKey, this._marginAccountAddress));
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Places an order on a zeta market.
-   * @param market          the address of the serum market
-   * @param price           the native price of the order (6 d.p as integer)
-   * @param size            the quantity of the order (3 d.p)
-   * @param side            the side of the order. bid / ask
-   * @param clientOrderId   optional: client order id (non 0 value)
-   * NOTE: If duplicate client order ids are used, after a cancel order,
-   * to cancel the second order with the same client order id,
-   * you may need to crank the corresponding event queue to flush that order id
-   * from the user open orders account before cancelling the second order.
-   * (Depending on the order in which the order was cancelled).
-   */
-  public async placeOrder(
-    market: PublicKey,
-    price: number,
-    size: number,
-    side: Side,
-    clientOrderId = 0
+  public async deposit(
+    asset: Asset,
+    amount: number
   ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-
-    let openOrdersPda = null;
-    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      console.log(
-        `User doesn't have open orders account. Initialising for market ${market.toString()}.`
-      );
-      let [initIx, _openOrdersPda] = await initializeOpenOrdersIx(
-        market,
-        this.publicKey,
-        this.marginAccountAddress
-      );
-      openOrdersPda = _openOrdersPda;
-      tx.add(initIx);
-    } else {
-      openOrdersPda = this._openOrdersAccounts[marketIndex];
-    }
-
-    let orderIx = placeOrderIx(
-      marketIndex,
-      price,
-      size,
-      side,
-      clientOrderId,
-      this.marginAccountAddress,
-      this.publicKey,
-      openOrdersPda,
-      this._whitelistTradingFeesAddress
-    );
-
-    tx.add(orderIx);
-
-    let txId = await utils.processTransaction(this._provider, tx);
-    this._openOrdersAccounts[marketIndex] = openOrdersPda;
-
-    return txId;
-  }
-
-  /**
-   * Places an order on a zeta market.
-   * @param market          the address of the serum market
-   * @param price           the native price of the order (6 d.p as integer)
-   * @param size            the quantity of the order (3 d.p)
-   * @param side            the side of the order. bid / ask
-   * @param orderType       the type of the order. limit / ioc / post-only
-   * @param clientOrderId   optional: client order id (non 0 value)
-   * NOTE: If duplicate client order ids are used, after a cancel order,
-   * to cancel the second order with the same client order id,
-   * you may need to crank the corresponding event queue to flush that order id
-   * from the user open orders account before cancelling the second order.
-   * (Depending on the order in which the order was cancelled).
-   */
-  public async placeOrderV2(
-    market: PublicKey,
-    price: number,
-    size: number,
-    side: Side,
-    orderType: OrderType,
-    clientOrderId = 0
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-
-    let openOrdersPda = null;
-    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      console.log(
-        `User doesn't have open orders account. Initialising for market ${market.toString()}.`
-      );
-      let [initIx, _openOrdersPda] = await initializeOpenOrdersIx(
-        market,
-        this.publicKey,
-        this.marginAccountAddress
-      );
-      openOrdersPda = _openOrdersPda;
-      tx.add(initIx);
-    } else {
-      openOrdersPda = this._openOrdersAccounts[marketIndex];
-    }
-
-    let orderIx = placeOrderV2Ix(
-      marketIndex,
-      price,
-      size,
-      side,
-      orderType,
-      clientOrderId,
-      this.marginAccountAddress,
-      this.publicKey,
-      openOrdersPda,
-      this._whitelistTradingFeesAddress
-    );
-
-    tx.add(orderIx);
-
-    let txId = await utils.processTransaction(this._provider, tx);
-    this._openOrdersAccounts[marketIndex] = openOrdersPda;
-
-    return txId;
-  }
-
-  /**
-   * Places a fill or kill  order on a zeta market.
-   * If successful - it will lock the full size into a user's spread account.
-   * It will create the spread account if the user didn't have one already.
-   * @param market          the address of the serum market
-   * @param price           the native price of the order (6 d.p as integer)
-   * @param size            the quantity of the order (3 d.p)
-   * @param side            the side of the order. bid / ask
-   */
-  public async placeOrderAndLockPosition(
-    market: PublicKey,
-    price: number,
-    size: number,
-    side: Side,
-    tag: String = DEFAULT_ORDER_TAG
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-
-    let openOrdersPda = null;
-    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      console.log(
-        `User doesn't have open orders account. Initialising for market ${market.toString()}.`
-      );
-      let [initIx, _openOrdersPda] = await initializeOpenOrdersIx(
-        market,
-        this.publicKey,
-        this.marginAccountAddress
-      );
-      openOrdersPda = _openOrdersPda;
-      tx.add(initIx);
-    } else {
-      openOrdersPda = this._openOrdersAccounts[marketIndex];
-    }
-
-    let orderIx = placeOrderV3Ix(
-      marketIndex,
-      price,
-      size,
-      side,
-      OrderType.FILLORKILL,
-      0, // Default to none for now.
-      tag,
-      this.marginAccountAddress,
-      this.publicKey,
-      openOrdersPda,
-      this._whitelistTradingFeesAddress
-    );
-
-    tx.add(orderIx);
-
-    if (this.spreadAccount == null) {
-      console.log("User has no spread account. Creating spread account...");
-      tx.add(
-        initializeSpreadAccountIx(
-          Exchange.zetaGroupAddress,
-          this.spreadAccountAddress,
-          this.publicKey
-        )
-      );
-    }
-
-    let movementSize = side == Side.BID ? size : -size;
-    let movements: PositionMovementArg[] = [
-      {
-        index: marketIndex,
-        size: new anchor.BN(movementSize),
-      },
-    ];
-
-    tx.add(
-      positionMovementIx(
-        Exchange.zetaGroupAddress,
-        this.marginAccountAddress,
-        this.spreadAccountAddress,
-        this.publicKey,
-        Exchange.greeksAddress,
-        Exchange.zetaGroup.oracle,
-        MovementType.LOCK,
-        movements
-      )
-    );
-
-    let txId = await utils.processTransaction(this._provider, tx);
-    this._openOrdersAccounts[marketIndex] = openOrdersPda;
-
-    return txId;
-  }
-
-  /**
-   * Places an order on a zeta market.
-   * @param market          the address of the serum market
-   * @param price           the native price of the order (6 d.p as integer)
-   * @param size            the quantity of the order (3 d.p)
-   * @param side            the side of the order. bid / ask
-   * @param orderType       the type of the order. limit / ioc / post-only
-   * @param clientOrderId   optional: client order id (non 0 value)
-   * @param tag             optional: the string tag corresponding to who is inserting
-   * NOTE: If duplicate client order ids are used, after a cancel order,
-   * to cancel the second order with the same client order id,
-   * you may need to crank the corresponding event queue to flush that order id
-   * from the user open orders account before cancelling the second order.
-   * (Depending on the order in which the order was cancelled).
-   */
-  public async placeOrderV3(
-    market: PublicKey,
-    price: number,
-    size: number,
-    side: Side,
-    orderType: OrderType,
-    clientOrderId = 0,
-    tag: String = DEFAULT_ORDER_TAG
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-
-    let openOrdersPda = null;
-    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      console.log(
-        `User doesn't have open orders account. Initialising for market ${market.toString()}.`
-      );
-      let [initIx, _openOrdersPda] = await initializeOpenOrdersIx(
-        market,
-        this.publicKey,
-        this.marginAccountAddress
-      );
-      openOrdersPda = _openOrdersPda;
-      tx.add(initIx);
-    } else {
-      openOrdersPda = this._openOrdersAccounts[marketIndex];
-    }
-
-    let orderIx = placeOrderV3Ix(
-      marketIndex,
-      price,
-      size,
-      side,
-      orderType,
-      clientOrderId,
-      tag,
-      this.marginAccountAddress,
-      this.publicKey,
-      openOrdersPda,
-      this._whitelistTradingFeesAddress
-    );
-
-    tx.add(orderIx);
-
-    let txId: TransactionSignature;
-    txId = await utils.processTransaction(this._provider, tx);
-    this._openOrdersAccounts[marketIndex] = openOrdersPda;
-    return txId;
-  }
-
-  /**
-   * Cancels a user order by orderId
-   * @param market     the market address of the order to be cancelled.
-   * @param orderId    the order id of the order.
-   * @param side       the side of the order. bid / ask.
-   */
-  public async cancelOrder(
-    market: PublicKey,
-    orderId: anchor.BN,
-    side: Side
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let index = Exchange.markets.getMarketIndex(market);
-    let ix = cancelOrderIx(
-      index,
-      this.publicKey,
-      this._marginAccountAddress,
-      this._openOrdersAccounts[index],
-      orderId,
-      side
-    );
-    tx.add(ix);
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by client order id.
-   * It will only cancel the FIRST
-   * @param market          the market address of the order to be cancelled.
-   * @param clientOrderId   the client order id of the order. (Non zero value).
-   */
-  public async cancelOrderByClientOrderId(
-    market: PublicKey,
-    clientOrderId: number
-  ): Promise<TransactionSignature> {
-    if (clientOrderId == 0) {
-      throw Error("Client order id cannot be 0.");
-    }
-    let tx = new Transaction();
-    let index = Exchange.markets.getMarketIndex(market);
-    let ix = cancelOrderByClientOrderIdIx(
-      index,
-      this.publicKey,
-      this._marginAccountAddress,
-      this._openOrdersAccounts[index],
-      new anchor.BN(clientOrderId)
-    );
-    tx.add(ix);
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by orderId and atomically places an order
-   * @param market     the market address of the order to be cancelled.
-   * @param orderId    the order id of the order.
-   * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderPrice  the native price of the order (6 d.p) as integer
-   * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderSide   the side of the order. bid / ask
-   */
-  public async cancelAndPlaceOrder(
-    market: PublicKey,
-    orderId: anchor.BN,
-    cancelSide: Side,
-    newOrderPrice: number,
-    newOrderSize: number,
-    newOrderSide: Side,
-    clientOrderId = 0
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    tx.add(
-      cancelOrderIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        orderId,
-        cancelSide
-      )
-    );
-    tx.add(
-      placeOrderIx(
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        clientOrderId,
-        this.marginAccountAddress,
-        this.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._whitelistTradingFeesAddress
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by orderId and atomically places an order
-   * @param market     the market address of the order to be cancelled.
-   * @param orderId    the order id of the order.
-   * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderPrice  the native price of the order (6 d.p) as integer
-   * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderSide   the side of the order. bid / ask
-   * @param newOrderType   the type of the order, limit / ioc / post-only
-   * @param clientOrderId   optional: client order id (non 0 value)
-   */
-  public async cancelAndPlaceOrderV2(
-    market: PublicKey,
-    orderId: anchor.BN,
-    cancelSide: Side,
-    newOrderPrice: number,
-    newOrderSize: number,
-    newOrderSide: Side,
-    newOrderType: OrderType,
-    clientOrderId = 0
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    tx.add(
-      cancelOrderIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        orderId,
-        cancelSide
-      )
-    );
-    tx.add(
-      placeOrderV2Ix(
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOrderType,
-        clientOrderId,
-        this.marginAccountAddress,
-        this.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._whitelistTradingFeesAddress
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by orderId and atomically places an order
-   * @param market     the market address of the order to be cancelled.
-   * @param orderId    the order id of the order.
-   * @param cancelSide       the side of the order. bid / ask.
-   * @param newOrderPrice  the native price of the order (6 d.p) as integer
-   * @param newOrderSize   the quantity of the order (3 d.p) as integer
-   * @param newOrderSide   the side of the order. bid / ask
-   * @param newOrderType   the type of the order, limit / ioc / post-only
-   * @param clientOrderId   optional: client order id (non 0 value)
-   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
-   */
-  public async cancelAndPlaceOrderV3(
-    market: PublicKey,
-    orderId: anchor.BN,
-    cancelSide: Side,
-    newOrderPrice: number,
-    newOrderSize: number,
-    newOrderSide: Side,
-    newOrderType: OrderType,
-    clientOrderId = 0,
-    newOrderTag: String = DEFAULT_ORDER_TAG
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    tx.add(
-      cancelOrderIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        orderId,
-        cancelSide
-      )
-    );
-    tx.add(
-      placeOrderV3Ix(
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOrderType,
-        clientOrderId,
-        newOrderTag,
-        this.marginAccountAddress,
-        this.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._whitelistTradingFeesAddress
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by client order id and atomically places an order by new client order id.
-   * @param market                  the market address of the order to be cancelled and new order.
-   * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderPrice           the native price of the order (6 d.p) as integer
-   * @param newOrderSize            the quantity of the order (3 d.p) as integer
-   * @param newOrderSide            the side of the order. bid / ask
-   * @param newOrderClientOrderId   the client order id for the new order
-   */
-  public async cancelAndPlaceOrderByClientOrderId(
-    market: PublicKey,
-    cancelClientOrderId: number,
-    newOrderPrice: number,
-    newOrderSize: number,
-    newOrderSide: Side,
-    newOrderClientOrderId: number
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    tx.add(
-      cancelOrderByClientOrderIdIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        new anchor.BN(cancelClientOrderId)
-      )
-    );
-    tx.add(
-      placeOrderIx(
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOrderClientOrderId,
-        this.marginAccountAddress,
-        this.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._whitelistTradingFeesAddress
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by client order id and atomically places an order by new client order id.
-   * @param market                  the market address of the order to be cancelled and new order.
-   * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderPrice           the native price of the order (6 d.p) as integer
-   * @param newOrderSize            the quantity of the order (3 d.p) as integer
-   * @param newOrderSide            the side of the order. bid / ask
-   * @param newOrderType            the type of the order, limit / ioc / post-only
-   * @param newOrderClientOrderId   the client order id for the new order
-   */
-  public async cancelAndPlaceOrderByClientOrderIdV2(
-    market: PublicKey,
-    cancelClientOrderId: number,
-    newOrderPrice: number,
-    newOrderSize: number,
-    newOrderSide: Side,
-    newOrderType: OrderType,
-    newOrderClientOrderId: number
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    tx.add(
-      cancelOrderByClientOrderIdIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        new anchor.BN(cancelClientOrderId)
-      )
-    );
-    tx.add(
-      placeOrderV2Ix(
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOrderType,
-        newOrderClientOrderId,
-        this.marginAccountAddress,
-        this.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._whitelistTradingFeesAddress
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by client order id and atomically places an order by new client order id.
-   * @param market                  the market address of the order to be cancelled and new order.
-   * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderPrice           the native price of the order (6 d.p) as integer
-   * @param newOrderSize            the quantity of the order (3 d.p) as integer
-   * @param newOrderSide            the side of the order. bid / ask
-   * @param newOrderType            the type of the order, limit / ioc / post-only
-   * @param newOrderClientOrderId   the client order id for the new order
-   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
-   */
-  public async cancelAndPlaceOrderByClientOrderIdV3(
-    market: PublicKey,
-    cancelClientOrderId: number,
-    newOrderPrice: number,
-    newOrderSize: number,
-    newOrderSide: Side,
-    newOrderType: OrderType,
-    newOrderClientOrderId: number,
-    newOrderTag: String = DEFAULT_ORDER_TAG
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    tx.add(
-      cancelOrderByClientOrderIdIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        new anchor.BN(cancelClientOrderId)
-      )
-    );
-    tx.add(
-      placeOrderV3Ix(
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOrderType,
-        newOrderClientOrderId,
-        newOrderTag,
-        this.marginAccountAddress,
-        this.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._whitelistTradingFeesAddress
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels a user order by client order id and atomically places an order by new client order id.
-   * Uses the 'NoError' cancel instruction, so a failed cancellation won't prohibit the placeOrder
-   * @param market                  the market address of the order to be cancelled and new order.
-   * @param cancelClientOrderId     the client order id of the order to be cancelled.
-   * @param newOrderPrice           the native price of the order (6 d.p) as integer
-   * @param newOrderSize            the quantity of the order (3 d.p) as integer
-   * @param newOrderSide            the side of the order. bid / ask
-   * @param newOrderType            the type of the order, limit / ioc / post-only
-   * @param newOrderClientOrderId   the client order id for the new order
-   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
-   */
-  public async replaceByClientOrderIdV3(
-    market: PublicKey,
-    cancelClientOrderId: number,
-    newOrderPrice: number,
-    newOrderSize: number,
-    newOrderSide: Side,
-    newOrderType: OrderType,
-    newOrderClientOrderId: number,
-    newOrderTag: String = DEFAULT_ORDER_TAG
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    tx.add(
-      cancelOrderByClientOrderIdNoErrorIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        new anchor.BN(cancelClientOrderId)
-      )
-    );
-    tx.add(
-      placeOrderV3Ix(
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOrderType,
-        newOrderClientOrderId,
-        newOrderTag,
-        this.marginAccountAddress,
-        this.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._whitelistTradingFeesAddress
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Initializes a user open orders account for a given market.
-   * This is handled atomically by place order but can be used by clients to initialize it independent of placing an order.
-   */
-  public async initializeOpenOrdersAccount(
-    market: PublicKey
-  ): Promise<TransactionSignature> {
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    if (!this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      throw Error("User already has an open orders account for market!");
-    }
-
-    let [initIx, openOrdersPda] = await initializeOpenOrdersIx(
-      market,
-      this.publicKey,
-      this.marginAccountAddress
-    );
-
-    let tx = new Transaction().add(initIx);
-    let txId = await utils.processTransaction(this._provider, tx);
-    this._openOrdersAccounts[marketIndex] = openOrdersPda;
-    return txId;
-  }
-
-  /**
-   * Closes a user open orders account for a given market.
-   */
-  public async closeOpenOrdersAccount(
-    market: PublicKey
-  ): Promise<TransactionSignature> {
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      throw Error("User has no open orders account for this market!");
-    }
-
-    const [vaultOwner, _vaultSignerNonce] =
-      await utils.getSerumVaultOwnerAndNonce(market, DEX_PID[Exchange.network]);
-
-    let tx = new Transaction();
-    tx.add(
-      settleDexFundsIx(
-        market,
-        vaultOwner,
-        this._openOrdersAccounts[marketIndex]
-      )
-    );
-
-    tx.add(
-      await closeOpenOrdersIx(
-        market,
-        this.publicKey,
-        this.marginAccountAddress,
-        this._openOrdersAccounts[marketIndex]
-      )
-    );
-    let txId = await utils.processTransaction(this._provider, tx);
-    this._openOrdersAccounts[marketIndex] = PublicKey.default;
-    return txId;
-  }
-
-  /**
-   * Closes multiple user open orders account for a given set of markets.
-   * Cannot pass in multiple of the same market address
-   */
-  public async closeMultipleOpenOrdersAccount(
-    markets: PublicKey[]
-  ): Promise<TransactionSignature[]> {
-    let combinedIxs: TransactionInstruction[] = [];
-    for (var i = 0; i < markets.length; i++) {
-      let market = markets[i];
-      let marketIndex = Exchange.markets.getMarketIndex(market);
-      if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-        throw Error("User has no open orders account for this market!");
-      }
-      const [vaultOwner, _vaultSignerNonce] =
-        await utils.getSerumVaultOwnerAndNonce(
-          market,
-          DEX_PID[Exchange.network]
-        );
-      let settleIx = settleDexFundsIx(
-        market,
-        vaultOwner,
-        this._openOrdersAccounts[marketIndex]
-      );
-      let closeIx = await closeOpenOrdersIx(
-        market,
-        this.publicKey,
-        this.marginAccountAddress,
-        this._openOrdersAccounts[marketIndex]
-      );
-      combinedIxs.push(settleIx);
-      combinedIxs.push(closeIx);
-    }
-
-    let txIds: string[] = [];
-
-    let combinedTxs = utils.splitIxsIntoTx(
-      combinedIxs,
-      MAX_SETTLE_AND_CLOSE_PER_TX
-    );
-
-    await Promise.all(
-      combinedTxs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
-      })
-    );
-
-    // Reset openOrdersAccount keys
-    for (var i = 0; i < markets.length; i++) {
-      let market = markets[i];
-      let marketIndex = Exchange.markets.getMarketIndex(market);
-      this._openOrdersAccounts[marketIndex] = PublicKey.default;
-    }
-
-    return txIds;
-  }
-
-  /**
-   * Cancels multiple user orders by orderId
-   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
-   */
-  public async cancelMultipleOrders(
-    cancelArguments: CancelArgs[]
-  ): Promise<TransactionSignature[]> {
-    let ixs = [];
-    for (var i = 0; i < cancelArguments.length; i++) {
-      let marketIndex = Exchange.markets.getMarketIndex(
-        cancelArguments[i].market
-      );
-      let ix = cancelOrderIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        cancelArguments[i].orderId,
-        cancelArguments[i].cancelSide
-      );
-      ixs.push(ix);
-    }
-    let txs = utils.splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
-      })
-    );
-    return txIds;
-  }
-
-  /**
-   * Cancels multiple user orders by orderId
-   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
-   */
-  public async cancelMultipleOrdersNoError(
-    cancelArguments: CancelArgs[]
-  ): Promise<TransactionSignature[]> {
-    let ixs = [];
-    for (var i = 0; i < cancelArguments.length; i++) {
-      let marketIndex = Exchange.markets.getMarketIndex(
-        cancelArguments[i].market
-      );
-      let ix = cancelOrderNoErrorIx(
-        marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        cancelArguments[i].orderId,
-        cancelArguments[i].cancelSide
-      );
-      ixs.push(ix);
-    }
-    let txs = utils.splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
-      })
-    );
-    return txIds;
-  }
-
-  /**
-   * Calls force cancel on another user's orders
-   * @param market  Market to cancel orders on
-   * @param marginAccountToCancel Users to be force-cancelled's margin account
-   */
-  public async forceCancelOrders(
-    market: PublicKey,
-    marginAccountToCancel: PublicKey
-  ): Promise<TransactionSignature> {
-    let marginAccount = (await this._program.account.marginAccount.fetch(
-      marginAccountToCancel
-    )) as unknown as MarginAccount;
-
-    let marketIndex = Exchange.markets.getMarketIndex(market);
-
-    let openOrdersAccountToCancel = await utils.createOpenOrdersAddress(
-      Exchange.programId,
-      market,
-      marginAccount.authority,
-      marginAccount.openOrdersNonce[marketIndex]
-    );
-
-    let tx = new Transaction();
-    let ix = forceCancelOrdersIx(
-      marketIndex,
-      marginAccountToCancel,
-      openOrdersAccountToCancel
-    );
-    tx.add(ix);
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Calls liquidate on another user
-   * @param market
-   * @param liquidatedMarginAccount
-   * @param size                        the quantity of the order (3 d.p)
-   */
-  public async liquidate(
-    market: PublicKey,
-    liquidatedMarginAccount: PublicKey,
-    size: number
-  ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let ix = liquidateIx(
-      this.publicKey,
-      this._marginAccountAddress,
-      market,
-      liquidatedMarginAccount,
-      size
-    );
-    tx.add(ix);
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Cancels all active user orders
-   */
-  public async cancelAllOrders(): Promise<TransactionSignature[]> {
-    // Can only fit 6 cancels worth of accounts per transaction.
-    // on 4 separate markets
-    // Compute is fine.
-    let ixs = [];
-    for (var i = 0; i < this._orders.length; i++) {
-      let order = this._orders[i];
-      let ix = cancelOrderIx(
-        order.marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[order.marketIndex],
-        order.orderId,
-        order.side
-      );
-      ixs.push(ix);
-    }
-
-    let txs = utils.splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
-      })
-    );
-    return txIds;
-  }
-
-  /**
-   * Cancels all active user orders, but will not crash if some cancels fail
-   */
-  public async cancelAllOrdersNoError(): Promise<TransactionSignature[]> {
-    // Can only fit 6 cancels worth of accounts per transaction.
-    // on 4 separate markets
-    // Compute is fine.
-    let ixs = [];
-    for (var i = 0; i < this._orders.length; i++) {
-      let order = this._orders[i];
-      let ix = cancelOrderNoErrorIx(
-        order.marketIndex,
-        this.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[order.marketIndex],
-        order.orderId,
-        order.side
-      );
-      ixs.push(ix);
-    }
-
-    let txs = utils.splitIxsIntoTx(ixs, MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
-      })
-    );
-    return txIds;
-  }
-
-  /**
-   * Moves positions to and from spread and margin account, based on the type.
-   * @param movementType    - type of movement
-   * @param movements       - vector of position movements
-   */
-  public async positionMovement(
-    movementType: MovementType,
-    movements: PositionMovementArg[]
-  ): Promise<TransactionSignature> {
-    let tx = this.getPositionMovementTx(movementType, movements);
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  /**
-   * Moves positions to and from spread and margin account, based on the type.
-   * @param movementType    - type of movement
-   * @param movements       - vector of position movements
-   */
-  public async simulatePositionMovement(
-    movementType: MovementType,
-    movements: PositionMovementArg[]
-  ): Promise<PositionMovementEvent> {
-    let tx = this.getPositionMovementTx(movementType, movements);
-    let response = await utils.simulateTransaction(this.provider, tx);
-
-    let events = response.events;
-    let positionMovementEvent = undefined;
-    for (var i = 0; i < events.length; i++) {
-      if (events[i].name == "PositionMovementEvent") {
-        positionMovementEvent = events[i].data;
-        break;
-      }
-    }
-
-    if (positionMovementEvent == undefined) {
-      throw new Error("Failed to simulate position movement.");
-    }
-
-    return positionMovementEvent;
-  }
-
-  private getPositionMovementTx(
-    movementType: MovementType,
-    movements: PositionMovementArg[]
-  ): Transaction {
-    if (movements.length > MAX_POSITION_MOVEMENTS) {
-      throw new Error(
-        `Max position movements exceeded. Max = ${MAX_POSITION_MOVEMENTS} < ${movements.length}`
-      );
-    }
-
-    let tx = new Transaction();
-    this.assertHasMarginAccount();
-
-    if (this.spreadAccount == null) {
-      console.log("User has no spread account. Creating spread account...");
-      tx.add(
-        initializeSpreadAccountIx(
-          Exchange.zetaGroupAddress,
-          this.spreadAccountAddress,
-          this.publicKey
-        )
-      );
-    }
-
-    tx.add(
-      positionMovementIx(
-        Exchange.zetaGroupAddress,
-        this.marginAccountAddress,
-        this.spreadAccountAddress,
-        this.publicKey,
-        Exchange.greeksAddress,
-        Exchange.zetaGroup.oracle,
-        movementType,
-        movements
-      )
-    );
-
-    return tx;
-  }
-
-  /**
-   * Transfers any non required balance in the spread account to margin account.
-   */
-  public async transferExcessSpreadBalance(): Promise<TransactionSignature> {
-    let tx = new Transaction().add(
-      transferExcessSpreadBalanceIx(
-        Exchange.zetaGroupAddress,
-        this.marginAccountAddress,
-        this.spreadAccountAddress,
-        this.publicKey
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  private getRelevantMarketIndexes(): number[] {
-    let indexes = [];
-    for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
-      let ledger = this._marginAccount.productLedgers[i];
-      if (
-        ledger.position.size.toNumber() !== 0 ||
-        ledger.orderState.openingOrders[0].toNumber() != 0 ||
-        ledger.orderState.openingOrders[1].toNumber() != 0
-      ) {
-        indexes.push(i);
-      }
-    }
-    return indexes;
-  }
-
-  private async updateOrders() {
-    let orders = [];
-    await Promise.all(
-      [...this.getRelevantMarketIndexes()].map(async (i) => {
-        await Exchange.markets.markets[i].updateOrderbook();
-        orders.push(
-          Exchange.markets.markets[i].getOrdersForAccount(
-            this._openOrdersAccounts[i]
-          )
-        );
-      })
-    );
-    this._orders = [].concat(...orders);
-  }
-
-  private updatePositions() {
-    let positions: Position[] = [];
-    for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
-      if (this._marginAccount.productLedgers[i].position.size.toNumber() != 0) {
-        positions.push({
-          marketIndex: i,
-          market: Exchange.zetaGroup.products[i].market,
-          size: utils.convertNativeLotSizeToDecimal(
-            this._marginAccount.productLedgers[i].position.size.toNumber()
-          ),
-          costOfTrades: utils.convertNativeBNToDecimal(
-            this._marginAccount.productLedgers[i].position.costOfTrades
-          ),
-        });
-      }
-    }
-    this._positions = positions;
-  }
-
-  private updateSpreadPositions() {
-    let positions: Position[] = [];
-    for (var i = 0; i < this._spreadAccount.positions.length; i++) {
-      if (this._spreadAccount.positions[i].size.toNumber() != 0) {
-        positions.push({
-          marketIndex: i,
-          market: Exchange.zetaGroup.products[i].market,
-          size: utils.convertNativeLotSizeToDecimal(
-            this._spreadAccount.positions[i].size.toNumber()
-          ),
-          costOfTrades: utils.convertNativeBNToDecimal(
-            this._spreadAccount.positions[i].costOfTrades
-          ),
-        });
-      }
-    }
-    this._spreadPositions = positions;
+    await this.usdcAccountCheck();
+    return await this.getSubClient(asset).deposit(amount);
   }
 
   private async usdcAccountCheck() {
@@ -1826,147 +336,380 @@ export class Client {
     }
   }
 
-  private async updateOpenOrdersAddresses() {
-    await Promise.all(
-      Exchange.zetaGroup.products.map(async (product, index) => {
-        if (
-          // If the nonce is not zero, we know there is an open orders account.
-          this._marginAccount.openOrdersNonce[index] !== 0 &&
-          // If this is equal to default, it means we haven't added the PDA yet.
-          this._openOrdersAccounts[index].equals(PublicKey.default)
-        ) {
-          let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
-            Exchange.programId,
-            product.market,
-            this.publicKey
-          );
-          this._openOrdersAccounts[index] = openOrdersPda;
-        }
-      })
+  /**
+   * Polls the margin account for the latest state.
+   * @param asset The underlying asset (eg SOL, BTC)
+   * @param fetch Whether to fetch and update _marginAccount and _spreadAccount in the subClient
+   * @param force Whether to forcefully update even though we may be already updating state currently
+   */
+  public async updateState(
+    asset: Asset = undefined,
+    fetch = true,
+    force = false
+  ) {
+    if (asset) {
+      await this.getSubClient(asset).updateState(fetch, force);
+    } else {
+      await Promise.all(
+        this.getAllSubClients().map(async (subClient) => {
+          await subClient.updateState(fetch, force);
+        })
+      );
+    }
+  }
+
+  public async cancelAllOrders(
+    asset: Asset = undefined
+  ): Promise<TransactionSignature[]> {
+    if (asset) {
+      return await this.getSubClient(asset).cancelAllOrders();
+    } else {
+      let allTxIds = [];
+      await Promise.all(
+        this.getAllSubClients().map(async (subClient) => {
+          let txIds = await subClient.cancelAllOrders();
+          allTxIds = allTxIds.concat(txIds);
+        })
+      );
+      return allTxIds;
+    }
+  }
+
+  public async cancelAllOrdersNoError(
+    asset: Asset = undefined
+  ): Promise<TransactionSignature[]> {
+    if (asset) {
+      return await this.getSubClient(asset).cancelAllOrdersNoError();
+    } else {
+      let allTxIds = [];
+      await Promise.all(
+        this.getAllSubClients().map(async (subClient) => {
+          let txIds = await subClient.cancelAllOrdersNoError();
+          allTxIds = allTxIds.concat(txIds);
+        })
+      );
+      return allTxIds;
+    }
+  }
+
+  public getMarginAccountState(asset: Asset): types.MarginAccountState {
+    return Exchange.riskCalculator.getMarginAccountState(
+      this.getSubClient(asset).marginAccount
     );
   }
 
-  private assertHasMarginAccount() {
-    if (this.marginAccount == null) {
-      throw Error("Margin account doesn't exist!");
-    }
+  public async closeMarginAccount(asset: Asset): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).closeMarginAccount();
   }
 
-  /**
-   * Getter functions for raw user margin account state.
-   */
+  public async closeSpreadAccount(asset: Asset): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).closeSpreadAccount();
+  }
 
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
+  public async withdraw(
+    asset: Asset,
+    amount: number
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).withdraw(amount);
+  }
+
+  public async withdrawAndCloseMarginAccount(
+    asset: Asset
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).withdrawAndCloseMarginAccount();
+  }
+
+  public async placeOrderAndLockPosition(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    price: number,
+    size: number,
+    side: types.Side,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).placeOrderAndLockPosition(
+      this.marketIdentifierToPublicKey(asset, market),
+      price,
+      size,
+      side,
+      tag
+    );
+  }
+
+  public async cancelOrder(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    orderId: anchor.BN,
+    side: types.Side
+  ): Promise<TransactionSignature> {
+    let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
+    return await this.getSubClient(asset).cancelOrder(
+      marketPubkey,
+      orderId,
+      side
+    );
+  }
+
+  public async cancelOrderByClientOrderId(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    clientOrderId: number
+  ): Promise<TransactionSignature> {
+    let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
+    return await this.getSubClient(asset).cancelOrderByClientOrderId(
+      marketPubkey,
+      clientOrderId
+    );
+  }
+
+  public async cancelAndPlaceOrder(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    orderId: anchor.BN,
+    cancelSide: types.Side,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: types.Side,
+    newOrderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).cancelAndPlaceOrderV3(
+      this.marketIdentifierToPublicKey(asset, market),
+      orderId,
+      cancelSide,
+      newOrderPrice,
+      newOrderSize,
+      newOrderSide,
+      newOrderType,
+      clientOrderId,
+      newOrderTag
+    );
+  }
+
+  public async cancelAndPlaceOrderByClientOrderId(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    cancelClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: types.Side,
+    newOrderType: types.OrderType,
+    newOrderClientOrderId: number,
+    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderIdV3(
+      this.marketIdentifierToPublicKey(asset, market),
+      cancelClientOrderId,
+      newOrderPrice,
+      newOrderSize,
+      newOrderSide,
+      newOrderType,
+      newOrderClientOrderId,
+      newOrderTag
+    );
+  }
+
+  public async replaceByClientOrderId(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    cancelClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: types.Side,
+    newOrderType: types.OrderType,
+    newOrderClientOrderId: number,
+    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).replaceByClientOrderIdV3(
+      this.marketIdentifierToPublicKey(asset, market),
+      cancelClientOrderId,
+      newOrderPrice,
+      newOrderSize,
+      newOrderSide,
+      newOrderType,
+      newOrderClientOrderId,
+      newOrderTag
+    );
+  }
+
+  public async initializeOpenOrdersAccount(
+    asset: Asset,
+    market: PublicKey
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).initializeOpenOrdersAccount(market);
+  }
+
+  public async closeOpenOrdersAccount(
+    asset: Asset,
+    market: PublicKey
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).closeOpenOrdersAccount(market);
+  }
+
+  public async closeMultipleOpenOrdersAccount(
+    asset: Asset,
+    markets: PublicKey[]
+  ): Promise<TransactionSignature[]> {
+    return await this.getSubClient(asset).closeMultipleOpenOrdersAccount(
+      markets
+    );
+  }
+
+  public async cancelMultipleOrders(
+    asset: Asset,
+    cancelArguments: types.CancelArgs[]
+  ): Promise<TransactionSignature[]> {
+    return await this.getSubClient(asset).cancelMultipleOrders(cancelArguments);
+  }
+
+  public async cancelMultipleOrdersNoError(
+    asset: Asset,
+    cancelArguments: types.CancelArgs[]
+  ): Promise<TransactionSignature[]> {
+    return await this.getSubClient(asset).cancelMultipleOrdersNoError(
+      cancelArguments
+    );
+  }
+
+  public async forceCancelOrders(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    marginAccountToCancel: PublicKey
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).forceCancelOrders(
+      this.marketIdentifierToPublicKey(asset, market),
+      marginAccountToCancel
+    );
+  }
+
+  public async liquidate(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    liquidatedMarginAccount: PublicKey,
+    size: number
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).liquidate(
+      this.marketIdentifierToPublicKey(asset, market),
+      liquidatedMarginAccount,
+      size
+    );
+  }
+
+  public async positionMovement(
+    asset: Asset,
+    movementType: types.MovementType,
+    movements: instructions.PositionMovementArg[]
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).positionMovement(
+      movementType,
+      movements
+    );
+  }
+
+  public async simulatePositionMovement(
+    asset: Asset,
+    movementType: types.MovementType,
+    movements: instructions.PositionMovementArg[]
+  ): Promise<PositionMovementEvent> {
+    return await this.getSubClient(asset).simulatePositionMovement(
+      movementType,
+      movements
+    );
+  }
+
+  public async transferExcessSpreadBalance(
+    asset: Asset
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).transferExcessSpreadBalance();
+  }
+
   public getMarginPositionSize(
+    asset: Asset,
     index: number,
     decimal: boolean = false
   ): number {
-    let size =
-      this.marginAccount.productLedgers[index].position.size.toNumber();
-    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+    return this.getSubClient(asset).getMarginPositionSize(index, decimal);
   }
 
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
   public getMarginCostOfTrades(
+    asset: Asset,
     index: number,
     decimal: boolean = false
   ): number {
-    let costOfTrades =
-      this.marginAccount.productLedgers[index].position.costOfTrades.toNumber();
-    return decimal
-      ? utils.convertNativeIntegerToDecimal(costOfTrades)
-      : costOfTrades;
+    return this.getSubClient(asset).getMarginCostOfTrades(index, decimal);
   }
 
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
+  public getMarginPositions(asset: Asset) {
+    return this.getSubClient(asset).marginPositions;
+  }
+
+  public getSpreadPositions(asset: Asset) {
+    return this.getSubClient(asset).spreadPositions;
+  }
+  public getOrders(asset: Asset) {
+    return this.getSubClient(asset).orders;
+  }
+
   public getOpeningOrders(
+    asset: Asset,
     index: number,
-    side: Side,
+    side: types.Side,
     decimal: boolean = false
   ): number {
-    let orderIndex = side == Side.BID ? 0 : 1;
-    let size =
-      this.marginAccount.productLedgers[index].orderState.openingOrders[
-        orderIndex
-      ].toNumber();
-    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+    return this.getSubClient(asset).getOpeningOrders(index, side, decimal);
   }
 
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
-  public getClosingOrders(index: number, decimal: boolean = false): number {
-    let size =
-      this.marginAccount.productLedgers[
-        index
-      ].orderState.closingOrders.toNumber();
-    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  public getClosingOrders(
+    asset: Asset,
+    index: number,
+    decimal: boolean = false
+  ): number {
+    return this.getSubClient(asset).getClosingOrders(index, decimal);
   }
 
-  /**
-   * Getter functions for raw user spread account state.
-   */
+  public getOpenOrdersAccounts(asset: Asset): PublicKey[] {
+    return this.getSubClient(asset).openOrdersAccounts;
+  }
 
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
   public getSpreadPositionSize(
+    asset: Asset,
     index: number,
     decimal: boolean = false
-  ): number {
-    let size = this.spreadAccount.positions[index].size.toNumber();
-    return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
+  ) {
+    return this.getSubClient(asset).getSpreadPositionSize(index, decimal);
   }
 
-  /**
-   * @param index - market index.
-   * @param decimal - whether to convert to readable decimal.
-   */
   public getSpreadCostOfTrades(
+    asset: Asset,
     index: number,
     decimal: boolean = false
   ): number {
-    let costOfTrades =
-      this.spreadAccount.positions[index].costOfTrades.toNumber();
-    return decimal
-      ? utils.convertNativeIntegerToDecimal(costOfTrades)
-      : costOfTrades;
+    return this.getSubClient(asset).getSpreadCostOfTrades(index, decimal);
   }
 
-  /**
-   * Closes the client websocket subscription to margin account.
-   */
+  public getSpreadAccount(asset: Asset): SpreadAccount {
+    return this.getSubClient(asset).spreadAccount;
+  }
+
+  public getSpreadAccountAddress(asset: Asset): PublicKey {
+    return this.getSubClient(asset).spreadAccountAddress;
+  }
+
+  public getMarginAccount(asset: Asset): MarginAccount {
+    return this.getSubClient(asset).marginAccount;
+  }
+
+  public getMarginAccountAddress(asset: Asset): PublicKey {
+    return this.getSubClient(asset).marginAccountAddress;
+  }
+
   public async close() {
-    if (this._marginAccountSubscriptionId !== undefined) {
-      await this._provider.connection.removeAccountChangeListener(
-        this._marginAccountSubscriptionId
-      );
-      this._marginAccountSubscriptionId = undefined;
-    }
-
-    if (this._spreadAccountSubscriptionId !== undefined) {
-      await this._provider.connection.removeAccountChangeListener(
-        this._spreadAccountSubscriptionId
-      );
-      this._spreadAccountSubscriptionId = undefined;
-    }
-
-    if (this._tradeEventListener !== undefined) {
-      await this._program.removeEventListener(this._tradeEventListener);
-      this._tradeEventListener = undefined;
-    }
-
+    await Promise.all(
+      this.getAllSubClients().map(async (subClient) => {
+        subClient.close();
+      })
+    );
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);
       this._pollIntervalId = undefined;

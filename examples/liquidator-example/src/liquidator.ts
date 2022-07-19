@@ -1,5 +1,13 @@
 require("dotenv").config();
-import { Client, Exchange, Network, utils, types } from "@zetamarkets/sdk";
+import {
+  Client,
+  Exchange,
+  Network,
+  utils,
+  types,
+  assets,
+  programTypes,
+} from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import { Wallet } from "@project-serum/anchor";
 import {
@@ -15,6 +23,9 @@ import { airdropUsdc } from "./utils";
 let client: Client;
 let scanning: boolean = false;
 
+// Underlying to run on. Can technically run on multiple at a time but will require some code modifications.
+export const asset = assets.Asset.BTC;
+
 // Function that will do a few things sequentially.
 // 1. Get all margin accounts for the program.
 // 2. Cancel all active orders for accounts at risk. (This is required to liquidate an account)
@@ -28,9 +39,23 @@ export async function scanMarginAccounts() {
   scanning = true;
   let marginAccounts: anchor.ProgramAccount[] =
     await Exchange.program.account.marginAccount.all();
-  console.log(`${marginAccounts.length} margin accounts.`);
 
-  let accountsAtRisk = await findAccountsAtRisk(marginAccounts);
+  let marginAccountsAsset = marginAccounts.filter((account) => {
+    return (
+      assets.fromProgramAsset(
+        (account.account as programTypes.MarginAccount).asset
+      ) == asset
+    );
+  });
+
+  console.log(`${marginAccounts.length} margin accounts.`);
+  console.log(
+    `${marginAccountsAsset.length} ${assets.assetToName(
+      asset
+    )} margin accounts.`
+  );
+
+  let accountsAtRisk = await findAccountsAtRisk(marginAccountsAsset);
   if (accountsAtRisk.length == 0) {
     console.log("No accounts at risk.");
     scanning = false;
@@ -51,7 +76,7 @@ export async function scanMarginAccounts() {
   // Display the latest client state.
   await client.updateState();
   let clientMarginAccountState = Exchange.riskCalculator.getMarginAccountState(
-    client.marginAccount
+    client.getMarginAccount(asset)
   );
   console.log(
     `Client margin account state: ${JSON.stringify(clientMarginAccountState)}`
@@ -66,7 +91,7 @@ async function main() {
   });
 
   // Starting balance for USDC to airdrop.
-  const startingBalance = 1_000_000;
+  const startingBalance = 10_000;
 
   // Set the network for the SDK to use.
   const network = Network.DEVNET;
@@ -92,6 +117,7 @@ async function main() {
 
   // Load the SDK Exchange object.
   await Exchange.load(
+    [asset],
     programId,
     network,
     connection,
@@ -104,7 +130,10 @@ async function main() {
 
   // The deposit function for client will initialize a margin account for you
   // atomically in the same transaction if you haven't created one already.
-  await client.deposit(utils.convertDecimalToNativeInteger(startingBalance));
+  await client.deposit(
+    asset,
+    utils.convertDecimalToNativeInteger(startingBalance)
+  );
 
   setInterval(
     async () => {

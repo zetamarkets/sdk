@@ -8,6 +8,7 @@ import {
   programTypes,
   constants,
   Market,
+  assets,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 
@@ -30,6 +31,7 @@ const NETWORK_URL = process.env["network_url"]!;
 const PROGRAM_ID = new PublicKey(process.env["program_id"]);
 let crankingMarkets = new Array(constants.ACTIVE_MARKETS).fill(false);
 console.log(NETWORK_URL);
+const assetList = [assets.Asset.SOL, assets.Asset.BTC];
 
 export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms, undefined));
@@ -57,6 +59,7 @@ async function main() {
 
   // We load the exchange with a valid wallet containing SOL to call permissionless zeta functions.
   await Exchange.load(
+    assetList,
     PROGRAM_ID,
     network,
     connection,
@@ -79,16 +82,19 @@ async function main() {
   // Crank all markets.
   setInterval(
     async function () {
-      await crankExchange(true);
-      // Use this instead of `crankExchange` if you wish to throttle your cranking.
-      /*
+      assetList.map(async (asset) => {
+        await crankExchange(asset, true);
+        // Use this instead of `crankExchange` if you wish to throttle your cranking.
+        /*
       await crankExchangeThrottled(
+        asset,
         true,
         process.env.CRANK_EXCHANGE_THROTTLE_MS
           ? parseInt(process.env.CRANK_EXCHANGE_THROTTLE_MS)
           : 1000
       );
       */
+      });
     },
     process.env.CRANK_EXCHANGE_INTERVAL
       ? parseInt(process.env.CRANK_EXCHANGE_INTERVAL)
@@ -108,7 +114,9 @@ async function main() {
   // Retreat pricing on markets
   setInterval(
     async function () {
-      await retreatMarketNodes();
+      assetList.map(async (asset) => {
+        await retreatMarketNodes(asset);
+      });
     },
     process.env.RETREAT_MARKET_NODES_INTERVAL
       ? parseInt(process.env.RETREAT_MARKET_NODES_INTERVAL)
@@ -118,7 +126,9 @@ async function main() {
   // Rebalance zeta vault and insurance fund
   setInterval(
     async function () {
-      await rebalanceInsuranceVault();
+      assetList.map(async (asset) => {
+        await rebalanceInsuranceVault(asset);
+      });
     }.bind(this),
     process.env.REBALANCE_INSURANCE_VAULT_INTERVAL
       ? parseInt(process.env.REBALANCE_INSURANCE_VAULT_INTERVAL)
@@ -132,63 +142,86 @@ async function main() {
  */
 async function updatePricing() {
   // Get relevant expiry indices.
-  let indicesToCrank = [];
-  for (var i = 0; i < Exchange.markets.expirySeries.length; i++) {
-    let expirySeries = Exchange.markets.expirySeries[i];
-    if (
-      Exchange.clockTimestamp <= expirySeries.expiryTs &&
-      expirySeries.strikesInitialized &&
-      !expirySeries.dirty
+  for (var asset of assetList) {
+    let indicesToCrank = [];
+    for (
+      var i = 0;
+      i < Exchange.getZetaGroupMarkets(asset).expirySeries.length;
+      i++
     ) {
-      indicesToCrank.push(i);
-    }
-  }
-  await Promise.all(
-    indicesToCrank.map(async (index) => {
-      try {
-        console.log(`Update pricing index ${index}`);
-        await Exchange.updatePricing(index);
-      } catch (e) {
-        console.error(`Index ${index}: Update pricing failed. ${e}`);
+      let expirySeries = Exchange.getZetaGroupMarkets(asset).expirySeries[i];
+      if (
+        Exchange.clockTimestamp <= expirySeries.expiryTs &&
+        expirySeries.strikesInitialized &&
+        !expirySeries.dirty
+      ) {
+        indicesToCrank.push(i);
       }
-    })
-  );
+    }
+    await Promise.all(
+      indicesToCrank.map(async (index) => {
+        try {
+          console.log(
+            `[${assets.assetToName(asset)}] Update pricing index ${index}`
+          );
+          await Exchange.updatePricing(asset, index);
+        } catch (e) {
+          console.error(
+            `[${assets.assetToName(
+              asset
+            )}] Index ${index}: Update pricing failed. ${e}`
+          );
+        }
+      })
+    );
+  }
 }
 
 /**
  * This calls zeta's permissionless retreat market nodes function through the Exchange object.
  * Cranks zeta's on-chain volatility, retreat and interest functionality similiar to update pricing.
  */
-async function retreatMarketNodes() {
+async function retreatMarketNodes(asset: assets.Asset) {
   // Get relevant expiry indices.
   let indicesToRetreat = [];
-  for (var i = 0; i < Exchange.markets.expirySeries.length; i++) {
-    if (Exchange.markets.expirySeries[i].isLive()) {
+  for (
+    var i = 0;
+    i < Exchange.getZetaGroupMarkets(asset).expirySeries.length;
+    i++
+  ) {
+    if (Exchange.getZetaGroupMarkets(asset).expirySeries[i].isLive()) {
       indicesToRetreat.push(i);
     }
   }
   await Promise.all(
     indicesToRetreat.map(async (index) => {
       try {
-        console.log(`Retreating index ${index}`);
-        await Exchange.retreatMarketNodes(index);
+        console.log(`[${assets.assetToName(asset)}] Retreating index ${index}`);
+        await Exchange.retreatMarketNodes(asset, index);
       } catch (e) {
-        console.error(`Index ${index}: Retreat market nodes failed. ${e}`);
+        console.error(
+          `[${assets.assetToName(
+            asset
+          )}] Index ${index}: Retreat market nodes failed. ${e}`
+        );
       }
     })
   );
 }
 
-function getMarketsToCrank(liveOnly: boolean): Market[] {
+function getMarketsToCrank(asset: assets.Asset, liveOnly: boolean): Market[] {
   let marketsToCrank = [];
   if (liveOnly) {
-    let liveExpiryIndices = Exchange.markets.getTradeableExpiryIndices();
+    let liveExpiryIndices =
+      Exchange.getZetaGroupMarkets(asset).getTradeableExpiryIndices();
     liveExpiryIndices.map(async (index) => {
-      marketsToCrank.push(Exchange.markets.getMarketsByExpiryIndex(index));
+      marketsToCrank.push(
+        Exchange.getZetaGroupMarkets(asset).getMarketsByExpiryIndex(index)
+      );
     });
     marketsToCrank = marketsToCrank.flat(1);
   } else {
-    marketsToCrank = Exchange.markets.markets;
+    marketsToCrank = Exchange.getMarkets(asset);
   }
   return marketsToCrank;
 }
@@ -202,8 +235,8 @@ function getMarketsToCrank(liveOnly: boolean): Market[] {
  * This function will poll all market event queues asynchronously so is quite expensive in terms of RPC requests per second.
  * Use crankExchangeThrottle if you are running into rate limit issues.
  */
-async function crankExchange(liveOnly: boolean) {
-  let marketsToCrank: Market[] = getMarketsToCrank(liveOnly);
+async function crankExchange(asset: assets.Asset, liveOnly: boolean) {
+  let marketsToCrank: Market[] = getMarketsToCrank(asset, liveOnly);
   marketsToCrank.map(async (market) => {
     let eventQueue = await market.serumMarket.loadEventQueue(
       Exchange.provider.connection
@@ -214,7 +247,7 @@ async function crankExchange(liveOnly: boolean) {
       try {
         while (eventQueue.length != 0) {
           try {
-            await utils.crankMarket(market.marketIndex);
+            await utils.crankMarket(asset, market.marketIndex);
           } catch (e) {
             console.error(
               `Cranking failed on market ${market.marketIndex}, ${e}`
@@ -229,7 +262,9 @@ async function crankExchange(liveOnly: boolean) {
 
           let numCranked = currLength - eventQueue.length;
           console.log(
-            `Cranked ${numCranked} events for market ${market.marketIndex}`
+            `[${assets.assetToName(
+              asset
+            )}] Cranked ${numCranked} events for market ${market.marketIndex}`
           );
         }
       } catch (e) {
@@ -244,8 +279,12 @@ async function crankExchange(liveOnly: boolean) {
  * Iteratively cranks each market event queue.
  * Allows an optional argument for `throttleMs` which is the duration it will sleep after each market crank.
  */
-async function crankExchangeThrottled(liveOnly: boolean, throttleMs: number) {
-  let marketsToCrank: Market[] = getMarketsToCrank(liveOnly);
+async function crankExchangeThrottled(
+  asset: assets.Asset,
+  liveOnly: boolean,
+  throttleMs: number
+) {
+  let marketsToCrank: Market[] = getMarketsToCrank(asset, liveOnly);
   for (var i = 0; i < marketsToCrank.length; i++) {
     let market = marketsToCrank[i];
     let eventQueue = await market.serumMarket.loadEventQueue(
@@ -256,7 +295,7 @@ async function crankExchangeThrottled(liveOnly: boolean, throttleMs: number) {
       try {
         while (eventQueue.length != 0) {
           try {
-            await utils.crankMarket(market.marketIndex);
+            await utils.crankMarket(asset, market.marketIndex);
           } catch (e) {
             console.error(
               `Cranking failed on market ${market.marketIndex}, ${e}`
@@ -271,7 +310,9 @@ async function crankExchangeThrottled(liveOnly: boolean, throttleMs: number) {
 
           let numCranked = currLength - eventQueue.length;
           console.log(
-            `Cranked ${numCranked} events for market ${market.marketIndex}`
+            `[${assets.assetToName(
+              asset
+            )}] Cranked ${numCranked} events for market ${market.marketIndex}`
           );
         }
       } catch (e) {
@@ -287,7 +328,7 @@ async function crankExchangeThrottled(liveOnly: boolean, throttleMs: number) {
  * Rebalances the zeta vault and the insurance vault to ensure consistent platform security.
  * Checks all margin accounts for non-zero rebalance amounts and rebalances them all.
  */
-async function rebalanceInsuranceVault() {
+async function rebalanceInsuranceVault(asset: assets.Asset) {
   let accs: any[] = await Exchange.program.account.marginAccount.all();
   let remainingAccounts: any[] = new Array();
   for (let i = 0; i < accs.length; i++) {
@@ -301,10 +342,12 @@ async function rebalanceInsuranceVault() {
     }
   }
   console.log(
-    `[REBALANCE INSURANCE VAULT] for ${remainingAccounts.length} accounts.`
+    `[${assets.assetToName(asset)}] [REBALANCE INSURANCE VAULT] for ${
+      remainingAccounts.length
+    } accounts.`
   );
   try {
-    await Exchange.rebalanceInsuranceVault(remainingAccounts);
+    await Exchange.rebalanceInsuranceVault(asset, remainingAccounts);
   } catch (e) {
     console.error("Rebalance insurance vault error on transaction!");
   }

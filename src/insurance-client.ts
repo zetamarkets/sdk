@@ -13,12 +13,9 @@ import {
   TransactionSignature,
 } from "@solana/web3.js";
 import idl from "./idl/zeta.json";
-import { Wallet } from "./types";
-import {
-  initializeInsuranceDepositAccountIx,
-  depositInsuranceVaultIx,
-  withdrawInsuranceVaultIx,
-} from "./program-instructions";
+import * as types from "./types";
+import * as instructions from "./program-instructions";
+import { Asset } from "./assets";
 
 export class InsuranceClient {
   /**
@@ -70,11 +67,21 @@ export class InsuranceClient {
   }
   private _usdcAccountAddress: PublicKey;
 
+  /**
+   * The underlying asset the client is using
+   */
+  public get asset(): Asset {
+    return this._asset;
+  }
+  private _asset: Asset;
+
   private constructor(
+    asset: Asset,
     connection: Connection,
-    wallet: Wallet,
+    wallet: types.Wallet,
     opts: ConfirmOptions
   ) {
+    this._asset = asset;
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._program = new anchor.Program(
       idl as anchor.Idl,
@@ -89,19 +96,20 @@ export class InsuranceClient {
    * Requires Exchange to be loaded
    */
   public static async load(
+    asset: Asset,
     connection: Connection,
-    wallet: Wallet,
+    wallet: types.Wallet,
     opts: ConfirmOptions = utils.defaultCommitment()
   ): Promise<InsuranceClient> {
     console.log(`Loading insurance client: ${wallet.publicKey.toString()}`);
-    let insuranceClient = new InsuranceClient(connection, wallet, opts);
+    let insuranceClient = new InsuranceClient(asset, connection, wallet, opts);
 
     await insuranceClient.insuranceWhitelistCheck();
 
     let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
       await utils.getUserInsuranceDepositAccount(
         Exchange.programId,
-        Exchange.zetaGroupAddress,
+        Exchange.getZetaGroupAddress(asset),
         wallet.publicKey
       );
 
@@ -132,14 +140,16 @@ export class InsuranceClient {
         "User has no insurance vault deposit account. Creating insurance vault deposit account..."
       );
       tx.add(
-        await initializeInsuranceDepositAccountIx(
+        await instructions.initializeInsuranceDepositAccountIx(
+          this.asset,
           this.publicKey,
           this.whitelistInsuranceAccountAddress
         )
       );
     }
     tx.add(
-      depositInsuranceVaultIx(
+      instructions.depositInsuranceVaultIx(
+        this.asset,
         amount,
         this._insuranceDepositAccountAddress,
         this._usdcAccountAddress,
@@ -165,7 +175,8 @@ export class InsuranceClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     tx.add(
-      withdrawInsuranceVaultIx(
+      instructions.withdrawInsuranceVaultIx(
+        this.asset,
         percentageAmount,
         this._insuranceDepositAccountAddress,
         this._usdcAccountAddress,

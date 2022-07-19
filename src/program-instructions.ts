@@ -10,17 +10,9 @@ import {
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import * as utils from "./utils";
 import * as anchor from "@project-serum/anchor";
-import {
-  MovementType,
-  OrderType,
-  Side,
-  toProgramOrderType,
-  toProgramSide,
-  toProgramMovementType,
-} from "./types";
+import * as types from "./types";
 import * as constants from "./constants";
-import { types } from ".";
-import * as assets from "./assets";
+import { Asset } from "./assets";
 
 export function initializeMarginAccountIx(
   zetaGroup: PublicKey,
@@ -40,6 +32,7 @@ export function initializeMarginAccountIx(
 }
 
 export function closeMarginAccountIx(
+  asset: Asset,
   userKey: PublicKey,
   marginAccount: PublicKey
 ): TransactionInstruction {
@@ -47,25 +40,27 @@ export function closeMarginAccountIx(
     accounts: {
       marginAccount,
       authority: userKey,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
     },
   });
 }
 
 export async function initializeInsuranceDepositAccountIx(
+  asset: Asset,
   userKey: PublicKey,
   userWhitelistInsuranceKey: PublicKey
 ): Promise<TransactionInstruction> {
+  let subExchange = Exchange.getSubExchange(asset);
   let [insuranceDepositAccount, nonce] =
     await utils.getUserInsuranceDepositAccount(
       Exchange.programId,
-      Exchange.zetaGroupAddress,
+      subExchange.zetaGroupAddress,
       userKey
     );
 
   return Exchange.program.instruction.initializeInsuranceDepositAccount(nonce, {
     accounts: {
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
       insuranceDepositAccount,
       authority: userKey,
       systemProgram: SystemProgram.programId,
@@ -78,6 +73,7 @@ export async function initializeInsuranceDepositAccountIx(
  * @param amount the native amount to deposit (6dp)
  */
 export async function depositIx(
+  asset: Asset,
   amount: number,
   marginAccount: PublicKey,
   usdcAccount: PublicKey,
@@ -94,18 +90,20 @@ export async function depositIx(
           },
         ]
       : [];
+  let subExchange = Exchange.getSubExchange(asset);
+
   // TODO: Probably use mint to find decimal places in future.
   return Exchange.program.instruction.deposit(new anchor.BN(amount), {
     accounts: {
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
       marginAccount: marginAccount,
-      vault: Exchange.vaultAddress,
+      vault: subExchange.vaultAddress,
       userTokenAccount: usdcAccount,
-      socializedLossAccount: Exchange.socializedLossAccountAddress,
+      socializedLossAccount: subExchange.socializedLossAccountAddress,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
       state: Exchange.stateAddress,
-      greeks: Exchange.zetaGroup.greeks,
+      greeks: subExchange.zetaGroup.greeks,
     },
     remainingAccounts,
   });
@@ -118,21 +116,23 @@ export async function depositIx(
  * @param userKey
  */
 export function depositInsuranceVaultIx(
+  asset: Asset,
   amount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.depositInsuranceVault(
     new anchor.BN(amount),
     {
       accounts: {
-        zetaGroup: Exchange.zetaGroupAddress,
-        insuranceVault: Exchange.insuranceVaultAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
+        insuranceVault: subExchange.insuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
-        zetaVault: Exchange.vaultAddress,
-        socializedLossAccount: Exchange.socializedLossAccountAddress,
+        zetaVault: subExchange.vaultAddress,
+        socializedLossAccount: subExchange.socializedLossAccountAddress,
         authority: userKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       },
@@ -141,17 +141,19 @@ export function depositInsuranceVaultIx(
 }
 
 export function withdrawInsuranceVaultIx(
+  asset: Asset,
   percentageAmount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.withdrawInsuranceVault(
     new anchor.BN(percentageAmount),
     {
       accounts: {
-        zetaGroup: Exchange.zetaGroupAddress,
-        insuranceVault: Exchange.insuranceVaultAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
+        insuranceVault: subExchange.insuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
         authority: userKey,
@@ -165,28 +167,31 @@ export function withdrawInsuranceVaultIx(
  * @param amount the native amount to withdraw (6dp)
  */
 export function withdrawIx(
+  asset: Asset,
   amount: number,
   marginAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.withdraw(new anchor.BN(amount), {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      vault: Exchange.vaultAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      vault: subExchange.vaultAddress,
       marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
-      greeks: Exchange.zetaGroup.greeks,
-      oracle: Exchange.zetaGroup.oracle,
-      socializedLossAccount: Exchange.socializedLossAccountAddress,
+      greeks: subExchange.zetaGroup.greeks,
+      oracle: subExchange.zetaGroup.oracle,
+      socializedLossAccount: subExchange.socializedLossAccountAddress,
     },
   });
 }
 
 export async function initializeOpenOrdersIx(
+  asset: Asset,
   market: PublicKey,
   userKey: PublicKey,
   marginAccount: PublicKey
@@ -206,7 +211,7 @@ export async function initializeOpenOrdersIx(
     Exchange.program.instruction.initializeOpenOrders({
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: Exchange.zetaGroupAddress,
+        zetaGroup: Exchange.getZetaGroupAddress(asset),
         dexProgram: constants.DEX_PID[Exchange.network],
         systemProgram: SystemProgram.programId,
         openOrders: openOrdersPda,
@@ -224,6 +229,7 @@ export async function initializeOpenOrdersIx(
 }
 
 export async function closeOpenOrdersIx(
+  asset: Asset,
   market: PublicKey,
   userKey: PublicKey,
   marginAccount: PublicKey,
@@ -237,7 +243,7 @@ export async function closeOpenOrdersIx(
   return Exchange.program.instruction.closeOpenOrders(openOrdersMapNonce, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
       dexProgram: constants.DEX_PID[Exchange.network],
       openOrders,
       marginAccount: marginAccount,
@@ -250,17 +256,19 @@ export async function closeOpenOrdersIx(
 }
 
 export function placeOrderIx(
+  asset: Asset,
   marketIndex: number,
   price: number,
   size: number,
-  side: Side,
+  side: types.Side,
   clientOrderId: number,
   marginAccount: PublicKey,
   authority: PublicKey,
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -275,18 +283,18 @@ export function placeOrderIx(
   return Exchange.program.instruction.placeOrder(
     new anchor.BN(price),
     new anchor.BN(size),
-    toProgramSide(side),
+    types.toProgramSide(side),
     clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     {
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: Exchange.zetaGroupAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
         marginAccount: marginAccount,
         authority: authority,
         dexProgram: constants.DEX_PID[Exchange.network],
         tokenProgram: TOKEN_PROGRAM_ID,
         serumAuthority: Exchange.serumAuthority,
-        greeks: Exchange.zetaGroup.greeks,
+        greeks: subExchange.zetaGroup.greeks,
         openOrders: openOrders,
         rent: SYSVAR_RENT_PUBKEY,
         marketAccounts: {
@@ -299,14 +307,16 @@ export function placeOrderIx(
           pcVault: marketData.serumMarket.decoded.quoteVault,
           // User params.
           orderPayerTokenAccount:
-            side == Side.BID ? marketData.quoteVault : marketData.baseVault,
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
           coinWallet: marketData.baseVault,
           pcWallet: marketData.quoteVault,
         },
-        oracle: Exchange.zetaGroup.oracle,
-        marketNode: Exchange.greeks.nodeKeys[marketIndex],
+        oracle: subExchange.zetaGroup.oracle,
+        marketNode: subExchange.greeks.nodeKeys[marketIndex],
         marketMint:
-          side == Side.BID
+          side == types.Side.BID
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
@@ -317,18 +327,20 @@ export function placeOrderIx(
 }
 
 export function placeOrderV2Ix(
+  asset: Asset,
   marketIndex: number,
   price: number,
   size: number,
-  side: Side,
-  orderType: OrderType,
+  side: types.Side,
+  orderType: types.OrderType,
   clientOrderId: number,
   marginAccount: PublicKey,
   authority: PublicKey,
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -343,19 +355,19 @@ export function placeOrderV2Ix(
   return Exchange.program.instruction.placeOrderV2(
     new anchor.BN(price),
     new anchor.BN(size),
-    toProgramSide(side),
-    toProgramOrderType(orderType),
+    types.toProgramSide(side),
+    types.toProgramOrderType(orderType),
     clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     {
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: Exchange.zetaGroupAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
         marginAccount: marginAccount,
         authority: authority,
         dexProgram: constants.DEX_PID[Exchange.network],
         tokenProgram: TOKEN_PROGRAM_ID,
         serumAuthority: Exchange.serumAuthority,
-        greeks: Exchange.zetaGroup.greeks,
+        greeks: subExchange.zetaGroup.greeks,
         openOrders: openOrders,
         rent: SYSVAR_RENT_PUBKEY,
         marketAccounts: {
@@ -368,14 +380,16 @@ export function placeOrderV2Ix(
           pcVault: marketData.serumMarket.decoded.quoteVault,
           // User params.
           orderPayerTokenAccount:
-            side == Side.BID ? marketData.quoteVault : marketData.baseVault,
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
           coinWallet: marketData.baseVault,
           pcWallet: marketData.quoteVault,
         },
-        oracle: Exchange.zetaGroup.oracle,
-        marketNode: Exchange.greeks.nodeKeys[marketIndex],
+        oracle: subExchange.zetaGroup.oracle,
+        marketNode: subExchange.greeks.nodeKeys[marketIndex],
         marketMint:
-          side == Side.BID
+          side == types.Side.BID
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
@@ -386,11 +400,12 @@ export function placeOrderV2Ix(
 }
 
 export function placeOrderV3Ix(
+  asset: Asset,
   marketIndex: number,
   price: number,
   size: number,
-  side: Side,
-  orderType: OrderType,
+  side: types.Side,
+  orderType: types.OrderType,
   clientOrderId: number,
   tag: String,
   marginAccount: PublicKey,
@@ -403,7 +418,8 @@ export function placeOrderV3Ix(
       `Tag is too long! Max length = ${constants.MAX_ORDER_TAG_LENGTH}`
     );
   }
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -418,20 +434,20 @@ export function placeOrderV3Ix(
   return Exchange.program.instruction.placeOrderV3(
     new anchor.BN(price),
     new anchor.BN(size),
-    toProgramSide(side),
-    toProgramOrderType(orderType),
+    types.toProgramSide(side),
+    types.toProgramOrderType(orderType),
     clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     new String(tag),
     {
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: Exchange.zetaGroupAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
         marginAccount: marginAccount,
         authority: authority,
         dexProgram: constants.DEX_PID[Exchange.network],
         tokenProgram: TOKEN_PROGRAM_ID,
         serumAuthority: Exchange.serumAuthority,
-        greeks: Exchange.zetaGroup.greeks,
+        greeks: subExchange.zetaGroup.greeks,
         openOrders: openOrders,
         rent: SYSVAR_RENT_PUBKEY,
         marketAccounts: {
@@ -444,14 +460,16 @@ export function placeOrderV3Ix(
           pcVault: marketData.serumMarket.decoded.quoteVault,
           // User params.
           orderPayerTokenAccount:
-            side == Side.BID ? marketData.quoteVault : marketData.baseVault,
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
           coinWallet: marketData.baseVault,
           pcWallet: marketData.quoteVault,
         },
-        oracle: Exchange.zetaGroup.oracle,
-        marketNode: Exchange.greeks.nodeKeys[marketIndex],
+        oracle: subExchange.zetaGroup.oracle,
+        marketNode: subExchange.greeks.nodeKeys[marketIndex],
         marketMint:
-          side == Side.BID
+          side == types.Side.BID
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
@@ -462,22 +480,24 @@ export function placeOrderV3Ix(
 }
 
 export function cancelOrderIx(
+  asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
-  side: Side
+  side: types.Side
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrder(
-    toProgramSide(side),
+    types.toProgramSide(side),
     orderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
+          zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -494,22 +514,24 @@ export function cancelOrderIx(
 }
 
 export function cancelOrderNoErrorIx(
+  asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
-  side: Side
+  side: types.Side
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrderNoError(
-    toProgramSide(side),
+    types.toProgramSide(side),
     orderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
+          zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -526,20 +548,22 @@ export function cancelOrderNoErrorIx(
 }
 
 export function cancelOrderByClientOrderIdIx(
+  asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   clientOrderId: anchor.BN
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrderByClientOrderId(
     clientOrderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
+          zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -556,20 +580,22 @@ export function cancelOrderByClientOrderIdIx(
 }
 
 export function cancelOrderByClientOrderIdNoErrorIx(
+  asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   clientOrderId: anchor.BN
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrderByClientOrderIdNoError(
     clientOrderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
+          zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -586,20 +612,22 @@ export function cancelOrderByClientOrderIdNoErrorIx(
 }
 
 export function cancelExpiredOrderIx(
+  asset: Asset,
   marketIndex: number,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
-  side: Side
+  side: types.Side
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelExpiredOrder(
-    toProgramSide(side),
+    types.toProgramSide(side),
     orderId,
     {
       accounts: {
         cancelAccounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
+          zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -616,17 +644,19 @@ export function cancelExpiredOrderIx(
 }
 
 export function forceCancelOrdersIx(
+  asset: Asset,
   marketIndex: number,
   marginAccount: PublicKey,
   openOrders: PublicKey
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   return Exchange.program.instruction.forceCancelOrders({
     accounts: {
-      greeks: Exchange.zetaGroup.greeks,
-      oracle: Exchange.zetaGroup.oracle,
+      greeks: subExchange.zetaGroup.greeks,
+      oracle: subExchange.zetaGroup.oracle,
       cancelAccounts: {
-        zetaGroup: Exchange.zetaGroupAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
         state: Exchange.stateAddress,
         marginAccount,
         dexProgram: constants.DEX_PID[Exchange.network],
@@ -642,6 +672,7 @@ export function forceCancelOrdersIx(
 }
 
 export async function initializeZetaMarketTxs(
+  asset: Asset,
   marketIndex: number,
   seedIndex: number,
   requestQueue: PublicKey,
@@ -650,9 +681,10 @@ export async function initializeZetaMarketTxs(
   asks: PublicKey,
   marketIndexes: PublicKey
 ): Promise<[Transaction, Transaction]> {
+  let subExchange = Exchange.getSubExchange(asset);
   const [market, marketNonce] = await utils.getMarketUninitialized(
     Exchange.programId,
-    Exchange.zetaGroupAddress,
+    subExchange.zetaGroupAddress,
     seedIndex
   );
 
@@ -688,10 +720,14 @@ export async function initializeZetaMarketTxs(
     quoteMint
   );
 
+  let fromPubkey = Exchange.useLedger
+    ? Exchange.ledgerWallet.publicKey
+    : Exchange.provider.wallet.publicKey;
+
   const tx = new Transaction();
   tx.add(
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: requestQueue,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(
@@ -701,7 +737,7 @@ export async function initializeZetaMarketTxs(
       programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: eventQueue,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(
@@ -711,7 +747,7 @@ export async function initializeZetaMarketTxs(
       programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: bids,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(
@@ -721,7 +757,7 @@ export async function initializeZetaMarketTxs(
       programId: constants.DEX_PID[Exchange.network],
     }),
     SystemProgram.createAccount({
-      fromPubkey: Exchange.provider.wallet.publicKey,
+      fromPubkey,
       newAccountPubkey: asks,
       lamports:
         await Exchange.provider.connection.getMinimumBalanceForRentExemption(
@@ -749,8 +785,8 @@ export async function initializeZetaMarketTxs(
         accounts: {
           state: Exchange.stateAddress,
           marketIndexes: marketIndexes,
-          zetaGroup: Exchange.zetaGroupAddress,
-          admin: Exchange.provider.wallet.publicKey,
+          zetaGroup: subExchange.zetaGroupAddress,
+          admin: Exchange.state.admin,
           market,
           requestQueue: requestQueue,
           eventQueue: eventQueue,
@@ -777,6 +813,7 @@ export async function initializeZetaMarketTxs(
 }
 
 export async function initializeZetaGroupIx(
+  asset: Asset,
   underlyingMint: PublicKey,
   oracle: PublicKey,
   pricingArgs: InitializeZetaGroupPricingArgs,
@@ -791,26 +828,26 @@ export async function initializeZetaGroupIx(
     Exchange.programId,
     Exchange.state.numUnderlyings
   );
-
+  let subExchange = Exchange.getSubExchange(asset);
   let [greeks, greeksNonce] = await utils.getGreeks(
     Exchange.programId,
-    Exchange.zetaGroupAddress
+    subExchange.zetaGroupAddress
   );
 
   let [vault, vaultNonce] = await utils.getVault(
     Exchange.programId,
-    Exchange.zetaGroupAddress
+    subExchange.zetaGroupAddress
   );
 
   let [insuranceVault, insuranceVaultNonce] = await utils.getZetaInsuranceVault(
     Exchange.programId,
-    Exchange.zetaGroupAddress
+    subExchange.zetaGroupAddress
   );
 
   let [socializedLossAccount, socializedLossAccountNonce] =
     await utils.getSocializedLossAccount(
       Exchange.programId,
-      Exchange.zetaGroupAddress
+      subExchange.zetaGroupAddress
     );
 
   return Exchange.program.instruction.initializeZetaGroup(
@@ -856,7 +893,7 @@ export async function initializeZetaGroupIx(
     {
       accounts: {
         state: Exchange.stateAddress,
-        admin: Exchange.provider.wallet.publicKey,
+        admin: Exchange.state.admin,
         systemProgram: SystemProgram.programId,
         underlyingMint,
         zetaProgram: Exchange.programId,
@@ -876,14 +913,16 @@ export async function initializeZetaGroupIx(
 }
 
 export function rebalanceInsuranceVaultIx(
+  asset: Asset,
   remainingAccounts: any[]
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
-      zetaGroup: Exchange.zetaGroupAddress,
-      zetaVault: Exchange.vaultAddress,
-      insuranceVault: Exchange.insuranceVaultAddress,
-      socializedLossAccount: Exchange.socializedLossAccountAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      zetaVault: subExchange.vaultAddress,
+      insuranceVault: subExchange.insuranceVaultAddress,
+      socializedLossAccount: subExchange.socializedLossAccountAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,
@@ -891,6 +930,7 @@ export function rebalanceInsuranceVaultIx(
 }
 
 export function liquidateIx(
+  asset: Asset,
   liquidator: PublicKey,
   liquidatorMarginAccount: PublicKey,
   market: PublicKey,
@@ -898,21 +938,23 @@ export function liquidateIx(
   size: number
 ): TransactionInstruction {
   let liquidateSize: any = new anchor.BN(size);
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.liquidate(liquidateSize, {
     accounts: {
       state: Exchange.stateAddress,
       liquidator,
       liquidatorMarginAccount,
-      greeks: Exchange.zetaGroup.greeks,
-      oracle: Exchange.zetaGroup.oracle,
+      greeks: subExchange.zetaGroup.greeks,
+      oracle: subExchange.zetaGroup.oracle,
       market,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
       liquidatedMarginAccount,
     },
   });
 }
 
 export function crankMarketIx(
+  asset: Asset,
   market: PublicKey,
   eventQueue: PublicKey,
   dexProgram: PublicKey,
@@ -921,7 +963,7 @@ export function crankMarketIx(
   return Exchange.program.instruction.crankEventQueue({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
       market,
       eventQueue,
       dexProgram,
@@ -932,11 +974,13 @@ export function crankMarketIx(
 }
 
 export async function initializeMarketNodeIx(
+  asset: Asset,
   index: number
 ): Promise<TransactionInstruction> {
+  let subExchange = Exchange.getSubExchange(asset);
   let [marketNode, nonce] = await utils.getMarketNode(
     Exchange.programId,
-    Exchange.zetaGroupAddress,
+    subExchange.zetaGroupAddress,
     index
   );
 
@@ -944,9 +988,9 @@ export async function initializeMarketNodeIx(
     { nonce, index },
     {
       accounts: {
-        zetaGroup: Exchange.zetaGroupAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
         marketNode,
-        greeks: Exchange.greeksAddress,
+        greeks: subExchange.greeksAddress,
         payer: Exchange.provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       },
@@ -955,10 +999,12 @@ export async function initializeMarketNodeIx(
 }
 
 export function retreatMarketNodesIx(
+  asset: Asset,
   expiryIndex: number
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   let head = expiryIndex * constants.PRODUCTS_PER_EXPIRY;
-  let remainingAccounts = Exchange.greeks.nodeKeys
+  let remainingAccounts = subExchange.greeks.nodeKeys
     .map((x: PublicKey) => {
       return {
         pubkey: x,
@@ -970,60 +1016,68 @@ export function retreatMarketNodesIx(
 
   return Exchange.program.instruction.retreatMarketNodes(expiryIndex, {
     accounts: {
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
-      oracle: Exchange.zetaGroup.oracle,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
+      oracle: subExchange.zetaGroup.oracle,
     },
     remainingAccounts,
   });
 }
 
-export function updatePricingIx(expiryIndex: number): TransactionInstruction {
+export function updatePricingIx(
+  asset: Asset,
+  expiryIndex: number
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.updatePricing(expiryIndex, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
-      oracle: Exchange.zetaGroup.oracle,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
+      oracle: subExchange.zetaGroup.oracle,
     },
   });
 }
 
 export function updatePricingParametersIx(
+  asset: Asset,
   args: UpdatePricingParametersArgs,
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updatePricingParameters(args, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
       admin,
     },
   });
 }
 
 export function updateMarginParametersIx(
+  asset: Asset,
   args: UpdateMarginParametersArgs,
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateMarginParameters(args, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
       admin,
     },
   });
 }
 
 export function updateVolatilityNodesIx(
+  asset: Asset,
   nodes: Array<anchor.BN>,
   admin: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.updateVolatilityNodes(nodes, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
       admin,
     },
   });
@@ -1068,6 +1122,7 @@ export function updateZetaStateIx(
 }
 
 export function initializeMarketIndexesIx(
+  asset: Asset,
   marketIndexes: PublicKey,
   nonce: number
 ): TransactionInstruction {
@@ -1075,34 +1130,39 @@ export function initializeMarketIndexesIx(
     accounts: {
       state: Exchange.stateAddress,
       marketIndexes: marketIndexes,
-      admin: Exchange.provider.wallet.publicKey,
+      admin: Exchange.state.admin,
       systemProgram: SystemProgram.programId,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
     },
   });
 }
 export function addMarketIndexesIx(
+  asset: Asset,
   marketIndexes: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.addMarketIndexes({
     accounts: {
       marketIndexes,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
     },
   });
 }
 
-export function initializeMarketStrikesIx(): TransactionInstruction {
+export function initializeMarketStrikesIx(
+  asset: Asset
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.initializeMarketStrikes({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      oracle: Exchange.zetaGroup.oracle,
+      zetaGroup: subExchange.zetaGroupAddress,
+      oracle: subExchange.zetaGroup.oracle,
     },
   });
 }
 
 export async function initializeWhitelistDepositAccountIx(
+  asset: Asset,
   user: PublicKey,
   admin: PublicKey
 ): Promise<TransactionInstruction> {
@@ -1213,6 +1273,7 @@ export async function initializeReferrerAccountIx(
 }
 
 export function settlePositionsTxs(
+  asset: Asset,
   expirationTs: anchor.BN,
   settlementPda: PublicKey,
   nonce: number,
@@ -1226,13 +1287,14 @@ export function settlePositionsTxs(
   ) {
     let tx = new Transaction();
     let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
-    tx.add(settlePositionsIx(expirationTs, settlementPda, nonce, slice));
+    tx.add(settlePositionsIx(asset, expirationTs, settlementPda, nonce, slice));
     txs.push(tx);
   }
   return txs;
 }
 
 export function settlePositionsIx(
+  asset: Asset,
   expirationTs: anchor.BN,
   settlementPda: PublicKey,
   nonce: number,
@@ -1240,7 +1302,7 @@ export function settlePositionsIx(
 ): TransactionInstruction {
   return Exchange.program.instruction.settlePositions(expirationTs, nonce, {
     accounts: {
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
       settlementAccount: settlementPda,
     },
     remainingAccounts: marginAccounts,
@@ -1248,6 +1310,7 @@ export function settlePositionsIx(
 }
 
 export function settleSpreadPositionsIx(
+  asset: Asset,
   expirationTs: anchor.BN,
   settlementPda: PublicKey,
   nonce: number,
@@ -1258,7 +1321,7 @@ export function settleSpreadPositionsIx(
     nonce,
     {
       accounts: {
-        zetaGroup: Exchange.zetaGroupAddress,
+        zetaGroup: Exchange.getZetaGroupAddress(asset),
         settlementAccount: settlementPda,
       },
       remainingAccounts: spreadAccounts,
@@ -1267,6 +1330,7 @@ export function settleSpreadPositionsIx(
 }
 
 export function settleSpreadPositionsHaltedTxs(
+  asset: Asset,
   spreadAccounts: AccountMeta[],
   admin: PublicKey
 ): Transaction[] {
@@ -1278,13 +1342,14 @@ export function settleSpreadPositionsHaltedTxs(
   ) {
     let slice = spreadAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
     txs.push(
-      new Transaction().add(settleSpreadPositionsHaltedIx(slice, admin))
+      new Transaction().add(settleSpreadPositionsHaltedIx(asset, slice, admin))
     );
   }
   return txs;
 }
 
 export function settlePositionsHaltedTxs(
+  asset: Asset,
   marginAccounts: AccountMeta[],
   admin: PublicKey
 ): Transaction[] {
@@ -1295,20 +1360,24 @@ export function settlePositionsHaltedTxs(
     i += constants.MAX_SETTLEMENT_ACCOUNTS
   ) {
     let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
-    txs.push(new Transaction().add(settlePositionsHaltedIx(slice, admin)));
+    txs.push(
+      new Transaction().add(settlePositionsHaltedIx(asset, slice, admin))
+    );
   }
   return txs;
 }
 
 export function settlePositionsHaltedIx(
+  asset: Asset,
   marginAccounts: AccountMeta[],
   admin: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.settlePositionsHalted({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
       admin,
     },
     remainingAccounts: marginAccounts,
@@ -1316,14 +1385,16 @@ export function settlePositionsHaltedIx(
 }
 
 export function settleSpreadPositionsHaltedIx(
+  asset: Asset,
   spreadAccounts: AccountMeta[],
   admin: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.settleSpreadPositionsHalted({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
       admin,
     },
     remainingAccounts: spreadAccounts,
@@ -1331,48 +1402,54 @@ export function settleSpreadPositionsHaltedIx(
 }
 
 export function cleanZetaMarketsIx(
+  asset: Asset,
   marketAccounts: any[]
 ): TransactionInstruction {
   return Exchange.program.instruction.cleanZetaMarkets({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
     },
     remainingAccounts: marketAccounts,
   });
 }
 
 export function cleanZetaMarketsHaltedIx(
+  asset: Asset,
   marketAccounts: any[]
 ): TransactionInstruction {
   return Exchange.program.instruction.cleanZetaMarketsHalted({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
     },
     remainingAccounts: marketAccounts,
   });
 }
 
 export function updatePricingHaltedIx(
+  asset: Asset,
   expiryIndex: number,
   admin: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.updatePricingHalted(expiryIndex, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
       admin,
     },
   });
 }
 
 export function cleanMarketNodesIx(
+  asset: Asset,
   expiryIndex: number
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   let head = expiryIndex * constants.PRODUCTS_PER_EXPIRY;
-  let remainingAccounts = Exchange.greeks.nodeKeys
+  let remainingAccounts = subExchange.greeks.nodeKeys
     .map((x: PublicKey) => {
       return {
         pubkey: x,
@@ -1384,28 +1461,30 @@ export function cleanMarketNodesIx(
 
   return Exchange.program.instruction.cleanMarketNodes(expiryIndex, {
     accounts: {
-      zetaGroup: Exchange.zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
     },
     remainingAccounts,
   });
 }
 
 export function cancelOrderHaltedIx(
+  asset: Asset,
   marketIndex: number,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   orderId: anchor.BN,
-  side: Side
+  side: types.Side
 ): TransactionInstruction {
-  let marketData = Exchange.markets.markets[marketIndex];
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
   return Exchange.program.instruction.cancelOrderHalted(
-    toProgramSide(side),
+    types.toProgramSide(side),
     orderId,
     {
       accounts: {
         cancelAccounts: {
-          zetaGroup: Exchange.zetaGroupAddress,
+          zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -1422,6 +1501,7 @@ export function cancelOrderHaltedIx(
 }
 
 export function haltZetaGroupIx(
+  asset: Asset,
   zetaGroupAddress: PublicKey,
   admin: PublicKey
 ): TransactionInstruction {
@@ -1429,7 +1509,7 @@ export function haltZetaGroupIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: zetaGroupAddress,
-      greeks: Exchange.greeksAddress,
+      greeks: Exchange.getSubExchange(asset).greeksAddress,
       admin,
     },
   });
@@ -1463,28 +1543,32 @@ export function updateHaltStateIx(
 }
 
 export function updateVolatilityIx(
+  asset: Asset,
   args: UpdateVolatilityArgs,
   admin: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.updateVolatility(args, {
     accounts: {
       state: Exchange.stateAddress,
-      greeks: Exchange.greeksAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
       admin,
     },
   });
 }
 
 export function updateInterestRateIx(
+  asset: Asset,
   args: UpdateInterestRateArgs,
   admin: PublicKey
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.updateInterestRate(args, {
     accounts: {
       state: Exchange.stateAddress,
-      greeks: Exchange.greeksAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
       admin,
     },
   });
@@ -1504,18 +1588,20 @@ export function updateAdminIx(
 }
 
 export function expireSeriesOverrideIx(
+  asset: Asset,
   admin: PublicKey,
   settlementAccount: PublicKey,
   args: ExpireSeriesOverrideArgs
 ): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.expireSeriesOverride(args, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.zetaGroupAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
       settlementAccount: settlementAccount,
       admin: admin,
       systemProgram: SystemProgram.programId,
-      greeks: Exchange.greeksAddress,
+      greeks: subExchange.greeksAddress,
     },
   });
 }
@@ -1558,11 +1644,11 @@ export function positionMovementIx(
   user: PublicKey,
   greeks: PublicKey,
   oracle: PublicKey,
-  movementType: MovementType,
+  movementType: types.MovementType,
   movements: PositionMovementArg[]
 ): TransactionInstruction {
   return Exchange.program.instruction.positionMovement(
-    toProgramMovementType(movementType),
+    types.toProgramMovementType(movementType),
     movements,
     {
       accounts: {
@@ -1595,11 +1681,12 @@ export function transferExcessSpreadBalanceIx(
 }
 
 export function settleDexFundsTxs(
+  asset: Asset,
   marketKey: PublicKey,
   vaultOwner: PublicKey,
   remainingAccounts: any[]
 ): Transaction[] {
-  let market = Exchange.markets.getMarket(marketKey);
+  let market = Exchange.getSubExchange(asset).markets.getMarket(marketKey);
   let accounts = {
     state: Exchange.stateAddress,
     market: market.address,
@@ -1634,11 +1721,12 @@ export function settleDexFundsTxs(
 }
 
 export function settleDexFundsIx(
+  asset: Asset,
   marketKey: PublicKey,
   vaultOwner: PublicKey,
   openOrders: PublicKey
 ): TransactionInstruction {
-  let market = Exchange.markets.getMarket(marketKey);
+  let market = Exchange.getSubExchange(asset).markets.getMarket(marketKey);
   let accounts = {
     state: Exchange.stateAddress,
     market: market.address,
@@ -1665,8 +1753,11 @@ export function settleDexFundsIx(
   });
 }
 
-export function burnVaultTokenTx(marketKey: PublicKey): Transaction {
-  let market = Exchange.markets.getMarket(marketKey);
+export function burnVaultTokenTx(
+  asset: Asset,
+  marketKey: PublicKey
+): Transaction {
+  let market = Exchange.getSubExchange(asset).markets.getMarket(marketKey);
   let tx = new Transaction();
   tx.add(
     Exchange.program.instruction.burnVaultTokens({
@@ -1691,6 +1782,19 @@ export function burnVaultTokenTx(marketKey: PublicKey): Transaction {
     })
   );
   return tx;
+}
+
+export function overrideExpiryIx(
+  zetaGroup: PublicKey,
+  args: OverrideExpiryArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.overrideExpiry(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin: Exchange.state.admin,
+      zetaGroup,
+    },
+  });
 }
 
 export async function toggleMarketMakerIx(
@@ -1793,4 +1897,10 @@ export interface UpdateMarginParametersArgs {
 export interface PositionMovementArg {
   index: number;
   size: anchor.BN;
+}
+
+export interface OverrideExpiryArgs {
+  expiryIndex: number;
+  activeTs: anchor.BN;
+  expiryTs: anchor.BN;
 }

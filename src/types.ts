@@ -211,6 +211,8 @@ export function toProgramMovementType(movementType: MovementType) {
   throw Error("Invalid side");
 }
 
+export type MarketIdentifier = number | PublicKey;
+
 export enum MarginAccountType {
   NORMAL = 0,
   MARKET_MAKER = 1,

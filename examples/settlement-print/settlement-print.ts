@@ -8,14 +8,16 @@ import {
   utils,
   constants,
   programTypes,
+  assets,
 } from "@zetamarkets/sdk";
 import { Commitment, PublicKey, Connection, Keypair } from "@solana/web3.js";
 import fetch from "node-fetch";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
-const PROGRAM_ID = new PublicKey(process.env["program_id"]);
+const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
 const STARTING_BALANCE = 10_000;
+const asset = assets.Asset.BTC;
 let network: Network;
 
 switch (process.env["network"]) {
@@ -39,6 +41,7 @@ async function main() {
   const connection: Connection = new Connection(NETWORK_URL, "confirmed");
 
   await Exchange.load(
+    [asset],
     PROGRAM_ID,
     network,
     connection,
@@ -52,7 +55,7 @@ async function main() {
   // Friday 8am UTC - 7th of January
   let expiryTs = 1641542400;
 
-  let underlyingMint = constants.MINTS.SOL;
+  let underlyingMint = constants.MINTS[asset];
 
   let [settlementAddress, _] = await utils.getSettlement(
     Exchange.programId,
