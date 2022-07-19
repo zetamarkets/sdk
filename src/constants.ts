@@ -1,11 +1,11 @@
 import { PublicKey } from "@solana/web3.js";
 import { Asset } from "./assets";
 
-// TODO add comment;
 // Asset keys are wormhole from mainnet.
 export const MINTS = {
   [Asset.SOL]: new PublicKey("So11111111111111111111111111111111111111112"),
   [Asset.BTC]: new PublicKey("qfnqNqs3nCAHjnyCgLRDbBtq4p2MtHZxw8YjSyYhPoL"),
+  [Asset.ETH]: new PublicKey("FeGn77dhg1KXRRFeSwwMiykZnZPw5JXW6naf2aQgZDQf"),
 };
 
 export const DEX_PID = {
@@ -35,18 +35,27 @@ export const MARKET_LOAD_LIMIT = 12;
 export const DEFAULT_ORDERBOOK_DEPTH = 5;
 export const MAX_ORDER_TAG_LENGTH = 4;
 
+// From the account itself in account.rs
+// 8 + 32 + 1 + 8 + 1 + 138 + 48 + 5520 + 8
+export const MARGIN_ACCOUNT_ASSET_OFFSET = 5764;
+// 8 + 32 + 1 + 8 + 48 + 2208
+export const SPREAD_ACCOUNT_ASSET_OFFSET = 2305;
+
 export const PYTH_PRICE_FEEDS = {
   localnet: {
     [Asset.SOL]: new PublicKey("2pRCJksgaoKRMqBfa7NTdd6tLYe9wbDFGCcCCZ6si3F7"),
     [Asset.BTC]: new PublicKey("9WD5hzrwEtwbYyZ34BRnrSS11TzD7PTMyszKV5Ur4JxJ"),
+    [Asset.ETH]: new PublicKey("FkUZhotvECPTBEXXzxBPjnJu6vPiQmptKyUDSXapBgHJ"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
     [Asset.BTC]: new PublicKey("HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J"),
+    [Asset.ETH]: new PublicKey("EdVCmQ9FSPcVe5YySXDPCRmc8aDQLKJ9xvYBMZPie1Vw"),
   },
   mainnet: {
     [Asset.SOL]: new PublicKey("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG"),
     [Asset.BTC]: new PublicKey("GVXRSBjFk6e6J3NbVPXohDJetcTjaeeuykUpbQF8UoMU"),
+    [Asset.ETH]: new PublicKey("JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB"),
   },
 };
 

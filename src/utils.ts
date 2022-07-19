@@ -1207,9 +1207,9 @@ export async function getAllProgramAccountAddresses(
     let assetOffset = 0;
     // From the account itself in account.rs
     if (accountType == types.ProgramAccountType.MarginAccount) {
-      assetOffset = 8 + 32 + 1 + 8 + 1 + 138 + 48 + 5520 + 8;
+      assetOffset = constants.MARGIN_ACCOUNT_ASSET_OFFSET;
     } else if (accountType == types.ProgramAccountType.SpreadAccount) {
-      assetOffset = 8 + 32 + 1 + 8 + 48 + 2208;
+      assetOffset = constants.SPREAD_ACCOUNT_ASSET_OFFSET;
     }
 
     filters.push({

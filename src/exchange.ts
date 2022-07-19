@@ -436,7 +436,6 @@ export class Exchange {
             this._lastPollTimestamp + this._pollInterval
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
-            await this.updateState();
             await Promise.all(
               this.getAllSubExchanges().map(async (subExchange) => {
                 await subExchange.handlePolling(callback);

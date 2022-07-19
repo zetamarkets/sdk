@@ -3,15 +3,14 @@ import { parsePythData, Price } from "./oracle-utils";
 import { Network } from "./network";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
-import { Asset, assetToName } from "./assets";
-import { assets } from ".";
+import { assets } from "./";
 
 export class Oracle {
   private _connection: Connection;
   private _network: Network;
   private _data: Map<assets.Asset, OraclePrice>;
   private _subscriptionIds: Map<assets.Asset, number>;
-  private _callback: (asset: Asset, price: OraclePrice) => void;
+  private _callback: (asset: assets.Asset, price: OraclePrice) => void;
 
   public constructor(network: Network, connection: Connection) {
     this._network = network;
@@ -49,7 +48,7 @@ export class Oracle {
     triggerCallback = true
   ): Promise<OraclePrice> {
     if (!(asset in constants.PYTH_PRICE_FEEDS[this._network])) {
-      throw Error("Invalid Oracle feed, no matching pubkey!");
+      throw Error("Invalid Oracle feed, no matching asset!");
     }
 
     let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
@@ -70,8 +69,8 @@ export class Oracle {
   }
 
   public async subscribePriceFeeds(
-    assets: Asset[],
-    callback: (asset: Asset, price: OraclePrice) => void
+    assetList: assets.Asset[],
+    callback: (asset: assets.Asset, price: OraclePrice) => void
   ) {
     if (this._callback != undefined) {
       throw Error("Oracle price feeds already subscribed to!");
@@ -79,8 +78,8 @@ export class Oracle {
     this._callback = callback;
 
     await Promise.all(
-      assets.map(async (asset) => {
-        console.log(`Oracle subscribing to feed ${assetToName(asset)}`);
+      assetList.map(async (asset) => {
+        console.log(`Oracle subscribing to feed ${assets.assetToName(asset)}`);
         let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
         let subscriptionId = this._connection.onAccountChange(
           priceAddress,

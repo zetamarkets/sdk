@@ -11,7 +11,7 @@ export enum Asset {
 
 import * as constants from "./constants";
 
-export function isValidType(asset: Asset) {
+export function isValidType(asset: Asset): boolean {
   try {
     assetToName(asset);
   } catch (e) {
@@ -20,7 +20,7 @@ export function isValidType(asset: Asset) {
   return true;
 }
 
-export function isValidStr(asset: string) {
+export function isValidStr(asset: string): boolean {
   try {
     nameToAsset(asset);
   } catch (e) {
@@ -39,15 +39,15 @@ export function allAssets(): Asset[] {
   return allAssets;
 }
 
-export function assetToName(asset: Asset) {
+export function assetToName(asset: Asset): string | null {
   if (asset == Asset.SOL) return "SOL";
   if (asset == Asset.BTC) return "BTC";
   if (asset == Asset.ETH) return "ETH";
-  if (asset == null) return ""; // Some things, like clock callbacks, are for all assets and return asset=null
+  if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   throw Error("Invalid asset");
 }
 
-export function nameToAsset(name: string) {
+export function nameToAsset(name: string): Asset {
   if (name == "SOL") return Asset.SOL;
   if (name == "BTC") return Asset.BTC;
   if (name == "ETH") return Asset.ETH;
@@ -65,7 +65,7 @@ export function toProgramAsset(asset: Asset) {
   throw Error("Invalid asset");
 }
 
-export function fromProgramAsset(asset: any) {
+export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { sol: {} })) {
     return Asset.SOL;
   }

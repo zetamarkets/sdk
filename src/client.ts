@@ -230,22 +230,22 @@ export class Client {
 
   public marketIdentifierToPublicKey(
     asset: Asset,
-    marketIndex: types.MarketIdentifier
+    market: types.MarketIdentifier
   ) {
     // marketIndex is either number or PublicKey
-    let market: PublicKey;
-    if (typeof marketIndex == "number") {
-      market =
-        Exchange.getSubExchange(asset).markets.markets[marketIndex].address;
+    let marketPubkey: PublicKey;
+    if (typeof market == "number") {
+      marketPubkey =
+        Exchange.getSubExchange(asset).markets.markets[market].address;
     } else {
-      market = marketIndex;
+      marketPubkey = market;
     }
-    return market;
+    return marketPubkey;
   }
 
   public async placeOrder(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     price: number,
     size: number,
     side: types.Side,
@@ -254,7 +254,7 @@ export class Client {
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).placeOrderV3(
-      this.marketIdentifierToPublicKey(asset, marketIndex),
+      this.marketIdentifierToPublicKey(asset, market),
       price,
       size,
       side,
@@ -307,9 +307,7 @@ export class Client {
       )
     );
 
-    // Send
-    let txId = await utils.processTransaction(this._provider, tx);
-    return txId;
+    return await utils.processTransaction(this._provider, tx);
   }
 
   public async deposit(
@@ -423,14 +421,14 @@ export class Client {
 
   public async placeOrderAndLockPosition(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     price: number,
     size: number,
     side: types.Side,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).placeOrderAndLockPosition(
-      this.marketIdentifierToPublicKey(asset, marketIndex),
+      this.marketIdentifierToPublicKey(asset, market),
       price,
       size,
       side,
@@ -440,29 +438,33 @@ export class Client {
 
   public async cancelOrder(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     orderId: anchor.BN,
     side: types.Side
   ): Promise<TransactionSignature> {
-    let market = this.marketIdentifierToPublicKey(asset, marketIndex);
-    return await this.getSubClient(asset).cancelOrder(market, orderId, side);
+    let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
+    return await this.getSubClient(asset).cancelOrder(
+      marketPubkey,
+      orderId,
+      side
+    );
   }
 
   public async cancelOrderByClientOrderId(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     clientOrderId: number
   ): Promise<TransactionSignature> {
-    let market = this.marketIdentifierToPublicKey(asset, marketIndex);
+    let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     return await this.getSubClient(asset).cancelOrderByClientOrderId(
-      market,
+      marketPubkey,
       clientOrderId
     );
   }
 
   public async cancelAndPlaceOrder(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     orderId: anchor.BN,
     cancelSide: types.Side,
     newOrderPrice: number,
@@ -473,7 +475,7 @@ export class Client {
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).cancelAndPlaceOrderV3(
-      this.marketIdentifierToPublicKey(asset, marketIndex),
+      this.marketIdentifierToPublicKey(asset, market),
       orderId,
       cancelSide,
       newOrderPrice,
@@ -487,7 +489,7 @@ export class Client {
 
   public async cancelAndPlaceOrderByClientOrderId(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     cancelClientOrderId: number,
     newOrderPrice: number,
     newOrderSize: number,
@@ -497,7 +499,7 @@ export class Client {
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderIdV3(
-      this.marketIdentifierToPublicKey(asset, marketIndex),
+      this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,
       newOrderSize,
@@ -510,7 +512,7 @@ export class Client {
 
   public async replaceByClientOrderId(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     cancelClientOrderId: number,
     newOrderPrice: number,
     newOrderSize: number,
@@ -520,7 +522,7 @@ export class Client {
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).replaceByClientOrderIdV3(
-      this.marketIdentifierToPublicKey(asset, marketIndex),
+      this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,
       newOrderSize,
@@ -572,23 +574,23 @@ export class Client {
 
   public async forceCancelOrders(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     marginAccountToCancel: PublicKey
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).forceCancelOrders(
-      this.marketIdentifierToPublicKey(asset, marketIndex),
+      this.marketIdentifierToPublicKey(asset, market),
       marginAccountToCancel
     );
   }
 
   public async liquidate(
     asset: Asset,
-    marketIndex: types.MarketIdentifier,
+    market: types.MarketIdentifier,
     liquidatedMarginAccount: PublicKey,
     size: number
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).liquidate(
-      this.marketIdentifierToPublicKey(asset, marketIndex),
+      this.marketIdentifierToPublicKey(asset, market),
       liquidatedMarginAccount,
       size
     );
