@@ -32,7 +32,7 @@ export function isValidStr(asset: string): boolean {
 export function allAssets(): Asset[] {
   let allAssets: Asset[] = [];
   for (var a in Asset) {
-    if (typeof Asset[a] === "number") {
+    if (typeof Asset[a] === "number" && a != "UNDEFINED") {
       allAssets.push(nameToAsset(a));
     }
   }
@@ -43,6 +43,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.SOL) return "SOL";
   if (asset == Asset.BTC) return "BTC";
   if (asset == Asset.ETH) return "ETH";
+  if (asset == Asset.UNDEFINED) return "UNDEFINED";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   throw Error("Invalid asset");
 }
@@ -51,6 +52,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "SOL") return Asset.SOL;
   if (name == "BTC") return Asset.BTC;
   if (name == "ETH") return Asset.ETH;
+  if (name == "UNDEFINED") return Asset.UNDEFINED;
   throw Error("Invalid asset");
 }
 
