@@ -5608,8 +5608,5 @@
       "name": "ReferrerAlreadyHasAlias",
       "msg": "Referrer already has alias"
     }
-  ],
-  "metadata": {
-    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
-  }
+  ]
 }

@@ -6,7 +6,6 @@ import {
   MarginAccount,
   PositionMovementEvent,
   ReferralAccount,
-  ReferrerAlias,
   ReferrerAccount,
 } from "./program-types";
 import {

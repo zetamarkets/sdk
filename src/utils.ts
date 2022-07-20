@@ -1470,6 +1470,7 @@ export async function fetchReferrerAliasAccount(
   if (!referrer && !alias) {
     return null;
   }
+
   let referrerAliases = await Exchange.program.account.referrerAlias.all();
   for (var i = 0; i < referrerAliases.length; i++) {
     let acc = referrerAliases[i].account as ReferrerAlias;
@@ -1480,5 +1481,6 @@ export async function fetchReferrerAliasAccount(
       return acc;
     }
   }
+
   return null;
 }
