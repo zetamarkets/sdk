@@ -27,7 +27,12 @@ import * as fs from "fs";
 import * as constants from "./constants";
 import * as errors from "./errors";
 import { exchange as Exchange } from "./exchange";
-import { MarginAccount, TradeEvent, OpenOrdersMap } from "./program-types";
+import {
+  MarginAccount,
+  ReferrerAlias,
+  TradeEvent,
+  OpenOrdersMap,
+} from "./program-types";
 import { Network } from "./network";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
@@ -397,6 +402,19 @@ export async function getReferralAccountAddress(
 ): Promise<[PublicKey, number]> {
   return await anchor.web3.PublicKey.findProgramAddress(
     [Buffer.from(anchor.utils.bytes.utf8.encode("referral")), user.toBuffer()],
+    programId
+  );
+}
+
+export async function getReferrerAliasAddress(
+  programId: PublicKey,
+  alias: string
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("referrer-alias")),
+      Buffer.from(alias),
+    ],
     programId
   );
 }
@@ -1443,4 +1461,24 @@ export function toAssets(assetsStr: string[]): Asset[] {
 
 export function objectEquals(a: any, b: any): boolean {
   return JSON.stringify(a) == JSON.stringify(b);
+}
+
+export async function fetchReferrerAliasAccount(
+  referrer: PublicKey = undefined,
+  alias: string = undefined
+): Promise<ReferrerAlias> {
+  if (!referrer && !alias) {
+    return null;
+  }
+  let referrerAliases = await Exchange.program.account.referrerAlias.all();
+  for (var i = 0; i < referrerAliases.length; i++) {
+    let acc = referrerAliases[i].account as ReferrerAlias;
+    if (
+      (referrer && acc.referrer.equals(referrer)) ||
+      (alias && Buffer.from(acc.alias).toString().trim() == alias)
+    ) {
+      return acc;
+    }
+  }
+  return null;
 }

@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.16.1]
+
+- referrals: Support referrer aliases.
+
 ## [0.16.0]
 
 - general: Multiasset support. ([#124](https://github.com/zetamarkets/sdk/pull/124)).

@@ -6,6 +6,8 @@ import {
   MarginAccount,
   PositionMovementEvent,
   ReferralAccount,
+  ReferrerAlias,
+  ReferrerAccount,
 } from "./program-types";
 import {
   PublicKey,
@@ -702,6 +704,41 @@ export class Client {
 
   public getMarginAccountAddress(asset: Asset): PublicKey {
     return this.getSubClient(asset).marginAccountAddress;
+  }
+
+  public async initializeReferrerAlias(
+    alias: string
+  ): Promise<TransactionSignature> {
+    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+
+    let [referrerAliasAddress] = await utils.getReferrerAliasAddress(
+      Exchange.programId,
+      alias
+    );
+
+    let referrerAccount: ReferrerAccount;
+    try {
+      referrerAccount = await Exchange.program.account.referrerAccount.fetch(
+        referrerAccountAddress
+      );
+    } catch (e) {
+      throw Error(`User is not a referrer, cannot create alias.`);
+    }
+
+    let referrerAlias = await utils.fetchReferrerAliasAccount(this.publicKey);
+    if (referrerAlias !== null) {
+      let existingAlias = Buffer.from(referrerAlias.alias).toString().trim();
+      throw Error(`Referrer already has alias. ${existingAlias}`);
+    }
+
+    let tx = new Transaction().add(
+      await instructions.initializeReferrerAliasIx(this.publicKey, alias)
+    );
+
+    return await utils.processTransaction(this.provider, tx);
   }
 
   public async close() {

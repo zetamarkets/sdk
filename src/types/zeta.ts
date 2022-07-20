@@ -2983,6 +2983,37 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "initializeReferrerAlias",
+      "accounts": [
+        {
+          "name": "referrer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrerAlias",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "alias",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -3696,6 +3727,10 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "hasAlias",
+            "type": "bool"
+          },
+          {
             "name": "referrer",
             "type": "publicKey"
           },
@@ -3738,6 +3773,31 @@ export type Zeta = {
           {
             "name": "claimedRewards",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referrerAlias",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "alias",
+            "type": {
+              "array": [
+                "u8",
+                15
+              ]
+            }
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
           }
         ]
       }
@@ -5537,6 +5597,16 @@ export type Zeta = {
       "code": 6107,
       "name": "InvalidUnderlyingMint",
       "msg": "Provided underlying mint address is invalid"
+    },
+    {
+      "code": 6108,
+      "name": "InvalidReferrerAlias",
+      "msg": "Invalid referrer alias"
+    },
+    {
+      "code": 6109,
+      "name": "ReferrerAlreadyHasAlias",
+      "msg": "Referrer already has alias"
     }
   ]
 };
@@ -8526,6 +8596,37 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "initializeReferrerAlias",
+      "accounts": [
+        {
+          "name": "referrer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrerAlias",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "alias",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -9239,6 +9340,10 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "hasAlias",
+            "type": "bool"
+          },
+          {
             "name": "referrer",
             "type": "publicKey"
           },
@@ -9281,6 +9386,31 @@ export const IDL: Zeta = {
           {
             "name": "claimedRewards",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referrerAlias",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "alias",
+            "type": {
+              "array": [
+                "u8",
+                15
+              ]
+            }
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
           }
         ]
       }
@@ -11080,6 +11210,16 @@ export const IDL: Zeta = {
       "code": 6107,
       "name": "InvalidUnderlyingMint",
       "msg": "Provided underlying mint address is invalid"
+    },
+    {
+      "code": 6108,
+      "name": "InvalidReferrerAlias",
+      "msg": "Invalid referrer alias"
+    },
+    {
+      "code": 6109,
+      "name": "ReferrerAlreadyHasAlias",
+      "msg": "Referrer already has alias"
     }
   ]
 };
