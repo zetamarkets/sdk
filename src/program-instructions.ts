@@ -1276,10 +1276,6 @@ export async function initializeReferrerAliasIx(
   referrer: PublicKey,
   alias: string
 ): Promise<TransactionInstruction> {
-  if (alias.length > 15) {
-    throw new Error("Alias cannot be over 15 chars!");
-  }
-
   let [referrerAccount] = await utils.getReferrerAccountAddress(
     Exchange.program.programId,
     referrer

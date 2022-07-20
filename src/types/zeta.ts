@@ -5601,7 +5601,7 @@ export type Zeta = {
     {
       "code": 6108,
       "name": "InvalidReferrerAlias",
-      "msg": "Invalid referrer alias"
+      "msg": "Invalid referrer alias - Invalid length"
     },
     {
       "code": 6109,
@@ -11214,7 +11214,7 @@ export const IDL: Zeta = {
     {
       "code": 6108,
       "name": "InvalidReferrerAlias",
-      "msg": "Invalid referrer alias"
+      "msg": "Invalid referrer alias - Invalid length"
     },
     {
       "code": 6109,

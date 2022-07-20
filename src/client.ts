@@ -708,6 +708,10 @@ export class Client {
   public async initializeReferrerAlias(
     alias: string
   ): Promise<TransactionSignature> {
+    if (alias.length > 15) {
+      throw new Error("Alias cannot be over 15 chars!");
+    }
+
     let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
       Exchange.programId,
       this.publicKey
