@@ -1272,6 +1272,30 @@ export async function initializeReferrerAccountIx(
   });
 }
 
+export async function initializeReferrerAliasIx(
+  referrer: PublicKey,
+  alias: string
+): Promise<TransactionInstruction> {
+  let [referrerAccount] = await utils.getReferrerAccountAddress(
+    Exchange.program.programId,
+    referrer
+  );
+
+  let [referrerAlias] = await utils.getReferrerAliasAddress(
+    Exchange.program.programId,
+    alias
+  );
+
+  return Exchange.program.instruction.initializeReferrerAlias(alias, {
+    accounts: {
+      referrer,
+      referrerAlias,
+      referrerAccount,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
 export function settlePositionsTxs(
   asset: Asset,
   expirationTs: anchor.BN,

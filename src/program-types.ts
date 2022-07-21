@@ -240,11 +240,19 @@ export interface ReferralAccount {
 
 export interface ReferrerAccount {
   nonce: number;
+  hasAlias: boolean;
   referrer: PublicKey;
   pendingRewards: anchor.BN;
   claimedRewards: anchor.BN;
 }
 
+export interface ReferrerAlias {
+  nonce: number;
+  alias: Array<number>;
+  referrer: PublicKey;
+}
+
+// TODO move these events to event.ts.
 export interface PlaceOrderEvent {
   fee: anchor.BN;
   oraclePrice: anchor.BN;
