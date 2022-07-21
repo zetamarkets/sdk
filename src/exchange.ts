@@ -489,7 +489,7 @@ export class Exchange {
   }
 
   public async initializeMarketNodes(asset: Asset, zetaGroup: PublicKey) {
-    this.getSubExchange(asset).initializeMarketNodes(zetaGroup);
+    await this.getSubExchange(asset).initializeMarketNodes(zetaGroup);
   }
 
   public subscribeMarket(asset: Asset, index: number) {
