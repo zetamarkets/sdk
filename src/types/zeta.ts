@@ -4782,6 +4782,20 @@ export type Zeta = {
       }
     },
     {
+      "name": "OrderCompleteType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "Fill"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -4992,6 +5006,62 @@ export type Zeta = {
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "OrderCompleteEvent",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marketIndex",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          },
+          "index": false
+        },
+        {
+          "name": "remainingSize",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderCompleteType",
+          "type": {
+            "defined": "OrderCompleteType"
+          },
           "index": false
         }
       ]
@@ -10325,6 +10395,20 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "OrderCompleteType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "Fill"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -10535,6 +10619,62 @@ export const IDL: Zeta = {
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "OrderCompleteEvent",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marketIndex",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          },
+          "index": false
+        },
+        {
+          "name": "remainingSize",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderCompleteType",
+          "type": {
+            "defined": "OrderCompleteType"
+          },
           "index": false
         }
       ]

@@ -279,3 +279,15 @@ export interface LiquidationEvent {
   markPrice: anchor.BN;
   underlyingPrice: anchor.BN;
 }
+
+export interface OrderCompleteEvent {
+  marginAccount: PublicKey;
+  user: PublicKey;
+  asset: Object;
+  marketIndex: number;
+  side: Object;
+  remainingSize: anchor.BN; // > 0 for cancels or 0 for non cancels
+  orderId: anchor.BN;
+  clientOrderId: anchor.BN;
+  orderCompleteType: Object;
+}
