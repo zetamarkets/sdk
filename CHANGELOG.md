@@ -5,6 +5,9 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- events: Add new OrderCompleteEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
+- events: Remove CancelEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
+
 ## [0.16.0]
 
 - general: Multiasset support. ([#124](https://github.com/zetamarkets/sdk/pull/124)).
