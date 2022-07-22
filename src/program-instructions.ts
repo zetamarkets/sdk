@@ -912,6 +912,44 @@ export async function initializeZetaGroupIx(
   );
 }
 
+export function collectTreasuryFundsIx(
+  collectionTokenAccount: PublicKey,
+  amount: anchor.BN,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.collectTreasuryFunds(amount, {
+    accounts: {
+      state: Exchange.stateAddress,
+      treasuryWallet: Exchange.treasuryWalletAddress,
+      collectionTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      admin,
+    },
+  });
+}
+
+export function treasuryMovementIx(
+  asset: Asset,
+  movementType: types.MovementType,
+  amount: anchor.BN
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  return Exchange.program.instruction.treasuryMovement(
+    types.toProgramMovementType(movementType),
+    amount,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
+        insuranceVault: subExchange.insuranceVaultAddress,
+        treasuryWallet: Exchange.treasuryWalletAddress,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        admin: Exchange.provider.wallet.publicKey,
+      },
+    }
+  );
+}
+
 export function rebalanceInsuranceVaultIx(
   asset: Asset,
   remainingAccounts: any[]
@@ -919,9 +957,11 @@ export function rebalanceInsuranceVaultIx(
   let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
+      state: Exchange.stateAddress,
       zetaGroup: subExchange.zetaGroupAddress,
       zetaVault: subExchange.vaultAddress,
       insuranceVault: subExchange.insuranceVaultAddress,
+      treasuryWallet: Exchange.treasuryWalletAddress,
       socializedLossAccount: subExchange.socializedLossAccountAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
@@ -1087,6 +1127,7 @@ export function initializeZetaStateIx(
   stateAddress: PublicKey,
   stateNonce: number,
   serumAuthority: PublicKey,
+  treasuryWallet: PublicKey,
   serumNonce: number,
   mintAuthority: PublicKey,
   mintAuthorityNonce: number,
@@ -1096,14 +1137,17 @@ export function initializeZetaStateIx(
   args["stateNonce"] = stateNonce;
   args["serumNonce"] = serumNonce;
   args["mintAuthNonce"] = mintAuthorityNonce;
+
   return Exchange.program.instruction.initializeZetaState(args, {
     accounts: {
       state: stateAddress,
       serumAuthority,
       mintAuthority,
+      treasuryWallet,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
+      usdcMint: Exchange.usdcMintAddress,
       admin: Exchange.provider.wallet.publicKey,
     },
   });

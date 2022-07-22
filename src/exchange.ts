@@ -153,6 +153,14 @@ export class Exchange {
   private _stateAddress: PublicKey;
 
   /**
+   * Public key for treasury wallet.
+   */
+  public get treasuryWalletAddress(): PublicKey {
+    return this._treasuryWalletAddress;
+  }
+  private _treasuryWalletAddress: PublicKey;
+
+  /**
    * Stores the latest timestamp received by websocket subscription
    * to the system clock account.
    */
@@ -251,12 +259,17 @@ export class Exchange {
     const [serumAuthority, serumNonce] = await utils.getSerumAuthority(
       this.programId
     );
+    const [treasuryWallet, _treasuryWalletnonce] =
+      await utils.getZetaTreasuryWallet(this.programId);
+
+    this._usdcMintAddress = constants.USDC_MINT_ADDRESS[this.network];
 
     let tx = new Transaction().add(
       instructions.initializeZetaStateIx(
         state,
         stateNonce,
         serumAuthority,
+        treasuryWallet,
         serumNonce,
         mintAuthority,
         mintAuthorityNonce,
@@ -272,7 +285,7 @@ export class Exchange {
     this._mintAuthority = mintAuthority;
     this._stateAddress = state;
     this._serumAuthority = serumAuthority;
-    this._usdcMintAddress = constants.USDC_MINT_ADDRESS[this.network];
+    this._treasuryWalletAddress = treasuryWallet;
     await this.updateState();
   }
 
@@ -678,6 +691,14 @@ export class Exchange {
 
   public async whitelistUserForTradingFees(asset: Asset, user: PublicKey) {
     await this.getSubExchange(asset).whitelistUserForTradingFees(user);
+  }
+
+  public async treasuryMovement(
+    asset: Asset,
+    movementType: types.MovementType,
+    amount: anchor.BN
+  ) {
+    await this.getSubExchange(asset).treasuryMovement(movementType, amount);
   }
 
   public async rebalanceInsuranceVault(asset: Asset, marginAccounts: any[]) {

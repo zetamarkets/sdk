@@ -23,6 +23,7 @@ export interface State {
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
   marginConcessionPercentage: number;
+  treasuryWalletNonce: number;
   padding: Array<number>;
 }
 
