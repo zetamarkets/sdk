@@ -34,6 +34,7 @@ import * as instructions from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
 import { assets } from ".";
+import { Event as serumEvent } from "@project-serum/serum/lib/queue";
 
 export async function getState(
   programId: PublicKey
@@ -1013,10 +1014,14 @@ export async function settleUsers(
 export async function crankMarket(
   asset: Asset,
   marketIndex: number,
-  openOrdersToMargin?: Map<PublicKey, PublicKey>
+  openOrdersToMargin?: Map<PublicKey, PublicKey>,
+  eventQueue?: serumEvent[]
 ) {
   let market = Exchange.getSubExchange(asset).markets.markets[marketIndex];
-  let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
+
+  if (!eventQueue) {
+    eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
+  }
   if (eventQueue.length == 0) {
     return;
   }

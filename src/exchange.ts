@@ -515,10 +515,10 @@ export class Exchange {
     for (
       let i = 0;
       i < allLiveMarkets.length;
-      i += constants.MAX_MARKETS_TO_FETCH
+      i += constants.MAX_MARKETS_TO_FETCH / 2
     ) {
       liveMarketsSlices.push(
-        allLiveMarkets.slice(i, i + constants.MAX_MARKETS_TO_FETCH)
+        allLiveMarkets.slice(i, i + constants.MAX_MARKETS_TO_FETCH / 2)
       );
     }
 
@@ -786,6 +786,7 @@ export class Exchange {
       );
     }
     this._programSubscriptionIds = [];
+    this._isInitialized = false;
   }
 
   public async initializeReferrerAccount(referrer: PublicKey) {
