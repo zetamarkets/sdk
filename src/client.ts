@@ -46,6 +46,22 @@ export class Client {
   private _referralAccountAddress: PublicKey;
 
   /**
+   * Stores the user referrer account data.
+   */
+  public get referrerAccount(): ReferrerAccount | null {
+    return this._referrerAccount;
+  }
+  private _referrerAccount: ReferrerAccount | null;
+
+  /**
+   * Stores the user referrer account alias.
+   */
+  public get referrerAlias(): string | null {
+    return this._referrerAlias;
+  }
+  private _referrerAlias: string | null;
+
+  /**
    * Client margin account address.
    */
   public get publicKey(): PublicKey {
@@ -93,6 +109,8 @@ export class Client {
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._subClients = new Map();
     this._referralAccount = null;
+    this._referrerAccount = null;
+    this._referrerAlias = null;
   }
   private _subClients: Map<Asset, SubClient>;
 
@@ -154,22 +172,9 @@ export class Client {
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
     client._referralAccountAddress = undefined;
-    try {
-      let [referralAccountAddress, _nonce] =
-        await utils.getReferralAccountAddress(
-          Exchange.programId,
-          wallet.publicKey
-        );
+    client._referrerAlias = undefined;
 
-      client._referralAccountAddress = referralAccountAddress;
-      client._referralAccount =
-        (await Exchange.program.account.referralAccount.fetch(
-          referralAccountAddress
-        )) as unknown as ReferralAccount;
-      console.log(
-        `User has been referred by ${client._referralAccount.referrer.toString()}.`
-      );
-    } catch (e) {}
+    await client.setReferralsState();
 
     return client;
   }
@@ -185,6 +190,44 @@ export class Client {
   public getAllSubClients(): SubClient[] {
     return [...this._subClients.values()];
     // This is referring itself by another referrer.
+  }
+
+  public async setReferralsState() {
+    try {
+      let [referrerAccount] = await utils.getReferrerAccountAddress(
+        Exchange.programId,
+        this.publicKey
+      );
+
+      this._referrerAccount =
+        (await Exchange.program.account.referrerAccount.fetch(
+          referrerAccount
+        )) as unknown as ReferrerAccount;
+      console.log(`User is a referrer. ${this.publicKey}.`);
+
+      let referrerAlias = await utils.fetchReferrerAliasAccount(this.publicKey);
+      if (referrerAlias !== null) {
+        let existingAlias = Buffer.from(referrerAlias.alias).toString().trim();
+        this._referrerAlias = existingAlias;
+      }
+    } catch (e) {}
+
+    try {
+      let [referralAccountAddress, _nonce] =
+        await utils.getReferralAccountAddress(
+          Exchange.programId,
+          this.publicKey
+        );
+
+      this._referralAccountAddress = referralAccountAddress;
+      this._referralAccount =
+        (await Exchange.program.account.referralAccount.fetch(
+          referralAccountAddress
+        )) as unknown as ReferralAccount;
+      console.log(
+        `User has been referred by ${this._referralAccount.referrer.toString()}.`
+      );
+    } catch (e) {}
   }
 
   public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
@@ -741,7 +784,10 @@ export class Client {
       await instructions.initializeReferrerAliasIx(this.publicKey, alias)
     );
 
-    return await utils.processTransaction(this.provider, tx);
+    let txid = await utils.processTransaction(this.provider, tx);
+    this._referrerAlias = alias;
+
+    return txid;
   }
 
   public async close() {
