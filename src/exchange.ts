@@ -259,10 +259,11 @@ export class Exchange {
     const [serumAuthority, serumNonce] = await utils.getSerumAuthority(
       this.programId
     );
-    const [treasuryWallet, _treasuryWalletnonce] =
-      await utils.getZetaTreasuryWallet(this.programId);
 
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[this.network];
+
+    const [treasuryWallet, _treasuryWalletnonce] =
+      await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
 
     let tx = new Transaction().add(
       instructions.initializeZetaStateIx(
@@ -359,6 +360,10 @@ export class Exchange {
     this._stateAddress = state;
     this._serumAuthority = serumAuthority;
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
+
+    const [treasuryWallet, _treasuryWalletnonce] =
+      await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
+    this._treasuryWalletAddress = treasuryWallet;
 
     this._lastPollTimestamp = 0;
 
@@ -695,10 +700,13 @@ export class Exchange {
 
   public async treasuryMovement(
     asset: Asset,
-    movementType: types.MovementType,
+    treasuryMovementType: types.TreasuryMovementType,
     amount: anchor.BN
   ) {
-    await this.getSubExchange(asset).treasuryMovement(movementType, amount);
+    await this.getSubExchange(asset).treasuryMovement(
+      treasuryMovementType,
+      amount
+    );
   }
 
   public async rebalanceInsuranceVault(asset: Asset, marginAccounts: any[]) {

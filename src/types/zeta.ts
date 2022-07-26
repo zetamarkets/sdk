@@ -522,6 +522,47 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializeZetaTreasuryWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateAdmin",
       "accounts": [
         {
@@ -2727,9 +2768,9 @@ export type Zeta = {
       ],
       "args": [
         {
-          "name": "movementType",
+          "name": "treasuryMovementType",
           "type": {
-            "defined": "MovementType"
+            "defined": "TreasuryMovementType"
           }
         },
         {
@@ -4949,6 +4990,23 @@ export type Zeta = {
       }
     },
     {
+      "name": "TreasuryMovementType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Undefined"
+          },
+          {
+            "name": "ToTreasury"
+          },
+          {
+            "name": "ToInsurance"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -5719,11 +5777,6 @@ export type Zeta = {
       "code": 6110,
       "name": "InvalidTreasuryMovementAmount",
       "msg": "Invalid treasury movement amount"
-    },
-    {
-      "code": 6111,
-      "name": "InvalidCollectTreasuryFundsMint",
-      "msg": "Invalid collect treasury funds mint"
     }
   ]
 };
@@ -6252,6 +6305,47 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializeZetaTreasuryWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateAdmin",
       "accounts": [
         {
@@ -8457,9 +8551,9 @@ export const IDL: Zeta = {
       ],
       "args": [
         {
-          "name": "movementType",
+          "name": "treasuryMovementType",
           "type": {
-            "defined": "MovementType"
+            "defined": "TreasuryMovementType"
           }
         },
         {
@@ -10679,6 +10773,23 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "TreasuryMovementType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Undefined"
+          },
+          {
+            "name": "ToTreasury"
+          },
+          {
+            "name": "ToInsurance"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -11449,11 +11560,6 @@ export const IDL: Zeta = {
       "code": 6110,
       "name": "InvalidTreasuryMovementAmount",
       "msg": "Invalid treasury movement amount"
-    },
-    {
-      "code": 6111,
-      "name": "InvalidCollectTreasuryFundsMint",
-      "msg": "Invalid collect treasury funds mint"
     }
   ]
 };
