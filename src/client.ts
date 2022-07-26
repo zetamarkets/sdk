@@ -174,8 +174,6 @@ export class Client {
     client._referralAccountAddress = undefined;
     client._referrerAlias = undefined;
 
-    await client.setReferralsState();
-
     return client;
   }
 
@@ -192,7 +190,7 @@ export class Client {
     // This is referring itself by another referrer.
   }
 
-  public async setReferralsState() {
+  public async setReferralData() {
     try {
       let [referrerAccount] = await utils.getReferrerAccountAddress(
         Exchange.programId,
