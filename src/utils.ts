@@ -1476,11 +1476,22 @@ export async function fetchReferrerAliasAccount(
     let acc = referrerAliases[i].account as ReferrerAlias;
     if (
       (referrer && acc.referrer.equals(referrer)) ||
-      (alias && Buffer.from(acc.alias).toString().trim() == alias)
+      (alias && convertBufferToTrimmedString(acc.alias) == alias)
     ) {
       return acc;
     }
   }
 
   return null;
+}
+
+export function convertBufferToTrimmedString(buffer: number[]): string {
+  let bufferString = Buffer.from(buffer).toString().trim();
+  let splitIndex;
+  for (let index = 0; index < bufferString.length; ++index) {
+    if (bufferString.charCodeAt(index) === 0) {
+      splitIndex = index - 1;
+    }
+  }
+  return bufferString.substring(0, splitIndex);
 }
