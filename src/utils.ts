@@ -1487,7 +1487,7 @@ export async function fetchReferrerAliasAccount(
 
 export function convertBufferToTrimmedString(buffer: number[]): string {
   let bufferString = Buffer.from(buffer).toString().trim();
-  let splitIndex;
+  let splitIndex = bufferString.length;
   for (let index = 0; index < bufferString.length; ++index) {
     if (bufferString.charCodeAt(index) === 0) {
       splitIndex = index;
