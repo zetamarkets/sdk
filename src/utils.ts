@@ -1490,7 +1490,8 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
   let splitIndex;
   for (let index = 0; index < bufferString.length; ++index) {
     if (bufferString.charCodeAt(index) === 0) {
-      splitIndex = index - 1;
+      splitIndex = index;
+      break;
     }
   }
   return bufferString.substring(0, splitIndex);
