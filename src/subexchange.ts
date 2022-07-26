@@ -636,11 +636,11 @@ export class SubExchange {
    * @param amount an array of remaining accounts (margin accounts) that will be rebalanced
    */
   public async treasuryMovement(
-    movementType: types.MovementType,
+    treasuryMovementType: types.TreasuryMovementType,
     amount: anchor.BN
   ) {
     let tx = new Transaction().add(
-      instructions.treasuryMovementIx(this.asset, movementType, amount)
+      instructions.treasuryMovementIx(this.asset, treasuryMovementType, amount)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }

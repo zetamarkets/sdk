@@ -208,7 +208,22 @@ export enum MovementType {
 export function toProgramMovementType(movementType: MovementType) {
   if (movementType == MovementType.LOCK) return { lock: {} };
   if (movementType == MovementType.UNLOCK) return { unlock: {} };
-  throw Error("Invalid side");
+  throw Error("Invalid movement type");
+}
+
+export enum TreasuryMovementType {
+  TO_TREASURY = 1,
+  TO_INSURANCE = 2,
+}
+
+export function toProgramTreasuryMovementType(
+  treasuryMovementType: TreasuryMovementType
+) {
+  if (treasuryMovementType == TreasuryMovementType.TO_TREASURY)
+    return { toTreasury: {} };
+  if (treasuryMovementType == TreasuryMovementType.TO_INSURANCE)
+    return { toInsurance: {} };
+  throw Error("Invalid treasury movement type");
 }
 
 export type MarketIdentifier = number | PublicKey;

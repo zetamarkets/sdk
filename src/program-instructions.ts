@@ -930,18 +930,17 @@ export function collectTreasuryFundsIx(
 
 export function treasuryMovementIx(
   asset: Asset,
-  movementType: types.MovementType,
+  treasuryMovementType: types.TreasuryMovementType,
   amount: anchor.BN
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.treasuryMovement(
-    types.toProgramMovementType(movementType),
+    types.toProgramTreasuryMovementType(treasuryMovementType),
     amount,
     {
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: subExchange.zetaGroupAddress,
-        insuranceVault: subExchange.insuranceVaultAddress,
+        zetaGroup: Exchange.getZetaGroupAddress(asset),
+        insuranceVault: Exchange.getInsuranceVaultAddress(asset),
         treasuryWallet: Exchange.treasuryWalletAddress,
         tokenProgram: TOKEN_PROGRAM_ID,
         admin: Exchange.provider.wallet.publicKey,
@@ -954,15 +953,14 @@ export function rebalanceInsuranceVaultIx(
   asset: Asset,
   remainingAccounts: any[]
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: subExchange.zetaGroupAddress,
-      zetaVault: subExchange.vaultAddress,
-      insuranceVault: subExchange.insuranceVaultAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      zetaVault: Exchange.getVaultAddress(asset),
+      insuranceVault: Exchange.getInsuranceVaultAddress(asset),
       treasuryWallet: Exchange.treasuryWalletAddress,
-      socializedLossAccount: subExchange.socializedLossAccountAddress,
+      socializedLossAccount: Exchange.getSocializedLossAccountAddress(asset),
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,
@@ -1144,6 +1142,20 @@ export function initializeZetaStateIx(
       serumAuthority,
       mintAuthority,
       treasuryWallet,
+      rent: SYSVAR_RENT_PUBKEY,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      usdcMint: Exchange.usdcMintAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function initializeZetaTreasuryWalletIx(): TransactionInstruction {
+  return Exchange.program.instruction.initializeZetaTreasuryWallet({
+    accounts: {
+      state: Exchange.stateAddress,
+      treasuryWallet: Exchange.treasuryWalletAddress,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
