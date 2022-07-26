@@ -8,6 +8,7 @@ import {
   MarginAccount,
   TradeEvent,
   PositionMovementEvent,
+  OrderCompleteEvent,
 } from "./program-types";
 import {
   PublicKey,
@@ -129,6 +130,11 @@ export class SubClient {
    * The listener for trade events.
    */
   private _tradeEventListener: any;
+
+  /**
+   * The listener for OrderComplete events.
+   */
+  private _orderCompleteEventListener: any;
 
   /**
    * Last update timestamp.
@@ -295,6 +301,15 @@ export class SubClient {
         (event: TradeEvent, _slot) => {
           if (event.marginAccount.equals(marginAccountAddress)) {
             callback(asset, EventType.TRADE, event);
+          }
+        }
+      );
+
+      subClient._orderCompleteEventListener = Exchange.program.addEventListener(
+        "OrderCompleteEvent",
+        (event: OrderCompleteEvent, _slot) => {
+          if (event.marginAccount.equals(marginAccountAddress)) {
+            callback(asset, EventType.ORDERCOMPLETE, event);
           }
         }
       );
@@ -1832,6 +1847,13 @@ export class SubClient {
     if (this._tradeEventListener !== undefined) {
       await Exchange.program.removeEventListener(this._tradeEventListener);
       this._tradeEventListener = undefined;
+    }
+
+    if (this._orderCompleteEventListener !== undefined) {
+      await Exchange.program.removeEventListener(
+        this._orderCompleteEventListener
+      );
+      this._orderCompleteEventListener = undefined;
     }
   }
 }
