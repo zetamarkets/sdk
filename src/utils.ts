@@ -1492,6 +1492,7 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
     if (bufferString.charCodeAt(index) === 0) {
       splitIndex = index - 1;
     }
+    break;
   }
   return bufferString.substring(0, splitIndex);
 }
