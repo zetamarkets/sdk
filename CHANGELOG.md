@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.2]
+
 - referrals: Add referrer support in Client. ([#137](https://github.com/zetamarkets/sdk/pull/137))
 
 ## [0.16.1]
