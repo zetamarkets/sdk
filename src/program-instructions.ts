@@ -1924,13 +1924,14 @@ export interface StateParams {
   liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
   nativeD1TradeFeePercentage: anchor.BN;
-  nativeUnderlyingFeePercentage: anchor.BN;
+  nativeD1UnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
   marginConcessionPercentage: number;
   nativeOptionTradeFeePercentage: anchor.BN;
+  nativeOptionUnderlyingFeePercentage: anchor.BN;
 }
 
 export interface UpdatePricingParametersArgs {

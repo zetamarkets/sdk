@@ -17,7 +17,7 @@ export interface State {
   liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
   nativeD1TradeFeePercentage: anchor.BN;
-  nativeUnderlyingFeePercentage: anchor.BN;
+  nativeD1UnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
@@ -25,6 +25,7 @@ export interface State {
   marginConcessionPercentage: number;
   treasuryWalletNonce: number;
   nativeOptionTradeFeePercentage: anchor.BN;
+  nativeOptionUnderlyingFeePercentage: anchor.BN;
   padding: Array<number>;
 }
 
