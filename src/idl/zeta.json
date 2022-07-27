@@ -5057,7 +5057,7 @@
           "index": false
         },
         {
-          "name": "remainingSize",
+          "name": "unfilledSize",
           "type": "u64",
           "index": false
         },

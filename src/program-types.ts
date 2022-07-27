@@ -294,7 +294,7 @@ export interface OrderCompleteEvent {
   asset: Object;
   marketIndex: number;
   side: Object;
-  remainingSize: anchor.BN; // > 0 for cancels or 0 for non cancels
+  unfilledSize: anchor.BN; // > 0 for cancel or booted, 0 for non cancels
   orderId: anchor.BN;
   clientOrderId: anchor.BN;
   orderCompleteType: Object;

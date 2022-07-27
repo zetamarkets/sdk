@@ -5057,7 +5057,7 @@ export type Zeta = {
           "index": false
         },
         {
-          "name": "remainingSize",
+          "name": "unfilledSize",
           "type": "u64",
           "index": false
         },
@@ -10694,7 +10694,7 @@ export const IDL: Zeta = {
           "index": false
         },
         {
-          "name": "remainingSize",
+          "name": "unfilledSize",
           "type": "u64",
           "index": false
         },
