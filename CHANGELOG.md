@@ -8,6 +8,14 @@ Version changes are pinned to SDK releases.
 - events: Add new OrderCompleteEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
 - events: Remove CancelEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
 
+## [0.16.3]
+
+- referrals: Fix referral alias fetching bug. ([#139](https://github.com/zetamarkets/sdk/pull/139))
+
+## [0.16.2]
+
+- referrals: Add referrer support in Client. ([#137](https://github.com/zetamarkets/sdk/pull/137))
+
 ## [0.16.1]
 
 - referrals: Support referrer aliases. ([#134](https://github.com/zetamarkets/sdk/pull/134))
