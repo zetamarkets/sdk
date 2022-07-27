@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 - program: Refactor fee collection methodology and add some associated instructions. ([#136](https://github.com/zetamarkets/sdk/pull/136))
 - program: Separate fee structure for d1 and option products. ([#138](https://github.com/zetamarkets/sdk/pull/138))
+
 ## [0.16.3]
 
 - referrals: Fix referral alias fetching bug. ([#139](https://github.com/zetamarkets/sdk/pull/139))
