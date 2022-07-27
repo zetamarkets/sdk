@@ -4851,6 +4851,9 @@ export type Zeta = {
           },
           {
             "name": "Fill"
+          },
+          {
+            "name": "Booted"
           }
         ]
       }
@@ -10485,6 +10488,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "Fill"
+          },
+          {
+            "name": "Booted"
           }
         ]
       }

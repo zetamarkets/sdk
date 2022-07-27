@@ -240,6 +240,7 @@ export function isMarketMaker(marginAccount: MarginAccount) {
 export enum OrderCompleteType {
   CANCEL = 0,
   FILL = 1,
+  BOOTED = 2,
 }
 
 export function fromProgramOrderCompleteType(
@@ -250,6 +251,9 @@ export function fromProgramOrderCompleteType(
   }
   if (objectEquals(orderCompleteType, { fill: {} })) {
     return OrderCompleteType.FILL;
+  }
+  if (objectEquals(orderCompleteType, { booted: {} })) {
+    return OrderCompleteType.BOOTED;
   }
   throw Error("Invalid order complete type");
 }
