@@ -5,12 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- events: Add new OrderCompleteEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
+- events: Remove CancelEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
+
 ## [0.16.1]
 
 - referrals: Support referrer aliases. ([#134](https://github.com/zetamarkets/sdk/pull/134))
-
-- events: Add new OrderCompleteEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
-- events: Remove CancelEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
 
 ## [0.16.0]
 
