@@ -6,6 +6,14 @@ Version changes are pinned to SDK releases.
 ## [Unreleased]
 
 - program: Refactor fee collection methodology and add some associated instructions. ([#136](https://github.com/zetamarkets/sdk/pull/136))
+## [0.16.3]
+
+- referrals: Fix referral alias fetching bug. ([#139](https://github.com/zetamarkets/sdk/pull/139))
+
+## [0.16.2]
+
+- referrals: Add referrer support in Client. ([#137](https://github.com/zetamarkets/sdk/pull/137))
+
 ## [0.16.1]
 
 - referrals: Support referrer aliases. ([#134](https://github.com/zetamarkets/sdk/pull/134))
