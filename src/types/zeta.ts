@@ -4842,6 +4842,23 @@ export type Zeta = {
       }
     },
     {
+      "name": "OrderCompleteType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "Fill"
+          },
+          {
+            "name": "Booted"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -5008,7 +5025,7 @@ export type Zeta = {
       ]
     },
     {
-      "name": "CancelEvent",
+      "name": "OrderCompleteEvent",
       "fields": [
         {
           "name": "marginAccount",
@@ -5040,7 +5057,7 @@ export type Zeta = {
           "index": false
         },
         {
-          "name": "size",
+          "name": "unfilledSize",
           "type": "u64",
           "index": false
         },
@@ -5052,6 +5069,13 @@ export type Zeta = {
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderCompleteType",
+          "type": {
+            "defined": "OrderCompleteType"
+          },
           "index": false
         }
       ]
@@ -10455,6 +10479,23 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "OrderCompleteType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "Fill"
+          },
+          {
+            "name": "Booted"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -10621,7 +10662,7 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "CancelEvent",
+      "name": "OrderCompleteEvent",
       "fields": [
         {
           "name": "marginAccount",
@@ -10653,7 +10694,7 @@ export const IDL: Zeta = {
           "index": false
         },
         {
-          "name": "size",
+          "name": "unfilledSize",
           "type": "u64",
           "index": false
         },
@@ -10665,6 +10706,13 @@ export const IDL: Zeta = {
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderCompleteType",
+          "type": {
+            "defined": "OrderCompleteType"
+          },
           "index": false
         }
       ]

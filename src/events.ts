@@ -25,6 +25,11 @@ export enum EventType {
    */
   TRADE,
   /**
+   * An OrderComplete event for the user margin account.
+   * Happens when an order is either fully filled or cancelled
+   */
+  ORDERCOMPLETE,
+  /**
    * An update in the orderbook.
    */
   ORDERBOOK,

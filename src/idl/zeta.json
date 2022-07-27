@@ -4842,6 +4842,23 @@
       }
     },
     {
+      "name": "OrderCompleteType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "Fill"
+          },
+          {
+            "name": "Booted"
+          }
+        ]
+      }
+    },
+    {
       "name": "MarginRequirement",
       "type": {
         "kind": "enum",
@@ -5008,7 +5025,7 @@
       ]
     },
     {
-      "name": "CancelEvent",
+      "name": "OrderCompleteEvent",
       "fields": [
         {
           "name": "marginAccount",
@@ -5040,7 +5057,7 @@
           "index": false
         },
         {
-          "name": "size",
+          "name": "unfilledSize",
           "type": "u64",
           "index": false
         },
@@ -5052,6 +5069,13 @@
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderCompleteType",
+          "type": {
+            "defined": "OrderCompleteType"
+          },
           "index": false
         }
       ]
