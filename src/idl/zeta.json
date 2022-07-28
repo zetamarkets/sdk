@@ -3408,11 +3408,11 @@
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -3440,11 +3440,19 @@
             "type": "u8"
           },
           {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                156
+                140
               ]
             }
           }
@@ -4476,11 +4484,19 @@
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -4572,11 +4588,19 @@
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {

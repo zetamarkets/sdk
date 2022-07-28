@@ -3408,11 +3408,11 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -3440,11 +3440,19 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                156
+                140
               ]
             }
           }
@@ -4476,11 +4484,19 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -4572,11 +4588,19 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -9215,11 +9239,11 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -9247,11 +9271,19 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                156
+                140
               ]
             }
           }
@@ -10283,11 +10315,19 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -10379,11 +10419,19 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeTradeFeePercentage",
+            "name": "nativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeUnderlyingFeePercentage",
+            "name": "nativeD1UnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {
