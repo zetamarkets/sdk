@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.4]
+
 - program: Refactor fee collection methodology and add some associated instructions. ([#136](https://github.com/zetamarkets/sdk/pull/136))
 - program: Separate fee structure for d1 and option products. ([#138](https://github.com/zetamarkets/sdk/pull/138))
 - events: Add new OrderCompleteEvent. ([#135](https://github.com/zetamarkets/sdk/pull/135))
