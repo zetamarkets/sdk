@@ -629,6 +629,22 @@ export class SubExchange {
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
+
+  /**
+   *
+   * @param movementType move funds from treasury wallet to insurance fund or the opposite
+   * @param amount an array of remaining accounts (margin accounts) that will be rebalanced
+   */
+  public async treasuryMovement(
+    treasuryMovementType: types.TreasuryMovementType,
+    amount: anchor.BN
+  ) {
+    let tx = new Transaction().add(
+      instructions.treasuryMovementIx(this.asset, treasuryMovementType, amount)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
   /**
    *
    * @param marginAccounts an array of remaining accounts (margin accounts) that will be rebalanced

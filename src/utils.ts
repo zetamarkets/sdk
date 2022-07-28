@@ -193,6 +193,19 @@ export async function getZetaInsuranceVault(
   );
 }
 
+export async function getZetaTreasuryWallet(
+  programId: PublicKey,
+  mint: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("zeta-treasury-wallet")),
+      mint.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getUserInsuranceDepositAccount(
   programId: PublicKey,
   zetaGroup: PublicKey,

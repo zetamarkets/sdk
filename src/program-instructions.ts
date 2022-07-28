@@ -912,17 +912,55 @@ export async function initializeZetaGroupIx(
   );
 }
 
+export function collectTreasuryFundsIx(
+  collectionTokenAccount: PublicKey,
+  amount: anchor.BN,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.collectTreasuryFunds(amount, {
+    accounts: {
+      state: Exchange.stateAddress,
+      treasuryWallet: Exchange.treasuryWalletAddress,
+      collectionTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      admin,
+    },
+  });
+}
+
+export function treasuryMovementIx(
+  asset: Asset,
+  treasuryMovementType: types.TreasuryMovementType,
+  amount: anchor.BN
+): TransactionInstruction {
+  return Exchange.program.instruction.treasuryMovement(
+    types.toProgramTreasuryMovementType(treasuryMovementType),
+    amount,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: Exchange.getZetaGroupAddress(asset),
+        insuranceVault: Exchange.getInsuranceVaultAddress(asset),
+        treasuryWallet: Exchange.treasuryWalletAddress,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        admin: Exchange.provider.wallet.publicKey,
+      },
+    }
+  );
+}
+
 export function rebalanceInsuranceVaultIx(
   asset: Asset,
   remainingAccounts: any[]
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
-      zetaGroup: subExchange.zetaGroupAddress,
-      zetaVault: subExchange.vaultAddress,
-      insuranceVault: subExchange.insuranceVaultAddress,
-      socializedLossAccount: subExchange.socializedLossAccountAddress,
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      zetaVault: Exchange.getVaultAddress(asset),
+      insuranceVault: Exchange.getInsuranceVaultAddress(asset),
+      treasuryWallet: Exchange.treasuryWalletAddress,
+      socializedLossAccount: Exchange.getSocializedLossAccountAddress(asset),
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,
@@ -1087,6 +1125,7 @@ export function initializeZetaStateIx(
   stateAddress: PublicKey,
   stateNonce: number,
   serumAuthority: PublicKey,
+  treasuryWallet: PublicKey,
   serumNonce: number,
   mintAuthority: PublicKey,
   mintAuthorityNonce: number,
@@ -1096,14 +1135,31 @@ export function initializeZetaStateIx(
   args["stateNonce"] = stateNonce;
   args["serumNonce"] = serumNonce;
   args["mintAuthNonce"] = mintAuthorityNonce;
+
   return Exchange.program.instruction.initializeZetaState(args, {
     accounts: {
       state: stateAddress,
       serumAuthority,
       mintAuthority,
+      treasuryWallet,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
+      usdcMint: Exchange.usdcMintAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function initializeZetaTreasuryWalletIx(): TransactionInstruction {
+  return Exchange.program.instruction.initializeZetaTreasuryWallet({
+    accounts: {
+      state: Exchange.stateAddress,
+      treasuryWallet: Exchange.treasuryWalletAddress,
+      rent: SYSVAR_RENT_PUBKEY,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      usdcMint: Exchange.usdcMintAddress,
       admin: Exchange.provider.wallet.publicKey,
     },
   });

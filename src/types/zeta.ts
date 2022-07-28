@@ -482,6 +482,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -493,6 +498,11 @@ export type Zeta = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
           "isMut": false,
           "isSigner": false
         },
@@ -510,6 +520,47 @@ export type Zeta = {
           }
         }
       ]
+    },
+    {
+      "name": "initializeZetaTreasuryWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
     },
     {
       "name": "updateAdmin",
@@ -2646,8 +2697,96 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "collectTreasuryFunds",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "treasuryMovement",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "treasuryMovementType",
+          "type": {
+            "defined": "TreasuryMovementType"
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "rebalanceInsuranceVault",
       "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "zetaGroup",
           "isMut": false,
@@ -2660,6 +2799,11 @@ export type Zeta = {
         },
         {
           "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -3292,11 +3436,15 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "treasuryWalletNonce",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                157
+                156
               ]
             }
           }
@@ -4842,6 +4990,23 @@ export type Zeta = {
       }
     },
     {
+      "name": "TreasuryMovementType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Undefined"
+          },
+          {
+            "name": "ToTreasury"
+          },
+          {
+            "name": "ToInsurance"
+          }
+        ]
+      }
+    },
+    {
       "name": "OrderCompleteType",
       "type": {
         "kind": "enum",
@@ -5631,6 +5796,11 @@ export type Zeta = {
       "code": 6109,
       "name": "ReferrerAlreadyHasAlias",
       "msg": "Referrer already has alias"
+    },
+    {
+      "code": 6110,
+      "name": "InvalidTreasuryMovementAmount",
+      "msg": "Invalid treasury movement amount"
     }
   ]
 };
@@ -6119,6 +6289,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -6130,6 +6305,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
           "isMut": false,
           "isSigner": false
         },
@@ -6147,6 +6327,47 @@ export const IDL: Zeta = {
           }
         }
       ]
+    },
+    {
+      "name": "initializeZetaTreasuryWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
     },
     {
       "name": "updateAdmin",
@@ -8283,8 +8504,96 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "collectTreasuryFunds",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "treasuryMovement",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "treasuryMovementType",
+          "type": {
+            "defined": "TreasuryMovementType"
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "rebalanceInsuranceVault",
       "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "zetaGroup",
           "isMut": false,
@@ -8297,6 +8606,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -8929,11 +9243,15 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "treasuryWalletNonce",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                157
+                156
               ]
             }
           }
@@ -10479,6 +10797,23 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "TreasuryMovementType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Undefined"
+          },
+          {
+            "name": "ToTreasury"
+          },
+          {
+            "name": "ToInsurance"
+          }
+        ]
+      }
+    },
+    {
       "name": "OrderCompleteType",
       "type": {
         "kind": "enum",
@@ -11268,6 +11603,11 @@ export const IDL: Zeta = {
       "code": 6109,
       "name": "ReferrerAlreadyHasAlias",
       "msg": "Referrer already has alias"
+    },
+    {
+      "code": 6110,
+      "name": "InvalidTreasuryMovementAmount",
+      "msg": "Invalid treasury movement amount"
     }
   ]
 };
