@@ -746,6 +746,13 @@ export class Client {
     return this.getSubClient(asset).marginAccountAddress;
   }
 
+  public async initializeReferrerAccount() {
+    let tx = new Transaction().add(
+      await instructions.initializeReferrerAccountIx(this.publicKey)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
   public async initializeReferrerAlias(
     alias: string
   ): Promise<TransactionSignature> {
@@ -758,14 +765,8 @@ export class Client {
       this.publicKey
     );
 
-    let [referrerAliasAddress] = await utils.getReferrerAliasAddress(
-      Exchange.programId,
-      alias
-    );
-
-    let referrerAccount: ReferrerAccount;
     try {
-      referrerAccount = await Exchange.program.account.referrerAccount.fetch(
+      await Exchange.program.account.referrerAccount.fetch(
         referrerAccountAddress
       );
     } catch (e) {

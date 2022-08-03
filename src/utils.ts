@@ -206,6 +206,21 @@ export async function getZetaTreasuryWallet(
   );
 }
 
+export async function getZetaReferralRewardsWallet(
+  programId: PublicKey,
+  mint: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(
+        anchor.utils.bytes.utf8.encode("zeta-referral-rewards-wallet")
+      ),
+      mint.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getUserInsuranceDepositAccount(
   programId: PublicKey,
   zetaGroup: PublicKey,

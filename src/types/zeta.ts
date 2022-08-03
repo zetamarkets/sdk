@@ -487,6 +487,16 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralAdmin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -563,7 +573,69 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "initializeZetaReferralRewardsWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referralRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateReferralAdmin",
       "accounts": [
         {
           "name": "state",
@@ -3075,19 +3147,9 @@ export type Zeta = {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
+          "name": "referrer",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "referrer",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "referrerAccount",
@@ -3156,6 +3218,31 @@ export type Zeta = {
         {
           "name": "alias",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "setReferralRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralAdmin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": "SetReferralRewardsArgs"
+            }
+          }
         }
       ]
     }
@@ -3448,11 +3535,19 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "referralAdmin",
+            "type": "publicKey"
+          },
+          {
+            "name": "referralRewardsWalletNonce",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                140
+                107
               ]
             }
           }
@@ -4378,6 +4473,22 @@ export type Zeta = {
           {
             "name": "interestRate",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetReferralRewardsArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referralAccountKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
           }
         ]
       }
@@ -5825,6 +5936,16 @@ export type Zeta = {
       "code": 6110,
       "name": "InvalidTreasuryMovementAmount",
       "msg": "Invalid treasury movement amount"
+    },
+    {
+      "code": 6111,
+      "name": "InvalidReferralAdminSigner",
+      "msg": "Invalid referral admin signer"
+    },
+    {
+      "code": 6112,
+      "name": "InvalidSetReferralRewardsRemainingAccounts",
+      "msg": "Invalid set referral rewards remaining accounts"
     }
   ]
 };
@@ -6318,6 +6439,16 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralAdmin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -6394,7 +6525,69 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "initializeZetaReferralRewardsWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referralRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateReferralAdmin",
       "accounts": [
         {
           "name": "state",
@@ -8906,19 +9099,9 @@ export const IDL: Zeta = {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
+          "name": "referrer",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "referrer",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "referrerAccount",
@@ -8987,6 +9170,31 @@ export const IDL: Zeta = {
         {
           "name": "alias",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "setReferralRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralAdmin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": "SetReferralRewardsArgs"
+            }
+          }
         }
       ]
     }
@@ -9279,11 +9487,19 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "referralAdmin",
+            "type": "publicKey"
+          },
+          {
+            "name": "referralRewardsWalletNonce",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                140
+                107
               ]
             }
           }
@@ -10209,6 +10425,22 @@ export const IDL: Zeta = {
           {
             "name": "interestRate",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetReferralRewardsArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referralAccountKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
           }
         ]
       }
@@ -11656,6 +11888,16 @@ export const IDL: Zeta = {
       "code": 6110,
       "name": "InvalidTreasuryMovementAmount",
       "msg": "Invalid treasury movement amount"
+    },
+    {
+      "code": 6111,
+      "name": "InvalidReferralAdminSigner",
+      "msg": "Invalid referral admin signer"
+    },
+    {
+      "code": 6112,
+      "name": "InvalidSetReferralRewardsRemainingAccounts",
+      "msg": "Invalid set referral rewards remaining accounts"
     }
   ]
 };
