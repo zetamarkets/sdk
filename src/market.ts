@@ -17,7 +17,7 @@ import * as types from "./types";
 
 import { EventType, OrderbookEvent } from "./events";
 import { Asset } from "./assets";
-import { Product } from "./program-types";
+import { Product, Strike } from "./program-types";
 import { SubExchange } from "./subexchange";
 
 export class ZetaGroupMarkets {
@@ -221,7 +221,6 @@ export class ZetaGroupMarkets {
       let slice = indexes.slice(i, i + constants.MARKET_LOAD_LIMIT);
       await Promise.all(
         slice.map(async (index) => {
-          console.log(index);
           let marketAddr = subExchange.zetaGroup.products[index].market;
           let serumMarket = await SerumMarket.load(
             Exchange.connection,
@@ -272,7 +271,7 @@ export class ZetaGroupMarkets {
       );
       instance._perpMarket = new Market(
         asset,
-        null, // not in use but technically sits at the end of the list of Products in the ZetaGroup
+        constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
         null,
         types.toProductKind(subExchange.zetaGroup.perp.kind),
         marketAddr,
@@ -293,7 +292,6 @@ export class ZetaGroupMarkets {
    * Updates the option series state based off state in SubExchange.
    */
   public async updateExpirySeries() {
-    console.log("Update expiry series");
     let subExchange = Exchange.getSubExchange(this.asset);
     for (var i = 0; i < subExchange.zetaGroup.products.length; i++) {
       this._markets[i].updateStrike();
@@ -302,7 +300,6 @@ export class ZetaGroupMarkets {
 
     this._frontExpiryIndex = subExchange.zetaGroup.frontExpiryIndex;
     for (var i = 0; i < subExchange.zetaGroup.expirySeries.length; i++) {
-      console.log(`expiry ${i}`);
       let strikesInitialized =
         this._markets[i * this.productsPerExpiry()].strike != null;
       this._expirySeries[i] = new ExpirySeries(
@@ -532,9 +529,14 @@ export class Market {
   }
 
   public updateStrike() {
-    let strike = Exchange.getSubExchange(this.asset).zetaGroup.products[
-      this._marketIndex
-    ].strike;
+    let strike: Strike;
+    if (this.kind == types.Kind.PERP) {
+      strike = Exchange.getSubExchange(this.asset).zetaGroup.perp.strike;
+    } else {
+      strike = Exchange.getSubExchange(this.asset).zetaGroup.products[
+        this._marketIndex
+      ].strike;
+    }
     if (!strike.isSet) {
       this._strike = null;
     } else {

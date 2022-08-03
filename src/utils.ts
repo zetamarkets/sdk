@@ -826,27 +826,39 @@ export function getGreeksIndex(marketIndex: number): number {
 function printMarkets(markets: Market[], subExchange: SubExchange) {
   for (var j = 0; j < markets.length; j++) {
     let market = markets[j];
+
+    // Custom log for perps
+    if (market.kind == types.Kind.PERP) {
+      let markPrice = subExchange.getMarkPrice(market.marketIndex);
+      console.log(
+        `[MARKET] INDEX: N/A KIND: ${
+          market.kind
+        } MARK_PRICE ${markPrice.toFixed(6)}`
+      );
+      return;
+    }
+
     let greeksIndex = getGreeksIndex(market.marketIndex);
     let markPrice = subExchange.getMarkPrice(market.marketIndex);
 
-    let delta = null;
-    let sigma = null;
-    let vega = null;
+    let delta = 1;
+    let sigma = 0;
+    let vega = 0;
 
-    // TODO skip greeks display for futures and perps
+    if (market.kind != types.Kind.FUTURE) {
+      delta = convertNativeBNToDecimal(
+        subExchange.greeks.productGreeks[greeksIndex].delta,
+        constants.PRICING_PRECISION
+      );
 
-    delta = convertNativeBNToDecimal(
-      subExchange.greeks.productGreeks[greeksIndex].delta,
-      constants.PRICING_PRECISION
-    );
+      sigma = Decimal.fromAnchorDecimal(
+        subExchange.greeks.productGreeks[greeksIndex].volatility
+      ).toNumber();
 
-    sigma = Decimal.fromAnchorDecimal(
-      subExchange.greeks.productGreeks[greeksIndex].volatility
-    ).toNumber();
-
-    vega = Decimal.fromAnchorDecimal(
-      subExchange.greeks.productGreeks[greeksIndex].vega
-    ).toNumber();
+      vega = Decimal.fromAnchorDecimal(
+        subExchange.greeks.productGreeks[greeksIndex].vega
+      ).toNumber();
+    }
 
     console.log(
       `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
@@ -867,7 +879,6 @@ export function displayState() {
       getMostRecentExpiredIndex(asset),
     ];
 
-    console.log(orderedIndexes, getMostRecentExpiredIndex(asset));
     console.log(
       `[EXCHANGE ${assetToName(subExchange.asset)}] Display market state...`
     );
@@ -876,10 +887,6 @@ export function displayState() {
     for (var i = 0; i < orderedIndexes.length; i++) {
       let index = orderedIndexes[i];
       let expirySeries = subExchange.markets.expirySeries[index];
-      // console.log(index);
-      // console.log(subExchange.markets);
-      // console.log("******");
-      // console.log(expirySeries);
       console.log(
         `Expiration @ ${new Date(
           expirySeries.expiryTs * 1000
