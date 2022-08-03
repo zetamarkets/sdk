@@ -74,10 +74,14 @@ export const CLUSTER_URLS = {
 // These are fixed and shouldn't change in the future.
 export const NUM_STRIKES = 11;
 export const PRODUCTS_PER_EXPIRY = NUM_STRIKES * 2 + 1; // +1 for the future.
+export const EXPIRY_FUTURE_INDEX = PRODUCTS_PER_EXPIRY - 1;
 export const ACTIVE_EXPIRIES = 2;
-export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY;
-export const TOTAL_EXPIRIES = 6;
-export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * TOTAL_EXPIRIES;
+export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 for perp
+export const TOTAL_EXPIRIES = 5;
+export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
+export const PERP_INDEX = TOTAL_MARKETS - 1;
+// TODO maybe these should be renamed after perps?
+// eg we tend to use ACTIVE_MARKETS as 'all the indexes that are active' rather than 'how many indexes are active'
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 30;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;

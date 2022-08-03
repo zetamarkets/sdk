@@ -97,6 +97,7 @@ export interface ZetaGroup {
   marginParameters: MarginParameters;
   products: Array<Product>;
   productsPadding: Array<Product>;
+  perp: Product;
   expirySeries: Array<ExpirySeries>;
   expirySeriesPadding: Array<ExpirySeries>;
   totalInsuranceVaultDeposits: anchor.BN;
@@ -150,6 +151,7 @@ export interface MarginAccount {
   seriesExpiry: Array<anchor.BN>;
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
+  perpProductLedger: ProductLedger;
   rebalanceAmount: anchor.BN;
   asset: any;
   accountType: any;
@@ -163,6 +165,7 @@ export interface SpreadAccount {
   seriesExpiry: Array<anchor.BN>;
   positions: Array<Position>;
   positionsPadding: Array<Position>;
+  perpPosition: Position;
   asset: any;
   padding: Array<number>;
 }
@@ -171,6 +174,7 @@ export interface Greeks {
   nonce: number;
   markPrices: Array<anchor.BN>;
   markPricesPadding: Array<anchor.BN>;
+  perpMarkPrice: anchor.BN;
   productGreeks: Array<ProductGreeks>;
   productGreeksPadding: Array<ProductGreeks>;
   updateTimestamp: Array<anchor.BN>;

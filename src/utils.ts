@@ -27,6 +27,8 @@ import * as fs from "fs";
 import * as constants from "./constants";
 import * as errors from "./errors";
 import { exchange as Exchange } from "./exchange";
+import { SubExchange } from "./subexchange";
+import { Market } from "./market";
 import {
   MarginAccount,
   ReferrerAlias,
@@ -693,6 +695,8 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
+    // TEMP REMOVE ME
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -819,6 +823,41 @@ export function getGreeksIndex(marketIndex: number): number {
   );
 }
 
+function printMarkets(markets: Market[], subExchange: SubExchange) {
+  for (var j = 0; j < markets.length; j++) {
+    let market = markets[j];
+    let greeksIndex = getGreeksIndex(market.marketIndex);
+    let markPrice = subExchange.getMarkPrice(market.marketIndex);
+
+    let delta = null;
+    let sigma = null;
+    let vega = null;
+
+    // TODO skip greeks display for futures and perps
+
+    delta = convertNativeBNToDecimal(
+      subExchange.greeks.productGreeks[greeksIndex].delta,
+      constants.PRICING_PRECISION
+    );
+
+    sigma = Decimal.fromAnchorDecimal(
+      subExchange.greeks.productGreeks[greeksIndex].volatility
+    ).toNumber();
+
+    vega = Decimal.fromAnchorDecimal(
+      subExchange.greeks.productGreeks[greeksIndex].vega
+    ).toNumber();
+
+    console.log(
+      `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
+        market.strike
+      } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
+        2
+      )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
+    );
+  }
+}
+
 export function displayState() {
   let subExchanges = Exchange.subExchanges;
 
@@ -828,12 +867,19 @@ export function displayState() {
       getMostRecentExpiredIndex(asset),
     ];
 
+    console.log(orderedIndexes, getMostRecentExpiredIndex(asset));
     console.log(
       `[EXCHANGE ${assetToName(subExchange.asset)}] Display market state...`
     );
+
+    // Products with expiries, ie options and futures
     for (var i = 0; i < orderedIndexes.length; i++) {
       let index = orderedIndexes[i];
       let expirySeries = subExchange.markets.expirySeries[index];
+      // console.log(index);
+      // console.log(subExchange.markets);
+      // console.log("******");
+      // console.log(expirySeries);
       console.log(
         `Expiration @ ${new Date(
           expirySeries.expiryTs * 1000
@@ -844,35 +890,14 @@ export function displayState() {
         constants.PRICING_PRECISION
       );
       console.log(`Interest rate: ${interestRate}`);
-      let markets = subExchange.markets.getMarketsByExpiryIndex(index);
-      for (var j = 0; j < markets.length; j++) {
-        let market = markets[j];
-        let greeksIndex = getGreeksIndex(market.marketIndex);
-        let markPrice = convertNativeBNToDecimal(
-          subExchange.greeks.markPrices[market.marketIndex]
-        );
-        let delta = convertNativeBNToDecimal(
-          subExchange.greeks.productGreeks[greeksIndex].delta,
-          constants.PRICING_PRECISION
-        );
-
-        let sigma = Decimal.fromAnchorDecimal(
-          subExchange.greeks.productGreeks[greeksIndex].volatility
-        ).toNumber();
-
-        let vega = Decimal.fromAnchorDecimal(
-          subExchange.greeks.productGreeks[greeksIndex].vega
-        ).toNumber();
-
-        console.log(
-          `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
-            market.strike
-          } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
-            2
-          )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
-        );
-      }
+      printMarkets(
+        subExchange.markets.getMarketsByExpiryIndex(index),
+        subExchange
+      );
     }
+
+    // Products without expiries, ie perps
+    printMarkets([subExchange.markets.perpMarket], subExchange);
   }
 }
 

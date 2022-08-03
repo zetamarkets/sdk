@@ -1,25 +1,40 @@
 import { exchange as Exchange } from "./exchange";
 import * as types from "./types";
 import * as constants from "./constants";
-import { SpreadAccount, MarginAccount } from "./program-types";
+import {
+  SpreadAccount,
+  MarginAccount,
+  ProductLedger,
+  Position,
+} from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
 import { Asset, fromProgramAsset } from "./assets";
+import * as anchor from "@project-serum/anchor";
 
 export class RiskCalculator {
   private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
+  private _perpMarginRequirements: Map<Asset, types.MarginRequirement>;
 
   public constructor(assets: Asset[]) {
     this._marginRequirements = new Map();
+    this._perpMarginRequirements = new Map();
     for (var asset of assets) {
-      this._marginRequirements.set(asset, new Array(constants.ACTIVE_MARKETS));
+      this._marginRequirements.set(
+        asset,
+        new Array(constants.ACTIVE_MARKETS - 1)
+      );
     }
   }
 
   public getMarginRequirements(asset: Asset): Array<types.MarginRequirement> {
     return this._marginRequirements.get(asset);
+  }
+
+  public getPerpMarginRequirements(asset: Asset): types.MarginRequirement {
+    return this._perpMarginRequirements.get(asset);
   }
 
   public updateMarginRequirements(asset: Asset) {
@@ -38,6 +53,10 @@ export class RiskCalculator {
         spotPrice
       );
     }
+    this._perpMarginRequirements.set(
+      asset,
+      calculatePerpMargin(asset, spotPrice)
+    );
   }
 
   /**
@@ -53,32 +72,45 @@ export class RiskCalculator {
     size: number,
     marginType: types.MarginType
   ): number {
-    if (this._marginRequirements.get(asset)[productIndex] === null) {
+    return this.calculateMarginRequirement(
+      this._marginRequirements.get(asset)[productIndex],
+      size,
+      marginType
+    );
+  }
+
+  public getPerpMarginRequirement(
+    asset: Asset,
+    size: number,
+    marginType: types.MarginType
+  ): number {
+    return this.calculateMarginRequirement(
+      this._perpMarginRequirements.get(asset),
+      size,
+      marginType
+    );
+  }
+
+  public calculateMarginRequirement(
+    marginRequirement: types.MarginRequirement,
+    size: number,
+    marginType: types.MarginType
+  ) {
+    if (marginRequirement === null) {
       return null;
     }
 
     if (size > 0) {
       if (marginType == types.MarginType.INITIAL) {
-        return (
-          size * this._marginRequirements.get(asset)[productIndex].initialLong
-        );
+        return size * marginRequirement.initialLong;
       } else {
-        return (
-          size *
-          this._marginRequirements.get(asset)[productIndex].maintenanceLong
-        );
+        return size * marginRequirement.maintenanceLong;
       }
     } else {
       if (marginType == types.MarginType.INITIAL) {
-        return (
-          Math.abs(size) *
-          this._marginRequirements.get(asset)[productIndex].initialShort
-        );
+        return Math.abs(size) * marginRequirement.initialShort;
       } else {
-        return (
-          Math.abs(size) *
-          this._marginRequirements.get(asset)[productIndex].maintenanceShort
-        );
+        return Math.abs(size) * marginRequirement.maintenanceShort;
       }
     }
   }
@@ -116,7 +148,7 @@ export class RiskCalculator {
   ): number {
     let pnl = 0;
 
-    for (var i = 0; i < constants.ACTIVE_MARKETS; i++) {
+    for (var i = 0; i < constants.ACTIVE_MARKETS - 1; i++) {
       const position =
         accountType == types.ProgramAccountType.MarginAccount
           ? account.productLedgers[i].position
@@ -391,6 +423,22 @@ export function calculateProductMargin(
     case types.Kind.CALL:
     case types.Kind.PUT:
       return calculateOptionMargin(asset, spotPrice, markPrice, kind, strike);
+  }
+}
+
+export function calculatePerpMargin(
+  asset: Asset,
+  spotPrice: number
+): types.MarginRequirement {
+  let subExchange = Exchange.getSubExchange(asset);
+  let market = subExchange.markets.perpMarket;
+  if (market.strike == null) {
+    return null;
+  }
+  let kind = market.kind;
+  switch (kind) {
+    case types.Kind.PERP:
+      return calculateFutureMargin(asset, spotPrice); // Shared calcs between futures and perps
   }
 }
 

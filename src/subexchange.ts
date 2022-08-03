@@ -225,7 +225,8 @@ export class SubExchange {
    * Initializes the market nodes for a zeta group.
    */
   public async initializeMarketNodes(zetaGroup: PublicKey) {
-    let indexes = [...Array(constants.ACTIVE_MARKETS).keys()];
+    let indexes = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
+    indexes = indexes.concat(constants.PERP_INDEX);
     await Promise.all(
       indexes.map(async (index: number) => {
         let tx = new Transaction().add(
@@ -368,6 +369,11 @@ export class SubExchange {
         await this.initializeZetaMarket(i, marketIndexes, marketIndexesAccount);
       }
     }
+    await this.initializeZetaMarket(
+      constants.PERP_INDEX,
+      marketIndexes,
+      marketIndexesAccount
+    );
   }
 
   private async initializeZetaMarket(
@@ -375,9 +381,7 @@ export class SubExchange {
     marketIndexes: PublicKey,
     marketIndexesAccount: MarketIndexes
   ) {
-    console.log(
-      `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
-    );
+    console.log(`Initializing zeta market ${i}`);
 
     const homedir = os.homedir();
     let dir = `${homedir}/keys/${assetToName(this.asset)}`;
@@ -584,10 +588,19 @@ export class SubExchange {
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    return utils.convertNativeBNToDecimal(
-      this._greeks.markPrices[index],
-      constants.PLATFORM_PRECISION
-    );
+    if (index == constants.PERP_INDEX) {
+      return utils.convertNativeBNToDecimal(
+        this._greeks.perpMarkPrice,
+        constants.PLATFORM_PRECISION
+      );
+    } else if (index < constants.ACTIVE_MARKETS - 1) {
+      return utils.convertNativeBNToDecimal(
+        this._greeks.markPrices[index],
+        constants.PLATFORM_PRECISION
+      );
+    } else {
+      return null;
+    }
   }
 
   /**

@@ -29,7 +29,7 @@ switch (process.env["network"]) {
 
 const NETWORK_URL = process.env["network_url"]!;
 const PROGRAM_ID = new PublicKey(process.env["program_id"]);
-let crankingMarkets = new Array(constants.ACTIVE_MARKETS).fill(false);
+let crankingMarkets = new Array(constants.ACTIVE_MARKETS - 1).fill(false);
 console.log(NETWORK_URL);
 const assetList = [assets.Asset.SOL, assets.Asset.BTC];
 

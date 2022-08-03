@@ -68,12 +68,14 @@ export enum Kind {
   CALL = "call",
   PUT = "put",
   FUTURE = "future",
+  PERP = "perp",
 }
 
 export function toProductKind(kind: Object): Kind {
   if (Object.keys(kind).includes(Kind.CALL)) return Kind.CALL;
   if (Object.keys(kind).includes(Kind.PUT)) return Kind.PUT;
   if (Object.keys(kind).includes(Kind.FUTURE)) return Kind.FUTURE;
+  if (Object.keys(kind).includes(Kind.PERP)) return Kind.PERP;
   // We don't expect uninitialized.
   throw Error("Invalid product type");
 }

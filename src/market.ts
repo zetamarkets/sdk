@@ -17,6 +17,8 @@ import * as types from "./types";
 
 import { EventType, OrderbookEvent } from "./events";
 import { Asset } from "./assets";
+import { Product } from "./program-types";
+import { SubExchange } from "./subexchange";
 
 export class ZetaGroupMarkets {
   /**
@@ -50,6 +52,11 @@ export class ZetaGroupMarkets {
   }
   private _markets: Array<Market>;
 
+  public get perpMarket(): Market {
+    return this._perpMarket;
+  }
+  private _perpMarket: Market;
+
   public set pollInterval(interval: number) {
     if (interval < 0) {
       throw Error("Invalid poll interval");
@@ -64,6 +71,8 @@ export class ZetaGroupMarkets {
   private _lastPollTimestamp: number;
 
   private _subscribedMarketIndexes: Set<number>;
+
+  private _subscribedPerp: boolean;
   /**
    * Returns the market's index.
    */
@@ -133,6 +142,7 @@ export class ZetaGroupMarkets {
     this._lastPollTimestamp = 0;
   }
 
+  // TODO perps too
   public subscribeMarket(marketIndex: number) {
     if (marketIndex >= this._markets.length) {
       throw Error(`Market index ${marketIndex} doesn't exist.`);
@@ -142,6 +152,14 @@ export class ZetaGroupMarkets {
 
   public unsubscribeMarket(marketIndex: number): boolean {
     return this._subscribedMarketIndexes.delete(marketIndex);
+  }
+
+  public subscribePerp() {
+    this._subscribedPerp = true;
+  }
+
+  public unsubscribePerp() {
+    this._subscribedPerp = false;
   }
 
   public async handlePolling(
@@ -166,6 +184,18 @@ export class ZetaGroupMarkets {
           }
         })
       );
+
+      if (this._subscribedPerp) {
+        try {
+          await this._perpMarket.updateOrderbook();
+        } catch (e) {
+          console.error(`Orderbook poll failed: ${e}`);
+        }
+        if (callback !== undefined) {
+          let data: OrderbookEvent = { marketIndex: constants.PERP_INDEX };
+          callback(this.asset, EventType.ORDERBOOK, data);
+        }
+      }
     }
   }
 
@@ -186,11 +216,12 @@ export class ZetaGroupMarkets {
         subExchange.zetaGroup.expirySeries.length
     );
 
-    let indexes = [...Array(constants.ACTIVE_MARKETS).keys()];
+    let indexes = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
     for (var i = 0; i < indexes.length; i += constants.MARKET_LOAD_LIMIT) {
       let slice = indexes.slice(i, i + constants.MARKET_LOAD_LIMIT);
       await Promise.all(
         slice.map(async (index) => {
+          console.log(index);
           let marketAddr = subExchange.zetaGroup.products[index].market;
           let serumMarket = await SerumMarket.load(
             Exchange.connection,
@@ -223,6 +254,34 @@ export class ZetaGroupMarkets {
         })
       );
 
+      // Perps product/market is separate
+      let marketAddr = subExchange.zetaGroup.perp.market;
+      let serumMarket = await SerumMarket.load(
+        Exchange.connection,
+        marketAddr,
+        { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
+        constants.DEX_PID[Exchange.network]
+      );
+      let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
+        Exchange.programId,
+        serumMarket.baseMintAddress
+      );
+      let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
+        Exchange.programId,
+        serumMarket.quoteMintAddress
+      );
+      instance._perpMarket = new Market(
+        asset,
+        null, // not in use but technically sits at the end of the list of Products in the ZetaGroup
+        null,
+        types.toProductKind(subExchange.zetaGroup.perp.kind),
+        marketAddr,
+        subExchange.zetaGroupAddress,
+        quoteVaultAddr,
+        baseVaultAddr,
+        serumMarket
+      );
+
       await sleep(throttleMs);
     }
 
@@ -234,13 +293,16 @@ export class ZetaGroupMarkets {
    * Updates the option series state based off state in SubExchange.
    */
   public async updateExpirySeries() {
+    console.log("Update expiry series");
     let subExchange = Exchange.getSubExchange(this.asset);
     for (var i = 0; i < subExchange.zetaGroup.products.length; i++) {
       this._markets[i].updateStrike();
     }
+    this._perpMarket.updateStrike();
 
     this._frontExpiryIndex = subExchange.zetaGroup.frontExpiryIndex;
     for (var i = 0; i < subExchange.zetaGroup.expirySeries.length; i++) {
+      console.log(`expiry ${i}`);
       let strikesInitialized =
         this._markets[i * this.productsPerExpiry()].strike != null;
       this._expirySeries[i] = new ExpirySeries(

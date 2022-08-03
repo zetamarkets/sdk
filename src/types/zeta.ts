@@ -3184,9 +3184,13 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarkPrice",
+            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -3561,8 +3565,14 @@ export type Zeta = {
                 {
                   "defined": "Product"
                 },
-                92
+                91
               ]
+            }
+          },
+          {
+            "name": "perp",
+            "type": {
+              "defined": "Product"
             }
           },
           {
@@ -3660,9 +3670,13 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                6
+                5
               ]
             }
+          },
+          {
+            "name": "seriesExpiryPadding",
+            "type": "u64"
           },
           {
             "name": "positions",
@@ -3682,8 +3696,14 @@ export type Zeta = {
                 {
                   "defined": "Position"
                 },
-                92
+                91
               ]
+            }
+          },
+          {
+            "name": "perpPosition",
+            "type": {
+              "defined": "Position"
             }
           },
           {
@@ -3739,9 +3759,13 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                6
+                5
               ]
             }
+          },
+          {
+            "name": "seriesExpiryPadding",
+            "type": "u64"
           },
           {
             "name": "productLedgers",
@@ -3761,8 +3785,14 @@ export type Zeta = {
                 {
                   "defined": "ProductLedger"
                 },
-                92
+                91
               ]
+            }
+          },
+          {
+            "name": "perpProductLedger",
+            "type": {
+              "defined": "ProductLedger"
             }
           },
           {
@@ -4075,9 +4105,13 @@ export type Zeta = {
             "type": {
               "array": [
                 "bool",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarketCleaned",
+            "type": "bool"
           }
         ]
       }
@@ -4938,6 +4972,9 @@ export type Zeta = {
           },
           {
             "name": "Future"
+          },
+          {
+            "name": "Perp"
           }
         ]
       }
@@ -9015,9 +9052,13 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarkPrice",
+            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -9392,8 +9433,14 @@ export const IDL: Zeta = {
                 {
                   "defined": "Product"
                 },
-                92
+                91
               ]
+            }
+          },
+          {
+            "name": "perp",
+            "type": {
+              "defined": "Product"
             }
           },
           {
@@ -9491,9 +9538,13 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                6
+                5
               ]
             }
+          },
+          {
+            "name": "seriesExpiryPadding",
+            "type": "u64"
           },
           {
             "name": "positions",
@@ -9513,8 +9564,14 @@ export const IDL: Zeta = {
                 {
                   "defined": "Position"
                 },
-                92
+                91
               ]
+            }
+          },
+          {
+            "name": "perpPosition",
+            "type": {
+              "defined": "Position"
             }
           },
           {
@@ -9570,9 +9627,13 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                6
+                5
               ]
             }
+          },
+          {
+            "name": "seriesExpiryPadding",
+            "type": "u64"
           },
           {
             "name": "productLedgers",
@@ -9592,8 +9653,14 @@ export const IDL: Zeta = {
                 {
                   "defined": "ProductLedger"
                 },
-                92
+                91
               ]
+            }
+          },
+          {
+            "name": "perpProductLedger",
+            "type": {
+              "defined": "ProductLedger"
             }
           },
           {
@@ -9906,9 +9973,13 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "bool",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarketCleaned",
+            "type": "bool"
           }
         ]
       }
@@ -10769,6 +10840,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "Future"
+          },
+          {
+            "name": "Perp"
           }
         ]
       }
