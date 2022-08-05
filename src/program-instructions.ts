@@ -13,6 +13,7 @@ import * as anchor from "@project-serum/anchor";
 import * as types from "./types";
 import * as constants from "./constants";
 import { Asset } from "./assets";
+import { Market } from "./market";
 
 export function initializeMarginAccountIx(
   zetaGroup: PublicKey,
@@ -268,7 +269,12 @@ export function placeOrderIx(
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -340,7 +346,12 @@ export function placeOrderV2Ix(
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -419,7 +430,12 @@ export function placeOrderV3Ix(
     );
   }
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -489,7 +505,12 @@ export function cancelOrderIx(
   side: types.Side
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   return Exchange.program.instruction.cancelOrder(
     types.toProgramSide(side),
     orderId,
@@ -523,7 +544,12 @@ export function cancelOrderNoErrorIx(
   side: types.Side
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   return Exchange.program.instruction.cancelOrderNoError(
     types.toProgramSide(side),
     orderId,
@@ -556,7 +582,12 @@ export function cancelOrderByClientOrderIdIx(
   clientOrderId: anchor.BN
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   return Exchange.program.instruction.cancelOrderByClientOrderId(
     clientOrderId,
     {
@@ -588,7 +619,12 @@ export function cancelOrderByClientOrderIdNoErrorIx(
   clientOrderId: anchor.BN
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   return Exchange.program.instruction.cancelOrderByClientOrderIdNoError(
     clientOrderId,
     {
@@ -620,7 +656,12 @@ export function cancelExpiredOrderIx(
   side: types.Side
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   return Exchange.program.instruction.cancelExpiredOrder(
     types.toProgramSide(side),
     orderId,
@@ -650,7 +691,12 @@ export function forceCancelOrdersIx(
   openOrders: PublicKey
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   return Exchange.program.instruction.forceCancelOrders({
     accounts: {
       greeks: subExchange.zetaGroup.greeks,
@@ -1557,7 +1603,12 @@ export function cancelOrderHaltedIx(
   side: types.Side
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.markets[marketIndex];
+  let marketData: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    marketData = subExchange.markets.perpMarket;
+  } else {
+    marketData = subExchange.markets.markets[marketIndex];
+  }
   return Exchange.program.instruction.cancelOrderHalted(
     types.toProgramSide(side),
     orderId,

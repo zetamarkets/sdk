@@ -142,7 +142,6 @@ export class ZetaGroupMarkets {
     this._lastPollTimestamp = 0;
   }
 
-  // TODO perps too
   public subscribeMarket(marketIndex: number) {
     if (marketIndex >= this._markets.length) {
       throw Error(`Market index ${marketIndex} doesn't exist.`);
@@ -296,7 +295,6 @@ export class ZetaGroupMarkets {
     for (var i = 0; i < subExchange.zetaGroup.products.length; i++) {
       this._markets[i].updateStrike();
     }
-    this._perpMarket.updateStrike();
 
     this._frontExpiryIndex = subExchange.zetaGroup.frontExpiryIndex;
     for (var i = 0; i < subExchange.zetaGroup.expirySeries.length; i++) {
@@ -340,6 +338,9 @@ export class ZetaGroupMarkets {
       } else {
         return k;
       }
+    }
+    if (compare(market, this._perpMarket.address) == 0) {
+      return constants.PERP_INDEX;
     }
     throw Error("Market doesn't exist!");
   }
@@ -529,14 +530,10 @@ export class Market {
   }
 
   public updateStrike() {
-    let strike: Strike;
-    if (this.kind == types.Kind.PERP) {
-      strike = Exchange.getSubExchange(this.asset).zetaGroup.perp.strike;
-    } else {
-      strike = Exchange.getSubExchange(this.asset).zetaGroup.products[
-        this._marketIndex
-      ].strike;
-    }
+    let strike = Exchange.getSubExchange(this.asset).zetaGroup.products[
+      this._marketIndex
+    ].strike;
+
     if (!strike.isSet) {
       this._strike = null;
     } else {

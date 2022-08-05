@@ -177,9 +177,9 @@ export class SubClient {
   private constructor(asset: Asset, parent: Client) {
     this._asset = asset;
     this._subExchange = Exchange.getSubExchange(asset);
-    this._openOrdersAccounts = Array(
-      this._subExchange.zetaGroup.products.length
-    ).fill(PublicKey.default);
+    this._openOrdersAccounts = Array(constants.TOTAL_MARKETS).fill(
+      PublicKey.default
+    );
     this._parent = parent;
 
     this._marginPositions = [];
@@ -1667,6 +1667,15 @@ export class SubClient {
         );
       })
     );
+
+    // perps too
+    await subExchange.markets.perpMarket.updateOrderbook();
+    orders.push(
+      subExchange.markets.perpMarket.getOrdersForAccount(
+        this._openOrdersAccounts[constants.PERP_INDEX]
+      )
+    );
+
     this._orders = [].concat(...orders);
   }
 
@@ -1686,6 +1695,20 @@ export class SubClient {
         });
       }
     }
+
+    // perps too
+    if (this._marginAccount.perpProductLedger.position.size.toNumber() != 0) {
+      positions.push({
+        marketIndex: i,
+        market: this._subExchange.zetaGroup.perp.market,
+        size: utils.convertNativeLotSizeToDecimal(
+          this._marginAccount.perpProductLedger.position.size.toNumber()
+        ),
+        costOfTrades: utils.convertNativeBNToDecimal(
+          this._marginAccount.perpProductLedger.position.costOfTrades
+        ),
+      });
+    }
     this._marginPositions = positions;
   }
 
@@ -1704,6 +1727,20 @@ export class SubClient {
           ),
         });
       }
+    }
+
+    // perps too
+    if (this._spreadAccount.perpPosition.size.toNumber() != 0) {
+      positions.push({
+        marketIndex: i,
+        market: this._subExchange.zetaGroup.perp.market,
+        size: utils.convertNativeLotSizeToDecimal(
+          this._spreadAccount.perpPosition.size.toNumber()
+        ),
+        costOfTrades: utils.convertNativeBNToDecimal(
+          this._spreadAccount.perpPosition.costOfTrades
+        ),
+      });
     }
     this._spreadPositions = positions;
   }
@@ -1726,6 +1763,21 @@ export class SubClient {
         }
       })
     );
+
+    // perps too
+    if (
+      // If the nonce is not zero, we know there is an open orders account.
+      this._marginAccount.openOrdersNonce[constants.PERP_INDEX] !== 0 &&
+      // If this is equal to default, it means we haven't added the PDA yet.
+      this._openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
+    ) {
+      let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
+        Exchange.programId,
+        this._subExchange.zetaGroup.perp.market,
+        this._parent.publicKey
+      );
+      this._openOrdersAccounts[constants.PERP_INDEX] = openOrdersPda;
+    }
   }
 
   private assertHasMarginAccount() {
@@ -1746,8 +1798,13 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let size =
-      this.marginAccount.productLedgers[index].position.size.toNumber();
+    let position;
+    if (index == constants.PERP_INDEX) {
+      position = this.marginAccount.perpProductLedger.position;
+    } else {
+      position = this.marginAccount.productLedgers[index].position;
+    }
+    let size = position.size.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1759,8 +1816,13 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let costOfTrades =
-      this.marginAccount.productLedgers[index].position.costOfTrades.toNumber();
+    let position;
+    if (index == constants.PERP_INDEX) {
+      position = this.marginAccount.perpProductLedger.position;
+    } else {
+      position = this.marginAccount.productLedgers[index].position;
+    }
+    let costOfTrades = position.costOfTrades.toNumber();
     return decimal
       ? utils.convertNativeIntegerToDecimal(costOfTrades)
       : costOfTrades;
@@ -1775,11 +1837,14 @@ export class SubClient {
     side: types.Side,
     decimal: boolean = false
   ): number {
+    let orderState;
+    if (index == constants.PERP_INDEX) {
+      orderState = this.marginAccount.perpProductLedger.orderState;
+    } else {
+      orderState = this.marginAccount.productLedgers[index].orderState;
+    }
     let orderIndex = side == types.Side.BID ? 0 : 1;
-    let size =
-      this.marginAccount.productLedgers[index].orderState.openingOrders[
-        orderIndex
-      ].toNumber();
+    let size = orderState.openingOrders[orderIndex].toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1788,10 +1853,13 @@ export class SubClient {
    * @param decimal - whether to convert to readable decimal.
    */
   public getClosingOrders(index: number, decimal: boolean = false): number {
-    let size =
-      this.marginAccount.productLedgers[
-        index
-      ].orderState.closingOrders.toNumber();
+    let orderState;
+    if (index == constants.PERP_INDEX) {
+      orderState = this.marginAccount.perpProductLedger.orderState;
+    } else {
+      orderState = this.marginAccount.productLedgers[index].orderState;
+    }
+    let size = orderState.closingOrders.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1807,7 +1875,13 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let size = this.spreadAccount.positions[index].size.toNumber();
+    let position;
+    if (index == constants.PERP_INDEX) {
+      position = this.spreadAccount.perpPosition;
+    } else {
+      position = this.spreadAccount.positions[index];
+    }
+    let size = position.size.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1819,8 +1893,13 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let costOfTrades =
-      this.spreadAccount.positions[index].costOfTrades.toNumber();
+    let position;
+    if (index == constants.PERP_INDEX) {
+      position = this.spreadAccount.perpPosition;
+    } else {
+      position = this.spreadAccount.positions[index];
+    }
+    let costOfTrades = position.costOfTrades.toNumber();
     return decimal
       ? utils.convertNativeIntegerToDecimal(costOfTrades)
       : costOfTrades;

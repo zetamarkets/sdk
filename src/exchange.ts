@@ -600,6 +600,10 @@ export class Exchange {
     return this.getSubExchange(asset).markets.markets;
   }
 
+  public getPerpMarket(asset: Asset): Market {
+    return this.getSubExchange(asset).markets.perpMarket;
+  }
+
   public getMarketsByExpiryIndex(asset: Asset, index: number): Market[] {
     return this.getSubExchange(asset).markets.getMarketsByExpiryIndex(index);
   }

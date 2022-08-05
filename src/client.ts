@@ -277,14 +277,19 @@ export class Client {
     // marketIndex is either number or PublicKey
     let marketPubkey: PublicKey;
     if (typeof market == "number") {
-      marketPubkey =
-        Exchange.getSubExchange(asset).markets.markets[market].address;
+      if (market == constants.PERP_INDEX) {
+        Exchange.getSubExchange(asset).markets.perpMarket.address;
+      } else {
+        marketPubkey =
+          Exchange.getSubExchange(asset).markets.markets[market].address;
+      }
     } else {
       marketPubkey = market;
     }
     return marketPubkey;
   }
 
+  // TODO giving Exchange.getPerpMarket(asset).marketIndex doesn't work here, fix
   public async placeOrder(
     asset: Asset,
     market: types.MarketIdentifier,
@@ -693,6 +698,7 @@ export class Client {
     return this.getSubClient(asset).orders;
   }
 
+  // TODO change these to use MarketIdentifier so you can pass perp market directly
   public getOpeningOrders(
     asset: Asset,
     index: number,

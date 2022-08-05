@@ -911,7 +911,7 @@ export function displayState() {
 export async function getMarginFromOpenOrders(
   asset: Asset,
   openOrders: PublicKey,
-  marketIndex: number
+  market: Market
 ) {
   const [openOrdersMap, _openOrdersMapNonce] = await getOpenOrdersMap(
     Exchange.programId,
@@ -922,7 +922,7 @@ export async function getMarginFromOpenOrders(
   )) as OpenOrdersMap;
   const [marginAccount, _marginNonce] = await getMarginAccount(
     Exchange.programId,
-    Exchange.getSubExchange(asset).markets.markets[marketIndex].zetaGroup,
+    market.zetaGroup,
     openOrdersMapInfo.userKey
   );
 
@@ -1078,7 +1078,12 @@ export async function crankMarket(
   marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>
 ) {
-  let market = Exchange.getSubExchange(asset).markets.markets[marketIndex];
+  let market: Market;
+  if (marketIndex == constants.PERP_INDEX) {
+    market = Exchange.getPerpMarket(asset);
+  } else {
+    market = Exchange.getMarket(asset, marketIndex);
+  }
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
     return;
@@ -1104,7 +1109,7 @@ export async function crankMarket(
         marginAccount = await getMarginFromOpenOrders(
           asset,
           openOrders,
-          marketIndex
+          market
         );
         openOrdersToMargin.set(openOrders, marginAccount);
       } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
@@ -1113,7 +1118,7 @@ export async function crankMarket(
         marginAccount = await getMarginFromOpenOrders(
           asset,
           openOrders,
-          marketIndex
+          market
         );
       }
 
