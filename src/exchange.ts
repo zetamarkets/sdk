@@ -216,6 +216,8 @@ export class Exchange {
 
   private _programSubscriptionIds: number[] = [];
 
+  private _isClockPolling: boolean = false;
+
   // Stored by reference so we don't have to iterate through all subexchanges to grab them when updating orderbooks on timer
   private _markets: Market[] = [];
 
@@ -451,8 +453,10 @@ export class Exchange {
         try {
           if (
             this._clockTimestamp >
-            this._lastPollTimestamp + this._pollInterval
+              this._lastPollTimestamp + this._pollInterval &&
+            !this._isClockPolling
           ) {
+            this._isClockPolling = true;
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
               this.getAllSubExchanges().map(async (subExchange) => {
@@ -463,6 +467,7 @@ export class Exchange {
         } catch (e) {
           console.log(`SubExchange polling failed. Error: ${e}`);
         }
+        this._isClockPolling = false;
       },
       this.provider.connection.commitment
     );
