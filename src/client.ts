@@ -789,6 +789,36 @@ export class Client {
     return txid;
   }
 
+  public async claimReferrerRewards(): Promise<TransactionSignature> {
+    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+    let tx = new Transaction().add(
+      await instructions.claimReferralsRewardsIx(
+        referrerAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  public async claimReferralRewards(): Promise<TransactionSignature> {
+    let [referralAccountAddress] = await utils.getReferralAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+    let tx = new Transaction().add(
+      await instructions.claimReferralsRewardsIx(
+        referralAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
   public async close() {
     await Promise.all(
       this.getAllSubClients().map(async (subClient) => {

@@ -487,12 +487,12 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "referralAdmin",
+          "name": "referralsAdmin",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "referralRewardsWallet",
+          "name": "referralsRewardsWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -573,7 +573,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "initializeZetaReferralRewardsWallet",
+      "name": "initializeZetaReferralsRewardsWallet",
       "accounts": [
         {
           "name": "state",
@@ -581,7 +581,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "referralRewardsWallet",
+          "name": "referralsRewardsWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -635,7 +635,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateReferralAdmin",
+      "name": "updateReferralsAdmin",
       "accounts": [
         {
           "name": "state",
@@ -3222,7 +3222,7 @@ export type Zeta = {
       ]
     },
     {
-      "name": "setReferralRewards",
+      "name": "setReferralsRewards",
       "accounts": [
         {
           "name": "state",
@@ -3230,7 +3230,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "referralAdmin",
+          "name": "referralsAdmin",
           "isMut": false,
           "isSigner": true
         }
@@ -3240,11 +3240,47 @@ export type Zeta = {
           "name": "args",
           "type": {
             "vec": {
-              "defined": "SetReferralRewardsArgs"
+              "defined": "SetReferralsRewardsArgs"
             }
           }
         }
       ]
+    },
+    {
+      "name": "claimReferralsRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userReferralsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -3535,11 +3571,11 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "referralAdmin",
+            "name": "referralsAdmin",
             "type": "publicKey"
           },
           {
-            "name": "referralRewardsWalletNonce",
+            "name": "referralsRewardsWalletNonce",
             "type": "u8"
           },
           {
@@ -4478,12 +4514,12 @@ export type Zeta = {
       }
     },
     {
-      "name": "SetReferralRewardsArgs",
+      "name": "SetReferralsRewardsArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "referralAccountKey",
+            "name": "referralsAccountKey",
             "type": "publicKey"
           },
           {
@@ -5939,13 +5975,23 @@ export type Zeta = {
     },
     {
       "code": 6111,
-      "name": "InvalidReferralAdminSigner",
+      "name": "InvalidReferralsAdminSigner",
       "msg": "Invalid referral admin signer"
     },
     {
       "code": 6112,
-      "name": "InvalidSetReferralRewardsRemainingAccounts",
-      "msg": "Invalid set referral rewards remaining accounts"
+      "name": "InvalidSetReferralsRewardsRemainingAccounts",
+      "msg": "Invalid set referrals rewards remaining accounts"
+    },
+    {
+      "code": 6113,
+      "name": "InvalidClaimReferralsRewardsAmount",
+      "msg": "Invalid claim referrals rewards: amount"
+    },
+    {
+      "code": 6114,
+      "name": "InvalidClaimReferralsRewardsAccount",
+      "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
     }
   ]
 };
@@ -6439,12 +6485,12 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "referralAdmin",
+          "name": "referralsAdmin",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "referralRewardsWallet",
+          "name": "referralsRewardsWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -6525,7 +6571,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "initializeZetaReferralRewardsWallet",
+      "name": "initializeZetaReferralsRewardsWallet",
       "accounts": [
         {
           "name": "state",
@@ -6533,7 +6579,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "referralRewardsWallet",
+          "name": "referralsRewardsWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -6587,7 +6633,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateReferralAdmin",
+      "name": "updateReferralsAdmin",
       "accounts": [
         {
           "name": "state",
@@ -9174,7 +9220,7 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "setReferralRewards",
+      "name": "setReferralsRewards",
       "accounts": [
         {
           "name": "state",
@@ -9182,7 +9228,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "referralAdmin",
+          "name": "referralsAdmin",
           "isMut": false,
           "isSigner": true
         }
@@ -9192,11 +9238,47 @@ export const IDL: Zeta = {
           "name": "args",
           "type": {
             "vec": {
-              "defined": "SetReferralRewardsArgs"
+              "defined": "SetReferralsRewardsArgs"
             }
           }
         }
       ]
+    },
+    {
+      "name": "claimReferralsRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userReferralsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -9487,11 +9569,11 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "referralAdmin",
+            "name": "referralsAdmin",
             "type": "publicKey"
           },
           {
-            "name": "referralRewardsWalletNonce",
+            "name": "referralsRewardsWalletNonce",
             "type": "u8"
           },
           {
@@ -10430,12 +10512,12 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "SetReferralRewardsArgs",
+      "name": "SetReferralsRewardsArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "referralAccountKey",
+            "name": "referralsAccountKey",
             "type": "publicKey"
           },
           {
@@ -11891,13 +11973,23 @@ export const IDL: Zeta = {
     },
     {
       "code": 6111,
-      "name": "InvalidReferralAdminSigner",
+      "name": "InvalidReferralsAdminSigner",
       "msg": "Invalid referral admin signer"
     },
     {
       "code": 6112,
-      "name": "InvalidSetReferralRewardsRemainingAccounts",
-      "msg": "Invalid set referral rewards remaining accounts"
+      "name": "InvalidSetReferralsRewardsRemainingAccounts",
+      "msg": "Invalid set referrals rewards remaining accounts"
+    },
+    {
+      "code": 6113,
+      "name": "InvalidClaimReferralsRewardsAmount",
+      "msg": "Invalid claim referrals rewards: amount"
+    },
+    {
+      "code": 6114,
+      "name": "InvalidClaimReferralsRewardsAccount",
+      "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
     }
   ]
 };

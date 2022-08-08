@@ -1126,8 +1126,8 @@ export function initializeZetaStateIx(
   stateNonce: number,
   serumAuthority: PublicKey,
   treasuryWallet: PublicKey,
-  referralAdmin: PublicKey,
-  referralRewardsWallet: PublicKey,
+  referralsAdmin: PublicKey,
+  referralsRewardsWallet: PublicKey,
   serumNonce: number,
   mintAuthority: PublicKey,
   mintAuthorityNonce: number,
@@ -1144,8 +1144,8 @@ export function initializeZetaStateIx(
       serumAuthority,
       mintAuthority,
       treasuryWallet,
-      referralAdmin,
-      referralRewardsWallet,
+      referralsAdmin,
+      referralsRewardsWallet,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -1169,11 +1169,11 @@ export function initializeZetaTreasuryWalletIx(): TransactionInstruction {
   });
 }
 
-export function initializeZetaReferralRewardsWalletIx(): TransactionInstruction {
-  return Exchange.program.instruction.initializeZetaReferralRewardsWallet({
+export function initializeZetaReferralsRewardsWalletIx(): TransactionInstruction {
+  return Exchange.program.instruction.initializeZetaReferralsRewardsWallet({
     accounts: {
       state: Exchange.stateAddress,
-      referralRewardsWallet: Exchange.referralRewardsWalletAddress,
+      referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -1367,17 +1367,34 @@ export async function initializeReferrerAliasIx(
   });
 }
 
-export async function setReferralRewardsIx(
-  args: SetReferralRewardsArgs[],
-  referralAdmin: PublicKey,
+export async function setReferralsRewardsIx(
+  args: SetReferralsRewardsArgs[],
+  referralsAdmin: PublicKey,
   remainingAccounts: AccountMeta[]
 ): Promise<TransactionInstruction> {
-  return Exchange.program.instruction.setReferralRewards(args, {
+  return Exchange.program.instruction.setReferralsRewards(args, {
     accounts: {
       state: Exchange.stateAddress,
-      referralAdmin,
+      referralsAdmin,
     },
     remainingAccounts,
+  });
+}
+
+export async function claimReferralsRewardsIx(
+  userReferralsAccount: PublicKey,
+  userTokenAccount: PublicKey,
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  return Exchange.program.instruction.claimReferralsRewards({
+    accounts: {
+      state: Exchange.stateAddress,
+      referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
+      userReferralsAccount,
+      userTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      user,
+    },
   });
 }
 
@@ -1696,15 +1713,15 @@ export function updateAdminIx(
   });
 }
 
-export function updateReferralAdminIx(
+export function updateReferralsAdminIx(
   admin: PublicKey,
-  newReferralAdmin: PublicKey
+  newReferralsAdmin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.updateReferralAdmin({
+  return Exchange.program.instruction.updateReferralsAdmin({
     accounts: {
       state: Exchange.stateAddress,
       admin,
-      newAdmin: newReferralAdmin,
+      newAdmin: newReferralsAdmin,
     },
   });
 }
@@ -2029,7 +2046,7 @@ export interface OverrideExpiryArgs {
   expiryTs: anchor.BN;
 }
 
-export interface SetReferralRewardsArgs {
-  referralAccountKey: PublicKey;
+export interface SetReferralsRewardsArgs {
+  referralsAccountKey: PublicKey;
   pendingRewards: anchor.BN;
 }

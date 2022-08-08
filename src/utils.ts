@@ -206,14 +206,14 @@ export async function getZetaTreasuryWallet(
   );
 }
 
-export async function getZetaReferralRewardsWallet(
+export async function getZetaReferralsRewardsWallet(
   programId: PublicKey,
   mint: PublicKey
 ): Promise<[PublicKey, number]> {
   return await anchor.web3.PublicKey.findProgramAddress(
     [
       Buffer.from(
-        anchor.utils.bytes.utf8.encode("zeta-referral-rewards-wallet")
+        anchor.utils.bytes.utf8.encode("zeta-referrals-rewards-wallet")
       ),
       mint.toBuffer(),
     ],

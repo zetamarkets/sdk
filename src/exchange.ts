@@ -163,10 +163,10 @@ export class Exchange {
   /**
    * Public key for referral rewards wallet.
    */
-  public get referralRewardsWalletAddress(): PublicKey {
-    return this._referralRewardsWalletAddress;
+  public get referralsRewardsWalletAddress(): PublicKey {
+    return this._referralsRewardsWalletAddress;
   }
-  private _referralRewardsWalletAddress: PublicKey;
+  private _referralsRewardsWalletAddress: PublicKey;
 
   /**
    * Stores the latest timestamp received by websocket subscription
@@ -277,7 +277,7 @@ export class Exchange {
       await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
 
     const [referralRewardsWallet, _referralRewardsWalletNonce] =
-      await utils.getZetaReferralRewardsWallet(
+      await utils.getZetaReferralsRewardsWallet(
         this.programId,
         this._usdcMintAddress
       );
@@ -306,7 +306,7 @@ export class Exchange {
     this._stateAddress = state;
     this._serumAuthority = serumAuthority;
     this._treasuryWalletAddress = treasuryWallet;
-    this._referralRewardsWalletAddress = referralRewardsWallet;
+    this._referralsRewardsWalletAddress = referralRewardsWallet;
     await this.updateState();
   }
 
@@ -385,12 +385,12 @@ export class Exchange {
       await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
     this._treasuryWalletAddress = treasuryWallet;
 
-    const [referralRewardsWallet, _referralRewardsWalletNonce] =
-      await utils.getZetaReferralRewardsWallet(
+    const [referralsRewardsWallet, _referralsRewardsWalletNonce] =
+      await utils.getZetaReferralsRewardsWallet(
         this.programId,
         this._usdcMintAddress
       );
-    this._referralRewardsWalletAddress = referralRewardsWallet;
+    this._referralsRewardsWalletAddress = referralsRewardsWallet;
 
     this._lastPollTimestamp = 0;
 
