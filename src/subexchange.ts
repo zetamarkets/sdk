@@ -872,6 +872,9 @@ export class SubExchange {
    * Close the websockets.
    */
   public async close() {
+    this._isInitialized = false;
+    this._isSetup = false;
+
     await Exchange.program.account.zetaGroup.unsubscribe(
       this._zetaGroupAddress
     );
@@ -880,7 +883,5 @@ export class SubExchange {
       this._eventEmitters[i].removeListener("change");
     }
     this._eventEmitters = [];
-    this._isInitialized = false;
-    this._isSetup = false;
   }
 }

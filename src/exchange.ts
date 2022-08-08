@@ -451,7 +451,8 @@ export class Exchange {
         try {
           if (
             this._clockTimestamp >
-            this._lastPollTimestamp + this._pollInterval
+              this._lastPollTimestamp + this._pollInterval &&
+            this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
@@ -795,6 +796,9 @@ export class Exchange {
   }
 
   public async close() {
+    this._isInitialized = false;
+    this._isSetup = false;
+
     await Promise.all(
       this.getAllSubExchanges().map(async (subExchange) => {
         await subExchange.close();
