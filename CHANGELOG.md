@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.5]
+
+- program: Add clock polling boolean to prevent stacking failed RPC requests. ([#141](https://github.com/zetamarkets/sdk/pull/141))
+
 ## [0.16.4]
 
 - program: Refactor fee collection methodology and add some associated instructions. ([#136](https://github.com/zetamarkets/sdk/pull/136))
