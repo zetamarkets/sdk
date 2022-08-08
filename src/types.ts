@@ -212,17 +212,26 @@ export function toProgramMovementType(movementType: MovementType) {
 }
 
 export enum TreasuryMovementType {
-  TO_TREASURY = 1,
+  TO_TREASURY_FROM_INSURANCE = 1,
   TO_INSURANCE = 2,
+  TO_TREASURY_FROM_REFERRALS_REWARDS = 3,
+  TO_REFERRALS_REWARDS = 4,
 }
 
 export function toProgramTreasuryMovementType(
   treasuryMovementType: TreasuryMovementType
 ) {
-  if (treasuryMovementType == TreasuryMovementType.TO_TREASURY)
-    return { toTreasury: {} };
+  if (treasuryMovementType == TreasuryMovementType.TO_TREASURY_FROM_INSURANCE)
+    return { toTreasuryFromInsurance: {} };
   if (treasuryMovementType == TreasuryMovementType.TO_INSURANCE)
     return { toInsurance: {} };
+  if (
+    treasuryMovementType ==
+    TreasuryMovementType.TO_TREASURY_FROM_REFERRALS_REWARDS
+  )
+    return { toTreasuryFromReferralsRewards: {} };
+  if (treasuryMovementType == TreasuryMovementType.TO_REFERRALS_REWARDS)
+    return { toReferralsRewards: {} };
   throw Error("Invalid treasury movement type");
 }
 

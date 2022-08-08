@@ -2828,6 +2828,11 @@
           "isSigner": false
         },
         {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -5169,10 +5174,16 @@
             "name": "Undefined"
           },
           {
-            "name": "ToTreasury"
+            "name": "ToTreasuryFromInsurance"
           },
           {
             "name": "ToInsurance"
+          },
+          {
+            "name": "ToTreasuryFromReferralsRewards"
+          },
+          {
+            "name": "ToReferralsRewards"
           }
         ]
       }

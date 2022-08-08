@@ -2828,6 +2828,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -5169,10 +5174,16 @@ export type Zeta = {
             "name": "Undefined"
           },
           {
-            "name": "ToTreasury"
+            "name": "ToTreasuryFromInsurance"
           },
           {
             "name": "ToInsurance"
+          },
+          {
+            "name": "ToTreasuryFromReferralsRewards"
+          },
+          {
+            "name": "ToReferralsRewards"
           }
         ]
       }
@@ -8826,6 +8837,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -11167,10 +11183,16 @@ export const IDL: Zeta = {
             "name": "Undefined"
           },
           {
-            "name": "ToTreasury"
+            "name": "ToTreasuryFromInsurance"
           },
           {
             "name": "ToInsurance"
+          },
+          {
+            "name": "ToTreasuryFromReferralsRewards"
+          },
+          {
+            "name": "ToReferralsRewards"
           }
         ]
       }

@@ -942,6 +942,7 @@ export function treasuryMovementIx(
         zetaGroup: Exchange.getZetaGroupAddress(asset),
         insuranceVault: Exchange.getInsuranceVaultAddress(asset),
         treasuryWallet: Exchange.treasuryWalletAddress,
+        referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
         tokenProgram: TOKEN_PROGRAM_ID,
         admin: Exchange.provider.wallet.publicKey,
       },
