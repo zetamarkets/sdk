@@ -244,6 +244,11 @@ export class Client {
     );
     let txId = await utils.processTransaction(this.provider, tx);
 
+    [this._referralAccountAddress] = await utils.getReferralAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+
     this._referralAccount =
       (await Exchange.program.account.referralAccount.fetch(
         this._referralAccountAddress

@@ -5996,11 +5996,16 @@ export type Zeta = {
     },
     {
       "code": 6113,
+      "name": "SetReferralsRewardsAccountNotMutable",
+      "msg": "Referrals account not mutable"
+    },
+    {
+      "code": 6114,
       "name": "InvalidClaimReferralsRewardsAmount",
       "msg": "Invalid claim referrals rewards: amount"
     },
     {
-      "code": 6114,
+      "code": 6115,
       "name": "InvalidClaimReferralsRewardsAccount",
       "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
     }
@@ -12005,11 +12010,16 @@ export const IDL: Zeta = {
     },
     {
       "code": 6113,
+      "name": "SetReferralsRewardsAccountNotMutable",
+      "msg": "Referrals account not mutable"
+    },
+    {
+      "code": 6114,
       "name": "InvalidClaimReferralsRewardsAmount",
       "msg": "Invalid claim referrals rewards: amount"
     },
     {
-      "code": 6114,
+      "code": 6115,
       "name": "InvalidClaimReferralsRewardsAccount",
       "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
     }
