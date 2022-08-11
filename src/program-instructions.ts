@@ -2050,4 +2050,5 @@ export interface OverrideExpiryArgs {
 export interface SetReferralsRewardsArgs {
   referralsAccountKey: PublicKey;
   pendingRewards: anchor.BN;
+  overwrite: boolean;
 }

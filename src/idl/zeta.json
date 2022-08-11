@@ -4530,6 +4530,10 @@
           {
             "name": "pendingRewards",
             "type": "u64"
+          },
+          {
+            "name": "overwrite",
+            "type": "bool"
           }
         ]
       }
@@ -6002,12 +6006,22 @@
     {
       "code": 6114,
       "name": "InvalidClaimReferralsRewardsAmount",
-      "msg": "Invalid claim referrals rewards: amount"
+      "msg": "Invalid claim referrals rewards: not enough in refererals rewards wallet"
     },
     {
       "code": 6115,
       "name": "InvalidClaimReferralsRewardsAccount",
       "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
+    },
+    {
+      "code": 6116,
+      "name": "ReferralAccountSeedsMismatch",
+      "msg": "Referral account seeds mismatch"
+    },
+    {
+      "code": 6117,
+      "name": "ReferrerAccountSeedsMismatch",
+      "msg": "Referrer account seeds mismatch"
     }
   ]
 }
