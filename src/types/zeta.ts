@@ -5987,7 +5987,7 @@ export type Zeta = {
     {
       "code": 6111,
       "name": "InvalidReferralsAdminSigner",
-      "msg": "Invalid referral admin signer"
+      "msg": "Invalid referrals admin signer"
     },
     {
       "code": 6112,
@@ -12001,7 +12001,7 @@ export const IDL: Zeta = {
     {
       "code": 6111,
       "name": "InvalidReferralsAdminSigner",
-      "msg": "Invalid referral admin signer"
+      "msg": "Invalid referrals admin signer"
     },
     {
       "code": 6112,
