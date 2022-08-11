@@ -73,6 +73,18 @@ export class ZetaGroupMarkets {
   }
 
   /**
+   * Returns all strikes given an expiry index.
+   */
+  public getStrikesByExpiryIndex(expiryIndex: number): number[] {
+    let strikes = Array(constants.NUM_STRIKES).fill(0);
+    let markets = this.getMarketsByExpiryIndex(expiryIndex);
+    for (let i = 0; i < constants.NUM_STRIKES; i++) {
+      strikes[i] = markets[i].strike;
+    }
+    return strikes;
+  }
+
+  /**
    * Returns the options market given an expiry index and options kind.
    */
   public getOptionsMarketByExpiryIndex(
