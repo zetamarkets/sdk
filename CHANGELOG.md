@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- referrals: Add referral rewards. ([#140](https://github.com/zetamarkets/sdk/pull/140))
+
 ## [0.16.4]
 
 - program: Refactor fee collection methodology and add some associated instructions. ([#136](https://github.com/zetamarkets/sdk/pull/136))
