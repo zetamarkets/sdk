@@ -73,7 +73,7 @@ export class ZetaGroupMarkets {
   }
 
   /**
-   * Returns all strikes given an expiry index.
+   * Returns all strikes given an expiry index. Strikes are returned as decimal numbers.
    */
   public getStrikesByExpiryIndex(expiryIndex: number): number[] {
     let strikes = Array(constants.NUM_STRIKES).fill(0);

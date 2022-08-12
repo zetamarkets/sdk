@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.6]
+
+- risk: Add calculation for position movement between spread and margin account. ([#144](https://github.com/zetamarkets/sdk/pull/144))
+
 ## [0.16.5]
 
 - program: Fix exchange closing. ([#142](https://github.com/zetamarkets/sdk/pull/142))
