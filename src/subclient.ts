@@ -1176,6 +1176,56 @@ export class SubClient {
     return await utils.processTransaction(this._parent.provider, tx);
   }
 
+    /**
+   * Sends an IOC by sending a placeOrder follow by a no error cancel to cancel the remaining balance
+   * @param market                  the market address of the order to be cancelled and new order.
+   * @param newOrderClientOrderId   the subClient order id for the new order
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
+   * @param newOrderSize            the quantity of the order (3 d.p) as integer
+   * @param newOrderSide            the side of the order. bid / ask
+   * @param newOrderType            the type of the order, limit / ioc / post-only
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   */
+     public async immediateOrCancel(
+      market: PublicKey,
+      newOrderClientOrderId: number,
+      newOrderPrice: number,
+      newOrderSize: number,
+      newOrderSide: types.Side,
+      newOrderType: types.OrderType,
+      newOrderTag: String = constants.DEFAULT_ORDER_TAG
+    ): Promise<TransactionSignature> {
+      let tx = new Transaction();
+      let marketIndex = this._subExchange.markets.getMarketIndex(market);
+      tx.add(
+        instructions.placeOrderV3Ix(
+          this.asset,
+          marketIndex,
+          newOrderPrice,
+          newOrderSize,
+          newOrderSide,
+          newOrderType,
+          newOrderClientOrderId,
+          newOrderTag,
+          this.marginAccountAddress,
+          this._parent.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
+        )
+      );
+      tx.add(
+        instructions.cancelOrderByClientOrderIdNoErrorIx(
+          this.asset,
+          marketIndex,
+          this._parent.publicKey,
+          this._marginAccountAddress,
+          this._openOrdersAccounts[marketIndex],
+          new anchor.BN(newOrderClientOrderId)
+        )
+      );
+      return await utils.processTransaction(this._parent.provider, tx);
+    }
+
   /**
    * Cancels a user order by client order id and atomically places an order by new client order id.
    * Uses the 'NoError' cancel instruction, so a failed cancellation won't prohibit the placeOrder

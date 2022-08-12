@@ -552,6 +552,27 @@ export class Client {
     );
   }
 
+  public async immediateOrCancel(
+    asset: Asset,
+    market: PublicKey,
+    newOrderClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: types.Side,
+    newOrderType: types.OrderType,
+    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).immediateOrCancel(
+      this.marketIdentifierToPublicKey(asset, market),
+      newOrderClientOrderId,
+      newOrderPrice,
+      newOrderSize,
+      newOrderSide,
+      newOrderType,
+      newOrderTag
+    );
+  }
+
   public async replaceByClientOrderId(
     asset: Asset,
     market: types.MarketIdentifier,
