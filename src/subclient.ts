@@ -1179,20 +1179,19 @@ export class SubClient {
     /**
    * Sends an IOC by sending a placeOrder follow by a no error cancel to cancel the remaining balance
    * @param market                  the market address of the order to be cancelled and new order.
-   * @param ClientOrderId   the subClient order id for the new order
-   * @param Price           the native price of the order (6 d.p) as integer
-   * @param Size            the quantity of the order (3 d.p) as integer
-   * @param Side            the side of the order. bid / ask
-   * @param Type            the type of the order, limit / ioc / post-only
-   * @param Tag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   * @param clientOrderId   the subClient order id for the new order
+   * @param price           the native price of the order (6 d.p) as integer
+   * @param size            the quantity of the order (3 d.p) as integer
+   * @param side            the side of the order. bid / ask
+   * @param tag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
      public async immediateOrCancel(
       market: PublicKey,
-      ClientOrderId: number,
-      Price: number,
-      Size: number,
-      Side: types.Side,
-      Tag: String = constants.DEFAULT_ORDER_TAG
+      clientOrderId: number,
+      price: number,
+      size: number,
+      side: types.Side,
+      tag: String = constants.DEFAULT_ORDER_TAG
     ): Promise<TransactionSignature> {
       let tx = new Transaction();
       let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -1200,12 +1199,12 @@ export class SubClient {
         instructions.placeOrderV3Ix(
           this.asset,
           marketIndex,
-          Price,
-          Size,
-          Side,
+          price,
+          size,
+          side,
           types.OrderType.LIMIT,
-          ClientOrderId,
-          Tag,
+          clientOrderId,
+          tag,
           this.marginAccountAddress,
           this._parent.publicKey,
           this._openOrdersAccounts[marketIndex],
@@ -1219,7 +1218,7 @@ export class SubClient {
           this._parent.publicKey,
           this._marginAccountAddress,
           this._openOrdersAccounts[marketIndex],
-          new anchor.BN(ClientOrderId)
+          new anchor.BN(clientOrderId)
         )
       );
       return await utils.processTransaction(this._parent.provider, tx);

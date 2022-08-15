@@ -555,19 +555,19 @@ export class Client {
   public async immediateOrCancel(
     asset: Asset,
     market: PublicKey,
-    ClientOrderId: number,
-    Price: number,
-    Size: number,
-    Side: types.Side,
-    Tag: String = constants.DEFAULT_ORDER_TAG
+    clientOrderId: number,
+    price: number,
+    size: number,
+    side: types.Side,
+    tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).immediateOrCancel(
       this.marketIdentifierToPublicKey(asset, market),
-      ClientOrderId,
-      Price,
-      Size,
-      Side,
-      Tag
+      clientOrderId,
+      price,
+      size,
+      side,
+      tag
     );
   }
 
