@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- program: Move expiry_interval_seconds and new_expiry_threshold_seconds from State to ZetaGroup.
+- program: Move expiry_interval_seconds and new_expiry_threshold_seconds from State to ZetaGroup. ([#146](https://github.com/zetamarkets/sdk/pull/146))
 
 ## [0.16.5]
 
