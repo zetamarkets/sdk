@@ -294,7 +294,8 @@ export class Exchange {
     asset: Asset,
     oracle: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
-    marginArgs: instructions.UpdateMarginParametersArgs
+    marginArgs: instructions.UpdateMarginParametersArgs,
+    expiryArgs: instructions.UpdateZetaGroupExpiryArgs
   ) {
     let tx = new Transaction().add(
       await instructions.initializeZetaGroupIx(
@@ -302,7 +303,8 @@ export class Exchange {
         constants.MINTS[asset],
         oracle,
         pricingArgs,
-        marginArgs
+        marginArgs,
+        expiryArgs
       )
     );
     try {
@@ -657,6 +659,13 @@ export class Exchange {
     args: instructions.UpdateMarginParametersArgs
   ) {
     await this.getSubExchange(asset).updateMarginParameters(args);
+  }
+
+  public async updateZetaGroupExpiryParameters(
+    asset: Asset,
+    args: instructions.UpdateZetaGroupExpiryArgs
+  ) {
+    await this.getSubExchange(asset).updateZetaGroupExpiryParameters(args);
   }
 
   public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {

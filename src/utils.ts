@@ -935,7 +935,7 @@ export function getNextStrikeInitialisationTs(asset: Asset) {
   return (
     backExpiryTs -
     Exchange.state.strikeInitializationThresholdSeconds -
-    Exchange.state.newExpiryThresholdSeconds
+    subExchange.zetaGroup.newExpiryThresholdSeconds
   );
 }
 
