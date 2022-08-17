@@ -1,12 +1,21 @@
 import { exchange as Exchange } from "./exchange";
 import * as types from "./types";
 import * as constants from "./constants";
-import { SpreadAccount, MarginAccount } from "./program-types";
+import { MarginAccount, PositionMovementEvent } from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
 import { Asset, fromProgramAsset } from "./assets";
+import { BN } from "@project-serum/anchor";
+import { assets, Client, instructions, utils } from ".";
+import { cloneDeep } from "lodash";
+import {
+  calculateProductMargin,
+  movePositions,
+  calculateNormalizedCostOfTrades,
+  checkMarginAccountMarginRequirement,
+} from "./risk-utils";
 
 export class RiskCalculator {
   private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
@@ -315,221 +324,117 @@ export class RiskCalculator {
       availableBalanceMaintenance,
     };
   }
-}
 
-// ** Calculation util functions **
-
-/**
- * Calculates the price at which a position will be liquidated.
- * @param accountBalance    margin account balance.
- * @param marginRequirement total margin requirement for margin account.
- * @param unrealizedPnl     unrealized pnl for margin account.
- * @param markPrice         mark price of product being calculated.
- * @param position          signed position size of user.
- */
-export function calculateLiquidationPrice(
-  accountBalance: number,
-  marginRequirement: number,
-  unrealizedPnl: number,
-  markPrice: number,
-  position: number
-): number {
-  if (position == 0) {
-    return 0;
-  }
-  let availableBalance = accountBalance - marginRequirement + unrealizedPnl;
-  return markPrice - availableBalance / position;
-}
-
-/**
- * Calculates how much the strike is out of the money.
- * @param kind          product kind (expect CALL/PUT);
- * @param strike        strike of the product.
- * @param spotPrice     price of the spot.
- */
-export function calculateOtmAmount(
-  kind: types.Kind,
-  strike: number,
-  spotPrice: number
-): number {
-  switch (kind) {
-    case types.Kind.CALL: {
-      return Math.max(0, strike - spotPrice);
+  public calculatePositionMovement(
+    user: Client,
+    asset: Asset,
+    movementType: types.MovementType,
+    movements: instructions.PositionMovementArg[]
+  ): PositionMovementEvent {
+    if (movements.length > constants.MAX_POSITION_MOVEMENTS) {
+      throw Error("Exceeded max position movements.");
     }
-    case types.Kind.PUT: {
-      return Math.max(0, spotPrice - strike);
+
+    let marginAccount = user.getMarginAccount(asset);
+    let spreadAccount = user.getSpreadAccount(asset);
+
+    if (spreadAccount === null) {
+      let positions = [];
+      let positionsPadding = [];
+      let seriesExpiry = [];
+      for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
+        positions.push({
+          size: new BN(0),
+          costOfTrades: new BN(0),
+        });
+      }
+      for (let i = 0; i < constants.TOTAL_MARKETS; i++) {
+        positionsPadding.push({
+          size: new BN(0),
+          costOfTrades: new BN(0),
+        });
+      }
+      for (
+        let i = 0;
+        i < constants.TOTAL_MARKETS - constants.ACTIVE_MARKETS;
+        i++
+      ) {
+        seriesExpiry.push(new BN(0));
+      }
+
+      spreadAccount = {
+        authority: marginAccount.authority,
+        nonce: 0,
+        balance: new BN(0),
+        seriesExpiry,
+        positions,
+        positionsPadding,
+        asset: assets.toProgramAsset(asset),
+        padding: new Array(262).fill(0),
+      };
     }
-    default:
-      throw Error("Unsupported kind for OTM amount.");
+
+    // Copy account objects to perform simulated position movement
+    let simulatedMarginAccount = cloneDeep(marginAccount);
+    let simulatedSpreadAccount = cloneDeep(spreadAccount);
+
+    let nativeSpot = utils.convertDecimalToNativeInteger(
+      Exchange.oracle.getPrice(asset).price
+    );
+
+    // Perform movement by movement type onto new margin and spread accounts
+    movePositions(
+      Exchange.getZetaGroup(asset),
+      simulatedSpreadAccount,
+      simulatedMarginAccount,
+      movementType,
+      movements
+    );
+
+    // Calculate margin requirements for new margin and spread accounts
+    // Calculate margin requirements for old margin and spread accounts
+    let totalContracts = 0;
+    for (let i = 0; i < movements.length; i++) {
+      totalContracts = totalContracts + Math.abs(movements[i].size.toNumber());
+    }
+    let movementNotional = calculateNormalizedCostOfTrades(
+      nativeSpot,
+      totalContracts
+    );
+    let movementFees =
+      (movementNotional / constants.BPS_DENOMINATOR) *
+      Exchange.state.positionMovementFeeBps;
+    simulatedMarginAccount.balance = new BN(
+      simulatedMarginAccount.balance.toNumber() - movementFees
+    );
+    simulatedMarginAccount.rebalanceAmount = new BN(
+      simulatedMarginAccount.rebalanceAmount.toNumber() + movementFees
+    );
+
+    if (!checkMarginAccountMarginRequirement(simulatedMarginAccount))
+      throw Error("Failed maintenance margin requirement.");
+
+    // Temporarily add limitation for maximum contracts locked as a safety.
+    // Set to 100k total contracts for now.
+    totalContracts = 0;
+    for (let i = 0; i < simulatedSpreadAccount.positions.length; i++) {
+      totalContracts =
+        totalContracts +
+        Math.abs(simulatedSpreadAccount.positions[i].size.toNumber());
+    }
+
+    if (totalContracts > constants.MAX_TOTAL_SPREAD_ACCOUNT_CONTRACTS)
+      throw Error("Exceeded max spread account contracts.");
+
+    let netTransfer =
+      simulatedSpreadAccount.balance.toNumber() -
+      spreadAccount.balance.toNumber();
+
+    return {
+      netBalanceTransfer: new BN(netTransfer),
+      marginAccountBalance: simulatedMarginAccount.balance,
+      spreadAccountBalance: simulatedSpreadAccount.balance,
+      movementFees: new BN(movementFees),
+    };
   }
-}
-
-/**
- * Calculates the margin requirement for given market index.
- * @param asset         underlying asset (SOL, BTC, etc.)
- * @param productIndex  market index of the product.
- * @param spotPrice     price of the spot.
- */
-export function calculateProductMargin(
-  asset: Asset,
-  productIndex: number,
-  spotPrice: number
-): types.MarginRequirement {
-  let subExchange = Exchange.getSubExchange(asset);
-  let market = subExchange.markets.markets[productIndex];
-  if (market.strike == null) {
-    return null;
-  }
-  let kind = market.kind;
-  let strike = market.strike;
-  let markPrice = convertNativeBNToDecimal(
-    subExchange.greeks.markPrices[productIndex]
-  );
-  switch (kind) {
-    case types.Kind.FUTURE:
-      return calculateFutureMargin(asset, spotPrice);
-    case types.Kind.CALL:
-    case types.Kind.PUT:
-      return calculateOptionMargin(asset, spotPrice, markPrice, kind, strike);
-  }
-}
-
-/**
- * Calculates the margin requirement for a future.
- * @param asset         underlying asset (SOL, BTC, etc.)
- * @param spotPrice     price of the spot.
- */
-export function calculateFutureMargin(
-  asset: Asset,
-  spotPrice: number
-): types.MarginRequirement {
-  let subExchange = Exchange.getSubExchange(asset);
-  let initial = spotPrice * subExchange.marginParams.futureMarginInitial;
-  let maintenance =
-    spotPrice * subExchange.marginParams.futureMarginMaintenance;
-  return {
-    initialLong: initial,
-    initialShort: initial,
-    maintenanceLong: maintenance,
-    maintenanceShort: maintenance,
-  };
-}
-
-/**
- * @param asset             underlying asset (SOL, BTC, etc.)
- * @param markPrice         mark price of product being calculated.
- * @param spotPrice         spot price of the underlying from oracle.
- * @param strike            strike of the option.
- * @param kind              kind of the option (expect CALL/PUT)
- */
-export function calculateOptionMargin(
-  asset: Asset,
-  spotPrice: number,
-  markPrice: number,
-  kind: types.Kind,
-  strike: number
-): types.MarginRequirement {
-  let otmAmount = calculateOtmAmount(kind, strike, spotPrice);
-  let initialLong = calculateLongOptionMargin(
-    asset,
-    spotPrice,
-    markPrice,
-    types.MarginType.INITIAL
-  );
-  let initialShort = calculateShortOptionMargin(
-    asset,
-    spotPrice,
-    otmAmount,
-    types.MarginType.INITIAL
-  );
-  let maintenanceLong = calculateLongOptionMargin(
-    asset,
-    spotPrice,
-    markPrice,
-    types.MarginType.MAINTENANCE
-  );
-  let maintenanceShort = calculateShortOptionMargin(
-    asset,
-    spotPrice,
-    otmAmount,
-    types.MarginType.MAINTENANCE
-  );
-  let subExchange = Exchange.getSubExchange(asset);
-  return {
-    initialLong,
-    initialShort:
-      kind == types.Kind.PUT
-        ? Math.min(
-            initialShort,
-            subExchange.marginParams.optionShortPutCapPercentage * strike
-          )
-        : initialShort,
-    maintenanceLong,
-    maintenanceShort:
-      kind == types.Kind.PUT
-        ? Math.min(
-            maintenanceShort,
-            subExchange.marginParams.optionShortPutCapPercentage * strike
-          )
-        : maintenanceShort,
-  };
-}
-
-/**
- * Calculates the margin requirement for a short option.
- * @param asset        underlying asset (SOL, BTC, etc.)
- * @param spotPrice    margin account balance.
- * @param otmAmount    otm amount calculated `from calculateOtmAmount`
- * @param marginType   type of margin calculation
- */
-export function calculateShortOptionMargin(
-  asset: Asset,
-  spotPrice: number,
-  otmAmount: number,
-  marginType: types.MarginType
-): number {
-  let subExchange = Exchange.getSubExchange(asset);
-  let basePercentageShort =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionDynamicPercentageShortInitial
-      : subExchange.marginParams.optionDynamicPercentageShortMaintenance;
-
-  let spotPricePercentageShort =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionSpotPercentageShortInitial
-      : subExchange.marginParams.optionSpotPercentageShortMaintenance;
-
-  let dynamicMargin = spotPrice * (basePercentageShort - otmAmount / spotPrice);
-  let minMargin = spotPrice * spotPricePercentageShort;
-  return Math.max(dynamicMargin, minMargin);
-}
-
-/**
- * Calculates the margin requirement for a long option.
- * @param asset        underlying asset (SOL, BTC, etc.)
- * @param spotPrice    margin account balance.
- * @param markPrice    mark price of option from greeks account.
- * @param marginType   type of margin calculation
- */
-export function calculateLongOptionMargin(
-  asset: Asset,
-  spotPrice: number,
-  markPrice: number,
-  marginType: types.MarginType
-): number {
-  let subExchange = Exchange.getSubExchange(asset);
-  let markPercentageLong =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionMarkPercentageLongInitial
-      : subExchange.marginParams.optionMarkPercentageLongMaintenance;
-
-  let spotPercentageLong =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionSpotPercentageLongInitial
-      : subExchange.marginParams.optionSpotPercentageLongMaintenance;
-
-  return Math.min(
-    markPrice * markPercentageLong,
-    spotPrice * spotPercentageLong
-  );
 }

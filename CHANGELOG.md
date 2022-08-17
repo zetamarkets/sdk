@@ -5,13 +5,17 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [0.16.6]
+## [0.16.7]
 
 - program: Move expiry_interval_seconds and new_expiry_threshold_seconds from State to ZetaGroup. ([#146](https://github.com/zetamarkets/sdk/pull/146))
 
 ### Breaking
 
 - `expiry_interval_seconds` and `new_expiry_threshold_seconds` is held in each asset's zeta group as opposed to the global state account.
+
+## [0.16.6]
+
+- risk: Add calculation for position movement between spread and margin account. ([#144](https://github.com/zetamarkets/sdk/pull/144))
 
 ## [0.16.5]
 
