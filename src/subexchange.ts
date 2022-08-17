@@ -271,6 +271,23 @@ export class SubExchange {
   }
 
   /**
+   * Update the margin parameters for a zeta group.
+   */
+  public async updateZetaGroupExpiryParameters(
+    args: instructions.UpdateZetaGroupExpiryArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.updateZetaGroupExpiryParameters(
+        this.asset,
+        args,
+        Exchange.provider.wallet.publicKey
+      )
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+    await this.updateZetaGroup();
+  }
+
+  /**
    * Update the volatility nodes for a surface.
    */
   public async updateVolatilityNodes(nodes: Array<anchor.BN>) {

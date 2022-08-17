@@ -10,8 +10,7 @@ export interface State {
   serumNonce: number;
   mintAuthNonce: number;
   numUnderlyings: number;
-  expiryIntervalSeconds: number;
-  newExpiryThresholdSeconds: number;
+  null: anchor.BN;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
@@ -101,6 +100,8 @@ export interface ZetaGroup {
   expirySeriesPadding: Array<ExpirySeries>;
   totalInsuranceVaultDeposits: anchor.BN;
   asset: any;
+  expiryIntervalSeconds: number;
+  newExpiryThresholdSeconds: number;
   padding: Array<number>;
 }
 

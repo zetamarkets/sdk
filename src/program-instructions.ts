@@ -817,7 +817,8 @@ export async function initializeZetaGroupIx(
   underlyingMint: PublicKey,
   oracle: PublicKey,
   pricingArgs: InitializeZetaGroupPricingArgs,
-  marginArgs: UpdateMarginParametersArgs
+  marginArgs: UpdateMarginParametersArgs,
+  expiryArgs: UpdateZetaGroupExpiryArgs
 ): Promise<TransactionInstruction> {
   let [zetaGroup, zetaGroupNonce] = await utils.getZetaGroup(
     Exchange.programId,
@@ -889,6 +890,8 @@ export async function initializeZetaGroupIx(
       optionDynamicPercentageShortMaintenance:
         marginArgs.optionDynamicPercentageShortMaintenance,
       optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
+      expiryIntervalSeconds: expiryArgs.expiryIntervalSeconds,
+      newExpiryThresholdSeconds: expiryArgs.newExpiryThresholdSeconds,
     },
     {
       accounts: {
@@ -1097,6 +1100,20 @@ export function updateMarginParametersIx(
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateMarginParameters(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      admin,
+    },
+  });
+}
+
+export function updateZetaGroupExpiryParameters(
+  asset: Asset,
+  args: UpdateZetaGroupExpiryArgs,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaGroupExpiryParameters(args, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
@@ -1917,8 +1934,6 @@ export interface UpdateInterestRateArgs {
 }
 
 export interface StateParams {
-  expiryIntervalSeconds: number;
-  newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
@@ -1974,6 +1989,11 @@ export interface UpdateMarginParametersArgs {
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
   optionShortPutCapPercentage: anchor.BN;
+}
+
+export interface UpdateZetaGroupExpiryArgs {
+  expiryIntervalSeconds: number;
+  newExpiryThresholdSeconds: number;
 }
 
 export interface PositionMovementArg {
