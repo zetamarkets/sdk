@@ -689,6 +689,34 @@ export type Zeta = {
       ]
     },
     {
+      "name": "updateZetaGroupExpiryParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaGroupExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "cleanZetaMarkets",
       "accounts": [
         {
@@ -3384,12 +3412,8 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
+            "name": "null",
+            "type": "u64"
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -3598,11 +3622,19 @@ export type Zeta = {
             }
           },
           {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1062
+                1054
               ]
             }
           }
@@ -4460,14 +4492,6 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
-          {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
           },
@@ -4563,14 +4587,6 @@ export type Zeta = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
@@ -4851,6 +4867,30 @@ export type Zeta = {
           {
             "name": "optionShortPutCapPercentage",
             "type": "u64"
+          },
+          {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateZetaGroupExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
           }
         ]
       }
@@ -6520,6 +6560,34 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "updateZetaGroupExpiryParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaGroupExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "cleanZetaMarkets",
       "accounts": [
         {
@@ -9215,12 +9283,8 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
+            "name": "null",
+            "type": "u64"
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -9429,11 +9493,19 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1062
+                1054
               ]
             }
           }
@@ -10291,14 +10363,6 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
-          {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
           },
@@ -10394,14 +10458,6 @@ export const IDL: Zeta = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
@@ -10682,6 +10738,30 @@ export const IDL: Zeta = {
           {
             "name": "optionShortPutCapPercentage",
             "type": "u64"
+          },
+          {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateZetaGroupExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
           }
         ]
       }
