@@ -9,9 +9,7 @@ Version changes are pinned to SDK releases.
 
 - program: Move expiry_interval_seconds and new_expiry_threshold_seconds from State to ZetaGroup. ([#146](https://github.com/zetamarkets/sdk/pull/146))
 
-###
-
-Breaking
+### Breaking
 
 - `expiry_interval_seconds` and `new_expiry_threshold_seconds` is held in each asset's zeta group as opposed to the global state account.
 
