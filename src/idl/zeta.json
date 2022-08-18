@@ -5181,13 +5181,13 @@
             "name": "ToTreasuryFromInsurance"
           },
           {
-            "name": "ToInsurance"
+            "name": "ToInsuranceFromTreasury"
           },
           {
             "name": "ToTreasuryFromReferralsRewards"
           },
           {
-            "name": "ToReferralsRewards"
+            "name": "ToReferralsRewardsFromTreasury"
           }
         ]
       }

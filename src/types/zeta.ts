@@ -5181,13 +5181,13 @@ export type Zeta = {
             "name": "ToTreasuryFromInsurance"
           },
           {
-            "name": "ToInsurance"
+            "name": "ToInsuranceFromTreasury"
           },
           {
             "name": "ToTreasuryFromReferralsRewards"
           },
           {
-            "name": "ToReferralsRewards"
+            "name": "ToReferralsRewardsFromTreasury"
           }
         ]
       }
@@ -11209,13 +11209,13 @@ export const IDL: Zeta = {
             "name": "ToTreasuryFromInsurance"
           },
           {
-            "name": "ToInsurance"
+            "name": "ToInsuranceFromTreasury"
           },
           {
             "name": "ToTreasuryFromReferralsRewards"
           },
           {
-            "name": "ToReferralsRewards"
+            "name": "ToReferralsRewardsFromTreasury"
           }
         ]
       }
