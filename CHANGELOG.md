@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [Unreleased]
+## [0.16.8]
 
 - referrals: Add referral rewards. ([#140](https://github.com/zetamarkets/sdk/pull/140))
 
