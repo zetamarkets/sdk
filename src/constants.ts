@@ -75,6 +75,7 @@ export const CLUSTER_URLS = {
 // These are fixed and shouldn't change in the future.
 export const NUM_STRIKES = 11;
 export const PRODUCTS_PER_EXPIRY = NUM_STRIKES * 2 + 1; // +1 for the future.
+export const SERIES_FUTURE_INDEX = PRODUCTS_PER_EXPIRY - 1;
 export const ACTIVE_EXPIRIES = 2;
 export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY;
 export const TOTAL_EXPIRIES = 6;
@@ -98,3 +99,8 @@ export const DEFAULT_ORDER_TAG = "SDK";
 
 export const MAX_POSITION_MOVEMENTS = 10;
 export const BPS_DENOMINATOR = 10_000;
+
+export const BID_ORDERS_INDEX = 0;
+export const ASK_ORDERS_INDEX = 1;
+
+export const MAX_TOTAL_SPREAD_ACCOUNT_CONTRACTS = 100_000_000;

@@ -314,7 +314,8 @@ export class Exchange {
     asset: Asset,
     oracle: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
-    marginArgs: instructions.UpdateMarginParametersArgs
+    marginArgs: instructions.UpdateMarginParametersArgs,
+    expiryArgs: instructions.UpdateZetaGroupExpiryArgs
   ) {
     let tx = new Transaction().add(
       await instructions.initializeZetaGroupIx(
@@ -322,7 +323,8 @@ export class Exchange {
         constants.MINTS[asset],
         oracle,
         pricingArgs,
-        marginArgs
+        marginArgs,
+        expiryArgs
       )
     );
     try {
@@ -478,7 +480,8 @@ export class Exchange {
         try {
           if (
             this._clockTimestamp >
-            this._lastPollTimestamp + this._pollInterval
+              this._lastPollTimestamp + this._pollInterval &&
+            this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
@@ -685,6 +688,13 @@ export class Exchange {
     await this.getSubExchange(asset).updateMarginParameters(args);
   }
 
+  public async updateZetaGroupExpiryParameters(
+    asset: Asset,
+    args: instructions.UpdateZetaGroupExpiryArgs
+  ) {
+    await this.getSubExchange(asset).updateZetaGroupExpiryParameters(args);
+  }
+
   public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
@@ -822,6 +832,9 @@ export class Exchange {
   }
 
   public async close() {
+    this._isInitialized = false;
+    this._isSetup = false;
+
     await Promise.all(
       this.getAllSubExchanges().map(async (subExchange) => {
         await subExchange.close();
