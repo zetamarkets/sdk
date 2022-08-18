@@ -161,6 +161,14 @@ export class Exchange {
   private _treasuryWalletAddress: PublicKey;
 
   /**
+   * Public key for referral rewards wallet.
+   */
+  public get referralsRewardsWalletAddress(): PublicKey {
+    return this._referralsRewardsWalletAddress;
+  }
+  private _referralsRewardsWalletAddress: PublicKey;
+
+  /**
    * Stores the latest timestamp received by websocket subscription
    * to the system clock account.
    */
@@ -251,7 +259,10 @@ export class Exchange {
     this._isSetup = true;
   }
 
-  public async initializeZetaState(params: instructions.StateParams) {
+  public async initializeZetaState(
+    params: instructions.StateParams,
+    referralAdmin: PublicKey
+  ) {
     const [mintAuthority, mintAuthorityNonce] = await utils.getMintAuthority(
       this.programId
     );
@@ -262,8 +273,14 @@ export class Exchange {
 
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[this.network];
 
-    const [treasuryWallet, _treasuryWalletnonce] =
+    const [treasuryWallet, _treasuryWalletNonce] =
       await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
+
+    const [referralRewardsWallet, _referralRewardsWalletNonce] =
+      await utils.getZetaReferralsRewardsWallet(
+        this.programId,
+        this._usdcMintAddress
+      );
 
     let tx = new Transaction().add(
       instructions.initializeZetaStateIx(
@@ -271,6 +288,8 @@ export class Exchange {
         stateNonce,
         serumAuthority,
         treasuryWallet,
+        referralAdmin,
+        referralRewardsWallet,
         serumNonce,
         mintAuthority,
         mintAuthorityNonce,
@@ -287,6 +306,7 @@ export class Exchange {
     this._stateAddress = state;
     this._serumAuthority = serumAuthority;
     this._treasuryWalletAddress = treasuryWallet;
+    this._referralsRewardsWalletAddress = referralRewardsWallet;
     await this.updateState();
   }
 
@@ -366,6 +386,13 @@ export class Exchange {
     const [treasuryWallet, _treasuryWalletnonce] =
       await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
     this._treasuryWalletAddress = treasuryWallet;
+
+    const [referralsRewardsWallet, _referralsRewardsWalletNonce] =
+      await utils.getZetaReferralsRewardsWallet(
+        this.programId,
+        this._usdcMintAddress
+      );
+    this._referralsRewardsWalletAddress = referralsRewardsWallet;
 
     this._lastPollTimestamp = 0;
 
@@ -828,16 +855,6 @@ export class Exchange {
       );
     }
     this._programSubscriptionIds = [];
-  }
-
-  public async initializeReferrerAccount(referrer: PublicKey) {
-    let tx = new Transaction().add(
-      await instructions.initializeReferrerAccountIx(
-        referrer,
-        this._provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(this._provider, tx);
   }
 }
 

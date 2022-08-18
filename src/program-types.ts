@@ -25,6 +25,8 @@ export interface State {
   treasuryWalletNonce: number;
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
+  referralsAdmin: PublicKey;
+  referralsRewardsWalletNonce: number;
   padding: Array<number>;
 }
 

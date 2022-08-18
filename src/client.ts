@@ -244,6 +244,11 @@ export class Client {
     );
     let txId = await utils.processTransaction(this.provider, tx);
 
+    [this._referralAccountAddress] = await utils.getReferralAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+
     this._referralAccount =
       (await Exchange.program.account.referralAccount.fetch(
         this._referralAccountAddress
@@ -746,6 +751,13 @@ export class Client {
     return this.getSubClient(asset).marginAccountAddress;
   }
 
+  public async initializeReferrerAccount() {
+    let tx = new Transaction().add(
+      await instructions.initializeReferrerAccountIx(this.publicKey)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
   public async initializeReferrerAlias(
     alias: string
   ): Promise<TransactionSignature> {
@@ -758,14 +770,8 @@ export class Client {
       this.publicKey
     );
 
-    let [referrerAliasAddress] = await utils.getReferrerAliasAddress(
-      Exchange.programId,
-      alias
-    );
-
-    let referrerAccount: ReferrerAccount;
     try {
-      referrerAccount = await Exchange.program.account.referrerAccount.fetch(
+      await Exchange.program.account.referrerAccount.fetch(
         referrerAccountAddress
       );
     } catch (e) {
@@ -786,6 +792,36 @@ export class Client {
     this._referrerAlias = alias;
 
     return txid;
+  }
+
+  public async claimReferrerRewards(): Promise<TransactionSignature> {
+    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+    let tx = new Transaction().add(
+      await instructions.claimReferralsRewardsIx(
+        referrerAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  public async claimReferralRewards(): Promise<TransactionSignature> {
+    let [referralAccountAddress] = await utils.getReferralAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+    let tx = new Transaction().add(
+      await instructions.claimReferralsRewardsIx(
+        referralAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
   }
 
   public async close() {

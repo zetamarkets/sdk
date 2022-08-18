@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- referrals: Add referral rewards. ([#140](https://github.com/zetamarkets/sdk/pull/140))
+
 ## [0.16.7]
 
 - program: Move expiry_interval_seconds and new_expiry_threshold_seconds from State to ZetaGroup. ([#146](https://github.com/zetamarkets/sdk/pull/146))
