@@ -46,6 +46,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "underlying",
           "isMut": true,
           "isSigner": false
@@ -1170,6 +1175,37 @@ export type Zeta = {
       ]
     },
     {
+      "name": "applyPerpFunding",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updatePricingHalted",
       "accounts": [
         {
@@ -1802,6 +1838,11 @@ export type Zeta = {
           "name": "mintAuthority",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1953,6 +1994,11 @@ export type Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -2111,6 +2157,11 @@ export type Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -3309,7 +3360,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "bool",
-                6
+                5
               ]
             }
           },
@@ -3318,9 +3369,37 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                1641
+                1642
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "perpData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "lastUpdatedTs",
+            "type": "u64"
+          },
+          {
+            "name": "longDelta",
+            "type": "i128"
+          },
+          {
+            "name": "shortDelta",
+            "type": "i128"
+          },
+          {
+            "name": "impactVolume",
+            "type": "u64"
           }
         ]
       }
@@ -3608,11 +3687,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "perpData",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1062
+                1030
               ]
             }
           }
@@ -3713,11 +3796,19 @@ export type Zeta = {
             }
           },
           {
+            "name": "lastFundingTs",
+            "type": "u64"
+          },
+          {
+            "name": "lastFundingDelta",
+            "type": "i128"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                262
+                238
               ]
             }
           }
@@ -3812,11 +3903,19 @@ export type Zeta = {
             }
           },
           {
+            "name": "lastFundingTs",
+            "type": "u64"
+          },
+          {
+            "name": "lastFundingDelta",
+            "type": "i128"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                386
+                362
               ]
             }
           }
@@ -4787,6 +4886,10 @@ export type Zeta = {
           },
           {
             "name": "socializedLossAccountNonce",
+            "type": "u8"
+          },
+          {
+            "name": "perpDataNonce",
             "type": "u8"
           },
           {
@@ -5862,6 +5965,11 @@ export type Zeta = {
       "code": 6110,
       "name": "InvalidTreasuryMovementAmount",
       "msg": "Invalid treasury movement amount"
+    },
+    {
+      "code": 6111,
+      "name": "PerpDataAccountSeedsMismatch",
+      "msg": "Perp Data account seeds mismatch"
     }
   ]
 };
@@ -5914,6 +6022,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "underlying",
           "isMut": true,
           "isSigner": false
@@ -7038,6 +7151,37 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "applyPerpFunding",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updatePricingHalted",
       "accounts": [
         {
@@ -7670,6 +7814,11 @@ export const IDL: Zeta = {
           "name": "mintAuthority",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -7821,6 +7970,11 @@ export const IDL: Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -7979,6 +8133,11 @@ export const IDL: Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -9177,7 +9336,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "bool",
-                6
+                5
               ]
             }
           },
@@ -9186,9 +9345,37 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                1641
+                1642
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "perpData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "lastUpdatedTs",
+            "type": "u64"
+          },
+          {
+            "name": "longDelta",
+            "type": "i128"
+          },
+          {
+            "name": "shortDelta",
+            "type": "i128"
+          },
+          {
+            "name": "impactVolume",
+            "type": "u64"
           }
         ]
       }
@@ -9476,11 +9663,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "perpData",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1062
+                1030
               ]
             }
           }
@@ -9581,11 +9772,19 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "lastFundingTs",
+            "type": "u64"
+          },
+          {
+            "name": "lastFundingDelta",
+            "type": "i128"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                262
+                238
               ]
             }
           }
@@ -9680,11 +9879,19 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "lastFundingTs",
+            "type": "u64"
+          },
+          {
+            "name": "lastFundingDelta",
+            "type": "i128"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                386
+                362
               ]
             }
           }
@@ -10655,6 +10862,10 @@ export const IDL: Zeta = {
           },
           {
             "name": "socializedLossAccountNonce",
+            "type": "u8"
+          },
+          {
+            "name": "perpDataNonce",
             "type": "u8"
           },
           {
@@ -11730,6 +11941,11 @@ export const IDL: Zeta = {
       "code": 6110,
       "name": "InvalidTreasuryMovementAmount",
       "msg": "Invalid treasury movement amount"
+    },
+    {
+      "code": 6111,
+      "name": "PerpDataAccountSeedsMismatch",
+      "msg": "Perp Data account seeds mismatch"
     }
   ]
 };

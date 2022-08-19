@@ -326,6 +326,7 @@ export function placeOrderIx(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
+        perpData: subExchange.zetaGroup.perpData,
       },
       remainingAccounts,
     }
@@ -404,6 +405,7 @@ export function placeOrderV2Ix(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
+        perpData: subExchange.zetaGroup.perpData,
       },
       remainingAccounts,
     }
@@ -489,6 +491,7 @@ export function placeOrderV3Ix(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
+        perpData: subExchange.zetaGroup.perpData,
       },
       remainingAccounts,
     }
@@ -896,6 +899,11 @@ export async function initializeZetaGroupIx(
       subExchange.zetaGroupAddress
     );
 
+  let [perpData, perpDataNonce] = await utils.getPerpData(
+    Exchange.programId,
+    subExchange.zetaGroupAddress
+  );
+
   return Exchange.program.instruction.initializeZetaGroup(
     {
       zetaGroupNonce,
@@ -904,6 +912,7 @@ export async function initializeZetaGroupIx(
       vaultNonce,
       insuranceVaultNonce,
       socializedLossAccountNonce,
+      perpDataNonce,
       interestRate: pricingArgs.interestRate,
       volatility: pricingArgs.volatility,
       optionTradeNormalizer: pricingArgs.optionTradeNormalizer,
@@ -946,6 +955,7 @@ export async function initializeZetaGroupIx(
         oracle,
         zetaGroup,
         greeks,
+        perpData,
         underlying,
         vault,
         insuranceVault,
