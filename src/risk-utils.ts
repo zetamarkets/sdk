@@ -228,6 +228,30 @@ export function calculateLongOptionMargin(
   );
 }
 
+export function calculateSpreadAccountMarginRequirement(
+  spreadAccount: SpreadAccount,
+  zetaGroup: ZetaGroup
+) {
+  let marginRequirement = 0;
+  for (let i = 0; i < zetaGroup.expirySeries.length; i++) {
+    // Skip if strikes are uninitialised
+    if (!zetaGroup.products[i].strike.isSet) {
+      continue;
+    }
+    let strikes = Exchange.getSubExchange(
+      assets.fromProgramAsset(zetaGroup.asset)
+    )
+      .markets.getStrikesByExpiryIndex(i)
+      // Convert to native integer, as all calculations are worked in native size
+      .map((strike) => convertDecimalToNativeInteger(strike));
+    let positions = getPositionsByExpiryIndexforSpreadAccount(spreadAccount, i);
+    marginRequirement =
+      marginRequirement + calculateSpreadMarginRequirements(strikes, positions);
+  }
+
+  return marginRequirement;
+}
+
 /**
  * Note: BN maths below are achieved through a BN -> number -> BN method.
  * If overflow errors occur, change this in future to pure BN math.
@@ -322,30 +346,6 @@ export function calculatePutCumPnl(
     cumPutPnl[i] = cumPutPnl[i + 1] + pnlDelta;
   }
   return cumPutPnl;
-}
-
-function calculateSpreadAccountMarginRequirement(
-  spreadAccount: SpreadAccount,
-  zetaGroup: ZetaGroup
-) {
-  let marginRequirement = 0;
-  for (let i = 0; i < zetaGroup.expirySeries.length; i++) {
-    // Skip if strikes are uninitialised
-    if (!zetaGroup.products[i].strike.isSet) {
-      continue;
-    }
-    let strikes = Exchange.getSubExchange(
-      assets.fromProgramAsset(zetaGroup.asset)
-    )
-      .markets.getStrikesByExpiryIndex(i)
-      // Convert to native integer, as all calculations are worked in native size
-      .map((strike) => convertDecimalToNativeInteger(strike));
-    let positions = getPositionsByExpiryIndexforSpreadAccount(spreadAccount, i);
-    marginRequirement =
-      marginRequirement + calculateSpreadMarginRequirements(strikes, positions);
-  }
-
-  return marginRequirement;
 }
 
 function getPositionsByExpiryIndexforSpreadAccount(
