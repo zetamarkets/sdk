@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.10]
+
+- export calculateSpreadAccountMarginRequirement
+
 ## [0.16.9]
 
 - export risk-utils.
