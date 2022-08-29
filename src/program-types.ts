@@ -81,6 +81,7 @@ export interface HaltState {
   marketNodesCleaned: Array<boolean>;
   marketNodesCleanedPadding: Array<boolean>;
   marketCleaned: Array<boolean>;
+  perpMarketCleaned: boolean;
   marketCleanedPadding: Array<boolean>;
 }
 
@@ -156,6 +157,7 @@ export interface MarginAccount {
   rebalanceAmount: anchor.BN;
   asset: any;
   accountType: any;
+  lastFundingDelta: anchor.BN;
   padding: Array<number>;
 }
 
@@ -168,6 +170,7 @@ export interface SpreadAccount {
   positionsPadding: Array<Position>;
   perpPosition: Position;
   asset: any;
+  lastFundingDelta: anchor.BN;
   padding: Array<number>;
 }
 
@@ -175,7 +178,6 @@ export interface Greeks {
   nonce: number;
   markPrices: Array<anchor.BN>;
   markPricesPadding: Array<anchor.BN>;
-  perpMarkPrice: anchor.BN;
   productGreeks: Array<ProductGreeks>;
   productGreeksPadding: Array<ProductGreeks>;
   updateTimestamp: Array<anchor.BN>;
@@ -190,6 +192,16 @@ export interface Greeks {
   nodeKeys: Array<PublicKey>;
   haltForcePricing: Array<boolean>;
   padding: Array<number>;
+}
+
+export interface PerpData {
+  nonce: number;
+  minFundingRate: anchor.BN;
+  maxFundingRate: anchor.BN;
+  lastUpdatedTs: anchor.BN;
+  fundingDelta: anchor.BN;
+  latestFundingRate: anchor.BN;
+  impactVolume: anchor.BN;
 }
 
 export interface MarketNode {

@@ -278,7 +278,8 @@ export class Client {
     let marketPubkey: PublicKey;
     if (typeof market == "number") {
       if (market == constants.PERP_INDEX) {
-        Exchange.getSubExchange(asset).markets.perpMarket.address;
+        marketPubkey =
+          Exchange.getSubExchange(asset).markets.perpMarket.address;
       } else {
         marketPubkey =
           Exchange.getSubExchange(asset).markets.markets[market].address;

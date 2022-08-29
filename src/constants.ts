@@ -18,6 +18,7 @@ export const MAX_SETTLE_AND_CLOSE_PER_TX = 4;
 export const MAX_CANCELS_PER_TX = 4;
 export const MAX_GREEK_UPDATES_PER_TX = 20;
 export const MAX_SETTLEMENT_ACCOUNTS = 20;
+export const MAX_FUNDING_ACCOUNTS = 20;
 export const MAX_REBALANCE_ACCOUNTS = 18;
 export const MAX_SETTLE_ACCOUNTS = 5;
 export const MAX_ZETA_GROUPS = 20;

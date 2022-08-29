@@ -739,6 +739,7 @@ export class SubClient {
         this.spreadAccountAddress,
         this._parent.publicKey,
         subExchange.greeksAddress,
+        subExchange.perpDataAddress,
         subExchange.zetaGroup.oracle,
         types.MovementType.LOCK,
         movements
@@ -1615,6 +1616,7 @@ export class SubClient {
         this.spreadAccountAddress,
         this._parent.publicKey,
         subExchange.greeksAddress,
+        subExchange.perpDataAddress,
         subExchange.zetaGroup.oracle,
         movementType,
         movements
@@ -1699,7 +1701,7 @@ export class SubClient {
     // perps too
     if (this._marginAccount.perpProductLedger.position.size.toNumber() != 0) {
       positions.push({
-        marketIndex: i,
+        marketIndex: constants.PERP_INDEX,
         market: this._subExchange.zetaGroup.perp.market,
         size: utils.convertNativeLotSizeToDecimal(
           this._marginAccount.perpProductLedger.position.size.toNumber()

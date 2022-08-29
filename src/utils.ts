@@ -1559,3 +1559,28 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
   }
   return bufferString.substring(0, splitIndex);
 }
+
+export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
+  let remainingAccounts = keys.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+
+  let txs = [];
+  for (
+    var i = 0;
+    i < remainingAccounts.length;
+    i += constants.MAX_FUNDING_ACCOUNTS
+  ) {
+    let tx = new Transaction();
+    let slice = remainingAccounts.slice(i, i + constants.MAX_FUNDING_ACCOUNTS);
+    tx.add(instructions.applyPerpFundingIx(asset, slice));
+    txs.push(tx);
+  }
+
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+      console.log(`Applying funding to users - TxId: ${txSig}`);
+    })
+  );
+}

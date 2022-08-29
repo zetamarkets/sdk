@@ -2649,6 +2649,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -2895,6 +2900,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -3044,6 +3054,11 @@ export type Zeta = {
         },
         {
           "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
           "isMut": false,
           "isSigner": false
         },
@@ -3235,13 +3250,9 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                91
+                92
               ]
             }
-          },
-          {
-            "name": "perpMarkPrice",
-            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -3386,20 +3397,28 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "lastUpdatedTs",
-            "type": "u64"
+            "name": "minFundingRate",
+            "type": "i64"
           },
           {
-            "name": "longDelta",
-            "type": "i128"
-          },
-          {
-            "name": "shortDelta",
-            "type": "i128"
+            "name": "maxFundingRate",
+            "type": "i64"
           },
           {
             "name": "impactVolume",
             "type": "u64"
+          },
+          {
+            "name": "lastUpdatedTs",
+            "type": "u64"
+          },
+          {
+            "name": "fundingDelta",
+            "type": "i128"
+          },
+          {
+            "name": "latestFundingRate",
+            "type": "i128"
           }
         ]
       }
@@ -3796,10 +3815,6 @@ export type Zeta = {
             }
           },
           {
-            "name": "lastFundingTs",
-            "type": "u64"
-          },
-          {
             "name": "lastFundingDelta",
             "type": "i128"
           },
@@ -3808,7 +3823,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                238
+                246
               ]
             }
           }
@@ -3903,10 +3918,6 @@ export type Zeta = {
             }
           },
           {
-            "name": "lastFundingTs",
-            "type": "u64"
-          },
-          {
             "name": "lastFundingDelta",
             "type": "i128"
           },
@@ -3915,7 +3926,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                362
+                370
               ]
             }
           }
@@ -4987,6 +4998,18 @@ export type Zeta = {
           },
           {
             "name": "optionShortPutCapPercentage",
+            "type": "u64"
+          },
+          {
+            "name": "minFundingRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRate",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactVolume",
             "type": "u64"
           }
         ]
@@ -8625,6 +8648,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -8871,6 +8899,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -9020,6 +9053,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
           "isMut": false,
           "isSigner": false
         },
@@ -9211,13 +9249,9 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                91
+                92
               ]
             }
-          },
-          {
-            "name": "perpMarkPrice",
-            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -9362,20 +9396,28 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "lastUpdatedTs",
-            "type": "u64"
+            "name": "minFundingRate",
+            "type": "i64"
           },
           {
-            "name": "longDelta",
-            "type": "i128"
-          },
-          {
-            "name": "shortDelta",
-            "type": "i128"
+            "name": "maxFundingRate",
+            "type": "i64"
           },
           {
             "name": "impactVolume",
             "type": "u64"
+          },
+          {
+            "name": "lastUpdatedTs",
+            "type": "u64"
+          },
+          {
+            "name": "fundingDelta",
+            "type": "i128"
+          },
+          {
+            "name": "latestFundingRate",
+            "type": "i128"
           }
         ]
       }
@@ -9772,10 +9814,6 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "lastFundingTs",
-            "type": "u64"
-          },
-          {
             "name": "lastFundingDelta",
             "type": "i128"
           },
@@ -9784,7 +9822,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                238
+                246
               ]
             }
           }
@@ -9879,10 +9917,6 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "lastFundingTs",
-            "type": "u64"
-          },
-          {
             "name": "lastFundingDelta",
             "type": "i128"
           },
@@ -9891,7 +9925,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                362
+                370
               ]
             }
           }
@@ -10963,6 +10997,18 @@ export const IDL: Zeta = {
           },
           {
             "name": "optionShortPutCapPercentage",
+            "type": "u64"
+          },
+          {
+            "name": "minFundingRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRate",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactVolume",
             "type": "u64"
           }
         ]

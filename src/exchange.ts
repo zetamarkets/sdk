@@ -10,7 +10,13 @@ import {
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
-import { Greeks, ProductGreeks, State, ZetaGroup } from "./program-types";
+import {
+  Greeks,
+  PerpData,
+  ProductGreeks,
+  State,
+  ZetaGroup,
+} from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
@@ -518,6 +524,14 @@ export class Exchange {
     this.getSubExchange(asset).markets.unsubscribeMarket(index);
   }
 
+  public subscribePerp(asset: Asset) {
+    this.getSubExchange(asset).markets.subscribePerp();
+  }
+
+  public unsubscribePerp(asset: Asset) {
+    this.getSubExchange(asset).markets.unsubscribePerp();
+  }
+
   public async updateOrderbook(asset: Asset, index: number) {
     await this.getSubExchange(asset).markets.markets[index].updateOrderbook();
   }
@@ -622,6 +636,10 @@ export class Exchange {
 
   public getGreeks(asset: Asset): Greeks {
     return this.getSubExchange(asset).greeks;
+  }
+
+  public getPerpData(asset: Asset): PerpData {
+    return this.getSubExchange(asset).perpData;
   }
 
   public getOrderbook(asset: Asset, index: number): types.DepthOrderbook {

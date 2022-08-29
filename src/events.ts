@@ -21,6 +21,10 @@ export enum EventType {
    */
   GREEKS,
   /**
+   * A change in the perpData account.
+   */
+  PERPDATA,
+  /**
    * A trade event for the user margin account.
    */
   TRADE,
@@ -55,6 +59,8 @@ export function eventTypeToString(event: EventType) {
       return "CLOCK";
     case EventType.GREEKS:
       return "GREEKS";
+    case EventType.PERPDATA:
+      return "PERPDATA";
     case EventType.TRADE:
       return "TRADE";
     case EventType.ORDERBOOK:

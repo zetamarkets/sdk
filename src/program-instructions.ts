@@ -703,6 +703,7 @@ export function forceCancelOrdersIx(
   return Exchange.program.instruction.forceCancelOrders({
     accounts: {
       greeks: subExchange.zetaGroup.greeks,
+      perpData: subExchange.zetaGroup.perpData,
       oracle: subExchange.zetaGroup.oracle,
       cancelAccounts: {
         zetaGroup: subExchange.zetaGroupAddress,
@@ -944,6 +945,9 @@ export async function initializeZetaGroupIx(
       optionDynamicPercentageShortMaintenance:
         marginArgs.optionDynamicPercentageShortMaintenance,
       optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
+      minFundingRate: pricingArgs.minFundingRate,
+      maxFundingRate: pricingArgs.maxFundingRate,
+      perpImpactVolume: pricingArgs.perpImpactVolume,
     },
     {
       accounts: {
@@ -1039,6 +1043,7 @@ export function liquidateIx(
       liquidator,
       liquidatorMarginAccount,
       greeks: subExchange.zetaGroup.greeks,
+      perpData: subExchange.zetaGroup.perpData,
       oracle: subExchange.zetaGroup.oracle,
       market,
       zetaGroup: subExchange.zetaGroupAddress,
@@ -1130,6 +1135,23 @@ export function updatePricingIx(
       greeks: subExchange.greeksAddress,
       oracle: subExchange.zetaGroup.oracle,
     },
+  });
+}
+
+export function applyPerpFundingIx(
+  asset: Asset,
+  remainingAccounts: any[]
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  return Exchange.program.instruction.applyPerpFunding({
+    accounts: {
+      zetaGroup: subExchange.zetaGroupAddress,
+      perpData: subExchange.perpDataAddress,
+      oracle: subExchange.zetaGroup.oracle,
+      bids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+      asks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
+    },
+    remainingAccounts, // margin and spread accounts
   });
 }
 
@@ -1784,6 +1806,7 @@ export function positionMovementIx(
   spreadAccount: PublicKey,
   user: PublicKey,
   greeks: PublicKey,
+  perpData: PublicKey,
   oracle: PublicKey,
   movementType: types.MovementType,
   movements: PositionMovementArg[]
@@ -1799,6 +1822,7 @@ export function positionMovementIx(
         spreadAccount,
         authority: user,
         greeks,
+        perpData,
         oracle,
       },
     }
@@ -2021,6 +2045,9 @@ export interface InitializeZetaGroupPricingArgs {
   maxInterestRate: anchor.BN;
   minVolatility: anchor.BN;
   maxVolatility: anchor.BN;
+  minFundingRate: anchor.BN;
+  maxFundingRate: anchor.BN;
+  perpImpactVolume: anchor.BN;
 }
 
 export interface UpdateMarginParametersArgs {

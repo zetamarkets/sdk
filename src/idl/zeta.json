@@ -2649,6 +2649,11 @@
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -2895,6 +2900,11 @@
           "isSigner": false
         },
         {
+          "name": "perpData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -3044,6 +3054,11 @@
         },
         {
           "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
           "isMut": false,
           "isSigner": false
         },
@@ -3235,13 +3250,9 @@
             "type": {
               "array": [
                 "u64",
-                91
+                92
               ]
             }
-          },
-          {
-            "name": "perpMarkPrice",
-            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -3386,20 +3397,28 @@
             "type": "u8"
           },
           {
-            "name": "lastUpdatedTs",
-            "type": "u64"
+            "name": "minFundingRate",
+            "type": "i64"
           },
           {
-            "name": "longDelta",
-            "type": "i128"
-          },
-          {
-            "name": "shortDelta",
-            "type": "i128"
+            "name": "maxFundingRate",
+            "type": "i64"
           },
           {
             "name": "impactVolume",
             "type": "u64"
+          },
+          {
+            "name": "lastUpdatedTs",
+            "type": "u64"
+          },
+          {
+            "name": "fundingDelta",
+            "type": "i128"
+          },
+          {
+            "name": "latestFundingRate",
+            "type": "i128"
           }
         ]
       }
@@ -3796,10 +3815,6 @@
             }
           },
           {
-            "name": "lastFundingTs",
-            "type": "u64"
-          },
-          {
             "name": "lastFundingDelta",
             "type": "i128"
           },
@@ -3808,7 +3823,7 @@
             "type": {
               "array": [
                 "u8",
-                238
+                246
               ]
             }
           }
@@ -3903,10 +3918,6 @@
             }
           },
           {
-            "name": "lastFundingTs",
-            "type": "u64"
-          },
-          {
             "name": "lastFundingDelta",
             "type": "i128"
           },
@@ -3915,7 +3926,7 @@
             "type": {
               "array": [
                 "u8",
-                362
+                370
               ]
             }
           }
@@ -4987,6 +4998,18 @@
           },
           {
             "name": "optionShortPutCapPercentage",
+            "type": "u64"
+          },
+          {
+            "name": "minFundingRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRate",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactVolume",
             "type": "u64"
           }
         ]
