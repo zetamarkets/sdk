@@ -268,8 +268,8 @@ export interface PlaceOrderEvent {
 export interface TradeEvent {
   marginAccount: PublicKey;
   index: number;
-  costOfTrades: anchor.BN;
   size: anchor.BN;
+  costOfTrades: anchor.BN;
   isBid: boolean;
   clientOrderId: anchor.BN;
   orderId: anchor.BN;
