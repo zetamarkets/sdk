@@ -7,6 +7,8 @@ import {
   PositionMovementEvent,
   ReferralAccount,
   ReferrerAccount,
+  TradeEvent,
+  OrderCompleteEvent,
 } from "./program-types";
 import {
   PublicKey,
@@ -93,6 +95,21 @@ export class Client {
   private _whitelistTradingFeesAddress: PublicKey | undefined;
 
   /**
+   * The listener for trade events.
+   */
+  private _tradeEventListener: any;
+
+  /**
+   * The listener for OrderComplete events.
+   */
+  private _orderCompleteEventListener: any;
+
+  /**
+   * A map for quick access when getting a callback
+   */
+  private _marginAccountToAsset: Map<String, Asset>;
+
+  /**
    * Timer id from SetInterval.
    */
   private _pollIntervalId: any;
@@ -156,6 +173,7 @@ export class Client {
       client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
     } catch (e) {}
 
+    client._marginAccountToAsset = new Map();
     await Promise.all(
       Exchange.assets.map(async (asset) => {
         const subClient = await SubClient.load(
@@ -167,12 +185,42 @@ export class Client {
           throttle
         );
         client.addSubClient(asset, subClient);
+        client._marginAccountToAsset.set(
+          subClient.marginAccountAddress.toString(),
+          asset
+        );
       })
     );
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
     client._referralAccountAddress = undefined;
     client._referrerAlias = undefined;
+
+    if (callback !== undefined) {
+      client._tradeEventListener = Exchange.program.addEventListener(
+        "TradeEvent",
+        (event: TradeEvent, _slot) => {
+          let asset = client._marginAccountToAsset.get(
+            event.marginAccount.toString()
+          );
+          if (asset) {
+            callback(asset, EventType.TRADE, event);
+          }
+        }
+      );
+
+      client._orderCompleteEventListener = Exchange.program.addEventListener(
+        "OrderCompleteEvent",
+        (event: OrderCompleteEvent, _slot) => {
+          let asset = client._marginAccountToAsset.get(
+            event.marginAccount.toString()
+          );
+          if (asset) {
+            callback(asset, EventType.ORDERCOMPLETE, event);
+          }
+        }
+      );
+    }
 
     return client;
   }
@@ -833,6 +881,17 @@ export class Client {
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);
       this._pollIntervalId = undefined;
+    }
+    if (this._tradeEventListener !== undefined) {
+      await Exchange.program.removeEventListener(this._tradeEventListener);
+      this._tradeEventListener = undefined;
+    }
+
+    if (this._orderCompleteEventListener !== undefined) {
+      await Exchange.program.removeEventListener(
+        this._orderCompleteEventListener
+      );
+      this._orderCompleteEventListener = undefined;
     }
   }
 }

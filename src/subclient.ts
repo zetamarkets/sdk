@@ -127,16 +127,6 @@ export class SubClient {
   private _spreadAccountSubscriptionId: number = undefined;
 
   /**
-   * The listener for trade events.
-   */
-  private _tradeEventListener: any;
-
-  /**
-   * The listener for OrderComplete events.
-   */
-  private _orderCompleteEventListener: any;
-
-  /**
    * Last update timestamp.
    */
   private _lastUpdateTimestamp: number;
@@ -293,26 +283,6 @@ export class SubClient {
       subClient.updateSpreadPositions();
     } catch (e) {
       console.log("User does not have a spread account.");
-    }
-
-    if (callback !== undefined) {
-      subClient._tradeEventListener = Exchange.program.addEventListener(
-        "TradeEvent",
-        (event: TradeEvent, _slot) => {
-          if (event.marginAccount.equals(marginAccountAddress)) {
-            callback(asset, EventType.TRADE, event);
-          }
-        }
-      );
-
-      subClient._orderCompleteEventListener = Exchange.program.addEventListener(
-        "OrderCompleteEvent",
-        (event: OrderCompleteEvent, _slot) => {
-          if (event.marginAccount.equals(marginAccountAddress)) {
-            callback(asset, EventType.ORDERCOMPLETE, event);
-          }
-        }
-      );
     }
 
     return subClient;
@@ -1842,18 +1812,6 @@ export class SubClient {
         this._spreadAccountSubscriptionId
       );
       this._spreadAccountSubscriptionId = undefined;
-    }
-
-    if (this._tradeEventListener !== undefined) {
-      await Exchange.program.removeEventListener(this._tradeEventListener);
-      this._tradeEventListener = undefined;
-    }
-
-    if (this._orderCompleteEventListener !== undefined) {
-      await Exchange.program.removeEventListener(
-        this._orderCompleteEventListener
-      );
-      this._orderCompleteEventListener = undefined;
     }
   }
 }
