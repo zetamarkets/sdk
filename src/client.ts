@@ -125,6 +125,7 @@ export class Client {
   ) {
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._subClients = new Map();
+    this._marginAccountToAsset = new Map();
     this._referralAccount = null;
     this._referrerAccount = null;
     this._referrerAlias = null;
@@ -173,7 +174,6 @@ export class Client {
       client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
     } catch (e) {}
 
-    client._marginAccountToAsset = new Map();
     await Promise.all(
       Exchange.assets.map(async (asset) => {
         const subClient = await SubClient.load(
@@ -200,11 +200,14 @@ export class Client {
       client._tradeEventListener = Exchange.program.addEventListener(
         "TradeEvent",
         (event: TradeEvent, _slot) => {
-          let asset = client._marginAccountToAsset.get(
-            event.marginAccount.toString()
-          );
-          if (asset) {
-            callback(asset, EventType.TRADE, event);
+          if (
+            client._marginAccountToAsset.has(event.marginAccount.toString())
+          ) {
+            callback(
+              client._marginAccountToAsset.get(event.marginAccount.toString()),
+              EventType.TRADE,
+              event
+            );
           }
         }
       );
@@ -212,11 +215,14 @@ export class Client {
       client._orderCompleteEventListener = Exchange.program.addEventListener(
         "OrderCompleteEvent",
         (event: OrderCompleteEvent, _slot) => {
-          let asset = client._marginAccountToAsset.get(
-            event.marginAccount.toString()
-          );
-          if (asset) {
-            callback(asset, EventType.ORDERCOMPLETE, event);
+          if (
+            client._marginAccountToAsset.has(event.marginAccount.toString())
+          ) {
+            callback(
+              client._marginAccountToAsset.get(event.marginAccount.toString()),
+              EventType.ORDERCOMPLETE,
+              event
+            );
           }
         }
       );
