@@ -5,6 +5,14 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.12]
+
+- events: Improve event handling in client. ([#149](https://github.com/zetamarkets/sdk/pull/149))
+
+## [0.16.11]
+
+- skipped due to release issues
+
 ## [0.16.10]
 
 - export calculateSpreadAccountMarginRequirement

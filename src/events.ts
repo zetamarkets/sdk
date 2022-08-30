@@ -57,6 +57,8 @@ export function eventTypeToString(event: EventType) {
       return "GREEKS";
     case EventType.TRADE:
       return "TRADE";
+    case EventType.ORDERCOMPLETE:
+      return "ORDERCOMPLETE";
     case EventType.ORDERBOOK:
       return "ORDERBOOK";
     case EventType.ORACLE:
