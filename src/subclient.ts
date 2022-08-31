@@ -734,6 +734,7 @@ export class SubClient {
 
     tx.add(
       instructions.positionMovementIx(
+        this._asset,
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
@@ -1611,6 +1612,7 @@ export class SubClient {
 
     tx.add(
       instructions.positionMovementIx(
+        this._asset,
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,

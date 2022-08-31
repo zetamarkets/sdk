@@ -187,6 +187,9 @@ export function withdrawIx(
       greeks: subExchange.zetaGroup.greeks,
       oracle: subExchange.zetaGroup.oracle,
       socializedLossAccount: subExchange.socializedLossAccountAddress,
+      perpData: subExchange.zetaGroup.perpData,
+      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
     },
   });
 }
@@ -327,6 +330,8 @@ export function placeOrderIx(
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
         perpData: subExchange.zetaGroup.perpData,
+        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
       remainingAccounts,
     }
@@ -406,6 +411,8 @@ export function placeOrderV2Ix(
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
         perpData: subExchange.zetaGroup.perpData,
+        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
       remainingAccounts,
     }
@@ -492,6 +499,8 @@ export function placeOrderV3Ix(
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
         perpData: subExchange.zetaGroup.perpData,
+        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
       remainingAccounts,
     }
@@ -531,6 +540,10 @@ export function cancelOrderIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
+          oracle: subExchange.zetaGroup.oracle,
+          perpData: subExchange.zetaGroup.perpData,
+          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -570,6 +583,10 @@ export function cancelOrderNoErrorIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
+          oracle: subExchange.zetaGroup.oracle,
+          perpData: subExchange.zetaGroup.perpData,
+          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -607,6 +624,10 @@ export function cancelOrderByClientOrderIdIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
+          oracle: subExchange.zetaGroup.oracle,
+          perpData: subExchange.zetaGroup.perpData,
+          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -644,6 +665,10 @@ export function cancelOrderByClientOrderIdNoErrorIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
+          oracle: subExchange.zetaGroup.oracle,
+          perpData: subExchange.zetaGroup.perpData,
+          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -681,6 +706,10 @@ export function cancelExpiredOrderIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
+          oracle: subExchange.zetaGroup.oracle,
+          perpData: subExchange.zetaGroup.perpData,
+          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -716,6 +745,10 @@ export function forceCancelOrdersIx(
         bids: marketData.serumMarket.decoded.bids,
         asks: marketData.serumMarket.decoded.asks,
         eventQueue: marketData.serumMarket.decoded.eventQueue,
+        oracle: subExchange.zetaGroup.oracle,
+        perpData: subExchange.zetaGroup.perpData,
+        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
     },
   });
@@ -1148,8 +1181,8 @@ export function applyPerpFundingIx(
       zetaGroup: subExchange.zetaGroupAddress,
       perpData: subExchange.perpDataAddress,
       oracle: subExchange.zetaGroup.oracle,
-      bids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-      asks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
+      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
     },
     remainingAccounts, // margin and spread accounts
   });
@@ -1657,6 +1690,10 @@ export function cancelOrderHaltedIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
+          oracle: subExchange.zetaGroup.oracle,
+          perpData: subExchange.zetaGroup.perpData,
+          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -1801,6 +1838,7 @@ export function closeSpreadAccountIx(
 }
 
 export function positionMovementIx(
+  asset: Asset,
   zetaGroup: PublicKey,
   marginAccount: PublicKey,
   spreadAccount: PublicKey,
@@ -1824,6 +1862,12 @@ export function positionMovementIx(
         greeks,
         perpData,
         oracle,
+        perpBids:
+          Exchange.getZetaGroupMarkets(asset).perpMarket.serumMarket.decoded
+            .bids,
+        perpAsks:
+          Exchange.getZetaGroupMarkets(asset).perpMarket.serumMarket.decoded
+            .asks,
       },
     }
   );

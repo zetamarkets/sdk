@@ -1193,12 +1193,12 @@
           "isSigner": false
         },
         {
-          "name": "bids",
+          "name": "perpBids",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "asks",
+          "name": "perpAsks",
           "isMut": true,
           "isSigner": false
         }
@@ -1394,6 +1394,21 @@
         {
           "name": "socializedLossAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -1843,6 +1858,16 @@
           "name": "perpData",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1999,6 +2024,16 @@
         {
           "name": "perpData",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -2163,6 +2198,16 @@
           "name": "perpData",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2260,6 +2305,26 @@
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2337,6 +2402,26 @@
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2408,6 +2493,26 @@
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -2486,6 +2591,26 @@
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2557,6 +2682,26 @@
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2622,6 +2767,26 @@
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -2709,6 +2874,26 @@
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -3059,6 +3244,16 @@
         },
         {
           "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
           "isMut": false,
           "isSigner": false
         },

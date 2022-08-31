@@ -1193,12 +1193,12 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "bids",
+          "name": "perpBids",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "asks",
+          "name": "perpAsks",
           "isMut": true,
           "isSigner": false
         }
@@ -1394,6 +1394,21 @@ export type Zeta = {
         {
           "name": "socializedLossAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -1843,6 +1858,16 @@ export type Zeta = {
           "name": "perpData",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1999,6 +2024,16 @@ export type Zeta = {
         {
           "name": "perpData",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -2163,6 +2198,16 @@ export type Zeta = {
           "name": "perpData",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2260,6 +2305,26 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2337,6 +2402,26 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2408,6 +2493,26 @@ export type Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -2486,6 +2591,26 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2557,6 +2682,26 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -2622,6 +2767,26 @@ export type Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -2709,6 +2874,26 @@ export type Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -3059,6 +3244,16 @@ export type Zeta = {
         },
         {
           "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
           "isMut": false,
           "isSigner": false
         },
@@ -7192,12 +7387,12 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "bids",
+          "name": "perpBids",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "asks",
+          "name": "perpAsks",
           "isMut": true,
           "isSigner": false
         }
@@ -7393,6 +7588,21 @@ export const IDL: Zeta = {
         {
           "name": "socializedLossAccount",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -7842,6 +8052,16 @@ export const IDL: Zeta = {
           "name": "perpData",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -7998,6 +8218,16 @@ export const IDL: Zeta = {
         {
           "name": "perpData",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -8162,6 +8392,16 @@ export const IDL: Zeta = {
           "name": "perpData",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -8259,6 +8499,26 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -8336,6 +8596,26 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -8407,6 +8687,26 @@ export const IDL: Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -8485,6 +8785,26 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -8556,6 +8876,26 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
+              "isSigner": false
             }
           ]
         }
@@ -8621,6 +8961,26 @@ export const IDL: Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -8708,6 +9068,26 @@ export const IDL: Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpData",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "perpBids",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpAsks",
+              "isMut": false,
               "isSigner": false
             }
           ]
@@ -9058,6 +9438,16 @@ export const IDL: Zeta = {
         },
         {
           "name": "perpData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
           "isMut": false,
           "isSigner": false
         },
