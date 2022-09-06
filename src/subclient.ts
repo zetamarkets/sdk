@@ -740,7 +740,6 @@ export class SubClient {
         this.spreadAccountAddress,
         this._parent.publicKey,
         subExchange.greeksAddress,
-        subExchange.perpDataAddress,
         subExchange.zetaGroup.oracle,
         types.MovementType.LOCK,
         movements
@@ -1618,7 +1617,6 @@ export class SubClient {
         this.spreadAccountAddress,
         this._parent.publicKey,
         subExchange.greeksAddress,
-        subExchange.perpDataAddress,
         subExchange.zetaGroup.oracle,
         movementType,
         movements

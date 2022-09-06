@@ -301,19 +301,6 @@ export async function getGreeks(
   );
 }
 
-export async function getPerpData(
-  programId: PublicKey,
-  zetaGroup: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode("perp-data")),
-      zetaGroup.toBuffer(),
-    ],
-    programId
-  );
-}
-
 export async function getMarketIndexes(
   programId: PublicKey,
   zetaGroup: PublicKey
@@ -1558,6 +1545,12 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
     }
   }
   return bufferString.substring(0, splitIndex);
+}
+
+export async function updatePerpFunding(asset: Asset) {
+  let tx = new Transaction();
+  tx.add(instructions.updatePerpFundingIx(asset));
+  await processTransaction(Exchange.provider, tx);
 }
 
 export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {

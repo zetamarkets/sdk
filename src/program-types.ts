@@ -72,6 +72,13 @@ export interface MarginParameters {
   padding: Array<number>;
 }
 
+export interface PerpParameters {
+  minFundingRatePercent: anchor.BN;
+  maxFundingRatePercent: anchor.BN;
+  impactVolume: anchor.BN;
+  padding: Array<number>;
+}
+
 export interface HaltState {
   halted: boolean;
   spotPrice: anchor.BN;
@@ -103,7 +110,7 @@ export interface ZetaGroup {
   expirySeriesPadding: Array<ExpirySeries>;
   totalInsuranceVaultDeposits: anchor.BN;
   asset: any;
-  perpData: PublicKey;
+  perpParameters: PerpParameters;
   padding: Array<number>;
 }
 
@@ -191,17 +198,10 @@ export interface Greeks {
   volatilityPadding: Array<anchor.BN>;
   nodeKeys: Array<PublicKey>;
   haltForcePricing: Array<boolean>;
+  perpLastUpdatedTs: anchor.BN;
+  perpFundingDelta: anchor.BN;
+  perpLatestFundingRate: anchor.BN;
   padding: Array<number>;
-}
-
-export interface PerpData {
-  nonce: number;
-  minFundingRate: anchor.BN;
-  maxFundingRate: anchor.BN;
-  lastUpdatedTs: anchor.BN;
-  fundingDelta: anchor.BN;
-  latestFundingRate: anchor.BN;
-  impactVolume: anchor.BN;
 }
 
 export interface MarketNode {

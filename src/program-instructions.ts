@@ -187,9 +187,6 @@ export function withdrawIx(
       greeks: subExchange.zetaGroup.greeks,
       oracle: subExchange.zetaGroup.oracle,
       socializedLossAccount: subExchange.socializedLossAccountAddress,
-      perpData: subExchange.zetaGroup.perpData,
-      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
     },
   });
 }
@@ -329,9 +326,6 @@ export function placeOrderIx(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
-        perpData: subExchange.zetaGroup.perpData,
-        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
       remainingAccounts,
     }
@@ -410,9 +404,6 @@ export function placeOrderV2Ix(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
-        perpData: subExchange.zetaGroup.perpData,
-        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
       remainingAccounts,
     }
@@ -498,9 +489,6 @@ export function placeOrderV3Ix(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
-        perpData: subExchange.zetaGroup.perpData,
-        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
       remainingAccounts,
     }
@@ -541,9 +529,6 @@ export function cancelOrderIx(
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
           oracle: subExchange.zetaGroup.oracle,
-          perpData: subExchange.zetaGroup.perpData,
-          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -584,9 +569,6 @@ export function cancelOrderNoErrorIx(
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
           oracle: subExchange.zetaGroup.oracle,
-          perpData: subExchange.zetaGroup.perpData,
-          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -625,9 +607,6 @@ export function cancelOrderByClientOrderIdIx(
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
           oracle: subExchange.zetaGroup.oracle,
-          perpData: subExchange.zetaGroup.perpData,
-          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -666,9 +645,6 @@ export function cancelOrderByClientOrderIdNoErrorIx(
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
           oracle: subExchange.zetaGroup.oracle,
-          perpData: subExchange.zetaGroup.perpData,
-          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -707,9 +683,6 @@ export function cancelExpiredOrderIx(
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
           oracle: subExchange.zetaGroup.oracle,
-          perpData: subExchange.zetaGroup.perpData,
-          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -732,7 +705,6 @@ export function forceCancelOrdersIx(
   return Exchange.program.instruction.forceCancelOrders({
     accounts: {
       greeks: subExchange.zetaGroup.greeks,
-      perpData: subExchange.zetaGroup.perpData,
       oracle: subExchange.zetaGroup.oracle,
       cancelAccounts: {
         zetaGroup: subExchange.zetaGroupAddress,
@@ -746,9 +718,6 @@ export function forceCancelOrdersIx(
         asks: marketData.serumMarket.decoded.asks,
         eventQueue: marketData.serumMarket.decoded.eventQueue,
         oracle: subExchange.zetaGroup.oracle,
-        perpData: subExchange.zetaGroup.perpData,
-        perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-        perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
       },
     },
   });
@@ -933,11 +902,6 @@ export async function initializeZetaGroupIx(
       subExchange.zetaGroupAddress
     );
 
-  let [perpData, perpDataNonce] = await utils.getPerpData(
-    Exchange.programId,
-    subExchange.zetaGroupAddress
-  );
-
   return Exchange.program.instruction.initializeZetaGroup(
     {
       zetaGroupNonce,
@@ -946,7 +910,6 @@ export async function initializeZetaGroupIx(
       vaultNonce,
       insuranceVaultNonce,
       socializedLossAccountNonce,
-      perpDataNonce,
       interestRate: pricingArgs.interestRate,
       volatility: pricingArgs.volatility,
       optionTradeNormalizer: pricingArgs.optionTradeNormalizer,
@@ -978,8 +941,8 @@ export async function initializeZetaGroupIx(
       optionDynamicPercentageShortMaintenance:
         marginArgs.optionDynamicPercentageShortMaintenance,
       optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
-      minFundingRate: pricingArgs.minFundingRate,
-      maxFundingRate: pricingArgs.maxFundingRate,
+      minFundingRatePercent: pricingArgs.minFundingRate,
+      maxFundingRatePercent: pricingArgs.maxFundingRate,
       perpImpactVolume: pricingArgs.perpImpactVolume,
     },
     {
@@ -992,7 +955,6 @@ export async function initializeZetaGroupIx(
         oracle,
         zetaGroup,
         greeks,
-        perpData,
         underlying,
         vault,
         insuranceVault,
@@ -1076,7 +1038,6 @@ export function liquidateIx(
       liquidator,
       liquidatorMarginAccount,
       greeks: subExchange.zetaGroup.greeks,
-      perpData: subExchange.zetaGroup.perpData,
       oracle: subExchange.zetaGroup.oracle,
       market,
       zetaGroup: subExchange.zetaGroupAddress,
@@ -1171,6 +1132,19 @@ export function updatePricingIx(
   });
 }
 
+export function updatePerpFundingIx(asset: Asset): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  return Exchange.program.instruction.updatePerpFunding({
+    accounts: {
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
+      oracle: subExchange.zetaGroup.oracle,
+      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
+    },
+  });
+}
+
 export function applyPerpFundingIx(
   asset: Asset,
   remainingAccounts: any[]
@@ -1179,12 +1153,9 @@ export function applyPerpFundingIx(
   return Exchange.program.instruction.applyPerpFunding({
     accounts: {
       zetaGroup: subExchange.zetaGroupAddress,
-      perpData: subExchange.perpDataAddress,
-      oracle: subExchange.zetaGroup.oracle,
-      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
+      greeks: subExchange.greeksAddress,
     },
-    remainingAccounts, // margin and spread accounts
+    remainingAccounts, // margin accounts
   });
 }
 
@@ -1691,9 +1662,6 @@ export function cancelOrderHaltedIx(
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
           oracle: subExchange.zetaGroup.oracle,
-          perpData: subExchange.zetaGroup.perpData,
-          perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-          perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
         },
       },
     }
@@ -1844,7 +1812,6 @@ export function positionMovementIx(
   spreadAccount: PublicKey,
   user: PublicKey,
   greeks: PublicKey,
-  perpData: PublicKey,
   oracle: PublicKey,
   movementType: types.MovementType,
   movements: PositionMovementArg[]
@@ -1860,14 +1827,7 @@ export function positionMovementIx(
         spreadAccount,
         authority: user,
         greeks,
-        perpData,
         oracle,
-        perpBids:
-          Exchange.getZetaGroupMarkets(asset).perpMarket.serumMarket.decoded
-            .bids,
-        perpAsks:
-          Exchange.getZetaGroupMarkets(asset).perpMarket.serumMarket.decoded
-            .asks,
       },
     }
   );
@@ -2061,6 +2021,7 @@ export interface StateParams {
   marginConcessionPercentage: number;
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
+  perpFundingThresholdSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {

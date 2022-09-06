@@ -9,7 +9,6 @@ import * as utils from "./utils";
 import * as constants from "./constants";
 import {
   Greeks,
-  PerpData,
   ExpirySeries,
   ZetaGroup,
   MarketIndexes,
@@ -117,16 +116,6 @@ export class SubExchange {
   }
   private _greeksAddress: PublicKey;
 
-  public get perpData(): PerpData {
-    return this._perpData;
-  }
-  private _perpData: PerpData;
-
-  public get perpDataAddress(): PublicKey {
-    return this._perpDataAddress;
-  }
-  private _perpDataAddress: PublicKey;
-
   public get marginParams(): types.MarginParams {
     return this._marginParams;
   }
@@ -162,13 +151,6 @@ export class SubExchange {
     );
 
     this._greeksAddress = greeks;
-
-    let [perpData, _perpDataNonce] = await utils.getPerpData(
-      Exchange.programId,
-      this.zetaGroupAddress
-    );
-
-    this._perpDataAddress = perpData;
 
     const [vaultAddress, _vaultNonce] = await utils.getVault(
       Exchange.programId,
@@ -228,15 +210,11 @@ export class SubExchange {
     this._greeks = (await Exchange.program.account.greeks.fetch(
       this.greeksAddress
     )) as Greeks;
-    this._perpData = (await Exchange.program.account.perpData.fetch(
-      this.perpDataAddress
-    )) as PerpData;
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
     // Set callbacks.
     this.subscribeZetaGroup(asset, callback);
     this.subscribeGreeks(asset, callback);
-    this.subscribePerpData(asset, callback);
 
     this._isInitialized = true;
 
@@ -586,32 +564,6 @@ export class SubExchange {
     this._eventEmitters.push(eventEmitter);
   }
 
-  private subscribePerpData(
-    asset: Asset,
-    callback?: (asset: Asset, type: EventType, data: any) => void
-  ) {
-    if (this._zetaGroup === null) {
-      throw Error("Cannot subscribe to perpData. ZetaGroup is null.");
-    }
-
-    let eventEmitter = Exchange.program.account.perpData.subscribe(
-      this._zetaGroup.perpData,
-      Exchange.provider.connection.commitment
-    );
-
-    eventEmitter.on("change", async (perpData: PerpData) => {
-      this._perpData = perpData;
-      if (this._isInitialized) {
-        Exchange.riskCalculator.updateMarginRequirements(asset);
-      }
-      if (callback !== undefined) {
-        callback(this.asset, EventType.PERPDATA, null);
-      }
-    });
-
-    this._eventEmitters.push(eventEmitter);
-  }
-
   public async handlePolling(
     callback?: (asset: Asset, eventType: EventType, data: any) => void
   ) {
@@ -932,9 +884,6 @@ export class SubExchange {
       this._zetaGroupAddress
     );
     await Exchange.program.account.greeks.unsubscribe(this._zetaGroup.greeks);
-    await Exchange.program.account.perpData.unsubscribe(
-      this._zetaGroup.perpData
-    );
     for (var i = 0; i < this._eventEmitters.length; i++) {
       this._eventEmitters[i].removeListener("change");
     }
