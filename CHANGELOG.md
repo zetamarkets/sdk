@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.14]
+
+- risk: Add available withdrawable balance for MMs.
+
 ## [0.16.13]
 
 - utils: add asset filter in fetching open orders accounts.
