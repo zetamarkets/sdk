@@ -1298,6 +1298,9 @@ export async function getAllOpenOrdersAccountsByMarket(
   await Promise.all(
     marginAccounts.map(async (acc) => {
       let marginAccount = acc.account as MarginAccount;
+      if (assets.fromProgramAsset(marginAccount.asset) != asset) {
+        return;
+      }
       for (var i = 0; i < subExchange.markets.markets.length; i++) {
         let nonce = marginAccount.openOrdersNonce[i];
         if (nonce == 0) {
