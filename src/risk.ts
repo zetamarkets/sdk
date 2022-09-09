@@ -158,7 +158,10 @@ export class RiskCalculator {
    * Place order, withdrawal and force cancels
    * @param marginAccount   the user's MarginAccount.
    */
-  public calculateTotalInitialMargin(marginAccount: MarginAccount): number {
+  public calculateTotalInitialMargin(
+    marginAccount: MarginAccount,
+    skipConcession: boolean = false
+  ): number {
     let asset = fromProgramAsset(marginAccount.asset);
     let marketMaker = types.isMarketMaker(marginAccount);
     let margin = 0;
@@ -174,7 +177,7 @@ export class RiskCalculator {
       let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
       let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
-      if (!marketMaker) {
+      if (!marketMaker || skipConcession) {
         if (size > 0) {
           longLots += Math.abs(convertNativeLotSizeToDecimal(size));
         } else if (size < 0) {
@@ -198,7 +201,7 @@ export class RiskCalculator {
           types.MarginType.INITIAL
         );
 
-      if (marketMaker) {
+      if (marketMaker && !skipConcession) {
         // Mark initial margin to concession (only contains open order margin).
         marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
         // Add position margin which doesn't get concessions.
@@ -310,9 +313,15 @@ export class RiskCalculator {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
+    let initialMarginSkipConcession = this.calculateTotalInitialMargin(
+      marginAccount,
+      true
+    );
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
     let availableBalanceInitial: number =
       balance + unrealizedPnl - initialMargin;
+    let availableBalanceWithdrawable: number =
+      balance + unrealizedPnl - initialMarginSkipConcession;
     let availableBalanceMaintenance: number =
       balance + unrealizedPnl - maintenanceMargin;
     return {
@@ -322,6 +331,7 @@ export class RiskCalculator {
       unrealizedPnl,
       availableBalanceInitial,
       availableBalanceMaintenance,
+      availableBalanceWithdrawable,
     };
   }
 

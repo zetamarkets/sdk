@@ -168,6 +168,7 @@ export interface MarginAccountState {
   unrealizedPnl: number;
   availableBalanceInitial: number;
   availableBalanceMaintenance: number;
+  availableBalanceWithdrawable: number;
 }
 
 export interface CancelArgs {
