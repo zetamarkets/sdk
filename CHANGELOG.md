@@ -7,11 +7,11 @@ Version changes are pinned to SDK releases.
 
 ## [0.16.14]
 
-- risk: Add available withdrawable balance for MMs.
+- risk: Add available withdrawable balance for MMs. ([#151](https://github.com/zetamarkets/sdk/pull/151))
 
 ## [0.16.13]
 
-- utils: add asset filter in fetching open orders accounts.
+- utils: add asset filter in fetching open orders accounts. ([#150](https://github.com/zetamarkets/sdk/pull/150))
 
 ## [0.16.12]
 
