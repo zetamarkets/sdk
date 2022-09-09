@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.13]
+
+- utils: add asset filter in fetching open orders accounts.
+
 ## [0.16.12]
 
 - events: Improve event handling in client. ([#149](https://github.com/zetamarkets/sdk/pull/149))
