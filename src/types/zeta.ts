@@ -1258,12 +1258,12 @@ export type Zeta = {
         },
         {
           "name": "perpBids",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
           "name": "perpAsks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -7454,12 +7454,12 @@ export const IDL: Zeta = {
         },
         {
           "name": "perpBids",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
           "name": "perpAsks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         }
       ],

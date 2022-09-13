@@ -1258,12 +1258,12 @@
         },
         {
           "name": "perpBids",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
           "name": "perpAsks",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         }
       ],
