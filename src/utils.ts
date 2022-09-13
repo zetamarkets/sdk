@@ -301,6 +301,19 @@ export async function getGreeks(
   );
 }
 
+export async function getPerpSyncQueue(
+  programId: PublicKey,
+  zetaGroup: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("perp-sync-queue")),
+      zetaGroup.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getMarketIndexes(
   programId: PublicKey,
   zetaGroup: PublicKey

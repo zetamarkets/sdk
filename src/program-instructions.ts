@@ -326,6 +326,7 @@ export function placeOrderIx(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: subExchange.zetaGroup.perpSyncQueue,
       },
       remainingAccounts,
     }
@@ -404,6 +405,7 @@ export function placeOrderV2Ix(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: subExchange.zetaGroup.perpSyncQueue,
       },
       remainingAccounts,
     }
@@ -489,6 +491,7 @@ export function placeOrderV3Ix(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: subExchange.zetaGroup.perpSyncQueue,
       },
       remainingAccounts,
     }
@@ -886,6 +889,11 @@ export async function initializeZetaGroupIx(
     subExchange.zetaGroupAddress
   );
 
+  let [perpSyncQueue, perpSyncQueueNonce] = await utils.getPerpSyncQueue(
+    Exchange.programId,
+    subExchange.zetaGroupAddress
+  );
+
   let [vault, vaultNonce] = await utils.getVault(
     Exchange.programId,
     subExchange.zetaGroupAddress
@@ -910,6 +918,7 @@ export async function initializeZetaGroupIx(
       vaultNonce,
       insuranceVaultNonce,
       socializedLossAccountNonce,
+      perpSyncQueueNonce,
       interestRate: pricingArgs.interestRate,
       volatility: pricingArgs.volatility,
       optionTradeNormalizer: pricingArgs.optionTradeNormalizer,
@@ -955,6 +964,7 @@ export async function initializeZetaGroupIx(
         oracle,
         zetaGroup,
         greeks,
+        perpSyncQueue,
         underlying,
         vault,
         insuranceVault,
@@ -1057,10 +1067,12 @@ export function crankMarketIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
+      greeks: Exchange.getSubExchange(asset).greeksAddress,
       market,
       eventQueue,
       dexProgram,
       serumAuthority: Exchange.serumAuthority,
+      perpSyncQueue: Exchange.getZetaGroup(asset).perpSyncQueue,
     },
     remainingAccounts,
   });

@@ -46,6 +46,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "underlying",
           "isMut": true,
           "isSigner": false
@@ -1877,6 +1882,11 @@ export type Zeta = {
           "name": "mintAuthority",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -2028,6 +2038,11 @@ export type Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -2186,6 +2201,11 @@ export type Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -2801,6 +2821,16 @@ export type Zeta = {
         {
           "name": "serumAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -3619,6 +3649,35 @@ export type Zeta = {
       }
     },
     {
+      "name": "perpSyncQueue",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "head",
+            "type": "u16"
+          },
+          {
+            "name": "length",
+            "type": "u16"
+          },
+          {
+            "name": "queue",
+            "type": {
+              "array": [
+                "i128",
+                600
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "zetaGroup",
       "type": {
         "kind": "struct",
@@ -3736,11 +3795,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "perpSyncQueue",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1006
+                974
               ]
             }
           }
@@ -4983,6 +5046,10 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "perpSyncQueueNonce",
+            "type": "u8"
+          },
+          {
             "name": "interestRate",
             "type": "i64"
           },
@@ -6072,6 +6139,21 @@ export type Zeta = {
       "code": 6111,
       "name": "FundingRateNotUpToDate",
       "msg": "Perp funding rate not up to date"
+    },
+    {
+      "code": 6112,
+      "name": "PerpSyncQueueFull",
+      "msg": "Perp taker/maker sync queue is full"
+    },
+    {
+      "code": 6113,
+      "name": "PerpSyncQueueAccountSeedsMismatch",
+      "msg": "PerpSyncQueue account seeds mismatch"
+    },
+    {
+      "code": 6114,
+      "name": "PerpSyncQueueEmpty",
+      "msg": "Program tried to pop from an empty perpSyncQueue"
     }
   ]
 };
@@ -6124,6 +6206,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "underlying",
           "isMut": true,
           "isSigner": false
@@ -7955,6 +8042,11 @@ export const IDL: Zeta = {
           "name": "mintAuthority",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -8106,6 +8198,11 @@ export const IDL: Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -8264,6 +8361,11 @@ export const IDL: Zeta = {
         {
           "name": "mintAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -8879,6 +8981,16 @@ export const IDL: Zeta = {
         {
           "name": "serumAuthority",
           "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -9697,6 +9809,35 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "perpSyncQueue",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "head",
+            "type": "u16"
+          },
+          {
+            "name": "length",
+            "type": "u16"
+          },
+          {
+            "name": "queue",
+            "type": {
+              "array": [
+                "i128",
+                600
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "zetaGroup",
       "type": {
         "kind": "struct",
@@ -9814,11 +9955,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "perpSyncQueue",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1006
+                974
               ]
             }
           }
@@ -11061,6 +11206,10 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "perpSyncQueueNonce",
+            "type": "u8"
+          },
+          {
             "name": "interestRate",
             "type": "i64"
           },
@@ -12150,6 +12299,21 @@ export const IDL: Zeta = {
       "code": 6111,
       "name": "FundingRateNotUpToDate",
       "msg": "Perp funding rate not up to date"
+    },
+    {
+      "code": 6112,
+      "name": "PerpSyncQueueFull",
+      "msg": "Perp taker/maker sync queue is full"
+    },
+    {
+      "code": 6113,
+      "name": "PerpSyncQueueAccountSeedsMismatch",
+      "msg": "PerpSyncQueue account seeds mismatch"
+    },
+    {
+      "code": 6114,
+      "name": "PerpSyncQueueEmpty",
+      "msg": "Program tried to pop from an empty perpSyncQueue"
     }
   ]
 };

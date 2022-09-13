@@ -111,6 +111,7 @@ export interface ZetaGroup {
   totalInsuranceVaultDeposits: anchor.BN;
   asset: any;
   perpParameters: PerpParameters;
+  perpSyncQueue: PublicKey;
   padding: Array<number>;
 }
 
