@@ -164,6 +164,7 @@ export interface MarginRequirement {
 export interface MarginAccountState {
   balance: number;
   initialMargin: number;
+  initialMarginSkipConcession: number;
   maintenanceMargin: number;
   unrealizedPnl: number;
   availableBalanceInitial: number;
