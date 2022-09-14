@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- events: Add TradeEventV2. ([#459](https://github.com/zetamarkets/zeta-options/pull/459))
+
 ## [0.16.14]
 
 - risk: Add available withdrawable balance for MMs. ([#151](https://github.com/zetamarkets/sdk/pull/151))

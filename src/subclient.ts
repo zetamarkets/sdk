@@ -6,9 +6,7 @@ import { exchange as Exchange } from "./exchange";
 import {
   SpreadAccount,
   MarginAccount,
-  TradeEvent,
   PositionMovementEvent,
-  OrderCompleteEvent,
 } from "./program-types";
 import {
   PublicKey,

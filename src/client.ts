@@ -8,6 +8,7 @@ import {
   ReferralAccount,
   ReferrerAccount,
   TradeEvent,
+  TradeEventV2,
   OrderCompleteEvent,
 } from "./program-types";
 import {
@@ -98,6 +99,11 @@ export class Client {
    * The listener for trade events.
    */
   private _tradeEventListener: any;
+
+  /**
+   * The listener for trade v2 events.
+   */
+  private _tradeEventV2Listener: any;
 
   /**
    * The listener for OrderComplete events.
@@ -206,6 +212,21 @@ export class Client {
             callback(
               client._marginAccountToAsset.get(event.marginAccount.toString()),
               EventType.TRADE,
+              event
+            );
+          }
+        }
+      );
+
+      client._tradeEventV2Listener = Exchange.program.addEventListener(
+        "TradeEventV2",
+        (event: TradeEventV2, _slot) => {
+          if (
+            client._marginAccountToAsset.has(event.marginAccount.toString())
+          ) {
+            callback(
+              client._marginAccountToAsset.get(event.marginAccount.toString()),
+              EventType.TRADEV2,
               event
             );
           }
@@ -891,6 +912,11 @@ export class Client {
     if (this._tradeEventListener !== undefined) {
       await Exchange.program.removeEventListener(this._tradeEventListener);
       this._tradeEventListener = undefined;
+    }
+
+    if (this._tradeEventV2Listener !== undefined) {
+      await Exchange.program.removeEventListener(this._tradeEventV2Listener);
+      this._tradeEventV2Listener = undefined;
     }
 
     if (this._orderCompleteEventListener !== undefined) {
