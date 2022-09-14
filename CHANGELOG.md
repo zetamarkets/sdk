@@ -5,6 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.15]
+
+- risk: Expose initial margin no concession. ([#154](https://github.com/zetamarkets/sdk/pull/154))
+- subclient: Fix multiple signing on closeMultipleOpenOrders. ([#154](https://github.com/zetamarkets/sdk/pull/154))
+
+
 ## [0.16.14]
 
 - risk: Add available withdrawable balance for MMs. ([#151](https://github.com/zetamarkets/sdk/pull/151))
