@@ -463,20 +463,18 @@ export class Client {
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
     if (asset) {
-      return await this.getSubClient(asset).cancelAllOrders();
+      await this.getSubClient(asset).cancelAllOrders();
     } else {
       let ixs = [];
       for (var subClient of this.getAllSubClients()) {
-        ixs.push(subClient.cancelAllOrdersIxs());
+        ixs = ixs.concat(subClient.cancelAllOrdersIxs());
       }
       let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
-      let txIds: string[] = [];
-      await Promise.all(
+      return await Promise.all(
         txs.map(async (tx) => {
-          txIds.push(await utils.processTransaction(this.provider, tx));
+          return utils.processTransaction(this.provider, tx);
         })
       );
-      return txIds;
     }
   }
 

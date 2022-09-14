@@ -1472,18 +1472,17 @@ export class SubClient {
   /**
    * Cancels all active user orders
    */
-  public async cancelAllOrders(): Promise<TransactionSignature[]> {
+  public async cancelAllOrders(): Promise<void[]> {
     let txs = utils.splitIxsIntoTx(
       this.cancelAllOrdersIxs(),
       constants.MAX_CANCELS_PER_TX
     );
     let txIds: string[] = [];
-    await Promise.all(
+    return await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
+        await utils.processTransaction(this._parent.provider, tx);
       })
     );
-    return txIds;
   }
 
   /**
