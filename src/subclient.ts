@@ -1448,10 +1448,7 @@ export class SubClient {
     return await utils.processTransaction(this._parent.provider, tx);
   }
 
-  /**
-   * Cancels all active user orders
-   */
-  public async cancelAllOrders(): Promise<TransactionSignature[]> {
+  public cancelAllOrdersIxs(): TransactionInstruction[] {
     // Can only fit 6 cancels worth of accounts per transaction.
     // on 4 separate markets
     // Compute is fine.
@@ -1469,8 +1466,17 @@ export class SubClient {
       );
       ixs.push(ix);
     }
+    return ixs;
+  }
 
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+  /**
+   * Cancels all active user orders
+   */
+  public async cancelAllOrders(): Promise<TransactionSignature[]> {
+    let txs = utils.splitIxsIntoTx(
+      this.cancelAllOrdersIxs(),
+      constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
