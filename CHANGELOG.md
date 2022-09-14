@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-- events: Add TradeEventV2. ([#459](https://github.com/zetamarkets/zeta-options/pull/459))
+- events: Add TradeEventV2. ([#153](https://github.com/zetamarkets/sdk/pull/153))
 
 ## [0.16.14]
 
