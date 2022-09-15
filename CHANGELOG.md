@@ -5,6 +5,14 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.15]
+
+- client: cancelAllOrders() and cancelAllOrdersNoError() now bundle instructions of different assets into one transaction if possible. ([#155](https://github.com/zetamarkets/sdk/pull/155))
+
+### Breaking
+
+- client: cancelMultipleOrders() and cancelMultipleOrdersNoError() now require Asset in the CancelArgs[] function argument. ([#155](https://github.com/zetamarkets/sdk/pull/155))
+
 ## [0.16.14]
 
 - risk: Add available withdrawable balance for MMs. ([#151](https://github.com/zetamarkets/sdk/pull/151))
