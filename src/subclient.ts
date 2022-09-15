@@ -1309,11 +1309,11 @@ export class SubClient {
       constants.MAX_SETTLE_AND_CLOSE_PER_TX
     );
 
-    await Promise.all(
-      combinedTxs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
-      })
-    );
+    for (var i = 0; i < combinedTxs.length; i++) {
+      let tx = combinedTxs[i];
+      let txId = await utils.processTransaction(this._parent.provider, tx);
+      txIds.push(txId);
+    }
 
     // Reset openOrdersAccount keys
     for (var i = 0; i < markets.length; i++) {
