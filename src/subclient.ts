@@ -1326,39 +1326,6 @@ export class SubClient {
   }
 
   /**
-   * Cancels multiple user orders by orderId
-   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
-   */
-  public async cancelMultipleOrdersNoError(
-    cancelArguments: types.CancelArgs[]
-  ): Promise<TransactionSignature[]> {
-    let ixs = [];
-    for (var i = 0; i < cancelArguments.length; i++) {
-      let marketIndex = this._subExchange.markets.getMarketIndex(
-        cancelArguments[i].market
-      );
-      let ix = instructions.cancelOrderNoErrorIx(
-        this.asset,
-        marketIndex,
-        this._parent.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        cancelArguments[i].orderId,
-        cancelArguments[i].cancelSide
-      );
-      ixs.push(ix);
-    }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
-      })
-    );
-    return txIds;
-  }
-
-  /**
    * Calls force cancel on another user's orders
    * @param market  Market to cancel orders on
    * @param marginAccountToCancel Users to be force-cancelled's margin account
