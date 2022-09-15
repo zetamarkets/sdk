@@ -173,6 +173,7 @@ export interface MarginAccountState {
 }
 
 export interface CancelArgs {
+  asset: Asset;
   market: PublicKey;
   orderId: anchor.BN;
   cancelSide: Side;
