@@ -448,7 +448,7 @@ export class Client {
     fetch = true,
     force = false
   ) {
-    if (asset) {
+    if (asset != undefined) {
       await this.getSubClient(asset).updateState(fetch, force);
     } else {
       await Promise.all(
@@ -462,7 +462,7 @@ export class Client {
   public async cancelAllOrders(
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
-    if (asset) {
+    if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrders();
     } else {
       let ixs = [];
@@ -481,7 +481,7 @@ export class Client {
   public async cancelAllOrdersNoError(
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
-    if (asset) {
+    if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrdersNoError();
     } else {
       let allTxIds = [];
