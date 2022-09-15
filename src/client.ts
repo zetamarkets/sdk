@@ -463,7 +463,7 @@ export class Client {
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
     if (asset) {
-      await this.getSubClient(asset).cancelAllOrders();
+      return await this.getSubClient(asset).cancelAllOrders();
     } else {
       let ixs = [];
       for (var subClient of this.getAllSubClients()) {
