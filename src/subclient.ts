@@ -1382,10 +1382,11 @@ export class SubClient {
     return await utils.processTransaction(this._parent.provider, tx);
   }
 
+  /**
+   * Instruction builder for cancelAllOrders()
+   * Returns a list of instructions cancelling all of this subclient's orders
+   */
   public cancelAllOrdersIxs(): TransactionInstruction[] {
-    // Can only fit 6 cancels worth of accounts per transaction.
-    // on 4 separate markets
-    // Compute is fine.
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
@@ -1403,10 +1404,11 @@ export class SubClient {
     return ixs;
   }
 
+  /**
+   * Instruction builder for cancelAllOrdersNoError()
+   * Returns a list of instructions cancelling all of this subclient's orders
+   */
   public cancelAllOrdersNoErrorIxs(): TransactionInstruction[] {
-    // Can only fit 6 cancels worth of accounts per transaction.
-    // on 4 separate markets
-    // Compute is fine.
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
@@ -1428,6 +1430,9 @@ export class SubClient {
    * Cancels all active user orders
    */
   public async cancelAllOrders(): Promise<TransactionSignature[]> {
+    // Can only fit 6 cancels worth of accounts per transaction.
+    // on 4 separate markets
+    // Compute is fine.
     let txs = utils.splitIxsIntoTx(
       this.cancelAllOrdersIxs(),
       constants.MAX_CANCELS_PER_TX
@@ -1445,6 +1450,9 @@ export class SubClient {
    * Cancels all active user orders, but will not crash if some cancels fail
    */
   public async cancelAllOrdersNoError(): Promise<TransactionSignature[]> {
+    // Can only fit 6 cancels worth of accounts per transaction.
+    // on 4 separate markets
+    // Compute is fine.
     let txs = utils.splitIxsIntoTx(
       this.cancelAllOrdersNoErrorIxs(),
       constants.MAX_CANCELS_PER_TX
