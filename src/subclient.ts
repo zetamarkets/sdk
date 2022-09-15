@@ -1329,39 +1329,6 @@ export class SubClient {
    * Cancels multiple user orders by orderId
    * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
    */
-  public async cancelMultipleOrders(
-    cancelArguments: types.CancelArgs[]
-  ): Promise<TransactionSignature[]> {
-    let ixs = [];
-    for (var i = 0; i < cancelArguments.length; i++) {
-      let marketIndex = this._subExchange.markets.getMarketIndex(
-        cancelArguments[i].market
-      );
-      let ix = instructions.cancelOrderIx(
-        this.asset,
-        marketIndex,
-        this._parent.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        cancelArguments[i].orderId,
-        cancelArguments[i].cancelSide
-      );
-      ixs.push(ix);
-    }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
-      })
-    );
-    return txIds;
-  }
-
-  /**
-   * Cancels multiple user orders by orderId
-   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
-   */
   public async cancelMultipleOrdersNoError(
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
@@ -1469,26 +1436,7 @@ export class SubClient {
     return ixs;
   }
 
-  /**
-   * Cancels all active user orders
-   */
-  public async cancelAllOrders(): Promise<void[]> {
-    let txs = utils.splitIxsIntoTx(
-      this.cancelAllOrdersIxs(),
-      constants.MAX_CANCELS_PER_TX
-    );
-    let txIds: string[] = [];
-    return await Promise.all(
-      txs.map(async (tx) => {
-        await utils.processTransaction(this._parent.provider, tx);
-      })
-    );
-  }
-
-  /**
-   * Cancels all active user orders, but will not crash if some cancels fail
-   */
-  public async cancelAllOrdersNoError(): Promise<TransactionSignature[]> {
+  public cancelAllOrdersNoErrorIxs(): TransactionInstruction[] {
     // Can only fit 6 cancels worth of accounts per transaction.
     // on 4 separate markets
     // Compute is fine.
@@ -1506,8 +1454,34 @@ export class SubClient {
       );
       ixs.push(ix);
     }
+    return ixs;
+  }
 
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+  /**
+   * Cancels all active user orders
+   */
+  public async cancelAllOrders(): Promise<TransactionSignature[]> {
+    let txs = utils.splitIxsIntoTx(
+      this.cancelAllOrdersIxs(),
+      constants.MAX_CANCELS_PER_TX
+    );
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._parent.provider, tx));
+      })
+    );
+    return txIds;
+  }
+
+  /**
+   * Cancels all active user orders, but will not crash if some cancels fail
+   */
+  public async cancelAllOrdersNoError(): Promise<TransactionSignature[]> {
+    let txs = utils.splitIxsIntoTx(
+      this.cancelAllOrdersNoErrorIxs(),
+      constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {

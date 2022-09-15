@@ -660,19 +660,64 @@ export class Client {
   }
 
   public async cancelMultipleOrders(
-    asset: Asset,
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
-    return await this.getSubClient(asset).cancelMultipleOrders(cancelArguments);
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let asset = cancelArguments[i].asset;
+      let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = instructions.cancelOrderIx(
+        asset,
+        marketIndex,
+        this.publicKey,
+        this.getSubClient(asset).marginAccountAddress,
+        this.getSubClient(asset).openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this.provider, tx));
+      })
+    );
+    return txIds;
   }
 
   public async cancelMultipleOrdersNoError(
     asset: Asset,
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
-    return await this.getSubClient(asset).cancelMultipleOrdersNoError(
-      cancelArguments
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let asset = cancelArguments[i].asset;
+      let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = instructions.cancelOrderNoErrorIx(
+        asset,
+        marketIndex,
+        this.publicKey,
+        this.getSubClient(asset).marginAccountAddress,
+        this.getSubClient(asset).openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this.provider, tx));
+      })
     );
+    return txIds;
   }
 
   public async forceCancelOrders(
