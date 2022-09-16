@@ -5,9 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.18]
+
+- client: add cancelAllMarketOrders(). ([#157](https://github.com/zetamarkets/sdk/pull/157))
+
 ## [0.16.17]
 
-- constants: drop MAX_CANCELS_PER_TX down to 3 ([#156](https://github.com/zetamarkets/sdk/pull/156))
+- constants: drop MAX_CANCELS_PER_TX down to 3. ([#156](https://github.com/zetamarkets/sdk/pull/156))
 
 ## [0.16.16]
 
