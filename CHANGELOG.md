@@ -5,6 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- events: Add TradeEventV2. ([#153](https://github.com/zetamarkets/sdk/pull/153))
 ## [0.16.17]
 
 - constants: drop MAX_CANCELS_PER_TX down to 3 ([#156](https://github.com/zetamarkets/sdk/pull/156))

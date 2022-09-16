@@ -275,6 +275,20 @@ export interface TradeEvent {
   orderId: anchor.BN;
 }
 
+export interface TradeEventV2 {
+  marginAccount: PublicKey;
+  index: number;
+  costOfTrades: anchor.BN;
+  size: anchor.BN;
+  isBid: boolean;
+  clientOrderId: anchor.BN;
+  orderId: anchor.BN;
+  asset: number;
+  user: PublicKey;
+  isTaker: boolean;
+  sequenceNumber: anchor.BN; // Unique id for the given market
+}
+
 export interface PositionMovementEvent {
   // Positive if movement from margin into spread, else negative.
   netBalanceTransfer: anchor.BN;
