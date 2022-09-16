@@ -5326,6 +5326,66 @@ export type Zeta = {
       ]
     },
     {
+      "name": "TradeEventV2",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "index",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isBid",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "sequenceNumber",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "PositionMovementEvent",
       "fields": [
         {
@@ -11389,6 +11449,66 @@ export const IDL: Zeta = {
         {
           "name": "orderId",
           "type": "u128",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "TradeEventV2",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "index",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isBid",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "sequenceNumber",
+          "type": "u64",
           "index": false
         }
       ]
