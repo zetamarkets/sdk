@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- risk: Change initial margin calcs to use Max(shorts, longs) for futures instead of shorts + longs. ([#158](https://github.com/zetamarkets/sdk/pull/158))
+
 ## [0.16.17]
 
 - constants: drop MAX_CANCELS_PER_TX down to 3 ([#156](https://github.com/zetamarkets/sdk/pull/156))
