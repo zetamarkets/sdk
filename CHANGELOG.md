@@ -6,6 +6,22 @@ Version changes are pinned to SDK releases.
 ## [Unreleased]
 
 - events: Add TradeEventV2. ([#153](https://github.com/zetamarkets/sdk/pull/153))
+## [0.16.17]
+
+- constants: drop MAX_CANCELS_PER_TX down to 3 ([#156](https://github.com/zetamarkets/sdk/pull/156))
+
+## [0.16.16]
+
+- client: cancelAllOrders() and cancelAllOrdersNoError() now bundle instructions of different assets into one transaction if possible. ([#155](https://github.com/zetamarkets/sdk/pull/155))
+
+### Breaking
+
+- client: cancelMultipleOrders() and cancelMultipleOrdersNoError() now require Asset in the CancelArgs[] function argument. ([#155](https://github.com/zetamarkets/sdk/pull/155))
+
+## [0.16.15]
+
+- risk: Expose initial margin no concession. ([#154](https://github.com/zetamarkets/sdk/pull/154))
+- subclient: Fix multiple signing on closeMultipleOpenOrders. ([#154](https://github.com/zetamarkets/sdk/pull/154))
 
 ## [0.16.14]
 
