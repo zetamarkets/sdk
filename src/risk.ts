@@ -333,6 +333,7 @@ export class RiskCalculator {
     return {
       balance,
       initialMargin,
+      initialMarginSkipConcession,
       maintenanceMargin,
       unrealizedPnl,
       availableBalanceInitial,

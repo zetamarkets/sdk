@@ -448,7 +448,7 @@ export class Client {
     fetch = true,
     force = false
   ) {
-    if (asset) {
+    if (asset != undefined) {
       await this.getSubClient(asset).updateState(fetch, force);
     } else {
       await Promise.all(
@@ -462,24 +462,26 @@ export class Client {
   public async cancelAllOrders(
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
-    if (asset) {
+    if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrders();
     } else {
-      let allTxIds = [];
-      await Promise.all(
-        this.getAllSubClients().map(async (subClient) => {
-          let txIds = await subClient.cancelAllOrders();
-          allTxIds = allTxIds.concat(txIds);
+      let ixs = [];
+      for (var subClient of this.getAllSubClients()) {
+        ixs = ixs.concat(subClient.cancelAllOrdersIxs());
+      }
+      let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+      return await Promise.all(
+        txs.map(async (tx) => {
+          return utils.processTransaction(this.provider, tx);
         })
       );
-      return allTxIds;
     }
   }
 
   public async cancelAllOrdersNoError(
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
-    if (asset) {
+    if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrdersNoError();
     } else {
       let allTxIds = [];
@@ -658,19 +660,64 @@ export class Client {
   }
 
   public async cancelMultipleOrders(
-    asset: Asset,
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
-    return await this.getSubClient(asset).cancelMultipleOrders(cancelArguments);
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let asset = cancelArguments[i].asset;
+      let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = instructions.cancelOrderIx(
+        asset,
+        marketIndex,
+        this.publicKey,
+        this.getSubClient(asset).marginAccountAddress,
+        this.getSubClient(asset).openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this.provider, tx));
+      })
+    );
+    return txIds;
   }
 
   public async cancelMultipleOrdersNoError(
     asset: Asset,
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
-    return await this.getSubClient(asset).cancelMultipleOrdersNoError(
-      cancelArguments
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let asset = cancelArguments[i].asset;
+      let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = instructions.cancelOrderNoErrorIx(
+        asset,
+        marketIndex,
+        this.publicKey,
+        this.getSubClient(asset).marginAccountAddress,
+        this.getSubClient(asset).openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this.provider, tx));
+      })
     );
+    return txIds;
   }
 
   public async forceCancelOrders(

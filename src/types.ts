@@ -164,6 +164,7 @@ export interface MarginRequirement {
 export interface MarginAccountState {
   balance: number;
   initialMargin: number;
+  initialMarginSkipConcession: number;
   maintenanceMargin: number;
   unrealizedPnl: number;
   availableBalanceInitial: number;
@@ -172,6 +173,7 @@ export interface MarginAccountState {
 }
 
 export interface CancelArgs {
+  asset: Asset;
   market: PublicKey;
   orderId: anchor.BN;
   cancelSide: Side;
