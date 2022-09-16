@@ -185,21 +185,27 @@ export class RiskCalculator {
         }
       }
 
-      let marginForMarket =
-        this.getMarginRequirement(
-          asset,
-          i,
-          // Positive for buys.
-          longLots,
-          types.MarginType.INITIAL
-        ) +
-        this.getMarginRequirement(
-          asset,
-          i,
-          // Negative for sells.
-          -shortLots,
-          types.MarginType.INITIAL
-        );
+      let marginForMarket: number = undefined;
+      let longLotsMarginReq = this.getMarginRequirement(
+        asset,
+        i,
+        // Positive for buys.
+        longLots,
+        types.MarginType.INITIAL
+      );
+      let shortLotsMarginReq = this.getMarginRequirement(
+        asset,
+        i,
+        // Negative for sells.
+        -shortLots,
+        types.MarginType.INITIAL
+      );
+      if ((i + 1) % 23 == 0) {
+        marginForMarket =
+          longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
+      } else {
+        marginForMarket = longLotsMarginReq + shortLotsMarginReq;
+      }
 
       if (marketMaker && !skipConcession) {
         // Mark initial margin to concession (only contains open order margin).
