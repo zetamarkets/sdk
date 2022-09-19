@@ -10,7 +10,13 @@ import {
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
-import { Greeks, ProductGreeks, State, ZetaGroup } from "./program-types";
+import {
+  Greeks,
+  PerpSyncQueue,
+  ProductGreeks,
+  State,
+  ZetaGroup,
+} from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
@@ -630,6 +636,10 @@ export class Exchange {
 
   public getGreeks(asset: Asset): Greeks {
     return this.getSubExchange(asset).greeks;
+  }
+
+  public getPerpSyncQueue(asset: Asset): PerpSyncQueue {
+    return this.getSubExchange(asset).perpSyncQueue;
   }
 
   public getOrderbook(asset: Asset, index: number): types.DepthOrderbook {

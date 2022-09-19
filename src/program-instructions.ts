@@ -269,12 +269,7 @@ export function placeOrderIx(
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData: Market;
-  if (marketIndex == constants.PERP_INDEX) {
-    marketData = subExchange.markets.perpMarket;
-  } else {
-    marketData = subExchange.markets.markets[marketIndex];
-  }
+  let marketData = subExchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -326,7 +321,6 @@ export function placeOrderIx(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
-        perpSyncQueue: subExchange.zetaGroup.perpSyncQueue,
       },
       remainingAccounts,
     }
@@ -347,12 +341,7 @@ export function placeOrderV2Ix(
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData: Market;
-  if (marketIndex == constants.PERP_INDEX) {
-    marketData = subExchange.markets.perpMarket;
-  } else {
-    marketData = subExchange.markets.markets[marketIndex];
-  }
+  let marketData = subExchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -363,7 +352,6 @@ export function placeOrderV2Ix(
           },
         ]
       : [];
-
   return Exchange.program.instruction.placeOrderV2(
     new anchor.BN(price),
     new anchor.BN(size),
@@ -405,7 +393,6 @@ export function placeOrderV2Ix(
             ? marketData.serumMarket.quoteMintAddress
             : marketData.serumMarket.baseMintAddress,
         mintAuthority: Exchange.mintAuthority,
-        perpSyncQueue: subExchange.zetaGroup.perpSyncQueue,
       },
       remainingAccounts,
     }
@@ -432,12 +419,7 @@ export function placeOrderV3Ix(
     );
   }
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData: Market;
-  if (marketIndex == constants.PERP_INDEX) {
-    marketData = subExchange.markets.perpMarket;
-  } else {
-    marketData = subExchange.markets.markets[marketIndex];
-  }
+  let marketData = subExchange.markets.markets[marketIndex];
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -448,8 +430,86 @@ export function placeOrderV3Ix(
           },
         ]
       : [];
-
   return Exchange.program.instruction.placeOrderV3(
+    new anchor.BN(price),
+    new anchor.BN(size),
+    types.toProgramSide(side),
+    types.toProgramOrderType(orderType),
+    clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
+    new String(tag),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: subExchange.zetaGroupAddress,
+        marginAccount: marginAccount,
+        authority: authority,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        tokenProgram: TOKEN_PROGRAM_ID,
+        serumAuthority: Exchange.serumAuthority,
+        greeks: subExchange.zetaGroup.greeks,
+        openOrders: openOrders,
+        rent: SYSVAR_RENT_PUBKEY,
+        marketAccounts: {
+          market: marketData.serumMarket.decoded.ownAddress,
+          requestQueue: marketData.serumMarket.decoded.requestQueue,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          coinVault: marketData.serumMarket.decoded.baseVault,
+          pcVault: marketData.serumMarket.decoded.quoteVault,
+          // User params.
+          orderPayerTokenAccount:
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
+          coinWallet: marketData.baseVault,
+          pcWallet: marketData.quoteVault,
+        },
+        oracle: subExchange.zetaGroup.oracle,
+        marketNode: subExchange.greeks.nodeKeys[marketIndex],
+        marketMint:
+          side == types.Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
+        mintAuthority: Exchange.mintAuthority,
+      },
+      remainingAccounts,
+    }
+  );
+}
+
+export function placePerpOrderIx(
+  asset: Asset,
+  marketIndex: number,
+  price: number,
+  size: number,
+  side: types.Side,
+  orderType: types.OrderType,
+  clientOrderId: number,
+  tag: String,
+  marginAccount: PublicKey,
+  authority: PublicKey,
+  openOrders: PublicKey,
+  whitelistTradingFeesAccount: PublicKey | undefined
+): TransactionInstruction {
+  if (tag.length > constants.MAX_ORDER_TAG_LENGTH) {
+    throw Error(
+      `Tag is too long! Max length = ${constants.MAX_ORDER_TAG_LENGTH}`
+    );
+  }
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.perpMarket;
+  let remainingAccounts =
+    whitelistTradingFeesAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistTradingFeesAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+  return Exchange.program.instruction.placePerpOrder(
     new anchor.BN(price),
     new anchor.BN(size),
     types.toProgramSide(side),

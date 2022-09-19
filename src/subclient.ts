@@ -823,6 +823,75 @@ export class SubClient {
   }
 
   /**
+   * Places an order on a zeta perp market.
+   * @param price           the native price of the order (6 d.p as integer)
+   * @param size            the quantity of the order (3 d.p)
+   * @param side            the side of the order. bid / ask
+   * @param orderType       the type of the order. limit / ioc / post-only
+   * @param clientOrderId   optional: subClient order id (non 0 value)
+   * @param tag             optional: the string tag corresponding to who is inserting
+   * NOTE: If duplicate subClient order ids are used, after a cancel order,
+   * to cancel the second order with the same subClient order id,
+   * you may need to crank the corresponding event queue to flush that order id
+   * from the user open orders account before cancelling the second order.
+   * (Depending on the order in which the order was cancelled).
+   */
+  public async placePerpOrder(
+    price: number,
+    size: number,
+    side: types.Side,
+    orderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let market = Exchange.getPerpMarket(this._asset).address;
+    let marketIndex = constants.PERP_INDEX;
+
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `[${assetToName(
+          this.asset
+        )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
+
+      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+        this.asset,
+        market,
+        this._parent.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
+    }
+
+    let orderIx = instructions.placePerpOrderIx(
+      this.asset,
+      marketIndex,
+      price,
+      size,
+      side,
+      orderType,
+      clientOrderId,
+      tag,
+      this.marginAccountAddress,
+      this._parent.publicKey,
+      openOrdersPda,
+      this._parent.whitelistTradingFeesAddress
+    );
+
+    tx.add(orderIx);
+
+    let txId: TransactionSignature;
+    txId = await utils.processTransaction(this._parent.provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+    return txId;
+  }
+
+  /**
    * Cancels a user order by orderId
    * @param market     the market address of the order to be cancelled.
    * @param orderId    the order id of the order.

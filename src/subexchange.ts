@@ -13,6 +13,7 @@ import {
   ZetaGroup,
   MarketIndexes,
   ProductGreeks,
+  PerpSyncQueue,
 } from "./program-types";
 import { ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
@@ -116,6 +117,20 @@ export class SubExchange {
   }
   private _greeksAddress: PublicKey;
 
+  /**
+   * Account storing the queue which synchronises taker/maker perp funding payments.
+   * You shouldn't need to read from this, it's mainly for our integration tests
+   */
+  public get perpSyncQueue(): PerpSyncQueue {
+    return this._perpSyncQueue;
+  }
+  private _perpSyncQueue: PerpSyncQueue;
+
+  public get perpSyncQueueAddress(): PublicKey {
+    return this._perpSyncQueueAddress;
+  }
+  private _perpSyncQueueAddress: PublicKey;
+
   public get marginParams(): types.MarginParams {
     return this._marginParams;
   }
@@ -151,6 +166,13 @@ export class SubExchange {
     );
 
     this._greeksAddress = greeks;
+
+    let [perpSyncQueue, _perpSyncQueueNonce] = await utils.getPerpSyncQueue(
+      Exchange.programId,
+      this.zetaGroupAddress
+    );
+
+    this._perpSyncQueueAddress = perpSyncQueue;
 
     const [vaultAddress, _vaultNonce] = await utils.getVault(
       Exchange.programId,
@@ -210,11 +232,15 @@ export class SubExchange {
     this._greeks = (await Exchange.program.account.greeks.fetch(
       this.greeksAddress
     )) as Greeks;
+    this._perpSyncQueue = (await Exchange.program.account.perpSyncQueue.fetch(
+      this.perpSyncQueueAddress
+    )) as PerpSyncQueue;
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
     // Set callbacks.
     this.subscribeZetaGroup(asset, callback);
     this.subscribeGreeks(asset, callback);
+    this.subscribePerpSyncQueue();
 
     this._isInitialized = true;
 
@@ -564,6 +590,25 @@ export class SubExchange {
     this._eventEmitters.push(eventEmitter);
   }
 
+  private subscribePerpSyncQueue() {
+    if (this._zetaGroup === null) {
+      throw Error("Cannot subscribe perpSyncQueue. ZetaGroup is null.");
+    }
+
+    let eventEmitter = Exchange.program.account.perpSyncQueue.subscribe(
+      this._zetaGroup.perpSyncQueue,
+      Exchange.provider.connection.commitment
+    );
+
+    // Purposely don't push out a callback here, users shouldn't care about
+    // updates to perpSyncQueue
+    eventEmitter.on("change", async (perpSyncQueue: PerpSyncQueue) => {
+      this._perpSyncQueue = perpSyncQueue;
+    });
+
+    this._eventEmitters.push(eventEmitter);
+  }
+
   public async handlePolling(
     callback?: (asset: Asset, eventType: EventType, data: any) => void
   ) {
@@ -884,6 +929,9 @@ export class SubExchange {
       this._zetaGroupAddress
     );
     await Exchange.program.account.greeks.unsubscribe(this._zetaGroup.greeks);
+    await Exchange.program.account.perpSyncQueue.unsubscribe(
+      this._zetaGroup.perpSyncQueue
+    );
     for (var i = 0; i < this._eventEmitters.length; i++) {
       this._eventEmitters[i].removeListener("change");
     }

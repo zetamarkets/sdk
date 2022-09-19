@@ -205,6 +205,13 @@ export interface Greeks {
   padding: Array<number>;
 }
 
+export interface PerpSyncQueue {
+  nonce: number;
+  head: number;
+  length: number;
+  queue: Array<anchor.BN>;
+}
+
 export interface MarketNode {
   index: number;
   nonce: number;

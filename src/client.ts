@@ -301,15 +301,27 @@ export class Client {
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).placeOrderV3(
-      this.marketIdentifierToPublicKey(asset, market),
-      price,
-      size,
-      side,
-      type,
-      clientOrderId,
-      tag
-    );
+    let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
+    if (marketPubkey == Exchange.getPerpMarket(asset).address) {
+      return await this.getSubClient(asset).placePerpOrder(
+        price,
+        size,
+        side,
+        type,
+        clientOrderId,
+        tag
+      );
+    } else {
+      return await this.getSubClient(asset).placeOrderV3(
+        marketPubkey,
+        price,
+        size,
+        side,
+        type,
+        clientOrderId,
+        tag
+      );
+    }
   }
 
   public async migrateFunds(
