@@ -12,7 +12,6 @@ Version changes are pinned to SDK releases.
 
 - constants: drop MAX_CANCELS_PER_TX down to 3 ([#156](https://github.com/zetamarkets/sdk/pull/156))
 
-
 ## [0.16.16]
 
 - client: cancelAllOrders() and cancelAllOrdersNoError() now bundle instructions of different assets into one transaction if possible. ([#155](https://github.com/zetamarkets/sdk/pull/155))

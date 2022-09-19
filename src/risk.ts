@@ -200,7 +200,7 @@ export class RiskCalculator {
         -shortLots,
         types.MarginType.INITIAL
       );
-      if ((i + 1) % 23 == 0) {
+      if ((i + 1) % constants.PRODUCTS_PER_EXPIRY == 0) {
         marginForMarket =
           longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
       } else {
