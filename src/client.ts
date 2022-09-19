@@ -375,7 +375,7 @@ export class Client {
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).placeOrderV3(
+    return await this.getSubClient(asset).placeOrderV4(
       this.marketIdentifierToPublicKey(asset, market),
       price,
       size,
@@ -598,7 +598,7 @@ export class Client {
     clientOrderId = 0,
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).cancelAndPlaceOrderV3(
+    return await this.getSubClient(asset).cancelAndPlaceOrderV4(
       this.marketIdentifierToPublicKey(asset, market),
       orderId,
       cancelSide,
@@ -622,7 +622,7 @@ export class Client {
     newOrderClientOrderId: number,
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderIdV3(
+    return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderIdV4(
       this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,
@@ -645,7 +645,7 @@ export class Client {
     newOrderClientOrderId: number,
     newOrderTag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).replaceByClientOrderIdV3(
+    return await this.getSubClient(asset).replaceByClientOrderIdV4(
       this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,

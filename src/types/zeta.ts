@@ -2268,11 +2268,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "authority",
           "isMut": false,
           "isSigner": true
@@ -2300,11 +2295,6 @@ export type Zeta = {
         {
           "name": "openOrders",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -2409,7 +2399,7 @@ export type Zeta = {
       ]
     },
     {
-      "name": "mintTokensToMarketVault",
+      "name": "mintTokensToMarketVaults",
       "accounts": [
         {
           "name": "state",
@@ -2417,17 +2407,22 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "orderPayerTokenAccount",
+          "name": "zetaBaseVault",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "marketMint",
+          "name": "baseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "quoteMint",
           "isMut": true,
           "isSigner": false
         },
@@ -8531,11 +8526,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "authority",
           "isMut": false,
           "isSigner": true
@@ -8563,11 +8553,6 @@ export const IDL: Zeta = {
         {
           "name": "openOrders",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -8672,7 +8657,7 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "mintTokensToMarketVault",
+      "name": "mintTokensToMarketVaults",
       "accounts": [
         {
           "name": "state",
@@ -8680,17 +8665,22 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "orderPayerTokenAccount",
+          "name": "zetaBaseVault",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "marketMint",
+          "name": "baseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "quoteMint",
           "isMut": true,
           "isSigner": false
         },

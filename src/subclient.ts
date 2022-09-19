@@ -664,7 +664,7 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx = instructions.placeOrderV3Ix(
+    let orderIx = instructions.placeOrderV4Ix(
       this.asset,
       marketIndex,
       price,
@@ -767,6 +767,76 @@ export class SubClient {
     }
 
     let orderIx = instructions.placeOrderV3Ix(
+      this.asset,
+      marketIndex,
+      price,
+      size,
+      side,
+      orderType,
+      clientOrderId,
+      tag,
+      this.marginAccountAddress,
+      this._parent.publicKey,
+      openOrdersPda,
+      this._parent.whitelistTradingFeesAddress
+    );
+
+    tx.add(orderIx);
+
+    let txId: TransactionSignature;
+    txId = await utils.processTransaction(this._parent.provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+    return txId;
+  }
+
+  /**
+   * Places an order on a zeta market.
+   * @param market          the address of the serum market
+   * @param price           the native price of the order (6 d.p as integer)
+   * @param size            the quantity of the order (3 d.p)
+   * @param side            the side of the order. bid / ask
+   * @param orderType       the type of the order. limit / ioc / post-only
+   * @param clientOrderId   optional: subClient order id (non 0 value)
+   * @param tag             optional: the string tag corresponding to who is inserting
+   * NOTE: If duplicate subClient order ids are used, after a cancel order,
+   * to cancel the second order with the same subClient order id,
+   * you may need to crank the corresponding event queue to flush that order id
+   * from the user open orders account before cancelling the second order.
+   * (Depending on the order in which the order was cancelled).
+   */
+  public async placeOrderV4(
+    market: PublicKey,
+    price: number,
+    size: number,
+    side: types.Side,
+    orderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = this._subExchange.markets.getMarketIndex(market);
+
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `[${assetToName(
+          this.asset
+        )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
+
+      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+        this.asset,
+        market,
+        this._parent.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
+    }
+
+    let orderIx = instructions.placeOrderV4Ix(
       this.asset,
       marketIndex,
       price,
@@ -998,6 +1068,61 @@ export class SubClient {
   }
 
   /**
+   * Cancels a user order by orderId and atomically places an order
+   * @param market     the market address of the order to be cancelled.
+   * @param orderId    the order id of the order.
+   * @param cancelSide       the side of the order. bid / ask.
+   * @param newOrderPrice  the native price of the order (6 d.p) as integer
+   * @param newOrderSize   the quantity of the order (3 d.p) as integer
+   * @param newOrderSide   the side of the order. bid / ask
+   * @param newOrderType   the type of the order, limit / ioc / post-only
+   * @param clientOrderId   optional: subClient order id (non 0 value)
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   */
+  public async cancelAndPlaceOrderV4(
+    market: PublicKey,
+    orderId: anchor.BN,
+    cancelSide: types.Side,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: types.Side,
+    newOrderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = this._subExchange.markets.getMarketIndex(market);
+    tx.add(
+      instructions.cancelOrderIx(
+        this.asset,
+        marketIndex,
+        this._parent.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        orderId,
+        cancelSide
+      )
+    );
+    tx.add(
+      instructions.placeOrderV4Ix(
+        this.asset,
+        marketIndex,
+        newOrderPrice,
+        newOrderSize,
+        newOrderSide,
+        newOrderType,
+        clientOrderId,
+        newOrderTag,
+        this.marginAccountAddress,
+        this._parent.publicKey,
+        this._openOrdersAccounts[marketIndex],
+        this._parent.whitelistTradingFeesAddress
+      )
+    );
+    return await utils.processTransaction(this._parent.provider, tx);
+  }
+
+  /**
    * Cancels a user order by subClient order id and atomically places an order by new subClient order id.
    * @param market                  the market address of the order to be cancelled and new order.
    * @param cancelClientOrderId     the subClient order id of the order to be cancelled.
@@ -1145,6 +1270,58 @@ export class SubClient {
   }
 
   /**
+   * Cancels a user order by subClient order id and atomically places an order by new subClient order id.
+   * @param market                  the market address of the order to be cancelled and new order.
+   * @param cancelClientOrderId     the subClient order id of the order to be cancelled.
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
+   * @param newOrderSize            the quantity of the order (3 d.p) as integer
+   * @param newOrderSide            the side of the order. bid / ask
+   * @param newOrderType            the type of the order, limit / ioc / post-only
+   * @param newOrderClientOrderId   the subClient order id for the new order
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   */
+  public async cancelAndPlaceOrderByClientOrderIdV4(
+    market: PublicKey,
+    cancelClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: types.Side,
+    newOrderType: types.OrderType,
+    newOrderClientOrderId: number,
+    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = this._subExchange.markets.getMarketIndex(market);
+    tx.add(
+      instructions.cancelOrderByClientOrderIdIx(
+        this.asset,
+        marketIndex,
+        this._parent.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        new anchor.BN(cancelClientOrderId)
+      )
+    );
+    tx.add(
+      instructions.placeOrderV4Ix(
+        this.asset,
+        marketIndex,
+        newOrderPrice,
+        newOrderSize,
+        newOrderSide,
+        newOrderType,
+        newOrderClientOrderId,
+        newOrderTag,
+        this.marginAccountAddress,
+        this._parent.publicKey,
+        this._openOrdersAccounts[marketIndex],
+        this._parent.whitelistTradingFeesAddress
+      )
+    );
+    return await utils.processTransaction(this._parent.provider, tx);
+  }
+
+  /**
    * Cancels a user order by client order id and atomically places an order by new client order id.
    * Uses the 'NoError' cancel instruction, so a failed cancellation won't prohibit the placeOrder
    * @param market                  the market address of the order to be cancelled and new order.
@@ -1180,6 +1357,59 @@ export class SubClient {
     );
     tx.add(
       instructions.placeOrderV3Ix(
+        this.asset,
+        marketIndex,
+        newOrderPrice,
+        newOrderSize,
+        newOrderSide,
+        newOrderType,
+        newOrderClientOrderId,
+        newOrderTag,
+        this.marginAccountAddress,
+        this._parent.publicKey,
+        this._openOrdersAccounts[marketIndex],
+        this._parent.whitelistTradingFeesAddress
+      )
+    );
+    return await utils.processTransaction(this._parent.provider, tx);
+  }
+
+  /**
+   * Cancels a user order by client order id and atomically places an order by new client order id.
+   * Uses the 'NoError' cancel instruction, so a failed cancellation won't prohibit the placeOrder
+   * @param market                  the market address of the order to be cancelled and new order.
+   * @param cancelClientOrderId     the client order id of the order to be cancelled.
+   * @param newOrderPrice           the native price of the order (6 d.p) as integer
+   * @param newOrderSize            the quantity of the order (3 d.p) as integer
+   * @param newOrderSide            the side of the order. bid / ask
+   * @param newOrderType            the type of the order, limit / ioc / post-only
+   * @param newOrderClientOrderId   the client order id for the new order
+   * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
+   */
+  public async replaceByClientOrderIdV4(
+    market: PublicKey,
+    cancelClientOrderId: number,
+    newOrderPrice: number,
+    newOrderSize: number,
+    newOrderSide: types.Side,
+    newOrderType: types.OrderType,
+    newOrderClientOrderId: number,
+    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let marketIndex = this._subExchange.markets.getMarketIndex(market);
+    tx.add(
+      instructions.cancelOrderByClientOrderIdNoErrorIx(
+        this.asset,
+        marketIndex,
+        this._parent.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
+        new anchor.BN(cancelClientOrderId)
+      )
+    );
+    tx.add(
+      instructions.placeOrderV4Ix(
         this.asset,
         marketIndex,
         newOrderPrice,

@@ -719,6 +719,10 @@ export class Exchange {
     await this.getSubExchange(asset).retreatMarketNodes(expiryIndex);
   }
 
+  public async mintTokensToMarketVaults(asset: Asset, marketIndex: number) {
+    await this.getSubExchange(asset).mintTokensToMarketVaults(marketIndex);
+  }
+
   public async updateSubExchangeState(asset: Asset) {
     await this.getSubExchange(asset).updateSubExchangeState();
   }

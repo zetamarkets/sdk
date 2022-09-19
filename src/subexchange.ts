@@ -515,6 +515,16 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
+  /**
+   * Retreat volatility surface and interest rates for an expiry index.
+   */
+  public async mintTokensToMarketVaults(marketIndex: number) {
+    let tx = new Transaction().add(
+      instructions.mintTokensToMarketVaults(this.asset, marketIndex)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
   public assertInitialized() {
     if (!this.isInitialized) {
       throw "SubExchange uninitialized";
