@@ -6122,6 +6122,11 @@ export type Zeta = {
       "code": 6117,
       "name": "ReferrerAccountSeedsMismatch",
       "msg": "Referrer account seeds mismatch"
+    },
+    {
+      "code": 6118,
+      "name": "ProtectedMmMarginAccount",
+      "msg": "Market maker accounts are protected from liquidation"
     }
   ]
 };
@@ -12250,6 +12255,11 @@ export const IDL: Zeta = {
       "code": 6117,
       "name": "ReferrerAccountSeedsMismatch",
       "msg": "Referrer account seeds mismatch"
+    },
+    {
+      "code": 6118,
+      "name": "ProtectedMmMarginAccount",
+      "msg": "Market maker accounts are protected from liquidation"
     }
   ]
 };
