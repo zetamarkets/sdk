@@ -516,7 +516,7 @@ export class SubExchange {
   }
 
   /**
-   * Retreat volatility surface and interest rates for an expiry index.
+   * Mint tokens to base and quote vault for a particular market index.
    */
   public async mintTokensToMarketVaults(marketIndex: number) {
     let tx = new Transaction().add(
