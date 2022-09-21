@@ -5579,6 +5579,20 @@
           }
         ]
       }
+    },
+    {
+      "name": "PlaceOrderType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PlaceOrder"
+          },
+          {
+            "name": "PlacePerpOrder"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -6352,6 +6366,11 @@
     },
     {
       "code": 6116,
+      "name": "NonPerpProductIndexGivenInPlacePerpOrder",
+      "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
+    },
+    {
+      "code": 6117,
       "name": "PerpProductIndexGivenInPlaceOrder",
       "msg": "Perp product index given in placeOrder, use placePerpOrder"
     }

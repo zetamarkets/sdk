@@ -5579,6 +5579,20 @@ export type Zeta = {
           }
         ]
       }
+    },
+    {
+      "name": "PlaceOrderType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PlaceOrder"
+          },
+          {
+            "name": "PlacePerpOrder"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -6352,6 +6366,11 @@ export type Zeta = {
     },
     {
       "code": 6116,
+      "name": "NonPerpProductIndexGivenInPlacePerpOrder",
+      "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
+    },
+    {
+      "code": 6117,
       "name": "PerpProductIndexGivenInPlaceOrder",
       "msg": "Perp product index given in placeOrder, use placePerpOrder"
     }
@@ -11939,6 +11958,20 @@ export const IDL: Zeta = {
           }
         ]
       }
+    },
+    {
+      "name": "PlaceOrderType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PlaceOrder"
+          },
+          {
+            "name": "PlacePerpOrder"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -12712,6 +12745,11 @@ export const IDL: Zeta = {
     },
     {
       "code": 6116,
+      "name": "NonPerpProductIndexGivenInPlacePerpOrder",
+      "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
+    },
+    {
+      "code": 6117,
       "name": "PerpProductIndexGivenInPlaceOrder",
       "msg": "Perp product index given in placeOrder, use placePerpOrder"
     }
