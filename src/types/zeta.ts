@@ -2253,11 +2253,6 @@ export type Zeta = {
       "name": "placeOrderV4",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "zetaGroup",
           "isMut": false,
           "isSigner": false
@@ -2395,6 +2390,195 @@ export type Zeta = {
           "type": {
             "option": "string"
           }
+        }
+      ]
+    },
+    {
+      "name": "doublePlaceOrder",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders1",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketNode0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketNode1",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAccounts0",
+          "accounts": [
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "requestQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "orderPayerTokenAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinWallet",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcWallet",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        },
+        {
+          "name": "marketAccounts1",
+          "accounts": [
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "requestQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "orderPayerTokenAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinWallet",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcWallet",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "arg0",
+          "type": "u64"
+        },
+        {
+          "name": "arg1",
+          "type": "u64"
+        },
+        {
+          "name": "arg2",
+          "type": "u64"
         }
       ]
     },
@@ -8593,11 +8777,6 @@ export const IDL: Zeta = {
       "name": "placeOrderV4",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "zetaGroup",
           "isMut": false,
           "isSigner": false
@@ -8735,6 +8914,195 @@ export const IDL: Zeta = {
           "type": {
             "option": "string"
           }
+        }
+      ]
+    },
+    {
+      "name": "doublePlaceOrder",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders1",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketNode0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketNode1",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAccounts0",
+          "accounts": [
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "requestQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "orderPayerTokenAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinWallet",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcWallet",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        },
+        {
+          "name": "marketAccounts1",
+          "accounts": [
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "requestQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "orderPayerTokenAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinWallet",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcWallet",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "arg0",
+          "type": "u64"
+        },
+        {
+          "name": "arg1",
+          "type": "u64"
+        },
+        {
+          "name": "arg2",
+          "type": "u64"
         }
       ]
     },

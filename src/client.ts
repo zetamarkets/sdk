@@ -375,15 +375,16 @@ export class Client {
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).placeOrderV4(
+    return (await this.getSubClient(asset).placeOrderV4(
       this.marketIdentifierToPublicKey(asset, market),
       price,
       size,
       side,
+      false,
       type,
       clientOrderId,
       tag
-    );
+    )) as TransactionSignature;
   }
 
   public async migrateFunds(
@@ -770,10 +771,11 @@ export class Client {
     movementType: types.MovementType,
     movements: instructions.PositionMovementArg[]
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).positionMovement(
+    return (await this.getSubClient(asset).positionMovement(
       movementType,
-      movements
-    );
+      movements,
+      false
+    )) as TransactionSignature;
   }
 
   public async simulatePositionMovement(

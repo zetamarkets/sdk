@@ -809,10 +809,11 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
+    returnTx: boolean = false,
     orderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
-  ): Promise<TransactionSignature> {
+  ): Promise<TransactionSignature | Transaction> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
 
@@ -850,8 +851,11 @@ export class SubClient {
       openOrdersPda,
       this._parent.whitelistTradingFeesAddress
     );
-
     tx.add(orderIx);
+
+    if (returnTx) {
+      return tx;
+    }
 
     let txId: TransactionSignature;
     txId = await utils.processTransaction(this._parent.provider, tx);
@@ -1701,9 +1705,13 @@ export class SubClient {
    */
   public async positionMovement(
     movementType: types.MovementType,
-    movements: instructions.PositionMovementArg[]
-  ): Promise<TransactionSignature> {
+    movements: instructions.PositionMovementArg[],
+    returnTx: boolean
+  ): Promise<TransactionSignature | Transaction> {
     let tx = this.getPositionMovementTx(movementType, movements);
+    if (returnTx) {
+      return tx;
+    }
     return await utils.processTransaction(this._parent.provider, tx);
   }
 
