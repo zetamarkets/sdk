@@ -2394,30 +2394,10 @@
       ]
     },
     {
-      "name": "doublePlaceOrder",
+      "name": "placeAndLockCombinedOrder",
       "accounts": [
         {
           "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2444,16 +2424,6 @@
         {
           "name": "openOrders1",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode0",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode1",
-          "isMut": false,
           "isSigner": false
         },
         {

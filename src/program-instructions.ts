@@ -552,11 +552,12 @@ export function placeOrderV4Ix(
   );
 }
 
-export function doublePlaceOrderIx(
+export function placeAndLockCombinedOrderIx(
   asset: Asset,
   marketIndex0: number,
   marketIndex1: number,
   marginAccount: PublicKey,
+  spreadAccount: PublicKey,
   authority: PublicKey,
   openOrders0: PublicKey,
   openOrders1: PublicKey
@@ -567,20 +568,19 @@ export function doublePlaceOrderIx(
 
   let x = new anchor.BN(1_000_000);
 
-  return Exchange.program.instruction.doublePlaceOrder(x, x, x, {
+  return Exchange.program.instruction.placeAndLockCombinedOrder(x, x, x, {
     accounts: {
       zetaGroup: subExchange.zetaGroupAddress,
-      marginAccount: marginAccount,
-      authority: authority,
-      dexProgram: constants.DEX_PID[Exchange.network],
-      tokenProgram: TOKEN_PROGRAM_ID,
+      // marginAccount: marginAccount,
+      // spreadAccount: spreadAccount,
+      // authority: authority,
+      // dexProgram: constants.DEX_PID[Exchange.network],
+      // tokenProgram: TOKEN_PROGRAM_ID,
       serumAuthority: Exchange.serumAuthority,
       greeks: subExchange.zetaGroup.greeks,
       oracle: subExchange.zetaGroup.oracle,
       openOrders0: openOrders0,
       openOrders1: openOrders1,
-      marketNode0: subExchange.greeks.nodeKeys[marketIndex0],
-      marketNode1: subExchange.greeks.nodeKeys[marketIndex1],
       marketAccounts0: {
         market: marketData0.serumMarket.decoded.ownAddress,
         requestQueue: marketData0.serumMarket.decoded.requestQueue,

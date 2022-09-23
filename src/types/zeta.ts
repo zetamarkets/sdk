@@ -2394,30 +2394,10 @@ export type Zeta = {
       ]
     },
     {
-      "name": "doublePlaceOrder",
+      "name": "placeAndLockCombinedOrder",
       "accounts": [
         {
           "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2444,16 +2424,6 @@ export type Zeta = {
         {
           "name": "openOrders1",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode0",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode1",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -8918,30 +8888,10 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "doublePlaceOrder",
+      "name": "placeAndLockCombinedOrder",
       "accounts": [
         {
           "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -8968,16 +8918,6 @@ export const IDL: Zeta = {
         {
           "name": "openOrders1",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode0",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode1",
-          "isMut": false,
           "isSigner": false
         },
         {
