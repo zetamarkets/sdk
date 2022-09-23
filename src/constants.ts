@@ -15,7 +15,7 @@ export const DEX_PID = {
 };
 
 export const MAX_SETTLE_AND_CLOSE_PER_TX = 4;
-export const MAX_CANCELS_PER_TX = 4;
+export const MAX_CANCELS_PER_TX = 3;
 export const MAX_GREEK_UPDATES_PER_TX = 20;
 export const MAX_SETTLEMENT_ACCOUNTS = 20;
 export const MAX_FUNDING_ACCOUNTS = 20;
@@ -23,6 +23,7 @@ export const MAX_REBALANCE_ACCOUNTS = 18;
 export const MAX_SETTLE_ACCOUNTS = 5;
 export const MAX_ZETA_GROUPS = 20;
 export const MAX_MARGIN_AND_SPREAD_ACCOUNTS = 20;
+export const MAX_SET_REFERRALS_REWARDS_ACCOUNTS = 12;
 export const MARKET_INDEX_LIMIT = 18;
 // 3 accounts per set * 9 = 27 + 2 = 29 accounts.
 export const CLEAN_MARKET_LIMIT = 9;
@@ -75,7 +76,7 @@ export const CLUSTER_URLS = {
 // These are fixed and shouldn't change in the future.
 export const NUM_STRIKES = 11;
 export const PRODUCTS_PER_EXPIRY = NUM_STRIKES * 2 + 1; // +1 for the future.
-export const EXPIRY_FUTURE_INDEX = PRODUCTS_PER_EXPIRY - 1;
+export const SERIES_FUTURE_INDEX = PRODUCTS_PER_EXPIRY - 1;
 export const ACTIVE_EXPIRIES = 2;
 export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 for perp
 export const TOTAL_EXPIRIES = 5;
@@ -102,3 +103,8 @@ export const DEFAULT_ORDER_TAG = "SDK";
 
 export const MAX_POSITION_MOVEMENTS = 10;
 export const BPS_DENOMINATOR = 10_000;
+
+export const BID_ORDERS_INDEX = 0;
+export const ASK_ORDERS_INDEX = 1;
+
+export const MAX_TOTAL_SPREAD_ACCOUNT_CONTRACTS = 100_000_000;

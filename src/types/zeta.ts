@@ -4316,14 +4316,8 @@ export type Zeta = {
                 {
                   "defined": "Position"
                 },
-                91
+                92
               ]
-            }
-          },
-          {
-            "name": "perpPosition",
-            "type": {
-              "defined": "Position"
             }
           },
           {
@@ -4333,15 +4327,11 @@ export type Zeta = {
             }
           },
           {
-            "name": "lastFundingDelta",
-            "type": "i128"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                246
+                254
               ]
             }
           }
@@ -11068,14 +11058,8 @@ export const IDL: Zeta = {
                 {
                   "defined": "Position"
                 },
-                91
+                92
               ]
-            }
-          },
-          {
-            "name": "perpPosition",
-            "type": {
-              "defined": "Position"
             }
           },
           {
@@ -11085,15 +11069,11 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "lastFundingDelta",
-            "type": "i128"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                246
+                254
               ]
             }
           }

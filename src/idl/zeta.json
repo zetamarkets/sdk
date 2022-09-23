@@ -4316,14 +4316,8 @@
                 {
                   "defined": "Position"
                 },
-                91
+                92
               ]
-            }
-          },
-          {
-            "name": "perpPosition",
-            "type": {
-              "defined": "Position"
             }
           },
           {
@@ -4333,15 +4327,11 @@
             }
           },
           {
-            "name": "lastFundingDelta",
-            "type": "i128"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                246
+                254
               ]
             }
           }

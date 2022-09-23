@@ -167,6 +167,14 @@ export class Exchange {
   private _treasuryWalletAddress: PublicKey;
 
   /**
+   * Public key for referral rewards wallet.
+   */
+  public get referralsRewardsWalletAddress(): PublicKey {
+    return this._referralsRewardsWalletAddress;
+  }
+  private _referralsRewardsWalletAddress: PublicKey;
+
+  /**
    * Stores the latest timestamp received by websocket subscription
    * to the system clock account.
    */
@@ -257,7 +265,10 @@ export class Exchange {
     this._isSetup = true;
   }
 
-  public async initializeZetaState(params: instructions.StateParams) {
+  public async initializeZetaState(
+    params: instructions.StateParams,
+    referralAdmin: PublicKey
+  ) {
     const [mintAuthority, mintAuthorityNonce] = await utils.getMintAuthority(
       this.programId
     );
@@ -268,8 +279,14 @@ export class Exchange {
 
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[this.network];
 
-    const [treasuryWallet, _treasuryWalletnonce] =
+    const [treasuryWallet, _treasuryWalletNonce] =
       await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
+
+    const [referralRewardsWallet, _referralRewardsWalletNonce] =
+      await utils.getZetaReferralsRewardsWallet(
+        this.programId,
+        this._usdcMintAddress
+      );
 
     let tx = new Transaction().add(
       instructions.initializeZetaStateIx(
@@ -277,6 +294,8 @@ export class Exchange {
         stateNonce,
         serumAuthority,
         treasuryWallet,
+        referralAdmin,
+        referralRewardsWallet,
         serumNonce,
         mintAuthority,
         mintAuthorityNonce,
@@ -293,6 +312,7 @@ export class Exchange {
     this._stateAddress = state;
     this._serumAuthority = serumAuthority;
     this._treasuryWalletAddress = treasuryWallet;
+    this._referralsRewardsWalletAddress = referralRewardsWallet;
     await this.updateState();
   }
 
@@ -300,7 +320,8 @@ export class Exchange {
     asset: Asset,
     oracle: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
-    marginArgs: instructions.UpdateMarginParametersArgs
+    marginArgs: instructions.UpdateMarginParametersArgs,
+    expiryArgs: instructions.UpdateZetaGroupExpiryArgs
   ) {
     let tx = new Transaction().add(
       await instructions.initializeZetaGroupIx(
@@ -308,7 +329,8 @@ export class Exchange {
         constants.MINTS[asset],
         oracle,
         pricingArgs,
-        marginArgs
+        marginArgs,
+        expiryArgs
       )
     );
     try {
@@ -370,6 +392,13 @@ export class Exchange {
     const [treasuryWallet, _treasuryWalletnonce] =
       await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
     this._treasuryWalletAddress = treasuryWallet;
+
+    const [referralsRewardsWallet, _referralsRewardsWalletNonce] =
+      await utils.getZetaReferralsRewardsWallet(
+        this.programId,
+        this._usdcMintAddress
+      );
+    this._referralsRewardsWalletAddress = referralsRewardsWallet;
 
     this._lastPollTimestamp = 0;
 
@@ -457,7 +486,8 @@ export class Exchange {
         try {
           if (
             this._clockTimestamp >
-            this._lastPollTimestamp + this._pollInterval
+              this._lastPollTimestamp + this._pollInterval &&
+            this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
@@ -680,6 +710,13 @@ export class Exchange {
     await this.getSubExchange(asset).updateMarginParameters(args);
   }
 
+  public async updateZetaGroupExpiryParameters(
+    asset: Asset,
+    args: instructions.UpdateZetaGroupExpiryArgs
+  ) {
+    await this.getSubExchange(asset).updateZetaGroupExpiryParameters(args);
+  }
+
   public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
@@ -817,6 +854,9 @@ export class Exchange {
   }
 
   public async close() {
+    this._isInitialized = false;
+    this._isSetup = false;
+
     await Promise.all(
       this.getAllSubExchanges().map(async (subExchange) => {
         await subExchange.close();
@@ -837,16 +877,6 @@ export class Exchange {
       );
     }
     this._programSubscriptionIds = [];
-  }
-
-  public async initializeReferrerAccount(referrer: PublicKey) {
-    let tx = new Transaction().add(
-      await instructions.initializeReferrerAccountIx(
-        referrer,
-        this._provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(this._provider, tx);
   }
 }
 

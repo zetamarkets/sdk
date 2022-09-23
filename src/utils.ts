@@ -33,9 +33,9 @@ import {
   MarginAccount,
   ReferrerAlias,
   TradeEvent,
+  TradeEventV2,
   OpenOrdersMap,
 } from "./program-types";
-import { Network } from "./network";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
 import { Decimal } from "./decimal";
@@ -202,6 +202,21 @@ export async function getZetaTreasuryWallet(
   return await anchor.web3.PublicKey.findProgramAddress(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-treasury-wallet")),
+      mint.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export async function getZetaReferralsRewardsWallet(
+  programId: PublicKey,
+  mint: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(
+        anchor.utils.bytes.utf8.encode("zeta-referrals-rewards-wallet")
+      ),
       mint.toBuffer(),
     ],
     programId
@@ -502,7 +517,7 @@ export function convertDecimalToNativeInteger(amount: number): number {
  * does not divide perfectly by tick size (0.0001) if your order traded
  * against orders at different prices.
  */
-export function getTradeEventPrice(event: TradeEvent): number {
+export function getTradeEventPrice(event: TradeEvent | TradeEventV2): number {
   let decimalCostOfTrades = convertNativeBNToDecimal(event.costOfTrades);
   let decimalSize = convertNativeLotSizeToDecimal(event.size.toNumber());
   return decimalCostOfTrades / decimalSize;
@@ -980,7 +995,7 @@ export function getNextStrikeInitialisationTs(asset: Asset) {
   return (
     backExpiryTs -
     Exchange.state.strikeInitializationThresholdSeconds -
-    Exchange.state.newExpiryThresholdSeconds
+    subExchange.zetaGroup.newExpiryThresholdSeconds
   );
 }
 
@@ -1333,6 +1348,9 @@ export async function getAllOpenOrdersAccountsByMarket(
   await Promise.all(
     marginAccounts.map(async (acc) => {
       let marginAccount = acc.account as MarginAccount;
+      if (assets.fromProgramAsset(marginAccount.asset) != asset) {
+        return;
+      }
       for (var i = 0; i < subExchange.markets.markets.length; i++) {
         let nonce = marginAccount.openOrdersNonce[i];
         if (nonce == 0) {

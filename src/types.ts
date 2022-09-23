@@ -166,13 +166,16 @@ export interface MarginRequirement {
 export interface MarginAccountState {
   balance: number;
   initialMargin: number;
+  initialMarginSkipConcession: number;
   maintenanceMargin: number;
   unrealizedPnl: number;
   availableBalanceInitial: number;
   availableBalanceMaintenance: number;
+  availableBalanceWithdrawable: number;
 }
 
 export interface CancelArgs {
+  asset: Asset;
   market: PublicKey;
   orderId: anchor.BN;
   cancelSide: Side;
@@ -214,17 +217,29 @@ export function toProgramMovementType(movementType: MovementType) {
 }
 
 export enum TreasuryMovementType {
-  TO_TREASURY = 1,
-  TO_INSURANCE = 2,
+  TO_TREASURY_FROM_INSURANCE = 1,
+  TO_INSURANCE_FROM_TREASURY = 2,
+  TO_TREASURY_FROM_REFERRALS_REWARDS = 3,
+  TO_REFERRALS_REWARDS_FROM_TREASURY = 4,
 }
 
 export function toProgramTreasuryMovementType(
   treasuryMovementType: TreasuryMovementType
 ) {
-  if (treasuryMovementType == TreasuryMovementType.TO_TREASURY)
-    return { toTreasury: {} };
-  if (treasuryMovementType == TreasuryMovementType.TO_INSURANCE)
-    return { toInsurance: {} };
+  if (treasuryMovementType == TreasuryMovementType.TO_TREASURY_FROM_INSURANCE)
+    return { toTreasuryFromInsurance: {} };
+  if (treasuryMovementType == TreasuryMovementType.TO_INSURANCE_FROM_TREASURY)
+    return { toInsuranceFromTreasury: {} };
+  if (
+    treasuryMovementType ==
+    TreasuryMovementType.TO_TREASURY_FROM_REFERRALS_REWARDS
+  )
+    return { toTreasuryFromReferralsRewards: {} };
+  if (
+    treasuryMovementType ==
+    TreasuryMovementType.TO_REFERRALS_REWARDS_FROM_TREASURY
+  )
+    return { toReferralsRewardsFromTreasury: {} };
   throw Error("Invalid treasury movement type");
 }
 

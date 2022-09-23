@@ -7,6 +7,9 @@ import {
   PositionMovementEvent,
   ReferralAccount,
   ReferrerAccount,
+  TradeEvent,
+  TradeEventV2,
+  OrderCompleteEvent,
 } from "./program-types";
 import {
   PublicKey,
@@ -93,6 +96,26 @@ export class Client {
   private _whitelistTradingFeesAddress: PublicKey | undefined;
 
   /**
+   * The listener for trade events.
+   */
+  private _tradeEventListener: any;
+
+  /**
+   * The listener for trade v2 events.
+   */
+  private _tradeEventV2Listener: any;
+
+  /**
+   * The listener for OrderComplete events.
+   */
+  private _orderCompleteEventListener: any;
+
+  /**
+   * A map for quick access when getting a callback
+   */
+  private _marginAccountToAsset: Map<String, Asset>;
+
+  /**
    * Timer id from SetInterval.
    */
   private _pollIntervalId: any;
@@ -108,6 +131,7 @@ export class Client {
   ) {
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._subClients = new Map();
+    this._marginAccountToAsset = new Map();
     this._referralAccount = null;
     this._referrerAccount = null;
     this._referrerAlias = null;
@@ -167,12 +191,63 @@ export class Client {
           throttle
         );
         client.addSubClient(asset, subClient);
+        client._marginAccountToAsset.set(
+          subClient.marginAccountAddress.toString(),
+          asset
+        );
       })
     );
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
     client._referralAccountAddress = undefined;
     client._referrerAlias = undefined;
+
+    if (callback !== undefined) {
+      client._tradeEventListener = Exchange.program.addEventListener(
+        "TradeEvent",
+        (event: TradeEvent, _slot) => {
+          if (
+            client._marginAccountToAsset.has(event.marginAccount.toString())
+          ) {
+            callback(
+              client._marginAccountToAsset.get(event.marginAccount.toString()),
+              EventType.TRADE,
+              event
+            );
+          }
+        }
+      );
+
+      client._tradeEventV2Listener = Exchange.program.addEventListener(
+        "TradeEventV2",
+        (event: TradeEventV2, _slot) => {
+          if (
+            client._marginAccountToAsset.has(event.marginAccount.toString())
+          ) {
+            callback(
+              client._marginAccountToAsset.get(event.marginAccount.toString()),
+              EventType.TRADEV2,
+              event
+            );
+          }
+        }
+      );
+
+      client._orderCompleteEventListener = Exchange.program.addEventListener(
+        "OrderCompleteEvent",
+        (event: OrderCompleteEvent, _slot) => {
+          if (
+            client._marginAccountToAsset.has(event.marginAccount.toString())
+          ) {
+            callback(
+              client._marginAccountToAsset.get(event.marginAccount.toString()),
+              EventType.ORDERCOMPLETE,
+              event
+            );
+          }
+        }
+      );
+    }
 
     return client;
   }
@@ -243,6 +318,11 @@ export class Client {
       await referUserIx(this.provider.wallet.publicKey, referrer)
     );
     let txId = await utils.processTransaction(this.provider, tx);
+
+    [this._referralAccountAddress] = await utils.getReferralAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
 
     this._referralAccount =
       (await Exchange.program.account.referralAccount.fetch(
@@ -407,7 +487,7 @@ export class Client {
     fetch = true,
     force = false
   ) {
-    if (asset) {
+    if (asset != undefined) {
       await this.getSubClient(asset).updateState(fetch, force);
     } else {
       await Promise.all(
@@ -421,24 +501,26 @@ export class Client {
   public async cancelAllOrders(
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
-    if (asset) {
+    if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrders();
     } else {
-      let allTxIds = [];
-      await Promise.all(
-        this.getAllSubClients().map(async (subClient) => {
-          let txIds = await subClient.cancelAllOrders();
-          allTxIds = allTxIds.concat(txIds);
+      let ixs = [];
+      for (var subClient of this.getAllSubClients()) {
+        ixs = ixs.concat(subClient.cancelAllOrdersIxs());
+      }
+      let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+      return await Promise.all(
+        txs.map(async (tx) => {
+          return utils.processTransaction(this.provider, tx);
         })
       );
-      return allTxIds;
     }
   }
 
   public async cancelAllOrdersNoError(
     asset: Asset = undefined
   ): Promise<TransactionSignature[]> {
-    if (asset) {
+    if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrdersNoError();
     } else {
       let allTxIds = [];
@@ -494,6 +576,25 @@ export class Client {
       side,
       tag
     );
+  }
+
+  public async cancelAllMarketOrders(
+    asset: Asset,
+    market: types.MarketIdentifier
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+      this.marketIdentifierToPublicKey(asset, market)
+    );
+    let ix = instructions.cancelAllMarketOrdersIx(
+      asset,
+      index,
+      this.publicKey,
+      this.getSubClient(asset).marginAccountAddress,
+      this.getSubClient(asset).openOrdersAccounts[index]
+    );
+    tx.add(ix);
+    return await utils.processTransaction(this.provider, tx);
   }
 
   public async cancelOrder(
@@ -617,19 +718,64 @@ export class Client {
   }
 
   public async cancelMultipleOrders(
-    asset: Asset,
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
-    return await this.getSubClient(asset).cancelMultipleOrders(cancelArguments);
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let asset = cancelArguments[i].asset;
+      let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = instructions.cancelOrderIx(
+        asset,
+        marketIndex,
+        this.publicKey,
+        this.getSubClient(asset).marginAccountAddress,
+        this.getSubClient(asset).openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this.provider, tx));
+      })
+    );
+    return txIds;
   }
 
   public async cancelMultipleOrdersNoError(
     asset: Asset,
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
-    return await this.getSubClient(asset).cancelMultipleOrdersNoError(
-      cancelArguments
+    let ixs = [];
+    for (var i = 0; i < cancelArguments.length; i++) {
+      let asset = cancelArguments[i].asset;
+      let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+        cancelArguments[i].market
+      );
+      let ix = instructions.cancelOrderNoErrorIx(
+        asset,
+        marketIndex,
+        this.publicKey,
+        this.getSubClient(asset).marginAccountAddress,
+        this.getSubClient(asset).openOrdersAccounts[marketIndex],
+        cancelArguments[i].orderId,
+        cancelArguments[i].cancelSide
+      );
+      ixs.push(ix);
+    }
+    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this.provider, tx));
+      })
     );
+    return txIds;
   }
 
   public async forceCancelOrders(
@@ -765,6 +911,13 @@ export class Client {
     return this.getSubClient(asset).marginAccountAddress;
   }
 
+  public async initializeReferrerAccount() {
+    let tx = new Transaction().add(
+      await instructions.initializeReferrerAccountIx(this.publicKey)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
   public async initializeReferrerAlias(
     alias: string
   ): Promise<TransactionSignature> {
@@ -777,14 +930,8 @@ export class Client {
       this.publicKey
     );
 
-    let [referrerAliasAddress] = await utils.getReferrerAliasAddress(
-      Exchange.programId,
-      alias
-    );
-
-    let referrerAccount: ReferrerAccount;
     try {
-      referrerAccount = await Exchange.program.account.referrerAccount.fetch(
+      await Exchange.program.account.referrerAccount.fetch(
         referrerAccountAddress
       );
     } catch (e) {
@@ -807,6 +954,36 @@ export class Client {
     return txid;
   }
 
+  public async claimReferrerRewards(): Promise<TransactionSignature> {
+    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+    let tx = new Transaction().add(
+      await instructions.claimReferralsRewardsIx(
+        referrerAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  public async claimReferralRewards(): Promise<TransactionSignature> {
+    let [referralAccountAddress] = await utils.getReferralAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+    let tx = new Transaction().add(
+      await instructions.claimReferralsRewardsIx(
+        referralAccountAddress,
+        this._usdcAccountAddress,
+        this.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
   public async close() {
     await Promise.all(
       this.getAllSubClients().map(async (subClient) => {
@@ -816,6 +993,22 @@ export class Client {
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);
       this._pollIntervalId = undefined;
+    }
+    if (this._tradeEventListener !== undefined) {
+      await Exchange.program.removeEventListener(this._tradeEventListener);
+      this._tradeEventListener = undefined;
+    }
+
+    if (this._tradeEventV2Listener !== undefined) {
+      await Exchange.program.removeEventListener(this._tradeEventV2Listener);
+      this._tradeEventV2Listener = undefined;
+    }
+
+    if (this._orderCompleteEventListener !== undefined) {
+      await Exchange.program.removeEventListener(
+        this._orderCompleteEventListener
+      );
+      this._orderCompleteEventListener = undefined;
     }
   }
 }

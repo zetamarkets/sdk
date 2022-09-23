@@ -5,6 +5,73 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.16.18]
+
+- client: add cancelAllMarketOrders(). ([#157](https://github.com/zetamarkets/sdk/pull/157))
+- events: Add TradeEventV2. ([#153](https://github.com/zetamarkets/sdk/pull/153))
+- risk: Change initial margin calcs to use Max(shorts, longs) for futures instead of shorts + longs. ([#158](https://github.com/zetamarkets/sdk/pull/158))
+
+## [0.16.17]
+
+- constants: drop MAX_CANCELS_PER_TX down to 3. ([#156](https://github.com/zetamarkets/sdk/pull/156))
+
+## [0.16.16]
+
+- client: cancelAllOrders() and cancelAllOrdersNoError() now bundle instructions of different assets into one transaction if possible. ([#155](https://github.com/zetamarkets/sdk/pull/155))
+
+### Breaking
+
+- client: cancelMultipleOrders() and cancelMultipleOrdersNoError() now require Asset in the CancelArgs[] function argument. ([#155](https://github.com/zetamarkets/sdk/pull/155))
+
+## [0.16.15]
+
+- risk: Expose initial margin no concession. ([#154](https://github.com/zetamarkets/sdk/pull/154))
+- subclient: Fix multiple signing on closeMultipleOpenOrders. ([#154](https://github.com/zetamarkets/sdk/pull/154))
+
+## [0.16.14]
+
+- risk: Add available withdrawable balance for MMs. ([#151](https://github.com/zetamarkets/sdk/pull/151))
+
+## [0.16.13]
+
+- utils: add asset filter in fetching open orders accounts. ([#150](https://github.com/zetamarkets/sdk/pull/150))
+
+## [0.16.12]
+
+- events: Improve event handling in client. ([#149](https://github.com/zetamarkets/sdk/pull/149))
+
+## [0.16.11]
+
+- skipped due to release issues
+
+## [0.16.10]
+
+- export calculateSpreadAccountMarginRequirement
+
+## [0.16.9]
+
+- export risk-utils.
+
+## [0.16.8]
+
+- referrals: Add referral rewards. ([#140](https://github.com/zetamarkets/sdk/pull/140))
+
+## [0.16.7]
+
+- program: Move expiry_interval_seconds and new_expiry_threshold_seconds from State to ZetaGroup. ([#146](https://github.com/zetamarkets/sdk/pull/146))
+
+### Breaking
+
+- `expiry_interval_seconds` and `new_expiry_threshold_seconds` is held in each asset's zeta group as opposed to the global state account.
+
+## [0.16.6]
+
+- risk: Add calculation for position movement between spread and margin account. ([#144](https://github.com/zetamarkets/sdk/pull/144))
+
+## [0.16.5]
+
+- program: Fix exchange closing. ([#142](https://github.com/zetamarkets/sdk/pull/142))
+
 ## [0.16.4]
 
 - program: Refactor fee collection methodology and add some associated instructions. ([#136](https://github.com/zetamarkets/sdk/pull/136))

@@ -298,6 +298,23 @@ export class SubExchange {
   }
 
   /**
+   * Update the margin parameters for a zeta group.
+   */
+  public async updateZetaGroupExpiryParameters(
+    args: instructions.UpdateZetaGroupExpiryArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.updateZetaGroupExpiryParameters(
+        this.asset,
+        args,
+        Exchange.provider.wallet.publicKey
+      )
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+    await this.updateZetaGroup();
+  }
+
+  /**
    * Update the volatility nodes for a surface.
    */
   public async updateVolatilityNodes(nodes: Array<anchor.BN>) {
@@ -925,6 +942,9 @@ export class SubExchange {
    * Close the websockets.
    */
   public async close() {
+    this._isInitialized = false;
+    this._isSetup = false;
+
     await Exchange.program.account.zetaGroup.unsubscribe(
       this._zetaGroupAddress
     );
@@ -936,7 +956,5 @@ export class SubExchange {
       this._eventEmitters[i].removeListener("change");
     }
     this._eventEmitters = [];
-    this._isInitialized = false;
-    this._isSetup = false;
   }
 }

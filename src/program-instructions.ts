@@ -638,6 +638,35 @@ export function cancelOrderNoErrorIx(
   );
 }
 
+export function cancelAllMarketOrdersIx(
+  asset: Asset,
+  marketIndex: number,
+  userKey: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[marketIndex];
+  return Exchange.program.instruction.cancelAllMarketOrders({
+    accounts: {
+      authority: userKey,
+      cancelAccounts: {
+        zetaGroup: subExchange.zetaGroupAddress,
+        state: Exchange.stateAddress,
+        marginAccount,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        serumAuthority: Exchange.serumAuthority,
+        openOrders,
+        market: marketData.address,
+        bids: marketData.serumMarket.decoded.bids,
+        asks: marketData.serumMarket.decoded.asks,
+        eventQueue: marketData.serumMarket.decoded.eventQueue,
+        oracle: subExchange.zetaGroup.oracle,
+      },
+    },
+  });
+}
+
 export function cancelOrderByClientOrderIdIx(
   asset: Asset,
   marketIndex: number,
@@ -932,7 +961,8 @@ export async function initializeZetaGroupIx(
   underlyingMint: PublicKey,
   oracle: PublicKey,
   pricingArgs: InitializeZetaGroupPricingArgs,
-  marginArgs: UpdateMarginParametersArgs
+  marginArgs: UpdateMarginParametersArgs,
+  expiryArgs: UpdateZetaGroupExpiryArgs
 ): Promise<TransactionInstruction> {
   let [zetaGroup, zetaGroupNonce] = await utils.getZetaGroup(
     Exchange.programId,
@@ -1010,6 +1040,8 @@ export async function initializeZetaGroupIx(
       optionDynamicPercentageShortMaintenance:
         marginArgs.optionDynamicPercentageShortMaintenance,
       optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
+      expiryIntervalSeconds: expiryArgs.expiryIntervalSeconds,
+      newExpiryThresholdSeconds: expiryArgs.newExpiryThresholdSeconds,
       minFundingRatePercent: pricingArgs.minFundingRate,
       maxFundingRatePercent: pricingArgs.maxFundingRate,
       perpImpactVolume: pricingArgs.perpImpactVolume,
@@ -1067,6 +1099,7 @@ export function treasuryMovementIx(
         zetaGroup: Exchange.getZetaGroupAddress(asset),
         insuranceVault: Exchange.getInsuranceVaultAddress(asset),
         treasuryWallet: Exchange.treasuryWalletAddress,
+        referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
         tokenProgram: TOKEN_PROGRAM_ID,
         admin: Exchange.provider.wallet.publicKey,
       },
@@ -1259,6 +1292,20 @@ export function updateMarginParametersIx(
   });
 }
 
+export function updateZetaGroupExpiryParameters(
+  asset: Asset,
+  args: UpdateZetaGroupExpiryArgs,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaGroupExpiryParameters(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      admin,
+    },
+  });
+}
+
 export function updateVolatilityNodesIx(
   asset: Asset,
   nodes: Array<anchor.BN>,
@@ -1280,6 +1327,8 @@ export function initializeZetaStateIx(
   stateNonce: number,
   serumAuthority: PublicKey,
   treasuryWallet: PublicKey,
+  referralsAdmin: PublicKey,
+  referralsRewardsWallet: PublicKey,
   serumNonce: number,
   mintAuthority: PublicKey,
   mintAuthorityNonce: number,
@@ -1296,6 +1345,8 @@ export function initializeZetaStateIx(
       serumAuthority,
       mintAuthority,
       treasuryWallet,
+      referralsAdmin,
+      referralsRewardsWallet,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -1310,6 +1361,20 @@ export function initializeZetaTreasuryWalletIx(): TransactionInstruction {
     accounts: {
       state: Exchange.stateAddress,
       treasuryWallet: Exchange.treasuryWalletAddress,
+      rent: SYSVAR_RENT_PUBKEY,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      usdcMint: Exchange.usdcMintAddress,
+      admin: Exchange.provider.wallet.publicKey,
+    },
+  });
+}
+
+export function initializeZetaReferralsRewardsWalletIx(): TransactionInstruction {
+  return Exchange.program.instruction.initializeZetaReferralsRewardsWallet({
+    accounts: {
+      state: Exchange.stateAddress,
+      referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -1465,16 +1530,13 @@ export async function referUserIx(
 }
 
 export async function initializeReferrerAccountIx(
-  referrer: PublicKey,
-  admin: PublicKey
+  referrer: PublicKey
 ): Promise<TransactionInstruction> {
   let [referrerAccount, _referrerAccountNonce] =
     await utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
 
   return Exchange.program.instruction.initializeReferrerAccount({
     accounts: {
-      state: Exchange.stateAddress,
-      admin,
       referrer,
       referrerAccount,
       systemProgram: SystemProgram.programId,
@@ -1502,6 +1564,37 @@ export async function initializeReferrerAliasIx(
       referrerAlias,
       referrerAccount,
       systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export async function setReferralsRewardsIx(
+  args: SetReferralsRewardsArgs[],
+  referralsAdmin: PublicKey,
+  remainingAccounts: AccountMeta[]
+): Promise<TransactionInstruction> {
+  return Exchange.program.instruction.setReferralsRewards(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      referralsAdmin,
+    },
+    remainingAccounts,
+  });
+}
+
+export async function claimReferralsRewardsIx(
+  userReferralsAccount: PublicKey,
+  userTokenAccount: PublicKey,
+  user: PublicKey
+): Promise<TransactionInstruction> {
+  return Exchange.program.instruction.claimReferralsRewards({
+    accounts: {
+      state: Exchange.stateAddress,
+      referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
+      userReferralsAccount,
+      userTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      user,
     },
   });
 }
@@ -1827,6 +1920,19 @@ export function updateAdminIx(
   });
 }
 
+export function updateReferralsAdminIx(
+  admin: PublicKey,
+  newReferralsAdmin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateReferralsAdmin({
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+      newAdmin: newReferralsAdmin,
+    },
+  });
+}
+
 export function expireSeriesOverrideIx(
   asset: Asset,
   admin: PublicKey,
@@ -2078,8 +2184,6 @@ export interface UpdateInterestRateArgs {
 }
 
 export interface StateParams {
-  expiryIntervalSeconds: number;
-  newExpiryThresholdSeconds: number;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
@@ -2141,6 +2245,11 @@ export interface UpdateMarginParametersArgs {
   optionShortPutCapPercentage: anchor.BN;
 }
 
+export interface UpdateZetaGroupExpiryArgs {
+  expiryIntervalSeconds: number;
+  newExpiryThresholdSeconds: number;
+}
+
 export interface PositionMovementArg {
   index: number;
   size: anchor.BN;
@@ -2150,4 +2259,10 @@ export interface OverrideExpiryArgs {
   expiryIndex: number;
   activeTs: anchor.BN;
   expiryTs: anchor.BN;
+}
+
+export interface SetReferralsRewardsArgs {
+  referralsAccountKey: PublicKey;
+  pendingRewards: anchor.BN;
+  overwrite: boolean;
 }

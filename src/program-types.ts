@@ -10,8 +10,7 @@ export interface State {
   serumNonce: number;
   mintAuthNonce: number;
   numUnderlyings: number;
-  expiryIntervalSeconds: number;
-  newExpiryThresholdSeconds: number;
+  null: anchor.BN;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
@@ -26,6 +25,9 @@ export interface State {
   treasuryWalletNonce: number;
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
+  referralsAdmin: PublicKey;
+  referralsRewardsWalletNonce: number;
+  perpFundingThresholdSeconds: number;
   padding: Array<number>;
 }
 
@@ -110,6 +112,8 @@ export interface ZetaGroup {
   expirySeriesPadding: Array<ExpirySeries>;
   totalInsuranceVaultDeposits: anchor.BN;
   asset: any;
+  expiryIntervalSeconds: number;
+  newExpiryThresholdSeconds: number;
   perpParameters: PerpParameters;
   perpSyncQueue: PublicKey;
   padding: Array<number>;
@@ -176,9 +180,7 @@ export interface SpreadAccount {
   seriesExpiry: Array<anchor.BN>;
   positions: Array<Position>;
   positionsPadding: Array<Position>;
-  perpPosition: Position;
   asset: any;
-  lastFundingDelta: anchor.BN;
   padding: Array<number>;
 }
 
@@ -295,6 +297,20 @@ export interface TradeEvent {
   isBid: boolean;
   clientOrderId: anchor.BN;
   orderId: anchor.BN;
+}
+
+export interface TradeEventV2 {
+  marginAccount: PublicKey;
+  index: number;
+  costOfTrades: anchor.BN;
+  size: anchor.BN;
+  isBid: boolean;
+  clientOrderId: anchor.BN;
+  orderId: anchor.BN;
+  asset: number;
+  user: PublicKey;
+  isTaker: boolean;
+  sequenceNumber: anchor.BN; // Unique id for the given market
 }
 
 export interface PositionMovementEvent {

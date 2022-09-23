@@ -6,9 +6,7 @@ import { exchange as Exchange } from "./exchange";
 import {
   SpreadAccount,
   MarginAccount,
-  TradeEvent,
   PositionMovementEvent,
-  OrderCompleteEvent,
 } from "./program-types";
 import {
   PublicKey,
@@ -125,16 +123,6 @@ export class SubClient {
    * The subscription id for the spread account subscription.
    */
   private _spreadAccountSubscriptionId: number = undefined;
-
-  /**
-   * The listener for trade events.
-   */
-  private _tradeEventListener: any;
-
-  /**
-   * The listener for OrderComplete events.
-   */
-  private _orderCompleteEventListener: any;
 
   /**
    * Last update timestamp.
@@ -293,26 +281,6 @@ export class SubClient {
       subClient.updateSpreadPositions();
     } catch (e) {
       console.log("User does not have a spread account.");
-    }
-
-    if (callback !== undefined) {
-      subClient._tradeEventListener = Exchange.program.addEventListener(
-        "TradeEvent",
-        (event: TradeEvent, _slot) => {
-          if (event.marginAccount.equals(marginAccountAddress)) {
-            callback(asset, EventType.TRADE, event);
-          }
-        }
-      );
-
-      subClient._orderCompleteEventListener = Exchange.program.addEventListener(
-        "OrderCompleteEvent",
-        (event: OrderCompleteEvent, _slot) => {
-          if (event.marginAccount.equals(marginAccountAddress)) {
-            callback(asset, EventType.ORDERCOMPLETE, event);
-          }
-        }
-      );
     }
 
     return subClient;
@@ -1409,11 +1377,11 @@ export class SubClient {
       constants.MAX_SETTLE_AND_CLOSE_PER_TX
     );
 
-    await Promise.all(
-      combinedTxs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
-      })
-    );
+    for (var i = 0; i < combinedTxs.length; i++) {
+      let tx = combinedTxs[i];
+      let txId = await utils.processTransaction(this._parent.provider, tx);
+      txIds.push(txId);
+    }
 
     // Reset openOrdersAccount keys
     for (var i = 0; i < markets.length; i++) {
@@ -1422,72 +1390,6 @@ export class SubClient {
       this._openOrdersAccounts[marketIndex] = PublicKey.default;
     }
 
-    return txIds;
-  }
-
-  /**
-   * Cancels multiple user orders by orderId
-   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
-   */
-  public async cancelMultipleOrders(
-    cancelArguments: types.CancelArgs[]
-  ): Promise<TransactionSignature[]> {
-    let ixs = [];
-    for (var i = 0; i < cancelArguments.length; i++) {
-      let marketIndex = this._subExchange.markets.getMarketIndex(
-        cancelArguments[i].market
-      );
-      let ix = instructions.cancelOrderIx(
-        this.asset,
-        marketIndex,
-        this._parent.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        cancelArguments[i].orderId,
-        cancelArguments[i].cancelSide
-      );
-      ixs.push(ix);
-    }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
-      })
-    );
-    return txIds;
-  }
-
-  /**
-   * Cancels multiple user orders by orderId
-   * @param cancelArguments list of cancelArgs objects which contains the arguments of cancel instructions
-   */
-  public async cancelMultipleOrdersNoError(
-    cancelArguments: types.CancelArgs[]
-  ): Promise<TransactionSignature[]> {
-    let ixs = [];
-    for (var i = 0; i < cancelArguments.length; i++) {
-      let marketIndex = this._subExchange.markets.getMarketIndex(
-        cancelArguments[i].market
-      );
-      let ix = instructions.cancelOrderNoErrorIx(
-        this.asset,
-        marketIndex,
-        this._parent.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[marketIndex],
-        cancelArguments[i].orderId,
-        cancelArguments[i].cancelSide
-      );
-      ixs.push(ix);
-    }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
-      })
-    );
     return txIds;
   }
 
@@ -1549,12 +1451,10 @@ export class SubClient {
   }
 
   /**
-   * Cancels all active user orders
+   * Instruction builder for cancelAllOrders()
+   * Returns a list of instructions cancelling all of this subclient's orders
    */
-  public async cancelAllOrders(): Promise<TransactionSignature[]> {
-    // Can only fit 6 cancels worth of accounts per transaction.
-    // on 4 separate markets
-    // Compute is fine.
+  public cancelAllOrdersIxs(): TransactionInstruction[] {
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
@@ -1569,8 +1469,42 @@ export class SubClient {
       );
       ixs.push(ix);
     }
+    return ixs;
+  }
 
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+  /**
+   * Instruction builder for cancelAllOrdersNoError()
+   * Returns a list of instructions cancelling all of this subclient's orders
+   */
+  public cancelAllOrdersNoErrorIxs(): TransactionInstruction[] {
+    let ixs = [];
+    for (var i = 0; i < this._orders.length; i++) {
+      let order = this._orders[i];
+      let ix = instructions.cancelOrderNoErrorIx(
+        this.asset,
+        order.marketIndex,
+        this._parent.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[order.marketIndex],
+        order.orderId,
+        order.side
+      );
+      ixs.push(ix);
+    }
+    return ixs;
+  }
+
+  /**
+   * Cancels all active user orders
+   */
+  public async cancelAllOrders(): Promise<TransactionSignature[]> {
+    // Can only fit 6 cancels worth of accounts per transaction.
+    // on 4 separate markets
+    // Compute is fine.
+    let txs = utils.splitIxsIntoTx(
+      this.cancelAllOrdersIxs(),
+      constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
@@ -1587,22 +1521,10 @@ export class SubClient {
     // Can only fit 6 cancels worth of accounts per transaction.
     // on 4 separate markets
     // Compute is fine.
-    let ixs = [];
-    for (var i = 0; i < this._orders.length; i++) {
-      let order = this._orders[i];
-      let ix = instructions.cancelOrderNoErrorIx(
-        this.asset,
-        order.marketIndex,
-        this._parent.publicKey,
-        this._marginAccountAddress,
-        this._openOrdersAccounts[order.marketIndex],
-        order.orderId,
-        order.side
-      );
-      ixs.push(ix);
-    }
-
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txs = utils.splitIxsIntoTx(
+      this.cancelAllOrdersNoErrorIxs(),
+      constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
@@ -1799,20 +1721,6 @@ export class SubClient {
         });
       }
     }
-
-    // perps too
-    if (this._spreadAccount.perpPosition.size.toNumber() != 0) {
-      positions.push({
-        marketIndex: i,
-        market: this._subExchange.zetaGroup.perp.market,
-        size: utils.convertNativeLotSizeToDecimal(
-          this._spreadAccount.perpPosition.size.toNumber()
-        ),
-        costOfTrades: utils.convertNativeBNToDecimal(
-          this._spreadAccount.perpPosition.costOfTrades
-        ),
-      });
-    }
     this._spreadPositions = positions;
   }
 
@@ -1946,12 +1854,7 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let position;
-    if (index == constants.PERP_INDEX) {
-      position = this.spreadAccount.perpPosition;
-    } else {
-      position = this.spreadAccount.positions[index];
-    }
+    let position = this.spreadAccount.positions[index];
     let size = position.size.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
@@ -1964,12 +1867,7 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let position;
-    if (index == constants.PERP_INDEX) {
-      position = this.spreadAccount.perpPosition;
-    } else {
-      position = this.spreadAccount.positions[index];
-    }
+    let position = this.spreadAccount.positions[index];
     let costOfTrades = position.costOfTrades.toNumber();
     return decimal
       ? utils.convertNativeIntegerToDecimal(costOfTrades)
@@ -1992,18 +1890,6 @@ export class SubClient {
         this._spreadAccountSubscriptionId
       );
       this._spreadAccountSubscriptionId = undefined;
-    }
-
-    if (this._tradeEventListener !== undefined) {
-      await Exchange.program.removeEventListener(this._tradeEventListener);
-      this._tradeEventListener = undefined;
-    }
-
-    if (this._orderCompleteEventListener !== undefined) {
-      await Exchange.program.removeEventListener(
-        this._orderCompleteEventListener
-      );
-      this._orderCompleteEventListener = undefined;
     }
   }
 }
