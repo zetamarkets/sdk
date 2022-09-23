@@ -528,6 +528,16 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralsAdmin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -604,7 +614,69 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "initializeZetaReferralsRewardsWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateReferralsAdmin",
       "accounts": [
         {
           "name": "state",
@@ -753,6 +825,34 @@ export type Zeta = {
           "name": "args",
           "type": {
             "defined": "UpdatePerpParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupExpiryParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaGroupExpiryArgs"
           }
         }
       ]
@@ -2599,6 +2699,77 @@ export type Zeta = {
       ]
     },
     {
+      "name": "cancelAllMarketOrders",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancelOrderHalted",
       "accounts": [
         {
@@ -3086,6 +3257,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -3405,19 +3581,9 @@ export type Zeta = {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
+          "name": "referrer",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "referrer",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "referrerAccount",
@@ -3488,6 +3654,67 @@ export type Zeta = {
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "setReferralsRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsAdmin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": "SetReferralsRewardsArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "claimReferralsRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userReferralsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -3726,12 +3953,8 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
+            "name": "null",
+            "type": "u64"
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -3790,6 +4013,14 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "referralsAdmin",
+            "type": "publicKey"
+          },
+          {
+            "name": "referralsRewardsWalletNonce",
+            "type": "u8"
+          },
+          {
             "name": "perpFundingThresholdSeconds",
             "type": "u32"
           },
@@ -3798,7 +4029,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                136
+                103
               ]
             }
           }
@@ -3979,6 +4210,14 @@ export type Zeta = {
             }
           },
           {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          },
+          {
             "name": "perpParameters",
             "type": {
               "defined": "PerpParameters"
@@ -3993,7 +4232,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                974
+                966
               ]
             }
           }
@@ -4835,6 +5074,26 @@ export type Zeta = {
       }
     },
     {
+      "name": "SetReferralsRewardsArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referralsAccountKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "overwrite",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExpireSeriesOverrideArgs",
       "type": {
         "kind": "struct",
@@ -4910,14 +5169,6 @@ export type Zeta = {
           {
             "name": "mintAuthNonce",
             "type": "u8"
-          },
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -5019,14 +5270,6 @@ export type Zeta = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
@@ -5337,6 +5580,14 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          },
+          {
             "name": "minFundingRatePercent",
             "type": "i64"
           },
@@ -5347,6 +5598,22 @@ export type Zeta = {
           {
             "name": "perpImpactVolume",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateZetaGroupExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
           }
         ]
       }
@@ -5521,10 +5788,16 @@ export type Zeta = {
             "name": "Undefined"
           },
           {
-            "name": "ToTreasury"
+            "name": "ToTreasuryFromInsurance"
           },
           {
-            "name": "ToInsurance"
+            "name": "ToInsuranceFromTreasury"
+          },
+          {
+            "name": "ToTreasuryFromReferralsRewards"
+          },
+          {
+            "name": "ToReferralsRewardsFromTreasury"
           }
         ]
       }
@@ -5632,6 +5905,66 @@ export type Zeta = {
         {
           "name": "orderId",
           "type": "u128",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "TradeEventV2",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "index",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isBid",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "sequenceNumber",
+          "type": "u64",
           "index": false
         }
       ]
@@ -6341,36 +6674,76 @@ export type Zeta = {
     },
     {
       "code": 6111,
+      "name": "InvalidReferralsAdminSigner",
+      "msg": "Invalid referrals admin signer"
+    },
+    {
+      "code": 6112,
+      "name": "InvalidSetReferralsRewardsRemainingAccounts",
+      "msg": "Invalid set referrals rewards remaining accounts"
+    },
+    {
+      "code": 6113,
+      "name": "SetReferralsRewardsAccountNotMutable",
+      "msg": "Referrals account not mutable"
+    },
+    {
+      "code": 6114,
+      "name": "InvalidClaimReferralsRewardsAmount",
+      "msg": "Invalid claim referrals rewards: not enough in refererals rewards wallet"
+    },
+    {
+      "code": 6115,
+      "name": "InvalidClaimReferralsRewardsAccount",
+      "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
+    },
+    {
+      "code": 6116,
+      "name": "ReferralAccountSeedsMismatch",
+      "msg": "Referral account seeds mismatch"
+    },
+    {
+      "code": 6117,
+      "name": "ReferrerAccountSeedsMismatch",
+      "msg": "Referrer account seeds mismatch"
+    },
+    {
+      "code": 6118,
+      "name": "ProtectedMmMarginAccount",
+      "msg": "Market maker accounts are protected from liquidation"
+    },
+    {
+      "code": 6119,
       "name": "FundingRateNotUpToDate",
       "msg": "Perp funding rate not up to date"
     },
     {
-      "code": 6112,
+      "code": 6120,
       "name": "PerpSyncQueueFull",
       "msg": "Perp taker/maker sync queue is full"
     },
     {
-      "code": 6113,
+      "code": 6121,
       "name": "PerpSyncQueueAccountSeedsMismatch",
       "msg": "PerpSyncQueue account seeds mismatch"
     },
     {
-      "code": 6114,
+      "code": 6122,
       "name": "PerpSyncQueueEmpty",
       "msg": "Program tried to pop from an empty perpSyncQueue"
     },
     {
-      "code": 6115,
+      "code": 6123,
       "name": "InvalidProductIndexInPlacePerpOrder",
       "msg": "Invalid product index in placePerpOrder"
     },
     {
-      "code": 6116,
+      "code": 6124,
       "name": "NonPerpProductIndexGivenInPlacePerpOrder",
       "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
     },
     {
-      "code": 6117,
+      "code": 6125,
       "name": "PerpProductIndexGivenInPlaceOrder",
       "msg": "Perp product index given in placeOrder, use placePerpOrder"
     }
@@ -6907,6 +7280,16 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralsAdmin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -6983,7 +7366,69 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "initializeZetaReferralsRewardsWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateReferralsAdmin",
       "accounts": [
         {
           "name": "state",
@@ -7132,6 +7577,34 @@ export const IDL: Zeta = {
           "name": "args",
           "type": {
             "defined": "UpdatePerpParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupExpiryParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaGroupExpiryArgs"
           }
         }
       ]
@@ -8978,6 +9451,77 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "cancelAllMarketOrders",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancelOrderHalted",
       "accounts": [
         {
@@ -9465,6 +10009,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -9784,19 +10333,9 @@ export const IDL: Zeta = {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
+          "name": "referrer",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "referrer",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "referrerAccount",
@@ -9867,6 +10406,67 @@ export const IDL: Zeta = {
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "setReferralsRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsAdmin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": "SetReferralsRewardsArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "claimReferralsRewards",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "referralsRewardsWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userReferralsAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -10105,12 +10705,8 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
+            "name": "null",
+            "type": "u64"
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -10169,6 +10765,14 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "referralsAdmin",
+            "type": "publicKey"
+          },
+          {
+            "name": "referralsRewardsWalletNonce",
+            "type": "u8"
+          },
+          {
             "name": "perpFundingThresholdSeconds",
             "type": "u32"
           },
@@ -10177,7 +10781,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                136
+                103
               ]
             }
           }
@@ -10358,6 +10962,14 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          },
+          {
             "name": "perpParameters",
             "type": {
               "defined": "PerpParameters"
@@ -10372,7 +10984,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                974
+                966
               ]
             }
           }
@@ -11214,6 +11826,26 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "SetReferralsRewardsArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referralsAccountKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "pendingRewards",
+            "type": "u64"
+          },
+          {
+            "name": "overwrite",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "ExpireSeriesOverrideArgs",
       "type": {
         "kind": "struct",
@@ -11289,14 +11921,6 @@ export const IDL: Zeta = {
           {
             "name": "mintAuthNonce",
             "type": "u8"
-          },
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -11398,14 +12022,6 @@ export const IDL: Zeta = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
           {
             "name": "strikeInitializationThresholdSeconds",
             "type": "u32"
@@ -11716,6 +12332,14 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
+          },
+          {
             "name": "minFundingRatePercent",
             "type": "i64"
           },
@@ -11726,6 +12350,22 @@ export const IDL: Zeta = {
           {
             "name": "perpImpactVolume",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateZetaGroupExpiryArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIntervalSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "newExpiryThresholdSeconds",
+            "type": "u32"
           }
         ]
       }
@@ -11900,10 +12540,16 @@ export const IDL: Zeta = {
             "name": "Undefined"
           },
           {
-            "name": "ToTreasury"
+            "name": "ToTreasuryFromInsurance"
           },
           {
-            "name": "ToInsurance"
+            "name": "ToInsuranceFromTreasury"
+          },
+          {
+            "name": "ToTreasuryFromReferralsRewards"
+          },
+          {
+            "name": "ToReferralsRewardsFromTreasury"
           }
         ]
       }
@@ -12011,6 +12657,66 @@ export const IDL: Zeta = {
         {
           "name": "orderId",
           "type": "u128",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "TradeEventV2",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "index",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isBid",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "sequenceNumber",
+          "type": "u64",
           "index": false
         }
       ]
@@ -12720,36 +13426,76 @@ export const IDL: Zeta = {
     },
     {
       "code": 6111,
+      "name": "InvalidReferralsAdminSigner",
+      "msg": "Invalid referrals admin signer"
+    },
+    {
+      "code": 6112,
+      "name": "InvalidSetReferralsRewardsRemainingAccounts",
+      "msg": "Invalid set referrals rewards remaining accounts"
+    },
+    {
+      "code": 6113,
+      "name": "SetReferralsRewardsAccountNotMutable",
+      "msg": "Referrals account not mutable"
+    },
+    {
+      "code": 6114,
+      "name": "InvalidClaimReferralsRewardsAmount",
+      "msg": "Invalid claim referrals rewards: not enough in refererals rewards wallet"
+    },
+    {
+      "code": 6115,
+      "name": "InvalidClaimReferralsRewardsAccount",
+      "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
+    },
+    {
+      "code": 6116,
+      "name": "ReferralAccountSeedsMismatch",
+      "msg": "Referral account seeds mismatch"
+    },
+    {
+      "code": 6117,
+      "name": "ReferrerAccountSeedsMismatch",
+      "msg": "Referrer account seeds mismatch"
+    },
+    {
+      "code": 6118,
+      "name": "ProtectedMmMarginAccount",
+      "msg": "Market maker accounts are protected from liquidation"
+    },
+    {
+      "code": 6119,
       "name": "FundingRateNotUpToDate",
       "msg": "Perp funding rate not up to date"
     },
     {
-      "code": 6112,
+      "code": 6120,
       "name": "PerpSyncQueueFull",
       "msg": "Perp taker/maker sync queue is full"
     },
     {
-      "code": 6113,
+      "code": 6121,
       "name": "PerpSyncQueueAccountSeedsMismatch",
       "msg": "PerpSyncQueue account seeds mismatch"
     },
     {
-      "code": 6114,
+      "code": 6122,
       "name": "PerpSyncQueueEmpty",
       "msg": "Program tried to pop from an empty perpSyncQueue"
     },
     {
-      "code": 6115,
+      "code": 6123,
       "name": "InvalidProductIndexInPlacePerpOrder",
       "msg": "Invalid product index in placePerpOrder"
     },
     {
-      "code": 6116,
+      "code": 6124,
       "name": "NonPerpProductIndexGivenInPlacePerpOrder",
       "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
     },
     {
-      "code": 6117,
+      "code": 6125,
       "name": "PerpProductIndexGivenInPlaceOrder",
       "msg": "Perp product index given in placeOrder, use placePerpOrder"
     }
