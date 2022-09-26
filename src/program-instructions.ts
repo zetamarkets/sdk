@@ -552,65 +552,6 @@ export function placeOrderV4Ix(
   );
 }
 
-export function placeAndLockCombinedOrderIx(
-  asset: Asset,
-  marketIndex0: number,
-  marketIndex1: number,
-  marginAccount: PublicKey,
-  spreadAccount: PublicKey,
-  authority: PublicKey,
-  openOrders0: PublicKey,
-  openOrders1: PublicKey
-): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-  let marketData0 = subExchange.markets.markets[marketIndex0];
-  let marketData1 = subExchange.markets.markets[marketIndex1];
-
-  let x = new anchor.BN(1_000_000);
-
-  return Exchange.program.instruction.placeAndLockCombinedOrder(x, x, x, {
-    accounts: {
-      zetaGroup: subExchange.zetaGroupAddress,
-      // marginAccount: marginAccount,
-      // spreadAccount: spreadAccount,
-      // authority: authority,
-      // dexProgram: constants.DEX_PID[Exchange.network],
-      // tokenProgram: TOKEN_PROGRAM_ID,
-      serumAuthority: Exchange.serumAuthority,
-      greeks: subExchange.zetaGroup.greeks,
-      oracle: subExchange.zetaGroup.oracle,
-      openOrders0: openOrders0,
-      openOrders1: openOrders1,
-      marketAccounts0: {
-        market: marketData0.serumMarket.decoded.ownAddress,
-        requestQueue: marketData0.serumMarket.decoded.requestQueue,
-        eventQueue: marketData0.serumMarket.decoded.eventQueue,
-        bids: marketData0.serumMarket.decoded.bids,
-        asks: marketData0.serumMarket.decoded.asks,
-        coinVault: marketData0.serumMarket.decoded.baseVault,
-        pcVault: marketData0.serumMarket.decoded.quoteVault,
-        // User params.
-        orderPayerTokenAccount: marketData0.quoteVault,
-        coinWallet: marketData0.baseVault,
-        pcWallet: marketData0.quoteVault,
-      },
-      marketAccounts1: {
-        market: marketData1.serumMarket.decoded.ownAddress,
-        requestQueue: marketData1.serumMarket.decoded.requestQueue,
-        eventQueue: marketData1.serumMarket.decoded.eventQueue,
-        bids: marketData1.serumMarket.decoded.bids,
-        asks: marketData1.serumMarket.decoded.asks,
-        coinVault: marketData1.serumMarket.decoded.baseVault,
-        pcVault: marketData1.serumMarket.decoded.quoteVault,
-        // User params.
-        orderPayerTokenAccount: marketData1.quoteVault,
-        coinWallet: marketData1.baseVault,
-        pcWallet: marketData1.quoteVault,
-      },
-    },
-  });
-}
-
 export function mintTokensToMarketVaults(
   asset: Asset,
   marketIndex: number
