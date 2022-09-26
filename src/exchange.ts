@@ -711,6 +711,10 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
+  public async calibratePricingMids(asset: Asset, productIndex: number) {
+    await this.getSubExchange(asset).calibratePricingMids(productIndex);
+  }
+
   public async updatePricing(asset: Asset, expiryIndex: number) {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
   }

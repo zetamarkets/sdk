@@ -1095,6 +1095,25 @@ export function retreatMarketNodesIx(
   });
 }
 
+export function calibratePricingMidsIx(
+  asset: Asset,
+  productIndex: number
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.markets[productIndex];
+  return Exchange.program.instruction.calibratePricingMids(productIndex, {
+    accounts: {
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.zetaGroup.greeks,
+      marketNode: subExchange.greeks.nodeKeys[productIndex],
+      oracle: subExchange.zetaGroup.oracle,
+      market: marketData.address,
+      bids: marketData.serumMarket.bidsAddress,
+      asks: marketData.serumMarket.asksAddress,
+    },
+  });
+}
+
 export function updatePricingIx(
   asset: Asset,
   expiryIndex: number
