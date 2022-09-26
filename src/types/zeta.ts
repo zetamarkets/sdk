@@ -1270,6 +1270,52 @@ export type Zeta = {
       ]
     },
     {
+      "name": "calibratePricingMids",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketNode",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "productIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "updatePricingHalted",
       "accounts": [
         {
@@ -7464,6 +7510,52 @@ export const IDL: Zeta = {
       "args": [
         {
           "name": "expiryIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "calibratePricingMids",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketNode",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "productIndex",
           "type": "u8"
         }
       ]
