@@ -920,6 +920,7 @@ export async function initializeZetaGroupIx(
       optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
       expiryIntervalSeconds: expiryArgs.expiryIntervalSeconds,
       newExpiryThresholdSeconds: expiryArgs.newExpiryThresholdSeconds,
+      midCalibrationVolumeThreshold: pricingArgs.midCalibrationVolumeThreshold,
     },
     {
       accounts: {
@@ -2048,6 +2049,7 @@ export interface UpdatePricingParametersArgs {
   maxInterestRate: anchor.BN;
   minVolatility: anchor.BN;
   maxVolatility: anchor.BN;
+  midCalibrationVolumeThreshold: anchor.BN;
 }
 
 export interface InitializeZetaGroupPricingArgs {
@@ -2063,6 +2065,7 @@ export interface InitializeZetaGroupPricingArgs {
   maxInterestRate: anchor.BN;
   minVolatility: anchor.BN;
   maxVolatility: anchor.BN;
+  midCalibrationVolumeThreshold: anchor.BN;
 }
 
 export interface UpdateMarginParametersArgs {

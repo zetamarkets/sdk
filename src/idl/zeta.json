@@ -3878,6 +3878,10 @@
             "type": "u32"
           },
           {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -4954,6 +4958,10 @@
           {
             "name": "maxVolatility",
             "type": "u64"
+          },
+          {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
           }
         ]
       }
@@ -5143,6 +5151,10 @@
           {
             "name": "newExpiryThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
           }
         ]
       }

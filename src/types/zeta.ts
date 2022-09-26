@@ -3878,6 +3878,10 @@ export type Zeta = {
             "type": "u32"
           },
           {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -4954,6 +4958,10 @@ export type Zeta = {
           {
             "name": "maxVolatility",
             "type": "u64"
+          },
+          {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
           }
         ]
       }
@@ -5143,6 +5151,10 @@ export type Zeta = {
           {
             "name": "newExpiryThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
           }
         ]
       }
@@ -10123,6 +10135,10 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -11199,6 +11215,10 @@ export const IDL: Zeta = {
           {
             "name": "maxVolatility",
             "type": "u64"
+          },
+          {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
           }
         ]
       }
@@ -11388,6 +11408,10 @@ export const IDL: Zeta = {
           {
             "name": "newExpiryThresholdSeconds",
             "type": "u32"
+          },
+          {
+            "name": "midCalibrationVolumeThreshold",
+            "type": "u64"
           }
         ]
       }
