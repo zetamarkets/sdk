@@ -261,7 +261,8 @@ export class Exchange {
 
   public async initializeZetaState(
     params: instructions.StateParams,
-    referralAdmin: PublicKey
+    referralAdmin: PublicKey,
+    pricingAdmin: PublicKey
   ) {
     const [mintAuthority, mintAuthorityNonce] = await utils.getMintAuthority(
       this.programId
@@ -290,6 +291,7 @@ export class Exchange {
         treasuryWallet,
         referralAdmin,
         referralRewardsWallet,
+        pricingAdmin,
         serumNonce,
         mintAuthority,
         mintAuthorityNonce,
@@ -709,10 +711,6 @@ export class Exchange {
 
   public async updateZetaGroup(asset: Asset) {
     await this.getSubExchange(asset).updateZetaGroup();
-  }
-
-  public async calibratePricingMids(asset: Asset, productIndex: number) {
-    await this.getSubExchange(asset).calibratePricingMids(productIndex);
   }
 
   public async updatePricing(asset: Asset, expiryIndex: number) {

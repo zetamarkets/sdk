@@ -497,6 +497,11 @@
           "isSigner": false
         },
         {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -636,6 +641,27 @@
     },
     {
       "name": "updateReferralsAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updatePricingAdmin",
       "accounts": [
         {
           "name": "state",
@@ -1272,6 +1298,16 @@
     {
       "name": "calibratePricingMids",
       "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
         {
           "name": "zetaGroup",
           "isMut": false,
@@ -3720,11 +3756,15 @@
             "type": "u8"
           },
           {
+            "name": "pricingAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                75
               ]
             }
           }

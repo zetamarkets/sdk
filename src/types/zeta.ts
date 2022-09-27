@@ -497,6 +497,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -636,6 +641,27 @@ export type Zeta = {
     },
     {
       "name": "updateReferralsAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updatePricingAdmin",
       "accounts": [
         {
           "name": "state",
@@ -1272,6 +1298,16 @@ export type Zeta = {
     {
       "name": "calibratePricingMids",
       "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
         {
           "name": "zetaGroup",
           "isMut": false,
@@ -3720,11 +3756,15 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "pricingAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                75
               ]
             }
           }
@@ -6754,6 +6794,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
@@ -6893,6 +6938,27 @@ export const IDL: Zeta = {
     },
     {
       "name": "updateReferralsAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updatePricingAdmin",
       "accounts": [
         {
           "name": "state",
@@ -7529,6 +7595,16 @@ export const IDL: Zeta = {
     {
       "name": "calibratePricingMids",
       "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
         {
           "name": "zetaGroup",
           "isMut": false,
@@ -9977,11 +10053,15 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "pricingAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                75
               ]
             }
           }

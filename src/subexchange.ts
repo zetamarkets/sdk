@@ -506,16 +506,6 @@ export class SubExchange {
   }
 
   /**
-   * Calibrate pricing to mids for a product index.
-   */
-  public async calibratePricingMids(productIndex: number) {
-    let tx = new Transaction().add(
-      instructions.calibratePricingMidsIx(this.asset, productIndex)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
    * Retreat volatility surface and interest rates for an expiry index.
    */
   public async retreatMarketNodes(expiryIndex: number) {

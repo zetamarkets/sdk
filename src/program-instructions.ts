@@ -1103,6 +1103,8 @@ export function calibratePricingMidsIx(
   let marketData = subExchange.markets.markets[productIndex];
   return Exchange.program.instruction.calibratePricingMids(productIndex, {
     accounts: {
+      state: Exchange.stateAddress,
+      pricingAdmin: Exchange.state.pricingAdmin,
       zetaGroup: subExchange.zetaGroupAddress,
       greeks: subExchange.zetaGroup.greeks,
       marketNode: subExchange.greeks.nodeKeys[productIndex],
@@ -1194,6 +1196,7 @@ export function initializeZetaStateIx(
   treasuryWallet: PublicKey,
   referralsAdmin: PublicKey,
   referralsRewardsWallet: PublicKey,
+  pricingAdmin: PublicKey,
   serumNonce: number,
   mintAuthority: PublicKey,
   mintAuthorityNonce: number,
@@ -1212,6 +1215,7 @@ export function initializeZetaStateIx(
       treasuryWallet,
       referralsAdmin,
       referralsRewardsWallet,
+      pricingAdmin,
       rent: SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -1788,6 +1792,19 @@ export function updateReferralsAdminIx(
       state: Exchange.stateAddress,
       admin,
       newAdmin: newReferralsAdmin,
+    },
+  });
+}
+
+export function updatePricingAdminIx(
+  admin: PublicKey,
+  newPricingAdmin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updatePricingAdmin({
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+      newAdmin: newPricingAdmin,
     },
   });
 }
