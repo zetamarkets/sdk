@@ -6291,6 +6291,11 @@ export type Zeta = {
       "code": 6118,
       "name": "ProtectedMmMarginAccount",
       "msg": "Market maker accounts are protected from liquidation"
+    },
+    {
+      "code": 6119,
+      "name": "InvalidPricingAdminSigner",
+      "msg": "Invalid pricing admin signer"
     }
   ]
 };
@@ -12588,6 +12593,11 @@ export const IDL: Zeta = {
       "code": 6118,
       "name": "ProtectedMmMarginAccount",
       "msg": "Market maker accounts are protected from liquidation"
+    },
+    {
+      "code": 6119,
+      "name": "InvalidPricingAdminSigner",
+      "msg": "Invalid pricing admin signer"
     }
   ]
 };

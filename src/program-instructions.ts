@@ -1097,6 +1097,7 @@ export function retreatMarketNodesIx(
 
 export function calibratePricingMidsIx(
   asset: Asset,
+  pricingAdmin: PublicKey,
   productIndex: number
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
@@ -1104,7 +1105,7 @@ export function calibratePricingMidsIx(
   return Exchange.program.instruction.calibratePricingMids(productIndex, {
     accounts: {
       state: Exchange.stateAddress,
-      pricingAdmin: Exchange.state.pricingAdmin,
+      pricingAdmin,
       zetaGroup: subExchange.zetaGroupAddress,
       greeks: subExchange.zetaGroup.greeks,
       marketNode: subExchange.greeks.nodeKeys[productIndex],
