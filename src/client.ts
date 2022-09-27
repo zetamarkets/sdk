@@ -730,7 +730,6 @@ export class Client {
   }
 
   public async cancelMultipleOrdersNoError(
-    asset: Asset,
     cancelArguments: types.CancelArgs[]
   ): Promise<TransactionSignature[]> {
     let ixs = [];
