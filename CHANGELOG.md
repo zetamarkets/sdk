@@ -10,6 +10,7 @@ Version changes are pinned to SDK releases.
 - client: add cancelAllMarketOrders(). ([#157](https://github.com/zetamarkets/sdk/pull/157))
 - events: Add TradeEventV2. ([#153](https://github.com/zetamarkets/sdk/pull/153))
 - risk: Change initial margin calcs to use Max(shorts, longs) for futures instead of shorts + longs. ([#158](https://github.com/zetamarkets/sdk/pull/158))
+- instructions: Add instruction to allow pricing admin to calibrate mark prices to midpoint if there's enough volume in two-sided quotes. ([#161](https://github.com/zetamarkets/sdk/pull/161))
 
 ## [0.16.17]
 
