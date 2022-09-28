@@ -561,6 +561,25 @@ export class Client {
     );
   }
 
+  public async cancelAllMarketOrders(
+    asset: Asset,
+    market: types.MarketIdentifier
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
+      this.marketIdentifierToPublicKey(asset, market)
+    );
+    let ix = instructions.cancelAllMarketOrdersIx(
+      asset,
+      index,
+      this.publicKey,
+      this.getSubClient(asset).marginAccountAddress,
+      this.getSubClient(asset).openOrdersAccounts[index]
+    );
+    tx.add(ix);
+    return await utils.processTransaction(this.provider, tx);
+  }
+
   public async cancelOrder(
     asset: Asset,
     market: types.MarketIdentifier,
