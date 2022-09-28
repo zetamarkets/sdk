@@ -2253,6 +2253,11 @@ export type Zeta = {
       "name": "placeOrderV4",
       "accounts": [
         {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": false,
           "isSigner": false
@@ -8653,6 +8658,11 @@ export const IDL: Zeta = {
     {
       "name": "placeOrderV4",
       "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "zetaGroup",
           "isMut": false,

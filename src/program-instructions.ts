@@ -520,6 +520,7 @@ export function placeOrderV4Ix(
     new String(tag),
     {
       accounts: {
+        state: Exchange.stateAddress,
         zetaGroup: subExchange.zetaGroupAddress,
         marginAccount: marginAccount,
         authority: authority,
