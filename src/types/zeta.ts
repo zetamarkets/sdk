@@ -2399,6 +2399,40 @@ export type Zeta = {
       ]
     },
     {
+      "name": "placeMultiOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price1",
+          "type": "u64"
+        },
+        {
+          "name": "size1",
+          "type": "u64"
+        },
+        {
+          "name": "side1",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "price2",
+          "type": "u64"
+        },
+        {
+          "name": "size2",
+          "type": "u64"
+        },
+        {
+          "name": "side2",
+          "type": {
+            "defined": "Side"
+          }
+        }
+      ]
+    },
+    {
       "name": "mintTokensToMarketVaults",
       "accounts": [
         {
@@ -5552,6 +5586,9 @@ export type Zeta = {
           },
           {
             "name": "PlaceOrderReducedAccounts"
+          },
+          {
+            "name": "PlaceMultiOrder"
           }
         ]
       }
@@ -8805,6 +8842,40 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "placeMultiOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price1",
+          "type": "u64"
+        },
+        {
+          "name": "size1",
+          "type": "u64"
+        },
+        {
+          "name": "side1",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "price2",
+          "type": "u64"
+        },
+        {
+          "name": "size2",
+          "type": "u64"
+        },
+        {
+          "name": "side2",
+          "type": {
+            "defined": "Side"
+          }
+        }
+      ]
+    },
+    {
       "name": "mintTokensToMarketVaults",
       "accounts": [
         {
@@ -11958,6 +12029,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "PlaceOrderReducedAccounts"
+          },
+          {
+            "name": "PlaceMultiOrder"
           }
         ]
       }
