@@ -723,8 +723,6 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
-    // TEMP REMOVE ME
-    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
