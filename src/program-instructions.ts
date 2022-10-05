@@ -1044,7 +1044,7 @@ export async function initializeZetaGroupIx(
       newExpiryThresholdSeconds: expiryArgs.newExpiryThresholdSeconds,
       minFundingRatePercent: pricingArgs.minFundingRate,
       maxFundingRatePercent: pricingArgs.maxFundingRate,
-      perpImpactVolume: pricingArgs.perpImpactVolume,
+      perpImpactCashDelta: pricingArgs.perpImpactCashDelta,
     },
     {
       accounts: {
@@ -2216,7 +2216,7 @@ export interface InitializeZetaGroupPricingArgs {
   maxVolatility: anchor.BN;
   minFundingRate: anchor.BN;
   maxFundingRate: anchor.BN;
-  perpImpactVolume: anchor.BN;
+  perpImpactCashDelta: anchor.BN;
 }
 
 export interface UpdateMarginParametersArgs {

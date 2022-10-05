@@ -76,7 +76,7 @@ export interface MarginParameters {
 export interface PerpParameters {
   minFundingRatePercent: anchor.BN;
   maxFundingRatePercent: anchor.BN;
-  impactVolume: anchor.BN;
+  impactCashDelta: anchor.BN;
   padding: Array<number>;
 }
 

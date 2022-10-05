@@ -4844,7 +4844,7 @@
             "type": "i64"
           },
           {
-            "name": "impactVolume",
+            "name": "impactCashDelta",
             "type": "u64"
           },
           {
@@ -5404,7 +5404,7 @@
             "type": "i64"
           },
           {
-            "name": "perpImpactVolume",
+            "name": "perpImpactCashDelta",
             "type": "u64"
           }
         ]
@@ -5557,7 +5557,7 @@
             "type": "i64"
           },
           {
-            "name": "perpImpactVolume",
+            "name": "perpImpactCashDelta",
             "type": "u64"
           }
         ]

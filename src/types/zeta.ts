@@ -4844,7 +4844,7 @@ export type Zeta = {
             "type": "i64"
           },
           {
-            "name": "impactVolume",
+            "name": "impactCashDelta",
             "type": "u64"
           },
           {
@@ -5404,7 +5404,7 @@ export type Zeta = {
             "type": "i64"
           },
           {
-            "name": "perpImpactVolume",
+            "name": "perpImpactCashDelta",
             "type": "u64"
           }
         ]
@@ -5557,7 +5557,7 @@ export type Zeta = {
             "type": "i64"
           },
           {
-            "name": "perpImpactVolume",
+            "name": "perpImpactCashDelta",
             "type": "u64"
           }
         ]
@@ -11557,7 +11557,7 @@ export const IDL: Zeta = {
             "type": "i64"
           },
           {
-            "name": "impactVolume",
+            "name": "impactCashDelta",
             "type": "u64"
           },
           {
@@ -12117,7 +12117,7 @@ export const IDL: Zeta = {
             "type": "i64"
           },
           {
-            "name": "perpImpactVolume",
+            "name": "perpImpactCashDelta",
             "type": "u64"
           }
         ]
@@ -12270,7 +12270,7 @@ export const IDL: Zeta = {
             "type": "i64"
           },
           {
-            "name": "perpImpactVolume",
+            "name": "perpImpactCashDelta",
             "type": "u64"
           }
         ]
