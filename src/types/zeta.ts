@@ -1329,32 +1329,6 @@ export type Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "updatePerpFunding",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "perpBids",
@@ -1367,7 +1341,12 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "expiryIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "applyPerpFunding",
@@ -3867,7 +3846,11 @@ export type Zeta = {
             }
           },
           {
-            "name": "perpLastUpdatedTs",
+            "name": "haltForcePerpPricing",
+            "type": "bool"
+          },
+          {
+            "name": "perpUpdateTimestamp",
             "type": "u64"
           },
           {
@@ -3883,7 +3866,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                1602
+                1601
               ]
             }
           }
@@ -4021,15 +4004,11 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "perpFundingThresholdSeconds",
-            "type": "u32"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                103
+                107
               ]
             }
           }
@@ -5211,10 +5190,6 @@ export type Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
-          },
-          {
-            "name": "perpFundingThresholdSeconds",
-            "type": "u32"
           }
         ]
       }
@@ -5311,10 +5286,6 @@ export type Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
-          },
-          {
-            "name": "perpFundingThresholdSeconds",
-            "type": "u32"
           }
         ]
       }
@@ -8071,32 +8042,6 @@ export const IDL: Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "updatePerpFunding",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "perpBids",
@@ -8109,7 +8054,12 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "expiryIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "applyPerpFunding",
@@ -10609,7 +10559,11 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "perpLastUpdatedTs",
+            "name": "haltForcePerpPricing",
+            "type": "bool"
+          },
+          {
+            "name": "perpUpdateTimestamp",
             "type": "u64"
           },
           {
@@ -10625,7 +10579,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                1602
+                1601
               ]
             }
           }
@@ -10763,15 +10717,11 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "perpFundingThresholdSeconds",
-            "type": "u32"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                103
+                107
               ]
             }
           }
@@ -11953,10 +11903,6 @@ export const IDL: Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
-          },
-          {
-            "name": "perpFundingThresholdSeconds",
-            "type": "u32"
           }
         ]
       }
@@ -12053,10 +11999,6 @@ export const IDL: Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
-          },
-          {
-            "name": "perpFundingThresholdSeconds",
-            "type": "u32"
           }
         ]
       }

@@ -1233,17 +1233,6 @@ export function updatePricingIx(
       zetaGroup: subExchange.zetaGroupAddress,
       greeks: subExchange.greeksAddress,
       oracle: subExchange.zetaGroup.oracle,
-    },
-  });
-}
-
-export function updatePerpFundingIx(asset: Asset): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-  return Exchange.program.instruction.updatePerpFunding({
-    accounts: {
-      zetaGroup: subExchange.zetaGroupAddress,
-      greeks: subExchange.greeksAddress,
-      oracle: subExchange.zetaGroup.oracle,
       perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
       perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
     },
@@ -2197,7 +2186,6 @@ export interface StateParams {
   marginConcessionPercentage: number;
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
-  perpFundingThresholdSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {

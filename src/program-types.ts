@@ -27,7 +27,6 @@ export interface State {
   nativeOptionUnderlyingFeePercentage: anchor.BN;
   referralsAdmin: PublicKey;
   referralsRewardsWalletNonce: number;
-  perpFundingThresholdSeconds: number;
   padding: Array<number>;
 }
 
@@ -201,7 +200,8 @@ export interface Greeks {
   volatilityPadding: Array<anchor.BN>;
   nodeKeys: Array<PublicKey>;
   haltForcePricing: Array<boolean>;
-  perpLastUpdatedTs: anchor.BN;
+  haltForcePerpPricing: boolean;
+  perpUpdateTimestamp: anchor.BN;
   perpFundingDelta: anchor.BN;
   perpLatestFundingRate: anchor.BN;
   padding: Array<number>;

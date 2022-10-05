@@ -1578,12 +1578,6 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
   return bufferString.substring(0, splitIndex);
 }
 
-export async function updatePerpFunding(asset: Asset) {
-  let tx = new Transaction();
-  tx.add(instructions.updatePerpFundingIx(asset));
-  await processTransaction(Exchange.provider, tx);
-}
-
 export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
   let remainingAccounts = keys.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
