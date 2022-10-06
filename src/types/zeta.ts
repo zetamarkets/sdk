@@ -5200,6 +5200,9 @@ export type Zeta = {
           },
           {
             "name": "Future"
+          },
+          {
+            "name": "Perp"
           }
         ]
       }
@@ -11399,6 +11402,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "Future"
+          },
+          {
+            "name": "Perp"
           }
         ]
       }
