@@ -264,6 +264,11 @@ export type Zeta = {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -6976,6 +6981,11 @@ export const IDL: Zeta = {
         {
           "name": "zetaGroup",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
           "isSigner": false
         }
       ],

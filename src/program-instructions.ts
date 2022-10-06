@@ -971,6 +971,7 @@ export async function initializePerpSyncQueueIx(
       state: Exchange.stateAddress,
       perpSyncQueue,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
+      systemProgram: SystemProgram.programId,
     },
   });
 }
