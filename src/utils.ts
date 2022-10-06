@@ -723,6 +723,7 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }

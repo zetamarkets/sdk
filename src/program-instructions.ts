@@ -959,20 +959,24 @@ export async function initializeZetaMarketTxs(
 export async function initializePerpSyncQueueIx(
   asset: Asset
 ): Promise<TransactionInstruction> {
-  let [perpSyncQueue, nonce] = await utils.getPerpSyncQueue(
+  let subExchange = Exchange.getSubExchange(asset);
+  let [perpSyncQueue, perpSyncQueueNonce] = await utils.getPerpSyncQueue(
     Exchange.programId,
-    Exchange.getSubExchange(asset).zetaGroupAddress
+    subExchange.zetaGroupAddress
   );
 
-  return Exchange.program.instruction.initializePerpSyncQueue(nonce, {
-    accounts: {
-      admin: Exchange.state.admin,
-      zetaProgram: Exchange.programId,
-      state: Exchange.stateAddress,
-      perpSyncQueue,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-    },
-  });
+  return Exchange.program.instruction.initializePerpSyncQueue(
+    perpSyncQueueNonce,
+    {
+      accounts: {
+        admin: Exchange.state.admin,
+        zetaProgram: Exchange.programId,
+        state: Exchange.stateAddress,
+        perpSyncQueue,
+        zetaGroup: Exchange.getZetaGroupAddress(asset),
+      },
+    }
+  );
 }
 
 export async function initializeZetaGroupIx(

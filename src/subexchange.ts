@@ -232,15 +232,15 @@ export class SubExchange {
     this._greeks = (await Exchange.program.account.greeks.fetch(
       this.greeksAddress
     )) as Greeks;
-    this._perpSyncQueue = (await Exchange.program.account.perpSyncQueue.fetch(
-      this.perpSyncQueueAddress
-    )) as PerpSyncQueue;
+    // this._perpSyncQueue = (await Exchange.program.account.perpSyncQueue.fetch(
+    //   this.perpSyncQueueAddress
+    // )) as PerpSyncQueue;
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
     // Set callbacks.
     this.subscribeZetaGroup(asset, callback);
     this.subscribeGreeks(asset, callback);
-    this.subscribePerpSyncQueue();
+    // this.subscribePerpSyncQueue();
 
     this._isInitialized = true;
 
@@ -419,7 +419,7 @@ export class SubExchange {
     );
   }
 
-  private async initializeZetaMarket(
+  public async initializeZetaMarket(
     i: number,
     marketIndexes: PublicKey,
     marketIndexesAccount: MarketIndexes
