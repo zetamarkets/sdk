@@ -264,36 +264,36 @@ export class ZetaGroupMarkets {
         })
       );
 
-      // Perps product/market is separate
-      let marketAddr = subExchange.zetaGroup.perp.market;
-      let serumMarket = await SerumMarket.load(
-        Exchange.connection,
-        marketAddr,
-        { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
-        constants.DEX_PID[Exchange.network]
-      );
-      let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
-        Exchange.programId,
-        serumMarket.baseMintAddress
-      );
-      let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
-        Exchange.programId,
-        serumMarket.quoteMintAddress
-      );
-      instance._perpMarket = new Market(
-        asset,
-        constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
-        null,
-        types.toProductKind(subExchange.zetaGroup.perp.kind),
-        marketAddr,
-        subExchange.zetaGroupAddress,
-        quoteVaultAddr,
-        baseVaultAddr,
-        serumMarket
-      );
-
       await sleep(throttleMs);
     }
+
+    // Perps product/market is separate
+    let marketAddr = subExchange.zetaGroup.perp.market;
+    let serumMarket = await SerumMarket.load(
+      Exchange.connection,
+      marketAddr,
+      { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
+      constants.DEX_PID[Exchange.network]
+    );
+    let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
+      Exchange.programId,
+      serumMarket.baseMintAddress
+    );
+    let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
+      Exchange.programId,
+      serumMarket.quoteMintAddress
+    );
+    instance._perpMarket = new Market(
+      asset,
+      constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
+      null,
+      types.toProductKind(subExchange.zetaGroup.perp.kind),
+      marketAddr,
+      subExchange.zetaGroupAddress,
+      quoteVaultAddr,
+      baseVaultAddr,
+      serumMarket
+    );
 
     instance.updateExpirySeries();
     return instance;
