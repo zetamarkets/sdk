@@ -6180,7 +6180,7 @@ export type Zeta = {
     {
       "code": 6115,
       "name": "InvalidClaimReferralsRewardsAccount",
-      "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
+      "msg": "Invalid claim referrals rewards: referrals account is not a referral or referrer account"
     },
     {
       "code": 6116,
@@ -6196,6 +6196,11 @@ export type Zeta = {
       "code": 6118,
       "name": "ProtectedMmMarginAccount",
       "msg": "Market maker accounts are protected from liquidation"
+    },
+    {
+      "code": 6119,
+      "name": "CannotWithdrawWithOpenOrders",
+      "msg": "Cannot withdraw with open orders"
     }
   ]
 };
@@ -12382,7 +12387,7 @@ export const IDL: Zeta = {
     {
       "code": 6115,
       "name": "InvalidClaimReferralsRewardsAccount",
-      "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
+      "msg": "Invalid claim referrals rewards: referrals account is not a referral or referrer account"
     },
     {
       "code": 6116,
@@ -12398,6 +12403,11 @@ export const IDL: Zeta = {
       "code": 6118,
       "name": "ProtectedMmMarginAccount",
       "msg": "Market maker accounts are protected from liquidation"
+    },
+    {
+      "code": 6119,
+      "name": "CannotWithdrawWithOpenOrders",
+      "msg": "Cannot withdraw with open orders"
     }
   ]
 };
