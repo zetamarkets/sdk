@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.17.0]
+
+- idl: add idl perp kind to prevent breaking changes.
+- program: disable withdrawals while user has open orders.
+
 ## [0.16.18]
 
 - client: add cancelAllMarketOrders(). ([#157](https://github.com/zetamarkets/sdk/pull/157))
