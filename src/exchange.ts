@@ -641,7 +641,9 @@ export class Exchange {
   }
 
   public getMarkets(asset: Asset): Market[] {
-    return this.getSubExchange(asset).markets.markets;
+    return this.getSubExchange(asset).markets.markets.concat(
+      this.getSubExchange(asset).markets.perpMarket
+    );
   }
 
   public getPerpMarket(asset: Asset): Market {
