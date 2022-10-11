@@ -570,7 +570,9 @@ export class Exchange {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
     let allLiveMarkets = this._markets;
     if (live) {
-      allLiveMarkets = this._markets.filter((m) => m.expirySeries.isLive());
+      allLiveMarkets = this._markets.filter(
+        (m) => m.kind == types.Kind.PERP || m.expirySeries.isLive()
+      );
     }
 
     let liveMarketsSlices: Market[][] = [];
