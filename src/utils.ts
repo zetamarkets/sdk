@@ -1178,11 +1178,6 @@ export async function crankMarket(
     );
   }
 
-  console.log(Exchange.getSubExchange(asset).greeksAddress);
-  console.log(Exchange.getSubExchange(asset).perpSyncQueueAddress);
-  console.log(remainingAccounts[0]);
-  console.log(remainingAccounts[1]);
-
   let tx = new Transaction().add(
     instructions.crankMarketIx(
       asset,
