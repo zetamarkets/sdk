@@ -723,6 +723,7 @@ export async function processTransaction(
     );
     return txSig;
   } catch (err) {
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -1161,6 +1162,27 @@ export async function crankMarket(
       };
     })
   );
+
+  if (marketIndex == constants.PERP_INDEX) {
+    remainingAccounts.unshift(
+      {
+        pubkey: Exchange.getSubExchange(asset).greeksAddress,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: Exchange.getSubExchange(asset).perpSyncQueueAddress,
+        isSigner: false,
+        isWritable: true,
+      }
+    );
+  }
+
+  console.log(Exchange.getSubExchange(asset).greeksAddress);
+  console.log(Exchange.getSubExchange(asset).perpSyncQueueAddress);
+  console.log(remainingAccounts[0]);
+  console.log(remainingAccounts[1]);
+
   let tx = new Transaction().add(
     instructions.crankMarketIx(
       asset,

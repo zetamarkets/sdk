@@ -1180,12 +1180,10 @@ export function crankMarketIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
-      greeks: Exchange.getSubExchange(asset).greeksAddress,
       market,
       eventQueue,
       dexProgram,
       serumAuthority: Exchange.serumAuthority,
-      perpSyncQueue: Exchange.getZetaGroup(asset).perpSyncQueue,
     },
     remainingAccounts,
   });

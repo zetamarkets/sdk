@@ -3167,16 +3167,6 @@ export type Zeta = {
           "name": "serumAuthority",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": []
@@ -9908,16 +9898,6 @@ export const IDL: Zeta = {
         {
           "name": "serumAuthority",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
           "isSigner": false
         }
       ],
