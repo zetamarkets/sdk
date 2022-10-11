@@ -4009,11 +4009,19 @@
             "type": "u8"
           },
           {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                91
               ]
             }
           }
@@ -5181,6 +5189,14 @@
             "type": "u64"
           },
           {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -5270,6 +5286,14 @@
           },
           {
             "name": "nativeOptionUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
             "type": "u64"
           },
           {

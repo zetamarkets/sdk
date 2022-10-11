@@ -4009,11 +4009,19 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                91
               ]
             }
           }
@@ -5181,6 +5189,14 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -5270,6 +5286,14 @@ export type Zeta = {
           },
           {
             "name": "nativeOptionUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -10727,11 +10751,19 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                91
               ]
             }
           }
@@ -11899,6 +11931,14 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -11988,6 +12028,14 @@ export const IDL: Zeta = {
           },
           {
             "name": "nativeOptionUnderlyingFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpTradeFeePercentage",
+            "type": "u64"
+          },
+          {
+            "name": "nativePerpUnderlyingFeePercentage",
             "type": "u64"
           },
           {

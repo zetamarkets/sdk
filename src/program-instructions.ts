@@ -2206,6 +2206,8 @@ export interface StateParams {
   marginConcessionPercentage: number;
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
+  nativePerpTradeFeePercentage: anchor.BN;
+  nativePerpUnderlyingFeePercentage: anchor.BN;
 }
 
 export interface UpdatePricingParametersArgs {
