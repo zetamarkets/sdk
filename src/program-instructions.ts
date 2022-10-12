@@ -1299,6 +1299,20 @@ export function updateMarginParametersIx(
   });
 }
 
+export function updatePerpParametersIx(
+  asset: Asset,
+  args: UpdatePerpParametersArgs,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updatePerpParameters(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      admin,
+    },
+  });
+}
+
 export function updateZetaGroupExpiryParameters(
   asset: Asset,
   args: UpdateZetaGroupExpiryArgs,
@@ -2251,6 +2265,12 @@ export interface UpdateMarginParametersArgs {
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
   optionShortPutCapPercentage: anchor.BN;
+}
+
+export interface UpdatePerpParametersArgs {
+  minFundingRatePercent: anchor.BN;
+  maxFundingRatePercent: anchor.BN;
+  perpImpactCashDelta: anchor.BN;
 }
 
 export interface UpdateZetaGroupExpiryArgs {

@@ -298,6 +298,23 @@ export class SubExchange {
   }
 
   /**
+   * Update the perp parameters for a zeta group.
+   */
+  public async updatePerpParameters(
+    args: instructions.UpdatePerpParametersArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.updatePerpParametersIx(
+        this.asset,
+        args,
+        Exchange.provider.wallet.publicKey
+      )
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+    await this.updateZetaGroup();
+  }
+
+  /**
    * Update the margin parameters for a zeta group.
    */
   public async updateZetaGroupExpiryParameters(

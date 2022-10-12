@@ -714,6 +714,13 @@ export class Exchange {
     await this.getSubExchange(asset).updateMarginParameters(args);
   }
 
+  public async updatePerpParameters(
+    asset: Asset,
+    args: instructions.UpdatePerpParametersArgs
+  ) {
+    await this.getSubExchange(asset).updatePerpParameters(args);
+  }
+
   public async updateZetaGroupExpiryParameters(
     asset: Asset,
     args: instructions.UpdateZetaGroupExpiryArgs
