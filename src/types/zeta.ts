@@ -6714,18 +6714,13 @@ export type Zeta = {
     },
     {
       "code": 6123,
-      "name": "InvalidProductIndexInPlacePerpOrder",
-      "msg": "Invalid product index in placePerpOrder"
+      "name": "InvalidNonPerpMarket",
+      "msg": "Perp product index given in placeOrder, use placePerpOrder"
     },
     {
       "code": 6124,
-      "name": "NonPerpProductIndexGivenInPlacePerpOrder",
+      "name": "InvalidPerpMarket",
       "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
-    },
-    {
-      "code": 6125,
-      "name": "PerpProductIndexGivenInPlaceOrder",
-      "msg": "Perp product index given in placeOrder, use placePerpOrder"
     }
   ]
 };
@@ -13446,18 +13441,13 @@ export const IDL: Zeta = {
     },
     {
       "code": 6123,
-      "name": "InvalidProductIndexInPlacePerpOrder",
-      "msg": "Invalid product index in placePerpOrder"
+      "name": "InvalidNonPerpMarket",
+      "msg": "Perp product index given in placeOrder, use placePerpOrder"
     },
     {
       "code": 6124,
-      "name": "NonPerpProductIndexGivenInPlacePerpOrder",
+      "name": "InvalidPerpMarket",
       "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
-    },
-    {
-      "code": 6125,
-      "name": "PerpProductIndexGivenInPlaceOrder",
-      "msg": "Perp product index given in placeOrder, use placePerpOrder"
     }
   ]
 };
