@@ -10,6 +10,7 @@ import {
   TradeEvent,
   TradeEventV2,
   OrderCompleteEvent,
+  ProductLedger,
 } from "./program-types";
 import {
   PublicKey,
@@ -357,13 +358,7 @@ export class Client {
     // marketIndex is either number or PublicKey
     let marketPubkey: PublicKey;
     if (typeof market == "number") {
-      if (market == constants.PERP_INDEX) {
-        marketPubkey =
-          Exchange.getSubExchange(asset).markets.perpMarket.address;
-      } else {
-        marketPubkey =
-          Exchange.getSubExchange(asset).markets.markets[market].address;
-      }
+      marketPubkey = Exchange.getMarket(asset, market).address;
     } else {
       marketPubkey = market;
     }
@@ -982,6 +977,10 @@ export class Client {
       )
     );
     return await utils.processTransaction(this._provider, tx);
+  }
+
+  public getProductLedger(asset: Asset, marketIndex: number): ProductLedger {
+    return this.getSubClient(asset).getProductLedger(marketIndex);
   }
 
   public async close() {

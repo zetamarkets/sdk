@@ -563,7 +563,7 @@ export class Exchange {
   }
 
   public async updateOrderbook(asset: Asset, index: number) {
-    await this.getSubExchange(asset).markets.markets[index].updateOrderbook();
+    await this.getMarket(asset, index).updateOrderbook();
   }
 
   public async updateAllOrderbooks(live: boolean = true) {
@@ -639,6 +639,9 @@ export class Exchange {
   }
 
   public getMarket(asset: Asset, index: number): Market {
+    if (index == constants.PERP_INDEX) {
+      return this.getPerpMarket(asset);
+    }
     return this.getSubExchange(asset).markets.markets[index];
   }
 
@@ -677,7 +680,7 @@ export class Exchange {
   }
 
   public getOrderbook(asset: Asset, index: number): types.DepthOrderbook {
-    return this.getSubExchange(asset).markets.markets[index].orderbook;
+    return this.getMarket(asset, index).orderbook;
   }
 
   public getMarkPrice(asset: Asset, index: number): number {

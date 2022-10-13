@@ -1644,29 +1644,27 @@ export class SubClient {
         indexes.push(i);
       }
     }
+
+    // Push perps productLedger too if relevant
+    let perpLedger = this._marginAccount.perpProductLedger;
+    if (
+      perpLedger.position.size.toNumber() !== 0 ||
+      perpLedger.orderState.openingOrders[0].toNumber() != 0 ||
+      perpLedger.orderState.openingOrders[1].toNumber() != 0
+    ) {
+      indexes.push(constants.PERP_INDEX);
+    }
     return indexes;
   }
 
   private async updateOrders() {
     let orders = [];
-    let subExchange = this._subExchange;
     await Promise.all(
       [...this.getRelevantMarketIndexes()].map(async (i) => {
-        await subExchange.markets.markets[i].updateOrderbook();
-        orders.push(
-          subExchange.markets.markets[i].getOrdersForAccount(
-            this._openOrdersAccounts[i]
-          )
-        );
+        let market = Exchange.getMarket(this._asset, i);
+        await market.updateOrderbook();
+        orders.push(market.getOrdersForAccount(this._openOrdersAccounts[i]));
       })
-    );
-
-    // perps too
-    await subExchange.markets.perpMarket.updateOrderbook();
-    orders.push(
-      subExchange.markets.perpMarket.getOrdersForAccount(
-        this._openOrdersAccounts[constants.PERP_INDEX]
-      )
     );
 
     this._orders = [].concat(...orders);
@@ -1777,12 +1775,7 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let position;
-    if (index == constants.PERP_INDEX) {
-      position = this.marginAccount.perpProductLedger.position;
-    } else {
-      position = this.marginAccount.productLedgers[index].position;
-    }
+    let position = this.getProductLedger(index).position;
     let size = position.size.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
@@ -1795,12 +1788,7 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let position;
-    if (index == constants.PERP_INDEX) {
-      position = this.marginAccount.perpProductLedger.position;
-    } else {
-      position = this.marginAccount.productLedgers[index].position;
-    }
+    let position = this.getProductLedger(index).position;
     let costOfTrades = position.costOfTrades.toNumber();
     return decimal
       ? utils.convertNativeIntegerToDecimal(costOfTrades)
@@ -1816,12 +1804,7 @@ export class SubClient {
     side: types.Side,
     decimal: boolean = false
   ): number {
-    let orderState;
-    if (index == constants.PERP_INDEX) {
-      orderState = this.marginAccount.perpProductLedger.orderState;
-    } else {
-      orderState = this.marginAccount.productLedgers[index].orderState;
-    }
+    let orderState = this.getProductLedger(index).orderState;
     let orderIndex = side == types.Side.BID ? 0 : 1;
     let size = orderState.openingOrders[orderIndex].toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
@@ -1832,12 +1815,7 @@ export class SubClient {
    * @param decimal - whether to convert to readable decimal.
    */
   public getClosingOrders(index: number, decimal: boolean = false): number {
-    let orderState;
-    if (index == constants.PERP_INDEX) {
-      orderState = this.marginAccount.perpProductLedger.orderState;
-    } else {
-      orderState = this.marginAccount.productLedgers[index].orderState;
-    }
+    let orderState = this.getProductLedger(index).orderState;
     let size = orderState.closingOrders.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
@@ -1872,6 +1850,16 @@ export class SubClient {
     return decimal
       ? utils.convertNativeIntegerToDecimal(costOfTrades)
       : costOfTrades;
+  }
+
+  /**
+   * Getter function to grab the correct product ledger because perps is separate
+   */
+  public getProductLedger(index: number) {
+    if (index == constants.PERP_INDEX) {
+      return this.marginAccount.perpProductLedger;
+    }
+    return this.marginAccount.productLedgers[index];
   }
 
   /**

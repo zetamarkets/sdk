@@ -1105,12 +1105,7 @@ export async function crankMarket(
   marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>
 ) {
-  let market: Market;
-  if (marketIndex == constants.PERP_INDEX) {
-    market = Exchange.getPerpMarket(asset);
-  } else {
-    market = Exchange.getMarket(asset, marketIndex);
-  }
+  let market = Exchange.getMarket(asset, marketIndex);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
     return;
