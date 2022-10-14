@@ -1349,11 +1349,8 @@ export async function getAllOpenOrdersAccountsByMarket(
   asset: Asset
 ): Promise<Map<number, Array<PublicKey>>> {
   let openOrdersByMarketIndex = new Map<number, Array<PublicKey>>();
-  for (var i = 0; i < Exchange.getMarkets(asset).length; i++) {
-    openOrdersByMarketIndex.set(
-      i == constants.PERP_INDEX ? constants.PERP_INDEX : i,
-      []
-    );
+  for (var market of Exchange.getMarkets(asset)) {
+    openOrdersByMarketIndex.set(market.marketIndex, []);
   }
 
   let marginAccounts = await Exchange.program.account.marginAccount.all();
@@ -1363,18 +1360,17 @@ export async function getAllOpenOrdersAccountsByMarket(
       if (assets.fromProgramAsset(marginAccount.asset) != asset) {
         return;
       }
-      for (var i = 0; i < Exchange.getMarkets(asset).length; i++) {
-        let index = constants.PERP_INDEX ? constants.PERP_INDEX : i;
-        let nonce = marginAccount.openOrdersNonce[index];
+      for (var market of Exchange.getMarkets(asset)) {
+        let nonce = marginAccount.openOrdersNonce[market.marketIndex];
         if (nonce == 0) {
           continue;
         }
         let [openOrders, _nonce] = await getOpenOrders(
           Exchange.programId,
-          Exchange.getMarkets(asset)[i].address,
+          market.address,
           marginAccount.authority
         );
-        openOrdersByMarketIndex.get(index).push(openOrders);
+        openOrdersByMarketIndex.get(market.marketIndex).push(openOrders);
       }
     })
   );

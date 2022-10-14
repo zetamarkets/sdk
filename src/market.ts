@@ -331,7 +331,9 @@ export class ZetaGroupMarkets {
    */
   public getMarket(market: PublicKey): Market {
     let index = this.getMarketIndex(market);
-    return this._markets[index];
+    return index == constants.PERP_INDEX
+      ? this._perpMarket
+      : this._markets[index];
   }
 
   /**
