@@ -858,7 +858,7 @@ function printMarkets(markets: Market[], subExchange: SubExchange) {
     if (market.kind == types.Kind.PERP) {
       let markPrice = subExchange.getMarkPrice(market.marketIndex);
       console.log(
-        `[MARKET] INDEX: N/A KIND: ${
+        `[MARKET] INDEX: ${constants.PERP_INDEX} KIND: ${
           market.kind
         } MARK_PRICE ${markPrice.toFixed(6)}`
       );
