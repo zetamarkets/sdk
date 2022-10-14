@@ -2,7 +2,7 @@
   "dependencies": {
     "@project-serum/anchor": "0.22.1",
     "@solana/web3.js": "^1.31.0",
-    "@zetamarkets/sdk": "^0.16.0",
+    "@zetamarkets/sdk": "^0.17.1",
     "buffer-layout": "^1.2.2",
     "dotenv": "^10.0.0",
     "ts-node": "^7.0.1",

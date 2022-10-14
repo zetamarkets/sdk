@@ -741,7 +741,8 @@ export class SubClient {
     side: types.Side,
     orderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG
+    tag: String = constants.DEFAULT_ORDER_TAG,
+    blockhash?: string
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -784,7 +785,14 @@ export class SubClient {
     tx.add(orderIx);
 
     let txId: TransactionSignature;
-    txId = await utils.processTransaction(this._parent.provider, tx);
+    txId = await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      blockhash
+    );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
   }
