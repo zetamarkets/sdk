@@ -75,11 +75,11 @@ export class RiskCalculator {
     size: number,
     marginType: types.MarginType
   ): number {
-    return this.calculateMarginRequirement(
-      this._marginRequirements.get(asset)[productIndex],
-      size,
-      marginType
-    );
+    let marginRequirement =
+      productIndex == constants.PERP_INDEX
+        ? this._perpMarginRequirements.get(asset)
+        : this._marginRequirements.get(asset)[productIndex];
+    return this.calculateMarginRequirement(marginRequirement, size, marginType);
   }
 
   public getPerpMarginRequirement(
@@ -178,13 +178,11 @@ export class RiskCalculator {
       );
       if (size > 0) {
         pnl +=
-          convertNativeLotSizeToDecimal(size) *
-            convertNativeBNToDecimal(subExchange.greeks.markPrices[i]) -
+          convertNativeLotSizeToDecimal(size) * subExchange.getMarkPrice(i) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
-          convertNativeLotSizeToDecimal(size) *
-            convertNativeBNToDecimal(subExchange.greeks.markPrices[i]) +
+          convertNativeLotSizeToDecimal(size) * subExchange.getMarkPrice(i) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
     }
@@ -206,9 +204,9 @@ export class RiskCalculator {
     let marketMaker = types.isMarketMaker(marginAccount);
     let margin = 0;
 
-    let ledgers = marginAccount.productLedgers;
-    ledgers[constants.PERP_INDEX] = marginAccount.perpProductLedger;
-
+    let ledgers = marginAccount.productLedgers.concat(
+      marginAccount.perpProductLedger
+    );
     for (var i = 0; i < ledgers.length; i++) {
       let ledger = ledgers[i];
       let size = ledger.position.size.toNumber();
@@ -284,8 +282,9 @@ export class RiskCalculator {
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
     let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
-    let ledgers = marginAccount.productLedgers;
-    ledgers[constants.PERP_INDEX] = marginAccount.perpProductLedger;
+    let ledgers = marginAccount.productLedgers.concat(
+      marginAccount.perpProductLedger
+    );
     for (var i = 0; i < ledgers.length; i++) {
       let position = ledgers[i].position;
       let size = position.size.toNumber();
