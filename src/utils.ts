@@ -1612,3 +1612,10 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
     })
   );
 }
+
+export function getProductLedger(marginAccount: MarginAccount, index: number) {
+  if (index == constants.PERP_INDEX) {
+    return marginAccount.perpProductLedger;
+  }
+  return marginAccount.productLedgers[index];
+}

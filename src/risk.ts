@@ -151,11 +151,24 @@ export class RiskCalculator {
   ): number {
     let pnl = 0;
 
-    for (var i = 0; i < constants.ACTIVE_MARKETS - 1; i++) {
+    let i_list = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
+    i_list.push(constants.PERP_INDEX);
+
+    for (var i of i_list) {
+      // No perps in spread accounts
+      if (
+        i == constants.PERP_INDEX &&
+        accountType == types.ProgramAccountType.SpreadAccount
+      ) {
+        continue;
+      }
+
       const position =
         accountType == types.ProgramAccountType.MarginAccount
-          ? account.productLedgers[i].position
-          : account.positions[i];
+          ? i == constants.PERP_INDEX
+            ? account.perpProductLedger.position // Margin account perp
+            : account.productLedgers[i].position // Margin account non-perp
+          : account.positions[i]; // Spread account
       const size = position.size.toNumber();
       if (size == 0) {
         continue;
@@ -175,6 +188,7 @@ export class RiskCalculator {
           convertNativeBNToDecimal(position.costOfTrades);
       }
     }
+
     return pnl;
   }
 
@@ -191,8 +205,12 @@ export class RiskCalculator {
     let asset = fromProgramAsset(marginAccount.asset);
     let marketMaker = types.isMarketMaker(marginAccount);
     let margin = 0;
-    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
-      let ledger = marginAccount.productLedgers[i];
+
+    let ledgers = marginAccount.productLedgers;
+    ledgers[constants.PERP_INDEX] = marginAccount.perpProductLedger;
+
+    for (var i = 0; i < ledgers.length; i++) {
+      let ledger = ledgers[i];
       let size = ledger.position.size.toNumber();
       let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
       let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
@@ -214,19 +232,22 @@ export class RiskCalculator {
       let marginForMarket: number = undefined;
       let longLotsMarginReq = this.getMarginRequirement(
         asset,
-        i,
+        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
         // Positive for buys.
         longLots,
         types.MarginType.INITIAL
       );
       let shortLotsMarginReq = this.getMarginRequirement(
         asset,
-        i,
+        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
         // Negative for sells.
         -shortLots,
         types.MarginType.INITIAL
       );
-      if ((i + 1) % constants.PRODUCTS_PER_EXPIRY == 0) {
+      if (
+        (i + 1) % constants.PRODUCTS_PER_EXPIRY == 0 ||
+        i == constants.PERP_INDEX
+      ) {
         marginForMarket =
           longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
       } else {
@@ -239,7 +260,7 @@ export class RiskCalculator {
         // Add position margin which doesn't get concessions.
         marginForMarket += this.getMarginRequirement(
           asset,
-          i,
+          i == ledgers.length - 1 ? constants.PERP_INDEX : i,
           // This is signed.
           convertNativeLotSizeToDecimal(size),
           types.MarginType.MAINTENANCE
@@ -263,15 +284,17 @@ export class RiskCalculator {
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
     let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
-    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
-      let position = marginAccount.productLedgers[i].position;
+    let ledgers = marginAccount.productLedgers;
+    ledgers[constants.PERP_INDEX] = marginAccount.perpProductLedger;
+    for (var i = 0; i < ledgers.length; i++) {
+      let position = ledgers[i].position;
       let size = position.size.toNumber();
       if (size == 0) {
         continue;
       }
       let positionMargin = this.getMarginRequirement(
         asset,
-        i,
+        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
         // This is signed.
         convertNativeLotSizeToDecimal(size),
         types.MarginType.MAINTENANCE
@@ -295,8 +318,11 @@ export class RiskCalculator {
   ): number {
     let asset = fromProgramAsset(marginAccount.asset);
     let margin = 0;
-    for (var i = 0; i < marginAccount.productLedgers.length; i++) {
-      let ledger = marginAccount.productLedgers[i];
+    let ledgers = marginAccount.productLedgers.concat(
+      marginAccount.perpProductLedger
+    );
+    for (var i = 0; i < ledgers.length; i++) {
+      let ledger = ledgers[i];
       let size = ledger.position.size.toNumber();
       let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
       let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
@@ -316,14 +342,14 @@ export class RiskCalculator {
       let marginForMarket =
         this.getMarginRequirement(
           asset,
-          i,
+          i == ledgers.length - 1 ? constants.PERP_INDEX : i,
           // Positive for buys.
           longLots,
           types.MarginType.MAINTENANCE
         ) +
         this.getMarginRequirement(
           asset,
-          i,
+          i == ledgers.length - 1 ? constants.PERP_INDEX : i,
           // Negative for sells.
           -shortLots,
           types.MarginType.MAINTENANCE

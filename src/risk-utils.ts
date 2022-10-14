@@ -11,6 +11,7 @@ import {
 import {
   convertNativeBNToDecimal,
   convertDecimalToNativeInteger,
+  getProductLedger,
 } from "./utils";
 
 /**
@@ -451,7 +452,7 @@ export function handleExecutionCostOfTrades(
     }
     return;
   }
-  let ledger = marginAccount.productLedgers[index];
+  let ledger = getProductLedger(marginAccount, index);
   let [openSize, closeSize] = getExecutionOpenCloseSize(
     ledger.position.size.toNumber(),
     size
@@ -488,7 +489,7 @@ function lockMarginAccountPosition(
   index: number,
   size: number
 ) {
-  let ledger = marginAccount.productLedgers[index];
+  let ledger = getProductLedger(marginAccount, index);
   resetClosingOrders(ledger);
   let costOfTrades = moveSize(ledger.position, size);
   rebalanceOrders(ledger);

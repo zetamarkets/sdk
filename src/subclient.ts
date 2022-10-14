@@ -1856,10 +1856,7 @@ export class SubClient {
    * Getter function to grab the correct product ledger because perps is separate
    */
   public getProductLedger(index: number) {
-    if (index == constants.PERP_INDEX) {
-      return this.marginAccount.perpProductLedger;
-    }
-    return this.marginAccount.productLedgers[index];
+    return utils.getProductLedger(this.marginAccount, index);
   }
 
   /**
