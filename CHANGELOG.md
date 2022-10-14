@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.17.1]
+
+- client: Add placeOrderWithBlockhash(), allowing the user to specify their own blockhash to avoid an RPC roundtrip. ([#166](https://github.com/zetamarkets/sdk/pull/166))
+- examples: Bump SDK version and webserver URL. ([#166](https://github.com/zetamarkets/sdk/pull/166))
+
 ## [0.17.0]
 
 - idl: add idl perp kind to prevent breaking changes.
