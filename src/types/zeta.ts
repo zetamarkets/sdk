@@ -3715,9 +3715,13 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarkPrice",
+            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -4822,11 +4826,19 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                32
+                16
               ]
             }
           }
@@ -5405,6 +5417,14 @@ export type Zeta = {
           {
             "name": "optionShortPutCapPercentage",
             "type": "u64"
+          },
+          {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
+            "type": "u64"
           }
         ]
       }
@@ -5521,6 +5541,14 @@ export type Zeta = {
           },
           {
             "name": "futureMarginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
             "type": "u64"
           },
           {
@@ -10442,9 +10470,13 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarkPrice",
+            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -11549,11 +11581,19 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                32
+                16
               ]
             }
           }
@@ -12132,6 +12172,14 @@ export const IDL: Zeta = {
           {
             "name": "optionShortPutCapPercentage",
             "type": "u64"
+          },
+          {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
+            "type": "u64"
           }
         ]
       }
@@ -12248,6 +12296,14 @@ export const IDL: Zeta = {
           },
           {
             "name": "futureMarginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
             "type": "u64"
           },
           {

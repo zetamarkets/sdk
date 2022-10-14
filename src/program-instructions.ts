@@ -1043,6 +1043,8 @@ export async function initializeZetaGroupIx(
       maxVolatility: pricingArgs.maxVolatility,
       futureMarginInitial: marginArgs.futureMarginInitial,
       futureMarginMaintenance: marginArgs.futureMarginMaintenance,
+      perpMarginInitial: marginArgs.perpMarginInitial,
+      perpMarginMaintenance: marginArgs.perpMarginMaintenance,
       optionMarkPercentageLongInitial:
         marginArgs.optionMarkPercentageLongInitial,
       optionSpotPercentageLongInitial:
@@ -2265,6 +2267,8 @@ export interface UpdateMarginParametersArgs {
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
   optionShortPutCapPercentage: anchor.BN;
+  perpMarginInitial: anchor.BN;
+  perpMarginMaintenance: anchor.BN;
 }
 
 export interface UpdatePerpParametersArgs {

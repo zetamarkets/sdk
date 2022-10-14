@@ -3715,9 +3715,13 @@
             "type": {
               "array": [
                 "u64",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarkPrice",
+            "type": "u64"
           },
           {
             "name": "productGreeks",
@@ -4822,11 +4826,19 @@
             "type": "u64"
           },
           {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                32
+                16
               ]
             }
           }
@@ -5405,6 +5417,14 @@
           {
             "name": "optionShortPutCapPercentage",
             "type": "u64"
+          },
+          {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
+            "type": "u64"
           }
         ]
       }
@@ -5521,6 +5541,14 @@
           },
           {
             "name": "futureMarginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "perpMarginMaintenance",
             "type": "u64"
           },
           {

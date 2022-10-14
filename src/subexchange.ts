@@ -667,14 +667,12 @@ export class SubExchange {
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    if (index == constants.PERP_INDEX) {
-      return Exchange.oracle.getPrice(this._asset).price;
-    }
+    let price =
+      index == constants.PERP_INDEX
+        ? this._greeks.perpMarkPrice
+        : this._greeks.markPrices[index];
 
-    return utils.convertNativeBNToDecimal(
-      this._greeks.markPrices[index],
-      constants.PLATFORM_PRECISION
-    );
+    return utils.convertNativeBNToDecimal(price, constants.PLATFORM_PRECISION);
   }
 
   /**

@@ -72,6 +72,8 @@ export interface MarginParameters {
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
   optionShortPutCapPercentage: anchor.BN;
+  perpMarginInitial: anchor.BN;
+  perpMarginMaintenance: anchor.BN;
   padding: Array<number>;
 }
 
@@ -188,6 +190,7 @@ export interface SpreadAccount {
 export interface Greeks {
   nonce: number;
   markPrices: Array<anchor.BN>;
+  perpMarkPrice: anchor.BN;
   markPricesPadding: Array<anchor.BN>;
   productGreeks: Array<ProductGreeks>;
   productGreeksPadding: Array<ProductGreeks>;
