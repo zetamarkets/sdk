@@ -71,12 +71,7 @@ export function calculateProductMargin(
   spotPrice: number
 ): types.MarginRequirement {
   let subExchange = Exchange.getSubExchange(asset);
-  let market;
-  if (productIndex == constants.PERP_INDEX) {
-    market = subExchange.markets.perpMarket;
-  } else {
-    market = subExchange.markets.markets[productIndex];
-  }
+  let market = Exchange.getMarket(asset, productIndex);
   if (market.strike == null) {
     return null;
   }
@@ -96,7 +91,7 @@ export function calculateProductMargin(
         strike
       );
     case types.Kind.PERP:
-      return calculateFutureMargin(asset, spotPrice);
+      return calculatePerpMargin(asset, spotPrice);
   }
 }
 
@@ -113,6 +108,26 @@ export function calculateFutureMargin(
   let initial = spotPrice * subExchange.marginParams.futureMarginInitial;
   let maintenance =
     spotPrice * subExchange.marginParams.futureMarginMaintenance;
+  return {
+    initialLong: initial,
+    initialShort: initial,
+    maintenanceLong: maintenance,
+    maintenanceShort: maintenance,
+  };
+}
+
+/**
+ * Calculates the margin requirement for a perp.
+ * @param asset         underlying asset (SOL, BTC, etc.)
+ * @param spotPrice     price of the spot.
+ */
+export function calculatePerpMargin(
+  asset: Asset,
+  spotPrice: number
+): types.MarginRequirement {
+  let subExchange = Exchange.getSubExchange(asset);
+  let initial = spotPrice * subExchange.marginParams.perpMarginInitial;
+  let maintenance = spotPrice * subExchange.marginParams.perpMarginMaintenance;
   return {
     initialLong: initial,
     initialShort: initial,

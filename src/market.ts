@@ -155,7 +155,10 @@ export class ZetaGroupMarkets {
   }
 
   public subscribeMarket(marketIndex: number) {
-    if (marketIndex >= this._markets.length) {
+    if (
+      marketIndex >= this._markets.length &&
+      marketIndex != constants.PERP_INDEX
+    ) {
       throw Error(`Market index ${marketIndex} doesn't exist.`);
     }
     this._subscribedMarketIndexes.add(marketIndex);
@@ -542,9 +545,12 @@ export class Market {
   }
 
   public updateStrike() {
-    let strike = Exchange.getSubExchange(this.asset).zetaGroup.products[
-      this._marketIndex
-    ].strike;
+    let strike =
+      this._marketIndex == constants.PERP_INDEX
+        ? Exchange.getSubExchange(this.asset).zetaGroup.perp.strike
+        : Exchange.getSubExchange(this.asset).zetaGroup.products[
+            this._marketIndex
+          ].strike;
 
     if (!strike.isSet) {
       this._strike = null;

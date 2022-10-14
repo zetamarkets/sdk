@@ -1226,7 +1226,7 @@ export function getMutMarketAccounts(
   asset: Asset,
   marketIndex: number
 ): Object[] {
-  let market = Exchange.getSubExchange(asset).markets.markets[marketIndex];
+  let market = Exchange.getMarket(asset, marketIndex);
   return [
     { pubkey: market.address, isSigner: false, isWritable: false },
     {
@@ -1348,10 +1348,12 @@ export async function getAllProgramAccountAddresses(
 export async function getAllOpenOrdersAccountsByMarket(
   asset: Asset
 ): Promise<Map<number, Array<PublicKey>>> {
-  let subExchange = Exchange.getSubExchange(asset);
   let openOrdersByMarketIndex = new Map<number, Array<PublicKey>>();
-  for (var i = 0; i < subExchange.markets.markets.length; i++) {
-    openOrdersByMarketIndex.set(i, []);
+  for (var i = 0; i < Exchange.getMarkets(asset).length; i++) {
+    openOrdersByMarketIndex.set(
+      i == constants.PERP_INDEX ? constants.PERP_INDEX : i,
+      []
+    );
   }
 
   let marginAccounts = await Exchange.program.account.marginAccount.all();
@@ -1361,17 +1363,18 @@ export async function getAllOpenOrdersAccountsByMarket(
       if (assets.fromProgramAsset(marginAccount.asset) != asset) {
         return;
       }
-      for (var i = 0; i < subExchange.markets.markets.length; i++) {
-        let nonce = marginAccount.openOrdersNonce[i];
+      for (var i = 0; i < Exchange.getMarkets(asset).length; i++) {
+        let index = constants.PERP_INDEX ? constants.PERP_INDEX : i;
+        let nonce = marginAccount.openOrdersNonce[index];
         if (nonce == 0) {
           continue;
         }
         let [openOrders, _nonce] = await getOpenOrders(
           Exchange.programId,
-          subExchange.markets.markets[i].address,
+          Exchange.getMarkets(asset)[i].address,
           marginAccount.authority
         );
-        openOrdersByMarketIndex.get(i).push(openOrders);
+        openOrdersByMarketIndex.get(index).push(openOrders);
       }
     })
   );
@@ -1385,7 +1388,7 @@ export async function settleAndBurnVaultTokensByMarket(
   marketIndex: number
 ) {
   console.log(`Burning tokens for market index ${marketIndex}`);
-  let market = Exchange.getSubExchange(asset).markets.markets[marketIndex];
+  let market = Exchange.getMarket(asset, marketIndex);
   let openOrders = openOrdersByMarketIndex.get(marketIndex);
   let remainingAccounts = openOrders.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
@@ -1420,12 +1423,10 @@ export async function settleAndBurnVaultTokens(
   asset: Asset,
   provider: anchor.AnchorProvider
 ) {
-  let subExchange = Exchange.getSubExchange(asset);
   let openOrdersByMarketIndex = await getAllOpenOrdersAccountsByMarket(asset);
-  for (var i = 0; i < subExchange.markets.markets.length; i++) {
-    console.log(`Burning tokens for market index ${i}`);
-    let market = subExchange.markets.markets[i];
-    let openOrders = openOrdersByMarketIndex.get(i);
+  for (var market of Exchange.getMarkets(asset)) {
+    console.log(`Burning tokens for market index ${market.marketIndex}`);
+    let openOrders = openOrdersByMarketIndex.get(market.marketIndex);
     let remainingAccounts = openOrders.map((key) => {
       return { pubkey: key, isSigner: false, isWritable: true };
     });
@@ -1460,10 +1461,8 @@ export async function burnVaultTokens(
   asset: Asset,
   provider: anchor.AnchorProvider
 ) {
-  let subExchange = Exchange.getSubExchange(asset);
-  for (var i = 0; i < subExchange.markets.markets.length; i++) {
-    console.log(`Burning tokens for market index ${i}`);
-    let market = subExchange.markets.markets[i];
+  for (var market of Exchange.getMarkets(asset)) {
+    console.log(`Burning tokens for market index ${market.marketIndex}`);
     let burnTx = instructions.burnVaultTokenTx(asset, market.address);
     await processTransaction(provider, burnTx);
   }

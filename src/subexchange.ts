@@ -15,7 +15,7 @@ import {
   ProductGreeks,
   PerpSyncQueue,
 } from "./program-types";
-import { ZetaGroupMarkets } from "./market";
+import { Market, ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
 import { Network } from "./network";
 import { Asset, assetToName } from "./assets";
@@ -98,7 +98,7 @@ export class SubExchange {
     return this._markets;
   }
   public get numMarkets(): number {
-    return this._markets.markets.length;
+    return this.getMarkets().length;
   }
   private _markets: ZetaGroupMarkets;
 
@@ -223,7 +223,8 @@ export class SubExchange {
     if (
       this.zetaGroup.products[this.zetaGroup.products.length - 1].market.equals(
         PublicKey.default
-      )
+      ) ||
+      this.zetaGroup.perp.market.equals(PublicKey.default)
     ) {
       throw "Zeta group markets are uninitialized!";
     }
@@ -676,6 +677,13 @@ export class SubExchange {
   }
 
   /**
+   * Returns all perp & nonperk markets in a single list
+   */
+  public getMarkets(): Market[] {
+    return this._markets.markets.concat(this._markets.perpMarket);
+  }
+
+  /**
    * @param user user pubkey to be whitelisted for uncapped deposit
    */
   public async whitelistUserForDeposit(user: PublicKey) {
@@ -807,6 +815,14 @@ export class SubExchange {
         this.zetaGroup.marginParameters.optionShortPutCapPercentage,
         constants.MARGIN_PRECISION
       ),
+      perpMarginInitial: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.perpMarginInitial,
+        constants.MARGIN_PRECISION
+      ),
+      perpMarginMaintenance: utils.convertNativeBNToDecimal(
+        this.zetaGroup.marginParameters.perpMarginMaintenance,
+        constants.MARGIN_PRECISION
+      ),
     };
   }
 
@@ -886,7 +902,7 @@ export class SubExchange {
   public async cancelAllOrdersHalted() {
     this.assertHalted();
     await Promise.all(
-      this._markets.markets.map(async (market) => {
+      this.getMarkets().map(async (market) => {
         await market.cancelAllOrdersHalted();
       })
     );
@@ -895,7 +911,7 @@ export class SubExchange {
   public async cleanZetaMarketsHalted() {
     this.assertHalted();
     let marketAccounts = await Promise.all(
-      this._markets.markets.map(async (market) => {
+      this.getMarkets().map(async (market) => {
         return utils.getMutMarketAccounts(this.asset, market.marketIndex);
       })
     );
