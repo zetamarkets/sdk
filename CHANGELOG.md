@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.17.1]
+
+- general: Bump solana-web3 package to 1.66.1 to fix some socket issues. ([#167](https://github.com/zetamarkets/sdk/pull/167))
+
 ## [0.17.0]
 
 - idl: add idl perp kind to prevent breaking changes.
