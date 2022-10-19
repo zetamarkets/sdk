@@ -3840,13 +3840,9 @@
             "type": {
               "array": [
                 "bool",
-                5
+                6
               ]
             }
-          },
-          {
-            "name": "haltForcePerpPricing",
-            "type": "bool"
           },
           {
             "name": "perpUpdateTimestamp",
@@ -4080,6 +4076,10 @@
                 600
               ]
             }
+          },
+          {
+            "name": "openInterestVolume",
+            "type": "u64"
           }
         ]
       }
@@ -4218,7 +4218,7 @@
             "type": {
               "array": [
                 "u8",
-                966
+                990
               ]
             }
           }
@@ -4317,7 +4317,7 @@
             "type": {
               "array": [
                 "u8",
-                254
+                262
               ]
             }
           }
@@ -4826,19 +4826,11 @@
             "type": "u64"
           },
           {
-            "name": "perpMarginInitial",
-            "type": "u64"
-          },
-          {
-            "name": "perpMarginMaintenance",
-            "type": "u64"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                16
+                32
               ]
             }
           }
@@ -4861,15 +4853,6 @@
           {
             "name": "impactCashDelta",
             "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
           }
         ]
       }
@@ -5417,14 +5400,6 @@
           {
             "name": "optionShortPutCapPercentage",
             "type": "u64"
-          },
-          {
-            "name": "perpMarginInitial",
-            "type": "u64"
-          },
-          {
-            "name": "perpMarginMaintenance",
-            "type": "u64"
           }
         ]
       }
@@ -5541,14 +5516,6 @@
           },
           {
             "name": "futureMarginMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "perpMarginInitial",
-            "type": "u64"
-          },
-          {
-            "name": "perpMarginMaintenance",
             "type": "u64"
           },
           {

@@ -193,8 +193,6 @@ export interface MarginParams {
   optionSpotPercentageShortMaintenance: number;
   optionDynamicPercentageShortMaintenance: number;
   optionShortPutCapPercentage: number;
-  perpMarginInitial: number;
-  perpMarginMaintenance: number;
 }
 
 export enum ProgramAccountType {

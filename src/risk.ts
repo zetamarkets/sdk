@@ -410,7 +410,7 @@ export class RiskCalculator {
       let positions = [];
       let positionsPadding = [];
       let seriesExpiry = [];
-      for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
+      for (let i = 0; i < constants.ACTIVE_MARKETS - 1; i++) {
         positions.push({
           size: new BN(0),
           costOfTrades: new BN(0),
@@ -424,7 +424,7 @@ export class RiskCalculator {
       }
       for (
         let i = 0;
-        i < constants.TOTAL_MARKETS - constants.ACTIVE_MARKETS;
+        i < constants.TOTAL_MARKETS - (constants.ACTIVE_MARKETS - 1);
         i++
       ) {
         seriesExpiry.push(new BN(0));

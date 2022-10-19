@@ -815,14 +815,6 @@ export class SubExchange {
         this.zetaGroup.marginParameters.optionShortPutCapPercentage,
         constants.MARGIN_PRECISION
       ),
-      perpMarginInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.perpMarginInitial,
-        constants.MARGIN_PRECISION
-      ),
-      perpMarginMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.perpMarginMaintenance,
-        constants.MARGIN_PRECISION
-      ),
     };
   }
 

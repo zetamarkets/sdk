@@ -125,15 +125,7 @@ export function calculatePerpMargin(
   asset: Asset,
   spotPrice: number
 ): types.MarginRequirement {
-  let subExchange = Exchange.getSubExchange(asset);
-  let initial = spotPrice * subExchange.marginParams.perpMarginInitial;
-  let maintenance = spotPrice * subExchange.marginParams.perpMarginMaintenance;
-  return {
-    initialLong: initial,
-    initialShort: initial,
-    maintenanceLong: maintenance,
-    maintenanceShort: maintenance,
-  };
+  return calculateFutureMargin(asset, spotPrice);
 }
 
 /**
@@ -409,7 +401,7 @@ export function movePositions(
   for (let i = 0; i < movements.length; i++) {
     let size = movements[i].size.toNumber();
     let index = movements[i].index;
-    if (size === 0 || index >= constants.ACTIVE_MARKETS) {
+    if (size === 0 || index >= constants.ACTIVE_MARKETS - 1) {
       throw Error("Invalid movement.");
     }
 

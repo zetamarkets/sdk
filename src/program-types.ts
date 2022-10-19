@@ -72,8 +72,6 @@ export interface MarginParameters {
   optionSpotPercentageShortMaintenance: anchor.BN;
   optionDynamicPercentageShortMaintenance: anchor.BN;
   optionShortPutCapPercentage: anchor.BN;
-  perpMarginInitial: anchor.BN;
-  perpMarginMaintenance: anchor.BN;
   padding: Array<number>;
 }
 
@@ -81,7 +79,6 @@ export interface PerpParameters {
   minFundingRatePercent: anchor.BN;
   maxFundingRatePercent: anchor.BN;
   impactCashDelta: anchor.BN;
-  padding: Array<number>;
 }
 
 export interface HaltState {
@@ -205,7 +202,6 @@ export interface Greeks {
   volatilityPadding: Array<anchor.BN>;
   nodeKeys: Array<PublicKey>;
   haltForcePricing: Array<boolean>;
-  haltForcePerpPricing: boolean;
   perpUpdateTimestamp: anchor.BN;
   perpFundingDelta: anchor.BN;
   perpLatestFundingRate: anchor.BN;
