@@ -6682,7 +6682,7 @@
       "name": "ProtectedMmMarginAccount",
       "msg": "Market maker accounts are protected from liquidation"
     },
-    { 
+    {
       "code": 6119,
       "name": "CannotWithdrawWithOpenOrders",
       "msg": "Cannot withdraw with open orders"
