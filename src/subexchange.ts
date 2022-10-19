@@ -253,7 +253,6 @@ export class SubExchange {
    */
   public async initializeMarketNodes(zetaGroup: PublicKey) {
     let indexes = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
-    indexes = indexes.concat(constants.PERP_INDEX);
     await Promise.all(
       indexes.map(async (index: number) => {
         let tx = new Transaction().add(

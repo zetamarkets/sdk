@@ -545,7 +545,6 @@ export function placePerpOrderIx(
           pcWallet: marketData.quoteVault,
         },
         oracle: subExchange.zetaGroup.oracle,
-        marketNode: subExchange.greeks.nodeKeys[marketIndex],
         marketMint:
           side == types.Side.BID
             ? marketData.serumMarket.quoteMintAddress
@@ -951,6 +950,7 @@ export async function initializeZetaGroupIx(
   underlyingMint: PublicKey,
   oracle: PublicKey,
   pricingArgs: InitializeZetaGroupPricingArgs,
+  perpArgs: UpdatePerpParametersArgs,
   marginArgs: UpdateMarginParametersArgs,
   expiryArgs: UpdateZetaGroupExpiryArgs
 ): Promise<TransactionInstruction> {
@@ -1032,9 +1032,9 @@ export async function initializeZetaGroupIx(
       optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
       expiryIntervalSeconds: expiryArgs.expiryIntervalSeconds,
       newExpiryThresholdSeconds: expiryArgs.newExpiryThresholdSeconds,
-      minFundingRatePercent: pricingArgs.minFundingRate,
-      maxFundingRatePercent: pricingArgs.maxFundingRate,
-      perpImpactCashDelta: pricingArgs.perpImpactCashDelta,
+      minFundingRatePercent: perpArgs.minFundingRatePercent,
+      maxFundingRatePercent: perpArgs.maxFundingRatePercent,
+      perpImpactCashDelta: perpArgs.perpImpactCashDelta,
     },
     {
       accounts: {
@@ -2213,9 +2213,6 @@ export interface InitializeZetaGroupPricingArgs {
   maxInterestRate: anchor.BN;
   minVolatility: anchor.BN;
   maxVolatility: anchor.BN;
-  minFundingRate: anchor.BN;
-  maxFundingRate: anchor.BN;
-  perpImpactCashDelta: anchor.BN;
 }
 
 export interface UpdateMarginParametersArgs {

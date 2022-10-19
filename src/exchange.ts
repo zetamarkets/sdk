@@ -320,6 +320,7 @@ export class Exchange {
     asset: Asset,
     oracle: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
+    perpArgs: instructions.UpdatePerpParametersArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
     expiryArgs: instructions.UpdateZetaGroupExpiryArgs
   ) {
@@ -329,6 +330,7 @@ export class Exchange {
         constants.MINTS[asset],
         oracle,
         pricingArgs,
+        perpArgs,
         marginArgs,
         expiryArgs
       )

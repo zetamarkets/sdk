@@ -2463,11 +2463,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "marketMint",
           "isMut": true,
           "isSigner": false
@@ -6716,6 +6711,11 @@ export type Zeta = {
       "code": 6124,
       "name": "InvalidPerpMarket",
       "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
+    },
+    {
+      "code": 6125,
+      "name": "CannotInitializePerpMarketNode",
+      "msg": "Not allowed to initialize market node for a perp market"
     }
   ]
 };
@@ -9185,11 +9185,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "marketMint",
           "isMut": true,
           "isSigner": false
@@ -13438,6 +13433,11 @@ export const IDL: Zeta = {
       "code": 6124,
       "name": "InvalidPerpMarket",
       "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
+    },
+    {
+      "code": 6125,
+      "name": "CannotInitializePerpMarketNode",
+      "msg": "Not allowed to initialize market node for a perp market"
     }
   ]
 };
