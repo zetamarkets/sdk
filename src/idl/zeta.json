@@ -6665,7 +6665,7 @@
     {
       "code": 6115,
       "name": "InvalidClaimReferralsRewardsAccount",
-      "msg": "Invalid claim referrals rewards: referrals asccount is not a referral or referrer account "
+      "msg": "Invalid claim referrals rewards: referrals account is not a referral or referrer account"
     },
     {
       "code": 6116,
@@ -6682,38 +6682,43 @@
       "name": "ProtectedMmMarginAccount",
       "msg": "Market maker accounts are protected from liquidation"
     },
-    {
+    { 
       "code": 6119,
+      "name": "CannotWithdrawWithOpenOrders",
+      "msg": "Cannot withdraw with open orders"
+    },
+    {
+      "code": 6120,
       "name": "FundingRateNotUpToDate",
       "msg": "Perp funding rate not up to date"
     },
     {
-      "code": 6120,
+      "code": 6121,
       "name": "PerpSyncQueueFull",
       "msg": "Perp taker/maker sync queue is full"
     },
     {
-      "code": 6121,
+      "code": 6122,
       "name": "PerpSyncQueueAccountSeedsMismatch",
       "msg": "PerpSyncQueue account seeds mismatch"
     },
     {
-      "code": 6122,
+      "code": 6123,
       "name": "PerpSyncQueueEmpty",
       "msg": "Program tried to pop from an empty perpSyncQueue"
     },
     {
-      "code": 6123,
+      "code": 6124,
       "name": "InvalidNonPerpMarket",
       "msg": "Perp product index given in placeOrder, use placePerpOrder"
     },
     {
-      "code": 6124,
+      "code": 6125,
       "name": "InvalidPerpMarket",
       "msg": "Non-perp product index given in placePerpOrder, use placeOrder"
     },
     {
-      "code": 6125,
+      "code": 6126,
       "name": "CannotInitializePerpMarketNode",
       "msg": "Not allowed to initialize market node for a perp market"
     }
