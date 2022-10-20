@@ -1336,6 +1336,11 @@
           "isSigner": false
         },
         {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "perpBids",
           "isMut": false,
           "isSigner": false

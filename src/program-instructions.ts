@@ -1215,12 +1215,14 @@ export function updatePricingIx(
   expiryIndex: number
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
+  let marketData = Exchange.getPerpMarket(asset);
   return Exchange.program.instruction.updatePricing(expiryIndex, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: subExchange.zetaGroupAddress,
       greeks: subExchange.greeksAddress,
       oracle: subExchange.zetaGroup.oracle,
+      perpMarket: marketData.address,
       perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
       perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
     },

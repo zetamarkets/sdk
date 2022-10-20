@@ -1336,6 +1336,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "perpBids",
           "isMut": false,
           "isSigner": false
@@ -8059,6 +8064,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpMarket",
           "isMut": false,
           "isSigner": false
         },
