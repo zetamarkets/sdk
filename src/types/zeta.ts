@@ -2578,11 +2578,6 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -2659,11 +2654,6 @@ export type Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]
@@ -2742,11 +2732,6 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -2807,11 +2792,6 @@ export type Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]
@@ -2890,11 +2870,6 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -2966,11 +2941,6 @@ export type Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -3036,11 +3006,6 @@ export type Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]
@@ -3123,11 +3088,6 @@ export type Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]
@@ -9310,11 +9270,6 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -9391,11 +9346,6 @@ export const IDL: Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]
@@ -9474,11 +9424,6 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -9539,11 +9484,6 @@ export const IDL: Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]
@@ -9622,11 +9562,6 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -9698,11 +9633,6 @@ export const IDL: Zeta = {
               "name": "eventQueue",
               "isMut": true,
               "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
             }
           ]
         }
@@ -9768,11 +9698,6 @@ export const IDL: Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]
@@ -9855,11 +9780,6 @@ export const IDL: Zeta = {
             {
               "name": "eventQueue",
               "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
               "isSigner": false
             }
           ]

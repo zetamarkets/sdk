@@ -585,7 +585,6 @@ export function cancelOrderIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
-          oracle: subExchange.zetaGroup.oracle,
         },
       },
     }
@@ -620,7 +619,6 @@ export function cancelOrderNoErrorIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
-          oracle: subExchange.zetaGroup.oracle,
         },
       },
     }
@@ -650,7 +648,6 @@ export function cancelAllMarketOrdersIx(
         bids: marketData.serumMarket.decoded.bids,
         asks: marketData.serumMarket.decoded.asks,
         eventQueue: marketData.serumMarket.decoded.eventQueue,
-        oracle: subExchange.zetaGroup.oracle,
       },
     },
   });
@@ -682,7 +679,6 @@ export function cancelOrderByClientOrderIdIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
-          oracle: subExchange.zetaGroup.oracle,
         },
       },
     }
@@ -715,7 +711,6 @@ export function cancelOrderByClientOrderIdNoErrorIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
-          oracle: subExchange.zetaGroup.oracle,
         },
       },
     }
@@ -748,7 +743,6 @@ export function cancelExpiredOrderIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
-          oracle: subExchange.zetaGroup.oracle,
         },
       },
     }
@@ -778,7 +772,6 @@ export function forceCancelOrdersIx(
         bids: marketData.serumMarket.decoded.bids,
         asks: marketData.serumMarket.decoded.asks,
         eventQueue: marketData.serumMarket.decoded.eventQueue,
-        oracle: subExchange.zetaGroup.oracle,
       },
     },
   });
@@ -1814,7 +1807,6 @@ export function cancelOrderHaltedIx(
           bids: marketData.serumMarket.decoded.bids,
           asks: marketData.serumMarket.decoded.asks,
           eventQueue: marketData.serumMarket.decoded.eventQueue,
-          oracle: subExchange.zetaGroup.oracle,
         },
       },
     }
