@@ -4036,10 +4036,6 @@ export type Zeta = {
                 600
               ]
             }
-          },
-          {
-            "name": "openInterestVolume",
-            "type": "u64"
           }
         ]
       }
@@ -4669,13 +4665,9 @@ export type Zeta = {
             "type": {
               "array": [
                 "bool",
-                91
+                92
               ]
             }
-          },
-          {
-            "name": "perpMarketCleaned",
-            "type": "bool"
           }
         ]
       }
@@ -10728,10 +10720,6 @@ export const IDL: Zeta = {
                 600
               ]
             }
-          },
-          {
-            "name": "openInterestVolume",
-            "type": "u64"
           }
         ]
       }
@@ -11361,13 +11349,9 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "bool",
-                91
+                92
               ]
             }
-          },
-          {
-            "name": "perpMarketCleaned",
-            "type": "bool"
           }
         ]
       }

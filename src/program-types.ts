@@ -90,7 +90,6 @@ export interface HaltState {
   marketNodesCleaned: Array<boolean>;
   marketNodesCleanedPadding: Array<boolean>;
   marketCleaned: Array<boolean>;
-  perpMarketCleaned: boolean;
   marketCleanedPadding: Array<boolean>;
 }
 

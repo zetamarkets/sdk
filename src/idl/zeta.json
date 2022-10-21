@@ -4036,10 +4036,6 @@
                 600
               ]
             }
-          },
-          {
-            "name": "openInterestVolume",
-            "type": "u64"
           }
         ]
       }
@@ -4669,13 +4665,9 @@
             "type": {
               "array": [
                 "bool",
-                91
+                92
               ]
             }
-          },
-          {
-            "name": "perpMarketCleaned",
-            "type": "bool"
           }
         ]
       }

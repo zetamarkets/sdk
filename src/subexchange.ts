@@ -902,7 +902,7 @@ export class SubExchange {
   public async cleanZetaMarketsHalted() {
     this.assertHalted();
     let marketAccounts = await Promise.all(
-      this.getMarkets().map(async (market) => {
+      this._markets.markets.map(async (market) => {
         return utils.getMutMarketAccounts(this.asset, market.marketIndex);
       })
     );

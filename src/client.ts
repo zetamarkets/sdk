@@ -250,6 +250,12 @@ export class Client {
       );
     }
 
+    await Promise.all(
+      client.getAllSubClients().map(async (subclient) => {
+        await subclient.updateState();
+      })
+    );
+
     return client;
   }
 
