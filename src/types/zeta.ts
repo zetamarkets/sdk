@@ -3810,11 +3810,15 @@ export type Zeta = {
           },
           {
             "name": "perpFundingDelta",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "perpLatestFundingRate",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "padding",
@@ -4032,7 +4036,9 @@ export type Zeta = {
             "name": "queue",
             "type": {
               "array": [
-                "i128",
+                {
+                  "defined": "AnchorDecimal"
+                },
                 600
               ]
             }
@@ -4369,7 +4375,9 @@ export type Zeta = {
           },
           {
             "name": "lastFundingDelta",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "padding",
@@ -10494,11 +10502,15 @@ export const IDL: Zeta = {
           },
           {
             "name": "perpFundingDelta",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "perpLatestFundingRate",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "padding",
@@ -10716,7 +10728,9 @@ export const IDL: Zeta = {
             "name": "queue",
             "type": {
               "array": [
-                "i128",
+                {
+                  "defined": "AnchorDecimal"
+                },
                 600
               ]
             }
@@ -11053,7 +11067,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "lastFundingDelta",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "padding",

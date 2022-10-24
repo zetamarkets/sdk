@@ -3810,11 +3810,15 @@
           },
           {
             "name": "perpFundingDelta",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "perpLatestFundingRate",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "padding",
@@ -4032,7 +4036,9 @@
             "name": "queue",
             "type": {
               "array": [
-                "i128",
+                {
+                  "defined": "AnchorDecimal"
+                },
                 600
               ]
             }
@@ -4369,7 +4375,9 @@
           },
           {
             "name": "lastFundingDelta",
-            "type": "i128"
+            "type": {
+              "defined": "AnchorDecimal"
+            }
           },
           {
             "name": "padding",

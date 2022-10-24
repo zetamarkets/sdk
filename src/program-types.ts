@@ -168,7 +168,7 @@ export interface MarginAccount {
   rebalanceAmount: anchor.BN;
   asset: any;
   accountType: any;
-  lastFundingDelta: anchor.BN;
+  lastFundingDelta: AnchorDecimal;
   padding: Array<number>;
 }
 
@@ -202,8 +202,8 @@ export interface Greeks {
   nodeKeys: Array<PublicKey>;
   haltForcePricing: Array<boolean>;
   perpUpdateTimestamp: anchor.BN;
-  perpFundingDelta: anchor.BN;
-  perpLatestFundingRate: anchor.BN;
+  perpFundingDelta: AnchorDecimal;
+  perpLatestFundingRate: AnchorDecimal;
   padding: Array<number>;
 }
 
@@ -211,7 +211,7 @@ export interface PerpSyncQueue {
   nonce: number;
   head: number;
   length: number;
-  queue: Array<anchor.BN>;
+  queue: Array<AnchorDecimal>;
 }
 
 export interface MarketNode {

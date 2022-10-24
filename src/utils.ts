@@ -1603,7 +1603,6 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
   await Promise.all(
     txs.map(async (tx) => {
       let txSig = await processTransaction(Exchange.provider, tx);
-      console.log(`Applying funding to users - TxId: ${txSig}`);
     })
   );
 }
