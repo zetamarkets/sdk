@@ -5220,6 +5220,9 @@
           },
           {
             "name": "FillOrKill"
+          },
+          {
+            "name": "ImmediateOrCancel"
           }
         ]
       }
