@@ -163,6 +163,8 @@ export class RiskCalculator {
       Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
       Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber();
 
+    // Note that there is some rounding occurs here in the Zeta program
+    // but we omit it in this function for simplicity
     return -1 * size * deltaDiff;
   }
 
