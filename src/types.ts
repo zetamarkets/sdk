@@ -169,6 +169,7 @@ export interface MarginAccountState {
   initialMarginSkipConcession: number;
   maintenanceMargin: number;
   unrealizedPnl: number;
+  unpaidFunding: number;
   availableBalanceInitial: number;
   availableBalanceMaintenance: number;
   availableBalanceWithdrawable: number;

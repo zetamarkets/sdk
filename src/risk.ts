@@ -8,7 +8,7 @@ import {
 } from "./utils";
 import { Asset, fromProgramAsset } from "./assets";
 import { BN } from "@project-serum/anchor";
-import { assets, Client, instructions, utils } from ".";
+import { assets, Client, Decimal, instructions, utils } from ".";
 import { cloneDeep } from "lodash";
 import {
   calculateProductMargin,
@@ -138,6 +138,32 @@ export class RiskCalculator {
     let sideMultiplier = size >= 0 ? 1 : -1;
 
     return sideMultiplier * openingSize;
+  }
+
+  /**
+   * Returns the unpaid funding for a given margin account.
+   * @param account the user's spread (returns 0) or margin account.
+   */
+  public calculateUnpaidFunding(
+    account: any,
+    accountType: types.ProgramAccountType = types.ProgramAccountType
+      .MarginAccount
+  ): number {
+    // Spread accounts cannot hold perps and therefore have no unpaid funding
+    if (accountType == types.ProgramAccountType.SpreadAccount) {
+      return 0;
+    }
+
+    const position = account.perpProductLedger.position;
+    const size = position.size.toNumber();
+    let asset = fromProgramAsset(account.asset);
+    let greeks = Exchange.getGreeks(asset);
+
+    let deltaDiff =
+      Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
+      Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber();
+
+    return -1 * size * deltaDiff;
   }
 
   /**
@@ -369,6 +395,7 @@ export class RiskCalculator {
   ): types.MarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
+    let unpaidFunding = this.calculateUnpaidFunding(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let initialMarginSkipConcession = this.calculateTotalInitialMargin(
       marginAccount,
@@ -376,17 +403,18 @@ export class RiskCalculator {
     );
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
     let availableBalanceInitial: number =
-      balance + unrealizedPnl - initialMargin;
+      balance + unrealizedPnl + unpaidFunding - initialMargin;
     let availableBalanceWithdrawable: number =
-      balance + unrealizedPnl - initialMarginSkipConcession;
+      balance + unrealizedPnl + unpaidFunding - initialMarginSkipConcession;
     let availableBalanceMaintenance: number =
-      balance + unrealizedPnl - maintenanceMargin;
+      balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
     return {
       balance,
       initialMargin,
       initialMarginSkipConcession,
       maintenanceMargin,
       unrealizedPnl,
+      unpaidFunding,
       availableBalanceInitial,
       availableBalanceMaintenance,
       availableBalanceWithdrawable,
