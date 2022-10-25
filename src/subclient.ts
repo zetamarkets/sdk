@@ -859,6 +859,57 @@ export class SubClient {
     return txId;
   }
 
+  public createCancelPerpOrderInstruction(
+    orderId: anchor.BN,
+    side: types.Side
+  ): TransactionInstruction {
+    return instructions.cancelOrderNoErrorIx(
+      this.asset,
+      constants.PERP_INDEX,
+      this._parent.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[constants.PERP_INDEX],
+      orderId,
+      side
+    );
+  }
+
+  public createCancelAllPerpOrderInstruction(): TransactionInstruction {
+    return instructions.cancelAllMarketOrdersIx(
+      this.asset,
+      constants.PERP_INDEX,
+      this._parent.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[constants.PERP_INDEX]
+    );
+  }
+
+  public createPlacePerpOrderInstruction(
+    price: number,
+    size: number,
+    side: types.Side,
+    orderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): TransactionInstruction {
+    let marketIndex = constants.PERP_INDEX;
+    let openOrdersPda = this._openOrdersAccounts[marketIndex];
+    return instructions.placePerpOrderIx(
+      this.asset,
+      marketIndex,
+      price,
+      size,
+      side,
+      orderType,
+      clientOrderId,
+      tag,
+      this.marginAccountAddress,
+      this._parent.publicKey,
+      openOrdersPda,
+      this._parent.whitelistTradingFeesAddress
+    );
+  }
+
   /**
    * Cancels a user order by orderId
    * @param market     the market address of the order to be cancelled.

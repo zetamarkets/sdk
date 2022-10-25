@@ -18,6 +18,7 @@ import {
   ConfirmOptions,
   TransactionSignature,
   Transaction,
+  TransactionInstruction,
 } from "@solana/web3.js";
 import * as constants from "./constants";
 import { referUserIx } from "./program-instructions";
@@ -403,6 +404,42 @@ export class Client {
         tag
       );
     }
+  }
+
+  public createPlacePerpOrderInstruction(
+    asset: Asset,
+    price: number,
+    size: number,
+    side: types.Side,
+    type: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createPlacePerpOrderInstruction(
+      price,
+      size,
+      side,
+      type,
+      clientOrderId,
+      tag
+    );
+  }
+
+  public createCancelPerpOrderInstruction(
+    asset: Asset,
+    orderId: anchor.BN,
+    side: types.Side
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createCancelPerpOrderInstruction(
+      orderId,
+      side
+    );
+  }
+
+  public createCancelAllPerpOrderInstruction(
+    asset: Asset
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createCancelAllPerpOrderInstruction();
   }
 
   public async migrateFunds(

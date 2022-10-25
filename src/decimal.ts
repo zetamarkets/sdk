@@ -53,7 +53,7 @@ export class Decimal {
     ];
 
     return this.isSignNegative()
-      ? -1 * new BN(new Uint8Array(bytes))
+      ? new BN(-1).mul(new BN(new Uint8Array(bytes)))
       : new BN(new Uint8Array(bytes));
   }
 
