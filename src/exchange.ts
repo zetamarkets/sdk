@@ -745,6 +745,10 @@ export class Exchange {
     await this.getSubExchange(asset).initializeMarketStrikes();
   }
 
+  public async initializePerpSyncQueue(asset: Asset) {
+    await this.getSubExchange(asset).initializePerpSyncQueue();
+  }
+
   public async updateZetaGroup(asset: Asset) {
     await this.getSubExchange(asset).updateZetaGroup();
   }

@@ -532,6 +532,13 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
+  public async initializePerpSyncQueue() {
+    let tx = new Transaction().add(
+      await instructions.initializePerpSyncQueueIx(this.asset)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
   /**
    * Polls the on chain account to update zeta group.
    */
