@@ -372,6 +372,16 @@ export class Client {
     return marketPubkey;
   }
 
+  public marketIdentifierToIndex(asset: Asset, market: types.MarketIdentifier) {
+    let index: number;
+    if (typeof market == "number") {
+      index = market;
+    } else {
+      index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(market);
+    }
+    return index;
+  }
+
   // TODO giving Exchange.getPerpMarket(asset).marketIndex doesn't work here, fix
   public async placeOrder(
     asset: Asset,
@@ -425,21 +435,26 @@ export class Client {
     );
   }
 
-  public createCancelPerpOrderInstruction(
+  public createCancelOrderNoErrorInstruction(
     asset: Asset,
+    market: types.MarketIdentifier,
     orderId: anchor.BN,
     side: types.Side
   ): TransactionInstruction {
-    return this.getSubClient(asset).createCancelPerpOrderInstruction(
+    return this.getSubClient(asset).createCancelOrderNoErrorInstruction(
+      this.marketIdentifierToIndex(asset, market),
       orderId,
       side
     );
   }
 
-  public createCancelAllPerpOrderInstruction(
-    asset: Asset
+  public createCancelAllMarketOrdersInstruction(
+    asset: Asset,
+    market: types.MarketIdentifier
   ): TransactionInstruction {
-    return this.getSubClient(asset).createCancelAllPerpOrderInstruction();
+    return this.getSubClient(asset).createCancelAllMarketOrdersInstruction(
+      this.marketIdentifierToIndex(asset, market)
+    );
   }
 
   public async migrateFunds(

@@ -859,28 +859,31 @@ export class SubClient {
     return txId;
   }
 
-  public createCancelPerpOrderInstruction(
+  public createCancelOrderNoErrorInstruction(
+    marketIndex: number,
     orderId: anchor.BN,
     side: types.Side
   ): TransactionInstruction {
     return instructions.cancelOrderNoErrorIx(
       this.asset,
-      constants.PERP_INDEX,
+      marketIndex,
       this._parent.publicKey,
       this._marginAccountAddress,
-      this._openOrdersAccounts[constants.PERP_INDEX],
+      this._openOrdersAccounts[marketIndex],
       orderId,
       side
     );
   }
 
-  public createCancelAllPerpOrderInstruction(): TransactionInstruction {
+  public createCancelAllMarketOrdersInstruction(
+    marketIndex: number
+  ): TransactionInstruction {
     return instructions.cancelAllMarketOrdersIx(
       this.asset,
-      constants.PERP_INDEX,
+      marketIndex,
       this._parent.publicKey,
       this._marginAccountAddress,
-      this._openOrdersAccounts[constants.PERP_INDEX]
+      this._openOrdersAccounts[marketIndex]
     );
   }
 
@@ -892,11 +895,9 @@ export class SubClient {
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): TransactionInstruction {
-    let marketIndex = constants.PERP_INDEX;
-    let openOrdersPda = this._openOrdersAccounts[marketIndex];
     return instructions.placePerpOrderIx(
       this.asset,
-      marketIndex,
+      constants.PERP_INDEX,
       price,
       size,
       side,
@@ -905,7 +906,7 @@ export class SubClient {
       tag,
       this.marginAccountAddress,
       this._parent.publicKey,
-      openOrdersPda,
+      this._openOrdersAccounts[constants.PERP_INDEX],
       this._parent.whitelistTradingFeesAddress
     );
   }
