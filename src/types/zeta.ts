@@ -3821,11 +3821,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "perpLatestMidpoint",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1601
+                1593
               ]
             }
           }
@@ -6046,6 +6050,48 @@ export type Zeta = {
           "type": {
             "defined": "OrderCompleteType"
           },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ApplyFundingEvent",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "balanceChange",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "remainingBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "fundingRate",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oraclePrice",
+          "type": "u64",
           "index": false
         }
       ]
@@ -10513,11 +10559,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "perpLatestMidpoint",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1601
+                1593
               ]
             }
           }
@@ -12738,6 +12788,48 @@ export const IDL: Zeta = {
           "type": {
             "defined": "OrderCompleteType"
           },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ApplyFundingEvent",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "balanceChange",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "remainingBalance",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "fundingRate",
+          "type": "i64",
+          "index": false
+        },
+        {
+          "name": "oraclePrice",
+          "type": "u64",
           "index": false
         }
       ]

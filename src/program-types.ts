@@ -204,6 +204,7 @@ export interface Greeks {
   perpUpdateTimestamp: anchor.BN;
   perpFundingDelta: AnchorDecimal;
   perpLatestFundingRate: AnchorDecimal;
+  perpLatestMidpoint: anchor.BN;
   padding: Array<number>;
 }
 
@@ -342,4 +343,14 @@ export interface OrderCompleteEvent {
   orderId: anchor.BN;
   clientOrderId: anchor.BN;
   orderCompleteType: Object;
+}
+
+export interface ApplyFundingEvent {
+  marginAccount: PublicKey;
+  user: PublicKey;
+  asset: Object;
+  balanceChange: anchor.BN;
+  remainingBalance: anchor.BN;
+  fundingRate: anchor.BN;
+  oraclePrice: anchor.BN;
 }
