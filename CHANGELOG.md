@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))
+
 ## [0.17.1]
 
 - general: Bump solana-web3 package to 1.66.1 to fix some socket issues. ([#167](https://github.com/zetamarkets/sdk/pull/167))
