@@ -1313,37 +1313,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "updatePricingNoPerps",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "updatePricing",
       "accounts": [
         {
@@ -8069,37 +8038,6 @@ export const IDL: Zeta = {
               5
             ]
           }
-        }
-      ]
-    },
-    {
-      "name": "updatePricingNoPerps",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
         }
       ]
     },

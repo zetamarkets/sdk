@@ -1203,21 +1203,6 @@ export function retreatMarketNodesIx(
   });
 }
 
-export function updatePricingNoPerpsIx(
-  asset: Asset,
-  expiryIndex: number
-): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-  return Exchange.program.instruction.updatePricingNoPerps(expiryIndex, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: subExchange.zetaGroupAddress,
-      greeks: subExchange.greeksAddress,
-      oracle: subExchange.zetaGroup.oracle,
-    },
-  });
-}
-
 export function updatePricingIx(
   asset: Asset,
   expiryIndex: number
