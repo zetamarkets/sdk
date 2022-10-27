@@ -155,13 +155,15 @@ export class RiskCalculator {
     }
 
     const position = account.perpProductLedger.position;
-    const size = position.size.toNumber();
+    const size =
+      position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
     let asset = fromProgramAsset(account.asset);
     let greeks = Exchange.getGreeks(asset);
 
     let deltaDiff =
-      Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
-      Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber();
+      (Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
+        Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber()) /
+      Math.pow(10, constants.PLATFORM_PRECISION);
 
     // Note that there is some rounding occurs here in the Zeta program
     // but we omit it in this function for simplicity
