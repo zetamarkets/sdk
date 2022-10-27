@@ -382,7 +382,6 @@ export class Client {
     return index;
   }
 
-  // TODO giving Exchange.getPerpMarket(asset).marketIndex doesn't work here, fix
   public async placeOrder(
     asset: Asset,
     market: types.MarketIdentifier,
@@ -414,6 +413,25 @@ export class Client {
         tag
       );
     }
+  }
+
+  public async placePerpOrder(
+    asset: Asset,
+    price: number,
+    size: number,
+    side: types.Side,
+    type: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).placePerpOrder(
+      price,
+      size,
+      side,
+      type,
+      clientOrderId,
+      tag
+    );
   }
 
   public createPlacePerpOrderInstruction(
