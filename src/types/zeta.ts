@@ -1396,6 +1396,21 @@ export type Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -8110,6 +8125,21 @@ export const IDL: Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [

@@ -1746,12 +1746,16 @@ export function updatePricingHaltedIx(
   admin: PublicKey
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
+  let marketData = Exchange.getPerpMarket(asset);
   return Exchange.program.instruction.updatePricingHalted(expiryIndex, {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: subExchange.zetaGroupAddress,
       greeks: subExchange.greeksAddress,
       admin,
+      perpMarket: marketData.address,
+      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
+      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
     },
   });
 }
