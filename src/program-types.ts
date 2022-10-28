@@ -6,7 +6,6 @@ import * as anchor from "@project-serum/anchor";
 export interface State {
   admin: PublicKey;
   stateNonce: number;
-  vaultNonce: number;
   serumNonce: number;
   mintAuthNonce: number;
   numUnderlyings: number;
