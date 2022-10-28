@@ -174,6 +174,7 @@ export interface SpreadAccount {
   nonce: number;
   balance: anchor.BN;
   seriesExpiry: Array<anchor.BN>;
+  seriesExpiryPadding: anchor.BN;
   positions: Array<Position>;
   positionsPadding: Array<Position>;
   asset: any;

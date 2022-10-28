@@ -467,6 +467,7 @@ export class RiskCalculator {
         nonce: 0,
         balance: new BN(0),
         seriesExpiry,
+        seriesExpiryPadding: new BN(0),
         positions,
         positionsPadding,
         asset: assets.toProgramAsset(asset),
