@@ -9,6 +9,7 @@ import {
   constants,
   Market,
   assets,
+  types,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 
@@ -109,6 +110,16 @@ async function main() {
     process.env.UPDATE_PRICING_INTERVAL
       ? parseInt(process.env.UPDATE_PRICING_INTERVAL)
       : 5000
+  );
+
+  // Apply funding to any users holding perp positions
+  setInterval(
+    async function () {
+      await this.applyFunding();
+    }.bind(this),
+    process.env.APPLY_FUNDING_INTERVAL
+      ? parseInt(process.env.APPLY_FUNDING_INTERVAL)
+      : 120_000
   );
 
   // Retreat pricing on markets
@@ -320,6 +331,53 @@ async function crankExchangeThrottled(
       }
       crankingMarkets[market.marketIndex] = false;
       await sleep(throttleMs);
+    }
+  }
+}
+
+async function applyFunding() {
+  let marginAccPubkeys = [];
+  try {
+    marginAccPubkeys = await utils.getAllProgramAccountAddresses(
+      types.ProgramAccountType.MarginAccount
+    );
+  } catch (e) {
+    throw Error("Account address fetch error on applyFunding()!");
+  }
+  for (
+    let i = 0;
+    i < marginAccPubkeys.length;
+    i += constants.MAX_FUNDING_ACCOUNTS
+  ) {
+    // Grab set of margin accounts
+    let marginAccounts = [];
+    try {
+      marginAccounts =
+        await Exchange.program.account.marginAccount.fetchMultiple(
+          marginAccPubkeys.slice(i, i + constants.MAX_FUNDING_ACCOUNTS)
+        );
+    } catch (e) {
+      throw Error("Account data fetch error on applyFunding()!");
+    }
+
+    // In that set: Check if any have non-zero perp positions
+    // If they do, apply funding on them
+    let fundingAccounts = new Map<assets.Asset, PublicKey[]>();
+    for (var asset of Exchange.assets) {
+      fundingAccounts.set(asset, []);
+    }
+
+    for (let j = 0; j < marginAccounts.length; j++) {
+      if (marginAccounts[j].perpProductLedger.position.size != 0) {
+        fundingAccounts
+          .get(assets.fromProgramAsset(marginAccounts[j].asset))
+          .push(marginAccPubkeys[i + j]);
+      }
+    }
+
+    // This will automatically break into multiple txs if there are too many
+    for (var asset of Exchange.assets) {
+      await utils.applyPerpFunding(asset, fundingAccounts.get(asset));
     }
   }
 }
