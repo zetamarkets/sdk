@@ -928,7 +928,6 @@ export class Client {
     return this.getSubClient(asset).orders;
   }
 
-  // TODO change these to use MarketIdentifier so you can pass perp market directly
   public getOpeningOrders(
     asset: Asset,
     index: number,
