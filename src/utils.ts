@@ -1110,9 +1110,14 @@ export async function crankMarket(
     return;
   }
   const openOrdersSet = new Set();
+  // We pass in a couple of extra accounts for perps so the limit is lower
+  let limit =
+    market.kind == types.Kind.PERP
+      ? constants.CRANK_PERP_ACCOUNT_LIMIT
+      : constants.CRANK_ACCOUNT_LIMIT;
   for (var i = 0; i < eventQueue.length; i++) {
     openOrdersSet.add(eventQueue[i].openOrders.toString());
-    if (openOrdersSet.size == constants.CRANK_ACCOUNT_LIMIT) {
+    if (openOrdersSet.size == limit) {
       break;
     }
   }
