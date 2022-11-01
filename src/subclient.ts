@@ -165,9 +165,9 @@ export class SubClient {
   private constructor(asset: Asset, parent: Client) {
     this._asset = asset;
     this._subExchange = Exchange.getSubExchange(asset);
-    this._openOrdersAccounts = Array(
-      this._subExchange.zetaGroup.products.length
-    ).fill(PublicKey.default);
+    this._openOrdersAccounts = Array(constants.TOTAL_MARKETS).fill(
+      PublicKey.default
+    );
     this._parent = parent;
 
     this._marginPositions = [];
@@ -702,6 +702,7 @@ export class SubClient {
 
     tx.add(
       instructions.positionMovementIx(
+        this._asset,
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
@@ -787,6 +788,127 @@ export class SubClient {
     txId = await utils.processTransaction(this._parent.provider, tx);
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
+  }
+
+  /**
+   * Places an order on a zeta perp market.
+   * @param price           the native price of the order (6 d.p as integer)
+   * @param size            the quantity of the order (3 d.p)
+   * @param side            the side of the order. bid / ask
+   * @param orderType       the type of the order. limit / ioc / post-only
+   * @param clientOrderId   optional: subClient order id (non 0 value)
+   * @param tag             optional: the string tag corresponding to who is inserting
+   * NOTE: If duplicate subClient order ids are used, after a cancel order,
+   * to cancel the second order with the same subClient order id,
+   * you may need to crank the corresponding event queue to flush that order id
+   * from the user open orders account before cancelling the second order.
+   * (Depending on the order in which the order was cancelled).
+   */
+  public async placePerpOrder(
+    price: number,
+    size: number,
+    side: types.Side,
+    orderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let market = Exchange.getPerpMarket(this._asset).address;
+    let marketIndex = constants.PERP_INDEX;
+
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `[${assetToName(
+          this.asset
+        )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
+
+      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+        this.asset,
+        market,
+        this._parent.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
+    }
+
+    let orderIx = instructions.placePerpOrderIx(
+      this.asset,
+      marketIndex,
+      price,
+      size,
+      side,
+      orderType,
+      clientOrderId,
+      tag,
+      this.marginAccountAddress,
+      this._parent.publicKey,
+      openOrdersPda,
+      this._parent.whitelistTradingFeesAddress
+    );
+
+    tx.add(orderIx);
+
+    let txId: TransactionSignature;
+    txId = await utils.processTransaction(this._parent.provider, tx);
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+    return txId;
+  }
+
+  public createCancelOrderNoErrorInstruction(
+    marketIndex: number,
+    orderId: anchor.BN,
+    side: types.Side
+  ): TransactionInstruction {
+    return instructions.cancelOrderNoErrorIx(
+      this.asset,
+      marketIndex,
+      this._parent.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[marketIndex],
+      orderId,
+      side
+    );
+  }
+
+  public createCancelAllMarketOrdersInstruction(
+    marketIndex: number
+  ): TransactionInstruction {
+    return instructions.cancelAllMarketOrdersIx(
+      this.asset,
+      marketIndex,
+      this._parent.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[marketIndex]
+    );
+  }
+
+  public createPlacePerpOrderInstruction(
+    price: number,
+    size: number,
+    side: types.Side,
+    orderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): TransactionInstruction {
+    return instructions.placePerpOrderIx(
+      this.asset,
+      constants.PERP_INDEX,
+      price,
+      size,
+      side,
+      orderType,
+      clientOrderId,
+      tag,
+      this.marginAccountAddress,
+      this._parent.publicKey,
+      this._openOrdersAccounts[constants.PERP_INDEX],
+      this._parent.whitelistTradingFeesAddress
+    );
   }
 
   /**
@@ -1532,6 +1654,7 @@ export class SubClient {
 
     tx.add(
       instructions.positionMovementIx(
+        this._asset,
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
@@ -1573,22 +1696,29 @@ export class SubClient {
         indexes.push(i);
       }
     }
+
+    // Push perps productLedger too if relevant
+    let perpLedger = this._marginAccount.perpProductLedger;
+    if (
+      perpLedger.position.size.toNumber() !== 0 ||
+      perpLedger.orderState.openingOrders[0].toNumber() != 0 ||
+      perpLedger.orderState.openingOrders[1].toNumber() != 0
+    ) {
+      indexes.push(constants.PERP_INDEX);
+    }
     return indexes;
   }
 
   private async updateOrders() {
     let orders = [];
-    let subExchange = this._subExchange;
     await Promise.all(
       [...this.getRelevantMarketIndexes()].map(async (i) => {
-        await subExchange.markets.markets[i].updateOrderbook();
-        orders.push(
-          subExchange.markets.markets[i].getOrdersForAccount(
-            this._openOrdersAccounts[i]
-          )
-        );
+        let market = Exchange.getMarket(this._asset, i);
+        await market.updateOrderbook();
+        orders.push(market.getOrdersForAccount(this._openOrdersAccounts[i]));
       })
     );
+
     this._orders = [].concat(...orders);
   }
 
@@ -1607,6 +1737,20 @@ export class SubClient {
           ),
         });
       }
+    }
+
+    // perps too
+    if (this._marginAccount.perpProductLedger.position.size.toNumber() != 0) {
+      positions.push({
+        marketIndex: constants.PERP_INDEX,
+        market: this._subExchange.zetaGroup.perp.market,
+        size: utils.convertNativeLotSizeToDecimal(
+          this._marginAccount.perpProductLedger.position.size.toNumber()
+        ),
+        costOfTrades: utils.convertNativeBNToDecimal(
+          this._marginAccount.perpProductLedger.position.costOfTrades
+        ),
+      });
     }
     this._marginPositions = positions;
   }
@@ -1648,6 +1792,21 @@ export class SubClient {
         }
       })
     );
+
+    // perps too
+    if (
+      // If the nonce is not zero, we know there is an open orders account.
+      this._marginAccount.openOrdersNonce[constants.PERP_INDEX] !== 0 &&
+      // If this is equal to default, it means we haven't added the PDA yet.
+      this._openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
+    ) {
+      let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
+        Exchange.programId,
+        this._subExchange.zetaGroup.perp.market,
+        this._parent.publicKey
+      );
+      this._openOrdersAccounts[constants.PERP_INDEX] = openOrdersPda;
+    }
   }
 
   private assertHasMarginAccount() {
@@ -1668,8 +1827,8 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let size =
-      this.marginAccount.productLedgers[index].position.size.toNumber();
+    let position = this.getProductLedger(index).position;
+    let size = position.size.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1681,8 +1840,8 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let costOfTrades =
-      this.marginAccount.productLedgers[index].position.costOfTrades.toNumber();
+    let position = this.getProductLedger(index).position;
+    let costOfTrades = position.costOfTrades.toNumber();
     return decimal
       ? utils.convertNativeIntegerToDecimal(costOfTrades)
       : costOfTrades;
@@ -1697,11 +1856,9 @@ export class SubClient {
     side: types.Side,
     decimal: boolean = false
   ): number {
+    let orderState = this.getProductLedger(index).orderState;
     let orderIndex = side == types.Side.BID ? 0 : 1;
-    let size =
-      this.marginAccount.productLedgers[index].orderState.openingOrders[
-        orderIndex
-      ].toNumber();
+    let size = orderState.openingOrders[orderIndex].toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1710,10 +1867,8 @@ export class SubClient {
    * @param decimal - whether to convert to readable decimal.
    */
   public getClosingOrders(index: number, decimal: boolean = false): number {
-    let size =
-      this.marginAccount.productLedgers[
-        index
-      ].orderState.closingOrders.toNumber();
+    let orderState = this.getProductLedger(index).orderState;
+    let size = orderState.closingOrders.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1729,7 +1884,8 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let size = this.spreadAccount.positions[index].size.toNumber();
+    let position = this.spreadAccount.positions[index];
+    let size = position.size.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
 
@@ -1741,11 +1897,18 @@ export class SubClient {
     index: number,
     decimal: boolean = false
   ): number {
-    let costOfTrades =
-      this.spreadAccount.positions[index].costOfTrades.toNumber();
+    let position = this.spreadAccount.positions[index];
+    let costOfTrades = position.costOfTrades.toNumber();
     return decimal
       ? utils.convertNativeIntegerToDecimal(costOfTrades)
       : costOfTrades;
+  }
+
+  /**
+   * Getter function to grab the correct product ledger because perps is separate
+   */
+  public getProductLedger(index: number) {
+    return utils.getProductLedger(this.marginAccount, index);
   }
 
   /**

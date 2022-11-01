@@ -11,6 +11,7 @@ import {
 import {
   convertNativeBNToDecimal,
   convertDecimalToNativeInteger,
+  getProductLedger,
 } from "./utils";
 
 /**
@@ -70,21 +71,27 @@ export function calculateProductMargin(
   spotPrice: number
 ): types.MarginRequirement {
   let subExchange = Exchange.getSubExchange(asset);
-  let market = subExchange.markets.markets[productIndex];
+  let market = Exchange.getMarket(asset, productIndex);
   if (market.strike == null) {
     return null;
   }
   let kind = market.kind;
   let strike = market.strike;
-  let markPrice = convertNativeBNToDecimal(
-    subExchange.greeks.markPrices[productIndex]
-  );
+
   switch (kind) {
     case types.Kind.FUTURE:
       return calculateFutureMargin(asset, spotPrice);
     case types.Kind.CALL:
     case types.Kind.PUT:
-      return calculateOptionMargin(asset, spotPrice, markPrice, kind, strike);
+      return calculateOptionMargin(
+        asset,
+        spotPrice,
+        convertNativeBNToDecimal(subExchange.greeks.markPrices[productIndex]),
+        kind,
+        strike
+      );
+    case types.Kind.PERP:
+      return calculatePerpMargin(asset, spotPrice);
   }
 }
 
@@ -107,6 +114,18 @@ export function calculateFutureMargin(
     maintenanceLong: maintenance,
     maintenanceShort: maintenance,
   };
+}
+
+/**
+ * Calculates the margin requirement for a perp.
+ * @param asset         underlying asset (SOL, BTC, etc.)
+ * @param spotPrice     price of the spot.
+ */
+export function calculatePerpMargin(
+  asset: Asset,
+  spotPrice: number
+): types.MarginRequirement {
+  return calculateFutureMargin(asset, spotPrice);
 }
 
 /**
@@ -382,7 +401,7 @@ export function movePositions(
   for (let i = 0; i < movements.length; i++) {
     let size = movements[i].size.toNumber();
     let index = movements[i].index;
-    if (size === 0 || index >= constants.ACTIVE_MARKETS) {
+    if (size === 0 || index >= constants.ACTIVE_MARKETS - 1) {
       throw Error("Invalid movement.");
     }
 
@@ -440,7 +459,7 @@ export function handleExecutionCostOfTrades(
     }
     return;
   }
-  let ledger = marginAccount.productLedgers[index];
+  let ledger = getProductLedger(marginAccount, index);
   let [openSize, closeSize] = getExecutionOpenCloseSize(
     ledger.position.size.toNumber(),
     size
@@ -477,7 +496,7 @@ function lockMarginAccountPosition(
   index: number,
   size: number
 ) {
-  let ledger = marginAccount.productLedgers[index];
+  let ledger = getProductLedger(marginAccount, index);
   resetClosingOrders(ledger);
   let costOfTrades = moveSize(ledger.position, size);
   rebalanceOrders(ledger);

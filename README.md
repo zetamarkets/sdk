@@ -518,7 +518,7 @@ ORACLE:
 
 ```ts
 export interface OraclePrice {
-  asset: assets.Asset; // The feed's asset ie SOL or BTC.
+  asset: assets.Asset; // The feed's asset eg SOL or BTC.
   price: number; // i.e. 1000.23
   lastUpdatedTime: number; // Seconds since Linux epoch
   lastUpdatedSlot: bigint; // Blockchain slot, from Pyth

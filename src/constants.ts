@@ -18,6 +18,7 @@ export const MAX_SETTLE_AND_CLOSE_PER_TX = 4;
 export const MAX_CANCELS_PER_TX = 3;
 export const MAX_GREEK_UPDATES_PER_TX = 20;
 export const MAX_SETTLEMENT_ACCOUNTS = 20;
+export const MAX_FUNDING_ACCOUNTS = 20;
 export const MAX_REBALANCE_ACCOUNTS = 18;
 export const MAX_SETTLE_ACCOUNTS = 5;
 export const MAX_ZETA_GROUPS = 20;
@@ -27,6 +28,7 @@ export const MARKET_INDEX_LIMIT = 18;
 // 3 accounts per set * 9 = 27 + 2 = 29 accounts.
 export const CLEAN_MARKET_LIMIT = 9;
 export const CRANK_ACCOUNT_LIMIT = 12;
+export const CRANK_PERP_ACCOUNT_LIMIT = 10;
 export const MAX_MARKETS_TO_FETCH = 50;
 
 // This is the most we can load per iteration without
@@ -77,9 +79,10 @@ export const NUM_STRIKES = 11;
 export const PRODUCTS_PER_EXPIRY = NUM_STRIKES * 2 + 1; // +1 for the future.
 export const SERIES_FUTURE_INDEX = PRODUCTS_PER_EXPIRY - 1;
 export const ACTIVE_EXPIRIES = 2;
-export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY;
-export const TOTAL_EXPIRIES = 6;
-export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * TOTAL_EXPIRIES;
+export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 for perp
+export const TOTAL_EXPIRIES = 5;
+export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
+export const PERP_INDEX = TOTAL_MARKETS - 1;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 30;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
