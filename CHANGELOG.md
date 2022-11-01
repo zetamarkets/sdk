@@ -6,6 +6,11 @@ Version changes are pinned to SDK releases.
 ## [Unreleased]
 
 - program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))
+- general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
+  - New client.placePerpOrder() function
+  - New ApplyFundingEvent
+  - Exchange.getMarkets() now includes the perpMarket concantenated to the markets array
+    The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
 
 ## [0.17.1]
 
