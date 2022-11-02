@@ -3,8 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [Unreleased]
+## [0.18.0]
 
+- client: Better cancelAllOrders() functionality. ([#169](https://github.com/zetamarkets/sdk/pull/169))
+- client: Warning message on combo placeOrder instructions if no open orders acc. ([#169](https://github.com/zetamarkets/sdk/pull/169))
 - program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))
 - general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
   - New client.placePerpOrder() function
