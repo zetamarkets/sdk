@@ -5651,6 +5651,9 @@
           },
           {
             "name": "FillOrKill"
+          },
+          {
+            "name": "ImmediateOrCancel"
           }
         ]
       }

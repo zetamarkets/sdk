@@ -5651,6 +5651,9 @@ export type Zeta = {
           },
           {
             "name": "FillOrKill"
+          },
+          {
+            "name": "ImmediateOrCancel"
           }
         ]
       }
@@ -12380,6 +12383,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "FillOrKill"
+          },
+          {
+            "name": "ImmediateOrCancel"
           }
         ]
       }

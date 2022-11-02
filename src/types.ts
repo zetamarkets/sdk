@@ -34,12 +34,15 @@ export enum OrderType {
   LIMIT,
   POSTONLY,
   FILLORKILL,
+  IMMEDIATEORCANCEL,
 }
 
 export function toProgramOrderType(orderType: OrderType) {
   if (orderType == OrderType.LIMIT) return { limit: {} };
   if (orderType == OrderType.POSTONLY) return { postOnly: {} };
   if (orderType == OrderType.FILLORKILL) return { fillOrKill: {} };
+  if (orderType == OrderType.IMMEDIATEORCANCEL)
+    return { immediateOrCancel: {} };
 }
 
 export enum Side {
