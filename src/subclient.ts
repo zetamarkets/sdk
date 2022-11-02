@@ -887,6 +887,42 @@ export class SubClient {
     );
   }
 
+  public createPlaceOrderInstruction(
+    marketIndex: number,
+    price: number,
+    size: number,
+    side: types.Side,
+    orderType: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): TransactionInstruction {
+    if (marketIndex == constants.PERP_INDEX) {
+      return this.createPlacePerpOrderInstruction(
+        price,
+        size,
+        side,
+        orderType,
+        clientOrderId,
+        tag
+      );
+    }
+
+    return instructions.placeOrderV3Ix(
+      this.asset,
+      marketIndex,
+      price,
+      size,
+      side,
+      orderType,
+      clientOrderId,
+      tag,
+      this.marginAccountAddress,
+      this._parent.publicKey,
+      this._openOrdersAccounts[marketIndex],
+      this._parent.whitelistTradingFeesAddress
+    );
+  }
+
   public createPlacePerpOrderInstruction(
     price: number,
     size: number,

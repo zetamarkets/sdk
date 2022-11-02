@@ -453,6 +453,27 @@ export class Client {
     );
   }
 
+  public createPlaceOrderInstruction(
+    asset: Asset,
+    marketIndex: number,
+    price: number,
+    size: number,
+    side: types.Side,
+    type: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createPlaceOrderInstruction(
+      marketIndex,
+      price,
+      size,
+      side,
+      type,
+      clientOrderId,
+      tag
+    );
+  }
+
   public createCancelOrderNoErrorInstruction(
     asset: Asset,
     market: types.MarketIdentifier,

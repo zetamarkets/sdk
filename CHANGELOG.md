@@ -11,6 +11,7 @@ Version changes are pinned to SDK releases.
   - New ApplyFundingEvent
   - Exchange.getMarkets() now includes the perpMarket concantenated to the markets array
     The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
+- client: Add create place order instruction function. (#[170](https://github.com/zetamarkets/sdk/pull/170))
 
 ## [0.17.1]
 
