@@ -3,10 +3,10 @@ import { objectEquals } from "./utils";
 
 // Ordered in underlying sequence number.
 export enum Asset {
-  SOL = 0,
-  BTC = 1,
-  ETH = 2,
-  UNDEFINED = 255,
+  SOL = "SOL",
+  BTC = "BTC",
+  ETH = "ETH",
+  UNDEFINED = "UNDEFINED",
 }
 
 import * as constants from "./constants";

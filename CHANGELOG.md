@@ -13,6 +13,10 @@ Version changes are pinned to SDK releases.
     The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
 - client: Add create place order instruction function. (#[170](https://github.com/zetamarkets/sdk/pull/170))
 
+### Breaking
+
+- assets: Asset enum value now stores string value of name instead of index i.e. `SOL = "SOL"` (#[171](https://github.com/zetamarkets/sdk/pull/171))
+
 ## [0.17.1]
 
 - general: Bump solana-web3 package to 1.66.1 to fix some socket issues. ([#167](https://github.com/zetamarkets/sdk/pull/167))
