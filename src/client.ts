@@ -575,16 +575,9 @@ export class Client {
     if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrders();
     } else {
-      let ixs = [];
       for (var subClient of this.getAllSubClients()) {
-        ixs = ixs.concat(subClient.cancelAllOrdersIxs());
+        await subClient.cancelAllOrders();
       }
-      let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
-      return await Promise.all(
-        txs.map(async (tx) => {
-          return utils.processTransaction(this.provider, tx);
-        })
-      );
     }
   }
 
