@@ -6,7 +6,6 @@ import * as anchor from "@project-serum/anchor";
 export interface State {
   admin: PublicKey;
   stateNonce: number;
-  vaultNonce: number;
   serumNonce: number;
   mintAuthNonce: number;
   numUnderlyings: number;
@@ -74,6 +73,12 @@ export interface MarginParameters {
   padding: Array<number>;
 }
 
+export interface PerpParameters {
+  minFundingRatePercent: anchor.BN;
+  maxFundingRatePercent: anchor.BN;
+  impactCashDelta: anchor.BN;
+}
+
 export interface HaltState {
   halted: boolean;
   spotPrice: anchor.BN;
@@ -99,12 +104,15 @@ export interface ZetaGroup {
   marginParameters: MarginParameters;
   products: Array<Product>;
   productsPadding: Array<Product>;
+  perp: Product;
   expirySeries: Array<ExpirySeries>;
   expirySeriesPadding: Array<ExpirySeries>;
   totalInsuranceVaultDeposits: anchor.BN;
   asset: any;
   expiryIntervalSeconds: number;
   newExpiryThresholdSeconds: number;
+  perpParameters: PerpParameters;
+  perpSyncQueue: PublicKey;
   padding: Array<number>;
 }
 
@@ -154,9 +162,11 @@ export interface MarginAccount {
   seriesExpiry: Array<anchor.BN>;
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
+  perpProductLedger: ProductLedger;
   rebalanceAmount: anchor.BN;
   asset: any;
   accountType: any;
+  lastFundingDelta: AnchorDecimal;
   padding: Array<number>;
 }
 
@@ -165,6 +175,7 @@ export interface SpreadAccount {
   nonce: number;
   balance: anchor.BN;
   seriesExpiry: Array<anchor.BN>;
+  seriesExpiryPadding: anchor.BN;
   positions: Array<Position>;
   positionsPadding: Array<Position>;
   asset: any;
@@ -174,6 +185,7 @@ export interface SpreadAccount {
 export interface Greeks {
   nonce: number;
   markPrices: Array<anchor.BN>;
+  perpMarkPrice: anchor.BN;
   markPricesPadding: Array<anchor.BN>;
   productGreeks: Array<ProductGreeks>;
   productGreeksPadding: Array<ProductGreeks>;
@@ -188,7 +200,18 @@ export interface Greeks {
   volatilityPadding: Array<anchor.BN>;
   nodeKeys: Array<PublicKey>;
   haltForcePricing: Array<boolean>;
+  perpUpdateTimestamp: anchor.BN;
+  perpFundingDelta: AnchorDecimal;
+  perpLatestFundingRate: AnchorDecimal;
+  perpLatestMidpoint: anchor.BN;
   padding: Array<number>;
+}
+
+export interface PerpSyncQueue {
+  nonce: number;
+  head: number;
+  length: number;
+  queue: Array<AnchorDecimal>;
 }
 
 export interface MarketNode {
@@ -319,4 +342,14 @@ export interface OrderCompleteEvent {
   orderId: anchor.BN;
   clientOrderId: anchor.BN;
   orderCompleteType: Object;
+}
+
+export interface ApplyFundingEvent {
+  marginAccount: PublicKey;
+  user: PublicKey;
+  asset: Object;
+  balanceChange: anchor.BN;
+  remainingBalance: anchor.BN;
+  fundingRate: anchor.BN;
+  oraclePrice: anchor.BN;
 }

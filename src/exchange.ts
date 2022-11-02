@@ -10,7 +10,13 @@ import {
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
-import { Greeks, ProductGreeks, State, ZetaGroup } from "./program-types";
+import {
+  Greeks,
+  PerpSyncQueue,
+  ProductGreeks,
+  State,
+  ZetaGroup,
+} from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
@@ -316,6 +322,7 @@ export class Exchange {
     asset: Asset,
     oracle: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
+    perpArgs: instructions.UpdatePerpParametersArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
     expiryArgs: instructions.UpdateZetaGroupExpiryArgs
   ) {
@@ -325,6 +332,7 @@ export class Exchange {
         constants.MINTS[asset],
         oracle,
         pricingArgs,
+        perpArgs,
         marginArgs,
         expiryArgs
       )
@@ -550,15 +558,25 @@ export class Exchange {
     this.getSubExchange(asset).markets.unsubscribeMarket(index);
   }
 
+  public subscribePerp(asset: Asset) {
+    this.getSubExchange(asset).markets.subscribePerp();
+  }
+
+  public unsubscribePerp(asset: Asset) {
+    this.getSubExchange(asset).markets.unsubscribePerp();
+  }
+
   public async updateOrderbook(asset: Asset, index: number) {
-    await this.getSubExchange(asset).markets.markets[index].updateOrderbook();
+    await this.getMarket(asset, index).updateOrderbook();
   }
 
   public async updateAllOrderbooks(live: boolean = true) {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
     let allLiveMarkets = this._markets;
     if (live) {
-      allLiveMarkets = this._markets.filter((m) => m.expirySeries.isLive());
+      allLiveMarkets = this._markets.filter(
+        (m) => m.kind == types.Kind.PERP || m.expirySeries.isLive()
+      );
     }
 
     let liveMarketsSlices: Market[][] = [];
@@ -625,11 +643,20 @@ export class Exchange {
   }
 
   public getMarket(asset: Asset, index: number): Market {
+    if (index == constants.PERP_INDEX) {
+      return this.getPerpMarket(asset);
+    }
     return this.getSubExchange(asset).markets.markets[index];
   }
 
   public getMarkets(asset: Asset): Market[] {
-    return this.getSubExchange(asset).markets.markets;
+    return this.getSubExchange(asset).markets.markets.concat(
+      this.getSubExchange(asset).markets.perpMarket
+    );
+  }
+
+  public getPerpMarket(asset: Asset): Market {
+    return this.getSubExchange(asset).markets.perpMarket;
   }
 
   public getMarketsByExpiryIndex(asset: Asset, index: number): Market[] {
@@ -652,8 +679,12 @@ export class Exchange {
     return this.getSubExchange(asset).greeks;
   }
 
+  public getPerpSyncQueue(asset: Asset): PerpSyncQueue {
+    return this.getSubExchange(asset).perpSyncQueue;
+  }
+
   public getOrderbook(asset: Asset, index: number): types.DepthOrderbook {
-    return this.getSubExchange(asset).markets.markets[index].orderbook;
+    return this.getMarket(asset, index).orderbook;
   }
 
   public getMarkPrice(asset: Asset, index: number): number {
@@ -690,6 +721,13 @@ export class Exchange {
     await this.getSubExchange(asset).updateMarginParameters(args);
   }
 
+  public async updatePerpParameters(
+    asset: Asset,
+    args: instructions.UpdatePerpParametersArgs
+  ) {
+    await this.getSubExchange(asset).updatePerpParameters(args);
+  }
+
   public async updateZetaGroupExpiryParameters(
     asset: Asset,
     args: instructions.UpdateZetaGroupExpiryArgs
@@ -707,6 +745,10 @@ export class Exchange {
 
   public async initializeMarketStrikes(asset: Asset) {
     await this.getSubExchange(asset).initializeMarketStrikes();
+  }
+
+  public async initializePerpSyncQueue(asset: Asset) {
+    await this.getSubExchange(asset).initializePerpSyncQueue();
   }
 
   public async updateZetaGroup(asset: Asset) {

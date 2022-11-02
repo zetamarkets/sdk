@@ -13,8 +13,9 @@ import {
   ZetaGroup,
   MarketIndexes,
   ProductGreeks,
+  PerpSyncQueue,
 } from "./program-types";
-import { ZetaGroupMarkets } from "./market";
+import { Market, ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
 import { Network } from "./network";
 import { Asset, assetToName } from "./assets";
@@ -97,7 +98,7 @@ export class SubExchange {
     return this._markets;
   }
   public get numMarkets(): number {
-    return this._markets.markets.length;
+    return this.getMarkets().length;
   }
   private _markets: ZetaGroupMarkets;
 
@@ -115,6 +116,20 @@ export class SubExchange {
     return this._greeksAddress;
   }
   private _greeksAddress: PublicKey;
+
+  /**
+   * Account storing the queue which synchronises taker/maker perp funding payments.
+   * You shouldn't need to read from this, it's mainly for our integration tests
+   */
+  public get perpSyncQueue(): PerpSyncQueue {
+    return this._perpSyncQueue;
+  }
+  private _perpSyncQueue: PerpSyncQueue;
+
+  public get perpSyncQueueAddress(): PublicKey {
+    return this._perpSyncQueueAddress;
+  }
+  private _perpSyncQueueAddress: PublicKey;
 
   public get marginParams(): types.MarginParams {
     return this._marginParams;
@@ -151,6 +166,13 @@ export class SubExchange {
     );
 
     this._greeksAddress = greeks;
+
+    let [perpSyncQueue, _perpSyncQueueNonce] = await utils.getPerpSyncQueue(
+      Exchange.programId,
+      this.zetaGroupAddress
+    );
+
+    this._perpSyncQueueAddress = perpSyncQueue;
 
     const [vaultAddress, _vaultNonce] = await utils.getVault(
       Exchange.programId,
@@ -201,7 +223,8 @@ export class SubExchange {
     if (
       this.zetaGroup.products[this.zetaGroup.products.length - 1].market.equals(
         PublicKey.default
-      )
+      ) ||
+      this.zetaGroup.perp.market.equals(PublicKey.default)
     ) {
       throw "Zeta group markets are uninitialized!";
     }
@@ -210,11 +233,15 @@ export class SubExchange {
     this._greeks = (await Exchange.program.account.greeks.fetch(
       this.greeksAddress
     )) as Greeks;
+    this._perpSyncQueue = (await Exchange.program.account.perpSyncQueue.fetch(
+      this.perpSyncQueueAddress
+    )) as PerpSyncQueue;
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
     // Set callbacks.
     this.subscribeZetaGroup(asset, callback);
     this.subscribeGreeks(asset, callback);
+    this.subscribePerpSyncQueue();
 
     this._isInitialized = true;
 
@@ -225,7 +252,7 @@ export class SubExchange {
    * Initializes the market nodes for a zeta group.
    */
   public async initializeMarketNodes(zetaGroup: PublicKey) {
-    let indexes = [...Array(constants.ACTIVE_MARKETS).keys()];
+    let indexes = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
     await Promise.all(
       indexes.map(async (index: number) => {
         let tx = new Transaction().add(
@@ -261,6 +288,23 @@ export class SubExchange {
   ) {
     let tx = new Transaction().add(
       instructions.updateMarginParametersIx(
+        this.asset,
+        args,
+        Exchange.provider.wallet.publicKey
+      )
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+    await this.updateZetaGroup();
+  }
+
+  /**
+   * Update the perp parameters for a zeta group.
+   */
+  public async updatePerpParameters(
+    args: instructions.UpdatePerpParametersArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.updatePerpParametersIx(
         this.asset,
         args,
         Exchange.provider.wallet.publicKey
@@ -385,6 +429,11 @@ export class SubExchange {
         await this.initializeZetaMarket(i, marketIndexes, marketIndexesAccount);
       }
     }
+    await this.initializeZetaMarket(
+      constants.PERP_INDEX,
+      marketIndexes,
+      marketIndexesAccount
+    );
   }
 
   private async initializeZetaMarket(
@@ -392,9 +441,7 @@ export class SubExchange {
     marketIndexes: PublicKey,
     marketIndexesAccount: MarketIndexes
   ) {
-    console.log(
-      `Initializing zeta market ${i + 1}/${this.zetaGroup.products.length}`
-    );
+    console.log(`Initializing zeta market ${i}`);
 
     const homedir = os.homedir();
     let dir = `${homedir}/keys/${assetToName(this.asset)}`;
@@ -481,6 +528,13 @@ export class SubExchange {
   public async initializeMarketStrikes() {
     let tx = new Transaction().add(
       instructions.initializeMarketStrikesIx(this.asset)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  public async initializePerpSyncQueue() {
+    let tx = new Transaction().add(
+      await instructions.initializePerpSyncQueueIx(this.asset)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
@@ -577,6 +631,25 @@ export class SubExchange {
     this._eventEmitters.push(eventEmitter);
   }
 
+  private subscribePerpSyncQueue() {
+    if (this._zetaGroup === null) {
+      throw Error("Cannot subscribe perpSyncQueue. ZetaGroup is null.");
+    }
+
+    let eventEmitter = Exchange.program.account.perpSyncQueue.subscribe(
+      this._zetaGroup.perpSyncQueue,
+      Exchange.provider.connection.commitment
+    );
+
+    // Purposely don't push out a callback here, users shouldn't care about
+    // updates to perpSyncQueue
+    eventEmitter.on("change", async (perpSyncQueue: PerpSyncQueue) => {
+      this._perpSyncQueue = perpSyncQueue;
+    });
+
+    this._eventEmitters.push(eventEmitter);
+  }
+
   public async handlePolling(
     callback?: (asset: Asset, eventType: EventType, data: any) => void
   ) {
@@ -601,10 +674,19 @@ export class SubExchange {
    * @param index   market index to get mark price.
    */
   public getMarkPrice(index: number): number {
-    return utils.convertNativeBNToDecimal(
-      this._greeks.markPrices[index],
-      constants.PLATFORM_PRECISION
-    );
+    let price =
+      index == constants.PERP_INDEX
+        ? this._greeks.perpMarkPrice
+        : this._greeks.markPrices[index];
+
+    return utils.convertNativeBNToDecimal(price, constants.PLATFORM_PRECISION);
+  }
+
+  /**
+   * Returns all perp & nonperk markets in a single list
+   */
+  public getMarkets(): Market[] {
+    return this._markets.markets.concat(this._markets.perpMarket);
   }
 
   /**
@@ -818,7 +900,7 @@ export class SubExchange {
   public async cancelAllOrdersHalted() {
     this.assertHalted();
     await Promise.all(
-      this._markets.markets.map(async (market) => {
+      this.getMarkets().map(async (market) => {
         await market.cancelAllOrdersHalted();
       })
     );
@@ -896,6 +978,9 @@ export class SubExchange {
       this._zetaGroupAddress
     );
     await Exchange.program.account.greeks.unsubscribe(this._zetaGroup.greeks);
+    await Exchange.program.account.perpSyncQueue.unsubscribe(
+      this._zetaGroup.perpSyncQueue
+    );
     for (var i = 0; i < this._eventEmitters.length; i++) {
       this._eventEmitters[i].removeListener("change");
     }

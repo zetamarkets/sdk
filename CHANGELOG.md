@@ -5,12 +5,25 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [0.16.18]
+- program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))
+- general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
+  - New client.placePerpOrder() function
+  - New ApplyFundingEvent
+  - Exchange.getMarkets() now includes the perpMarket concantenated to the markets array
+    The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
+- instructions: Add instruction to allow pricing admin to calibrate mark prices to midpoint if there's enough volume in two-sided quotes. ([#161](https://github.com/zetamarkets/sdk/pull/161))
 
+## [0.17.1]
+
+- general: Bump solana-web3 package to 1.66.1 to fix some socket issues. ([#167](https://github.com/zetamarkets/sdk/pull/167))
+
+## [0.17.0]
+
+- idl: add idl perp kind to prevent breaking changes.
+- program: disable withdrawals while user has open orders.
 - client: add cancelAllMarketOrders(). ([#157](https://github.com/zetamarkets/sdk/pull/157))
 - events: Add TradeEventV2. ([#153](https://github.com/zetamarkets/sdk/pull/153))
-- risk: Change initial margin calcs to use Max(shorts, longs) for futures instead of shorts + longs. ([#158](https://github.com/zetamarkets/sdk/pull/158))
-- instructions: Add instruction to allow pricing admin to calibrate mark prices to midpoint if there's enough volume in two-sided quotes. ([#161](https://github.com/zetamarkets/sdk/pull/161))
+- risk: change initial margin calcs to use max(shorts, longs) for futures instead of shorts + longs. ([#158](https://github.com/zetamarkets/sdk/pull/158))
 
 ## [0.16.17]
 
