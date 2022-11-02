@@ -5,10 +5,18 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [0.17.1]
-
 - client: Add placeOrderWithBlockhash(), allowing the user to specify their own blockhash to avoid an RPC roundtrip. ([#166](https://github.com/zetamarkets/sdk/pull/166))
 - examples: Bump SDK version and webserver URL. ([#166](https://github.com/zetamarkets/sdk/pull/166))
+- program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))
+- general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
+  - New client.placePerpOrder() function
+  - New ApplyFundingEvent
+  - Exchange.getMarkets() now includes the perpMarket concantenated to the markets array
+    The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
+
+## [0.17.1]
+
+- general: Bump solana-web3 package to 1.66.1 to fix some socket issues. ([#167](https://github.com/zetamarkets/sdk/pull/167))
 
 ## [0.17.0]
 

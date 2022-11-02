@@ -10,6 +10,7 @@ import {
   TradeEvent,
   TradeEventV2,
   OrderCompleteEvent,
+  ProductLedger,
 } from "./program-types";
 import {
   PublicKey,
@@ -17,6 +18,7 @@ import {
   ConfirmOptions,
   TransactionSignature,
   Transaction,
+  TransactionInstruction,
 } from "@solana/web3.js";
 import * as constants from "./constants";
 import { referUserIx } from "./program-instructions";
@@ -249,6 +251,12 @@ export class Client {
       );
     }
 
+    await Promise.all(
+      client.getAllSubClients().map(async (subclient) => {
+        await subclient.updateState();
+      })
+    );
+
     return client;
   }
 
@@ -357,12 +365,21 @@ export class Client {
     // marketIndex is either number or PublicKey
     let marketPubkey: PublicKey;
     if (typeof market == "number") {
-      marketPubkey =
-        Exchange.getSubExchange(asset).markets.markets[market].address;
+      marketPubkey = Exchange.getMarket(asset, market).address;
     } else {
       marketPubkey = market;
     }
     return marketPubkey;
+  }
+
+  public marketIdentifierToIndex(asset: Asset, market: types.MarketIdentifier) {
+    let index: number;
+    if (typeof market == "number") {
+      index = market;
+    } else {
+      index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(market);
+    }
+    return index;
   }
 
   public async placeOrder(
@@ -376,8 +393,39 @@ export class Client {
     tag: String = constants.DEFAULT_ORDER_TAG,
     blockhash?: string
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).placeOrderV3(
-      this.marketIdentifierToPublicKey(asset, market),
+    let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
+    if (marketPubkey == Exchange.getPerpMarket(asset).address) {
+      return await this.getSubClient(asset).placePerpOrder(
+        price,
+        size,
+        side,
+        type,
+        clientOrderId,
+        tag
+      );
+    } else {
+      return await this.getSubClient(asset).placeOrderV3(
+        marketPubkey,
+        price,
+        size,
+        side,
+        type,
+        clientOrderId,
+        tag
+      );
+    }
+  }
+
+  public async placePerpOrder(
+    asset: Asset,
+    price: number,
+    size: number,
+    side: types.Side,
+    type: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).placePerpOrder(
       price,
       size,
       side,
@@ -385,6 +433,47 @@ export class Client {
       clientOrderId,
       tag,
       blockhash
+    );
+  }
+
+  public createPlacePerpOrderInstruction(
+    asset: Asset,
+    price: number,
+    size: number,
+    side: types.Side,
+    type: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createPlacePerpOrderInstruction(
+      price,
+      size,
+      side,
+      type,
+      clientOrderId,
+      tag
+    );
+  }
+
+  public createCancelOrderNoErrorInstruction(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    orderId: anchor.BN,
+    side: types.Side
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createCancelOrderNoErrorInstruction(
+      this.marketIdentifierToIndex(asset, market),
+      orderId,
+      side
+    );
+  }
+
+  public createCancelAllMarketOrdersInstruction(
+    asset: Asset,
+    market: types.MarketIdentifier
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createCancelAllMarketOrdersInstruction(
+      this.marketIdentifierToIndex(asset, market)
     );
   }
 
@@ -965,6 +1054,10 @@ export class Client {
       )
     );
     return await utils.processTransaction(this._provider, tx);
+  }
+
+  public getProductLedger(asset: Asset, marketIndex: number): ProductLedger {
+    return this.getSubClient(asset).getProductLedger(marketIndex);
   }
 
   public async close() {

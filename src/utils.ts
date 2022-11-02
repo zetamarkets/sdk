@@ -27,6 +27,8 @@ import * as fs from "fs";
 import * as constants from "./constants";
 import * as errors from "./errors";
 import { exchange as Exchange } from "./exchange";
+import { SubExchange } from "./subexchange";
+import { Market } from "./market";
 import {
   MarginAccount,
   ReferrerAlias,
@@ -314,6 +316,19 @@ export async function getGreeks(
   );
 }
 
+export async function getPerpSyncQueue(
+  programId: PublicKey,
+  zetaGroup: PublicKey
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("perp-sync-queue")),
+      zetaGroup.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export async function getMarketIndexes(
   programId: PublicKey,
   zetaGroup: PublicKey
@@ -585,7 +600,7 @@ export async function getTokenAccountInfo(
 
   if (accountInfo.delegateOption === 0) {
     accountInfo.delegate = null;
-    accountInfo.delegatedAmount = new u64(0);
+    accountInfo.delegatedAmount = 0;
   } else {
     accountInfo.delegate = new PublicKey(accountInfo.delegate);
     accountInfo.delegatedAmount = u64.fromBuffer(accountInfo.delegatedAmount);
@@ -841,6 +856,53 @@ export function getGreeksIndex(marketIndex: number): number {
   );
 }
 
+function printMarkets(markets: Market[], subExchange: SubExchange) {
+  for (var j = 0; j < markets.length; j++) {
+    let market = markets[j];
+
+    // Custom log for perps
+    if (market.kind == types.Kind.PERP) {
+      let markPrice = subExchange.getMarkPrice(market.marketIndex);
+      console.log(
+        `[MARKET] INDEX: ${constants.PERP_INDEX} KIND: ${
+          market.kind
+        } MARK_PRICE ${markPrice.toFixed(6)}`
+      );
+      return;
+    }
+
+    let greeksIndex = getGreeksIndex(market.marketIndex);
+    let markPrice = subExchange.getMarkPrice(market.marketIndex);
+
+    let delta = 1;
+    let sigma = 0;
+    let vega = 0;
+
+    if (market.kind != types.Kind.FUTURE) {
+      delta = convertNativeBNToDecimal(
+        subExchange.greeks.productGreeks[greeksIndex].delta,
+        constants.PRICING_PRECISION
+      );
+
+      sigma = Decimal.fromAnchorDecimal(
+        subExchange.greeks.productGreeks[greeksIndex].volatility
+      ).toNumber();
+
+      vega = Decimal.fromAnchorDecimal(
+        subExchange.greeks.productGreeks[greeksIndex].vega
+      ).toNumber();
+    }
+
+    console.log(
+      `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
+        market.strike
+      } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
+        2
+      )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
+    );
+  }
+}
+
 export function displayState() {
   let subExchanges = Exchange.subExchanges;
 
@@ -853,6 +915,8 @@ export function displayState() {
     console.log(
       `[EXCHANGE ${assetToName(subExchange.asset)}] Display market state...`
     );
+
+    // Products with expiries, ie options and futures
     for (var i = 0; i < orderedIndexes.length; i++) {
       let index = orderedIndexes[i];
       let expirySeries = subExchange.markets.expirySeries[index];
@@ -866,42 +930,21 @@ export function displayState() {
         constants.PRICING_PRECISION
       );
       console.log(`Interest rate: ${interestRate}`);
-      let markets = subExchange.markets.getMarketsByExpiryIndex(index);
-      for (var j = 0; j < markets.length; j++) {
-        let market = markets[j];
-        let greeksIndex = getGreeksIndex(market.marketIndex);
-        let markPrice = convertNativeBNToDecimal(
-          subExchange.greeks.markPrices[market.marketIndex]
-        );
-        let delta = convertNativeBNToDecimal(
-          subExchange.greeks.productGreeks[greeksIndex].delta,
-          constants.PRICING_PRECISION
-        );
-
-        let sigma = Decimal.fromAnchorDecimal(
-          subExchange.greeks.productGreeks[greeksIndex].volatility
-        ).toNumber();
-
-        let vega = Decimal.fromAnchorDecimal(
-          subExchange.greeks.productGreeks[greeksIndex].vega
-        ).toNumber();
-
-        console.log(
-          `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
-            market.strike
-          } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
-            2
-          )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
-        );
-      }
+      printMarkets(
+        subExchange.markets.getMarketsByExpiryIndex(index),
+        subExchange
+      );
     }
+
+    // Products without expiries, ie perps
+    printMarkets([subExchange.markets.perpMarket], subExchange);
   }
 }
 
 export async function getMarginFromOpenOrders(
   asset: Asset,
   openOrders: PublicKey,
-  marketIndex: number
+  market: Market
 ) {
   const [openOrdersMap, _openOrdersMapNonce] = await getOpenOrdersMap(
     Exchange.programId,
@@ -912,7 +955,7 @@ export async function getMarginFromOpenOrders(
   )) as OpenOrdersMap;
   const [marginAccount, _marginNonce] = await getMarginAccount(
     Exchange.programId,
-    Exchange.getSubExchange(asset).markets.markets[marketIndex].zetaGroup,
+    market.zetaGroup,
     openOrdersMapInfo.userKey
   );
 
@@ -1068,15 +1111,20 @@ export async function crankMarket(
   marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>
 ) {
-  let market = Exchange.getSubExchange(asset).markets.markets[marketIndex];
+  let market = Exchange.getMarket(asset, marketIndex);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
     return;
   }
   const openOrdersSet = new Set();
+  // We pass in a couple of extra accounts for perps so the limit is lower
+  let limit =
+    market.kind == types.Kind.PERP
+      ? constants.CRANK_PERP_ACCOUNT_LIMIT
+      : constants.CRANK_ACCOUNT_LIMIT;
   for (var i = 0; i < eventQueue.length; i++) {
     openOrdersSet.add(eventQueue[i].openOrders.toString());
-    if (openOrdersSet.size == constants.CRANK_ACCOUNT_LIMIT) {
+    if (openOrdersSet.size == limit) {
       break;
     }
   }
@@ -1094,7 +1142,7 @@ export async function crankMarket(
         marginAccount = await getMarginFromOpenOrders(
           asset,
           openOrders,
-          marketIndex
+          market
         );
         openOrdersToMargin.set(openOrders, marginAccount);
       } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
@@ -1103,7 +1151,7 @@ export async function crankMarket(
         marginAccount = await getMarginFromOpenOrders(
           asset,
           openOrders,
-          marketIndex
+          market
         );
       }
 
@@ -1120,6 +1168,22 @@ export async function crankMarket(
       };
     })
   );
+
+  if (marketIndex == constants.PERP_INDEX) {
+    remainingAccounts.unshift(
+      {
+        pubkey: Exchange.getSubExchange(asset).greeksAddress,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: Exchange.getSubExchange(asset).perpSyncQueueAddress,
+        isSigner: false,
+        isWritable: true,
+      }
+    );
+  }
+
   let tx = new Transaction().add(
     instructions.crankMarketIx(
       asset,
@@ -1173,7 +1237,7 @@ export function getMutMarketAccounts(
   asset: Asset,
   marketIndex: number
 ): Object[] {
-  let market = Exchange.getSubExchange(asset).markets.markets[marketIndex];
+  let market = Exchange.getMarket(asset, marketIndex);
   return [
     { pubkey: market.address, isSigner: false, isWritable: false },
     {
@@ -1295,10 +1359,9 @@ export async function getAllProgramAccountAddresses(
 export async function getAllOpenOrdersAccountsByMarket(
   asset: Asset
 ): Promise<Map<number, Array<PublicKey>>> {
-  let subExchange = Exchange.getSubExchange(asset);
   let openOrdersByMarketIndex = new Map<number, Array<PublicKey>>();
-  for (var i = 0; i < subExchange.markets.markets.length; i++) {
-    openOrdersByMarketIndex.set(i, []);
+  for (var market of Exchange.getMarkets(asset)) {
+    openOrdersByMarketIndex.set(market.marketIndex, []);
   }
 
   let marginAccounts = await Exchange.program.account.marginAccount.all();
@@ -1308,17 +1371,17 @@ export async function getAllOpenOrdersAccountsByMarket(
       if (assets.fromProgramAsset(marginAccount.asset) != asset) {
         return;
       }
-      for (var i = 0; i < subExchange.markets.markets.length; i++) {
-        let nonce = marginAccount.openOrdersNonce[i];
+      for (var market of Exchange.getMarkets(asset)) {
+        let nonce = marginAccount.openOrdersNonce[market.marketIndex];
         if (nonce == 0) {
           continue;
         }
         let [openOrders, _nonce] = await getOpenOrders(
           Exchange.programId,
-          subExchange.markets.markets[i].address,
+          market.address,
           marginAccount.authority
         );
-        openOrdersByMarketIndex.get(i).push(openOrders);
+        openOrdersByMarketIndex.get(market.marketIndex).push(openOrders);
       }
     })
   );
@@ -1332,7 +1395,7 @@ export async function settleAndBurnVaultTokensByMarket(
   marketIndex: number
 ) {
   console.log(`Burning tokens for market index ${marketIndex}`);
-  let market = Exchange.getSubExchange(asset).markets.markets[marketIndex];
+  let market = Exchange.getMarket(asset, marketIndex);
   let openOrders = openOrdersByMarketIndex.get(marketIndex);
   let remainingAccounts = openOrders.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
@@ -1367,12 +1430,10 @@ export async function settleAndBurnVaultTokens(
   asset: Asset,
   provider: anchor.AnchorProvider
 ) {
-  let subExchange = Exchange.getSubExchange(asset);
   let openOrdersByMarketIndex = await getAllOpenOrdersAccountsByMarket(asset);
-  for (var i = 0; i < subExchange.markets.markets.length; i++) {
-    console.log(`Burning tokens for market index ${i}`);
-    let market = subExchange.markets.markets[i];
-    let openOrders = openOrdersByMarketIndex.get(i);
+  for (var market of Exchange.getMarkets(asset)) {
+    console.log(`Burning tokens for market index ${market.marketIndex}`);
+    let openOrders = openOrdersByMarketIndex.get(market.marketIndex);
     let remainingAccounts = openOrders.map((key) => {
       return { pubkey: key, isSigner: false, isWritable: true };
     });
@@ -1407,10 +1468,8 @@ export async function burnVaultTokens(
   asset: Asset,
   provider: anchor.AnchorProvider
 ) {
-  let subExchange = Exchange.getSubExchange(asset);
-  for (var i = 0; i < subExchange.markets.markets.length; i++) {
-    console.log(`Burning tokens for market index ${i}`);
-    let market = subExchange.markets.markets[i];
+  for (var market of Exchange.getMarkets(asset)) {
+    console.log(`Burning tokens for market index ${market.marketIndex}`);
     let burnTx = instructions.burnVaultTokenTx(asset, market.address);
     await processTransaction(provider, burnTx);
   }
@@ -1533,4 +1592,35 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
     }
   }
   return bufferString.substring(0, splitIndex);
+}
+
+export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
+  let remainingAccounts = keys.map((key) => {
+    return { pubkey: key, isSigner: false, isWritable: true };
+  });
+
+  let txs = [];
+  for (
+    var i = 0;
+    i < remainingAccounts.length;
+    i += constants.MAX_FUNDING_ACCOUNTS
+  ) {
+    let tx = new Transaction();
+    let slice = remainingAccounts.slice(i, i + constants.MAX_FUNDING_ACCOUNTS);
+    tx.add(instructions.applyPerpFundingIx(asset, slice));
+    txs.push(tx);
+  }
+
+  await Promise.all(
+    txs.map(async (tx) => {
+      let txSig = await processTransaction(Exchange.provider, tx);
+    })
+  );
+}
+
+export function getProductLedger(marginAccount: MarginAccount, index: number) {
+  if (index == constants.PERP_INDEX) {
+    return marginAccount.perpProductLedger;
+  }
+  return marginAccount.productLedgers[index];
 }

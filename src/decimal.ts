@@ -29,7 +29,7 @@ export class Decimal {
   }
 
   public isSignNegative(): boolean {
-    return (this._flags & SIGN_MASK) > 0;
+    return (this._flags & SIGN_MASK) != 0;
   }
 
   public isSignPositive(): boolean {
@@ -52,7 +52,9 @@ export class Decimal {
       this._lo & 0xff,
     ];
 
-    return new BN(new Uint8Array(bytes));
+    return this.isSignNegative()
+      ? new BN(-1).mul(new BN(new Uint8Array(bytes)))
+      : new BN(new Uint8Array(bytes));
   }
 
   public isUnset(): boolean {
