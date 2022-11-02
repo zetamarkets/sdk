@@ -896,6 +896,17 @@ export class SubClient {
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): TransactionInstruction {
+    if (marketIndex == constants.PERP_INDEX) {
+      return this.createPlacePerpOrderInstruction(
+        price,
+        size,
+        side,
+        orderType,
+        clientOrderId,
+        tag
+      );
+    }
+
     return instructions.placeOrderV3Ix(
       this.asset,
       marketIndex,
