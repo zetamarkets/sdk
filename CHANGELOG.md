@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [Unreleased]
+
 ## [0.18.0]
 
 - client: Better cancelAllOrders() functionality. ([#169](https://github.com/zetamarkets/sdk/pull/169))
