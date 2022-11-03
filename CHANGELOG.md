@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+- client: Add placeOrderWithBlockhash(), allowing the user to specify their own blockhash to avoid an RPC roundtrip. ([#166](https://github.com/zetamarkets/sdk/pull/166))
+- examples: Bump SDK version and webserver URL. ([#166](https://github.com/zetamarkets/sdk/pull/166))
 - program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))
 - general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
   - New client.placePerpOrder() function

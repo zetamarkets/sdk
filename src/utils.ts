@@ -691,11 +691,18 @@ export async function processTransaction(
   tx: Transaction,
   signers?: Array<Signer>,
   opts?: ConfirmOptions,
-  useLedger: boolean = false
+  useLedger: boolean = false,
+  blockhash?: string
 ): Promise<TransactionSignature> {
   let txSig: TransactionSignature;
-  const blockhash = await provider.connection.getRecentBlockhash();
-  tx.recentBlockhash = blockhash.blockhash;
+
+  if (blockhash == undefined) {
+    const recentBlockhash = await provider.connection.getRecentBlockhash();
+    tx.recentBlockhash = recentBlockhash.blockhash;
+  } else {
+    tx.recentBlockhash = blockhash;
+  }
+
   tx.feePayer = useLedger
     ? Exchange.ledgerWallet.publicKey
     : provider.wallet.publicKey;
