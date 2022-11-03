@@ -903,7 +903,7 @@ export class SubClient {
           this.asset
         )}-PERP. Please call client.placeOrder() or client.initializeOpenOrdersAccount()`
       );
-      return null;
+      throw Error("User does not have an open orders account.");
     }
     return instructions.placePerpOrderIx(
       this.asset,
