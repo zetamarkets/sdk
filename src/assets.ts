@@ -3,10 +3,10 @@ import { objectEquals } from "./utils";
 
 // Ordered in underlying sequence number.
 export enum Asset {
-  SOL = 0,
-  BTC = 1,
-  ETH = 2,
-  UNDEFINED = 255,
+  SOL = "SOL",
+  BTC = "BTC",
+  ETH = "ETH",
+  UNDEFINED = "UNDEFINED",
 }
 
 import * as constants from "./constants";
@@ -32,7 +32,7 @@ export function isValidStr(asset: string): boolean {
 export function allAssets(): Asset[] {
   let allAssets: Asset[] = [];
   for (var a in Asset) {
-    if (typeof Asset[a] === "number" && a != "UNDEFINED") {
+    if (typeof Asset[a] === "string" && a != "UNDEFINED") {
       allAssets.push(nameToAsset(a));
     }
   }
@@ -78,4 +78,19 @@ export function fromProgramAsset(asset: any): Asset {
     return Asset.ETH;
   }
   throw Error("Invalid asset");
+}
+
+export function indexToAsset(index: number): Asset {
+  switch (index) {
+    case 0: {
+      return Asset.SOL;
+    }
+    case 1: {
+      return Asset.BTC;
+    }
+    case 2: {
+      return Asset.ETH;
+    }
+  }
+  throw new Error("Invalid index");
 }

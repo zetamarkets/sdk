@@ -390,7 +390,8 @@ export class Client {
     side: types.Side,
     type: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG
+    tag: String = constants.DEFAULT_ORDER_TAG,
+    blockhash?: string
   ): Promise<TransactionSignature> {
     let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     if (marketPubkey == Exchange.getPerpMarket(asset).address) {
@@ -410,7 +411,8 @@ export class Client {
         side,
         type,
         clientOrderId,
-        tag
+        tag,
+        blockhash
       );
     }
   }
@@ -422,7 +424,8 @@ export class Client {
     side: types.Side,
     type: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG
+    tag: String = constants.DEFAULT_ORDER_TAG,
+    blockhash?: string
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).placePerpOrder(
       price,
@@ -430,7 +433,8 @@ export class Client {
       side,
       type,
       clientOrderId,
-      tag
+      tag,
+      blockhash
     );
   }
 
@@ -444,6 +448,27 @@ export class Client {
     tag: String = constants.DEFAULT_ORDER_TAG
   ): TransactionInstruction {
     return this.getSubClient(asset).createPlacePerpOrderInstruction(
+      price,
+      size,
+      side,
+      type,
+      clientOrderId,
+      tag
+    );
+  }
+
+  public createPlaceOrderInstruction(
+    asset: Asset,
+    marketIndex: number,
+    price: number,
+    size: number,
+    side: types.Side,
+    type: types.OrderType = types.OrderType.LIMIT,
+    clientOrderId = 0,
+    tag: String = constants.DEFAULT_ORDER_TAG
+  ): TransactionInstruction {
+    return this.getSubClient(asset).createPlaceOrderInstruction(
+      marketIndex,
       price,
       size,
       side,

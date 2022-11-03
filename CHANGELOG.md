@@ -9,12 +9,19 @@ Version changes are pinned to SDK releases.
 
 - client: Better cancelAllOrders() functionality. ([#169](https://github.com/zetamarkets/sdk/pull/169))
 - client: Warning message on combo placeOrder instructions if no open orders acc. ([#169](https://github.com/zetamarkets/sdk/pull/169))
+- client: Add placeOrderWithBlockhash(), allowing the user to specify their own blockhash to avoid an RPC roundtrip. ([#166](https://github.com/zetamarkets/sdk/pull/166))
+- examples: Bump SDK version and webserver URL. ([#166](https://github.com/zetamarkets/sdk/pull/166))
 - program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))
 - general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
   - New client.placePerpOrder() function
   - New ApplyFundingEvent
   - Exchange.getMarkets() now includes the perpMarket concantenated to the markets array
     The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
+- client: Add create place order instruction function. (#[170](https://github.com/zetamarkets/sdk/pull/170))
+
+### Breaking
+
+- assets: Asset enum value now stores string value of name instead of index i.e. `SOL = "SOL"` (#[171](https://github.com/zetamarkets/sdk/pull/171))
 
 ## [0.17.1]
 
