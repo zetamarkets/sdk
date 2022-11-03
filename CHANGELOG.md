@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.18.0]
+
+- client: Better cancelAllOrders() functionality. ([#169](https://github.com/zetamarkets/sdk/pull/169))
+- client: Warning message on combo placeOrder instructions if no open orders acc. ([#169](https://github.com/zetamarkets/sdk/pull/169))
 - client: Add placeOrderWithBlockhash(), allowing the user to specify their own blockhash to avoid an RPC roundtrip. ([#166](https://github.com/zetamarkets/sdk/pull/166))
 - examples: Bump SDK version and webserver URL. ([#166](https://github.com/zetamarkets/sdk/pull/166))
 - program: Add an ImmediateOrCancel order type. ([#168](https://github.com/zetamarkets/sdk/pull/168))

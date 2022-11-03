@@ -947,6 +947,16 @@ export class SubClient {
     clientOrderId = 0,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): TransactionInstruction {
+    if (
+      this._openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
+    ) {
+      console.log(
+        `No open orders account for ${assetToName(
+          this.asset
+        )}-PERP. Please call client.placeOrder() or client.initializeOpenOrdersAccount()`
+      );
+      throw Error("User does not have an open orders account.");
+    }
     return instructions.placePerpOrderIx(
       this.asset,
       constants.PERP_INDEX,
