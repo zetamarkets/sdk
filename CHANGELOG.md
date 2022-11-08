@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.18.1]
+
+- utils: Add an optional limit to the amount of events cranked at once. ([#172](https://github.com/zetamarkets/sdk/pull/172))
+
 ## [0.18.0]
 
 - client: Better cancelAllOrders() functionality. ([#169](https://github.com/zetamarkets/sdk/pull/169))
