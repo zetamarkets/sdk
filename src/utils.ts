@@ -1109,7 +1109,8 @@ export async function settleUsers(
 export async function crankMarket(
   asset: Asset,
   marketIndex: number,
-  openOrdersToMargin?: Map<PublicKey, PublicKey>
+  openOrdersToMargin?: Map<PublicKey, PublicKey>,
+  crankLimit?: number
 ) {
   let market = Exchange.getMarket(asset, marketIndex);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
@@ -1122,6 +1123,12 @@ export async function crankMarket(
     market.kind == types.Kind.PERP
       ? constants.CRANK_PERP_ACCOUNT_LIMIT
       : constants.CRANK_ACCOUNT_LIMIT;
+
+  // Manually defined crankLimit will override
+  if (crankLimit) {
+    limit = crankLimit;
+  }
+
   for (var i = 0; i < eventQueue.length; i++) {
     openOrdersSet.add(eventQueue[i].openOrders.toString());
     if (openOrdersSet.size == limit) {
