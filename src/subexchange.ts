@@ -913,6 +913,10 @@ export class SubExchange {
         return utils.getMutMarketAccounts(this.asset, market.marketIndex);
       })
     );
+    marketAccounts.push(
+      (this._markets.perpMarket,
+      utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
+    );
     await utils.cleanZetaMarketsHalted(this.asset, marketAccounts);
   }
 
