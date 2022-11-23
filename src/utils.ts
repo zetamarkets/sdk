@@ -1339,7 +1339,7 @@ export async function getAllProgramAccountAddresses(
     filters.push({
       memcmp: {
         offset: assetOffset,
-        bytes: bs58.encode([asset]),
+        bytes: bs58.encode([assets.assetToIndex(asset)]),
       },
     });
   }
