@@ -4648,9 +4648,13 @@ export type Zeta = {
             "type": {
               "array": [
                 "bool",
-                4
+                3
               ]
             }
+          },
+          {
+            "name": "perpMarkPriceSet",
+            "type": "bool"
           },
           {
             "name": "marketNodesCleaned",
@@ -11384,9 +11388,13 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "bool",
-                4
+                3
               ]
             }
+          },
+          {
+            "name": "perpMarkPriceSet",
+            "type": "bool"
           },
           {
             "name": "marketNodesCleaned",

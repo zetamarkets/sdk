@@ -4648,9 +4648,13 @@
             "type": {
               "array": [
                 "bool",
-                4
+                3
               ]
             }
+          },
+          {
+            "name": "perpMarkPriceSet",
+            "type": "bool"
           },
           {
             "name": "marketNodesCleaned",
