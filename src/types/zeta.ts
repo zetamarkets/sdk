@@ -4684,9 +4684,13 @@ export type Zeta = {
             "type": {
               "array": [
                 "bool",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarketCleaned",
+            "type": "bool"
           }
         ]
       }
@@ -11416,9 +11420,13 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "bool",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarketCleaned",
+            "type": "bool"
           }
         ]
       }

@@ -4684,9 +4684,13 @@
             "type": {
               "array": [
                 "bool",
-                92
+                91
               ]
             }
+          },
+          {
+            "name": "perpMarketCleaned",
+            "type": "bool"
           }
         ]
       }
