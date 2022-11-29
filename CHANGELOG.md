@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [0.18.2]
+
+- program: Add perpMarkPriceSet and perpMarketCleaned to IDL. ([#173](https://github.com/zetamarkets/sdk/pull/173))
+- utils: Add assetToIndex, fix getAllProgramAccountAddresses + cleanZetaMarketsHalted. ([#173](https://github.com/zetamarkets/sdk/pull/173))
+
 ## [0.18.1]
 
 - utils: Add an optional limit to the amount of events cranked at once. ([#172](https://github.com/zetamarkets/sdk/pull/172))
