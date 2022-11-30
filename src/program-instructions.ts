@@ -606,6 +606,40 @@ export function cancelExpiredOrderIx(
   );
 }
 
+export function forceCancelOrderByOrderIdIx(
+  asset: Asset,
+  marketIndex: number,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  orderId: anchor.BN,
+  side: types.Side
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = Exchange.getMarket(asset, marketIndex);
+  return Exchange.program.instruction.forceCancelOrderByOrderId(
+    types.toProgramSide(side),
+    orderId,
+    {
+      accounts: {
+        greeks: subExchange.zetaGroup.greeks,
+        oracle: subExchange.zetaGroup.oracle,
+        cancelAccounts: {
+          zetaGroup: subExchange.zetaGroupAddress,
+          state: Exchange.stateAddress,
+          marginAccount,
+          dexProgram: constants.DEX_PID[Exchange.network],
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.decoded.bids,
+          asks: marketData.serumMarket.decoded.asks,
+          eventQueue: marketData.serumMarket.decoded.eventQueue,
+        },
+      },
+    }
+  );
+}
+
 export function forceCancelOrdersIx(
   asset: Asset,
   marketIndex: number,

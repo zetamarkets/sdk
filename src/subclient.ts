@@ -1192,6 +1192,43 @@ export class SubClient {
    * @param market  Market to cancel orders on
    * @param marginAccountToCancel Users to be force-cancelled's margin account
    */
+  public async forceCancelOrderByOrderId(
+    market: PublicKey,
+    marginAccountToCancel: PublicKey,
+    orderId: anchor.BN,
+    side: types.Side
+  ): Promise<TransactionSignature> {
+    let marginAccount = (await Exchange.program.account.marginAccount.fetch(
+      marginAccountToCancel
+    )) as unknown as MarginAccount;
+
+    let marketIndex = this._subExchange.markets.getMarketIndex(market);
+
+    let openOrdersAccountToCancel = await utils.createOpenOrdersAddress(
+      Exchange.programId,
+      market,
+      marginAccount.authority,
+      marginAccount.openOrdersNonce[marketIndex]
+    );
+
+    let tx = new Transaction();
+    let ix = instructions.forceCancelOrderByOrderIdIx(
+      this.asset,
+      marketIndex,
+      marginAccountToCancel,
+      openOrdersAccountToCancel,
+      orderId,
+      side
+    );
+    tx.add(ix);
+    return await utils.processTransaction(this._parent.provider, tx);
+  }
+
+  /**
+   * Calls force cancel on another user's orders
+   * @param market  Market to cancel orders on
+   * @param marginAccountToCancel Users to be force-cancelled's margin account
+   */
   public async forceCancelOrders(
     market: PublicKey,
     marginAccountToCancel: PublicKey

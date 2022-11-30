@@ -846,6 +846,21 @@ export class Client {
     return txIds;
   }
 
+  public async forceCancelOrderByOrderId(
+    asset: Asset,
+    market: types.MarketIdentifier,
+    marginAccountToCancel: PublicKey,
+    orderId: anchor.BN,
+    side: types.Side
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).forceCancelOrderByOrderId(
+      this.marketIdentifierToPublicKey(asset, market),
+      marginAccountToCancel,
+      orderId,
+      side
+    );
+  }
+
   public async forceCancelOrders(
     asset: Asset,
     market: types.MarketIdentifier,
