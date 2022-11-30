@@ -7,7 +7,6 @@ import {
   PositionMovementEvent,
   ReferralAccount,
   ReferrerAccount,
-  TradeEvent,
   TradeEventV2,
   OrderCompleteEvent,
   ProductLedger,
@@ -96,11 +95,6 @@ export class Client {
     return this._whitelistTradingFeesAddress;
   }
   private _whitelistTradingFeesAddress: PublicKey | undefined;
-
-  /**
-   * The listener for trade events.
-   */
-  private _tradeEventListener: any;
 
   /**
    * The listener for trade v2 events.
@@ -205,21 +199,6 @@ export class Client {
     client._referrerAlias = undefined;
 
     if (callback !== undefined) {
-      client._tradeEventListener = Exchange.program.addEventListener(
-        "TradeEvent",
-        (event: TradeEvent, _slot) => {
-          if (
-            client._marginAccountToAsset.has(event.marginAccount.toString())
-          ) {
-            callback(
-              client._marginAccountToAsset.get(event.marginAccount.toString()),
-              EventType.TRADE,
-              event
-            );
-          }
-        }
-      );
-
       client._tradeEventV2Listener = Exchange.program.addEventListener(
         "TradeEventV2",
         (event: TradeEventV2, _slot) => {
@@ -1085,10 +1064,6 @@ export class Client {
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);
       this._pollIntervalId = undefined;
-    }
-    if (this._tradeEventListener !== undefined) {
-      await Exchange.program.removeEventListener(this._tradeEventListener);
-      this._tradeEventListener = undefined;
     }
 
     if (this._tradeEventV2Listener !== undefined) {

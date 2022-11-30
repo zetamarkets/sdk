@@ -5975,7 +5975,7 @@
         },
         {
           "name": "size",
-          "type": "u64",
+          "type": "i64",
           "index": false
         },
         {
@@ -6734,6 +6734,11 @@
       "code": 6126,
       "name": "CannotInitializePerpMarketNode",
       "msg": "Not allowed to initialize market node for a perp market"
+    },
+    {
+      "code": 6127,
+      "name": "DeprecatedInstruction",
+      "msg": "Instruction is deprecated, please use the newer version"
     }
   ]
 }

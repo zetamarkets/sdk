@@ -5975,7 +5975,7 @@ export type Zeta = {
         },
         {
           "name": "size",
-          "type": "u64",
+          "type": "i64",
           "index": false
         },
         {
@@ -6734,6 +6734,11 @@ export type Zeta = {
       "code": 6126,
       "name": "CannotInitializePerpMarketNode",
       "msg": "Not allowed to initialize market node for a perp market"
+    },
+    {
+      "code": 6127,
+      "name": "DeprecatedInstruction",
+      "msg": "Instruction is deprecated, please use the newer version"
     }
   ]
 };
@@ -12715,7 +12720,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "size",
-          "type": "u64",
+          "type": "i64",
           "index": false
         },
         {
@@ -13474,6 +13479,11 @@ export const IDL: Zeta = {
       "code": 6126,
       "name": "CannotInitializePerpMarketNode",
       "msg": "Not allowed to initialize market node for a perp market"
+    },
+    {
+      "code": 6127,
+      "name": "DeprecatedInstruction",
+      "msg": "Instruction is deprecated, please use the newer version"
     }
   ]
 };
