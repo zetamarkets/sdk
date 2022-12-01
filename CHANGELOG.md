@@ -5,8 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [0.18.3]
-
+- program: Add perpMarkPriceSet and perpMarketCleaned to IDL. ([#173](https://github.com/zetamarkets/sdk/pull/173))
+- utils: Add assetToIndex, fix getAllProgramAccountAddresses + cleanZetaMarketsHalted. ([#173](https://github.com/zetamarkets/sdk/pull/173))
 - program: Deprecate placeOrder, placeOrderV2. ([#174](https://github.com/zetamarkets/sdk/pull/174))
 - events: Deprecate TradeEvent. ([#174](https://github.com/zetamarkets/sdk/pull/174))
 - program: Add new forceCancelOrderByOrderId instruction. ([#174](https://github.com/zetamarkets/sdk/pull/174))
@@ -14,11 +14,6 @@ Version changes are pinned to SDK releases.
 ### Breaking
 
 - LiquidationEvent now has a signed (i64) size instead of unsigned (u64). ([#174](https://github.com/zetamarkets/sdk/pull/174))
-
-## [0.18.2]
-
-- program: Add perpMarkPriceSet and perpMarketCleaned to IDL. ([#173](https://github.com/zetamarkets/sdk/pull/173))
-- utils: Add assetToIndex, fix getAllProgramAccountAddresses + cleanZetaMarketsHalted. ([#173](https://github.com/zetamarkets/sdk/pull/173))
 
 ## [0.18.1]
 
