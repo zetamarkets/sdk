@@ -1724,14 +1724,15 @@ export function haltZetaGroupIx(
 }
 
 export function unhaltZetaGroupIx(
-  zetaGroupAddress: PublicKey,
+  asset: Asset,
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.unhaltZetaGroup({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: zetaGroupAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
       admin,
+      greeks: Exchange.getSubExchange(asset).greeksAddress,
     },
   });
 }

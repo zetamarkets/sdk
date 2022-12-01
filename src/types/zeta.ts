@@ -395,6 +395,11 @@ export type Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []
@@ -7222,6 +7227,11 @@ export const IDL: Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []

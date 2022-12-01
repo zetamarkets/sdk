@@ -395,6 +395,11 @@
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []

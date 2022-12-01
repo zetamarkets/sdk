@@ -801,7 +801,7 @@ export class Exchange {
   }
 
   public async unhaltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
-    await this.getSubExchange(asset).unhaltZetaGroup(zetaGroupAddress);
+    await this.getSubExchange(asset).unhaltZetaGroup();
   }
 
   public async updateHaltState(
