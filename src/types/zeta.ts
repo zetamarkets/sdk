@@ -395,6 +395,11 @@ export type Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []
@@ -2970,6 +2975,88 @@ export type Zeta = {
     {
       "name": "cancelExpiredOrder",
       "accounts": [
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "forceCancelOrderByOrderId",
+      "accounts": [
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "cancelAccounts",
           "accounts": [
@@ -5975,7 +6062,7 @@ export type Zeta = {
         },
         {
           "name": "size",
-          "type": "u64",
+          "type": "i64",
           "index": false
         },
         {
@@ -6734,6 +6821,11 @@ export type Zeta = {
       "code": 6126,
       "name": "CannotInitializePerpMarketNode",
       "msg": "Not allowed to initialize market node for a perp market"
+    },
+    {
+      "code": 6127,
+      "name": "DeprecatedInstruction",
+      "msg": "Instruction is deprecated, please use the newer version"
     }
   ]
 };
@@ -7135,6 +7227,11 @@ export const IDL: Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []
@@ -9710,6 +9807,88 @@ export const IDL: Zeta = {
     {
       "name": "cancelExpiredOrder",
       "accounts": [
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "zetaGroup",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "forceCancelOrderByOrderId",
+      "accounts": [
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "cancelAccounts",
           "accounts": [
@@ -12715,7 +12894,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "size",
-          "type": "u64",
+          "type": "i64",
           "index": false
         },
         {
@@ -13474,6 +13653,11 @@ export const IDL: Zeta = {
       "code": 6126,
       "name": "CannotInitializePerpMarketNode",
       "msg": "Not allowed to initialize market node for a perp market"
+    },
+    {
+      "code": 6127,
+      "name": "DeprecatedInstruction",
+      "msg": "Instruction is deprecated, please use the newer version"
     }
   ]
 };

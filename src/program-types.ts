@@ -288,6 +288,9 @@ export interface PlaceOrderEvent {
   orderId: anchor.BN;
 }
 
+/**
+ * @deprecated - here for historical documentation.
+ */
 export interface TradeEvent {
   marginAccount: PublicKey;
   index: number;

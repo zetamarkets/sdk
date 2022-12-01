@@ -845,10 +845,10 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async unhaltZetaGroup(zetaGroupAddress: PublicKey) {
+  public async unhaltZetaGroup() {
     let tx = new Transaction().add(
       instructions.unhaltZetaGroupIx(
-        zetaGroupAddress,
+        this._asset,
         Exchange.provider.wallet.publicKey
       )
     );
