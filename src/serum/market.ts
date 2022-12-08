@@ -7,26 +7,11 @@ import {
   AccountInfo,
   Commitment,
   Connection,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
-  Transaction,
-  TransactionInstruction,
-  TransactionSignature,
 } from "@solana/web3.js";
 import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
-// import {
-//   closeAccount,
-//   initializeAccount,
-//   MSRM_DECIMALS,
-//   MSRM_MINT,
-//   SRM_DECIMALS,
-//   SRM_MINT,
-//   TOKEN_PROGRAM_ID,
-//   WRAPPED_SOL_MINT,
-// } from "./token-instructions";
-// import { getLayoutVersion } from "./tokens_and_markets";
 
 export const _MARKET_STAT_LAYOUT_V1 = struct([
   blob(5),
@@ -207,7 +192,7 @@ export class Market {
       throw new Error("Address not owned by program: " + owner.toBase58());
     }
 
-    const decoded = MARKET_STATE_LAYOUT_V2.decode(data);
+    const decoded = MARKET_STATE_LAYOUT_V3.decode(data);
     if (
       !decoded.accountFlags.initialized ||
       !decoded.accountFlags.market ||
@@ -564,13 +549,6 @@ export class OpenOrders {
     Object.assign(this, decoded);
   }
 
-  //   static getLayout(programId: PublicKey) {
-  //     if (getLayoutVersion(programId) === 1) {
-  //       return _OPEN_ORDERS_LAYOUT_V1;
-  //     }
-  //     return _OPEN_ORDERS_LAYOUT_V2;
-  //   }
-
   static async findForOwner(
     connection: Connection,
     ownerAddress: PublicKey,
@@ -656,28 +634,6 @@ export class OpenOrders {
       throw new Error("Invalid open orders account");
     }
     return new OpenOrders(address, decoded, programId);
-  }
-
-  static async makeCreateAccountTransaction(
-    connection: Connection,
-    marketAddress: PublicKey,
-    ownerAddress: PublicKey,
-    newAccountAddress: PublicKey,
-    programId: PublicKey
-  ) {
-    return SystemProgram.createAccount({
-      fromPubkey: ownerAddress,
-      newAccountPubkey: newAccountAddress,
-      lamports: await connection.getMinimumBalanceForRentExemption(
-        _OPEN_ORDERS_LAYOUT_V2.span
-      ),
-      space: _OPEN_ORDERS_LAYOUT_V2.span,
-      programId,
-    });
-  }
-
-  get publicKey() {
-    return this.address;
   }
 }
 

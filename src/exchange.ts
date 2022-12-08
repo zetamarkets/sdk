@@ -29,7 +29,6 @@ import { Asset } from "./assets";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
-// import { Orderbook } from "@project-serum/serum";
 
 export class Exchange {
   /**
