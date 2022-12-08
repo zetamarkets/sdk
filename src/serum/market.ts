@@ -13,80 +13,6 @@ import {
 import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
 
-export const _MARKET_STAT_LAYOUT_V1 = struct([
-  blob(5),
-
-  accountFlagsLayout("accountFlags"),
-
-  publicKeyLayout("ownAddress"),
-
-  u64("vaultSignerNonce"),
-
-  publicKeyLayout("baseMint"),
-  publicKeyLayout("quoteMint"),
-
-  publicKeyLayout("baseVault"),
-  u64("baseDepositsTotal"),
-  u64("baseFeesAccrued"),
-
-  publicKeyLayout("quoteVault"),
-  u64("quoteDepositsTotal"),
-  u64("quoteFeesAccrued"),
-
-  u64("quoteDustThreshold"),
-
-  publicKeyLayout("requestQueue"),
-  publicKeyLayout("eventQueue"),
-
-  publicKeyLayout("bids"),
-  publicKeyLayout("asks"),
-
-  u64("baseLotSize"),
-  u64("quoteLotSize"),
-
-  u64("feeRateBps"),
-
-  blob(7),
-]);
-
-export const MARKET_STATE_LAYOUT_V2 = struct([
-  blob(5),
-
-  accountFlagsLayout("accountFlags"),
-
-  publicKeyLayout("ownAddress"),
-
-  u64("vaultSignerNonce"),
-
-  publicKeyLayout("baseMint"),
-  publicKeyLayout("quoteMint"),
-
-  publicKeyLayout("baseVault"),
-  u64("baseDepositsTotal"),
-  u64("baseFeesAccrued"),
-
-  publicKeyLayout("quoteVault"),
-  u64("quoteDepositsTotal"),
-  u64("quoteFeesAccrued"),
-
-  u64("quoteDustThreshold"),
-
-  publicKeyLayout("requestQueue"),
-  publicKeyLayout("eventQueue"),
-
-  publicKeyLayout("bids"),
-  publicKeyLayout("asks"),
-
-  u64("baseLotSize"),
-  u64("quoteLotSize"),
-
-  u64("feeRateBps"),
-
-  u64("referrerRebatesAccrued"),
-
-  blob(7),
-]);
-
 export const MARKET_STATE_LAYOUT_V3 = struct([
   blob(5),
 
@@ -260,61 +186,6 @@ export class Market {
     return Orderbook.decode(this, data);
   }
 
-  async loadOrdersForOwner(
-    connection: Connection,
-    ownerAddress: PublicKey,
-    cacheDurationMs = 0
-  ): Promise<Order[]> {
-    const [bids, asks, openOrdersAccounts] = await Promise.all([
-      this.loadBids(connection),
-      this.loadAsks(connection),
-      this.findOpenOrdersAccountsForOwner(
-        connection,
-        ownerAddress,
-        cacheDurationMs
-      ),
-    ]);
-    return this.filterForOpenOrders(bids, asks, openOrdersAccounts);
-  }
-
-  filterForOpenOrders(
-    bids: Orderbook,
-    asks: Orderbook,
-    openOrdersAccounts: OpenOrders[]
-  ): Order[] {
-    return [...bids, ...asks].filter((order) =>
-      openOrdersAccounts.some((openOrders) =>
-        order.openOrdersAddress.equals(openOrders.address)
-      )
-    );
-  }
-
-  async findOpenOrdersAccountsForOwner(
-    connection: Connection,
-    ownerAddress: PublicKey,
-    cacheDurationMs = 0
-  ): Promise<OpenOrders[]> {
-    const strOwner = ownerAddress.toBase58();
-    const now = new Date().getTime();
-    if (
-      strOwner in this._openOrdersAccountsCache &&
-      now - this._openOrdersAccountsCache[strOwner].ts < cacheDurationMs
-    ) {
-      return this._openOrdersAccountsCache[strOwner].accounts;
-    }
-    const openOrdersAccountsForOwner = await OpenOrders.findForMarketAndOwner(
-      connection,
-      this.address,
-      ownerAddress,
-      this._programId
-    );
-    this._openOrdersAccountsCache[strOwner] = {
-      accounts: openOrdersAccountsForOwner,
-      ts: now,
-    };
-    return openOrdersAccountsForOwner;
-  }
-
   async loadRequestQueue(connection: Connection) {
     const { data } = throwIfNull(
       await connection.getAccountInfo(this._decoded.requestQueue)
@@ -327,59 +198,6 @@ export class Market {
       await connection.getAccountInfo(this._decoded.eventQueue)
     );
     return decodeEventQueue(data);
-  }
-
-  async loadFills(connection: Connection, limit = 100) {
-    // TODO: once there's a separate source of fills use that instead
-    const { data } = throwIfNull(
-      await connection.getAccountInfo(this._decoded.eventQueue)
-    );
-    const events = decodeEventQueue(data, limit);
-    return events
-      .filter(
-        (event) => event.eventFlags.fill && event.nativeQuantityPaid.gtn(0)
-      )
-      .map(this.parseFillEvent.bind(this));
-  }
-
-  parseFillEvent(event) {
-    let size, price, side, priceBeforeFees;
-    if (event.eventFlags.bid) {
-      side = "buy";
-      priceBeforeFees = event.eventFlags.maker
-        ? event.nativeQuantityPaid.add(event.nativeFeeOrRebate)
-        : event.nativeQuantityPaid.sub(event.nativeFeeOrRebate);
-      price = divideBnToNumber(
-        priceBeforeFees.mul(this._baseSplTokenMultiplier),
-        this._quoteSplTokenMultiplier.mul(event.nativeQuantityReleased)
-      );
-      size = divideBnToNumber(
-        event.nativeQuantityReleased,
-        this._baseSplTokenMultiplier
-      );
-    } else {
-      side = "sell";
-      priceBeforeFees = event.eventFlags.maker
-        ? event.nativeQuantityReleased.sub(event.nativeFeeOrRebate)
-        : event.nativeQuantityReleased.add(event.nativeFeeOrRebate);
-      price = divideBnToNumber(
-        priceBeforeFees.mul(this._baseSplTokenMultiplier),
-        this._quoteSplTokenMultiplier.mul(event.nativeQuantityPaid)
-      );
-      size = divideBnToNumber(
-        event.nativeQuantityPaid,
-        this._baseSplTokenMultiplier
-      );
-    }
-    return {
-      ...event,
-      side,
-      price,
-      feeCost:
-        this.quoteSplSizeToNumber(event.nativeFeeOrRebate) *
-        (event.eventFlags.maker ? -1 : 1),
-      size,
-    };
   }
 
   private get _baseSplTokenMultiplier() {
@@ -480,29 +298,6 @@ export interface OrderParams<T = Account> {
   programId?: PublicKey;
 }
 
-export const _OPEN_ORDERS_LAYOUT_V1 = struct([
-  blob(5),
-
-  accountFlagsLayout("accountFlags"),
-
-  publicKeyLayout("market"),
-  publicKeyLayout("owner"),
-
-  // These are in spl-token (i.e. not lot) units
-  u64("baseTokenFree"),
-  u64("baseTokenTotal"),
-  u64("quoteTokenFree"),
-  u64("quoteTokenTotal"),
-
-  u128("freeSlotBits"),
-  u128("isBidBits"),
-
-  seq(u128(), 128, "orders"),
-  seq(u64(), 128, "clientIds"),
-
-  blob(7),
-]);
-
 export const _OPEN_ORDERS_LAYOUT_V2 = struct([
   blob(5),
 
@@ -547,65 +342,6 @@ export class OpenOrders {
     this.address = address;
     this._programId = programId;
     Object.assign(this, decoded);
-  }
-
-  static async findForOwner(
-    connection: Connection,
-    ownerAddress: PublicKey,
-    programId: PublicKey
-  ) {
-    const filters = [
-      {
-        memcmp: {
-          offset: _OPEN_ORDERS_LAYOUT_V2.offsetOf("owner"),
-          bytes: ownerAddress.toBase58(),
-        },
-      },
-      {
-        dataSize: _OPEN_ORDERS_LAYOUT_V2.span,
-      },
-    ];
-    const accounts = await getFilteredProgramAccounts(
-      connection,
-      programId,
-      filters
-    );
-    return accounts.map(({ publicKey, accountInfo }) =>
-      OpenOrders.fromAccountInfo(publicKey, accountInfo, programId)
-    );
-  }
-
-  static async findForMarketAndOwner(
-    connection: Connection,
-    marketAddress: PublicKey,
-    ownerAddress: PublicKey,
-    programId: PublicKey
-  ) {
-    const filters = [
-      {
-        memcmp: {
-          offset: _OPEN_ORDERS_LAYOUT_V2.offsetOf("market"),
-          bytes: marketAddress.toBase58(),
-        },
-      },
-      {
-        memcmp: {
-          offset: _OPEN_ORDERS_LAYOUT_V2.offsetOf("owner"),
-          bytes: ownerAddress.toBase58(),
-        },
-      },
-      {
-        dataSize: _OPEN_ORDERS_LAYOUT_V2.span,
-      },
-    ];
-    const accounts = await getFilteredProgramAccounts(
-      connection,
-      programId,
-      filters
-    );
-    return accounts.map(({ publicKey, accountInfo }) =>
-      OpenOrders.fromAccountInfo(publicKey, accountInfo, programId)
-    );
   }
 
   static async load(
@@ -759,36 +495,6 @@ export async function getMintDecimals(
   );
   const { decimals } = MINT_LAYOUT.decode(data);
   return decimals;
-}
-
-async function getFilteredProgramAccounts(
-  connection: Connection,
-  programId: PublicKey,
-  filters
-): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
-  // @ts-ignore
-  const resp = await connection._rpcRequest("getProgramAccounts", [
-    programId.toBase58(),
-    {
-      commitment: connection.commitment,
-      filters,
-      encoding: "base64",
-    },
-  ]);
-  if (resp.error) {
-    throw new Error(resp.error.message);
-  }
-  return resp.result.map(
-    ({ pubkey, account: { data, executable, owner, lamports } }) => ({
-      publicKey: new PublicKey(pubkey),
-      accountInfo: {
-        data: Buffer.from(data[0], "base64"),
-        executable,
-        owner: new PublicKey(owner),
-        lamports,
-      },
-    })
-  );
 }
 
 function throwIfNull<T>(value: T | null, message = "account not found"): T {
