@@ -28,7 +28,7 @@ import * as types from "./types";
 import { Asset } from "./assets";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
-import { Orderbook } from "@project-serum/serum";
+import { Orderbook } from "./serum/market";
 
 export class Exchange {
   /**

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [Unreleased]
+
+- general: Port serum sdk into the zetamarkets sdk. ([#175](https://github.com/zetamarkets/sdk/pull/175))
+
 ## [0.18.2] 2022-12-05
 
 - program: Add perpMarkPriceSet and perpMarketCleaned to IDL. ([#173](https://github.com/zetamarkets/sdk/pull/173))

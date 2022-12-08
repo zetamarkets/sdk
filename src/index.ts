@@ -23,6 +23,7 @@ import * as risk from "./risk";
 import * as riskUtils from "./risk-utils";
 import * as events from "./events";
 import * as subscription from "./subscription";
+import { Market as SerumMarket, OpenOrders } from "./serum/market";
 
 export {
   assets,
@@ -49,4 +50,6 @@ export {
   Wallet,
   Market,
   subscription,
+  SerumMarket,
+  OpenOrders,
 };
