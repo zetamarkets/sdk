@@ -8,7 +8,6 @@ import {
   Commitment,
   Connection,
   PublicKey,
-  SystemProgram,
 } from "@solana/web3.js";
 import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
