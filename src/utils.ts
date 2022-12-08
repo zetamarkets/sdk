@@ -920,7 +920,9 @@ export function displayState() {
       let index = orderedIndexes[i];
       let expirySeries = subExchange.markets.expirySeries[index];
       console.log(
-        `Expiration @ ${new Date(
+        `Active @ ${new Date(
+          expirySeries.activeTs * 1000
+        )}, Expiration @ ${new Date(
           expirySeries.expiryTs * 1000
         )} Live: ${expirySeries.isLive()}`
       );

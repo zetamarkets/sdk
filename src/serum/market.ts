@@ -1,5 +1,5 @@
 import { blob, seq, struct, u8 } from "buffer-layout";
-import { accountFlagsLayout, publicKeyLayout, u128, u64 } from "./layout";
+import { accountFlagsLayout, publicKeyLayout, u128, u64, u16 } from "./layout";
 import { Slab, SLAB_LAYOUT } from "./slab";
 import BN from "bn.js";
 import {
@@ -50,7 +50,12 @@ export const MARKET_STATE_LAYOUT_V3 = struct([
   publicKeyLayout("authority"),
   publicKeyLayout("pruneAuthority"),
 
-  blob(1024),
+  // Consume events authority
+  u16("epochLength"),
+  u64("epochStartTs"),
+  u64("startEpochSeqNum"),
+
+  blob(974),
 
   blob(7),
 ]);
@@ -435,6 +440,7 @@ export class Orderbook {
       quantity,
       feeTier,
       clientOrderId,
+      tifOffset,
     } of this.slab.items(descending)) {
       const price = getPriceFromKey(key);
       yield {
@@ -448,6 +454,7 @@ export class Orderbook {
         size: this.market.baseSizeLotsToNumber(quantity),
         sizeLots: quantity,
         side: (this.isBids ? "buy" : "sell") as "buy" | "sell",
+        tifOffset,
       };
     }
   }
@@ -464,6 +471,7 @@ export interface Order {
   sizeLots: BN;
   side: "buy" | "sell";
   clientId?: BN;
+  tifOffset: number;
 }
 
 function getPriceFromKey(key) {
