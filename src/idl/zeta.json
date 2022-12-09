@@ -7202,6 +7202,11 @@
       "code": 6127,
       "name": "DeprecatedInstruction",
       "msg": "Instruction is deprecated, please use the newer version"
+    },
+    {
+      "code": 6128,
+      "name": "ForceCancelExpiredTifOrdersOnly",
+      "msg": "Can only force cancel expired TIF orders"
     }
   ]
 }

@@ -741,6 +741,15 @@ export class Exchange {
     await this.getSubExchange(asset).initializeZetaMarkets();
   }
 
+  public async initializeZetaMarketsTifEpochCycle(
+    asset: Asset,
+    cycleLengthSecs: number
+  ) {
+    await this.getSubExchange(asset).initializeZetaMarketsTifEpochCycle(
+      cycleLengthSecs
+    );
+  }
+
   public async initializeMarketStrikes(asset: Asset) {
     await this.getSubExchange(asset).initializeMarketStrikes();
   }

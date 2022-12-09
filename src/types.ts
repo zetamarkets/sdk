@@ -95,6 +95,7 @@ export interface Order {
   owner: PublicKey;
   // Client order id.
   clientOrderId: BN;
+  tifOffset: number;
 }
 
 export function orderEquals(

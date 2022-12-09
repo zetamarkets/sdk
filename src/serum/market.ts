@@ -47,8 +47,9 @@ export const MARKET_STATE_LAYOUT_V3 = struct([
 
   u64("referrerRebatesAccrued"),
 
-  publicKeyLayout("authority"),
+  publicKeyLayout("openOrdersAuthority"),
   publicKeyLayout("pruneAuthority"),
+  publicKeyLayout("consumeEventsAuthority"),
 
   // Consume events authority
   u16("epochLength"),

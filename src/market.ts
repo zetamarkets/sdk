@@ -614,6 +614,7 @@ export class Market {
       orderId: order.orderId,
       owner: order.openOrdersAddress,
       clientOrderId: order.clientId,
+      tifOffset: order.tifOffset,
     };
   }
 

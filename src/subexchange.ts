@@ -4,6 +4,7 @@ import {
   Transaction,
   ConfirmOptions,
   AccountMeta,
+  TransactionInstruction,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -246,6 +247,22 @@ export class SubExchange {
     this._isInitialized = true;
 
     console.log(`${assetToName(this.asset)} SubExchange loaded`);
+  }
+
+  /**
+   * Refreshes serum markets cache
+   * @param asset    which asset to load
+   */
+  public async updateSerumMarkets(asset: Asset, opts: ConfirmOptions) {
+    console.info(
+      `Refreshing Serum markets for ${assetToName(asset)} SubExchange.`
+    );
+
+    this._markets = await ZetaGroupMarkets.load(this.asset, opts, 0);
+
+    console.log(
+      `${assetToName(this.asset)} SubExchange Serum markets refreshed`
+    );
   }
 
   /**
@@ -520,6 +537,46 @@ export class SubExchange {
         console.error(`Initialize zeta market ${i} failed: ${e}`);
       }
     }
+  }
+
+  public async initializeZetaMarketsTifEpochCycle(cycleLengthSecs: number) {
+    let ixs: TransactionInstruction[] = [];
+    for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
+      if (i == constants.ACTIVE_MARKETS - 1) {
+        ixs.push(
+          instructions.initializeZetaMarketTifEpochCyclesIx(
+            this.asset,
+            constants.PERP_INDEX,
+            cycleLengthSecs
+          )
+        );
+        continue;
+      }
+      ixs.push(
+        instructions.initializeZetaMarketTifEpochCyclesIx(
+          this.asset,
+          i,
+          cycleLengthSecs
+        )
+      );
+    }
+
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      constants.MAX_INITIALIZE_MARKET_TIF_EPOCH_CYCLE_IXS_PER_TX
+    );
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        await utils.processTransaction(
+          Exchange.provider,
+          tx,
+          [],
+          utils.commitmentConfig(Exchange.connection.commitment),
+          Exchange.useLedger
+        );
+      })
+    );
   }
 
   /**
