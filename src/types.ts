@@ -114,6 +114,7 @@ export function orderEquals(
     a.price === b.price &&
     a.size === b.size &&
     a.side === b.side &&
+    a.tifOffset === b.tifOffset &&
     orderIdMatch
   );
 }

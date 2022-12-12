@@ -540,6 +540,10 @@ export class SubExchange {
   }
 
   public async initializeZetaMarketsTifEpochCycle(cycleLengthSecs: number) {
+    if (cycleLengthSecs > 65_535) {
+      throw Error("Can't initialize TIF epoch cycle > u16::MAX");
+    }
+
     let ixs: TransactionInstruction[] = [];
     for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
       if (i == constants.ACTIVE_MARKETS - 1) {

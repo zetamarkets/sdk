@@ -455,7 +455,7 @@ export class Orderbook {
         size: this.market.baseSizeLotsToNumber(quantity),
         sizeLots: quantity,
         side: (this.isBids ? "buy" : "sell") as "buy" | "sell",
-        tifOffset,
+        tifOffset: (tifOffset as any).toNumber(),
       };
     }
   }

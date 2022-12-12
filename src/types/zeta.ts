@@ -7207,6 +7207,11 @@ export type Zeta = {
       "code": 6128,
       "name": "ForceCancelExpiredTifOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
+    },
+    {
+      "code": 6129,
+      "name": "MarketTifEpochCycleAlreadyInitialized",
+      "msg": "Market TIF epoch cycle already initialized"
     }
   ]
 };
@@ -14420,6 +14425,11 @@ export const IDL: Zeta = {
       "code": 6128,
       "name": "ForceCancelExpiredTifOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
+    },
+    {
+      "code": 6129,
+      "name": "MarketTifEpochCycleAlreadyInitialized",
+      "msg": "Market TIF epoch cycle already initialized"
     }
   ]
 };
