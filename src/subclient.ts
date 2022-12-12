@@ -694,6 +694,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
+    explicitTIF: boolean,
     tifOffset: number,
     orderType: types.OrderType = types.OrderType.LIMIT,
     clientOrderId = 0,
@@ -723,6 +724,31 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
+    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+    let tifOffsetToUse: number = 0;
+    if (explicitTIF) {
+      tifOffsetToUse = tifOffset;
+    } else {
+      let epochStartTsToUse: number = 0;
+      let now = Math.floor(Date.now() / 1000);
+      if (
+        marketInfo.serumMarket.decoded.epochStartTs.toNumber() +
+          marketInfo.serumMarket.decoded.epochLength.toNumber() <
+        now
+      ) {
+        epochStartTsToUse =
+          now - (now % marketInfo.serumMarket.decoded.epochLength.toNumber());
+      } else {
+        epochStartTsToUse =
+          marketInfo.serumMarket.decoded.epochStartTs.toNumber();
+      }
+
+      tifOffsetToUse =
+        Math.floor(Date.now() / 1000) - epochStartTsToUse + tifOffset;
+    }
+
+    console.log("Tif offset calced =", tifOffsetToUse);
+
     let orderIx = instructions.placeOrderV4Ix(
       this.asset,
       marketIndex,
@@ -732,7 +758,7 @@ export class SubClient {
       orderType,
       clientOrderId,
       tag,
-      tifOffset,
+      tifOffsetToUse,
       this.marginAccountAddress,
       this._parent.publicKey,
       openOrdersPda,
