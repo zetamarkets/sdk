@@ -1632,3 +1632,24 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
   }
   return marginAccount.productLedgers[index];
 }
+
+export function getTifOffset(
+  explicitTIF: boolean,
+  tifOffset: number,
+  currEpochStartTs: number,
+  epochLength: number
+) {
+  if (explicitTIF) {
+    return tifOffset;
+  }
+
+  let now = Exchange.clockTimestamp;
+
+  let epochStartTsToUse: number = 0;
+  if (currEpochStartTs + epochLength < now) {
+    epochStartTsToUse = now - (now % epochLength);
+  } else {
+    epochStartTsToUse = currEpochStartTs;
+  }
+  return now - epochStartTsToUse + tifOffset;
+}
