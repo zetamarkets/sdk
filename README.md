@@ -274,7 +274,7 @@ console.log(Exchange.getOrderbook(asset, index));
 Placing an order.
 
 - Placing an order on a new market (market index) will create a serum `OpenOrders` account. This is handled by the SDK.
-- The minimum price is $0.0001.
+- The minimum price is $0.001.
 - The minimum trade tick size is 0.001.
 
 ```ts

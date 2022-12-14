@@ -513,7 +513,7 @@ export function convertDecimalToNativeInteger(amount: number): number {
 
 /**
  * Returns the trade event price. This may return a number that
- * does not divide perfectly by tick size (0.0001) if your order traded
+ * does not divide perfectly by tick size (0.001) if your order traded
  * against orders at different prices.
  */
 export function getTradeEventPrice(event: TradeEventV2): number {
