@@ -12,6 +12,8 @@ import {
   convertNativeLotSizeToDecimal,
   getCancelAllIxs,
   splitIxsIntoTx,
+  getSeqNumFromSerumOrderKey,
+  isOrderExpired,
 } from "./utils";
 import * as types from "./types";
 
@@ -568,10 +570,44 @@ export class Market {
       ]);
     }
 
+    // console.log(
+    //   `index = ${
+    //     this.marketIndex
+    //   }, address = ${this._serumMarket.address.toString()}, epochStartTs = ${
+    //     this._serumMarket.epochStartTs
+    //   }, startEpochSeqNum = ${this._serumMarket.startEpochSeqNum}, now = ${
+    //     Exchange.clockTimestamp
+    //   }}`
+    // );
+
     [this._bids, this._asks].map((orderbookSide) => {
       const descending = orderbookSide.isBids ? true : false;
-      const levels = []; // (price, size)
-      for (const { key, quantity } of orderbookSide.slab.items(descending)) {
+      const levels = []; // (price, size, tifOffset)
+      for (const { key, quantity, tifOffset } of orderbookSide.slab.items(
+        descending
+      )) {
+        let seqNum = getSeqNumFromSerumOrderKey(key, orderbookSide.isBids);
+
+        if (
+          isOrderExpired(
+            tifOffset.toNumber(),
+            seqNum.toNumber(),
+            this._serumMarket.epochStartTs.toNumber(),
+            this._serumMarket.startEpochSeqNum.toNumber()
+          )
+        ) {
+          console.log(
+            `order expired!: index = ${
+              this.marketIndex
+            }, address = ${this._serumMarket.address.toString()}, epochStartTs = ${
+              this._serumMarket.epochStartTs
+            }, startEpochSeqNum = ${
+              this._serumMarket.startEpochSeqNum
+            }, now = ${Exchange.clockTimestamp}}`
+          );
+          continue;
+        }
+
         const price = getPriceFromSerumOrderKey(key);
         if (levels.length > 0 && levels[levels.length - 1][0].eq(price)) {
           levels[levels.length - 1][1].iadd(quantity);

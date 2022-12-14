@@ -728,8 +728,8 @@ export class SubClient {
     let tifOffsetToUse = utils.getTifOffset(
       explicitTIF,
       tifOffset,
-      marketInfo.serumMarket.decoded.epochStartTs.toNumber(),
-      marketInfo.serumMarket.decoded.epochLength.toNumber()
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
     );
 
     let orderIx = instructions.placeOrderV4Ix(
@@ -893,8 +893,8 @@ export class SubClient {
     let tifOffsetToUse = utils.getTifOffset(
       explicitTIF,
       tifOffset,
-      marketInfo.serumMarket.decoded.epochStartTs.toNumber(),
-      marketInfo.serumMarket.decoded.epochLength.toNumber()
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
     );
     let orderIx = instructions.placePerpOrderV2Ix(
       this.asset,

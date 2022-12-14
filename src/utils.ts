@@ -796,6 +796,19 @@ export function getPriceFromSerumOrderKey(key: anchor.BN): anchor.BN {
   return key.ushrn(64);
 }
 
+export function getSeqNumFromSerumOrderKey(
+  key: anchor.BN,
+  isBid: boolean
+): anchor.BN {
+  let lower = key.maskn(64);
+  if (isBid) {
+    let x = lower.notn(64);
+    return x;
+  } else {
+    return lower;
+  }
+}
+
 export function splitIxsIntoTx(
   ixs: TransactionInstruction[],
   ixsPerTx: number
@@ -1196,7 +1209,7 @@ export async function crankMarket(
     instructions.crankMarketIx(
       asset,
       market.address,
-      market.serumMarket.decoded.eventQueue,
+      market.serumMarket.eventQueueAddress,
       constants.DEX_PID[Exchange.network],
       remainingAccounts
     )
@@ -1249,12 +1262,12 @@ export function getMutMarketAccounts(
   return [
     { pubkey: market.address, isSigner: false, isWritable: false },
     {
-      pubkey: market.serumMarket.decoded.bids,
+      pubkey: market.serumMarket.bidsAddress,
       isSigner: false,
       isWritable: false,
     },
     {
-      pubkey: market.serumMarket.decoded.asks,
+      pubkey: market.serumMarket.asksAddress,
       isSigner: false,
       isWritable: false,
     },
@@ -1495,12 +1508,12 @@ export async function cancelExpiredOrdersAndCleanMarkets(
       return [
         { pubkey: market.address, isSigner: false, isWritable: false },
         {
-          pubkey: market.serumMarket.decoded.bids,
+          pubkey: market.serumMarket.bidsAddress,
           isSigner: false,
           isWritable: false,
         },
         {
-          pubkey: market.serumMarket.decoded.asks,
+          pubkey: market.serumMarket.asksAddress,
           isSigner: false,
           isWritable: false,
         },
@@ -1633,6 +1646,11 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
   return marginAccount.productLedgers[index];
 }
 
+/*
+ TODO: Maybe this should all be done in BN arithmetic because
+ sequence number gets quite large
+ */
+
 export function getTifOffset(
   explicitTIF: boolean,
   tifOffset: number,
@@ -1652,4 +1670,26 @@ export function getTifOffset(
     epochStartTsToUse = currEpochStartTs;
   }
   return now - epochStartTsToUse + tifOffset;
+}
+
+export function isOrderExpired(
+  orderTifOffset: number,
+  orderSeqNum: number,
+  epochStartTs: number,
+  startEpochSeqNum: number
+): boolean {
+  console.log(`tifOffset = ${orderTifOffset}, seqNum = ${orderSeqNum}`);
+  if (orderTifOffset == 0) {
+    return false;
+  }
+
+  if (epochStartTs + orderTifOffset < Exchange.clockTimestamp) {
+    return true;
+  }
+
+  if (orderSeqNum < startEpochSeqNum) {
+    return true;
+  }
+
+  return false;
 }

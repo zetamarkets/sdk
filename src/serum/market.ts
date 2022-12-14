@@ -173,6 +173,34 @@ export class Market {
     return this._decoded.asks;
   }
 
+  get requestQueueAddress(): PublicKey {
+    return this._decoded.requestQueue;
+  }
+
+  get eventQueueAddress(): PublicKey {
+    return this._decoded.eventQueue;
+  }
+
+  get baseVaultAddress(): PublicKey {
+    return this._decoded.baseVault;
+  }
+
+  get quoteVaultAddress(): PublicKey {
+    return this._decoded.quoteVault;
+  }
+
+  get epochStartTs(): BN {
+    return this._decoded.epochStartTs;
+  }
+
+  get epochLength(): BN {
+    return this._decoded.epochLength;
+  }
+
+  get startEpochSeqNum(): BN {
+    return this._decoded.startEpochSeqNum;
+  }
+
   get decoded(): any {
     return this._decoded;
   }
@@ -408,27 +436,6 @@ export class Orderbook {
     return new Orderbook(market, accountFlags, slab);
   }
 
-  getL2(depth: number): [number, number, BN, BN][] {
-    const descending = this.isBids;
-    const levels: [BN, BN][] = []; // (price, size)
-    for (const { key, quantity } of this.slab.items(descending)) {
-      const price = getPriceFromKey(key);
-      if (levels.length > 0 && levels[levels.length - 1][0].eq(price)) {
-        levels[levels.length - 1][1].iadd(quantity);
-      } else if (levels.length === depth) {
-        break;
-      } else {
-        levels.push([price, quantity]);
-      }
-    }
-    return levels.map(([priceLots, sizeLots]) => [
-      this.market.priceLotsToNumber(priceLots),
-      this.market.baseSizeLotsToNumber(sizeLots),
-      priceLots,
-      sizeLots,
-    ]);
-  }
-
   [Symbol.iterator]() {
     return this.items(false);
   }
@@ -455,7 +462,8 @@ export class Orderbook {
         size: this.market.baseSizeLotsToNumber(quantity),
         sizeLots: quantity,
         side: (this.isBids ? "buy" : "sell") as "buy" | "sell",
-        tifOffset: (tifOffset as any).toNumber(),
+        tifOffset: tifOffset.toNumber(),
+        tifOffsetBN: tifOffset,
       };
     }
   }
@@ -473,6 +481,7 @@ export interface Order {
   side: "buy" | "sell";
   clientId?: BN;
   tifOffset: number;
+  tifOffsetBN: BN;
 }
 
 function getPriceFromKey(key) {

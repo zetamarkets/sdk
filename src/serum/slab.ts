@@ -127,7 +127,7 @@ export class Slab {
     quantity: BN;
     feeTier: number;
     clientOrderId: BN;
-    tifOffset: number;
+    tifOffset: BN;
   }> {
     if (this.header.leafCount === 0) {
       return;

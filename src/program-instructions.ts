@@ -307,13 +307,13 @@ export function placeOrderV3Ix(
         openOrders: openOrders,
         rent: SYSVAR_RENT_PUBKEY,
         marketAccounts: {
-          market: marketData.serumMarket.decoded.ownAddress,
-          requestQueue: marketData.serumMarket.decoded.requestQueue,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          coinVault: marketData.serumMarket.decoded.baseVault,
-          pcVault: marketData.serumMarket.decoded.quoteVault,
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
           // User params.
           orderPayerTokenAccount:
             side == types.Side.BID
@@ -388,13 +388,13 @@ export function placeOrderV4Ix(
         openOrders: openOrders,
         rent: SYSVAR_RENT_PUBKEY,
         marketAccounts: {
-          market: marketData.serumMarket.decoded.ownAddress,
-          requestQueue: marketData.serumMarket.decoded.requestQueue,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          coinVault: marketData.serumMarket.decoded.baseVault,
-          pcVault: marketData.serumMarket.decoded.quoteVault,
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
           // User params.
           orderPayerTokenAccount:
             side == types.Side.BID
@@ -467,13 +467,13 @@ export function placePerpOrderIx(
         openOrders: openOrders,
         rent: SYSVAR_RENT_PUBKEY,
         marketAccounts: {
-          market: marketData.serumMarket.decoded.ownAddress,
-          requestQueue: marketData.serumMarket.decoded.requestQueue,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          coinVault: marketData.serumMarket.decoded.baseVault,
-          pcVault: marketData.serumMarket.decoded.quoteVault,
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
           // User params.
           orderPayerTokenAccount:
             side == types.Side.BID
@@ -548,13 +548,13 @@ export function placePerpOrderV2Ix(
         openOrders: openOrders,
         rent: SYSVAR_RENT_PUBKEY,
         marketAccounts: {
-          market: marketData.serumMarket.decoded.ownAddress,
-          requestQueue: marketData.serumMarket.decoded.requestQueue,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          coinVault: marketData.serumMarket.decoded.baseVault,
-          pcVault: marketData.serumMarket.decoded.quoteVault,
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
           // User params.
           orderPayerTokenAccount:
             side == types.Side.BID
@@ -601,9 +601,9 @@ export function cancelOrderIx(
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
         },
       },
     }
@@ -635,9 +635,9 @@ export function cancelOrderNoErrorIx(
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
         },
       },
     }
@@ -664,9 +664,9 @@ export function cancelAllMarketOrdersIx(
         serumAuthority: Exchange.serumAuthority,
         openOrders,
         market: marketData.address,
-        bids: marketData.serumMarket.decoded.bids,
-        asks: marketData.serumMarket.decoded.asks,
-        eventQueue: marketData.serumMarket.decoded.eventQueue,
+        bids: marketData.serumMarket.bidsAddress,
+        asks: marketData.serumMarket.asksAddress,
+        eventQueue: marketData.serumMarket.eventQueueAddress,
       },
     },
   });
@@ -695,9 +695,9 @@ export function cancelOrderByClientOrderIdIx(
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
         },
       },
     }
@@ -727,9 +727,9 @@ export function cancelOrderByClientOrderIdNoErrorIx(
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
         },
       },
     }
@@ -759,9 +759,9 @@ export function cancelExpiredOrderIx(
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
         },
       },
     }
@@ -793,9 +793,9 @@ export function forceCancelOrderByOrderIdIx(
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
         },
       },
     }
@@ -822,9 +822,9 @@ export function forceCancelOrdersIx(
         serumAuthority: Exchange.serumAuthority,
         openOrders,
         market: marketData.address,
-        bids: marketData.serumMarket.decoded.bids,
-        asks: marketData.serumMarket.decoded.asks,
-        eventQueue: marketData.serumMarket.decoded.eventQueue,
+        bids: marketData.serumMarket.bidsAddress,
+        asks: marketData.serumMarket.asksAddress,
+        eventQueue: marketData.serumMarket.eventQueueAddress,
       },
     },
   });
@@ -1288,8 +1288,8 @@ export function updatePricingIx(
       greeks: subExchange.greeksAddress,
       oracle: subExchange.zetaGroup.oracle,
       perpMarket: marketData.address,
-      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
+      perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
+      perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
     },
   });
 }
@@ -1826,8 +1826,8 @@ export function updatePricingHaltedIx(
       greeks: subExchange.greeksAddress,
       admin,
       perpMarket: marketData.address,
-      perpBids: subExchange.markets.perpMarket.serumMarket.decoded.bids,
-      perpAsks: subExchange.markets.perpMarket.serumMarket.decoded.asks,
+      perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
+      perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
     },
   });
 }
@@ -1880,9 +1880,9 @@ export function cancelOrderHaltedIx(
           serumAuthority: Exchange.serumAuthority,
           openOrders,
           market: marketData.address,
-          bids: marketData.serumMarket.decoded.bids,
-          asks: marketData.serumMarket.decoded.asks,
-          eventQueue: marketData.serumMarket.decoded.eventQueue,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
         },
       },
     }
@@ -2096,8 +2096,8 @@ export function settleDexFundsTxs(
     market: market.address,
     zetaBaseVault: market.baseVault,
     zetaQuoteVault: market.quoteVault,
-    dexBaseVault: market.serumMarket.decoded.baseVault,
-    dexQuoteVault: market.serumMarket.decoded.quoteVault,
+    dexBaseVault: market.serumMarket.baseVaultAddress,
+    dexQuoteVault: market.serumMarket.quoteVaultAddress,
     vaultOwner,
     mintAuthority: Exchange.mintAuthority,
     serumAuthority: Exchange.serumAuthority,
@@ -2136,8 +2136,8 @@ export function settleDexFundsIx(
     market: market.address,
     zetaBaseVault: market.baseVault,
     zetaQuoteVault: market.quoteVault,
-    dexBaseVault: market.serumMarket.decoded.baseVault,
-    dexQuoteVault: market.serumMarket.decoded.quoteVault,
+    dexBaseVault: market.serumMarket.baseVaultAddress,
+    dexQuoteVault: market.serumMarket.quoteVaultAddress,
     vaultOwner,
     mintAuthority: Exchange.mintAuthority,
     serumAuthority: Exchange.serumAuthority,
@@ -2167,7 +2167,7 @@ export function burnVaultTokenTx(
     Exchange.program.instruction.burnVaultTokens({
       accounts: {
         state: Exchange.stateAddress,
-        mint: market.serumMarket.decoded.quoteMint,
+        mint: market.serumMarket.quoteMintAddress,
         vault: market.quoteVault,
         serumAuthority: Exchange.serumAuthority,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -2178,7 +2178,7 @@ export function burnVaultTokenTx(
     Exchange.program.instruction.burnVaultTokens({
       accounts: {
         state: Exchange.stateAddress,
-        mint: market.serumMarket.decoded.baseMint,
+        mint: market.serumMarket.baseMintAddress,
         vault: market.baseVault,
         serumAuthority: Exchange.serumAuthority,
         tokenProgram: TOKEN_PROGRAM_ID,
