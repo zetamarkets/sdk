@@ -269,7 +269,7 @@ export class Market {
   }
 
   get tickSize() {
-    return this.priceLotsToNumber(new BN(1));
+    return this.priceLotsToNumber(new BN(10));
   }
 }
 
