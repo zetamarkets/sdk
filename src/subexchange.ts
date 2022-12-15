@@ -539,7 +539,7 @@ export class SubExchange {
     }
   }
 
-  public async initializeZetaMarketsTifEpochCycle(cycleLengthSecs: number) {
+  public async initializeZetaMarketsTIFEpochCycle(cycleLengthSecs: number) {
     if (cycleLengthSecs > 65_535) {
       throw Error("Can't initialize TIF epoch cycle > u16::MAX");
     }
@@ -548,7 +548,7 @@ export class SubExchange {
     for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
       if (i == constants.ACTIVE_MARKETS - 1) {
         ixs.push(
-          instructions.initializeZetaMarketTifEpochCyclesIx(
+          instructions.initializeZetaMarketTIFEpochCyclesIx(
             this.asset,
             constants.PERP_INDEX,
             cycleLengthSecs
@@ -557,7 +557,7 @@ export class SubExchange {
         continue;
       }
       ixs.push(
-        instructions.initializeZetaMarketTifEpochCyclesIx(
+        instructions.initializeZetaMarketTIFEpochCyclesIx(
           this.asset,
           i,
           cycleLengthSecs

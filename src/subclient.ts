@@ -679,7 +679,8 @@ export class SubClient {
    * @param price           the native price of the order (6 d.p as integer)
    * @param size            the quantity of the order (3 d.p)
    * @param side            the side of the order. bid / ask
-   * @param tifOffset       the tif offset at which the order will expire
+   * @param explicitTIF     whether to calculate the relative TIF offset or use absolute TIF offset
+   * @param tifOffset       the TIF offset at which the order will expire
    * @param orderType       the type of the order. limit / ioc / post-only
    * @param clientOrderId   optional: subClient order id (non 0 value)
    * @param tag             optional: the string tag corresponding to who is inserting
@@ -725,7 +726,7 @@ export class SubClient {
     }
 
     let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
-    let tifOffsetToUse = utils.getTifOffset(
+    let tifOffsetToUse = utils.getTIFOffset(
       explicitTIF,
       tifOffset,
       marketInfo.serumMarket.epochStartTs.toNumber(),
@@ -890,7 +891,7 @@ export class SubClient {
     }
 
     let marketInfo = Exchange.getPerpMarket(this._asset);
-    let tifOffsetToUse = utils.getTifOffset(
+    let tifOffsetToUse = utils.getTIFOffset(
       explicitTIF,
       tifOffset,
       marketInfo.serumMarket.epochStartTs.toNumber(),

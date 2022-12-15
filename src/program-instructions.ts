@@ -830,7 +830,7 @@ export function forceCancelOrdersIx(
   });
 }
 
-export function initializeZetaMarketTifEpochCyclesIx(
+export function initializeZetaMarketTIFEpochCyclesIx(
   asset: Asset,
   marketIndex: number,
   cycleLength: number

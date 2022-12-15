@@ -1651,7 +1651,7 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
  sequence number gets quite large
  */
 
-export function getTifOffset(
+export function getTIFOffset(
   explicitTIF: boolean,
   tifOffset: number,
   currEpochStartTs: number,
@@ -1673,17 +1673,16 @@ export function getTifOffset(
 }
 
 export function isOrderExpired(
-  orderTifOffset: number,
+  orderTIFOffset: number,
   orderSeqNum: number,
   epochStartTs: number,
   startEpochSeqNum: number
 ): boolean {
-  console.log(`tifOffset = ${orderTifOffset}, seqNum = ${orderSeqNum}`);
-  if (orderTifOffset == 0) {
+  if (orderTIFOffset == 0) {
     return false;
   }
 
-  if (epochStartTs + orderTifOffset < Exchange.clockTimestamp) {
+  if (epochStartTs + orderTIFOffset < Exchange.clockTimestamp) {
     return true;
   }
 

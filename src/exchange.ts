@@ -230,9 +230,6 @@ export class Exchange {
 
   private _programSubscriptionIds: number[] = [];
 
-  // Stored by reference so we don't have to iterate through all subexchanges to grab them when updating orderbooks on timer
-  // private _markets: Market[] = [];
-
   public async initialize(
     assets: Asset[],
     programId: PublicKey,
@@ -565,16 +562,9 @@ export class Exchange {
   public async updateAllOrderbooks(live: boolean = true) {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
     let allLiveMarkets = [];
-    this.assets.map(async (asset) => {
+    this.assets.forEach((asset) => {
       allLiveMarkets = allLiveMarkets.concat(this.getMarkets(asset));
     });
-
-    for (let i = 0; i < allLiveMarkets.length; i++) {
-      console.log(
-        "some state:",
-        allLiveMarkets[i].serumMarket.epochStartTs.toNumber()
-      );
-    }
 
     if (live) {
       allLiveMarkets = allLiveMarkets.filter(
@@ -746,11 +736,11 @@ export class Exchange {
     await this.getSubExchange(asset).initializeZetaMarkets();
   }
 
-  public async initializeZetaMarketsTifEpochCycle(
+  public async initializeZetaMarketsTIFEpochCycle(
     asset: Asset,
     cycleLengthSecs: number
   ) {
-    await this.getSubExchange(asset).initializeZetaMarketsTifEpochCycle(
+    await this.getSubExchange(asset).initializeZetaMarketsTIFEpochCycle(
       cycleLengthSecs
     );
   }

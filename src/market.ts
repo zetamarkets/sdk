@@ -570,16 +570,6 @@ export class Market {
       ]);
     }
 
-    // console.log(
-    //   `index = ${
-    //     this.marketIndex
-    //   }, address = ${this._serumMarket.address.toString()}, epochStartTs = ${
-    //     this._serumMarket.epochStartTs
-    //   }, startEpochSeqNum = ${this._serumMarket.startEpochSeqNum}, now = ${
-    //     Exchange.clockTimestamp
-    //   }}`
-    // );
-
     [this._bids, this._asks].map((orderbookSide) => {
       const descending = orderbookSide.isBids ? true : false;
       const levels = []; // (price, size, tifOffset)
@@ -596,15 +586,6 @@ export class Market {
             this._serumMarket.startEpochSeqNum.toNumber()
           )
         ) {
-          console.log(
-            `order expired!: index = ${
-              this.marketIndex
-            }, address = ${this._serumMarket.address.toString()}, epochStartTs = ${
-              this._serumMarket.epochStartTs
-            }, startEpochSeqNum = ${
-              this._serumMarket.startEpochSeqNum
-            }, now = ${Exchange.clockTimestamp}}`
-          );
           continue;
         }
 
@@ -671,7 +652,6 @@ export class Market {
   }
 
   public getBidOrders(): types.Order[] {
-    console.log("*");
     return [...this._bids].map((order) => {
       return Market.convertOrder(this, order);
     });

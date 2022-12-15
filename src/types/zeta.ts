@@ -7205,23 +7205,8 @@ export type Zeta = {
     },
     {
       "code": 6128,
-      "name": "ForceCancelExpiredTifOrdersOnly",
+      "name": "ForceCancelExpiredTIFOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
-    },
-    {
-      "code": 6129,
-      "name": "MarketTifEpochCycleAlreadyInitialized",
-      "msg": "Market TIF epoch cycle already initialized"
-    },
-    {
-      "code": 6130,
-      "name": "TIFOffsetLessThanEqualToEpochCycleLength",
-      "msg": "TIF offset must be <= epoch cycle length"
-    },
-    {
-      "code": 6131,
-      "name": "CannotPlaceExpiredOrder",
-      "msg": "Cannot place already expired order"
     }
   ]
 };
@@ -14433,23 +14418,8 @@ export const IDL: Zeta = {
     },
     {
       "code": 6128,
-      "name": "ForceCancelExpiredTifOrdersOnly",
+      "name": "ForceCancelExpiredTIFOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
-    },
-    {
-      "code": 6129,
-      "name": "MarketTifEpochCycleAlreadyInitialized",
-      "msg": "Market TIF epoch cycle already initialized"
-    },
-    {
-      "code": 6130,
-      "name": "TIFOffsetLessThanEqualToEpochCycleLength",
-      "msg": "TIF offset must be <= epoch cycle length"
-    },
-    {
-      "code": 6131,
-      "name": "CannotPlaceExpiredOrder",
-      "msg": "Cannot place already expired order"
     }
   ]
 };
