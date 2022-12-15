@@ -367,31 +367,23 @@ export class Client {
     price: number,
     size: number,
     side: types.Side,
-    type: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG,
-    blockhash?: string
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
     let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     if (marketPubkey == Exchange.getPerpMarket(asset).address) {
-      return await this.getSubClient(asset).placePerpOrder(
+      return await this.getSubClient(asset).placePerpOrderV2(
         price,
         size,
         side,
-        type,
-        clientOrderId,
-        tag
+        options
       );
     } else {
-      return await this.getSubClient(asset).placeOrderV3(
+      return await this.getSubClient(asset).placeOrderV4(
         marketPubkey,
         price,
         size,
         side,
-        type,
-        clientOrderId,
-        tag,
-        blockhash
+        options
       );
     }
   }
@@ -401,19 +393,13 @@ export class Client {
     price: number,
     size: number,
     side: types.Side,
-    type: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG,
-    blockhash?: string
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).placePerpOrder(
+    return await this.getSubClient(asset).placePerpOrderV2(
       price,
       size,
       side,
-      type,
-      clientOrderId,
-      tag,
-      blockhash
+      options
     );
   }
 
@@ -422,17 +408,13 @@ export class Client {
     price: number,
     size: number,
     side: types.Side,
-    type: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): TransactionInstruction {
     return this.getSubClient(asset).createPlacePerpOrderInstruction(
       price,
       size,
       side,
-      type,
-      clientOrderId,
-      tag
+      options
     );
   }
 
@@ -442,18 +424,14 @@ export class Client {
     price: number,
     size: number,
     side: types.Side,
-    type: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): TransactionInstruction {
     return this.getSubClient(asset).createPlaceOrderInstruction(
       marketIndex,
       price,
       size,
       side,
-      type,
-      clientOrderId,
-      tag
+      options
     );
   }
 
@@ -699,20 +677,16 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+    newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).cancelAndPlaceOrderV3(
+    return await this.getSubClient(asset).cancelAndPlaceOrderV4(
       this.marketIdentifierToPublicKey(asset, market),
       orderId,
       cancelSide,
       newOrderPrice,
       newOrderSize,
       newOrderSide,
-      newOrderType,
-      clientOrderId,
-      newOrderTag
+      newOptions
     );
   }
 
@@ -723,19 +697,15 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType,
-    newOrderClientOrderId: number,
-    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+    newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderIdV3(
+    return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderIdV4(
       this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,
       newOrderSize,
       newOrderSide,
-      newOrderType,
-      newOrderClientOrderId,
-      newOrderTag
+      newOptions
     );
   }
 
@@ -746,19 +716,15 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType,
-    newOrderClientOrderId: number,
-    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+    newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).replaceByClientOrderIdV3(
+    return await this.getSubClient(asset).replaceByClientOrderIdV4(
       this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,
       newOrderSize,
       newOrderSide,
-      newOrderType,
-      newOrderClientOrderId,
-      newOrderTag
+      newOptions
     );
   }
 
