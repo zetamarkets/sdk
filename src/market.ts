@@ -577,7 +577,6 @@ export class Market {
         descending
       )) {
         let seqNum = getSeqNumFromSerumOrderKey(key, orderbookSide.isBids);
-
         if (
           isOrderExpired(
             tifOffset.toNumber(),
