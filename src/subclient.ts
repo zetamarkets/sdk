@@ -613,7 +613,7 @@ export class SubClient {
    * from the user open orders account before cancelling the second order.
    * (Depending on the order in which the order was cancelled).
    */
-  public async placeOrderV4(
+  public async placeOrder(
     market: PublicKey,
     price: number,
     size: number,
@@ -698,7 +698,7 @@ export class SubClient {
    * from the user open orders account before cancelling the second order.
    * (Depending on the order in which the order was cancelled).
    */
-  public async placePerpOrderV2(
+  public async placePerpOrder(
     price: number,
     size: number,
     side: types.Side,
@@ -926,7 +926,7 @@ export class SubClient {
    * @param clientOrderId   optional: subClient order id (non 0 value)
    * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-  public async cancelAndPlaceOrderV4(
+  public async cancelAndPlaceOrder(
     market: PublicKey,
     orderId: anchor.BN,
     cancelSide: types.Side,
@@ -981,7 +981,7 @@ export class SubClient {
    * @param newOrderClientOrderId   the subClient order id for the new order
    * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-  public async cancelAndPlaceOrderByClientOrderIdV4(
+  public async cancelAndPlaceOrderByClientOrderId(
     market: PublicKey,
     cancelClientOrderId: number,
     newOrderPrice: number,
@@ -1037,7 +1037,7 @@ export class SubClient {
    * @param newOrderClientOrderId   the client order id for the new order
    * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-  public async replaceByClientOrderIdV4(
+  public async replaceByClientOrderId(
     market: PublicKey,
     cancelClientOrderId: number,
     newOrderPrice: number,

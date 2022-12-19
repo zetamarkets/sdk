@@ -371,14 +371,14 @@ export class Client {
   ): Promise<TransactionSignature> {
     let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     if (marketPubkey == Exchange.getPerpMarket(asset).address) {
-      return await this.getSubClient(asset).placePerpOrderV2(
+      return await this.getSubClient(asset).placePerpOrder(
         price,
         size,
         side,
         options
       );
     } else {
-      return await this.getSubClient(asset).placeOrderV4(
+      return await this.getSubClient(asset).placeOrder(
         marketPubkey,
         price,
         size,
@@ -395,7 +395,7 @@ export class Client {
     side: types.Side,
     options: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).placePerpOrderV2(
+    return await this.getSubClient(asset).placePerpOrder(
       price,
       size,
       side,
@@ -679,7 +679,7 @@ export class Client {
     newOrderSide: types.Side,
     newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).cancelAndPlaceOrderV4(
+    return await this.getSubClient(asset).cancelAndPlaceOrder(
       this.marketIdentifierToPublicKey(asset, market),
       orderId,
       cancelSide,
@@ -699,7 +699,7 @@ export class Client {
     newOrderSide: types.Side,
     newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderIdV4(
+    return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderId(
       this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,
@@ -718,7 +718,7 @@ export class Client {
     newOrderSide: types.Side,
     newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).replaceByClientOrderIdV4(
+    return await this.getSubClient(asset).replaceByClientOrderId(
       this.marketIdentifierToPublicKey(asset, market),
       cancelClientOrderId,
       newOrderPrice,

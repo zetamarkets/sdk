@@ -1646,11 +1646,6 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
   return marginAccount.productLedgers[index];
 }
 
-/*
- TODO: Maybe this should all be done in BN arithmetic because
- sequence number gets quite large
- */
-
 export function getTIFOffset(
   explicitTIF: boolean,
   tifOffset: number,
@@ -1674,9 +1669,9 @@ export function getTIFOffset(
 
 export function isOrderExpired(
   orderTIFOffset: number,
-  orderSeqNum: number,
+  orderSeqNum: anchor.BN,
   epochStartTs: number,
-  startEpochSeqNum: number
+  startEpochSeqNum: anchor.BN
 ): boolean {
   if (orderTIFOffset == 0) {
     return false;
@@ -1686,7 +1681,7 @@ export function isOrderExpired(
     return true;
   }
 
-  if (orderSeqNum < startEpochSeqNum) {
+  if (startEpochSeqNum.gt(orderSeqNum)) {
     return true;
   }
 

@@ -580,9 +580,9 @@ export class Market {
         if (
           isOrderExpired(
             tifOffset.toNumber(),
-            seqNum.toNumber(),
+            seqNum,
             this._serumMarket.epochStartTs.toNumber(),
-            this._serumMarket.startEpochSeqNum.toNumber()
+            this._serumMarket.startEpochSeqNum
           )
         ) {
           continue;
