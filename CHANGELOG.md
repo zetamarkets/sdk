@@ -8,7 +8,7 @@ Version changes are pinned to SDK releases.
 - Remove placeOrder and placePerpOrder VX from subClient replace with placeOrder only across client and subClient
 - Remove arguments and use types.OrderOptions now for OrderType, clientOrderId, tag, TIFOffset, etc;
 
-## [Unreleased]
+## [#0.19.0]
 
 - general: Port serum sdk into the zetamarkets sdk. ([#175](https://github.com/zetamarkets/sdk/pull/175))
 - general: Add TIF orders into zetamarkets sdk. ([#176](https://github.com/zetamarkets/sdk/pull/176))
