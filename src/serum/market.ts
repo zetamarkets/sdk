@@ -474,7 +474,10 @@ function divideBnToNumber(numerator: BN, denominator: BN): number {
   const quotient = numerator.div(denominator).toNumber();
   const rem = numerator.umod(denominator);
   const gcd = rem.gcd(denominator);
-  return quotient + rem.div(gcd).toNumber() / denominator.div(gcd).toNumber();
+  return +(
+    quotient +
+    rem.div(gcd).toNumber() / denominator.div(gcd).toNumber()
+  ).toFixed(6);
 }
 
 const MINT_LAYOUT = struct([blob(44), u8("decimals"), blob(37)]);
