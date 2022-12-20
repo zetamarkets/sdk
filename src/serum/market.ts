@@ -1,5 +1,5 @@
 import { blob, seq, struct, u8 } from "buffer-layout";
-import { accountFlagsLayout, publicKeyLayout, u128, u64 } from "./layout";
+import { accountFlagsLayout, publicKeyLayout, u128, u64, u16 } from "./layout";
 import { Slab, SLAB_LAYOUT } from "./slab";
 import BN from "bn.js";
 import {
@@ -47,10 +47,16 @@ export const MARKET_STATE_LAYOUT_V3 = struct([
 
   u64("referrerRebatesAccrued"),
 
-  publicKeyLayout("authority"),
+  publicKeyLayout("openOrdersAuthority"),
   publicKeyLayout("pruneAuthority"),
+  publicKeyLayout("consumeEventsAuthority"),
 
-  blob(1024),
+  // Consume events authority
+  u16("epochLength"),
+  u64("epochStartTs"),
+  u64("startEpochSeqNum"),
+
+  blob(974),
 
   blob(7),
 ]);
@@ -165,6 +171,34 @@ export class Market {
 
   get asksAddress(): PublicKey {
     return this._decoded.asks;
+  }
+
+  get requestQueueAddress(): PublicKey {
+    return this._decoded.requestQueue;
+  }
+
+  get eventQueueAddress(): PublicKey {
+    return this._decoded.eventQueue;
+  }
+
+  get baseVaultAddress(): PublicKey {
+    return this._decoded.baseVault;
+  }
+
+  get quoteVaultAddress(): PublicKey {
+    return this._decoded.quoteVault;
+  }
+
+  get epochStartTs(): BN {
+    return this._decoded.epochStartTs;
+  }
+
+  get epochLength(): BN {
+    return this._decoded.epochLength;
+  }
+
+  get startEpochSeqNum(): BN {
+    return this._decoded.startEpochSeqNum;
   }
 
   get decoded(): any {
@@ -402,27 +436,6 @@ export class Orderbook {
     return new Orderbook(market, accountFlags, slab);
   }
 
-  getL2(depth: number): [number, number, BN, BN][] {
-    const descending = this.isBids;
-    const levels: [BN, BN][] = []; // (price, size)
-    for (const { key, quantity } of this.slab.items(descending)) {
-      const price = getPriceFromKey(key);
-      if (levels.length > 0 && levels[levels.length - 1][0].eq(price)) {
-        levels[levels.length - 1][1].iadd(quantity);
-      } else if (levels.length === depth) {
-        break;
-      } else {
-        levels.push([price, quantity]);
-      }
-    }
-    return levels.map(([priceLots, sizeLots]) => [
-      this.market.priceLotsToNumber(priceLots),
-      this.market.baseSizeLotsToNumber(sizeLots),
-      priceLots,
-      sizeLots,
-    ]);
-  }
-
   [Symbol.iterator]() {
     return this.items(false);
   }
@@ -435,6 +448,7 @@ export class Orderbook {
       quantity,
       feeTier,
       clientOrderId,
+      tifOffset,
     } of this.slab.items(descending)) {
       const price = getPriceFromKey(key);
       yield {
@@ -448,6 +462,8 @@ export class Orderbook {
         size: this.market.baseSizeLotsToNumber(quantity),
         sizeLots: quantity,
         side: (this.isBids ? "buy" : "sell") as "buy" | "sell",
+        tifOffset: tifOffset.toNumber(),
+        tifOffsetBN: tifOffset,
       };
     }
   }
@@ -464,6 +480,8 @@ export interface Order {
   sizeLots: BN;
   side: "buy" | "sell";
   clientId?: BN;
+  tifOffset: number;
+  tifOffsetBN: BN;
 }
 
 function getPriceFromKey(key) {

@@ -4,6 +4,8 @@ import { PublicKey, Transaction } from "@solana/web3.js";
 import { Asset } from "./assets";
 import { objectEquals } from "./utils";
 import { MarginAccount } from "./program-types";
+import { types } from ".";
+import * as constants from "./constants";
 
 /**
  * Wallet interface for objects that can be used to sign provider transactions.
@@ -97,6 +99,7 @@ export interface Order {
   owner: PublicKey;
   // Client order id.
   clientOrderId: BN;
+  tifOffset: number;
 }
 
 export function orderEquals(
@@ -115,6 +118,7 @@ export function orderEquals(
     a.price === b.price &&
     a.size === b.size &&
     a.side === b.side &&
+    a.tifOffset === b.tifOffset &&
     orderIdMatch
   );
 }
@@ -294,4 +298,24 @@ export function fromProgramOrderCompleteType(
     return OrderCompleteType.BOOTED;
   }
   throw Error("Invalid order complete type");
+}
+
+export interface OrderOptions {
+  explicitTIF?: boolean;
+  tifOffset?: number;
+  orderType?: types.OrderType;
+  clientOrderId?: number;
+  tag?: string;
+  blockhash?: string;
+}
+
+export function defaultOrderOptions(): OrderOptions {
+  return {
+    explicitTIF: true,
+    tifOffset: 0,
+    orderType: OrderType.LIMIT,
+    clientOrderId: 0,
+    tag: constants.DEFAULT_ORDER_TAG,
+    blockhash: undefined,
+  };
 }

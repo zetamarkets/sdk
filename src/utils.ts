@@ -796,6 +796,19 @@ export function getPriceFromSerumOrderKey(key: anchor.BN): anchor.BN {
   return key.ushrn(64);
 }
 
+export function getSeqNumFromSerumOrderKey(
+  key: anchor.BN,
+  isBid: boolean
+): anchor.BN {
+  let lower = key.maskn(64);
+  if (isBid) {
+    let x = lower.notn(64);
+    return x;
+  } else {
+    return lower;
+  }
+}
+
 export function splitIxsIntoTx(
   ixs: TransactionInstruction[],
   ixsPerTx: number
@@ -920,7 +933,9 @@ export function displayState() {
       let index = orderedIndexes[i];
       let expirySeries = subExchange.markets.expirySeries[index];
       console.log(
-        `Expiration @ ${new Date(
+        `Active @ ${new Date(
+          expirySeries.activeTs * 1000
+        )}, Expiration @ ${new Date(
           expirySeries.expiryTs * 1000
         )} Live: ${expirySeries.isLive()}`
       );
@@ -1194,7 +1209,7 @@ export async function crankMarket(
     instructions.crankMarketIx(
       asset,
       market.address,
-      market.serumMarket.decoded.eventQueue,
+      market.serumMarket.eventQueueAddress,
       constants.DEX_PID[Exchange.network],
       remainingAccounts
     )
@@ -1247,12 +1262,12 @@ export function getMutMarketAccounts(
   return [
     { pubkey: market.address, isSigner: false, isWritable: false },
     {
-      pubkey: market.serumMarket.decoded.bids,
+      pubkey: market.serumMarket.bidsAddress,
       isSigner: false,
       isWritable: false,
     },
     {
-      pubkey: market.serumMarket.decoded.asks,
+      pubkey: market.serumMarket.asksAddress,
       isSigner: false,
       isWritable: false,
     },
@@ -1493,12 +1508,12 @@ export async function cancelExpiredOrdersAndCleanMarkets(
       return [
         { pubkey: market.address, isSigner: false, isWritable: false },
         {
-          pubkey: market.serumMarket.decoded.bids,
+          pubkey: market.serumMarket.bidsAddress,
           isSigner: false,
           isWritable: false,
         },
         {
-          pubkey: market.serumMarket.decoded.asks,
+          pubkey: market.serumMarket.asksAddress,
           isSigner: false,
           isWritable: false,
         },
@@ -1629,4 +1644,46 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
     return marginAccount.perpProductLedger;
   }
   return marginAccount.productLedgers[index];
+}
+
+export function getTIFOffset(
+  explicitTIF: boolean,
+  tifOffset: number,
+  currEpochStartTs: number,
+  epochLength: number
+) {
+  if (explicitTIF) {
+    return tifOffset;
+  }
+
+  let now = Exchange.clockTimestamp;
+
+  let epochStartTsToUse: number = 0;
+  if (currEpochStartTs + epochLength < now) {
+    epochStartTsToUse = now - (now % epochLength);
+  } else {
+    epochStartTsToUse = currEpochStartTs;
+  }
+  return now - epochStartTsToUse + tifOffset;
+}
+
+export function isOrderExpired(
+  orderTIFOffset: number,
+  orderSeqNum: anchor.BN,
+  epochStartTs: number,
+  startEpochSeqNum: anchor.BN
+): boolean {
+  if (orderTIFOffset == 0) {
+    return false;
+  }
+
+  if (epochStartTs + orderTIFOffset < Exchange.clockTimestamp) {
+    return true;
+  }
+
+  if (startEpochSeqNum.gt(orderSeqNum)) {
+    return true;
+  }
+
+  return false;
 }

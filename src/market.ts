@@ -12,6 +12,8 @@ import {
   convertNativeLotSizeToDecimal,
   getCancelAllIxs,
   splitIxsIntoTx,
+  getSeqNumFromSerumOrderKey,
+  isOrderExpired,
 } from "./utils";
 import * as types from "./types";
 
@@ -570,8 +572,22 @@ export class Market {
 
     [this._bids, this._asks].map((orderbookSide) => {
       const descending = orderbookSide.isBids ? true : false;
-      const levels = []; // (price, size)
-      for (const { key, quantity } of orderbookSide.slab.items(descending)) {
+      const levels = []; // (price, size, tifOffset)
+      for (const { key, quantity, tifOffset } of orderbookSide.slab.items(
+        descending
+      )) {
+        let seqNum = getSeqNumFromSerumOrderKey(key, orderbookSide.isBids);
+        if (
+          isOrderExpired(
+            tifOffset.toNumber(),
+            seqNum,
+            this._serumMarket.epochStartTs.toNumber(),
+            this._serumMarket.startEpochSeqNum
+          )
+        ) {
+          continue;
+        }
+
         const price = getPriceFromSerumOrderKey(key);
         if (levels.length > 0 && levels[levels.length - 1][0].eq(price)) {
           levels[levels.length - 1][1].iadd(quantity);
@@ -614,6 +630,7 @@ export class Market {
       orderId: order.orderId,
       owner: order.openOrdersAddress,
       clientOrderId: order.clientId,
+      tifOffset: order.tifOffset,
     };
   }
 
@@ -634,7 +651,6 @@ export class Market {
   }
 
   public getBidOrders(): types.Order[] {
-    console.log("*");
     return [...this._bids].map((order) => {
       return Market.convertOrder(this, order);
     });

@@ -50,6 +50,10 @@ export function u64(property = null) {
   return new BNLayout(8, property);
 }
 
+export function u16(property = null) {
+  return new BNLayout(2, property);
+}
+
 export function u128(property = null) {
   return new BNLayout(16, property);
 }
