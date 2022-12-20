@@ -1,6 +1,13 @@
 import BN from "bn.js";
 import { blob, offset, seq, struct, u32, u8, union } from "buffer-layout";
-import { publicKeyLayout, setLayoutDecoder, u128, u64, zeros } from "./layout";
+import {
+  u16,
+  publicKeyLayout,
+  setLayoutDecoder,
+  u128,
+  u64,
+  zeros,
+} from "./layout";
 import { PublicKey } from "@solana/web3.js";
 
 const SLAB_HEADER_LAYOUT = struct(
@@ -39,7 +46,7 @@ SLAB_NODE_LAYOUT.addVariant(
   struct([
     u8("ownerSlot"), // Index into OPEN_ORDERS_LAYOUT.orders
     u8("feeTier"),
-    blob(2),
+    u16("tifOffset"),
     u128("key"), // (price, seqNum)
     publicKeyLayout("owner"), // Open orders account
     u64("quantity"), // In units of lot size
@@ -120,6 +127,7 @@ export class Slab {
     quantity: BN;
     feeTier: number;
     clientOrderId: BN;
+    tifOffset: BN;
   }> {
     if (this.header.leafCount === 0) {
       return;

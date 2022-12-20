@@ -539,7 +539,7 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx = instructions.placeOrderV3Ix(
+    let orderIx = instructions.placeOrderV4Ix(
       this.asset,
       marketIndex,
       price,
@@ -548,6 +548,7 @@ export class SubClient {
       types.OrderType.FILLORKILL,
       0, // Default to none for now.
       tag,
+      0,
       this.marginAccountAddress,
       this._parent.publicKey,
       openOrdersPda,
@@ -601,6 +602,8 @@ export class SubClient {
    * @param price           the native price of the order (6 d.p as integer)
    * @param size            the quantity of the order (3 d.p)
    * @param side            the side of the order. bid / ask
+   * @param explicitTIF     whether to calculate the relative TIF offset or use absolute TIF offset
+   * @param tifOffset       the TIF offset at which the order will expire
    * @param orderType       the type of the order. limit / ioc / post-only
    * @param clientOrderId   optional: subClient order id (non 0 value)
    * @param tag             optional: the string tag corresponding to who is inserting
@@ -610,15 +613,12 @@ export class SubClient {
    * from the user open orders account before cancelling the second order.
    * (Depending on the order in which the order was cancelled).
    */
-  public async placeOrderV3(
+  public async placeOrder(
     market: PublicKey,
     price: number,
     size: number,
     side: types.Side,
-    orderType: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG,
-    blockhash?: string
+    options: types.OrderOptions
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -643,15 +643,26 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx = instructions.placeOrderV3Ix(
+    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+    let tifOffsetToUse = utils.getTIFOffset(
+      options.explicitTIF != undefined ? options.explicitTIF : true,
+      options.tifOffset != undefined ? options.tifOffset : 0,
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
+    );
+
+    let orderIx = instructions.placeOrderV4Ix(
       this.asset,
       marketIndex,
       price,
       size,
       side,
-      orderType,
-      clientOrderId,
-      tag,
+      options.orderType != undefined
+        ? options.orderType
+        : types.OrderType.LIMIT,
+      options.clientOrderId != undefined ? options.clientOrderId : 0,
+      options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+      tifOffsetToUse,
       this.marginAccountAddress,
       this._parent.publicKey,
       openOrdersPda,
@@ -667,7 +678,7 @@ export class SubClient {
       undefined,
       undefined,
       undefined,
-      blockhash
+      options.blockhash
     );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
@@ -691,10 +702,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    orderType: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG,
-    blockhash?: string
+    options: types.OrderOptions
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let market = Exchange.getPerpMarket(this._asset).address;
@@ -720,15 +728,25 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let orderIx = instructions.placePerpOrderIx(
+    let marketInfo = Exchange.getPerpMarket(this._asset);
+    let tifOffsetToUse = utils.getTIFOffset(
+      options.explicitTIF != undefined ? options.explicitTIF : true,
+      options.tifOffset != undefined ? options.tifOffset : 0,
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
+    );
+    let orderIx = instructions.placePerpOrderV2Ix(
       this.asset,
       marketIndex,
       price,
       size,
       side,
-      orderType,
-      clientOrderId,
-      tag,
+      options.orderType != undefined
+        ? options.orderType
+        : types.OrderType.LIMIT,
+      options.clientOrderId != undefined ? options.clientOrderId : 0,
+      options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+      tifOffsetToUse,
       this.marginAccountAddress,
       this._parent.publicKey,
       openOrdersPda,
@@ -744,7 +762,7 @@ export class SubClient {
       undefined,
       undefined,
       undefined,
-      blockhash
+      options.blockhash
     );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
@@ -783,30 +801,24 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    orderType: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG
+    options: types.OrderOptions
   ): TransactionInstruction {
     if (marketIndex == constants.PERP_INDEX) {
-      return this.createPlacePerpOrderInstruction(
-        price,
-        size,
-        side,
-        orderType,
-        clientOrderId,
-        tag
-      );
+      return this.createPlacePerpOrderInstruction(price, size, side, options);
     }
 
-    return instructions.placeOrderV3Ix(
+    return instructions.placeOrderV4Ix(
       this.asset,
       marketIndex,
       price,
       size,
       side,
-      orderType,
-      clientOrderId,
-      tag,
+      options.orderType != undefined
+        ? options.orderType
+        : types.OrderType.LIMIT,
+      options.clientOrderId != undefined ? options.clientOrderId : 0,
+      options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+      options.tifOffset != undefined ? options.tifOffset : 0,
       this.marginAccountAddress,
       this._parent.publicKey,
       this._openOrdersAccounts[marketIndex],
@@ -818,9 +830,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    orderType: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    tag: String = constants.DEFAULT_ORDER_TAG
+    options: types.OrderOptions
   ): TransactionInstruction {
     if (
       this._openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
@@ -832,15 +842,18 @@ export class SubClient {
       );
       throw Error("User does not have an open orders account.");
     }
-    return instructions.placePerpOrderIx(
+    return instructions.placePerpOrderV2Ix(
       this.asset,
       constants.PERP_INDEX,
       price,
       size,
       side,
-      orderType,
-      clientOrderId,
-      tag,
+      options.orderType != undefined
+        ? options.orderType
+        : types.OrderType.LIMIT,
+      options.clientOrderId != undefined ? options.clientOrderId : 0,
+      options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+      options.tifOffset != undefined ? options.tifOffset : 0,
       this.marginAccountAddress,
       this._parent.publicKey,
       this._openOrdersAccounts[constants.PERP_INDEX],
@@ -913,16 +926,14 @@ export class SubClient {
    * @param clientOrderId   optional: subClient order id (non 0 value)
    * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-  public async cancelAndPlaceOrderV3(
+  public async cancelAndPlaceOrder(
     market: PublicKey,
     orderId: anchor.BN,
     cancelSide: types.Side,
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType = types.OrderType.LIMIT,
-    clientOrderId = 0,
-    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+    options: types.OrderOptions
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -938,15 +949,18 @@ export class SubClient {
       )
     );
     tx.add(
-      instructions.placeOrderV3Ix(
+      instructions.placeOrderV4Ix(
         this.asset,
         marketIndex,
         newOrderPrice,
         newOrderSize,
         newOrderSide,
-        newOrderType,
-        clientOrderId,
-        newOrderTag,
+        options.orderType != undefined
+          ? options.orderType
+          : types.OrderType.LIMIT,
+        options.clientOrderId != undefined ? options.clientOrderId : 0,
+        options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+        options.tifOffset != undefined ? options.tifOffset : 0,
         this.marginAccountAddress,
         this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
@@ -967,15 +981,13 @@ export class SubClient {
    * @param newOrderClientOrderId   the subClient order id for the new order
    * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-  public async cancelAndPlaceOrderByClientOrderIdV3(
+  public async cancelAndPlaceOrderByClientOrderId(
     market: PublicKey,
     cancelClientOrderId: number,
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType,
-    newOrderClientOrderId: number,
-    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+    newOptions: types.OrderOptions
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -990,15 +1002,20 @@ export class SubClient {
       )
     );
     tx.add(
-      instructions.placeOrderV3Ix(
+      instructions.placeOrderV4Ix(
         this.asset,
         marketIndex,
         newOrderPrice,
         newOrderSize,
         newOrderSide,
-        newOrderType,
-        newOrderClientOrderId,
-        newOrderTag,
+        newOptions.orderType != undefined
+          ? newOptions.orderType
+          : types.OrderType.LIMIT,
+        newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
+        newOptions.tag != undefined
+          ? newOptions.tag
+          : constants.DEFAULT_ORDER_TAG,
+        newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
         this.marginAccountAddress,
         this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
@@ -1020,15 +1037,13 @@ export class SubClient {
    * @param newOrderClientOrderId   the client order id for the new order
    * @param newOrderTag     optional: the string tag corresponding to who is inserting. Default "SDK", max 4 length
    */
-  public async replaceByClientOrderIdV3(
+  public async replaceByClientOrderId(
     market: PublicKey,
     cancelClientOrderId: number,
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOrderType: types.OrderType,
-    newOrderClientOrderId: number,
-    newOrderTag: String = constants.DEFAULT_ORDER_TAG
+    newOptions: types.OrderOptions
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -1043,15 +1058,20 @@ export class SubClient {
       )
     );
     tx.add(
-      instructions.placeOrderV3Ix(
+      instructions.placeOrderV4Ix(
         this.asset,
         marketIndex,
         newOrderPrice,
         newOrderSize,
         newOrderSide,
-        newOrderType,
-        newOrderClientOrderId,
-        newOrderTag,
+        newOptions.orderType != undefined
+          ? newOptions.orderType
+          : types.OrderType.LIMIT,
+        newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
+        newOptions.tag != undefined
+          ? newOptions.tag
+          : constants.DEFAULT_ORDER_TAG,
+        newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
         this.marginAccountAddress,
         this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
