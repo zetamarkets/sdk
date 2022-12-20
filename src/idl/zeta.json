@@ -5749,6 +5749,9 @@
           },
           {
             "name": "ImmediateOrCancel"
+          },
+          {
+            "name": "PostOnlySlide"
           }
         ]
       }

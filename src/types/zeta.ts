@@ -5749,6 +5749,9 @@ export type Zeta = {
           },
           {
             "name": "ImmediateOrCancel"
+          },
+          {
+            "name": "PostOnlySlide"
           }
         ]
       }
@@ -12581,6 +12584,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "ImmediateOrCancel"
+          },
+          {
+            "name": "PostOnlySlide"
           }
         ]
       }

@@ -15,7 +15,7 @@ export interface Wallet {
 }
 
 export class DummyWallet implements Wallet {
-  constructor() {}
+  constructor() { }
 
   async signTransaction(_tx: Transaction): Promise<Transaction> {
     throw Error("Not supported by dummy wallet!");
@@ -35,6 +35,7 @@ export enum OrderType {
   POSTONLY,
   FILLORKILL,
   IMMEDIATEORCANCEL,
+  POSTONLYSLIDE,
 }
 
 export function toProgramOrderType(orderType: OrderType) {
@@ -43,6 +44,7 @@ export function toProgramOrderType(orderType: OrderType) {
   if (orderType == OrderType.FILLORKILL) return { fillOrKill: {} };
   if (orderType == OrderType.IMMEDIATEORCANCEL)
     return { immediateOrCancel: {} };
+  if (orderType == OrderType.POSTONLYSLIDE) return { postOnySlide: {} };
 }
 
 export enum Side {
