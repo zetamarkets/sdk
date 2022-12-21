@@ -270,7 +270,7 @@ export class SubClient {
       // We don't update orders here to make load faster.
       subClient._pendingUpdate = true;
     } catch (e) {
-      console.log("User does not have a margin account.");
+      console.log(`User does not have a margin account for ${asset}.`);
     }
 
     try {
@@ -280,7 +280,7 @@ export class SubClient {
         )) as unknown as SpreadAccount;
       subClient.updateSpreadPositions();
     } catch (e) {
-      console.log("User does not have a spread account.");
+      console.log(`User does not have a spread account for ${asset}.`);
     }
 
     return subClient;
@@ -807,6 +807,14 @@ export class SubClient {
       return this.createPlacePerpOrderInstruction(price, size, side, options);
     }
 
+    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+    let tifOffsetToUse = utils.getTIFOffset(
+      options.explicitTIF != undefined ? options.explicitTIF : true,
+      options.tifOffset != undefined ? options.tifOffset : 0,
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
+    );
+
     return instructions.placeOrderV4Ix(
       this.asset,
       marketIndex,
@@ -818,7 +826,7 @@ export class SubClient {
         : types.OrderType.LIMIT,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
-      options.tifOffset != undefined ? options.tifOffset : 0,
+      tifOffsetToUse,
       this.marginAccountAddress,
       this._parent.publicKey,
       this._openOrdersAccounts[marketIndex],
@@ -948,6 +956,15 @@ export class SubClient {
         cancelSide
       )
     );
+
+    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+    let tifOffsetToUse = utils.getTIFOffset(
+      options.explicitTIF != undefined ? options.explicitTIF : true,
+      options.tifOffset != undefined ? options.tifOffset : 0,
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
+    );
+
     tx.add(
       instructions.placeOrderV4Ix(
         this.asset,
@@ -960,7 +977,7 @@ export class SubClient {
           : types.OrderType.LIMIT,
         options.clientOrderId != undefined ? options.clientOrderId : 0,
         options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
-        options.tifOffset != undefined ? options.tifOffset : 0,
+        tifOffsetToUse,
         this.marginAccountAddress,
         this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
@@ -1001,6 +1018,14 @@ export class SubClient {
         new anchor.BN(cancelClientOrderId)
       )
     );
+
+    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+    let tifOffsetToUse = utils.getTIFOffset(
+      newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
+      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
+    );
     tx.add(
       instructions.placeOrderV4Ix(
         this.asset,
@@ -1015,7 +1040,7 @@ export class SubClient {
         newOptions.tag != undefined
           ? newOptions.tag
           : constants.DEFAULT_ORDER_TAG,
-        newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
+        tifOffsetToUse,
         this.marginAccountAddress,
         this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
@@ -1057,6 +1082,13 @@ export class SubClient {
         new anchor.BN(cancelClientOrderId)
       )
     );
+    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+    let tifOffsetToUse = utils.getTIFOffset(
+      newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
+      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
+      marketInfo.serumMarket.epochStartTs.toNumber(),
+      marketInfo.serumMarket.epochLength.toNumber()
+    );
     tx.add(
       instructions.placeOrderV4Ix(
         this.asset,
@@ -1071,7 +1103,7 @@ export class SubClient {
         newOptions.tag != undefined
           ? newOptions.tag
           : constants.DEFAULT_ORDER_TAG,
-        newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
+        tifOffsetToUse,
         this.marginAccountAddress,
         this._parent.publicKey,
         this._openOrdersAccounts[marketIndex],
