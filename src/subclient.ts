@@ -270,7 +270,7 @@ export class SubClient {
       // We don't update orders here to make load faster.
       subClient._pendingUpdate = true;
     } catch (e) {
-      console.log("User does not have a margin account.");
+      console.log(`User does not have a margin account for ${asset}.`);
     }
 
     try {
@@ -280,7 +280,7 @@ export class SubClient {
         )) as unknown as SpreadAccount;
       subClient.updateSpreadPositions();
     } catch (e) {
-      console.log("User does not have a spread account.");
+      console.log(`User does not have a spread account for ${asset}.`);
     }
 
     return subClient;
