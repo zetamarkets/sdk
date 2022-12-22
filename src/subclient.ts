@@ -644,7 +644,7 @@ export class SubClient {
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
-      marketIndex,
+      this._subExchange.markets.getMarket(market),
       options.explicitTIF != undefined ? options.explicitTIF : true,
       options.tifOffset != undefined ? options.tifOffset : 0
     );
@@ -727,7 +727,7 @@ export class SubClient {
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
-      marketIndex,
+      this._subExchange.markets.getMarket(market),
       options.explicitTIF != undefined ? options.explicitTIF : true,
       options.tifOffset != undefined ? options.tifOffset : 0
     );
@@ -804,7 +804,7 @@ export class SubClient {
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
-      marketIndex,
+      Exchange.getMarket(this._asset, marketIndex),
       options.explicitTIF != undefined ? options.explicitTIF : true,
       options.tifOffset != undefined ? options.tifOffset : 0
     );
@@ -952,7 +952,7 @@ export class SubClient {
     );
 
     let tifOffsetToUse = utils.getTIFOffset(
-      marketIndex,
+      this._subExchange.markets.getMarket(market),
       options.explicitTIF != undefined ? options.explicitTIF : true,
       options.tifOffset != undefined ? options.tifOffset : 0
     );
@@ -1012,7 +1012,7 @@ export class SubClient {
     );
 
     let tifOffsetToUse = utils.getTIFOffset(
-      marketIndex,
+      this._subExchange.markets.getMarket(market),
       newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
       newOptions.tifOffset != undefined ? newOptions.tifOffset : 0
     );
@@ -1074,7 +1074,7 @@ export class SubClient {
     );
 
     let tifOffsetToUse = utils.getTIFOffset(
-      marketIndex,
+      this._subExchange.markets.getMarket(market),
       newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
       newOptions.tifOffset != undefined ? newOptions.tifOffset : 0
     );

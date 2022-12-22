@@ -1647,7 +1647,7 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
 }
 
 export function getTIFOffset(
-  marketIndex: number,
+  marketInfo: Market,
   explicitTIF: boolean,
   tifOffset: number
 ) {
@@ -1655,7 +1655,6 @@ export function getTIFOffset(
     return tifOffset;
   }
 
-  let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
   let currEpochStartTs = marketInfo.serumMarket.epochStartTs.toNumber();
   let epochLength = marketInfo.serumMarket.epochLength.toNumber();
 
