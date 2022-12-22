@@ -643,12 +643,10 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
+      marketIndex,
       options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      options.tifOffset != undefined ? options.tifOffset : 0
     );
 
     let orderIx = instructions.placeOrderV4Ix(
