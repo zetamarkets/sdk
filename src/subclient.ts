@@ -1539,52 +1539,25 @@ export class SubClient {
       })
     );
 
-    // let allOrders = [].concat(...orders);
-    // this._orders = allOrders.filter(function (order: types.Order) {
-    //   console.log("hello");
-    //   let seqNum = utils.getSeqNumFromSerumOrderKey(
-    //     order.orderId,
-    //     order.side == types.Side.BID ? true : false
-    //   );
-    //   let serumMarket = Exchange.getMarket(
-    //     this._asset,
-    //     order.marketIndex
-    //   ).serumMarket;
-
-    //   return !utils.isOrderExpired(
-    //     order.tifOffset,
-    //     seqNum,
-    //     serumMarket.epochStartTs.toNumber(),
-    //     serumMarket.startEpochSeqNum
-    //   );
-    // });
-
-    let allOrders: types.Order[] = [].concat(...orders);
-    let userOrders: types.Order[] = [];
-    allOrders.forEach((order) => {
+    let allOrders = [].concat(...orders);
+    const asset = this._asset;
+    this._orders = allOrders.filter(function (order: types.Order) {
       let seqNum = utils.getSeqNumFromSerumOrderKey(
         order.orderId,
         order.side == types.Side.BID ? true : false
       );
       let serumMarket = Exchange.getMarket(
-        this._asset,
+        asset,
         order.marketIndex
       ).serumMarket;
 
-      if (
-        utils.isOrderExpired(
-          order.tifOffset,
-          seqNum,
-          serumMarket.epochStartTs.toNumber(),
-          serumMarket.startEpochSeqNum
-        )
-      ) {
-        return;
-      }
-      userOrders.push(order);
+      return !utils.isOrderExpired(
+        order.tifOffset,
+        seqNum,
+        serumMarket.epochStartTs.toNumber(),
+        serumMarket.startEpochSeqNum
+      );
     });
-
-    this._orders = userOrders;
   }
 
   private updateMarginPositions() {
