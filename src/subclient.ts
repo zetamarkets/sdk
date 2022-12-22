@@ -726,12 +726,10 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let marketInfo = Exchange.getPerpMarket(this._asset);
     let tifOffsetToUse = utils.getTIFOffset(
+      marketIndex,
       options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      options.tifOffset != undefined ? options.tifOffset : 0
     );
     let orderIx = instructions.placePerpOrderV2Ix(
       this.asset,
@@ -805,12 +803,10 @@ export class SubClient {
       return this.createPlacePerpOrderInstruction(price, size, side, options);
     }
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
+      marketIndex,
       options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      options.tifOffset != undefined ? options.tifOffset : 0
     );
 
     return instructions.placeOrderV4Ix(
@@ -955,12 +951,10 @@ export class SubClient {
       )
     );
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
+      marketIndex,
       options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      options.tifOffset != undefined ? options.tifOffset : 0
     );
 
     tx.add(
@@ -1017,12 +1011,10 @@ export class SubClient {
       )
     );
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
+      marketIndex,
       newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
-      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0
     );
     tx.add(
       instructions.placeOrderV4Ix(
@@ -1080,12 +1072,11 @@ export class SubClient {
         new anchor.BN(cancelClientOrderId)
       )
     );
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+
     let tifOffsetToUse = utils.getTIFOffset(
+      marketIndex,
       newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
-      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0
     );
     tx.add(
       instructions.placeOrderV4Ix(
