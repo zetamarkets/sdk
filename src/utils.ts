@@ -1652,7 +1652,7 @@ export function getTIFOffset(marketInfo: Market, tifOptions: types.TIFOptions) {
   }
 
   if (tifOptions.tifOffset != 0 && tifOptions.tifExpiryTs != 0) {
-    throw new Error("Cannot set both tifExpiryTs and tifOption!");
+    throw new Error("Cannot set both tifExpiryTs and tifOffset!");
   }
 
   if (tifOptions.tifOffset != 0) {
