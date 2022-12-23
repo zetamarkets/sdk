@@ -307,19 +307,16 @@ export interface OrderOptions {
 }
 
 /* Only set one of these values.
- * tifOffset - seconds in future that the order will expire.
- * tifExpiryTs - timestamp at which the order will expire.
+ * expiryOffset - seconds in future that the order will expire.
  */
 export interface TIFOptions {
-  tifOffset?: number;
-  tifExpiryTs?: number;
+  expiryOffset?: number | undefined;
 }
 
 export function defaultOrderOptions(): OrderOptions {
   return {
     tifOptions: {
-      tifOffset: 0,
-      tifExpiryTs: 0,
+      expiryOffset: undefined,
     },
     orderType: OrderType.LIMIT,
     clientOrderId: 0,
