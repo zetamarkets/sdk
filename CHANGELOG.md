@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
 
+## [0.19.1] 2022-12-23
+
+- cleanup: refactor tif in order options for dev ux. ([#182](https://github.com/zetamarkets/sdk/pull/182))
+
 ## [0.19.0] 2022-12-22
 
 - general: Port serum sdk into the zetamarkets sdk. ([#175](https://github.com/zetamarkets/sdk/pull/175))
