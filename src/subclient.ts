@@ -1544,7 +1544,7 @@ export class SubClient {
     this._orders = allOrders.filter(function (order: types.Order) {
       let seqNum = utils.getSeqNumFromSerumOrderKey(
         order.orderId,
-        order.side == types.Side.BID ? true : false
+        order.side == types.Side.BID
       );
       let serumMarket = Exchange.getMarket(
         asset,
