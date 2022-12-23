@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [0.19.1] 2022-12-23
+
+- general: Add user order filtering for expired orders. ([#181](https://github.com/zetamarkets/sdk/pull/181)
 
 ## [0.19.0] 2022-12-22
 

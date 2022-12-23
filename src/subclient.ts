@@ -1539,7 +1539,25 @@ export class SubClient {
       })
     );
 
-    this._orders = [].concat(...orders);
+    let allOrders = [].concat(...orders);
+    const asset = this._asset;
+    this._orders = allOrders.filter(function (order: types.Order) {
+      let seqNum = utils.getSeqNumFromSerumOrderKey(
+        order.orderId,
+        order.side == types.Side.BID
+      );
+      let serumMarket = Exchange.getMarket(
+        asset,
+        order.marketIndex
+      ).serumMarket;
+
+      return !utils.isOrderExpired(
+        order.tifOffset,
+        seqNum,
+        serumMarket.epochStartTs.toNumber(),
+        serumMarket.startEpochSeqNum
+      );
+    });
   }
 
   private updateMarginPositions() {
