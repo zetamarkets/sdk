@@ -6,6 +6,7 @@ Version changes are pinned to SDK releases.
 ## [0.19.1] 2022-12-23
 
 - general: Add user order filtering for expired orders. ([#181](https://github.com/zetamarkets/sdk/pull/181)
+- cleanup: refactor tif in order options for dev ux. ([#182](https://github.com/zetamarkets/sdk/pull/182))
 
 ## [0.19.0] 2022-12-22
 
