@@ -306,8 +306,8 @@ export interface OrderOptions {
   blockhash?: string;
 }
 
-/* Only set one of these values.
- * expiryOffset - seconds in future that the order will expire.
+/*
+ * expiryOffset - seconds in future that the order will expire. Set to undefined to disable TIF.
  */
 export interface TIFOptions {
   expiryOffset?: number | undefined;
