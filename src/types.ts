@@ -299,18 +299,28 @@ export function fromProgramOrderCompleteType(
 }
 
 export interface OrderOptions {
-  explicitTIF?: boolean;
-  tifOffset?: number;
+  tifOptions: TIFOptions;
   orderType?: types.OrderType;
   clientOrderId?: number;
   tag?: string;
   blockhash?: string;
 }
 
+/* Only set one of these values.
+ * tifOffset - seconds in future that the order will expire.
+ * tifExpiryTs - timestamp at which the order will expire.
+ */
+export interface TIFOptions {
+  tifOffset?: number;
+  tifExpiryTs?: number;
+}
+
 export function defaultOrderOptions(): OrderOptions {
   return {
-    explicitTIF: true,
-    tifOffset: 0,
+    tifOptions: {
+      tifOffset: 0,
+      tifExpiryTs: 0,
+    },
     orderType: OrderType.LIMIT,
     clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,

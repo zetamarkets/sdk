@@ -1646,27 +1646,24 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
   return marginAccount.productLedgers[index];
 }
 
-export function getTIFOffset(
-  marketInfo: Market,
-  explicitTIF: boolean,
-  tifOffset: number
-) {
-  if (explicitTIF) {
-    return tifOffset;
+export function getTIFOffset(marketInfo: Market, tifOptions: types.TIFOptions) {
+  if (tifOptions.tifOffset == 0 && tifOptions.tifExpiryTs == 0) {
+    return 0;
+  }
+
+  if (tifOptions.tifOffset != 0 && tifOptions.tifExpiryTs != 0) {
+    throw new Error("Cannot set both tifExpiryTs and tifOption!");
+  }
+
+  if (tifOptions.tifOffset != 0) {
+    return tifOptions.tifOffset;
   }
 
   let currEpochStartTs = marketInfo.serumMarket.epochStartTs.toNumber();
   let epochLength = marketInfo.serumMarket.epochLength.toNumber();
+  let epochEnd = currEpochStartTs + epochLength;
 
-  let now = Exchange.clockTimestamp;
-
-  let epochStartTsToUse: number = 0;
-  if (currEpochStartTs + epochLength < now) {
-    epochStartTsToUse = now - (now % epochLength);
-  } else {
-    epochStartTsToUse = currEpochStartTs;
-  }
-  return now - epochStartTsToUse + tifOffset;
+  return tifOptions.tifExpiryTs % epochLength;
 }
 
 export function isOrderExpired(
