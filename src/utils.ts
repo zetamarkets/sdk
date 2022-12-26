@@ -1659,6 +1659,12 @@ export function getTIFOffset(marketInfo: Market, tifOptions: types.TIFOptions) {
   let epochLength = marketInfo.serumMarket.epochLength.toNumber();
   let epochEnd = currEpochStartTs + epochLength;
   let now = Exchange.clockTimestamp;
+
+  // get correct epoch end in case where serumMarket data is not up to date
+  if (now > epochEnd) {
+    epochEnd = now - (now % epochLength) + epochLength;
+  }
+
   let desiredExpiryTs = now + tifOptions.expiryOffset;
   let desiredOffset = desiredExpiryTs % epochLength;
 
