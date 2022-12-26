@@ -3,16 +3,21 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-### Breaking
+## [0.19.1] 2022-12-23
 
-- Remove placeOrder and placePerpOrder VX from subClient replace with placeOrder only across client and subClient
-- Remove arguments and use types.OrderOptions now for OrderType, clientOrderId, tag, TIFOffset, etc;
+- general: Add user order filtering for expired orders. ([#181](https://github.com/zetamarkets/sdk/pull/181)
+- cleanup: refactor tif in order options for dev ux. ([#182](https://github.com/zetamarkets/sdk/pull/182))
 
-## [#0.19.0]
+## [0.19.0] 2022-12-22
 
 - general: Port serum sdk into the zetamarkets sdk. ([#175](https://github.com/zetamarkets/sdk/pull/175))
 - general: Add TIF orders into zetamarkets sdk. ([#176](https://github.com/zetamarkets/sdk/pull/176))
 - general: Add PostOnlySlide order type. ([#178](https://github.com/zetamarkets/sdk/pull/178))
+
+### Breaking
+
+- Remove placeOrder and placePerpOrder VX from subClient replace with placeOrder only across client and subClient
+- Remove arguments and use types.OrderOptions now for orderType, clientOrderId, tag, TIFOffset, etc;
 
 ## [0.18.2] 2022-12-05
 

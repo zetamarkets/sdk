@@ -618,7 +618,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -643,12 +643,9 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
-      options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      this._subExchange.markets.getMarket(market),
+      options.tifOptions
     );
 
     let orderIx = instructions.placeOrderV4Ix(
@@ -702,7 +699,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let market = Exchange.getPerpMarket(this._asset).address;
@@ -728,13 +725,11 @@ export class SubClient {
       openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
-    let marketInfo = Exchange.getPerpMarket(this._asset);
     let tifOffsetToUse = utils.getTIFOffset(
-      options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      this._subExchange.markets.getMarket(market),
+      options.tifOptions
     );
+
     let orderIx = instructions.placePerpOrderV2Ix(
       this.asset,
       marketIndex,
@@ -801,18 +796,15 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): TransactionInstruction {
     if (marketIndex == constants.PERP_INDEX) {
       return this.createPlacePerpOrderInstruction(price, size, side, options);
     }
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
-      options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      Exchange.getMarket(this._asset, marketIndex),
+      options.tifOptions
     );
 
     return instructions.placeOrderV4Ix(
@@ -838,7 +830,7 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): TransactionInstruction {
     if (
       this._openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
@@ -850,6 +842,13 @@ export class SubClient {
       );
       throw Error("User does not have an open orders account.");
     }
+
+    let market = Exchange.getPerpMarket(this._asset).address;
+    let tifOffset = utils.getTIFOffset(
+      this._subExchange.markets.getMarket(market),
+      options.tifOptions
+    );
+
     return instructions.placePerpOrderV2Ix(
       this.asset,
       constants.PERP_INDEX,
@@ -861,7 +860,7 @@ export class SubClient {
         : types.OrderType.LIMIT,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
-      options.tifOffset != undefined ? options.tifOffset : 0,
+      tifOffset,
       this.marginAccountAddress,
       this._parent.publicKey,
       this._openOrdersAccounts[constants.PERP_INDEX],
@@ -941,7 +940,7 @@ export class SubClient {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    options: types.OrderOptions
+    options: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -957,12 +956,9 @@ export class SubClient {
       )
     );
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
-      options.explicitTIF != undefined ? options.explicitTIF : true,
-      options.tifOffset != undefined ? options.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      this._subExchange.markets.getMarket(market),
+      options.tifOptions
     );
 
     tx.add(
@@ -1004,7 +1000,7 @@ export class SubClient {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOptions: types.OrderOptions
+    newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -1019,12 +1015,9 @@ export class SubClient {
       )
     );
 
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
     let tifOffsetToUse = utils.getTIFOffset(
-      newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
-      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      this._subExchange.markets.getMarket(market),
+      newOptions.tifOptions
     );
     tx.add(
       instructions.placeOrderV4Ix(
@@ -1068,7 +1061,7 @@ export class SubClient {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOptions: types.OrderOptions
+    newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
@@ -1082,13 +1075,12 @@ export class SubClient {
         new anchor.BN(cancelClientOrderId)
       )
     );
-    let marketInfo = Exchange.getMarkets(this._asset)[marketIndex];
+
     let tifOffsetToUse = utils.getTIFOffset(
-      newOptions.explicitTIF != undefined ? newOptions.explicitTIF : true,
-      newOptions.tifOffset != undefined ? newOptions.tifOffset : 0,
-      marketInfo.serumMarket.epochStartTs.toNumber(),
-      marketInfo.serumMarket.epochLength.toNumber()
+      this._subExchange.markets.getMarket(market),
+      newOptions.tifOptions
     );
+
     tx.add(
       instructions.placeOrderV4Ix(
         this.asset,
@@ -1550,7 +1542,25 @@ export class SubClient {
       })
     );
 
-    this._orders = [].concat(...orders);
+    let allOrders = [].concat(...orders);
+    const asset = this._asset;
+    this._orders = allOrders.filter(function (order: types.Order) {
+      let seqNum = utils.getSeqNumFromSerumOrderKey(
+        order.orderId,
+        order.side == types.Side.BID
+      );
+      let serumMarket = Exchange.getMarket(
+        asset,
+        order.marketIndex
+      ).serumMarket;
+
+      return !utils.isOrderExpired(
+        order.tifOffset,
+        seqNum,
+        serumMarket.epochStartTs.toNumber(),
+        serumMarket.startEpochSeqNum
+      );
+    });
   }
 
   private updateMarginPositions() {
