@@ -1647,12 +1647,18 @@ export function getProductLedger(marginAccount: MarginAccount, index: number) {
 }
 
 export function getTIFOffset(marketInfo: Market, tifOptions: types.TIFOptions) {
-  if (tifOptions.expiryOffset == 0) {
-    throw new Error("Invalid expiry offset");
+  if (
+    tifOptions.expiryOffset == undefined &&
+    tifOptions.expiryTs == undefined
+  ) {
+    return 0;
   }
 
-  if (tifOptions.expiryOffset == undefined) {
-    return 0;
+  if (
+    tifOptions.expiryOffset != undefined &&
+    tifOptions.expiryTs != undefined
+  ) {
+    throw new Error("Cannot set both expiryOffset and expiryTs");
   }
 
   let currEpochStartTs = marketInfo.serumMarket.epochStartTs.toNumber();
@@ -1662,17 +1668,42 @@ export function getTIFOffset(marketInfo: Market, tifOptions: types.TIFOptions) {
 
   // get correct epoch end in case where serumMarket data is not up to date
   if (now > epochEnd) {
-    epochEnd = now - (now % epochLength) + epochLength;
+    currEpochStartTs = now - (now % epochLength);
+    epochEnd = currEpochStartTs + epochLength;
   }
 
-  let desiredExpiryTs = now + tifOptions.expiryOffset;
-  let desiredOffset = desiredExpiryTs % epochLength;
+  if (tifOptions.expiryOffset != undefined) {
+    if (tifOptions.expiryOffset == 0) {
+      throw new Error("Invalid expiry offset");
+    }
 
-  if (epochEnd >= desiredExpiryTs) {
-    return desiredOffset;
-  } else {
-    // Cap the offset at the end of the cycle.
-    return epochLength;
+    let desiredExpiryTs = now + tifOptions.expiryOffset;
+    let desiredOffset = desiredExpiryTs % epochLength;
+
+    if (epochEnd >= desiredExpiryTs) {
+      return desiredOffset;
+    } else {
+      // Cap the offset at the end of the cycle.
+      return epochLength;
+    }
+  }
+
+  if (tifOptions.expiryTs != undefined) {
+    if (tifOptions.expiryTs < Exchange.clockTimestamp) {
+      throw new Error("Cannot place an expired order");
+    }
+
+    let tifOffset = tifOptions.expiryTs - currEpochStartTs;
+
+    if (tifOffset > epochLength) {
+      return epochLength;
+    }
+
+    if (tifOffset <= 0) {
+      throw new Error("Cannot place an expired order");
+    }
+
+    return tifOffset;
   }
 }
 

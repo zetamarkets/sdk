@@ -308,17 +308,21 @@ export interface OrderOptions {
   blockhash?: string;
 }
 
-/*
- * expiryOffset - seconds in future that the order will expire. Set to undefined to disable TIF.
+/**
+ * Only set one of these options
+ * @field expiryOffset  seconds in future that the order will expire. Set to undefined to disable TIF.
+ * @field expiryTs      timestamp that the order will expire. Set to undefined to disable TIF.
  */
 export interface TIFOptions {
   expiryOffset?: number | undefined;
+  expiryTs?: number | undefined;
 }
 
 export function defaultOrderOptions(): OrderOptions {
   return {
     tifOptions: {
       expiryOffset: undefined,
+      expiryTs: undefined,
     },
     orderType: OrderType.LIMIT,
     clientOrderId: 0,
