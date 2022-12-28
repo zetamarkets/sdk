@@ -12,6 +12,7 @@ Version changes are pinned to SDK releases.
 
 - general: Port serum sdk into the zetamarkets sdk. ([#175](https://github.com/zetamarkets/sdk/pull/175))
 - general: Add TIF orders into zetamarkets sdk. ([#176](https://github.com/zetamarkets/sdk/pull/176))
+- general: Add PostOnlySlide order type. ([#178](https://github.com/zetamarkets/sdk/pull/178))
 
 ### Breaking
 

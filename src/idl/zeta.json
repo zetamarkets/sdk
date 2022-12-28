@@ -6125,6 +6125,9 @@
           },
           {
             "name": "ImmediateOrCancel"
+          },
+          {
+            "name": "PostOnlySlide"
           }
         ]
       }
