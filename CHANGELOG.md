@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 - general: Add user order filtering for expired orders. ([#181](https://github.com/zetamarkets/sdk/pull/181)
 - cleanup: refactor tif in order options for dev ux. ([#182](https://github.com/zetamarkets/sdk/pull/182))
+- cleanup: add option for setting expiry timestamp on tif orders. ([#183](https://github.com/zetamarkets/sdk/pull/183))
 
 ## [0.19.0] 2022-12-22
 
