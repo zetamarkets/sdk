@@ -644,6 +644,24 @@ export function cancelOrderNoErrorIx(
   );
 }
 
+export function pruneExpiredTIFOrdersIx(
+  asset: Asset,
+  marketIndex: number
+): TransactionInstruction {
+  let marketData = Exchange.getMarket(asset, marketIndex);
+  return Exchange.program.instruction.pruneExpiredTifOrders({
+    accounts: {
+      dexProgram: constants.DEX_PID[Exchange.network],
+      state: Exchange.stateAddress,
+      serumAuthority: Exchange.serumAuthority,
+      market: marketData.address,
+      bids: marketData.serumMarket.bidsAddress,
+      asks: marketData.serumMarket.asksAddress,
+      eventQueue: marketData.serumMarket.eventQueueAddress,
+    },
+  });
+}
+
 export function cancelAllMarketOrdersIx(
   asset: Asset,
   marketIndex: number,

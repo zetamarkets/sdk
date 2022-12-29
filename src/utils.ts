@@ -1217,6 +1217,26 @@ export async function crankMarket(
   await processTransaction(Exchange.provider, tx);
 }
 
+/*
+ * prune expired TIF orders from a list of market indices.
+ */
+export async function pruneExpiredTIFOrders(
+  asset: Asset,
+  marketIndices: number[]
+) {
+  let ixs = marketIndices.map((i) => {
+    return instructions.pruneExpiredTIFOrdersIx(asset, i);
+  });
+
+  let txs = splitIxsIntoTx(ixs, 10);
+
+  await Promise.all(
+    txs.map(async (tx) => {
+      return processTransaction(Exchange.provider, tx);
+    })
+  );
+}
+
 export async function expireSeries(asset: Asset, expiryTs: anchor.BN) {
   let subExchange = Exchange.getSubExchange(asset);
   let [settlement, settlementNonce] = await getSettlement(
