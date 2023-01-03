@@ -1673,7 +1673,7 @@ export function getTIFOffset(marketInfo: Market, tifOptions: types.TIFOptions) {
   }
 
   if (tifOptions.expiryOffset != undefined) {
-    if (tifOptions.expiryOffset == 0) {
+    if (tifOptions.expiryOffset <= 0) {
       throw new Error("Invalid expiry offset");
     }
 
