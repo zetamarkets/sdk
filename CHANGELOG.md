@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## Unreleased
+
+- cleanup: add option for setting expiry timestamp on tif orders. ([#183](https://github.com/zetamarkets/sdk/pull/183))
+
 ## [0.19.1] 2022-12-23
 
 - general: Add user order filtering for expired orders. ([#181](https://github.com/zetamarkets/sdk/pull/181)
