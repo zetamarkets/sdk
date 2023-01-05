@@ -82,6 +82,11 @@ export class Slab {
     return SLAB_LAYOUT.decode(buffer);
   }
 
+  // For test only.
+  public get leafCount(): number {
+    return this.header.leafCount;
+  }
+
   get(searchKey: BN | number) {
     if (this.header.leafCount === 0) {
       return null;
