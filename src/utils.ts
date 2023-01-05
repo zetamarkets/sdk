@@ -677,10 +677,7 @@ export async function simulateTransaction(
     Exchange.program.coder
   );
 
-  let events = [];
-  parser.parseLogs(response.logs, (event) => {
-    events.push(event);
-  });
+  let events = parser.parseLogs(response.logs);
 
   return { events, raw: logs };
 }

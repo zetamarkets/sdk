@@ -1433,12 +1433,14 @@ export class SubClient {
   ): Promise<PositionMovementEvent> {
     let tx = this.getPositionMovementTx(movementType, movements);
     let response = await utils.simulateTransaction(this._parent.provider, tx);
-
-    let events = response.events;
     let positionMovementEvent = undefined;
-    for (var i = 0; i < events.length; i++) {
-      if (events[i].name == "PositionMovementEvent") {
-        positionMovementEvent = events[i].data;
+    while (true) {
+      let event = response.events.next();
+      if (event.done) {
+        break;
+      }
+      if ((event.value as any).name == "PositionMovementEvent") {
+        positionMovementEvent = (event.value as any).data;
         break;
       }
     }

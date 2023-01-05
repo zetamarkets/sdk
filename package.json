@@ -13,10 +13,10 @@
     "build-no-idl": "./node_modules/.bin/tsc"
   },
   "dependencies": {
-    "@project-serum/anchor": "0.24.2",
+    "@project-serum/anchor": "0.26.0",
     "@solana/buffer-layout": "4.0.0",
     "@solana/spl-token": "0.1.6",
-    "@solana/web3.js": "1.66.1",
+    "@solana/web3.js": "1.68.0",
     "bs58": "^4.0.1",
     "lodash": "^4.17.21",
     "ts-node": "^10.7.0",

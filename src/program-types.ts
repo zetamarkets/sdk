@@ -144,7 +144,7 @@ export interface Position {
 
 export interface OrderState {
   closingOrders: anchor.BN;
-  openingOrders: [anchor.BN, anchor.BN];
+  openingOrders: Array<anchor.BN>;
 }
 
 export interface ProductLedger {
