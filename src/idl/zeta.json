@@ -4168,6 +4168,42 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "editDelegatedPubkey",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newKey",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -4893,6 +4929,10 @@
             "type": {
               "defined": "AnchorDecimal"
             }
+          },
+          {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
           },
           {
             "name": "padding",

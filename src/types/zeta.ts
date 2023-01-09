@@ -4168,6 +4168,42 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "editDelegatedPubkey",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newKey",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -4893,6 +4929,10 @@ export type Zeta = {
             "type": {
               "defined": "AnchorDecimal"
             }
+          },
+          {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
           },
           {
             "name": "padding",
@@ -11425,6 +11465,42 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "editDelegatedPubkey",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newKey",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -12150,6 +12226,10 @@ export const IDL: Zeta = {
             "type": {
               "defined": "AnchorDecimal"
             }
+          },
+          {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
           },
           {
             "name": "padding",

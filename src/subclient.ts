@@ -1,6 +1,6 @@
 import * as anchor from "@project-serum/anchor";
 import * as utils from "./utils";
-import { Asset, assetToName } from "./assets";
+import { Asset, assetToName, fromProgramAsset } from "./assets";
 import * as constants from "./constants";
 import { exchange as Exchange } from "./exchange";
 import {
@@ -699,30 +699,89 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions = types.defaultOrderOptions()
+    options: types.OrderOptions = types.defaultOrderOptions(),
+    onBehalfOfMarginAccountAddress: PublicKey
   ): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    let market = Exchange.getPerpMarket(this._asset).address;
     let marketIndex = constants.PERP_INDEX;
+    let openOrdersAccounts = this._openOrdersAccounts[marketIndex];
+    let asset = this._asset;
+    let accountOwner = this._parent.publicKey;
+    let authority = this._parent.publicKey;
+    let marginAccountAddress = this.marginAccountAddress;
+    let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
+    let openOrders = null;
 
-    let openOrdersPda = null;
-    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      console.log(
-        `[${assetToName(
-          this.asset
-        )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
-      );
+    let tx = new Transaction();
+    let market = Exchange.getPerpMarket(asset).address;
 
-      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
-        this.asset,
-        market,
-        this._parent.publicKey,
-        this.marginAccountAddress
+    if (onBehalfOfMarginAccountAddress != undefined) {
+      let account = (await Exchange.program.account.marginAccount.fetch(
+        onBehalfOfMarginAccountAddress
+      )) as unknown as MarginAccount;
+
+      let asset = fromProgramAsset(account.asset);
+
+      if (!Exchange.assets.includes(asset)) {
+        console.log(
+          "onBehalfOfMarginAccountAddress is for an asset that wasn't loaded in Exchange.load()"
+        );
+        return null;
+      }
+
+      accountOwner = account.authority;
+
+      let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
+        Exchange.programId,
+        Exchange.getZetaGroup(asset).perp.market,
+        accountOwner
       );
-      openOrdersPda = _openOrdersPda;
-      tx.add(initIx);
+      if (
+        (await this._parent.connection.getAccountInfo(openOrdersPda)) == null
+      ) {
+        console.log(
+          `[${assetToName(
+            asset
+          )}] Delegated user doesn't have open orders account. Please make one and retry. Returning...`
+        );
+        return null;
+      } else {
+        openOrders = openOrdersPda;
+      }
+
+      let [whitelistAddress, _whitelistTradingFeesNonce] =
+        await utils.getUserWhitelistTradingFeesAccount(
+          Exchange.programId,
+          accountOwner
+        );
+      whitelistTradingFeesAddress = undefined;
+      if (
+        (await this._parent.connection.getAccountInfo(whitelistAddress)) != null
+      ) {
+        whitelistTradingFeesAddress = whitelistAddress;
+      }
+
+      openOrders = openOrdersPda;
+      marginAccountAddress = onBehalfOfMarginAccountAddress;
     } else {
-      openOrdersPda = this._openOrdersAccounts[marketIndex];
+      if (openOrdersAccounts.equals(PublicKey.default)) {
+        console.log(
+          `[${assetToName(
+            asset
+          )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+        );
+
+        let [initIx, _openOrdersPda] =
+          await instructions.initializeOpenOrdersIx(
+            asset,
+            market,
+            accountOwner,
+            marginAccountAddress
+          );
+        openOrders = _openOrdersPda;
+        tx.add(initIx);
+      } else {
+        openOrders = openOrdersAccounts;
+      }
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
@@ -731,7 +790,7 @@ export class SubClient {
     );
 
     let orderIx = instructions.placePerpOrderV2Ix(
-      this.asset,
+      asset,
       marketIndex,
       price,
       size,
@@ -742,10 +801,10 @@ export class SubClient {
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
-      this.marginAccountAddress,
-      this._parent.publicKey,
-      openOrdersPda,
-      this._parent.whitelistTradingFeesAddress
+      marginAccountAddress,
+      authority,
+      openOrders,
+      whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
@@ -759,7 +818,28 @@ export class SubClient {
       undefined,
       options.blockhash
     );
-    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+
+    if (onBehalfOfMarginAccountAddress == undefined) {
+      this._openOrdersAccounts[marketIndex] = openOrders;
+    }
+    return txId;
+  }
+
+  public async editDelegatedPubkey(
+    delegatedPubkey: PublicKey
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+
+    tx.add(
+      instructions.editDelegatedPubkeyIx(
+        this._asset,
+        delegatedPubkey,
+        this.marginAccountAddress,
+        this._parent.publicKey
+      )
+    );
+
+    let txId = await utils.processTransaction(this._parent.provider, tx);
     return txId;
   }
 

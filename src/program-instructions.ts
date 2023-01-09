@@ -2238,6 +2238,23 @@ export async function toggleMarketMakerIx(
   });
 }
 
+export function editDelegatedPubkeyIx(
+  asset: Asset,
+  delegatedPubkey: PublicKey,
+  marginAccount: PublicKey,
+  authority: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.editDelegatedPubkey(delegatedPubkey, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      marginAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      authority,
+    },
+  });
+}
+
 export interface ExpireSeriesOverrideArgs {
   settlementNonce: number;
   settlementPrice: anchor.BN;

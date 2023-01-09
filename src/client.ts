@@ -367,7 +367,8 @@ export class Client {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions = types.defaultOrderOptions()
+    options: types.OrderOptions = types.defaultOrderOptions(),
+    onBehalfOfMarginAccountAddress: PublicKey = undefined
   ): Promise<TransactionSignature> {
     let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     if (marketPubkey == Exchange.getPerpMarket(asset).address) {
@@ -375,7 +376,8 @@ export class Client {
         price,
         size,
         side,
-        options
+        options,
+        onBehalfOfMarginAccountAddress
       );
     } else {
       return await this.getSubClient(asset).placeOrder(
@@ -393,13 +395,15 @@ export class Client {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions = types.defaultOrderOptions()
+    options: types.OrderOptions = types.defaultOrderOptions(),
+    onBehalfOfMarginAccountAddress: PublicKey = undefined
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).placePerpOrder(
       price,
       size,
       side,
-      options
+      options,
+      onBehalfOfMarginAccountAddress
     );
   }
 
@@ -455,6 +459,13 @@ export class Client {
     return this.getSubClient(asset).createCancelAllMarketOrdersInstruction(
       this.marketIdentifierToIndex(asset, market)
     );
+  }
+
+  public async editDelegatedPubkey(
+    asset: Asset,
+    delegatedPubkey: PublicKey
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).editDelegatedPubkey(delegatedPubkey);
   }
 
   public async migrateFunds(
