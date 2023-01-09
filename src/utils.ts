@@ -12,6 +12,9 @@ import {
   sendAndConfirmRawTransaction,
   AccountInfo,
   SystemProgram,
+  TransactionMessage,
+  MessageV0,
+  VersionedTransaction,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
@@ -690,45 +693,86 @@ export async function processTransaction(
   useLedger: boolean = false,
   blockhash?: string
 ): Promise<TransactionSignature> {
-  let txSig: TransactionSignature;
-
+  // create v0 compatible message
+  let v0Msg: MessageV0;
   if (blockhash == undefined) {
     const recentBlockhash = await provider.connection.getRecentBlockhash();
-    tx.recentBlockhash = recentBlockhash.blockhash;
+    v0Msg = new TransactionMessage({
+      payerKey: provider.wallet.publicKey,
+      recentBlockhash: recentBlockhash.blockhash,
+      instructions: tx.instructions,
+    }).compileToV0Message();
   } else {
-    tx.recentBlockhash = blockhash;
+    v0Msg = new TransactionMessage({
+      payerKey: provider.wallet.publicKey,
+      recentBlockhash: blockhash,
+      instructions: tx.instructions,
+    }).compileToV0Message();
   }
-
-  tx.feePayer = useLedger
-    ? Exchange.ledgerWallet.publicKey
-    : provider.wallet.publicKey;
-
+  let v0Tx: VersionedTransaction = new VersionedTransaction(v0Msg);
   if (signers === undefined) {
     signers = [];
   }
-  signers
+  let sigs = signers
     .filter((s) => s !== undefined)
-    .forEach((kp) => {
-      tx.partialSign(kp);
+    .map((kp) => {
+      return kp;
     });
 
-  if (useLedger) {
-    tx = await Exchange.ledgerWallet.signTransaction(tx);
-  } else {
-    tx = await provider.wallet.signTransaction(tx);
-  }
+  v0Tx.sign(sigs);
+
+  // if (useLedger) {
+  //   tx = await Exchange.ledgerWallet.signTransaction(tx);
+  // } else {
+  //   tx = await provider.wallet.signTransaction(tx);
+  // }
 
   try {
-    txSig = await sendAndConfirmRawTransaction(
-      provider.connection,
-      tx.serialize(),
+    return await provider.connection.sendTransaction(
+      v0Tx,
       opts || commitmentConfig(provider.connection.commitment)
     );
-    return txSig;
   } catch (err) {
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
+
+  // if (blockhash == undefined) {
+  //   const recentBlockhash = await provider.connection.getRecentBlockhash();
+  //   tx.recentBlockhash = recentBlockhash.blockhash;
+  // } else {
+  //   tx.recentBlockhash = blockhash;
+  // }
+
+  // tx.feePayer = useLedger
+  //   ? Exchange.ledgerWallet.publicKey
+  //   : provider.wallet.publicKey;
+
+  // if (signers === undefined) {
+  //   signers = [];
+  // }
+  // signers
+  //   .filter((s) => s !== undefined)
+  //   .forEach((kp) => {
+  //     tx.partialSign(kp);
+  //   });
+
+  // if (useLedger) {
+  //   tx = await Exchange.ledgerWallet.signTransaction(tx);
+  // } else {
+  //   tx = await provider.wallet.signTransaction(tx);
+  // }
+  // try {
+  //   return await sendAndConfirmRawTransaction(
+  //     provider.connection,
+  //     tx.serialize(),
+  //     opts || commitmentConfig(provider.connection.commitment)
+  //   );
+  // } catch (err) {
+  //   let parsedErr = parseError(err);
+  //   throw parsedErr;
+  // }
 }
 
 export function parseError(err: any) {
