@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [0.19.1] 2023-01-05
+## [0.19.3] 2023-01-09
+
+- client: add perp functionality to all cancel+place functions in subclient. ([#186](https://github.com/zetamarkets/sdk/pull/186))
+
+## [0.19.2] 2023-01-05
 
 - cleanup: add option for setting expiry timestamp on tif orders. ([#183](https://github.com/zetamarkets/sdk/pull/183))
 - general: add instruction to prune expired orders for expired TIF orders. ([#184](https://github.com/zetamarkets/sdk/pull/184))
