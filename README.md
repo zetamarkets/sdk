@@ -501,18 +501,17 @@ You can see these `EventType` in `src/events.ts`.
 
 **NOTE: Some callbacks are done on poll so don't always reflect a change in state.**
 
-| Event              |     Type     |                 Meaning                  |                                            Change |
-| ------------------ | :----------: | :--------------------------------------: | ------------------------------------------------: |
-| EXCHANGE           |   Program    |  Strike initialization, market cleaning  |                              Exchange's zetaGroup |
-| EXPIRY             |   Program    |       On option series expiration        |                                Exchange's markets |
-| GREEKS             |   Program    |  When greeks are updated (mark prices)   | Exchange's greeks or <br> Exchange.riskCalculator |
-| ORDERBOOK          |   Program    |      When an orderbook poll occurs.      |                                  Exchange.markets |
-| ORACLE             | Pyth oracle  |            Pyth price update.            |                                   Exchange.oracle |
-| CLOCK              | Solana clock |       Solana clock account change.       |                           Exchange.clockTimestamp |
-| TRADEV2            |     User     |           On user trade event.           |                              client.marginAccount |
-| ORDERCOMPLETEEVENT |     User     | User order is fully filled or cancelled. |                              client.marginAccount |
-
-| USER | User | When the user's marginAccount <br> changes, which can occur on <br> inserts, cancels, trades, withdrawals, <br> deposits, settlement, liquidation, <br> force cancellations | client.marginAccount |
+| Event              |     Type     |                                                                                   Meaning                                                                                   |                                            Change |
+| ------------------ | :----------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ------------------------------------------------: |
+| EXCHANGE           |   Program    |                                                                   Strike initialization, market cleaning                                                                    |                              Exchange's zetaGroup |
+| EXPIRY             |   Program    |                                                                         On option series expiration                                                                         |                                Exchange's markets |
+| GREEKS             |   Program    |                                                                    When greeks are updated (mark prices)                                                                    | Exchange's greeks or <br> Exchange.riskCalculator |
+| ORDERBOOK          |   Program    |                                                                       When an orderbook poll occurs.                                                                        |                                  Exchange.markets |
+| ORACLE             | Pyth oracle  |                                                                             Pyth price update.                                                                              |                                   Exchange.oracle |
+| CLOCK              | Solana clock |                                                                        Solana clock account change.                                                                         |                           Exchange.clockTimestamp |
+| TRADEV2            |     User     |                                                                            On user trade event.                                                                             |                              client.marginAccount |
+| ORDERCOMPLETEEVENT |     User     |                                                                  User order is fully filled or cancelled.                                                                   |                              client.marginAccount |
+| USER               |     User     | When the user's marginAccount <br> changes, which can occur on <br> inserts, cancels, trades, withdrawals, <br> deposits, settlement, liquidation, <br> force cancellations |                              client.marginAccount |
 
 These callbacks should eliminate the need to poll for most accounts, unless you need certainty on the state, in which case there are polling functions available in `Exchange` and `Client`.
 
