@@ -251,7 +251,7 @@ The details should be abstracted away into `client.getOrders(asset)` and `client
 ### Basic script setup to place a trade and view positions
 
 For examples sake, we want to see the orderbook for SOL market index 2, i.e. the CALL option expiring on Fri Nov 19 with strike 211.
-Different markets (such as perps or futures) are just a different `index`. Try index = constants.PERP_INDEX :)
+Different markets (such as perps or futures) are just a different `index`. Try index = constants.PERP_INDEX 😊
 
 ```ts
 const index = 2;
