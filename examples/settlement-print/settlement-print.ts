@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import {
   Wallet,
   Exchange,

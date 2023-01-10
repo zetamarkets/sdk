@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import {
   Commitment,
   Keypair,
@@ -9,7 +9,6 @@ import {
   Transaction,
   TransactionInstruction,
   TransactionSignature,
-  sendAndConfirmRawTransaction,
   AccountInfo,
   SystemProgram,
   TransactionMessage,
@@ -694,26 +693,17 @@ export async function processTransaction(
   blockhash?: string
 ): Promise<TransactionSignature> {
   // create v0 compatible message
-  let v0Msg: MessageV0;
-  if (blockhash == undefined) {
-    const recentBlockhash = await provider.connection.getRecentBlockhash();
-    v0Msg = new TransactionMessage({
+
+  let v0Tx: VersionedTransaction = new VersionedTransaction(
+    new TransactionMessage({
       payerKey: provider.wallet.publicKey,
-      recentBlockhash: recentBlockhash.blockhash,
+      recentBlockhash:
+        blockhash ?? (await provider.connection.getRecentBlockhash()).blockhash,
       instructions: tx.instructions,
-    }).compileToV0Message();
-  } else {
-    v0Msg = new TransactionMessage({
-      payerKey: provider.wallet.publicKey,
-      recentBlockhash: blockhash,
-      instructions: tx.instructions,
-    }).compileToV0Message();
-  }
-  let v0Tx: VersionedTransaction = new VersionedTransaction(v0Msg);
-  if (signers === undefined) {
-    signers = [];
-  }
-  let sigs = signers
+    }).compileToV0Message()
+  );
+
+  let sigs = (signers ?? [])
     .filter((s) => s !== undefined)
     .map((kp) => {
       return kp;
@@ -727,52 +717,18 @@ export async function processTransaction(
   //   tx = await provider.wallet.signTransaction(tx);
   // }
 
+  v0Tx = (await provider.wallet.signTransaction(v0Tx)) as VersionedTransaction;
+
   try {
-    return await provider.connection.sendTransaction(
-      v0Tx,
+    return await anchor.sendAndConfirmRawTransaction(
+      provider.connection,
+      v0Tx.serialize(),
       opts || commitmentConfig(provider.connection.commitment)
     );
   } catch (err) {
-    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
-
-  // if (blockhash == undefined) {
-  //   const recentBlockhash = await provider.connection.getRecentBlockhash();
-  //   tx.recentBlockhash = recentBlockhash.blockhash;
-  // } else {
-  //   tx.recentBlockhash = blockhash;
-  // }
-
-  // tx.feePayer = useLedger
-  //   ? Exchange.ledgerWallet.publicKey
-  //   : provider.wallet.publicKey;
-
-  // if (signers === undefined) {
-  //   signers = [];
-  // }
-  // signers
-  //   .filter((s) => s !== undefined)
-  //   .forEach((kp) => {
-  //     tx.partialSign(kp);
-  //   });
-
-  // if (useLedger) {
-  //   tx = await Exchange.ledgerWallet.signTransaction(tx);
-  // } else {
-  //   tx = await provider.wallet.signTransaction(tx);
-  // }
-  // try {
-  //   return await sendAndConfirmRawTransaction(
-  //     provider.connection,
-  //     tx.serialize(),
-  //     opts || commitmentConfig(provider.connection.commitment)
-  //   );
-  // } catch (err) {
-  //   let parsedErr = parseError(err);
-  //   throw parsedErr;
-  // }
 }
 
 export function parseError(err: any) {

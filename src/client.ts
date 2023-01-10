@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import * as utils from "./utils";
 import { exchange as Exchange } from "./exchange";
 import {
