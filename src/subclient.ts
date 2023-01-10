@@ -675,6 +675,7 @@ export class SubClient {
       undefined,
       undefined,
       undefined,
+      undefined,
       options.blockhash
     );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
@@ -754,6 +755,7 @@ export class SubClient {
     txId = await utils.processTransaction(
       this._parent.provider,
       tx,
+      undefined,
       undefined,
       undefined,
       undefined,
@@ -1002,7 +1004,15 @@ export class SubClient {
         )
       );
     }
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      options.blockhash
+    );
   }
 
   /**
@@ -1087,7 +1097,15 @@ export class SubClient {
         )
       );
     }
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      newOptions.blockhash
+    );
   }
 
   /**
@@ -1173,7 +1191,15 @@ export class SubClient {
         )
       );
     }
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      newOptions.blockhash
+    );
   }
 
   /**

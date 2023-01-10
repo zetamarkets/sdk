@@ -690,39 +690,63 @@ export async function processTransaction(
   signers?: Array<Signer>,
   opts?: ConfirmOptions,
   useLedger: boolean = false,
+  useVersioned: boolean = false,
   blockhash?: string
 ): Promise<TransactionSignature> {
   // create v0 compatible message
 
-  let v0Tx: VersionedTransaction = new VersionedTransaction(
-    new TransactionMessage({
-      payerKey: provider.wallet.publicKey,
-      recentBlockhash:
-        blockhash ?? (await provider.connection.getRecentBlockhash()).blockhash,
-      instructions: tx.instructions,
-    }).compileToV0Message()
-  );
+  let rawTx;
 
-  let sigs = (signers ?? [])
-    .filter((s) => s !== undefined)
-    .map((kp) => {
-      return kp;
-    });
+  if (useVersioned) {
+    if (useLedger) {
+      throw Error("Ledger does not support versioned transactions");
+    }
 
-  v0Tx.sign(sigs);
+    let v0Tx: VersionedTransaction = new VersionedTransaction(
+      new TransactionMessage({
+        payerKey: provider.wallet.publicKey,
+        recentBlockhash:
+          blockhash ??
+          (await provider.connection.getRecentBlockhash()).blockhash,
+        instructions: tx.instructions,
+      }).compileToV0Message()
+    );
 
-  // if (useLedger) {
-  //   tx = await Exchange.ledgerWallet.signTransaction(tx);
-  // } else {
-  //   tx = await provider.wallet.signTransaction(tx);
-  // }
+    let sigs = (signers ?? [])
+      .filter((s) => s !== undefined)
+      .map((kp) => {
+        return kp;
+      });
 
-  v0Tx = (await provider.wallet.signTransaction(v0Tx)) as VersionedTransaction;
+    v0Tx.sign(sigs);
+    rawTx = (await provider.wallet.signTransaction(v0Tx)).serialize();
+  } else {
+    tx.recentBlockhash =
+      blockhash ?? (await provider.connection.getRecentBlockhash()).blockhash;
+
+    tx.feePayer = useLedger
+      ? Exchange.ledgerWallet.publicKey
+      : provider.wallet.publicKey;
+
+    (signers ?? [])
+      .filter((s) => s !== undefined)
+      .forEach((kp) => {
+        tx.partialSign(kp);
+      });
+
+    if (useLedger) {
+      tx = await Exchange.ledgerWallet.signTransaction(tx);
+    } else {
+      tx = (await provider.wallet.signTransaction(tx)) as Transaction;
+    }
+
+    rawTx = tx.serialize();
+  }
 
   try {
     return await anchor.sendAndConfirmRawTransaction(
       provider.connection,
-      v0Tx.serialize(),
+      rawTx,
       opts || commitmentConfig(provider.connection.commitment)
     );
   } catch (err) {

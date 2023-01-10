@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@zetamarkets/anchor": "0.22.1",
-    "@solana/web3.js": "^1.66.1",
+    "@zetamarkets/anchor": "0.26.0-beta-3",
+    "@solana/web3.js": "^1.68.0",
     "@zetamarkets/sdk": "^0.18.0",
     "buffer-layout": "^1.2.2",
     "dotenv": "^10.0.0",

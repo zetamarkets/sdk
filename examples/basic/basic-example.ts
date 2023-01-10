@@ -97,8 +97,7 @@ async function main() {
     index,
     utils.convertDecimalToNativeInteger(0.1),
     utils.convertDecimalToNativeLotSize(2),
-    types.Side.BID,
-    types.OrderType.LIMIT
+    types.Side.BID
   );
 
   // See our order in the orderbook.
