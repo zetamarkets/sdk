@@ -961,25 +961,47 @@ export class SubClient {
       options.tifOptions
     );
 
-    tx.add(
-      instructions.placeOrderV4Ix(
-        this.asset,
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        options.orderType != undefined
-          ? options.orderType
-          : types.OrderType.LIMIT,
-        options.clientOrderId != undefined ? options.clientOrderId : 0,
-        options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
-        tifOffsetToUse,
-        this.marginAccountAddress,
-        this._parent.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._parent.whitelistTradingFeesAddress
-      )
-    );
+    if (marketIndex == constants.PERP_INDEX) {
+      tx.add(
+        instructions.placePerpOrderV2Ix(
+          this.asset,
+          marketIndex,
+          newOrderPrice,
+          newOrderSize,
+          newOrderSide,
+          options.orderType != undefined
+            ? options.orderType
+            : types.OrderType.LIMIT,
+          options.clientOrderId != undefined ? options.clientOrderId : 0,
+          options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+          tifOffsetToUse,
+          this.marginAccountAddress,
+          this._parent.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
+        )
+      );
+    } else {
+      tx.add(
+        instructions.placeOrderV4Ix(
+          this.asset,
+          marketIndex,
+          newOrderPrice,
+          newOrderSize,
+          newOrderSide,
+          options.orderType != undefined
+            ? options.orderType
+            : types.OrderType.LIMIT,
+          options.clientOrderId != undefined ? options.clientOrderId : 0,
+          options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+          tifOffsetToUse,
+          this.marginAccountAddress,
+          this._parent.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
+        )
+      );
+    }
     return await utils.processTransaction(this._parent.provider, tx);
   }
 
@@ -1019,27 +1041,52 @@ export class SubClient {
       this._subExchange.markets.getMarket(market),
       newOptions.tifOptions
     );
-    tx.add(
-      instructions.placeOrderV4Ix(
-        this.asset,
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOptions.orderType != undefined
-          ? newOptions.orderType
-          : types.OrderType.LIMIT,
-        newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
-        newOptions.tag != undefined
-          ? newOptions.tag
-          : constants.DEFAULT_ORDER_TAG,
-        tifOffsetToUse,
-        this.marginAccountAddress,
-        this._parent.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._parent.whitelistTradingFeesAddress
-      )
-    );
+
+    if (marketIndex == constants.PERP_INDEX) {
+      tx.add(
+        instructions.placePerpOrderV2Ix(
+          this.asset,
+          marketIndex,
+          newOrderPrice,
+          newOrderSize,
+          newOrderSide,
+          newOptions.orderType != undefined
+            ? newOptions.orderType
+            : types.OrderType.LIMIT,
+          newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
+          newOptions.tag != undefined
+            ? newOptions.tag
+            : constants.DEFAULT_ORDER_TAG,
+          tifOffsetToUse,
+          this.marginAccountAddress,
+          this._parent.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
+        )
+      );
+    } else {
+      tx.add(
+        instructions.placeOrderV4Ix(
+          this.asset,
+          marketIndex,
+          newOrderPrice,
+          newOrderSize,
+          newOrderSide,
+          newOptions.orderType != undefined
+            ? newOptions.orderType
+            : types.OrderType.LIMIT,
+          newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
+          newOptions.tag != undefined
+            ? newOptions.tag
+            : constants.DEFAULT_ORDER_TAG,
+          tifOffsetToUse,
+          this.marginAccountAddress,
+          this._parent.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
+        )
+      );
+    }
     return await utils.processTransaction(this._parent.provider, tx);
   }
 
@@ -1081,27 +1128,51 @@ export class SubClient {
       newOptions.tifOptions
     );
 
-    tx.add(
-      instructions.placeOrderV4Ix(
-        this.asset,
-        marketIndex,
-        newOrderPrice,
-        newOrderSize,
-        newOrderSide,
-        newOptions.orderType != undefined
-          ? newOptions.orderType
-          : types.OrderType.LIMIT,
-        newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
-        newOptions.tag != undefined
-          ? newOptions.tag
-          : constants.DEFAULT_ORDER_TAG,
-        tifOffsetToUse,
-        this.marginAccountAddress,
-        this._parent.publicKey,
-        this._openOrdersAccounts[marketIndex],
-        this._parent.whitelistTradingFeesAddress
-      )
-    );
+    if (marketIndex == constants.PERP_INDEX) {
+      tx.add(
+        instructions.placePerpOrderV2Ix(
+          this.asset,
+          marketIndex,
+          newOrderPrice,
+          newOrderSize,
+          newOrderSide,
+          newOptions.orderType != undefined
+            ? newOptions.orderType
+            : types.OrderType.LIMIT,
+          newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
+          newOptions.tag != undefined
+            ? newOptions.tag
+            : constants.DEFAULT_ORDER_TAG,
+          tifOffsetToUse,
+          this.marginAccountAddress,
+          this._parent.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
+        )
+      );
+    } else {
+      tx.add(
+        instructions.placeOrderV4Ix(
+          this.asset,
+          marketIndex,
+          newOrderPrice,
+          newOrderSize,
+          newOrderSide,
+          newOptions.orderType != undefined
+            ? newOptions.orderType
+            : types.OrderType.LIMIT,
+          newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
+          newOptions.tag != undefined
+            ? newOptions.tag
+            : constants.DEFAULT_ORDER_TAG,
+          tifOffsetToUse,
+          this.marginAccountAddress,
+          this._parent.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
+        )
+      );
+    }
     return await utils.processTransaction(this._parent.provider, tx);
   }
 
