@@ -368,7 +368,7 @@ export class Client {
     size: number,
     side: types.Side,
     options: types.OrderOptions = types.defaultOrderOptions(),
-    onBehalfOfMarginAccountAddress: PublicKey = undefined
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     if (marketPubkey == Exchange.getPerpMarket(asset).address) {
@@ -377,7 +377,7 @@ export class Client {
         size,
         side,
         options,
-        onBehalfOfMarginAccountAddress
+        onBehalfOfUser
       );
     } else {
       return await this.getSubClient(asset).placeOrder(
@@ -968,6 +968,14 @@ export class Client {
 
   public getMarginAccountAddress(asset: Asset): PublicKey {
     return this.getSubClient(asset).marginAccountAddress;
+  }
+
+  public getMarginAccountAddresses(): PublicKey[] {
+    let addresses = [];
+    for (var asset of Exchange.assets) {
+      addresses.push(this.getSubClient(asset).marginAccountAddress);
+    }
+    return addresses;
   }
 
   public async initializeReferrerAccount() {

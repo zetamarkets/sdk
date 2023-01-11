@@ -700,7 +700,7 @@ export class SubClient {
     size: number,
     side: types.Side,
     options: types.OrderOptions = types.defaultOrderOptions(),
-    onBehalfOfMarginAccountAddress: PublicKey
+    onBehalfOfUser: PublicKey
   ): Promise<TransactionSignature> {
     let marketIndex = constants.PERP_INDEX;
     let openOrdersAccounts = this._openOrdersAccounts[marketIndex];
@@ -714,54 +714,26 @@ export class SubClient {
     let tx = new Transaction();
     let market = Exchange.getPerpMarket(asset).address;
 
-    if (onBehalfOfMarginAccountAddress != undefined) {
-      let account = (await Exchange.program.account.marginAccount.fetch(
-        onBehalfOfMarginAccountAddress
-      )) as unknown as MarginAccount;
-
-      let asset = fromProgramAsset(account.asset);
-
-      if (!Exchange.assets.includes(asset)) {
-        console.log(
-          "onBehalfOfMarginAccountAddress is for an asset that wasn't loaded in Exchange.load()"
-        );
-        return null;
-      }
-
-      accountOwner = account.authority;
-
-      let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
-        Exchange.programId,
-        Exchange.getZetaGroup(asset).perp.market,
-        accountOwner
+    if (onBehalfOfUser != undefined) {
+      let delegatedClient = await Client.load(
+        this._parent.connection,
+        new types.DelegatedWallet(onBehalfOfUser)
       );
-      if (
-        (await this._parent.connection.getAccountInfo(openOrdersPda)) == null
-      ) {
+
+      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[marketIndex];
+      if (openOrders.equals(PublicKey.default)) {
         console.log(
           `[${assetToName(
             asset
           )}] Delegated user doesn't have open orders account. Please make one and retry. Returning...`
         );
         return null;
-      } else {
-        openOrders = openOrdersPda;
       }
 
-      let [whitelistAddress, _whitelistTradingFeesNonce] =
-        await utils.getUserWhitelistTradingFeesAccount(
-          Exchange.programId,
-          accountOwner
-        );
-      whitelistTradingFeesAddress = undefined;
-      if (
-        (await this._parent.connection.getAccountInfo(whitelistAddress)) != null
-      ) {
-        whitelistTradingFeesAddress = whitelistAddress;
-      }
+      whitelistTradingFeesAddress = delegatedClient.whitelistTradingFeesAddress;
+      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
 
-      openOrders = openOrdersPda;
-      marginAccountAddress = onBehalfOfMarginAccountAddress;
+      await delegatedClient.close();
     } else {
       if (openOrdersAccounts.equals(PublicKey.default)) {
         console.log(
@@ -819,7 +791,7 @@ export class SubClient {
       options.blockhash
     );
 
-    if (onBehalfOfMarginAccountAddress == undefined) {
+    if (onBehalfOfUser == undefined) {
       this._openOrdersAccounts[marketIndex] = openOrders;
     }
     return txId;
