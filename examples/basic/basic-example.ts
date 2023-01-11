@@ -98,7 +98,7 @@ async function main() {
     utils.convertDecimalToNativeInteger(0.1),
     utils.convertDecimalToNativeLotSize(2),
     types.Side.BID,
-    types.OrderType.LIMIT
+    { tifOptions: {}, orderType: types.OrderType.LIMIT } // Extra optional parameters
   );
 
   // See our order in the orderbook.
