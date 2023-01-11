@@ -12,7 +12,6 @@ import {
   AccountInfo,
   SystemProgram,
   TransactionMessage,
-  MessageV0,
   VersionedTransaction,
 } from "@solana/web3.js";
 import {
@@ -691,16 +690,25 @@ export async function processTransaction(
   opts?: ConfirmOptions,
   useLedger: boolean = false,
   useVersioned: boolean = false,
+  lutAddresses?: PublicKey[],
   blockhash?: string
 ): Promise<TransactionSignature> {
-  // create v0 compatible message
-
-  let rawTx;
-
+  let rawTx: Buffer | Uint8Array;
+  let txSig: TransactionSignature;
   if (useVersioned) {
     if (useLedger) {
       throw Error("Ledger does not support versioned transactions");
     }
+
+    let lutAccountArr = lutAddresses
+      ? await Promise.all(
+          lutAddresses.map(async (addr) => {
+            return (
+              await Exchange.provider.connection.getAddressLookupTable(addr)
+            ).value;
+          })
+        )
+      : undefined;
 
     let v0Tx: VersionedTransaction = new VersionedTransaction(
       new TransactionMessage({
@@ -709,21 +717,23 @@ export async function processTransaction(
           blockhash ??
           (await provider.connection.getRecentBlockhash()).blockhash,
         instructions: tx.instructions,
-      }).compileToV0Message()
+      }).compileToV0Message(lutAccountArr)
     );
-
-    let sigs = (signers ?? [])
-      .filter((s) => s !== undefined)
-      .map((kp) => {
-        return kp;
-      });
-
-    v0Tx.sign(sigs);
-    rawTx = (await provider.wallet.signTransaction(v0Tx)).serialize();
+    v0Tx.sign(
+      (signers ?? [])
+        .filter((s) => s !== undefined)
+        .map((kp) => {
+          return kp;
+        })
+    );
+    v0Tx = (await provider.wallet.signTransaction(
+      v0Tx
+    )) as VersionedTransaction;
+    console.log(v0Tx);
+    rawTx = v0Tx.serialize();
   } else {
     tx.recentBlockhash =
       blockhash ?? (await provider.connection.getRecentBlockhash()).blockhash;
-
     tx.feePayer = useLedger
       ? Exchange.ledgerWallet.publicKey
       : provider.wallet.publicKey;
@@ -739,7 +749,6 @@ export async function processTransaction(
     } else {
       tx = (await provider.wallet.signTransaction(tx)) as Transaction;
     }
-
     rawTx = tx.serialize();
   }
 

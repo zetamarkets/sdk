@@ -244,7 +244,7 @@ export class Exchange {
     this._assets = assets;
     this._provider = new anchor.AnchorProvider(
       connection,
-      wallet,
+      wallet instanceof types.DummyWallet ? null : wallet,
       opts || utils.commitmentConfig(connection.commitment)
     );
     this._opts = opts;
