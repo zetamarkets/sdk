@@ -618,29 +618,58 @@ export class SubClient {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions = types.defaultOrderOptions()
+    options: types.OrderOptions = types.defaultOrderOptions(),
+    onBehalfOfUser: PublicKey
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
+    let openOrdersAccounts = this._openOrdersAccounts[marketIndex];
+    let asset = this._asset;
+    let authority = this._parent.publicKey;
+    let marginAccountAddress = this.marginAccountAddress;
+    let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
+    let openOrders = null;
 
-    let openOrdersPda = null;
-    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-      console.log(
-        `[${assetToName(
-          this.asset
-        )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+    if (onBehalfOfUser != undefined) {
+      let delegatedClient = await Client.load(
+        this._parent.connection,
+        new types.DelegatedWallet(onBehalfOfUser)
       );
 
-      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
-        this.asset,
-        market,
-        this._parent.publicKey,
-        this.marginAccountAddress
-      );
-      openOrdersPda = _openOrdersPda;
-      tx.add(initIx);
+      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[marketIndex];
+      if (openOrders.equals(PublicKey.default)) {
+        console.log(
+          `[${assetToName(
+            asset
+          )}] Delegated user doesn't have open orders account. Please make one and retry. Returning...`
+        );
+        return null;
+      }
+
+      whitelistTradingFeesAddress = delegatedClient.whitelistTradingFeesAddress;
+      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
+
+      await delegatedClient.close();
     } else {
-      openOrdersPda = this._openOrdersAccounts[marketIndex];
+      if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+        console.log(
+          `[${assetToName(
+            this.asset
+          )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+        );
+
+        let [initIx, _openOrdersPda] =
+          await instructions.initializeOpenOrdersIx(
+            this.asset,
+            market,
+            this._parent.publicKey,
+            this.marginAccountAddress
+          );
+        openOrders = _openOrdersPda;
+        tx.add(initIx);
+      } else {
+        openOrders = this._openOrdersAccounts[marketIndex];
+      }
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
@@ -660,10 +689,10 @@ export class SubClient {
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
-      this.marginAccountAddress,
-      this._parent.publicKey,
-      openOrdersPda,
-      this._parent.whitelistTradingFeesAddress
+      marginAccountAddress,
+      authority,
+      openOrders,
+      whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
@@ -677,7 +706,9 @@ export class SubClient {
       undefined,
       options.blockhash
     );
-    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+    if (onBehalfOfUser == undefined) {
+      this._openOrdersAccounts[marketIndex] = openOrders;
+    }
     return txId;
   }
 
@@ -705,7 +736,6 @@ export class SubClient {
     let marketIndex = constants.PERP_INDEX;
     let openOrdersAccounts = this._openOrdersAccounts[marketIndex];
     let asset = this._asset;
-    let accountOwner = this._parent.publicKey;
     let authority = this._parent.publicKey;
     let marginAccountAddress = this.marginAccountAddress;
     let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
@@ -746,7 +776,7 @@ export class SubClient {
           await instructions.initializeOpenOrdersIx(
             asset,
             market,
-            accountOwner,
+            this._parent.publicKey,
             marginAccountAddress
           );
         openOrders = _openOrdersPda;

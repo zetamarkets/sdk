@@ -385,7 +385,8 @@ export class Client {
         price,
         size,
         side,
-        options
+        options,
+        onBehalfOfUser
       );
     }
   }
@@ -396,14 +397,14 @@ export class Client {
     size: number,
     side: types.Side,
     options: types.OrderOptions = types.defaultOrderOptions(),
-    onBehalfOfMarginAccountAddress: PublicKey = undefined
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).placePerpOrder(
       price,
       size,
       side,
       options,
-      onBehalfOfMarginAccountAddress
+      onBehalfOfUser
     );
   }
 
