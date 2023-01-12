@@ -564,27 +564,31 @@ export class Client {
   }
 
   public async cancelAllOrders(
-    asset: Asset = undefined
+    asset: Asset = undefined,
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature[]> {
     if (asset != undefined) {
-      return await this.getSubClient(asset).cancelAllOrders();
+      return await this.getSubClient(asset).cancelAllOrders(onBehalfOfUser);
     } else {
       for (var subClient of this.getAllSubClients()) {
-        await subClient.cancelAllOrders();
+        await subClient.cancelAllOrders(onBehalfOfUser);
       }
     }
   }
 
   public async cancelAllOrdersNoError(
-    asset: Asset = undefined
+    asset: Asset = undefined,
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature[]> {
     if (asset != undefined) {
-      return await this.getSubClient(asset).cancelAllOrdersNoError();
+      return await this.getSubClient(asset).cancelAllOrdersNoError(
+        onBehalfOfUser
+      );
     } else {
       let allTxIds = [];
       await Promise.all(
         this.getAllSubClients().map(async (subClient) => {
-          let txIds = await subClient.cancelAllOrdersNoError();
+          let txIds = await subClient.cancelAllOrdersNoError(onBehalfOfUser);
           allTxIds = allTxIds.concat(txIds);
         })
       );
@@ -638,18 +642,33 @@ export class Client {
 
   public async cancelAllMarketOrders(
     asset: Asset,
-    market: types.MarketIdentifier
+    market: types.MarketIdentifier,
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
       this.marketIdentifierToPublicKey(asset, market)
     );
+    let subClient = this.getSubClient(asset);
+    let marginAccountAddress = subClient.marginAccountAddress;
+    let openOrders = subClient.openOrdersAccounts[index];
+
+    if (onBehalfOfUser != undefined) {
+      let delegatedClient = await Client.load(
+        this.connection,
+        new types.DelegatedWallet(onBehalfOfUser)
+      );
+      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
+      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[index];
+      await delegatedClient.close();
+    }
+
     let ix = instructions.cancelAllMarketOrdersIx(
       asset,
       index,
       this.publicKey,
-      this.getSubClient(asset).marginAccountAddress,
-      this.getSubClient(asset).openOrdersAccounts[index]
+      marginAccountAddress,
+      openOrders
     );
     tx.add(ix);
     return await utils.processTransaction(this.provider, tx);
@@ -659,25 +678,29 @@ export class Client {
     asset: Asset,
     market: types.MarketIdentifier,
     orderId: anchor.BN,
-    side: types.Side
+    side: types.Side,
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     return await this.getSubClient(asset).cancelOrder(
       marketPubkey,
       orderId,
-      side
+      side,
+      onBehalfOfUser
     );
   }
 
   public async cancelOrderByClientOrderId(
     asset: Asset,
     market: types.MarketIdentifier,
-    clientOrderId: number
+    clientOrderId: number,
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     let marketPubkey = this.marketIdentifierToPublicKey(asset, market);
     return await this.getSubClient(asset).cancelOrderByClientOrderId(
       marketPubkey,
-      clientOrderId
+      clientOrderId,
+      onBehalfOfUser
     );
   }
 
@@ -689,7 +712,8 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOptions: types.OrderOptions = types.defaultOrderOptions()
+    newOptions: types.OrderOptions = types.defaultOrderOptions(),
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).cancelAndPlaceOrder(
       this.marketIdentifierToPublicKey(asset, market),
@@ -698,7 +722,8 @@ export class Client {
       newOrderPrice,
       newOrderSize,
       newOrderSide,
-      newOptions
+      newOptions,
+      onBehalfOfUser
     );
   }
 
@@ -709,7 +734,8 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOptions: types.OrderOptions = types.defaultOrderOptions()
+    newOptions: types.OrderOptions = types.defaultOrderOptions(),
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).cancelAndPlaceOrderByClientOrderId(
       this.marketIdentifierToPublicKey(asset, market),
@@ -717,7 +743,8 @@ export class Client {
       newOrderPrice,
       newOrderSize,
       newOrderSide,
-      newOptions
+      newOptions,
+      onBehalfOfUser
     );
   }
 
@@ -728,7 +755,8 @@ export class Client {
     newOrderPrice: number,
     newOrderSize: number,
     newOrderSide: types.Side,
-    newOptions: types.OrderOptions = types.defaultOrderOptions()
+    newOptions: types.OrderOptions = types.defaultOrderOptions(),
+    onBehalfOfUser: PublicKey = undefined
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).replaceByClientOrderId(
       this.marketIdentifierToPublicKey(asset, market),
@@ -736,7 +764,8 @@ export class Client {
       newOrderPrice,
       newOrderSize,
       newOrderSide,
-      newOptions
+      newOptions,
+      onBehalfOfUser
     );
   }
 
