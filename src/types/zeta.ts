@@ -4939,7 +4939,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                370
+                338
               ]
             }
           }
@@ -7291,6 +7291,11 @@ export type Zeta = {
       "code": 6128,
       "name": "ForceCancelExpiredTIFOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
+    },
+    {
+      "code": 6129,
+      "name": "InvalidPlaceOrderAuthority",
+      "msg": "Invalid place order authority"
     }
   ]
 };
@@ -12236,7 +12241,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                370
+                338
               ]
             }
           }
@@ -14588,6 +14593,11 @@ export const IDL: Zeta = {
       "code": 6128,
       "name": "ForceCancelExpiredTIFOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
+    },
+    {
+      "code": 6129,
+      "name": "InvalidPlaceOrderAuthority",
+      "msg": "Invalid place order authority"
     }
   ]
 };

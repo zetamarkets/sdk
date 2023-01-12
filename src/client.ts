@@ -120,6 +120,11 @@ export class Client {
     return this._subClients;
   }
 
+  public get delegatedAccount(): Client {
+    return this._delegatedAccount;
+  }
+  private _delegatedAccount: Client;
+
   private constructor(
     connection: Connection,
     wallet: types.Wallet,
@@ -250,6 +255,21 @@ export class Client {
   public getAllSubClients(): SubClient[] {
     return [...this._subClients.values()];
     // This is referring itself by another referrer.
+  }
+
+  public async loadDelegatedClient(onBehalfOfUser: PublicKey) {
+    await this.unloadDelegatedClient();
+    this._delegatedAccount = await Client.load(
+      this.connection,
+      new types.DelegatedWallet(onBehalfOfUser)
+    );
+  }
+
+  public async unloadDelegatedClient() {
+    if (this._delegatedAccount !== undefined) {
+      this._delegatedAccount.close();
+      this._delegatedAccount = null;
+    }
   }
 
   public async setReferralData() {
@@ -642,8 +662,7 @@ export class Client {
 
   public async cancelAllMarketOrders(
     asset: Asset,
-    market: types.MarketIdentifier,
-    onBehalfOfUser: PublicKey = undefined
+    market: types.MarketIdentifier
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
@@ -653,14 +672,10 @@ export class Client {
     let marginAccountAddress = subClient.marginAccountAddress;
     let openOrders = subClient.openOrdersAccounts[index];
 
-    if (onBehalfOfUser != undefined) {
-      let delegatedClient = await Client.load(
-        this.connection,
-        new types.DelegatedWallet(onBehalfOfUser)
-      );
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[index];
-      await delegatedClient.close();
+    if (this._delegatedAccount !== undefined) {
+      marginAccountAddress =
+        this._delegatedAccount.getMarginAccountAddress(asset);
+      openOrders = this._delegatedAccount.getOpenOrdersAccounts(asset)[index];
     }
 
     let ix = instructions.cancelAllMarketOrdersIx(
@@ -1106,6 +1121,10 @@ export class Client {
         this._orderCompleteEventListener
       );
       this._orderCompleteEventListener = undefined;
+    }
+
+    if (this._delegatedAccount !== undefined) {
+      this._delegatedAccount.close();
     }
   }
 }
