@@ -13,6 +13,7 @@ import {
   SystemProgram,
   TransactionMessage,
   VersionedTransaction,
+  AddressLookupTableAccount,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
@@ -690,25 +691,14 @@ export async function processTransaction(
   opts?: ConfirmOptions,
   useLedger: boolean = false,
   useVersioned: boolean = false,
-  lutAddresses?: PublicKey[],
+  lutAccs?: AddressLookupTableAccount[],
   blockhash?: string
 ): Promise<TransactionSignature> {
   let rawTx: Buffer | Uint8Array;
-  let txSig: TransactionSignature;
   if (useVersioned) {
     if (useLedger) {
       throw Error("Ledger does not support versioned transactions");
     }
-
-    let lutAccountArr = lutAddresses
-      ? await Promise.all(
-          lutAddresses.map(async (addr) => {
-            return (
-              await Exchange.provider.connection.getAddressLookupTable(addr)
-            ).value;
-          })
-        )
-      : undefined;
 
     let v0Tx: VersionedTransaction = new VersionedTransaction(
       new TransactionMessage({
@@ -717,7 +707,7 @@ export async function processTransaction(
           blockhash ??
           (await provider.connection.getRecentBlockhash()).blockhash,
         instructions: tx.instructions,
-      }).compileToV0Message(lutAccountArr)
+      }).compileToV0Message(lutAccs)
     );
     v0Tx.sign(
       (signers ?? [])
@@ -729,7 +719,6 @@ export async function processTransaction(
     v0Tx = (await provider.wallet.signTransaction(
       v0Tx
     )) as VersionedTransaction;
-    console.log(v0Tx);
     rawTx = v0Tx.serialize();
   } else {
     tx.recentBlockhash =
