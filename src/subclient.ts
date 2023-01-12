@@ -1572,6 +1572,7 @@ export class SubClient {
     let asset = this._asset;
     let openOrdersAccounts = this._openOrdersAccounts;
     let marginAccountAddress = this.marginAccountAddress;
+    let orders = this._orders;
 
     if (onBehalfOfUser != undefined) {
       let delegatedClient = await Client.load(
@@ -1581,12 +1582,12 @@ export class SubClient {
 
       marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
       openOrdersAccounts = delegatedClient.getOpenOrdersAccounts(asset);
-
+      orders = delegatedClient.getOrders(asset);
       await delegatedClient.close();
     }
 
-    for (var i = 0; i < this._orders.length; i++) {
-      let order = this._orders[i];
+    for (var i = 0; i < orders.length; i++) {
+      let order = orders[i];
       let ix = instructions.cancelOrderIx(
         asset,
         order.marketIndex,
@@ -1612,6 +1613,7 @@ export class SubClient {
     let asset = this._asset;
     let openOrdersAccounts = this._openOrdersAccounts;
     let marginAccountAddress = this.marginAccountAddress;
+    let orders = this._orders;
 
     if (onBehalfOfUser != undefined) {
       let delegatedClient = await Client.load(
@@ -1621,13 +1623,13 @@ export class SubClient {
 
       marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
       openOrdersAccounts = delegatedClient.getOpenOrdersAccounts(asset);
-
+      orders = delegatedClient.getOrders(asset);
       await delegatedClient.close();
     }
 
-    for (var i = 0; i < this._orders.length; i++) {
-      let order = this._orders[i];
-      let ix = instructions.cancelOrderIx(
+    for (var i = 0; i < orders.length; i++) {
+      let order = orders[i];
+      let ix = instructions.cancelOrderNoErrorIx(
         asset,
         order.marketIndex,
         this._parent.publicKey,
