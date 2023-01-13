@@ -1251,6 +1251,7 @@ export async function expireSeries(asset: Asset, expiryTs: anchor.BN) {
       state: Exchange.stateAddress,
       zetaGroup: subExchange.zetaGroupAddress,
       oracle: subExchange.zetaGroup.oracle,
+      oracleBackup: subExchange.zetaGroup.oracleBackup,
       settlementAccount: settlement,
       payer: Exchange.provider.wallet.publicKey,
       systemProgram: SystemProgram.programId,

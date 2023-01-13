@@ -316,6 +316,7 @@ export class Exchange {
   public async initializeZetaGroup(
     asset: Asset,
     oracle: PublicKey,
+    oracleBackup: PublicKey,
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
     perpArgs: instructions.UpdatePerpParametersArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
@@ -326,6 +327,7 @@ export class Exchange {
         asset,
         constants.MINTS[asset],
         oracle,
+        oracleBackup,
         pricingArgs,
         perpArgs,
         marginArgs,

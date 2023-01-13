@@ -36,6 +36,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
@@ -756,6 +761,32 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "updateOracleBackup",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updatePricingParameters",
       "accounts": [
         {
@@ -1018,6 +1049,11 @@ export type Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -1080,6 +1116,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -1287,6 +1328,11 @@ export type Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1373,6 +1419,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -1613,6 +1664,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -2050,6 +2106,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "marketNode",
           "isMut": true,
           "isSigner": false
@@ -2198,6 +2259,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -2356,6 +2422,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -2524,6 +2595,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "marketMint",
           "isMut": true,
           "isSigner": false
@@ -2684,6 +2760,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -2854,6 +2935,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -3475,6 +3561,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "cancelAccounts",
           "accounts": [
             {
@@ -3553,6 +3644,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -3808,6 +3904,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "market",
           "isMut": false,
           "isSigner": false
@@ -3957,6 +4058,11 @@ export type Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         }
@@ -4691,11 +4797,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "oracleBackup",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                998
+                966
               ]
             }
           }
@@ -7293,6 +7403,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
@@ -8013,6 +8128,32 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "updateOracleBackup",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updatePricingParameters",
       "accounts": [
         {
@@ -8275,6 +8416,11 @@ export const IDL: Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -8337,6 +8483,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -8544,6 +8695,11 @@ export const IDL: Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -8630,6 +8786,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -8870,6 +9031,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -9307,6 +9473,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "marketNode",
           "isMut": true,
           "isSigner": false
@@ -9455,6 +9626,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -9613,6 +9789,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -9781,6 +9962,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "marketMint",
           "isMut": true,
           "isSigner": false
@@ -9941,6 +10127,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -10111,6 +10302,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -10732,6 +10928,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "cancelAccounts",
           "accounts": [
             {
@@ -10810,6 +11011,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         },
@@ -11065,6 +11271,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "oracleBackup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "market",
           "isMut": false,
           "isSigner": false
@@ -11214,6 +11425,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackup",
           "isMut": false,
           "isSigner": false
         }
@@ -11948,11 +12164,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "oracleBackup",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                998
+                966
               ]
             }
           }

@@ -585,6 +585,7 @@ export class SubClient {
         this._parent.publicKey,
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
+        subExchange.zetaGroup.oracleBackup,
         types.MovementType.LOCK,
         movements
       )
@@ -1555,6 +1556,7 @@ export class SubClient {
         this._parent.publicKey,
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
+        subExchange.zetaGroup.oracleBackup,
         movementType,
         movements
       )
