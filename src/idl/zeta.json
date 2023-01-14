@@ -36,7 +36,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -761,7 +766,33 @@
       "args": []
     },
     {
-      "name": "updateOracleBackup",
+      "name": "updateOracleBackupFeed",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateOracleBackupProgram",
       "accounts": [
         {
           "name": "state",
@@ -1051,7 +1082,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1120,7 +1156,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1330,7 +1371,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1423,7 +1469,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1668,7 +1719,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2106,7 +2162,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2263,7 +2324,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2426,7 +2492,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2595,7 +2666,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2764,7 +2840,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2939,7 +3020,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3561,7 +3647,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3648,7 +3739,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3904,7 +4000,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -4062,7 +4163,12 @@
           "isSigner": false
         },
         {
-          "name": "oracleBackup",
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -4797,7 +4903,11 @@
             "type": "publicKey"
           },
           {
-            "name": "oracleBackup",
+            "name": "oracleBackupFeed",
+            "type": "publicKey"
+          },
+          {
+            "name": "oracleBackupProgram",
             "type": "publicKey"
           },
           {
@@ -4805,7 +4915,7 @@
             "type": {
               "array": [
                 "u8",
-                966
+                934
               ]
             }
           }

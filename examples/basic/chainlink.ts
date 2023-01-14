@@ -68,6 +68,7 @@ async function main() {
 
   //listen for events agains the price feed, and grab the latest rounds price data
   listener = dataFeed.onRound(feedAddress, (event) => {
+    console.log(event);
     console.log(event.observationsTS, event.answer.toNumber());
   });
 }

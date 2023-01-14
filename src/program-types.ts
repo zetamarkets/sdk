@@ -112,7 +112,8 @@ export interface ZetaGroup {
   newExpiryThresholdSeconds: number;
   perpParameters: PerpParameters;
   perpSyncQueue: PublicKey;
-  oracleBackup: PublicKey;
+  oracleBackupFeed: PublicKey;
+  oracleBackupProgram: PublicKey;
   padding: Array<number>;
 }
 
