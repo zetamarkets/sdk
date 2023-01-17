@@ -679,9 +679,7 @@ export class SubClient {
       undefined,
       options.blockhash
     );
-    // if (this.parent.delegatedAccount == undefined) {
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
-    // }
     return txId;
   }
 
@@ -1424,7 +1422,7 @@ export class SubClient {
    * Instruction builder for cancelAllOrders()
    * Returns a list of instructions cancelling all of this subclient's orders
    */
-  public async cancelAllOrdersIxs(): Promise<TransactionInstruction[]> {
+  public cancelAllOrdersIxs(): TransactionInstruction[] {
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
@@ -1446,7 +1444,7 @@ export class SubClient {
    * Instruction builder for cancelAllOrdersNoError()
    * Returns a list of instructions cancelling all of this subclient's orders
    */
-  public async cancelAllOrdersNoErrorIxs(): Promise<TransactionInstruction[]> {
+  public cancelAllOrdersNoErrorIxs(): TransactionInstruction[] {
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
@@ -1472,7 +1470,7 @@ export class SubClient {
     // on 4 separate markets
     // Compute is fine.
     let txs = utils.splitIxsIntoTx(
-      await this.cancelAllOrdersIxs(),
+      this.cancelAllOrdersIxs(),
       constants.MAX_CANCELS_PER_TX
     );
     let txIds: string[] = [];
@@ -1492,7 +1490,7 @@ export class SubClient {
     // on 4 separate markets
     // Compute is fine.
     let txs = utils.splitIxsIntoTx(
-      await this.cancelAllOrdersNoErrorIxs(),
+      this.cancelAllOrdersNoErrorIxs(),
       constants.MAX_CANCELS_PER_TX
     );
     let txIds: string[] = [];
