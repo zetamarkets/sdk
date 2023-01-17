@@ -267,6 +267,7 @@ export class Client {
   }
 
   public async setReferralData() {
+    this.delegatedCheck();
     try {
       let [referrerAccount] = await utils.getReferrerAccountAddress(
         Exchange.programId,
@@ -305,6 +306,7 @@ export class Client {
   }
 
   public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let [referrerAccount] = await utils.getReferrerAccountAddress(
       Exchange.programId,
       referrer
@@ -483,6 +485,7 @@ export class Client {
     withdrawAsset: assets.Asset,
     depositAsset: assets.Asset
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     await this.usdcAccountCheck();
     let tx = new Transaction();
     let withdrawSubClient = this.getSubClient(withdrawAsset);
@@ -495,7 +498,7 @@ export class Client {
         amount,
         withdrawSubClient.marginAccountAddress,
         this.usdcAccountAddress,
-        this.publicKey
+        this.provider.wallet.publicKey
       )
     );
 
@@ -506,7 +509,7 @@ export class Client {
         instructions.initializeMarginAccountIx(
           depositSubClient.subExchange.zetaGroupAddress,
           depositSubClient.marginAccountAddress,
-          this.publicKey
+          this.provider.wallet.publicKey
         )
       );
     }
@@ -516,7 +519,7 @@ export class Client {
         amount,
         depositSubClient.marginAccountAddress,
         this.usdcAccountAddress,
-        this.publicKey,
+        this.provider.wallet.publicKey,
         this.whitelistDepositAddress
       )
     );
@@ -784,7 +787,7 @@ export class Client {
       let ix = instructions.cancelOrderIx(
         asset,
         marketIndex,
-        this.publicKey,
+        this.provider.wallet.publicKey,
         this.getSubClient(asset).marginAccountAddress,
         this.getSubClient(asset).openOrdersAccounts[marketIndex],
         cancelArguments[i].orderId,
@@ -815,7 +818,7 @@ export class Client {
       let ix = instructions.cancelOrderNoErrorIx(
         asset,
         marketIndex,
-        this.publicKey,
+        this.provider.wallet.publicKey,
         this.getSubClient(asset).marginAccountAddress,
         this.getSubClient(asset).openOrdersAccounts[marketIndex],
         cancelArguments[i].orderId,
@@ -989,6 +992,7 @@ export class Client {
   }
 
   public async initializeReferrerAccount() {
+    this.delegatedCheck();
     let tx = new Transaction().add(
       await instructions.initializeReferrerAccountIx(this.publicKey)
     );
@@ -998,6 +1002,7 @@ export class Client {
   public async initializeReferrerAlias(
     alias: string
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     if (alias.length > 15) {
       throw new Error("Alias cannot be over 15 chars!");
     }
@@ -1032,6 +1037,7 @@ export class Client {
   }
 
   public async claimReferrerRewards(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
       Exchange.programId,
       this.publicKey
@@ -1040,13 +1046,14 @@ export class Client {
       await instructions.claimReferralsRewardsIx(
         referrerAccountAddress,
         this._usdcAccountAddress,
-        this.publicKey
+        this.provider.wallet.publicKey
       )
     );
     return await utils.processTransaction(this._provider, tx);
   }
 
   public async claimReferralRewards(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let [referralAccountAddress] = await utils.getReferralAccountAddress(
       Exchange.programId,
       this.publicKey
@@ -1055,7 +1062,7 @@ export class Client {
       await instructions.claimReferralsRewardsIx(
         referralAccountAddress,
         this._usdcAccountAddress,
-        this.publicKey
+        this.provider.wallet.publicKey
       )
     );
     return await utils.processTransaction(this._provider, tx);
@@ -1086,6 +1093,14 @@ export class Client {
         this._orderCompleteEventListener
       );
       this._orderCompleteEventListener = undefined;
+    }
+  }
+
+  private delegatedCheck() {
+    if (this.delegatorKey) {
+      throw Error(
+        "Function not supported by delegated client. Please load without 'delegator' argument"
+      );
     }
   }
 }
