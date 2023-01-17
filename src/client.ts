@@ -148,13 +148,13 @@ export class Client {
     opts: ConfirmOptions = utils.defaultCommitment(),
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false,
-    onBehalfOfUser: PublicKey = undefined
+    delegator: PublicKey = undefined
   ): Promise<Client> {
     let client = new Client(connection, wallet, opts);
 
-    if (onBehalfOfUser != undefined) {
-      wallet = new types.DelegatedWallet(onBehalfOfUser);
-      client._delegatedKey = onBehalfOfUser;
+    if (delegator != undefined) {
+      wallet = new types.DelegatedWallet(delegator);
+      client._delegatedKey = delegator;
     }
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
