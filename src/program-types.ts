@@ -113,7 +113,6 @@ export interface ZetaGroup {
   perpParameters: PerpParameters;
   perpSyncQueue: PublicKey;
   oracleBackupFeed: PublicKey;
-  oracleBackupProgram: PublicKey;
   padding: Array<number>;
 }
 

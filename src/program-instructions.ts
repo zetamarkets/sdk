@@ -187,7 +187,7 @@ export function withdrawIx(
       greeks: subExchange.zetaGroup.greeks,
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+      oracleBackupProgram: constants.CHAINLINK_PID,
       socializedLossAccount: subExchange.socializedLossAccountAddress,
     },
   });
@@ -326,7 +326,7 @@ export function placeOrderV3Ix(
         },
         oracle: subExchange.zetaGroup.oracle,
         oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-        oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+        oracleBackupProgram: constants.CHAINLINK_PID,
         marketNode: subExchange.greeks.nodeKeys[marketIndex],
         marketMint:
           side == types.Side.BID
@@ -409,7 +409,7 @@ export function placeOrderV4Ix(
         },
         oracle: subExchange.zetaGroup.oracle,
         oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-        oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+        oracleBackupProgram: constants.CHAINLINK_PID,
         marketNode: subExchange.greeks.nodeKeys[marketIndex],
         marketMint:
           side == types.Side.BID
@@ -490,7 +490,7 @@ export function placePerpOrderIx(
         },
         oracle: subExchange.zetaGroup.oracle,
         oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-        oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+        oracleBackupProgram: constants.CHAINLINK_PID,
         marketMint:
           side == types.Side.BID
             ? marketData.serumMarket.quoteMintAddress
@@ -573,7 +573,7 @@ export function placePerpOrderV2Ix(
         },
         oracle: subExchange.zetaGroup.oracle,
         oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-        oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+        oracleBackupProgram: constants.CHAINLINK_PID,
         marketMint:
           side == types.Side.BID
             ? marketData.serumMarket.quoteMintAddress
@@ -814,7 +814,7 @@ export function forceCancelOrderByOrderIdIx(
         greeks: subExchange.zetaGroup.greeks,
         oracle: subExchange.zetaGroup.oracle,
         oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-        oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+        oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
           zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
@@ -845,7 +845,7 @@ export function forceCancelOrdersIx(
       greeks: subExchange.zetaGroup.greeks,
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+      oracleBackupProgram: constants.CHAINLINK_PID,
       cancelAccounts: {
         zetaGroup: subExchange.zetaGroupAddress,
         state: Exchange.stateAddress,
@@ -1234,7 +1234,7 @@ export function liquidateIx(
       greeks: subExchange.zetaGroup.greeks,
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+      oracleBackupProgram: constants.CHAINLINK_PID,
       market,
       zetaGroup: subExchange.zetaGroupAddress,
       liquidatedMarginAccount,
@@ -1309,7 +1309,7 @@ export function retreatMarketNodesIx(
       greeks: subExchange.greeksAddress,
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+      oracleBackupProgram: constants.CHAINLINK_PID,
     },
     remainingAccounts,
   });
@@ -1328,7 +1328,7 @@ export function updatePricingIx(
       greeks: subExchange.greeksAddress,
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+      oracleBackupProgram: constants.CHAINLINK_PID,
       perpMarket: marketData.address,
       perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
       perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
@@ -1533,7 +1533,7 @@ export function initializeMarketStrikesIx(
       zetaGroup: subExchange.zetaGroupAddress,
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: subExchange.zetaGroup.oracleBackupProgram,
+      oracleBackupProgram: constants.CHAINLINK_PID,
     },
   });
 }

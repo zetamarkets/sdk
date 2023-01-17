@@ -586,7 +586,7 @@ export class SubClient {
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
         subExchange.zetaGroup.oracleBackupFeed,
-        subExchange.zetaGroup.oracleBackupProgram,
+        constants.CHAINLINK_PID,
         types.MovementType.LOCK,
         movements
       )
@@ -1558,7 +1558,7 @@ export class SubClient {
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
         subExchange.zetaGroup.oracleBackupFeed,
-        subExchange.zetaGroup.oracleBackupProgram,
+        constants.CHAINLINK_PID,
         movementType,
         movements
       )

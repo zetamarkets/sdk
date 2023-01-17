@@ -792,32 +792,6 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateOracleBackupProgram",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "updatePricingParameters",
       "accounts": [
         {
@@ -4907,15 +4881,11 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "oracleBackupProgram",
-            "type": "publicKey"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                934
+                966
               ]
             }
           }
@@ -8269,32 +8239,6 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateOracleBackupProgram",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "updatePricingParameters",
       "accounts": [
         {
@@ -12384,15 +12328,11 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "oracleBackupProgram",
-            "type": "publicKey"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                934
+                966
               ]
             }
           }
