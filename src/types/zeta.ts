@@ -6354,6 +6354,23 @@ export type Zeta = {
           }
         ]
       }
+    },
+    {
+      "name": "ValidationType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Place"
+          },
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "OpenOrders"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -7296,6 +7313,11 @@ export type Zeta = {
       "code": 6129,
       "name": "InvalidPlaceOrderAuthority",
       "msg": "Invalid place order authority"
+    },
+    {
+      "code": 6130,
+      "name": "InvalidOpenOrdersAuthority",
+      "msg": "Invalid open orders authority"
     }
   ]
 };
@@ -13656,6 +13678,23 @@ export const IDL: Zeta = {
           }
         ]
       }
+    },
+    {
+      "name": "ValidationType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Place"
+          },
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "OpenOrders"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -14598,6 +14637,11 @@ export const IDL: Zeta = {
       "code": 6129,
       "name": "InvalidPlaceOrderAuthority",
       "msg": "Invalid place order authority"
+    },
+    {
+      "code": 6130,
+      "name": "InvalidOpenOrdersAuthority",
+      "msg": "Invalid open orders authority"
     }
   ]
 };

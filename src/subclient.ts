@@ -531,6 +531,7 @@ export class SubClient {
         this.asset,
         market,
         this._parent.publicKey,
+        this._parent.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -622,47 +623,26 @@ export class SubClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
-    let asset = this._asset;
-    let marginAccountAddress = this.marginAccountAddress;
-    let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
-    let openOrders = null;
 
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount.getSubClient(asset);
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `[${assetToName(
+          this.asset
+        )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
 
-      openOrders = delegatedClient._openOrdersAccounts[marketIndex];
-      if (openOrders.equals(PublicKey.default)) {
-        console.log(
-          `[${assetToName(
-            asset
-          )}] Delegated user doesn't have open orders account. Please make one and retry. Returning...`
-        );
-        return null;
-      }
-
-      whitelistTradingFeesAddress =
-        this.parent.delegatedAccount.whitelistTradingFeesAddress;
-      marginAccountAddress = delegatedClient.marginAccountAddress;
+      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+        this.asset,
+        market,
+        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
     } else {
-      if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-        console.log(
-          `[${assetToName(
-            this.asset
-          )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
-        );
-
-        let [initIx, _openOrdersPda] =
-          await instructions.initializeOpenOrdersIx(
-            this.asset,
-            market,
-            this._parent.publicKey,
-            this.marginAccountAddress
-          );
-        openOrders = _openOrdersPda;
-        tx.add(initIx);
-      } else {
-        openOrders = this._openOrdersAccounts[marketIndex];
-      }
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
@@ -682,10 +662,10 @@ export class SubClient {
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
-      marginAccountAddress,
-      this._parent.publicKey,
-      openOrders,
-      whitelistTradingFeesAddress
+      this.marginAccountAddress,
+      this._parent.provider.wallet.publicKey,
+      openOrdersPda,
+      this._parent.whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
@@ -699,9 +679,9 @@ export class SubClient {
       undefined,
       options.blockhash
     );
-    if (this.parent.delegatedAccount == undefined) {
-      this._openOrdersAccounts[marketIndex] = openOrders;
-    }
+    // if (this.parent.delegatedAccount == undefined) {
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
+    // }
     return txId;
   }
 
@@ -725,51 +705,29 @@ export class SubClient {
     side: types.Side,
     options: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    let marketIndex = constants.PERP_INDEX;
-    let asset = this._asset;
-    let marginAccountAddress = this.marginAccountAddress;
-    let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
-    let openOrders = null;
-
     let tx = new Transaction();
-    let market = Exchange.getPerpMarket(asset).address;
+    let market = Exchange.getPerpMarket(this._asset).address;
+    let marketIndex = constants.PERP_INDEX;
 
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount.getSubClient(asset);
+    let openOrdersPda = null;
+    if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
+      console.log(
+        `[${assetToName(
+          this.asset
+        )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
+      );
 
-      openOrders = delegatedClient._openOrdersAccounts[marketIndex];
-      if (openOrders.equals(PublicKey.default)) {
-        console.log(
-          `[${assetToName(
-            asset
-          )}] Delegated user doesn't have open orders account. Please make one and retry. Returning...`
-        );
-        return null;
-      }
-
-      whitelistTradingFeesAddress =
-        this.parent.delegatedAccount.whitelistTradingFeesAddress;
-      marginAccountAddress = delegatedClient.marginAccountAddress;
+      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+        this.asset,
+        market,
+        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
+        this.marginAccountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
     } else {
-      if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
-        console.log(
-          `[${assetToName(
-            asset
-          )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
-        );
-
-        let [initIx, _openOrdersPda] =
-          await instructions.initializeOpenOrdersIx(
-            asset,
-            market,
-            this._parent.publicKey,
-            marginAccountAddress
-          );
-        openOrders = _openOrdersPda;
-        tx.add(initIx);
-      } else {
-        openOrders = this._openOrdersAccounts[marketIndex];
-      }
+      openOrdersPda = this._openOrdersAccounts[marketIndex];
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
@@ -778,7 +736,7 @@ export class SubClient {
     );
 
     let orderIx = instructions.placePerpOrderV2Ix(
-      asset,
+      this.asset,
       marketIndex,
       price,
       size,
@@ -789,10 +747,10 @@ export class SubClient {
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
-      marginAccountAddress,
-      this._parent.publicKey,
-      openOrders,
-      whitelistTradingFeesAddress
+      this.marginAccountAddress,
+      this._parent.provider.wallet.publicKey,
+      openOrdersPda,
+      this._parent.whitelistTradingFeesAddress
     );
 
     tx.add(orderIx);
@@ -806,10 +764,7 @@ export class SubClient {
       undefined,
       options.blockhash
     );
-
-    if (this.parent.delegatedAccount == undefined) {
-      this._openOrdersAccounts[marketIndex] = openOrders;
-    }
+    this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
   }
 
@@ -948,22 +903,13 @@ export class SubClient {
     side: types.Side
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
-    let asset = this._asset;
     let index = this._subExchange.markets.getMarketIndex(market);
-    let marginAccountAddress = this.marginAccountAddress;
-    let openOrders = this._openOrdersAccounts[index];
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount;
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[index];
-    }
-
     let ix = instructions.cancelOrderIx(
-      asset,
+      this.asset,
       index,
-      this._parent.publicKey,
-      marginAccountAddress,
-      openOrders,
+      this._parent.provider.wallet.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[index],
       orderId,
       side
     );
@@ -986,22 +932,12 @@ export class SubClient {
     }
     let tx = new Transaction();
     let index = this._subExchange.markets.getMarketIndex(market);
-    let asset = this._asset;
-    let marginAccountAddress = this.marginAccountAddress;
-    let openOrders = this._openOrdersAccounts[index];
-
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount;
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[index];
-    }
-
     let ix = instructions.cancelOrderByClientOrderIdIx(
       this.asset,
       index,
-      this._parent.publicKey,
-      marginAccountAddress,
-      openOrders,
+      this._parent.provider.wallet.publicKey,
+      this._marginAccountAddress,
+      this._openOrdersAccounts[index],
       new anchor.BN(clientOrderId)
     );
     tx.add(ix);
@@ -1031,25 +967,13 @@ export class SubClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
-    let asset = this._asset;
-    let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
-    let marginAccountAddress = this.marginAccountAddress;
-    let openOrders = this._openOrdersAccounts[marketIndex];
-
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount;
-      whitelistTradingFeesAddress = delegatedClient.whitelistTradingFeesAddress;
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[marketIndex];
-    }
-
     tx.add(
       instructions.cancelOrderIx(
         this.asset,
         marketIndex,
-        this._parent.publicKey,
-        marginAccountAddress,
-        openOrders,
+        this._parent.provider.wallet.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
         orderId,
         cancelSide
       )
@@ -1074,10 +998,10 @@ export class SubClient {
           options.clientOrderId != undefined ? options.clientOrderId : 0,
           options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
-          marginAccountAddress,
-          this._parent.publicKey,
-          openOrders,
-          whitelistTradingFeesAddress
+          this.marginAccountAddress,
+          this._parent.provider.wallet.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
         )
       );
     } else {
@@ -1094,10 +1018,10 @@ export class SubClient {
           options.clientOrderId != undefined ? options.clientOrderId : 0,
           options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
-          marginAccountAddress,
-          this._parent.publicKey,
-          openOrders,
-          whitelistTradingFeesAddress
+          this.marginAccountAddress,
+          this._parent.provider.wallet.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
         )
       );
     }
@@ -1125,26 +1049,13 @@ export class SubClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
-
-    let asset = this._asset;
-    let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
-    let marginAccountAddress = this.marginAccountAddress;
-    let openOrders = this._openOrdersAccounts[marketIndex];
-
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount;
-      whitelistTradingFeesAddress = delegatedClient.whitelistTradingFeesAddress;
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[marketIndex];
-    }
-
     tx.add(
       instructions.cancelOrderByClientOrderIdIx(
         this.asset,
         marketIndex,
-        this._parent.publicKey,
-        marginAccountAddress,
-        openOrders,
+        this._parent.provider.wallet.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
       )
     );
@@ -1170,10 +1081,10 @@ export class SubClient {
             ? newOptions.tag
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
-          marginAccountAddress,
-          this._parent.publicKey,
-          openOrders,
-          whitelistTradingFeesAddress
+          this.marginAccountAddress,
+          this._parent.provider.wallet.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
         )
       );
     } else {
@@ -1192,10 +1103,10 @@ export class SubClient {
             ? newOptions.tag
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
-          marginAccountAddress,
-          this._parent.publicKey,
-          openOrders,
-          whitelistTradingFeesAddress
+          this.marginAccountAddress,
+          this._parent.provider.wallet.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
         )
       );
     }
@@ -1224,26 +1135,13 @@ export class SubClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
-
-    let asset = this._asset;
-    let whitelistTradingFeesAddress = this._parent.whitelistTradingFeesAddress;
-    let marginAccountAddress = this.marginAccountAddress;
-    let openOrders = this._openOrdersAccounts[marketIndex];
-
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount;
-      whitelistTradingFeesAddress = delegatedClient.whitelistTradingFeesAddress;
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrders = delegatedClient.getOpenOrdersAccounts(asset)[marketIndex];
-    }
-
     tx.add(
       instructions.cancelOrderByClientOrderIdNoErrorIx(
         this.asset,
         marketIndex,
-        this._parent.publicKey,
-        marginAccountAddress,
-        openOrders,
+        this._parent.provider.wallet.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
       )
     );
@@ -1269,10 +1167,10 @@ export class SubClient {
             ? newOptions.tag
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
-          marginAccountAddress,
-          this._parent.publicKey,
-          openOrders,
-          whitelistTradingFeesAddress
+          this.marginAccountAddress,
+          this._parent.provider.wallet.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
         )
       );
     } else {
@@ -1291,10 +1189,10 @@ export class SubClient {
             ? newOptions.tag
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
-          marginAccountAddress,
-          this._parent.publicKey,
-          openOrders,
-          whitelistTradingFeesAddress
+          this.marginAccountAddress,
+          this._parent.provider.wallet.publicKey,
+          this._openOrdersAccounts[marketIndex],
+          this._parent.whitelistTradingFeesAddress
         )
       );
     }
@@ -1317,6 +1215,7 @@ export class SubClient {
       this.asset,
       market,
       this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this.marginAccountAddress
     );
 
@@ -1527,26 +1426,14 @@ export class SubClient {
    */
   public async cancelAllOrdersIxs(): Promise<TransactionInstruction[]> {
     let ixs = [];
-    let asset = this._asset;
-    let openOrdersAccounts = this._openOrdersAccounts;
-    let marginAccountAddress = this.marginAccountAddress;
-    let orders = this._orders;
-
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount;
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrdersAccounts = delegatedClient.getOpenOrdersAccounts(asset);
-      orders = delegatedClient.getOrders(asset);
-    }
-
-    for (var i = 0; i < orders.length; i++) {
-      let order = orders[i];
+    for (var i = 0; i < this._orders.length; i++) {
+      let order = this._orders[i];
       let ix = instructions.cancelOrderIx(
-        asset,
+        this.asset,
         order.marketIndex,
-        this._parent.publicKey,
-        marginAccountAddress,
-        openOrdersAccounts[order.marketIndex],
+        this._parent.provider.wallet.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[order.marketIndex],
         order.orderId,
         order.side
       );
@@ -1561,26 +1448,14 @@ export class SubClient {
    */
   public async cancelAllOrdersNoErrorIxs(): Promise<TransactionInstruction[]> {
     let ixs = [];
-    let asset = this._asset;
-    let openOrdersAccounts = this._openOrdersAccounts;
-    let marginAccountAddress = this.marginAccountAddress;
-    let orders = this._orders;
-
-    if (this.parent.delegatedAccount != undefined) {
-      let delegatedClient = this.parent.delegatedAccount;
-      marginAccountAddress = delegatedClient.getMarginAccountAddress(asset);
-      openOrdersAccounts = delegatedClient.getOpenOrdersAccounts(asset);
-      orders = delegatedClient.getOrders(asset);
-    }
-
-    for (var i = 0; i < orders.length; i++) {
-      let order = orders[i];
+    for (var i = 0; i < this._orders.length; i++) {
+      let order = this._orders[i];
       let ix = instructions.cancelOrderNoErrorIx(
-        asset,
+        this.asset,
         order.marketIndex,
-        this._parent.publicKey,
-        marginAccountAddress,
-        openOrdersAccounts[order.marketIndex],
+        this._parent.provider.wallet.publicKey,
+        this._marginAccountAddress,
+        this._openOrdersAccounts[order.marketIndex],
         order.orderId,
         order.side
       );

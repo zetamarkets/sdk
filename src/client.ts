@@ -69,6 +69,9 @@ export class Client {
    * Client margin account address.
    */
   public get publicKey(): PublicKey {
+    if (this._delegatedKey != undefined) {
+      return this._delegatedKey;
+    }
     return this.provider.wallet.publicKey;
   }
 
@@ -120,10 +123,10 @@ export class Client {
     return this._subClients;
   }
 
-  public get delegatedAccount(): Client {
-    return this._delegatedAccount;
+  public get delegatedKey(): PublicKey {
+    return this._delegatedKey;
   }
-  private _delegatedAccount: Client;
+  public _delegatedKey: PublicKey = undefined;
 
   private constructor(
     connection: Connection,
@@ -148,6 +151,11 @@ export class Client {
     onBehalfOfUser: PublicKey = undefined
   ): Promise<Client> {
     let client = new Client(connection, wallet, opts);
+
+    if (onBehalfOfUser != undefined) {
+      wallet = new types.DelegatedWallet(onBehalfOfUser);
+      client._delegatedKey = onBehalfOfUser;
+    }
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
@@ -236,20 +244,11 @@ export class Client {
       );
     }
 
-    if (onBehalfOfUser !== undefined) {
-      await client.loadDelegatedClient(onBehalfOfUser);
-    }
-
     await Promise.all(
       client.getAllSubClients().map(async (subclient) => {
         await subclient.updateState();
       })
     );
-    if (onBehalfOfUser !== undefined) {
-      client.delegatedAccount.getAllSubClients().map(async (subclient) => {
-        await subclient.updateState();
-      });
-    }
 
     return client;
   }
@@ -265,21 +264,6 @@ export class Client {
   public getAllSubClients(): SubClient[] {
     return [...this._subClients.values()];
     // This is referring itself by another referrer.
-  }
-
-  public async loadDelegatedClient(onBehalfOfUser: PublicKey) {
-    await this.unloadDelegatedClient();
-    this._delegatedAccount = await Client.load(
-      this.connection,
-      new types.DelegatedWallet(onBehalfOfUser)
-    );
-  }
-
-  public async unloadDelegatedClient() {
-    if (this._delegatedAccount !== undefined) {
-      this._delegatedAccount.close();
-      this._delegatedAccount = null;
-    }
   }
 
   public async setReferralData() {
@@ -669,22 +653,12 @@ export class Client {
     let index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
       this.marketIdentifierToPublicKey(asset, market)
     );
-    let subClient = this.getSubClient(asset);
-    let marginAccountAddress = subClient.marginAccountAddress;
-    let openOrders = subClient.openOrdersAccounts[index];
-
-    if (this._delegatedAccount !== undefined) {
-      marginAccountAddress =
-        this._delegatedAccount.getMarginAccountAddress(asset);
-      openOrders = this._delegatedAccount.getOpenOrdersAccounts(asset)[index];
-    }
-
     let ix = instructions.cancelAllMarketOrdersIx(
       asset,
       index,
-      this.publicKey,
-      marginAccountAddress,
-      openOrders
+      this.provider.wallet.publicKey,
+      this.getSubClient(asset).marginAccountAddress,
+      this.getSubClient(asset).openOrdersAccounts[index]
     );
     tx.add(ix);
     return await utils.processTransaction(this.provider, tx);
@@ -1112,10 +1086,6 @@ export class Client {
         this._orderCompleteEventListener
       );
       this._orderCompleteEventListener = undefined;
-    }
-
-    if (this._delegatedAccount !== undefined) {
-      this._delegatedAccount.close();
     }
   }
 }
