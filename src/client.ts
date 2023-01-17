@@ -69,8 +69,8 @@ export class Client {
    * Client margin account address.
    */
   public get publicKey(): PublicKey {
-    if (this._delegatedKey != undefined) {
-      return this._delegatedKey;
+    if (this._delegatorKey != undefined) {
+      return this._delegatorKey;
     }
     return this.provider.wallet.publicKey;
   }
@@ -123,10 +123,10 @@ export class Client {
     return this._subClients;
   }
 
-  public get delegatedKey(): PublicKey {
-    return this._delegatedKey;
+  public get delegatorKey(): PublicKey {
+    return this._delegatorKey;
   }
-  public _delegatedKey: PublicKey = undefined;
+  public _delegatorKey: PublicKey = undefined;
 
   private constructor(
     connection: Connection,
@@ -154,7 +154,7 @@ export class Client {
 
     if (delegator != undefined) {
       wallet = new types.DelegatedWallet(delegator);
-      client._delegatedKey = delegator;
+      client._delegatorKey = delegator;
     }
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
