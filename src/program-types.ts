@@ -166,6 +166,7 @@ export interface MarginAccount {
   asset: any;
   accountType: any;
   lastFundingDelta: AnchorDecimal;
+  delegatedPubkey: PublicKey;
   padding: Array<number>;
 }
 

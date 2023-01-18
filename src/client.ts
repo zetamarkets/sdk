@@ -152,21 +152,21 @@ export class Client {
   ): Promise<Client> {
     let client = new Client(connection, wallet, opts);
 
-    let user = wallet.publicKey;
+    let owner = wallet.publicKey;
     if (delegator != undefined) {
-      user = delegator;
+      owner = delegator;
       client._delegatorKey = delegator;
     }
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
-      user
+      owner
     );
 
     client._whitelistDepositAddress = undefined;
     try {
       let [whitelistDepositAddress, _whitelistTradingFeesNonce] =
-        await utils.getUserWhitelistDepositAccount(Exchange.programId, user);
+        await utils.getUserWhitelistDepositAccount(Exchange.programId, owner);
       await Exchange.program.account.whitelistDepositAccount.fetch(
         whitelistDepositAddress
       );
@@ -179,7 +179,7 @@ export class Client {
       let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
         await utils.getUserWhitelistTradingFeesAccount(
           Exchange.programId,
-          user
+          owner
         );
       await Exchange.program.account.whitelistTradingFeesAccount.fetch(
         whitelistTradingFeesAddress
@@ -194,7 +194,7 @@ export class Client {
           asset,
           client,
           connection,
-          user,
+          owner,
           callback,
           throttle
         );
