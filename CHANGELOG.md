@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [0.19.4] 2023-01-18
+
+- general: Add delegated account functionality to program and SDK. ([#187](https://github.com/zetamarkets/sdk/pull/187))
+
 ## [0.19.3] 2023-01-09
 
 - client: add perp functionality to all cancel+place functions in subclient. ([#186](https://github.com/zetamarkets/sdk/pull/186))
