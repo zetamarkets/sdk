@@ -32,26 +32,6 @@ export class DummyWallet implements Wallet {
   }
 }
 
-export class DelegatedWallet implements Wallet {
-  constructor(delegatedPublicKey: PublicKey) {
-    this._delegatedPublicKey = delegatedPublicKey;
-  }
-
-  async signTransaction(_tx: Transaction): Promise<Transaction> {
-    throw Error("Not supported by delegated wallet!");
-  }
-
-  async signAllTransactions(_txs: Transaction[]): Promise<Transaction[]> {
-    throw Error("Not supported by delegated wallet!");
-  }
-
-  get publicKey(): PublicKey {
-    return this._delegatedPublicKey;
-  }
-
-  public _delegatedPublicKey: PublicKey;
-}
-
 export enum OrderType {
   LIMIT,
   POSTONLY,

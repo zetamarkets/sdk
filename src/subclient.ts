@@ -191,7 +191,7 @@ export class SubClient {
     asset: Asset,
     parent: Client,
     connection: Connection,
-    wallet: types.Wallet,
+    user: PublicKey,
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false
   ): Promise<SubClient> {
@@ -200,14 +200,14 @@ export class SubClient {
       await utils.getMarginAccount(
         Exchange.programId,
         subClient._subExchange.zetaGroupAddress,
-        wallet.publicKey
+        user
       );
 
     let [spreadAccountAddress, _spreadAccountNonce] =
       await utils.getSpreadAccount(
         Exchange.programId,
         subClient._subExchange.zetaGroupAddress,
-        wallet.publicKey
+        user
       );
 
     subClient._marginAccountAddress = marginAccountAddress;
