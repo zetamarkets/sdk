@@ -1228,7 +1228,7 @@ export async function pruneExpiredTIFOrders(
     return instructions.pruneExpiredTIFOrdersIx(asset, i);
   });
 
-  let txs = splitIxsIntoTx(ixs, 10);
+  let txs = splitIxsIntoTx(ixs, 5);
 
   await Promise.all(
     txs.map(async (tx) => {

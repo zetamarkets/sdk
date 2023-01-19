@@ -69,6 +69,9 @@ export class Client {
    * Client margin account address.
    */
   public get publicKey(): PublicKey {
+    if (this._delegatorKey != undefined) {
+      return this._delegatorKey;
+    }
     return this.provider.wallet.publicKey;
   }
 
@@ -120,6 +123,11 @@ export class Client {
     return this._subClients;
   }
 
+  public get delegatorKey(): PublicKey {
+    return this._delegatorKey;
+  }
+  public _delegatorKey: PublicKey = undefined;
+
   private constructor(
     connection: Connection,
     wallet: types.Wallet,
@@ -139,22 +147,26 @@ export class Client {
     wallet: types.Wallet,
     opts: ConfirmOptions = utils.defaultCommitment(),
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
-    throttle: boolean = false
+    throttle: boolean = false,
+    delegator: PublicKey = undefined
   ): Promise<Client> {
     let client = new Client(connection, wallet, opts);
 
+    let owner = wallet.publicKey;
+    if (delegator != undefined) {
+      owner = delegator;
+      client._delegatorKey = delegator;
+    }
+
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
-      wallet.publicKey
+      owner
     );
 
     client._whitelistDepositAddress = undefined;
     try {
       let [whitelistDepositAddress, _whitelistTradingFeesNonce] =
-        await utils.getUserWhitelistDepositAccount(
-          Exchange.programId,
-          wallet.publicKey
-        );
+        await utils.getUserWhitelistDepositAccount(Exchange.programId, owner);
       await Exchange.program.account.whitelistDepositAccount.fetch(
         whitelistDepositAddress
       );
@@ -167,7 +179,7 @@ export class Client {
       let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
         await utils.getUserWhitelistTradingFeesAccount(
           Exchange.programId,
-          wallet.publicKey
+          owner
         );
       await Exchange.program.account.whitelistTradingFeesAccount.fetch(
         whitelistTradingFeesAddress
@@ -182,7 +194,7 @@ export class Client {
           asset,
           client,
           connection,
-          wallet,
+          owner,
           callback,
           throttle
         );
@@ -253,6 +265,7 @@ export class Client {
   }
 
   public async setReferralData() {
+    this.delegatedCheck();
     try {
       let [referrerAccount] = await utils.getReferrerAccountAddress(
         Exchange.programId,
@@ -291,6 +304,7 @@ export class Client {
   }
 
   public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let [referrerAccount] = await utils.getReferrerAccountAddress(
       Exchange.programId,
       referrer
@@ -457,11 +471,19 @@ export class Client {
     );
   }
 
+  public async editDelegatedPubkey(
+    asset: Asset,
+    delegatedPubkey: PublicKey
+  ): Promise<TransactionSignature> {
+    return await this.getSubClient(asset).editDelegatedPubkey(delegatedPubkey);
+  }
+
   public async migrateFunds(
     amount: number,
     withdrawAsset: assets.Asset,
     depositAsset: assets.Asset
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     await this.usdcAccountCheck();
     let tx = new Transaction();
     let withdrawSubClient = this.getSubClient(withdrawAsset);
@@ -474,7 +496,7 @@ export class Client {
         amount,
         withdrawSubClient.marginAccountAddress,
         this.usdcAccountAddress,
-        this.publicKey
+        this.provider.wallet.publicKey
       )
     );
 
@@ -485,7 +507,7 @@ export class Client {
         instructions.initializeMarginAccountIx(
           depositSubClient.subExchange.zetaGroupAddress,
           depositSubClient.marginAccountAddress,
-          this.publicKey
+          this.provider.wallet.publicKey
         )
       );
     }
@@ -495,7 +517,7 @@ export class Client {
         amount,
         depositSubClient.marginAccountAddress,
         this.usdcAccountAddress,
-        this.publicKey,
+        this.provider.wallet.publicKey,
         this.whitelistDepositAddress
       )
     );
@@ -635,7 +657,7 @@ export class Client {
     let ix = instructions.cancelAllMarketOrdersIx(
       asset,
       index,
-      this.publicKey,
+      this.provider.wallet.publicKey,
       this.getSubClient(asset).marginAccountAddress,
       this.getSubClient(asset).openOrdersAccounts[index]
     );
@@ -763,7 +785,7 @@ export class Client {
       let ix = instructions.cancelOrderIx(
         asset,
         marketIndex,
-        this.publicKey,
+        this.provider.wallet.publicKey,
         this.getSubClient(asset).marginAccountAddress,
         this.getSubClient(asset).openOrdersAccounts[marketIndex],
         cancelArguments[i].orderId,
@@ -794,7 +816,7 @@ export class Client {
       let ix = instructions.cancelOrderNoErrorIx(
         asset,
         marketIndex,
-        this.publicKey,
+        this.provider.wallet.publicKey,
         this.getSubClient(asset).marginAccountAddress,
         this.getSubClient(asset).openOrdersAccounts[marketIndex],
         cancelArguments[i].orderId,
@@ -959,7 +981,16 @@ export class Client {
     return this.getSubClient(asset).marginAccountAddress;
   }
 
+  public getMarginAccountAddresses(): PublicKey[] {
+    let addresses = [];
+    for (var asset of Exchange.assets) {
+      addresses.push(this.getSubClient(asset).marginAccountAddress);
+    }
+    return addresses;
+  }
+
   public async initializeReferrerAccount() {
+    this.delegatedCheck();
     let tx = new Transaction().add(
       await instructions.initializeReferrerAccountIx(this.publicKey)
     );
@@ -969,6 +1000,7 @@ export class Client {
   public async initializeReferrerAlias(
     alias: string
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     if (alias.length > 15) {
       throw new Error("Alias cannot be over 15 chars!");
     }
@@ -1003,6 +1035,7 @@ export class Client {
   }
 
   public async claimReferrerRewards(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
       Exchange.programId,
       this.publicKey
@@ -1011,13 +1044,14 @@ export class Client {
       await instructions.claimReferralsRewardsIx(
         referrerAccountAddress,
         this._usdcAccountAddress,
-        this.publicKey
+        this.provider.wallet.publicKey
       )
     );
     return await utils.processTransaction(this._provider, tx);
   }
 
   public async claimReferralRewards(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let [referralAccountAddress] = await utils.getReferralAccountAddress(
       Exchange.programId,
       this.publicKey
@@ -1026,7 +1060,7 @@ export class Client {
       await instructions.claimReferralsRewardsIx(
         referralAccountAddress,
         this._usdcAccountAddress,
-        this.publicKey
+        this.provider.wallet.publicKey
       )
     );
     return await utils.processTransaction(this._provider, tx);
@@ -1057,6 +1091,14 @@ export class Client {
         this._orderCompleteEventListener
       );
       this._orderCompleteEventListener = undefined;
+    }
+  }
+
+  private delegatedCheck() {
+    if (this.delegatorKey) {
+      throw Error(
+        "Function not supported by delegated client. Please load without 'delegator' argument"
+      );
     }
   }
 }
