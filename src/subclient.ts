@@ -777,6 +777,7 @@ export class SubClient {
   public async editDelegatedPubkey(
     delegatedPubkey: PublicKey
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let tx = new Transaction();
 
     tx.add(
@@ -784,7 +785,7 @@ export class SubClient {
         this._asset,
         delegatedPubkey,
         this.marginAccountAddress,
-        this._parent.publicKey
+        this._parent.provider.wallet.publicKey
       )
     );
 
