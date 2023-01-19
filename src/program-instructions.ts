@@ -195,6 +195,7 @@ export async function initializeOpenOrdersIx(
   asset: Asset,
   market: PublicKey,
   userKey: PublicKey,
+  authority: PublicKey,
   marginAccount: PublicKey
 ): Promise<[TransactionInstruction, PublicKey]> {
   const [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
@@ -217,8 +218,8 @@ export async function initializeOpenOrdersIx(
         systemProgram: SystemProgram.programId,
         openOrders: openOrdersPda,
         marginAccount: marginAccount,
-        authority: userKey,
-        payer: userKey,
+        authority: authority,
+        payer: authority,
         market: market,
         rent: SYSVAR_RENT_PUBKEY,
         serumAuthority: Exchange.serumAuthority,
@@ -2234,6 +2235,23 @@ export async function toggleMarketMakerIx(
       state: Exchange.stateAddress,
       admin: Exchange.state.admin,
       marginAccount,
+    },
+  });
+}
+
+export function editDelegatedPubkeyIx(
+  asset: Asset,
+  delegatedPubkey: PublicKey,
+  marginAccount: PublicKey,
+  authority: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.editDelegatedPubkey(delegatedPubkey, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      marginAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      authority,
     },
   });
 }

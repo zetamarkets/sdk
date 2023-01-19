@@ -4168,6 +4168,42 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "editDelegatedPubkey",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newKey",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -4895,11 +4931,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                370
+                338
               ]
             }
           }
@@ -6314,6 +6354,23 @@ export type Zeta = {
           }
         ]
       }
+    },
+    {
+      "name": "ValidationType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Place"
+          },
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "OpenOrders"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -7251,6 +7308,16 @@ export type Zeta = {
       "code": 6128,
       "name": "ForceCancelExpiredTIFOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
+    },
+    {
+      "code": 6129,
+      "name": "InvalidPlaceOrderAuthority",
+      "msg": "Invalid place order authority"
+    },
+    {
+      "code": 6130,
+      "name": "InvalidOpenOrdersAuthority",
+      "msg": "Invalid open orders authority"
     }
   ]
 };
@@ -11425,6 +11492,42 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "editDelegatedPubkey",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newKey",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -12152,11 +12255,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                370
+                338
               ]
             }
           }
@@ -13571,6 +13678,23 @@ export const IDL: Zeta = {
           }
         ]
       }
+    },
+    {
+      "name": "ValidationType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Place"
+          },
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "OpenOrders"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -14508,6 +14632,16 @@ export const IDL: Zeta = {
       "code": 6128,
       "name": "ForceCancelExpiredTIFOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
+    },
+    {
+      "code": 6129,
+      "name": "InvalidPlaceOrderAuthority",
+      "msg": "Invalid place order authority"
+    },
+    {
+      "code": 6130,
+      "name": "InvalidOpenOrdersAuthority",
+      "msg": "Invalid open orders authority"
     }
   ]
 };
