@@ -112,6 +112,7 @@ export interface ZetaGroup {
   newExpiryThresholdSeconds: number;
   perpParameters: PerpParameters;
   perpSyncQueue: PublicKey;
+  oracleBackupFeed: PublicKey;
   padding: Array<number>;
 }
 
@@ -166,6 +167,7 @@ export interface MarginAccount {
   asset: any;
   accountType: any;
   lastFundingDelta: AnchorDecimal;
+  delegatedPubkey: PublicKey;
   padding: Array<number>;
 }
 

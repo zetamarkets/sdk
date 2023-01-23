@@ -12,7 +12,7 @@
     <a href="https://opensource.org/licenses/Apache-2.0"
       ><img
         alt="License"
-        src="https://img.shields.io/github/license/project-serum/anchor?color=blueviolet"
+        src="https://img.shields.io/badge/License-Apache%202.0-blueviolet"
     /></a>
   </p>
 </div>
@@ -44,24 +44,24 @@ PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
 
-Zeta is a protocol that allows the trading of undercollateralized options and futures on Solana, using the Serum DEX for its order matching. Zeta is available with SOL and BTC as underlying assets, with more to come!
+Zeta is a protocol that allows the trading of undercollateralized perps, futures and options on Solana, using an orderbook matching system. Zeta is available with SOL, BTC and ETH as underlying assets, with more to come!
 
 Each asset corresponds to a `ZetaGroup` account. A Zeta group contains all the respective data for its markets.
 
-Zeta markets use a circular buffer of expirations, as the Serum markets are re-used after expiry.
+Zeta markets use a circular buffer of expirations, as the markets are re-used after expiry.
 
-| Field                 |       Value       |
-| --------------------- | :---------------: |
-| Expiration interval   |      1 Week       |
-| Number of expiries    |         2         |
-| Number of strikes     |        11         |
-| Supported instruments | Call, Put, Future |
+| Field                 |          Value          |
+| --------------------- | :---------------------: |
+| Expiration interval   |         1 Week          |
+| Number of expiries    |            2            |
+| Number of strikes     |           11            |
+| Supported instruments | Call, Put, Future, Perp |
 
 As such - there are 23 markets per expiry
 
 - 11 calls, 11 puts, 1 future
 
-We are on weekly expiries.
+We are on weekly expiries. Perps sit separate to futures and options as they do not expire, but most of your code can be reused between all products - it's just a different market index.
 
 Native numbers are represented with BN to the precision of 6 d.p as u64 integers in the smart contract code.
 
@@ -126,6 +126,7 @@ import {
   utils,
   types,
   assets,
+  Decimal
 } from "@zetamarkets/sdk";
 import fetch from "node-fetch";
 
@@ -189,6 +190,7 @@ Expiration @ Fri Nov 19 2021 08:00:00 GMT+0800
 [MARKET] INDEX: 20 KIND: put STRIKE: 240
 [MARKET] INDEX: 21 KIND: put STRIKE: 245
 [MARKET] INDEX: 22 KIND: future STRIKE: 0
+[MARKET] INDEX: 137 KIND: perp MARK_PRICE 15.236
 `;
 ```
 
@@ -249,6 +251,7 @@ The details should be abstracted away into `client.getOrders(asset)` and `client
 ### Basic script setup to place a trade and view positions
 
 For examples sake, we want to see the orderbook for SOL market index 2, i.e. the CALL option expiring on Fri Nov 19 with strike 211.
+Different markets (such as perps or futures) are just a different `index`. Try index = constants.PERP_INDEX 😊
 
 ```ts
 const index = 2;
@@ -273,7 +276,7 @@ console.log(Exchange.getOrderbook(asset, index));
 
 Placing an order.
 
-- Placing an order on a new market (market index) will create a serum `OpenOrders` account. This is handled by the SDK.
+- Placing an order on a new market (market index) will create an `OpenOrders` account. This is handled by the SDK.
 - The minimum price is $0.0001.
 - The minimum trade tick size is 0.001.
 
@@ -426,7 +429,7 @@ console.log(marginAccountState);
 
 Zeta market data is available through `Exchange.getZetaGroupMarkets(asset)`, which simplifies the data in `Exchange.getZetaGroup(asset)` to be more easily understood.
 
-Markets are indexed via 0..N-1 (N being 46 for now.) and are grouped in `ExpirySeries`.
+Markets are indexed via 0..N-1 (N being 46 for now.) and are grouped in `ExpirySeries`. Perps are index 137, and sit beside the dated markets.
 
 ```ts
 // Whole zeta group markets object
@@ -449,6 +452,24 @@ let expirySeries = market.expirySeries;
 ```
 
 See `src/markets.ts` to see full functionality.
+
+## Viewing perp funding information
+
+Perp markets have a unique mechanic - funding rates ([Gitbook](https://docs.zeta.markets/zeta-protocol/zeta-infrastructure/perpetual-funding-system)). These values are stored in the Greeks account.
+
+```ts
+// Get the whole greeks account
+let greeks = Exchange.getGreeks(assets.Asset.BTC);
+
+// Funding rate (per day) is stored as decimal without multipliers
+// ie if funding is 5% daily, greeks store 0.05
+let fundingRate = Decimal.fromAnchorDecimal(
+  greeks.perpLatestFundingRate
+).toNumber();
+
+// 'Impact' midpoint used to calculate the funding rate
+let midpoint = greeks.perpLatestMidpoint.toNumber();
+```
 
 ## Viewing oracle price
 
@@ -480,16 +501,17 @@ You can see these `EventType` in `src/events.ts`.
 
 **NOTE: Some callbacks are done on poll so don't always reflect a change in state.**
 
-| Event     |     Type     |                                                                                   Meaning                                                                                   |                                            Change |
-| --------- | :----------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ------------------------------------------------: |
-| EXCHANGE  |   Program    |                                                                   Strike initialization, market cleaning                                                                    |                              Exchange's zetaGroup |
-| EXPIRY    |   Program    |                                                                         On option series expiration                                                                         |                                Exchange's markets |
-| GREEKS    |   Program    |                                                                    When greeks are updated (mark prices)                                                                    | Exchange's greeks or <br> Exchange.riskCalculator |
-| ORDERBOOK |   Program    |                                                                       When an orderbook poll occurs.                                                                        |                                  Exchange.markets |
-| ORACLE    | Pyth oracle  |                                                                             Pyth price update.                                                                              |                                   Exchange.oracle |
-| CLOCK     | Solana clock |                                                                        Solana clock account change.                                                                         |                           Exchange.clockTimestamp |
-| TRADE     |     User     |                                                                            On user trade event.                                                                             |                              client.marginAccount |
-| USER      |     User     | When the user's marginAccount <br> changes, which can occur on <br> inserts, cancels, trades, withdrawals, <br> deposits, settlement, liquidation, <br> force cancellations |                              client.marginAccount |
+| Event              |     Type     |                                                                                   Meaning                                                                                   |                                            Change |
+| ------------------ | :----------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ------------------------------------------------: |
+| EXCHANGE           |   Program    |                                                                   Strike initialization, market cleaning                                                                    |                              Exchange's zetaGroup |
+| EXPIRY             |   Program    |                                                                         On option series expiration                                                                         |                                Exchange's markets |
+| GREEKS             |   Program    |                                                                    When greeks are updated (mark prices)                                                                    | Exchange's greeks or <br> Exchange.riskCalculator |
+| ORDERBOOK          |   Program    |                                                                       When an orderbook poll occurs.                                                                        |                                  Exchange.markets |
+| ORACLE             | Pyth oracle  |                                                                             Pyth price update.                                                                              |                                   Exchange.oracle |
+| CLOCK              | Solana clock |                                                                        Solana clock account change.                                                                         |                           Exchange.clockTimestamp |
+| TRADEV2            |     User     |                                                                            On user trade event.                                                                             |                              client.marginAccount |
+| ORDERCOMPLETEEVENT |     User     |                                                                  User order is fully filled or cancelled.                                                                   |                              client.marginAccount |
+| USER               |     User     | When the user's marginAccount <br> changes, which can occur on <br> inserts, cancels, trades, withdrawals, <br> deposits, settlement, liquidation, <br> force cancellations |                              client.marginAccount |
 
 These callbacks should eliminate the need to poll for most accounts, unless you need certainty on the state, in which case there are polling functions available in `Exchange` and `Client`.
 

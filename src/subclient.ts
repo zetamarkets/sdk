@@ -1,6 +1,6 @@
 import * as anchor from "@zetamarkets/anchor";
 import * as utils from "./utils";
-import { Asset, assetToName } from "./assets";
+import { Asset, assetToName, fromProgramAsset } from "./assets";
 import * as constants from "./constants";
 import { exchange as Exchange } from "./exchange";
 import {
@@ -191,7 +191,7 @@ export class SubClient {
     asset: Asset,
     parent: Client,
     connection: Connection,
-    wallet: types.Wallet,
+    user: PublicKey,
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false
   ): Promise<SubClient> {
@@ -200,14 +200,14 @@ export class SubClient {
       await utils.getMarginAccount(
         Exchange.programId,
         subClient._subExchange.zetaGroupAddress,
-        wallet.publicKey
+        user
       );
 
     let [spreadAccountAddress, _spreadAccountNonce] =
       await utils.getSpreadAccount(
         Exchange.programId,
         subClient._subExchange.zetaGroupAddress,
-        wallet.publicKey
+        user
       );
 
     subClient._marginAccountAddress = marginAccountAddress;
@@ -383,6 +383,7 @@ export class SubClient {
    * @param amount  the native amount to deposit (6 decimals fixed point)
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
+    this.delegatedCheck();
     // Check if the user has a USDC account.
     let tx = new Transaction();
     if (this._marginAccount === null) {
@@ -391,7 +392,7 @@ export class SubClient {
         instructions.initializeMarginAccountIx(
           this._subExchange.zetaGroupAddress,
           this._marginAccountAddress,
-          this._parent.publicKey
+          this._parent.provider.wallet.publicKey
         )
       );
     }
@@ -401,7 +402,7 @@ export class SubClient {
         amount,
         this._marginAccountAddress,
         this._parent.usdcAccountAddress,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._parent.whitelistDepositAddress
       )
     );
@@ -413,6 +414,7 @@ export class SubClient {
    * Closes a subClient's margin account
    */
   public async closeMarginAccount(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     if (this._marginAccount === null) {
       throw Error("User has no margin account to close");
     }
@@ -420,7 +422,7 @@ export class SubClient {
     let tx = new Transaction().add(
       instructions.closeMarginAccountIx(
         this.asset,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._marginAccountAddress
       )
     );
@@ -433,6 +435,7 @@ export class SubClient {
    * Closes a subClient's spread account
    */
   public async closeSpreadAccount(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     if (this._spreadAccount === null) {
       throw Error("User has no spread account to close");
     }
@@ -443,14 +446,14 @@ export class SubClient {
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this._spreadAccountAddress,
-        this._parent.publicKey
+        this._parent.provider.wallet.publicKey
       )
     );
     tx.add(
       instructions.closeSpreadAccountIx(
         subExchange.zetaGroupAddress,
         this._spreadAccountAddress,
-        this._parent.publicKey
+        this._parent.provider.wallet.publicKey
       )
     );
     let txId = await utils.processTransaction(this._parent.provider, tx);
@@ -462,6 +465,7 @@ export class SubClient {
    * @param amount  the native amount to withdraw (6 dp)
    */
   public async withdraw(amount: number): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let tx = new Transaction();
     tx.add(
       instructions.withdrawIx(
@@ -469,7 +473,7 @@ export class SubClient {
         amount,
         this._marginAccountAddress,
         this._parent.usdcAccountAddress,
-        this._parent.publicKey
+        this._parent.provider.wallet.publicKey
       )
     );
     return await utils.processTransaction(this._parent.provider, tx);
@@ -479,6 +483,7 @@ export class SubClient {
    * Withdraws the entirety of the subClient's margin account and then closes it.
    */
   public async withdrawAndCloseMarginAccount(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     if (this._marginAccount === null) {
       throw Error("User has no margin account to withdraw or close.");
     }
@@ -489,13 +494,13 @@ export class SubClient {
         this._marginAccount.balance.toNumber(),
         this._marginAccountAddress,
         this._parent.usdcAccountAddress,
-        this._parent.publicKey
+        this._parent.provider.wallet.publicKey
       )
     );
     tx.add(
       instructions.closeMarginAccountIx(
         this.asset,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._marginAccountAddress
       )
     );
@@ -518,6 +523,7 @@ export class SubClient {
     side: types.Side,
     tag: String = constants.DEFAULT_ORDER_TAG
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let tx = new Transaction();
     let subExchange = this._subExchange;
     let marketIndex = subExchange.markets.getMarketIndex(market);
@@ -531,6 +537,7 @@ export class SubClient {
         this.asset,
         market,
         this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -550,7 +557,7 @@ export class SubClient {
       tag,
       0,
       this.marginAccountAddress,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       openOrdersPda,
       this._parent.whitelistTradingFeesAddress
     );
@@ -563,7 +570,7 @@ export class SubClient {
         instructions.initializeSpreadAccountIx(
           subExchange.zetaGroupAddress,
           this.spreadAccountAddress,
-          this._parent.publicKey
+          this._parent.provider.wallet.publicKey
         )
       );
     }
@@ -582,9 +589,11 @@ export class SubClient {
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
+        subExchange.zetaGroup.oracleBackupFeed,
+        constants.CHAINLINK_PID,
         types.MovementType.LOCK,
         movements
       )
@@ -635,6 +644,7 @@ export class SubClient {
         this.asset,
         market,
         this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -661,7 +671,7 @@ export class SubClient {
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
       this.marginAccountAddress,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       openOrdersPda,
       this._parent.whitelistTradingFeesAddress
     );
@@ -719,6 +729,7 @@ export class SubClient {
         this.asset,
         market,
         this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this.marginAccountAddress
       );
       openOrdersPda = _openOrdersPda;
@@ -745,7 +756,7 @@ export class SubClient {
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
       this.marginAccountAddress,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       openOrdersPda,
       this._parent.whitelistTradingFeesAddress
     );
@@ -767,6 +778,25 @@ export class SubClient {
     return txId;
   }
 
+  public async editDelegatedPubkey(
+    delegatedPubkey: PublicKey
+  ): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    let tx = new Transaction();
+
+    tx.add(
+      instructions.editDelegatedPubkeyIx(
+        this._asset,
+        delegatedPubkey,
+        this.marginAccountAddress,
+        this._parent.provider.wallet.publicKey
+      )
+    );
+
+    let txId = await utils.processTransaction(this._parent.provider, tx);
+    return txId;
+  }
+
   public createCancelOrderNoErrorInstruction(
     marketIndex: number,
     orderId: anchor.BN,
@@ -775,7 +805,7 @@ export class SubClient {
     return instructions.cancelOrderNoErrorIx(
       this.asset,
       marketIndex,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[marketIndex],
       orderId,
@@ -789,7 +819,7 @@ export class SubClient {
     return instructions.cancelAllMarketOrdersIx(
       this.asset,
       marketIndex,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[marketIndex]
     );
@@ -824,7 +854,7 @@ export class SubClient {
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
       this.marginAccountAddress,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this._openOrdersAccounts[marketIndex],
       this._parent.whitelistTradingFeesAddress
     );
@@ -866,7 +896,7 @@ export class SubClient {
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffset,
       this.marginAccountAddress,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this._openOrdersAccounts[constants.PERP_INDEX],
       this._parent.whitelistTradingFeesAddress
     );
@@ -888,7 +918,7 @@ export class SubClient {
     let ix = instructions.cancelOrderIx(
       this.asset,
       index,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[index],
       orderId,
@@ -916,7 +946,7 @@ export class SubClient {
     let ix = instructions.cancelOrderByClientOrderIdIx(
       this.asset,
       index,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[index],
       new anchor.BN(clientOrderId)
@@ -952,7 +982,7 @@ export class SubClient {
       instructions.cancelOrderIx(
         this.asset,
         marketIndex,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         orderId,
@@ -980,7 +1010,7 @@ export class SubClient {
           options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
           this.marginAccountAddress,
-          this._parent.publicKey,
+          this._parent.provider.wallet.publicKey,
           this._openOrdersAccounts[marketIndex],
           this._parent.whitelistTradingFeesAddress
         )
@@ -1000,7 +1030,7 @@ export class SubClient {
           options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
           this.marginAccountAddress,
-          this._parent.publicKey,
+          this._parent.provider.wallet.publicKey,
           this._openOrdersAccounts[marketIndex],
           this._parent.whitelistTradingFeesAddress
         )
@@ -1043,7 +1073,7 @@ export class SubClient {
       instructions.cancelOrderByClientOrderIdIx(
         this.asset,
         marketIndex,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
@@ -1072,7 +1102,7 @@ export class SubClient {
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
           this.marginAccountAddress,
-          this._parent.publicKey,
+          this._parent.provider.wallet.publicKey,
           this._openOrdersAccounts[marketIndex],
           this._parent.whitelistTradingFeesAddress
         )
@@ -1094,7 +1124,7 @@ export class SubClient {
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
           this.marginAccountAddress,
-          this._parent.publicKey,
+          this._parent.provider.wallet.publicKey,
           this._openOrdersAccounts[marketIndex],
           this._parent.whitelistTradingFeesAddress
         )
@@ -1138,7 +1168,7 @@ export class SubClient {
       instructions.cancelOrderByClientOrderIdNoErrorIx(
         this.asset,
         marketIndex,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
         new anchor.BN(cancelClientOrderId)
@@ -1167,7 +1197,7 @@ export class SubClient {
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
           this.marginAccountAddress,
-          this._parent.publicKey,
+          this._parent.provider.wallet.publicKey,
           this._openOrdersAccounts[marketIndex],
           this._parent.whitelistTradingFeesAddress
         )
@@ -1189,7 +1219,7 @@ export class SubClient {
             : constants.DEFAULT_ORDER_TAG,
           tifOffsetToUse,
           this.marginAccountAddress,
-          this._parent.publicKey,
+          this._parent.provider.wallet.publicKey,
           this._openOrdersAccounts[marketIndex],
           this._parent.whitelistTradingFeesAddress
         )
@@ -1223,6 +1253,7 @@ export class SubClient {
       this.asset,
       market,
       this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this.marginAccountAddress
     );
 
@@ -1238,6 +1269,7 @@ export class SubClient {
   public async closeOpenOrdersAccount(
     market: PublicKey
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
     if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
       throw Error("User has no open orders account for this market!");
@@ -1263,7 +1295,7 @@ export class SubClient {
       await instructions.closeOpenOrdersIx(
         this.asset,
         market,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this.marginAccountAddress,
         this._openOrdersAccounts[marketIndex]
       )
@@ -1280,6 +1312,7 @@ export class SubClient {
   public async closeMultipleOpenOrdersAccount(
     markets: PublicKey[]
   ): Promise<TransactionSignature[]> {
+    this.delegatedCheck();
     let combinedIxs: TransactionInstruction[] = [];
     let subExchange = this._subExchange;
     for (var i = 0; i < markets.length; i++) {
@@ -1302,7 +1335,7 @@ export class SubClient {
       let closeIx = await instructions.closeOpenOrdersIx(
         this.asset,
         market,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this.marginAccountAddress,
         this._openOrdersAccounts[marketIndex]
       );
@@ -1344,6 +1377,7 @@ export class SubClient {
     orderId: anchor.BN,
     side: types.Side
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let marginAccount = (await Exchange.program.account.marginAccount.fetch(
       marginAccountToCancel
     )) as unknown as MarginAccount;
@@ -1379,6 +1413,7 @@ export class SubClient {
     market: PublicKey,
     marginAccountToCancel: PublicKey
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let marginAccount = (await Exchange.program.account.marginAccount.fetch(
       marginAccountToCancel
     )) as unknown as MarginAccount;
@@ -1414,10 +1449,11 @@ export class SubClient {
     liquidatedMarginAccount: PublicKey,
     size: number
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let tx = new Transaction();
     let ix = instructions.liquidateIx(
       this.asset,
-      this._parent.publicKey,
+      this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       market,
       liquidatedMarginAccount,
@@ -1438,7 +1474,7 @@ export class SubClient {
       let ix = instructions.cancelOrderIx(
         this.asset,
         order.marketIndex,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[order.marketIndex],
         order.orderId,
@@ -1460,7 +1496,7 @@ export class SubClient {
       let ix = instructions.cancelOrderNoErrorIx(
         this.asset,
         order.marketIndex,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[order.marketIndex],
         order.orderId,
@@ -1520,6 +1556,7 @@ export class SubClient {
     movementType: types.MovementType,
     movements: instructions.PositionMovementArg[]
   ): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let tx = this.getPositionMovementTx(movementType, movements);
     return await utils.processTransaction(this._parent.provider, tx);
   }
@@ -1533,6 +1570,7 @@ export class SubClient {
     movementType: types.MovementType,
     movements: instructions.PositionMovementArg[]
   ): Promise<PositionMovementEvent> {
+    this.delegatedCheck();
     let tx = this.getPositionMovementTx(movementType, movements);
     let response = await utils.simulateTransaction(this._parent.provider, tx);
     let positionMovementEvent = undefined;
@@ -1558,6 +1596,7 @@ export class SubClient {
     movementType: types.MovementType,
     movements: instructions.PositionMovementArg[]
   ): Transaction {
+    this.delegatedCheck();
     if (movements.length > constants.MAX_POSITION_MOVEMENTS) {
       throw new Error(
         `Max position movements exceeded. Max = ${constants.MAX_POSITION_MOVEMENTS} < ${movements.length}`
@@ -1574,7 +1613,7 @@ export class SubClient {
         instructions.initializeSpreadAccountIx(
           subExchange.zetaGroupAddress,
           this.spreadAccountAddress,
-          this._parent.publicKey
+          this._parent.provider.wallet.publicKey
         )
       );
     }
@@ -1585,9 +1624,11 @@ export class SubClient {
         subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
-        this._parent.publicKey,
+        this._parent.provider.wallet.publicKey,
         subExchange.greeksAddress,
         subExchange.zetaGroup.oracle,
+        subExchange.zetaGroup.oracleBackupFeed,
+        constants.CHAINLINK_PID,
         movementType,
         movements
       )
@@ -1600,12 +1641,13 @@ export class SubClient {
    * Transfers any non required balance in the spread account to margin account.
    */
   public async transferExcessSpreadBalance(): Promise<TransactionSignature> {
+    this.delegatedCheck();
     let tx = new Transaction().add(
       instructions.transferExcessSpreadBalanceIx(
         this._subExchange.zetaGroupAddress,
         this.marginAccountAddress,
         this.spreadAccountAddress,
-        this._parent.publicKey
+        this._parent.provider.wallet.publicKey
       )
     );
     return await utils.processTransaction(this._parent.provider, tx);
@@ -1872,6 +1914,14 @@ export class SubClient {
         this._spreadAccountSubscriptionId
       );
       this._spreadAccountSubscriptionId = undefined;
+    }
+  }
+
+  private delegatedCheck() {
+    if (this._parent.delegatorKey) {
+      throw Error(
+        "Function not supported by delegated client. Please load without 'delegator' argument"
+      );
     }
   }
 }

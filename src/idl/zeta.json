@@ -36,6 +36,16 @@
           "isSigner": false
         },
         {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
@@ -767,6 +777,32 @@
       "args": []
     },
     {
+      "name": "updateOracleBackupFeed",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updatePricingParameters",
       "accounts": [
         {
@@ -1029,6 +1065,16 @@
           "name": "oracle",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -1091,6 +1137,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1298,6 +1354,16 @@
           "name": "oracle",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -1384,6 +1450,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1624,6 +1700,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2061,6 +2147,16 @@
           "isSigner": false
         },
         {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "marketNode",
           "isMut": true,
           "isSigner": false
@@ -2209,6 +2305,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2367,6 +2473,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2535,6 +2651,16 @@
           "isSigner": false
         },
         {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "marketMint",
           "isMut": true,
           "isSigner": false
@@ -2695,6 +2821,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2865,6 +3001,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3486,6 +3632,16 @@
           "isSigner": false
         },
         {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "cancelAccounts",
           "accounts": [
             {
@@ -3564,6 +3720,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3822,6 +3988,16 @@
           "isSigner": false
         },
         {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "market",
           "isMut": false,
           "isSigner": false
@@ -3971,6 +4147,16 @@
         },
         {
           "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -4182,6 +4368,42 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "editDelegatedPubkey",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newKey",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -4705,11 +4927,15 @@
             "type": "publicKey"
           },
           {
+            "name": "oracleBackupFeed",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                998
+                966
               ]
             }
           }
@@ -4909,11 +5135,15 @@
             }
           },
           {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                370
+                338
               ]
             }
           }
@@ -6328,6 +6558,23 @@
           }
         ]
       }
+    },
+    {
+      "name": "ValidationType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Place"
+          },
+          {
+            "name": "Cancel"
+          },
+          {
+            "name": "OpenOrders"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -7265,6 +7512,16 @@
       "code": 6128,
       "name": "ForceCancelExpiredTIFOrdersOnly",
       "msg": "Can only force cancel expired TIF orders"
+    },
+    {
+      "code": 6129,
+      "name": "InvalidPlaceOrderAuthority",
+      "msg": "Invalid place order authority"
+    },
+    {
+      "code": 6130,
+      "name": "InvalidOpenOrdersAuthority",
+      "msg": "Invalid open orders authority"
     }
   ]
 }

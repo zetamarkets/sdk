@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## Unreleased
+
+- client: Return txSigs properly on cancelAllOrders.
+
+## [0.21.0] 2023-01-21
+
+### Breaking
+
+- Add backup oracle (Chainlink) to program code. This adds an extra account to most instructions so an SDK upgrade is required to trade. ([#189](https://github.com/zetamarkets/sdk/pull/189))
+
+## [0.20.0] 2023-01-18
+
+- general: Add delegated account functionality to program and SDK. ([#187](https://github.com/zetamarkets/sdk/pull/187))
+
 ## [0.19.3] 2023-01-09
 
 - client: add perp functionality to all cancel+place functions in subclient. ([#186](https://github.com/zetamarkets/sdk/pull/186))

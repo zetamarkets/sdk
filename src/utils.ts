@@ -1247,7 +1247,7 @@ export async function pruneExpiredTIFOrders(
     return instructions.pruneExpiredTIFOrdersIx(asset, i);
   });
 
-  let txs = splitIxsIntoTx(ixs, 10);
+  let txs = splitIxsIntoTx(ixs, 5);
 
   await Promise.all(
     txs.map(async (tx) => {
@@ -1270,6 +1270,8 @@ export async function expireSeries(asset: Asset, expiryTs: anchor.BN) {
       state: Exchange.stateAddress,
       zetaGroup: subExchange.zetaGroupAddress,
       oracle: subExchange.zetaGroup.oracle,
+      oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
+      oracleBackupProgram: constants.CHAINLINK_PID,
       settlementAccount: settlement,
       payer: Exchange.provider.wallet.publicKey,
       systemProgram: SystemProgram.programId,

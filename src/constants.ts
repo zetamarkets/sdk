@@ -14,6 +14,10 @@ export const DEX_PID = {
   mainnet: new PublicKey("zDEXqXEG7gAyxb1Kg9mK5fPnUdENCGKzWrM21RMdWRq"),
 };
 
+export const CHAINLINK_PID = new PublicKey(
+  "HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny"
+);
+
 export const MAX_SETTLE_AND_CLOSE_PER_TX = 4;
 export const MAX_CANCELS_PER_TX = 3;
 export const MAX_GREEK_UPDATES_PER_TX = 20;
