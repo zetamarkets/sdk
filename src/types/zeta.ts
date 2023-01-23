@@ -1054,16 +1054,6 @@ export type Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -1126,16 +1116,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1343,16 +1323,6 @@ export type Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -1420,7 +1390,7 @@ export type Zeta = {
       ]
     },
     {
-      "name": "updatePricing",
+      "name": "updatePricingV2Temp",
       "accounts": [
         {
           "name": "state",
@@ -1449,6 +1419,52 @@ export type Zeta = {
         },
         {
           "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "expiryIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "updatePricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
           "isMut": false,
           "isSigner": false
         },
@@ -1689,16 +1705,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2136,16 +2142,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "marketNode",
           "isMut": true,
           "isSigner": false
@@ -2294,16 +2290,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2462,16 +2448,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2640,16 +2616,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "marketMint",
           "isMut": true,
           "isSigner": false
@@ -2810,16 +2776,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2990,16 +2946,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3621,16 +3567,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "cancelAccounts",
           "accounts": [
             {
@@ -3709,16 +3645,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3974,16 +3900,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "market",
           "isMut": false,
           "isSigner": false
@@ -4133,16 +4049,6 @@ export type Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -8568,16 +8474,6 @@ export const IDL: Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": []
@@ -8640,16 +8536,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -8857,16 +8743,6 @@ export const IDL: Zeta = {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -8934,7 +8810,7 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "updatePricing",
+      "name": "updatePricingV2Temp",
       "accounts": [
         {
           "name": "state",
@@ -8963,6 +8839,52 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "expiryIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "updatePricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
           "isMut": false,
           "isSigner": false
         },
@@ -9203,16 +9125,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -9650,16 +9562,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "marketNode",
           "isMut": true,
           "isSigner": false
@@ -9808,16 +9710,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -9976,16 +9868,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -10154,16 +10036,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "marketMint",
           "isMut": true,
           "isSigner": false
@@ -10324,16 +10196,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -10504,16 +10366,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -11135,16 +10987,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "cancelAccounts",
           "accounts": [
             {
@@ -11223,16 +11065,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -11488,16 +11320,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "market",
           "isMut": false,
           "isSigner": false
@@ -11647,16 +11469,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false
         }
