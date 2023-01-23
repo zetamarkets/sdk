@@ -579,9 +579,11 @@ export class Client {
     if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrders();
     } else {
+      let txIds = [];
       for (var subClient of this.getAllSubClients()) {
-        await subClient.cancelAllOrders();
+        txIds.push(await subClient.cancelAllOrders());
       }
+      return txIds.flat();
     }
   }
 

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## Unreleased
+
+- client: Return txSigs properly on cancelAllOrders.
+
 ## [0.21.0] 2023-01-21
 
 ### Breaking
