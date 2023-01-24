@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## Unreleased
+## [0.21.3] 2023-01-24
+
+- utils: Specify `finalized` commitment for blockhash in processTransaction. ([#193](https://github.com/zetamarkets/sdk/pull/193))
 
 ## [0.21.2] 2023-01-24
 
@@ -11,7 +13,7 @@ Version changes are pinned to SDK releases.
 
 ## [0.21.1] 2023-01-23
 
-- client: Return txSigs properly on cancelAllOrders.
+- client: Return txSigs properly on cancelAllOrders. ([#192](https://github.com/zetamarkets/sdk/pull/192))
 
 ## [0.21.0] 2023-01-21
 

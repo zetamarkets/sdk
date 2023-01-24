@@ -697,7 +697,9 @@ export async function processTransaction(
   let txSig: TransactionSignature;
 
   if (blockhash == undefined) {
-    const recentBlockhash = await provider.connection.getRecentBlockhash();
+    const recentBlockhash = await provider.connection.getLatestBlockhash(
+      commitmentConfig("finalized")
+    );
     tx.recentBlockhash = recentBlockhash.blockhash;
   } else {
     tx.recentBlockhash = blockhash;
