@@ -12,6 +12,7 @@ import {
   sendAndConfirmRawTransaction,
   AccountInfo,
   SystemProgram,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
@@ -716,6 +717,14 @@ export async function processTransaction(
     .forEach((kp) => {
       tx.partialSign(kp);
     });
+
+  if (Exchange.usePriorityFees) {
+    tx.instructions.unshift(
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: Exchange.priorityFee,
+      })
+    );
+  }
 
   if (useLedger) {
     tx = await Exchange.ledgerWallet.signTransaction(tx);
