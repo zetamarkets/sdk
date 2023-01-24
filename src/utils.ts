@@ -717,7 +717,7 @@ export async function processTransaction(
     });
 
   if (Exchange.usePriorityFees) {
-    tx.add(
+    tx.instructions.unshift(
       ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: Exchange.priorityFee,
       })

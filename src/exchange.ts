@@ -251,11 +251,8 @@ export class Exchange {
     this._priorityFee = microLamportsPerCU;
   }
 
-  public async updatePriorityFee(microLamportsPerCU: number) {
-    if (microLamportsPerCU) {
-      this._priorityFee = microLamportsPerCU;
-      return;
-    }
+  public updatePriorityFee(microLamportsPerCU: number) {
+    this._priorityFee = microLamportsPerCU;
   }
 
   public async initialize(
