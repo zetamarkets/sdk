@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [0.21.2] 2023-01-24
 
-- general: add ability to toggle compute units per transaction.
+- general: add ability to toggle compute units per transaction. ([#194](https://github.com/zetamarkets/sdk/pull/194))
 
 ## [0.21.1] 2023-01-23
 
