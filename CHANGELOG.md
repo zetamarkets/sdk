@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.21.2] 2023-01-24
+
 - general: add ability to toggle compute units per transaction.
 
 ## [0.21.1] 2023-01-23
