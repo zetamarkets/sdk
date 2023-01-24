@@ -5,6 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.21.2] 2023-01-24
+
+- general: add ability to toggle compute units per transaction. ([#194](https://github.com/zetamarkets/sdk/pull/194))
+
+## [0.21.1] 2023-01-23
+
 - client: Return txSigs properly on cancelAllOrders.
 
 ## [0.21.0] 2023-01-21
