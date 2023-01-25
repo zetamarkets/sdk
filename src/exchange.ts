@@ -7,6 +7,7 @@ import {
   SYSVAR_CLOCK_PUBKEY,
   AccountInfo,
   AccountMeta,
+  Commitment,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -241,6 +242,11 @@ export class Exchange {
   }
   private _usePriorityFees: boolean = false;
 
+  public get blockhashCommitment(): Commitment {
+    return this._blockhashCommitment;
+  }
+  private _blockhashCommitment: Commitment = "finalized";
+
   public toggleUsePriorityFees(
     microLamportsPerCU: number = constants.DEFAULT_MICRO_LAMPORTS_PER_CU_FEE
   ) {
@@ -253,6 +259,10 @@ export class Exchange {
 
   public updatePriorityFee(microLamportsPerCU: number) {
     this._priorityFee = microLamportsPerCU;
+  }
+
+  public updateBlockhashCommitment(commitment: Commitment) {
+    this._blockhashCommitment = commitment;
   }
 
   public async initialize(

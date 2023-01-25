@@ -717,7 +717,7 @@ export async function processTransaction(
           blockhash ??
           (
             await provider.connection.getLatestBlockhash(
-              commitmentConfig("finalized")
+              Exchange.blockhashCommitment
             )
           ).blockhash,
         instructions: tx.instructions,
@@ -739,7 +739,7 @@ export async function processTransaction(
       blockhash ??
       (
         await provider.connection.getLatestBlockhash(
-          commitmentConfig("finalized")
+          Exchange.blockhashCommitment
         )
       ).blockhash;
     tx.feePayer = useLedger
