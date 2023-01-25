@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [Unreleased]
+
+- general: Bump anchor version to 0.26.0, solana version to 1.31.5 and @solana/web3.js to 1.68.0. ([#185](https://github.com/zetamarkets/sdk/pull/185))
+- general: Allow for the setting of blockhash commitment to fetch. ([#185](https://github.com/zetamarkets/sdk/pull/185))
+- general: Add versioned transactions and LUTs. ([#185](https://github.com/zetamarkets/sdk/pull/185))
+
 ## [0.21.3] 2023-01-24
 
 - utils: Specify `finalized` commitment for blockhash in processTransaction. ([#193](https://github.com/zetamarkets/sdk/pull/193))
