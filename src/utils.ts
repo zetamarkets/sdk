@@ -14,6 +14,7 @@ import {
   TransactionMessage,
   VersionedTransaction,
   AddressLookupTableAccount,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
@@ -695,6 +696,15 @@ export async function processTransaction(
   blockhash?: string
 ): Promise<TransactionSignature> {
   let rawTx: Buffer | Uint8Array;
+
+  if (Exchange.usePriorityFees) {
+    tx.instructions.unshift(
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: Exchange.priorityFee,
+      })
+    );
+  }
+
   if (useVersioned) {
     if (useLedger) {
       throw Error("Ledger does not support versioned transactions");
@@ -705,7 +715,11 @@ export async function processTransaction(
         payerKey: provider.wallet.publicKey,
         recentBlockhash:
           blockhash ??
-          (await provider.connection.getRecentBlockhash()).blockhash,
+          (
+            await provider.connection.getLatestBlockhash(
+              commitmentConfig("finalized")
+            )
+          ).blockhash,
         instructions: tx.instructions,
       }).compileToV0Message(lutAccs)
     );
@@ -722,7 +736,12 @@ export async function processTransaction(
     rawTx = v0Tx.serialize();
   } else {
     tx.recentBlockhash =
-      blockhash ?? (await provider.connection.getRecentBlockhash()).blockhash;
+      blockhash ??
+      (
+        await provider.connection.getLatestBlockhash(
+          commitmentConfig("finalized")
+        )
+      ).blockhash;
     tx.feePayer = useLedger
       ? Exchange.ledgerWallet.publicKey
       : provider.wallet.publicKey;

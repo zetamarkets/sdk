@@ -230,6 +230,31 @@ export class Exchange {
 
   private _programSubscriptionIds: number[] = [];
 
+  // Micro lamports per CU of fees.
+  public get priorityFee(): number {
+    return this._priorityFee;
+  }
+  private _priorityFee: number = 0;
+
+  public get usePriorityFees(): boolean {
+    return this._usePriorityFees;
+  }
+  private _usePriorityFees: boolean = false;
+
+  public toggleUsePriorityFees(
+    microLamportsPerCU: number = constants.DEFAULT_MICRO_LAMPORTS_PER_CU_FEE
+  ) {
+    if (this._usePriorityFees) {
+      throw Error("Priority fees already turned on");
+    }
+    this._usePriorityFees = true;
+    this._priorityFee = microLamportsPerCU;
+  }
+
+  public updatePriorityFee(microLamportsPerCU: number) {
+    this._priorityFee = microLamportsPerCU;
+  }
+
   public async initialize(
     assets: Asset[],
     programId: PublicKey,
