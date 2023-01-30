@@ -120,10 +120,10 @@ export const STATIC_AND_PERPS_LUT: {
   mainnet: AddressLookupTableAccount;
 } = {
   devnet: new AddressLookupTableAccount({
-    key: new PublicKey("xZ97ws3mx5ye14A1rdhstEMx4QWCDdtZDuzrmha66HZ"),
+    key: new PublicKey("GkmnUMKdpKePwGnaVVxwoC38CDKS1u9QzF9yM7e3JJPQ"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 192321794,
+      lastExtendedSlot: 192364115,
       lastExtendedSlotStartIndex: 40,
       authority: new PublicKey("6qtNr6afnq8JjXQqxxgKfXQ2QKPrdVD232tivdrkhP39"),
       addresses: [

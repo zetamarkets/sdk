@@ -233,39 +233,39 @@ export class ZetaGroupMarkets {
     let indexes = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
     for (var i = 0; i < indexes.length; i += constants.MARKET_LOAD_LIMIT) {
       let slice = indexes.slice(i, i + constants.MARKET_LOAD_LIMIT);
-      for (let j = 0; j < slice.length; j++) {
-        let index = slice[j];
-        let marketAddr = subExchange.zetaGroup.products[index].market;
-        let serumMarket = await SerumMarket.load(
-          Exchange.connection,
-          marketAddr,
-          { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
-          constants.DEX_PID[Exchange.network]
-        );
-        let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
-          Exchange.programId,
-          serumMarket.baseMintAddress
-        );
-        let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
-          Exchange.programId,
-          serumMarket.quoteMintAddress
-        );
+      await Promise.all(
+        slice.map(async (index) => {
+          let marketAddr = subExchange.zetaGroup.products[index].market;
+          let serumMarket = await SerumMarket.load(
+            Exchange.connection,
+            marketAddr,
+            { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
+            constants.DEX_PID[Exchange.network]
+          );
+          let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
+            Exchange.programId,
+            serumMarket.baseMintAddress
+          );
+          let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
+            Exchange.programId,
+            serumMarket.quoteMintAddress
+          );
 
-        let expiryIndex = Math.floor(index / productsPerExpiry);
+          let expiryIndex = Math.floor(index / productsPerExpiry);
 
-        instance._markets[index] = new Market(
-          asset,
-          index,
-          expiryIndex,
-          types.toProductKind(subExchange.zetaGroup.products[index].kind),
-          marketAddr,
-          subExchange.zetaGroupAddress,
-          quoteVaultAddr,
-          baseVaultAddr,
-          serumMarket
-        );
-      }
-
+          instance._markets[index] = new Market(
+            asset,
+            index,
+            expiryIndex,
+            types.toProductKind(subExchange.zetaGroup.products[index].kind),
+            marketAddr,
+            subExchange.zetaGroupAddress,
+            quoteVaultAddr,
+            baseVaultAddr,
+            serumMarket
+          );
+        })
+      );
       await sleep(throttleMs);
     }
 
