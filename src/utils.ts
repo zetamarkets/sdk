@@ -43,6 +43,7 @@ import * as instructions from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
 import { assets } from ".";
+import { Network } from "./network";
 
 export async function getState(
   programId: PublicKey
@@ -691,7 +692,6 @@ export async function processTransaction(
   signers?: Array<Signer>,
   opts?: ConfirmOptions,
   useLedger: boolean = false,
-  useVersioned: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
   blockhash?: string
 ): Promise<TransactionSignature> {
@@ -705,7 +705,7 @@ export async function processTransaction(
     );
   }
 
-  if (useVersioned) {
+  if (lutAccs) {
     if (useLedger) {
       throw Error("Ledger does not support versioned transactions");
     }
@@ -1786,4 +1786,11 @@ export function isOrderExpired(
   }
 
   return false;
+}
+
+export function getZetaLutArr(): AddressLookupTableAccount[] {
+  if (Exchange.network == Network.LOCALNET) {
+    return [];
+  }
+  return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
 }

@@ -13,9 +13,7 @@ import {
 import { PublicKey, Connection } from "@solana/web3.js";
 
 const NETWORK_URL = process.env["network_url"]!;
-const SERVER_URL = process.env["server_url"];
 const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
-const STARTING_BALANCE = 10_000;
 const assetList = [assets.Asset.SOL, assets.Asset.BTC];
 
 let network: Network;
