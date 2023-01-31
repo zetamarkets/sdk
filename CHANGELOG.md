@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [0.22.1]
+
+- utils: Round price to nearest tick in `utils.convertDecimalToNativeInteger`. ([#195](https://github.com/zetamarkets/sdk/pull/195))
+
 ## [0.22.0]
 
 - general: Bump anchor version to 0.26.0, solana version to 1.31.5 and @solana/web3.js to 1.68.0. ([#185](https://github.com/zetamarkets/sdk/pull/185))
