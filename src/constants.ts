@@ -102,6 +102,7 @@ export const PLATFORM_PRECISION = 6;
 export const PRICING_PRECISION = 12;
 export const MARGIN_PRECISION = 8;
 export const POSITION_PRECISION = 3;
+export const TICK_SIZE = 100;
 
 export const DEFAULT_ORDER_TAG = "SDK";
 

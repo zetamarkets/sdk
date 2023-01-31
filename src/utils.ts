@@ -507,8 +507,13 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
  * Converts a decimal number to native fixed point integer of precision 6.
  */
 export function convertDecimalToNativeInteger(amount: number): number {
-  return parseInt(
-    (amount * Math.pow(10, constants.PLATFORM_PRECISION)).toFixed(0)
+  return (
+    parseInt(
+      (
+        (amount * Math.pow(10, constants.PLATFORM_PRECISION)) /
+        constants.TICK_SIZE
+      ).toFixed(0)
+    ) * constants.TICK_SIZE
   );
 }
 
