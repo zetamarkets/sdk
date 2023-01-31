@@ -1,11 +1,5 @@
-import * as anchor from "@project-serum/anchor";
-import {
-  constants,
-  Client,
-  Exchange,
-  programTypes,
-  assets,
-} from "@zetamarkets/sdk";
+import * as anchor from "@zetamarkets/anchor";
+import { constants, Client, Exchange, programTypes } from "@zetamarkets/sdk";
 import { asset } from "./liquidator";
 
 export async function findAccountsAtRisk(

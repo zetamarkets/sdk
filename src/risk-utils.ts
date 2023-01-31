@@ -1,4 +1,4 @@
-import { BN } from "@project-serum/anchor";
+import { BN } from "@zetamarkets/anchor";
 import { types, Exchange, constants, assets, instructions } from ".";
 import { Asset } from "./assets";
 import {

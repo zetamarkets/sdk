@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import {
   Wallet,
   Exchange,
@@ -10,13 +10,10 @@ import {
   programTypes,
   assets,
 } from "@zetamarkets/sdk";
-import { Commitment, PublicKey, Connection, Keypair } from "@solana/web3.js";
-import fetch from "node-fetch";
+import { PublicKey, Connection } from "@solana/web3.js";
 
 const NETWORK_URL = process.env["network_url"]!;
-const SERVER_URL = process.env["server_url"];
 const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
-const STARTING_BALANCE = 10_000;
 const asset = assets.Asset.BTC;
 let network: Network;
 

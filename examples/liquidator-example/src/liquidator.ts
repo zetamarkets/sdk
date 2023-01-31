@@ -9,14 +9,14 @@ import {
   programTypes,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
-import { Wallet } from "@project-serum/anchor";
+import { Wallet } from "@zetamarkets/anchor";
 import {
   cancelAllActiveOrders,
   findAccountsAtRisk,
   findLiquidatableAccounts,
   liquidateAccounts,
 } from "./liquidator-utils";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 
 import { airdropUsdc } from "./utils";
 

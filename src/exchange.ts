@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import {
   PublicKey,
   Transaction,
@@ -7,6 +7,7 @@ import {
   SYSVAR_CLOCK_PUBKEY,
   AccountInfo,
   AccountMeta,
+  Commitment,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -241,6 +242,11 @@ export class Exchange {
   }
   private _usePriorityFees: boolean = false;
 
+  public get blockhashCommitment(): Commitment {
+    return this._blockhashCommitment;
+  }
+  private _blockhashCommitment: Commitment = "finalized";
+
   public toggleUsePriorityFees(
     microLamportsPerCU: number = constants.DEFAULT_MICRO_LAMPORTS_PER_CU_FEE
   ) {
@@ -253,6 +259,10 @@ export class Exchange {
 
   public updatePriorityFee(microLamportsPerCU: number) {
     this._priorityFee = microLamportsPerCU;
+  }
+
+  public updateBlockhashCommitment(commitment: Commitment) {
+    this._blockhashCommitment = commitment;
   }
 
   public async initialize(
@@ -269,7 +279,7 @@ export class Exchange {
     this._assets = assets;
     this._provider = new anchor.AnchorProvider(
       connection,
-      wallet,
+      wallet instanceof types.DummyWallet ? null : wallet,
       opts || utils.commitmentConfig(connection.commitment)
     );
     this._opts = opts;

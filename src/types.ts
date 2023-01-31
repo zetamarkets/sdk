@@ -1,6 +1,6 @@
-import * as anchor from "@project-serum/anchor";
-import { BN } from "@project-serum/anchor";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import * as anchor from "@zetamarkets/anchor";
+import { BN } from "@zetamarkets/anchor";
+import { PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
 import { Asset } from "./assets";
 import { objectEquals } from "./utils";
 import { MarginAccount } from "./program-types";
@@ -11,19 +11,27 @@ import * as constants from "./constants";
  * Wallet interface for objects that can be used to sign provider transactions.
  */
 export interface Wallet {
-  signTransaction(tx: Transaction): Promise<Transaction>;
-  signAllTransactions(txs: Transaction[]): Promise<Transaction[]>;
+  signTransaction(
+    tx: Transaction | VersionedTransaction
+  ): Promise<Transaction | VersionedTransaction>;
+  signAllTransactions(
+    txs: Transaction[] | VersionedTransaction[]
+  ): Promise<Transaction[] | VersionedTransaction[]>;
   publicKey: PublicKey;
 }
 
 export class DummyWallet implements Wallet {
   constructor() {}
 
-  async signTransaction(_tx: Transaction): Promise<Transaction> {
+  async signTransaction(
+    _tx: Transaction | VersionedTransaction
+  ): Promise<Transaction | VersionedTransaction> {
     throw Error("Not supported by dummy wallet!");
   }
 
-  async signAllTransactions(_txs: Transaction[]): Promise<Transaction[]> {
+  async signAllTransactions(
+    _txs: Transaction[] | VersionedTransaction[]
+  ): Promise<Transaction[] | VersionedTransaction[]> {
     throw Error("Not supported by dummy wallet!");
   }
 
