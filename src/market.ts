@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import { Orderbook, Market as SerumMarket } from "./serum/market";
 import { ConfirmOptions, PublicKey } from "@solana/web3.js";
 import { exchange as Exchange } from "./exchange";
@@ -266,7 +266,6 @@ export class ZetaGroupMarkets {
           );
         })
       );
-
       await sleep(throttleMs);
     }
 

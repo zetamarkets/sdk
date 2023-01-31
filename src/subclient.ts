@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import * as utils from "./utils";
 import { Asset, assetToName, fromProgramAsset } from "./assets";
 import * as constants from "./constants";
@@ -406,8 +406,15 @@ export class SubClient {
         this._parent.whitelistDepositAddress
       )
     );
-    let txId = await utils.processTransaction(this._parent.provider, tx);
-    return txId;
+
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -426,7 +433,14 @@ export class SubClient {
         this._marginAccountAddress
       )
     );
-    let txId = await utils.processTransaction(this._parent.provider, tx);
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
     this._marginAccount = null;
     return txId;
   }
@@ -456,7 +470,14 @@ export class SubClient {
         this._parent.provider.wallet.publicKey
       )
     );
-    let txId = await utils.processTransaction(this._parent.provider, tx);
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
     this._spreadAccount = null;
     return txId;
   }
@@ -476,7 +497,14 @@ export class SubClient {
         this._parent.provider.wallet.publicKey
       )
     );
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -504,7 +532,16 @@ export class SubClient {
         this._marginAccountAddress
       )
     );
-    return await utils.processTransaction(this._parent.provider, tx);
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+    this._marginAccount = null;
+    return txId;
   }
 
   /**
@@ -599,9 +636,15 @@ export class SubClient {
       )
     );
 
-    let txId = await utils.processTransaction(this._parent.provider, tx);
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
-
     return txId;
   }
 
@@ -678,13 +721,13 @@ export class SubClient {
 
     tx.add(orderIx);
 
-    let txId: TransactionSignature;
-    txId = await utils.processTransaction(
+    let txId: TransactionSignature = await utils.processTransaction(
       this._parent.provider,
       tx,
       undefined,
       undefined,
       undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined,
       options.blockhash
     );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
@@ -761,13 +804,13 @@ export class SubClient {
 
     tx.add(orderIx);
 
-    let txId: TransactionSignature;
-    txId = await utils.processTransaction(
+    let txId: TransactionSignature = await utils.processTransaction(
       this._parent.provider,
       tx,
       undefined,
       undefined,
       undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined,
       options.blockhash
     );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
@@ -789,8 +832,14 @@ export class SubClient {
       )
     );
 
-    let txId = await utils.processTransaction(this._parent.provider, tx);
-    return txId;
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   public createCancelOrderNoErrorInstruction(
@@ -921,7 +970,14 @@ export class SubClient {
       side
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -948,7 +1004,14 @@ export class SubClient {
       new anchor.BN(clientOrderId)
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -1032,7 +1095,15 @@ export class SubClient {
         )
       );
     }
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      options.blockhash
+    );
   }
 
   /**
@@ -1117,7 +1188,15 @@ export class SubClient {
         )
       );
     }
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      newOptions.blockhash
+    );
   }
 
   /**
@@ -1203,7 +1282,15 @@ export class SubClient {
         )
       );
     }
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      newOptions.blockhash
+    );
   }
 
   /**
@@ -1227,7 +1314,14 @@ export class SubClient {
     );
 
     let tx = new Transaction().add(initIx);
-    let txId = await utils.processTransaction(this._parent.provider, tx);
+    let txId = await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
     this._openOrdersAccounts[marketIndex] = openOrdersPda;
     return txId;
   }
@@ -1269,7 +1363,14 @@ export class SubClient {
         this._openOrdersAccounts[marketIndex]
       )
     );
-    let txId = await utils.processTransaction(this._parent.provider, tx);
+    let txId = await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
     this._openOrdersAccounts[marketIndex] = PublicKey.default;
     return txId;
   }
@@ -1321,7 +1422,14 @@ export class SubClient {
 
     for (var i = 0; i < combinedTxs.length; i++) {
       let tx = combinedTxs[i];
-      let txId = await utils.processTransaction(this._parent.provider, tx);
+      let txId = await utils.processTransaction(
+        this._parent.provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+      );
       txIds.push(txId);
     }
 
@@ -1370,7 +1478,14 @@ export class SubClient {
       side
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -1404,7 +1519,14 @@ export class SubClient {
       openOrdersAccountToCancel
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -1429,7 +1551,14 @@ export class SubClient {
       size
     );
     tx.add(ix);
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -1490,7 +1619,16 @@ export class SubClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
+        txIds.push(
+          await utils.processTransaction(
+            this._parent.provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+          )
+        );
       })
     );
     return txIds;
@@ -1510,7 +1648,16 @@ export class SubClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._parent.provider, tx));
+        txIds.push(
+          await utils.processTransaction(
+            this._parent.provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+          )
+        );
       })
     );
     return txIds;
@@ -1527,7 +1674,14 @@ export class SubClient {
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
     let tx = this.getPositionMovementTx(movementType, movements);
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -1542,12 +1696,14 @@ export class SubClient {
     this.delegatedCheck();
     let tx = this.getPositionMovementTx(movementType, movements);
     let response = await utils.simulateTransaction(this._parent.provider, tx);
-
-    let events = response.events;
     let positionMovementEvent = undefined;
-    for (var i = 0; i < events.length; i++) {
-      if (events[i].name == "PositionMovementEvent") {
-        positionMovementEvent = events[i].data;
+    while (true) {
+      let event = response.events.next();
+      if (event.done) {
+        break;
+      }
+      if ((event.value as any).name == "PositionMovementEvent") {
+        positionMovementEvent = (event.value as any).data;
         break;
       }
     }
@@ -1617,7 +1773,14 @@ export class SubClient {
         this._parent.provider.wallet.publicKey
       )
     );
-    return await utils.processTransaction(this._parent.provider, tx);
+    return await utils.processTransaction(
+      this._parent.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._parent.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   private getRelevantMarketIndexes(): number[] {

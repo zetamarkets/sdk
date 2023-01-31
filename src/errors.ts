@@ -1,5 +1,5 @@
 import idl from "./idl/zeta.json";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 
 export const DEX_ERRORS: Map<number, string> = new Map([
   [41, "Client order ID not found"],

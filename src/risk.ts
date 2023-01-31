@@ -7,7 +7,7 @@ import {
   convertNativeLotSizeToDecimal,
 } from "./utils";
 import { Asset, fromProgramAsset } from "./assets";
-import { BN } from "@project-serum/anchor";
+import { BN } from "@zetamarkets/anchor";
 import { assets, Client, Decimal, instructions, utils } from ".";
 import { cloneDeep } from "lodash";
 import {

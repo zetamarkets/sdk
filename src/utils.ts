@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import {
   Commitment,
   Keypair,
@@ -9,9 +9,11 @@ import {
   Transaction,
   TransactionInstruction,
   TransactionSignature,
-  sendAndConfirmRawTransaction,
   AccountInfo,
   SystemProgram,
+  TransactionMessage,
+  VersionedTransaction,
+  AddressLookupTableAccount,
   ComputeBudgetProgram,
 } from "@solana/web3.js";
 import {
@@ -41,6 +43,7 @@ import * as instructions from "./program-instructions";
 import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
 import { assets } from ".";
+import { Network } from "./network";
 
 export async function getState(
   programId: PublicKey
@@ -678,10 +681,7 @@ export async function simulateTransaction(
     Exchange.program.coder
   );
 
-  let events = [];
-  parser.parseLogs(response.logs, (event) => {
-    events.push(event);
-  });
+  let events = parser.parseLogs(response.logs);
 
   return { events, raw: logs };
 }
@@ -692,31 +692,10 @@ export async function processTransaction(
   signers?: Array<Signer>,
   opts?: ConfirmOptions,
   useLedger: boolean = false,
+  lutAccs?: AddressLookupTableAccount[],
   blockhash?: string
 ): Promise<TransactionSignature> {
-  let txSig: TransactionSignature;
-
-  if (blockhash == undefined) {
-    const recentBlockhash = await provider.connection.getLatestBlockhash(
-      commitmentConfig("finalized")
-    );
-    tx.recentBlockhash = recentBlockhash.blockhash;
-  } else {
-    tx.recentBlockhash = blockhash;
-  }
-
-  tx.feePayer = useLedger
-    ? Exchange.ledgerWallet.publicKey
-    : provider.wallet.publicKey;
-
-  if (signers === undefined) {
-    signers = [];
-  }
-  signers
-    .filter((s) => s !== undefined)
-    .forEach((kp) => {
-      tx.partialSign(kp);
-    });
+  let rawTx: Buffer | Uint8Array;
 
   if (Exchange.usePriorityFees) {
     tx.instructions.unshift(
@@ -726,19 +705,67 @@ export async function processTransaction(
     );
   }
 
-  if (useLedger) {
-    tx = await Exchange.ledgerWallet.signTransaction(tx);
+  if (lutAccs) {
+    if (useLedger) {
+      throw Error("Ledger does not support versioned transactions");
+    }
+
+    let v0Tx: VersionedTransaction = new VersionedTransaction(
+      new TransactionMessage({
+        payerKey: provider.wallet.publicKey,
+        recentBlockhash:
+          blockhash ??
+          (
+            await provider.connection.getLatestBlockhash(
+              Exchange.blockhashCommitment
+            )
+          ).blockhash,
+        instructions: tx.instructions,
+      }).compileToV0Message(lutAccs)
+    );
+    v0Tx.sign(
+      (signers ?? [])
+        .filter((s) => s !== undefined)
+        .map((kp) => {
+          return kp;
+        })
+    );
+    v0Tx = (await provider.wallet.signTransaction(
+      v0Tx
+    )) as VersionedTransaction;
+    rawTx = v0Tx.serialize();
   } else {
-    tx = await provider.wallet.signTransaction(tx);
+    tx.recentBlockhash =
+      blockhash ??
+      (
+        await provider.connection.getLatestBlockhash(
+          Exchange.blockhashCommitment
+        )
+      ).blockhash;
+    tx.feePayer = useLedger
+      ? Exchange.ledgerWallet.publicKey
+      : provider.wallet.publicKey;
+
+    (signers ?? [])
+      .filter((s) => s !== undefined)
+      .forEach((kp) => {
+        tx.partialSign(kp);
+      });
+
+    if (useLedger) {
+      tx = await Exchange.ledgerWallet.signTransaction(tx);
+    } else {
+      tx = (await provider.wallet.signTransaction(tx)) as Transaction;
+    }
+    rawTx = tx.serialize();
   }
 
   try {
-    txSig = await sendAndConfirmRawTransaction(
+    return await anchor.sendAndConfirmRawTransaction(
       provider.connection,
-      tx.serialize(),
+      rawTx,
       opts || commitmentConfig(provider.connection.commitment)
     );
-    return txSig;
   } catch (err) {
     let parsedErr = parseError(err);
     throw parsedErr;
@@ -1759,4 +1786,11 @@ export function isOrderExpired(
   }
 
   return false;
+}
+
+export function getZetaLutArr(): AddressLookupTableAccount[] {
+  if (Exchange.network == Network.LOCALNET) {
+    return [];
+  }
+  return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
 }

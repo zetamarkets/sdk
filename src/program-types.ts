@@ -1,7 +1,7 @@
 // Defines all the program structs for Zeta.
 
 import { PublicKey } from "@solana/web3.js";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 
 export interface State {
   admin: PublicKey;
@@ -145,7 +145,7 @@ export interface Position {
 
 export interface OrderState {
   closingOrders: anchor.BN;
-  openingOrders: [anchor.BN, anchor.BN];
+  openingOrders: Array<anchor.BN>;
 }
 
 export interface ProductLedger {

@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@zetamarkets/anchor";
 import * as utils from "./utils";
 import { exchange as Exchange } from "./exchange";
 import {
@@ -126,7 +126,12 @@ export class Client {
   public get delegatorKey(): PublicKey {
     return this._delegatorKey;
   }
-  public _delegatorKey: PublicKey = undefined;
+  private _delegatorKey: PublicKey = undefined;
+
+  public get useVersionedTxs(): boolean {
+    return this._useVersionedTxs;
+  }
+  private _useVersionedTxs: boolean = false;
 
   private constructor(
     connection: Connection,
@@ -148,7 +153,8 @@ export class Client {
     opts: ConfirmOptions = utils.defaultCommitment(),
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false,
-    delegator: PublicKey = undefined
+    delegator: PublicKey = undefined,
+    useVersionedTxs: boolean = false
   ): Promise<Client> {
     let client = new Client(connection, wallet, opts);
 
@@ -157,6 +163,8 @@ export class Client {
       owner = delegator;
       client._delegatorKey = delegator;
     }
+
+    client._useVersionedTxs = useVersionedTxs;
 
     client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
@@ -249,6 +257,10 @@ export class Client {
     );
 
     return client;
+  }
+
+  public setUseVersionedTxs(useVersionedTxs: boolean) {
+    this._useVersionedTxs = useVersionedTxs;
   }
 
   private addSubClient(asset: Asset, subClient: SubClient) {
