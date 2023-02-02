@@ -1,10 +1,16 @@
 import * as anchor from "@zetamarkets/anchor";
 import { BN } from "@zetamarkets/anchor";
-import { PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
+import {
+  ConfirmOptions,
+  Connection,
+  PublicKey,
+  Transaction,
+  VersionedTransaction,
+} from "@solana/web3.js";
 import { Asset } from "./assets";
 import { objectEquals } from "./utils";
 import { MarginAccount } from "./program-types";
-import { types } from ".";
+import { Network, types } from ".";
 import * as constants from "./constants";
 
 /**
@@ -216,6 +222,9 @@ export interface MarginParams {
 export enum ProgramAccountType {
   MarginAccount = "MarginAccount",
   SpreadAccount = "SpreadAccount",
+  ZetaGroup = "ZetaGroup",
+  Greeks = "Greeks",
+  PerpSyncQueue = "PerpSyncQueue",
 }
 
 export interface ClockData {
@@ -337,4 +346,13 @@ export function defaultOrderOptions(): OrderOptions {
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,
   };
+}
+
+export interface LoadExchangeConfig {
+  assets: Asset[];
+  network: Network;
+  connection: Connection;
+  opts: ConfirmOptions;
+  throttleMs: number;
+  loadFromStore: boolean;
 }

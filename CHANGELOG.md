@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [0.23.0]
+
+- general: Remove a lot of unnecessary async things and improve exchange loading times.
+- general: Add the option to load devnet/mainnet zeta exchange state from serum market stores.
+
 ## [0.22.0]
 
 - general: Bump anchor version to 0.26.0, solana version to 1.31.5 and @solana/web3.js to 1.68.0. ([#185](https://github.com/zetamarkets/sdk/pull/185))

@@ -196,19 +196,17 @@ export class SubClient {
     throttle: boolean = false
   ): Promise<SubClient> {
     let subClient = new SubClient(asset, parent);
-    let [marginAccountAddress, _marginAccountNonce] =
-      await utils.getMarginAccount(
-        Exchange.programId,
-        subClient._subExchange.zetaGroupAddress,
-        user
-      );
+    let [marginAccountAddress, _marginAccountNonce] = utils.getMarginAccount(
+      Exchange.programId,
+      subClient._subExchange.zetaGroupAddress,
+      user
+    );
 
-    let [spreadAccountAddress, _spreadAccountNonce] =
-      await utils.getSpreadAccount(
-        Exchange.programId,
-        subClient._subExchange.zetaGroupAddress,
-        user
-      );
+    let [spreadAccountAddress, _spreadAccountNonce] = utils.getSpreadAccount(
+      Exchange.programId,
+      subClient._subExchange.zetaGroupAddress,
+      user
+    );
 
     subClient._marginAccountAddress = marginAccountAddress;
     subClient._spreadAccountAddress = spreadAccountAddress;
@@ -236,7 +234,7 @@ export class SubClient {
           callback(asset, EventType.USER, null);
         }
 
-        await subClient.updateOpenOrdersAddresses();
+        subClient.updateOpenOrdersAddresses();
       },
       connection.commitment
     );
@@ -265,7 +263,7 @@ export class SubClient {
         )) as unknown as MarginAccount;
 
       // Set open order pdas for initialized accounts.
-      await subClient.updateOpenOrdersAddresses();
+      subClient.updateOpenOrdersAddresses();
       subClient.updateMarginPositions();
       // We don't update orders here to make load faster.
       subClient._pendingUpdate = true;
@@ -397,7 +395,7 @@ export class SubClient {
       );
     }
     tx.add(
-      await instructions.depositIx(
+      instructions.depositIx(
         this.asset,
         amount,
         this._marginAccountAddress,
@@ -570,7 +568,7 @@ export class SubClient {
       console.log(
         `User doesn't have open orders account. Initialising for market ${market.toString()}.`
       );
-      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersIx(
         this.asset,
         market,
         this._parent.publicKey,
@@ -683,7 +681,7 @@ export class SubClient {
         )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
       );
 
-      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersIx(
         this.asset,
         market,
         this._parent.publicKey,
@@ -766,7 +764,7 @@ export class SubClient {
         )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
       );
 
-      let [initIx, _openOrdersPda] = await instructions.initializeOpenOrdersIx(
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersIx(
         this.asset,
         market,
         this._parent.publicKey,
@@ -1095,7 +1093,7 @@ export class SubClient {
         )
       );
     }
-    return await await utils.processTransaction(
+    return await utils.processTransaction(
       this._parent.provider,
       tx,
       undefined,
@@ -1305,7 +1303,7 @@ export class SubClient {
       throw Error("User already has an open orders account for market!");
     }
 
-    let [initIx, openOrdersPda] = await instructions.initializeOpenOrdersIx(
+    let [initIx, openOrdersPda] = instructions.initializeOpenOrdersIx(
       this.asset,
       market,
       this._parent.publicKey,
@@ -1338,11 +1336,10 @@ export class SubClient {
       throw Error("User has no open orders account for this market!");
     }
 
-    const [vaultOwner, _vaultSignerNonce] =
-      await utils.getSerumVaultOwnerAndNonce(
-        market,
-        constants.DEX_PID[Exchange.network]
-      );
+    const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
+      market,
+      constants.DEX_PID[Exchange.network]
+    );
 
     let tx = new Transaction();
     tx.add(
@@ -1355,7 +1352,7 @@ export class SubClient {
     );
 
     tx.add(
-      await instructions.closeOpenOrdersIx(
+      instructions.closeOpenOrdersIx(
         this.asset,
         market,
         this._parent.provider.wallet.publicKey,
@@ -1391,18 +1388,17 @@ export class SubClient {
       if (this._openOrdersAccounts[marketIndex].equals(PublicKey.default)) {
         throw Error("User has no open orders account for this market!");
       }
-      const [vaultOwner, _vaultSignerNonce] =
-        await utils.getSerumVaultOwnerAndNonce(
-          market,
-          constants.DEX_PID[Exchange.network]
-        );
+      const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
+        market,
+        constants.DEX_PID[Exchange.network]
+      );
       let settleIx = instructions.settleDexFundsIx(
         this.asset,
         market,
         vaultOwner,
         this._openOrdersAccounts[marketIndex]
       );
-      let closeIx = await instructions.closeOpenOrdersIx(
+      let closeIx = instructions.closeOpenOrdersIx(
         this.asset,
         market,
         this._parent.provider.wallet.publicKey,
@@ -1461,7 +1457,7 @@ export class SubClient {
 
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
 
-    let openOrdersAccountToCancel = await utils.createOpenOrdersAddress(
+    let openOrdersAccountToCancel = utils.createOpenOrdersAddress(
       Exchange.programId,
       market,
       marginAccount.authority,
@@ -1504,7 +1500,7 @@ export class SubClient {
 
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
 
-    let openOrdersAccountToCancel = await utils.createOpenOrdersAddress(
+    let openOrdersAccountToCancel = utils.createOpenOrdersAddress(
       Exchange.programId,
       market,
       marginAccount.authority,
@@ -1891,24 +1887,22 @@ export class SubClient {
     this._spreadPositions = positions;
   }
 
-  private async updateOpenOrdersAddresses() {
-    await Promise.all(
-      this._subExchange.zetaGroup.products.map(async (product, index) => {
-        if (
-          // If the nonce is not zero, we know there is an open orders account.
-          this._marginAccount.openOrdersNonce[index] !== 0 &&
-          // If this is equal to default, it means we haven't added the PDA yet.
-          this._openOrdersAccounts[index].equals(PublicKey.default)
-        ) {
-          let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
-            Exchange.programId,
-            product.market,
-            this._parent.publicKey
-          );
-          this._openOrdersAccounts[index] = openOrdersPda;
-        }
-      })
-    );
+  private updateOpenOrdersAddresses() {
+    this._subExchange.zetaGroup.products.map((product, index) => {
+      if (
+        // If the nonce is not zero, we know there is an open orders account.
+        this._marginAccount.openOrdersNonce[index] !== 0 &&
+        // If this is equal to default, it means we haven't added the PDA yet.
+        this._openOrdersAccounts[index].equals(PublicKey.default)
+      ) {
+        let [openOrdersPda, _openOrdersNonce] = utils.getOpenOrders(
+          Exchange.programId,
+          product.market,
+          this._parent.publicKey
+        );
+        this._openOrdersAccounts[index] = openOrdersPda;
+      }
+    });
 
     // perps too
     if (
@@ -1917,7 +1911,7 @@ export class SubClient {
       // If this is equal to default, it means we haven't added the PDA yet.
       this._openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
     ) {
-      let [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
+      let [openOrdersPda, _openOrdersNonce] = utils.getOpenOrders(
         Exchange.programId,
         this._subExchange.zetaGroup.perp.market,
         this._parent.publicKey

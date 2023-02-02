@@ -46,18 +46,17 @@ export function closeMarginAccountIx(
   });
 }
 
-export async function initializeInsuranceDepositAccountIx(
+export function initializeInsuranceDepositAccountIx(
   asset: Asset,
   userKey: PublicKey,
   userWhitelistInsuranceKey: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let [insuranceDepositAccount, nonce] =
-    await utils.getUserInsuranceDepositAccount(
-      Exchange.programId,
-      subExchange.zetaGroupAddress,
-      userKey
-    );
+  let [insuranceDepositAccount, nonce] = utils.getUserInsuranceDepositAccount(
+    Exchange.programId,
+    subExchange.zetaGroupAddress,
+    userKey
+  );
 
   return Exchange.program.instruction.initializeInsuranceDepositAccount(nonce, {
     accounts: {
@@ -73,14 +72,14 @@ export async function initializeInsuranceDepositAccountIx(
 /**
  * @param amount the native amount to deposit (6dp)
  */
-export async function depositIx(
+export function depositIx(
   asset: Asset,
   amount: number,
   marginAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey,
   whitelistDepositAccount: PublicKey | undefined
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let remainingAccounts =
     whitelistDepositAccount !== undefined
       ? [
@@ -193,20 +192,20 @@ export function withdrawIx(
   });
 }
 
-export async function initializeOpenOrdersIx(
+export function initializeOpenOrdersIx(
   asset: Asset,
   market: PublicKey,
   userKey: PublicKey,
   authority: PublicKey,
   marginAccount: PublicKey
-): Promise<[TransactionInstruction, PublicKey]> {
-  const [openOrdersPda, _openOrdersNonce] = await utils.getOpenOrders(
+): [TransactionInstruction, PublicKey] {
+  const [openOrdersPda, _openOrdersNonce] = utils.getOpenOrders(
     Exchange.programId,
     market,
     userKey
   );
 
-  const [openOrdersMap, _openOrdersMapNonce] = await utils.getOpenOrdersMap(
+  const [openOrdersMap, _openOrdersMapNonce] = utils.getOpenOrdersMap(
     Exchange.programId,
     openOrdersPda
   );
@@ -232,14 +231,14 @@ export async function initializeOpenOrdersIx(
   ];
 }
 
-export async function closeOpenOrdersIx(
+export function closeOpenOrdersIx(
   asset: Asset,
   market: PublicKey,
   userKey: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey
-): Promise<TransactionInstruction> {
-  const [openOrdersMap, openOrdersMapNonce] = await utils.getOpenOrdersMap(
+): TransactionInstruction {
+  const [openOrdersMap, openOrdersMapNonce] = utils.getOpenOrdersMap(
     Exchange.programId,
     openOrders
   );
@@ -893,40 +892,40 @@ export async function initializeZetaMarketTxs(
   marketIndexes: PublicKey
 ): Promise<[Transaction, Transaction]> {
   let subExchange = Exchange.getSubExchange(asset);
-  const [market, marketNonce] = await utils.getMarketUninitialized(
+  const [market, marketNonce] = utils.getMarketUninitialized(
     Exchange.programId,
     subExchange.zetaGroupAddress,
     seedIndex
   );
 
-  const [vaultOwner, vaultSignerNonce] = await utils.getSerumVaultOwnerAndNonce(
+  const [vaultOwner, vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
     market,
     constants.DEX_PID[Exchange.network]
   );
 
-  const [baseMint, baseMintNonce] = await utils.getBaseMint(
+  const [baseMint, baseMintNonce] = utils.getBaseMint(
     Exchange.program.programId,
     market
   );
-  const [quoteMint, quoteMintNonce] = await utils.getQuoteMint(
+  const [quoteMint, quoteMintNonce] = utils.getQuoteMint(
     Exchange.program.programId,
     market
   );
   // Create SPL token vaults for serum trading owned by the Zeta program
-  const [zetaBaseVault, zetaBaseVaultNonce] = await utils.getZetaVault(
+  const [zetaBaseVault, zetaBaseVaultNonce] = utils.getZetaVault(
     Exchange.program.programId,
     baseMint
   );
-  const [zetaQuoteVault, zetaQuoteVaultNonce] = await utils.getZetaVault(
+  const [zetaQuoteVault, zetaQuoteVaultNonce] = utils.getZetaVault(
     Exchange.program.programId,
     quoteMint
   );
   // Create SPL token vaults for serum trading owned by the DEX program
-  const [dexBaseVault, dexBaseVaultNonce] = await utils.getSerumVault(
+  const [dexBaseVault, dexBaseVaultNonce] = utils.getSerumVault(
     Exchange.program.programId,
     baseMint
   );
-  const [dexQuoteVault, dexQuoteVaultNonce] = await utils.getSerumVault(
+  const [dexQuoteVault, dexQuoteVaultNonce] = utils.getSerumVault(
     Exchange.program.programId,
     quoteMint
   );
@@ -1023,10 +1022,10 @@ export async function initializeZetaMarketTxs(
   return [tx, tx2];
 }
 
-export async function initializePerpSyncQueueIx(
+export function initializePerpSyncQueueIx(
   asset: Asset
-): Promise<TransactionInstruction> {
-  let [perpSyncQueue, nonce] = await utils.getPerpSyncQueue(
+): TransactionInstruction {
+  let [perpSyncQueue, nonce] = utils.getPerpSyncQueue(
     Exchange.programId,
     Exchange.getSubExchange(asset).zetaGroupAddress
   );
@@ -1043,7 +1042,7 @@ export async function initializePerpSyncQueueIx(
   });
 }
 
-export async function initializeZetaGroupIx(
+export function initializeZetaGroupIx(
   asset: Asset,
   underlyingMint: PublicKey,
   oracle: PublicKey,
@@ -1053,39 +1052,39 @@ export async function initializeZetaGroupIx(
   perpArgs: UpdatePerpParametersArgs,
   marginArgs: UpdateMarginParametersArgs,
   expiryArgs: UpdateZetaGroupExpiryArgs
-): Promise<TransactionInstruction> {
-  let [zetaGroup, zetaGroupNonce] = await utils.getZetaGroup(
+): TransactionInstruction {
+  let [zetaGroup, zetaGroupNonce] = utils.getZetaGroup(
     Exchange.programId,
     underlyingMint
   );
 
-  let [underlying, underlyingNonce] = await utils.getUnderlying(
+  let [underlying, underlyingNonce] = utils.getUnderlying(
     Exchange.programId,
     Exchange.state.numUnderlyings
   );
   let subExchange = Exchange.getSubExchange(asset);
-  let [greeks, greeksNonce] = await utils.getGreeks(
+  let [greeks, greeksNonce] = utils.getGreeks(
     Exchange.programId,
     subExchange.zetaGroupAddress
   );
 
-  let [perpSyncQueue, perpSyncQueueNonce] = await utils.getPerpSyncQueue(
+  let [perpSyncQueue, perpSyncQueueNonce] = utils.getPerpSyncQueue(
     Exchange.programId,
     subExchange.zetaGroupAddress
   );
 
-  let [vault, vaultNonce] = await utils.getVault(
+  let [vault, vaultNonce] = utils.getVault(
     Exchange.programId,
     subExchange.zetaGroupAddress
   );
 
-  let [insuranceVault, insuranceVaultNonce] = await utils.getZetaInsuranceVault(
+  let [insuranceVault, insuranceVaultNonce] = utils.getZetaInsuranceVault(
     Exchange.programId,
     subExchange.zetaGroupAddress
   );
 
   let [socializedLossAccount, socializedLossAccountNonce] =
-    await utils.getSocializedLossAccount(
+    utils.getSocializedLossAccount(
       Exchange.programId,
       subExchange.zetaGroupAddress
     );
@@ -1263,12 +1262,12 @@ export function crankMarketIx(
   });
 }
 
-export async function initializeMarketNodeIx(
+export function initializeMarketNodeIx(
   asset: Asset,
   index: number
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let [marketNode, nonce] = await utils.getMarketNode(
+  let [marketNode, nonce] = utils.getMarketNode(
     Exchange.programId,
     subExchange.zetaGroupAddress,
     index
@@ -1539,16 +1538,13 @@ export function initializeMarketStrikesIx(
   });
 }
 
-export async function initializeWhitelistDepositAccountIx(
+export function initializeWhitelistDepositAccountIx(
   asset: Asset,
   user: PublicKey,
   admin: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let [whitelistDepositAccount, whitelistDepositNonce] =
-    await utils.getUserWhitelistDepositAccount(
-      Exchange.program.programId,
-      user
-    );
+    utils.getUserWhitelistDepositAccount(Exchange.program.programId, user);
 
   return Exchange.program.instruction.initializeWhitelistDepositAccount(
     whitelistDepositNonce,
@@ -1564,15 +1560,12 @@ export async function initializeWhitelistDepositAccountIx(
   );
 }
 
-export async function initializeWhitelistInsuranceAccountIx(
+export function initializeWhitelistInsuranceAccountIx(
   user: PublicKey,
   admin: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let [whitelistInsuranceAccount, whitelistInsuranceNonce] =
-    await utils.getUserWhitelistInsuranceAccount(
-      Exchange.program.programId,
-      user
-    );
+    utils.getUserWhitelistInsuranceAccount(Exchange.program.programId, user);
 
   return Exchange.program.instruction.initializeWhitelistInsuranceAccount(
     whitelistInsuranceNonce,
@@ -1588,15 +1581,12 @@ export async function initializeWhitelistInsuranceAccountIx(
   );
 }
 
-export async function initializeWhitelistTradingFeesAccountIx(
+export function initializeWhitelistTradingFeesAccountIx(
   user: PublicKey,
   admin: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let [whitelistTradingFeesAccount, whitelistTradingFeesNonce] =
-    await utils.getUserWhitelistTradingFeesAccount(
-      Exchange.program.programId,
-      user
-    );
+    utils.getUserWhitelistTradingFeesAccount(Exchange.program.programId, user);
 
   return Exchange.program.instruction.initializeWhitelistTradingFeesAccount(
     whitelistTradingFeesNonce,
@@ -1612,15 +1602,15 @@ export async function initializeWhitelistTradingFeesAccountIx(
   );
 }
 
-export async function referUserIx(
+export function referUserIx(
   user: PublicKey,
   referrer: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let [referrerAccount, _referrerAccountNonce] =
-    await utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
+    utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
 
   let [referralAccount, _referralAccountNonce] =
-    await utils.getReferralAccountAddress(Exchange.program.programId, user);
+    utils.getReferralAccountAddress(Exchange.program.programId, user);
 
   return Exchange.program.instruction.referUser({
     accounts: {
@@ -1632,11 +1622,11 @@ export async function referUserIx(
   });
 }
 
-export async function initializeReferrerAccountIx(
+export function initializeReferrerAccountIx(
   referrer: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   let [referrerAccount, _referrerAccountNonce] =
-    await utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
+    utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
 
   return Exchange.program.instruction.initializeReferrerAccount({
     accounts: {
@@ -1647,16 +1637,16 @@ export async function initializeReferrerAccountIx(
   });
 }
 
-export async function initializeReferrerAliasIx(
+export function initializeReferrerAliasIx(
   referrer: PublicKey,
   alias: string
-): Promise<TransactionInstruction> {
-  let [referrerAccount] = await utils.getReferrerAccountAddress(
+): TransactionInstruction {
+  let [referrerAccount] = utils.getReferrerAccountAddress(
     Exchange.program.programId,
     referrer
   );
 
-  let [referrerAlias] = await utils.getReferrerAliasAddress(
+  let [referrerAlias] = utils.getReferrerAliasAddress(
     Exchange.program.programId,
     alias
   );
@@ -1671,11 +1661,11 @@ export async function initializeReferrerAliasIx(
   });
 }
 
-export async function setReferralsRewardsIx(
+export function setReferralsRewardsIx(
   args: SetReferralsRewardsArgs[],
   referralsAdmin: PublicKey,
   remainingAccounts: AccountMeta[]
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.setReferralsRewards(args, {
     accounts: {
       state: Exchange.stateAddress,
@@ -1685,11 +1675,11 @@ export async function setReferralsRewardsIx(
   });
 }
 
-export async function claimReferralsRewardsIx(
+export function claimReferralsRewardsIx(
   userReferralsAccount: PublicKey,
   userTokenAccount: PublicKey,
   user: PublicKey
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return Exchange.program.instruction.claimReferralsRewards({
     accounts: {
       state: Exchange.stateAddress,
@@ -2250,12 +2240,12 @@ export function overrideExpiryIx(
   });
 }
 
-export async function toggleMarketMakerIx(
+export function toggleMarketMakerIx(
   isMarketMaker: boolean,
   zetaGroup: PublicKey,
   user: PublicKey
-): Promise<TransactionInstruction> {
-  let [marginAccount, _nonce] = await utils.getMarginAccount(
+): TransactionInstruction {
+  let [marginAccount, _nonce] = utils.getMarginAccount(
     Exchange.programId,
     zetaGroup,
     user

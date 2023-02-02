@@ -154,47 +154,30 @@ export class SubExchange {
 
     // Load zeta group.
     let underlyingMint = constants.MINTS[asset];
-
-    const [zetaGroup, _zetaGroupNonce] = await utils.getZetaGroup(
+    this._zetaGroupAddress = utils.getZetaGroup(
       Exchange.programId,
       underlyingMint
-    );
-    this._zetaGroupAddress = zetaGroup;
-
-    let [greeks, _greeksNonce] = await utils.getGreeks(
+    )[0];
+    this._greeksAddress = utils.getGreeks(
       Exchange.programId,
       this.zetaGroupAddress
-    );
-
-    this._greeksAddress = greeks;
-
-    let [perpSyncQueue, _perpSyncQueueNonce] = await utils.getPerpSyncQueue(
+    )[0];
+    this._perpSyncQueueAddress = utils.getPerpSyncQueue(
       Exchange.programId,
       this.zetaGroupAddress
-    );
-
-    this._perpSyncQueueAddress = perpSyncQueue;
-
-    const [vaultAddress, _vaultNonce] = await utils.getVault(
+    )[0];
+    this._vaultAddress = utils.getVault(
       Exchange.programId,
       this._zetaGroupAddress
-    );
-
-    const [insuranceVaultAddress, _insuranceNonce] =
-      await utils.getZetaInsuranceVault(
-        Exchange.programId,
-        this.zetaGroupAddress
-      );
-
-    const [socializedLossAccount, _socializedLossAccountNonce] =
-      await utils.getSocializedLossAccount(
-        Exchange.programId,
-        this._zetaGroupAddress
-      );
-
-    this._vaultAddress = vaultAddress;
-    this._insuranceVaultAddress = insuranceVaultAddress;
-    this._socializedLossAccountAddress = socializedLossAccount;
+    )[0];
+    this._insuranceVaultAddress = utils.getZetaInsuranceVault(
+      Exchange.programId,
+      this.zetaGroupAddress
+    )[0];
+    this._socializedLossAccountAddress = utils.getSocializedLossAccount(
+      Exchange.programId,
+      this._zetaGroupAddress
+    )[0];
 
     this._isSetup = true;
   }
@@ -205,9 +188,9 @@ export class SubExchange {
    */
   public async load(
     asset: Asset,
-    programId: PublicKey,
-    network: Network,
     opts: ConfirmOptions,
+    fetchedAccs: any[],
+    loadFromStore: boolean,
     throttleMs = 0,
     callback?: (asset: Asset, event: EventType, data: any) => void
   ) {
@@ -217,9 +200,10 @@ export class SubExchange {
       throw "SubExchange already loaded.";
     }
 
-    await this.updateZetaGroup();
-
-    this._markets = await ZetaGroupMarkets.load(this.asset, opts, 0);
+    this._zetaGroup = fetchedAccs[0] as ZetaGroup;
+    this._greeks = fetchedAccs[1] as Greeks;
+    this._perpSyncQueue = fetchedAccs[2] as PerpSyncQueue;
+    this.updateMarginParams();
 
     if (
       this.zetaGroup.products[this.zetaGroup.products.length - 1].market.equals(
@@ -230,13 +214,13 @@ export class SubExchange {
       throw "Zeta group markets are uninitialized!";
     }
 
-    this._markets = await ZetaGroupMarkets.load(asset, opts, throttleMs);
-    this._greeks = (await Exchange.program.account.greeks.fetch(
-      this.greeksAddress
-    )) as Greeks;
-    this._perpSyncQueue = (await Exchange.program.account.perpSyncQueue.fetch(
-      this.perpSyncQueueAddress
-    )) as PerpSyncQueue;
+    this._markets = await ZetaGroupMarkets.load(
+      asset,
+      opts,
+      throttleMs,
+      loadFromStore
+    );
+
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
     // Set callbacks.
@@ -246,7 +230,8 @@ export class SubExchange {
 
     this._isInitialized = true;
 
-    console.log(`${assetToName(this.asset)} SubExchange loaded`);
+    console.info(`${assetToName(this.asset)} SubExchange loaded`);
+    return;
   }
 
   /**
@@ -258,7 +243,7 @@ export class SubExchange {
       `Refreshing Serum markets for ${assetToName(asset)} SubExchange.`
     );
 
-    this._markets = await ZetaGroupMarkets.load(this.asset, opts, 0);
+    this._markets = await ZetaGroupMarkets.load(this.asset, opts, 0, false);
 
     console.log(
       `${assetToName(this.asset)} SubExchange Serum markets refreshed`
@@ -273,7 +258,7 @@ export class SubExchange {
     await Promise.all(
       indexes.map(async (index: number) => {
         let tx = new Transaction().add(
-          await instructions.initializeMarketNodeIx(this.asset, index)
+          instructions.initializeMarketNodeIx(this.asset, index)
         );
         await utils.processTransaction(Exchange.provider, tx);
       })
@@ -372,7 +357,7 @@ export class SubExchange {
    */
   public async initializeZetaMarkets() {
     // Initialize market indexes.
-    let [marketIndexes, marketIndexesNonce] = await utils.getMarketIndexes(
+    let [marketIndexes, marketIndexesNonce] = utils.getMarketIndexes(
       Exchange.programId,
       this._zetaGroupAddress
     );
@@ -487,7 +472,7 @@ export class SubExchange {
     if (Exchange.network != Network.LOCALNET) {
       // Validate that the market hasn't already been initialized
       // So no sol is wasted on unnecessary accounts.
-      const [market, _marketNonce] = await utils.getMarketUninitialized(
+      const [market, _marketNonce] = utils.getMarketUninitialized(
         Exchange.programId,
         this._zetaGroupAddress,
         marketIndexesAccount.indexes[i]
@@ -755,7 +740,7 @@ export class SubExchange {
    */
   public async whitelistUserForDeposit(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistDepositAccountIx(
+      instructions.initializeWhitelistDepositAccountIx(
         this.asset,
         user,
         Exchange.provider.wallet.publicKey
@@ -769,7 +754,7 @@ export class SubExchange {
    */
   public async whitelistUserForInsuranceVault(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistInsuranceAccountIx(
+      instructions.initializeWhitelistInsuranceAccountIx(
         user,
         Exchange.provider.wallet.publicKey
       )
@@ -782,7 +767,7 @@ export class SubExchange {
    */
   public async whitelistUserForTradingFees(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistTradingFeesAccountIx(
+      instructions.initializeWhitelistTradingFeesAccountIx(
         user,
         Exchange.provider.wallet.publicKey
       )

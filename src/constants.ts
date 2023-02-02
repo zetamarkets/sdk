@@ -1,6 +1,16 @@
 import { PublicKey, AddressLookupTableAccount } from "@solana/web3.js";
 import { Asset } from "./assets";
 
+export const ZETA_PID: {
+  localnet: PublicKey;
+  devnet: PublicKey;
+  mainnet: PublicKey;
+} = {
+  localnet: new PublicKey("BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"),
+  devnet: new PublicKey("BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"),
+  mainnet: new PublicKey("ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD"),
+};
+
 // Asset keys are wormhole from mainnet.
 export const MINTS = {
   [Asset.SOL]: new PublicKey("So11111111111111111111111111111111111111112"),
@@ -8,13 +18,17 @@ export const MINTS = {
   [Asset.ETH]: new PublicKey("FeGn77dhg1KXRRFeSwwMiykZnZPw5JXW6naf2aQgZDQf"),
 };
 
-export const DEX_PID = {
+export const DEX_PID: {
+  localnet: PublicKey;
+  devnet: PublicKey;
+  mainnet: PublicKey;
+} = {
   localnet: new PublicKey("5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"),
   devnet: new PublicKey("5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"),
   mainnet: new PublicKey("zDEXqXEG7gAyxb1Kg9mK5fPnUdENCGKzWrM21RMdWRq"),
 };
 
-export const CHAINLINK_PID = new PublicKey(
+export const CHAINLINK_PID: PublicKey = new PublicKey(
   "HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny"
 );
 

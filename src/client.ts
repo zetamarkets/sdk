@@ -166,7 +166,7 @@ export class Client {
 
     client._useVersionedTxs = useVersionedTxs;
 
-    client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
+    client._usdcAccountAddress = utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
       owner
     );
@@ -174,7 +174,7 @@ export class Client {
     client._whitelistDepositAddress = undefined;
     try {
       let [whitelistDepositAddress, _whitelistTradingFeesNonce] =
-        await utils.getUserWhitelistDepositAccount(Exchange.programId, owner);
+        utils.getUserWhitelistDepositAccount(Exchange.programId, owner);
       await Exchange.program.account.whitelistDepositAccount.fetch(
         whitelistDepositAddress
       );
@@ -185,10 +185,7 @@ export class Client {
     client._whitelistTradingFeesAddress = undefined;
     try {
       let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
-        await utils.getUserWhitelistTradingFeesAccount(
-          Exchange.programId,
-          owner
-        );
+        utils.getUserWhitelistTradingFeesAccount(Exchange.programId, owner);
       await Exchange.program.account.whitelistTradingFeesAccount.fetch(
         whitelistTradingFeesAddress
       );
@@ -279,7 +276,7 @@ export class Client {
   public async setReferralData() {
     this.delegatedCheck();
     try {
-      let [referrerAccount] = await utils.getReferrerAccountAddress(
+      let [referrerAccount] = utils.getReferrerAccountAddress(
         Exchange.programId,
         this.publicKey
       );
@@ -298,11 +295,10 @@ export class Client {
     } catch (e) {}
 
     try {
-      let [referralAccountAddress, _nonce] =
-        await utils.getReferralAccountAddress(
-          Exchange.programId,
-          this.publicKey
-        );
+      let [referralAccountAddress, _nonce] = utils.getReferralAccountAddress(
+        Exchange.programId,
+        this.publicKey
+      );
 
       this._referralAccountAddress = referralAccountAddress;
       this._referralAccount =
@@ -317,7 +313,7 @@ export class Client {
 
   public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
     this.delegatedCheck();
-    let [referrerAccount] = await utils.getReferrerAccountAddress(
+    let [referrerAccount] = utils.getReferrerAccountAddress(
       Exchange.programId,
       referrer
     );
@@ -328,11 +324,11 @@ export class Client {
       throw Error(`Invalid referrer. ${referrer.toString()}`);
     }
     let tx = new Transaction().add(
-      await referUserIx(this.provider.wallet.publicKey, referrer)
+      referUserIx(this.provider.wallet.publicKey, referrer)
     );
     let txId = await utils.processTransaction(this.provider, tx);
 
-    [this._referralAccountAddress] = await utils.getReferralAccountAddress(
+    [this._referralAccountAddress] = utils.getReferralAccountAddress(
       Exchange.programId,
       this.publicKey
     );
@@ -524,7 +520,7 @@ export class Client {
       );
     }
     tx.add(
-      await instructions.depositIx(
+      instructions.depositIx(
         depositAsset,
         amount,
         depositSubClient.marginAccountAddress,
@@ -1019,7 +1015,7 @@ export class Client {
       throw new Error("Alias cannot be over 15 chars!");
     }
 
-    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
       Exchange.programId,
       this.publicKey
     );
@@ -1050,7 +1046,7 @@ export class Client {
 
   public async claimReferrerRewards(): Promise<TransactionSignature> {
     this.delegatedCheck();
-    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
       Exchange.programId,
       this.publicKey
     );
@@ -1066,7 +1062,7 @@ export class Client {
 
   public async claimReferralRewards(): Promise<TransactionSignature> {
     this.delegatedCheck();
-    let [referralAccountAddress] = await utils.getReferralAccountAddress(
+    let [referralAccountAddress] = utils.getReferralAccountAddress(
       Exchange.programId,
       this.publicKey
     );

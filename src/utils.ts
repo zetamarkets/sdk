@@ -45,21 +45,19 @@ import { readBigInt64LE } from "./oracle-utils";
 import { assets } from ".";
 import { Network } from "./network";
 
-export async function getState(
-  programId: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+export function getState(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from(anchor.utils.bytes.utf8.encode("state"))],
     programId
   );
 }
 
-export async function getMarketNode(
+export function getMarketNode(
   programId: PublicKey,
   zetaGroup: PublicKey,
   marketIndex: number
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("market-node")),
       zetaGroup.toBuffer(),
@@ -69,12 +67,12 @@ export async function getMarketNode(
   );
 }
 
-export async function getSettlement(
+export function getSettlement(
   programId: PublicKey,
   underlyingMint: PublicKey,
   expirationTs: anchor.BN
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("settlement")),
       underlyingMint.toBuffer(),
@@ -84,12 +82,12 @@ export async function getSettlement(
   );
 }
 
-export async function getOpenOrders(
+export function getOpenOrders(
   programId: PublicKey,
   market: PublicKey,
   userKey: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("open-orders")),
       constants.DEX_PID[Exchange.network].toBuffer(),
@@ -100,13 +98,13 @@ export async function getOpenOrders(
   );
 }
 
-export async function createOpenOrdersAddress(
+export function createOpenOrdersAddress(
   programId: PublicKey,
   market: PublicKey,
   userKey: PublicKey,
   nonce: number
-): Promise<PublicKey> {
-  return await PublicKey.createProgramAddress(
+): PublicKey {
+  return PublicKey.createProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("open-orders")),
       constants.DEX_PID[Exchange.network].toBuffer(),
@@ -118,39 +116,35 @@ export async function createOpenOrdersAddress(
   );
 }
 
-export async function getOpenOrdersMap(
+export function getOpenOrdersMap(
   programId: PublicKey,
   openOrders: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [openOrders.toBuffer()],
     programId
   );
 }
 
-export async function getSerumAuthority(
-  programId: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+export function getSerumAuthority(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from(anchor.utils.bytes.utf8.encode("serum"))],
     programId
   );
 }
 
-export async function getMintAuthority(
-  programId: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+export function getMintAuthority(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from(anchor.utils.bytes.utf8.encode("mint-auth"))],
     programId
   );
 }
 
-export async function getVault(
+export function getVault(
   programId: PublicKey,
   zetaGroup: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("vault")),
       zetaGroup.toBuffer(),
@@ -159,11 +153,11 @@ export async function getVault(
   );
 }
 
-export async function getSerumVault(
+export function getSerumVault(
   programId: PublicKey,
   mint: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("serum-vault")),
       mint.toBuffer(),
@@ -172,11 +166,11 @@ export async function getSerumVault(
   );
 }
 
-export async function getZetaVault(
+export function getZetaVault(
   programId: PublicKey,
   mint: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-vault")),
       mint.toBuffer(),
@@ -185,11 +179,11 @@ export async function getZetaVault(
   );
 }
 
-export async function getZetaInsuranceVault(
+export function getZetaInsuranceVault(
   programId: PublicKey,
   zetaGroup: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-insurance-vault")),
       zetaGroup.toBuffer(),
@@ -198,11 +192,11 @@ export async function getZetaInsuranceVault(
   );
 }
 
-export async function getZetaTreasuryWallet(
+export function getZetaTreasuryWallet(
   programId: PublicKey,
   mint: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-treasury-wallet")),
       mint.toBuffer(),
@@ -211,11 +205,11 @@ export async function getZetaTreasuryWallet(
   );
 }
 
-export async function getZetaReferralsRewardsWallet(
+export function getZetaReferralsRewardsWallet(
   programId: PublicKey,
   mint: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(
         anchor.utils.bytes.utf8.encode("zeta-referrals-rewards-wallet")
@@ -226,12 +220,12 @@ export async function getZetaReferralsRewardsWallet(
   );
 }
 
-export async function getUserInsuranceDepositAccount(
+export function getUserInsuranceDepositAccount(
   programId: PublicKey,
   zetaGroup: PublicKey,
   userKey: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("user-insurance-deposit")),
       zetaGroup.toBuffer(),
@@ -241,11 +235,11 @@ export async function getUserInsuranceDepositAccount(
   );
 }
 
-export async function getUserWhitelistDepositAccount(
+export function getUserWhitelistDepositAccount(
   programId: PublicKey,
   userKey: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("whitelist-deposit")),
       userKey.toBuffer(),
@@ -254,11 +248,11 @@ export async function getUserWhitelistDepositAccount(
   );
 }
 
-export async function getUserWhitelistInsuranceAccount(
+export function getUserWhitelistInsuranceAccount(
   programId: PublicKey,
   userKey: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("whitelist-insurance")),
       userKey.toBuffer(),
@@ -267,11 +261,11 @@ export async function getUserWhitelistInsuranceAccount(
   );
 }
 
-export async function getUserWhitelistTradingFeesAccount(
+export function getUserWhitelistTradingFeesAccount(
   programId: PublicKey,
   userKey: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("whitelist-trading-fees")),
       userKey.toBuffer(),
@@ -280,11 +274,11 @@ export async function getUserWhitelistTradingFeesAccount(
   );
 }
 
-export async function getZetaGroup(
+export function getZetaGroup(
   programId: PublicKey,
   mint: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-group")),
       mint.toBuffer(),
@@ -293,11 +287,11 @@ export async function getZetaGroup(
   );
 }
 
-export async function getUnderlying(
+export function getUnderlying(
   programId: PublicKey,
   underlyingIndex: number
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("underlying")),
       Buffer.from([underlyingIndex]),
@@ -306,11 +300,11 @@ export async function getUnderlying(
   );
 }
 
-export async function getGreeks(
+export function getGreeks(
   programId: PublicKey,
   zetaGroup: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("greeks")),
       zetaGroup.toBuffer(),
@@ -319,11 +313,11 @@ export async function getGreeks(
   );
 }
 
-export async function getPerpSyncQueue(
+export function getPerpSyncQueue(
   programId: PublicKey,
   zetaGroup: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("perp-sync-queue")),
       zetaGroup.toBuffer(),
@@ -332,11 +326,11 @@ export async function getPerpSyncQueue(
   );
 }
 
-export async function getMarketIndexes(
+export function getMarketIndexes(
   programId: PublicKey,
   zetaGroup: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("market-indexes")),
       zetaGroup.toBuffer(),
@@ -345,11 +339,11 @@ export async function getMarketIndexes(
   );
 }
 
-export async function getBaseMint(
+export function getBaseMint(
   programId: PublicKey,
   market: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("base-mint")),
       market.toBuffer(),
@@ -358,11 +352,11 @@ export async function getBaseMint(
   );
 }
 
-export async function getQuoteMint(
+export function getQuoteMint(
   programId: PublicKey,
   market: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("quote-mint")),
       market.toBuffer(),
@@ -371,12 +365,12 @@ export async function getQuoteMint(
   );
 }
 
-export async function getMarginAccount(
+export function getMarginAccount(
   programId: PublicKey,
   zetaGroup: PublicKey,
   userKey: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("margin")),
       zetaGroup.toBuffer(),
@@ -386,12 +380,12 @@ export async function getMarginAccount(
   );
 }
 
-export async function getSpreadAccount(
+export function getSpreadAccount(
   programId: PublicKey,
   zetaGroup: PublicKey,
   userKey: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("spread")),
       zetaGroup.toBuffer(),
@@ -401,12 +395,12 @@ export async function getSpreadAccount(
   );
 }
 
-export async function getMarketUninitialized(
+export function getMarketUninitialized(
   programId: PublicKey,
   zetaGroup: PublicKey,
   marketIndex: number
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("market")),
       zetaGroup.toBuffer(),
@@ -416,11 +410,11 @@ export async function getMarketUninitialized(
   );
 }
 
-export async function getSocializedLossAccount(
+export function getSocializedLossAccount(
   programId: PublicKey,
   zetaGroup: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("socialized-loss")),
       zetaGroup.toBuffer(),
@@ -429,11 +423,11 @@ export async function getSocializedLossAccount(
   );
 }
 
-export async function getReferrerAccountAddress(
+export function getReferrerAccountAddress(
   programId: PublicKey,
   referrer: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("referrer")),
       referrer.toBuffer(),
@@ -442,21 +436,21 @@ export async function getReferrerAccountAddress(
   );
 }
 
-export async function getReferralAccountAddress(
+export function getReferralAccountAddress(
   programId: PublicKey,
   user: PublicKey
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from(anchor.utils.bytes.utf8.encode("referral")), user.toBuffer()],
     programId
   );
 }
 
-export async function getReferrerAliasAddress(
+export function getReferrerAliasAddress(
   programId: PublicKey,
   alias: string
-): Promise<[PublicKey, number]> {
-  return await anchor.web3.PublicKey.findProgramAddress(
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("referrer-alias")),
       Buffer.from(alias),
@@ -470,14 +464,14 @@ export async function getReferrerAliasAddress(
  * Serum uses a u64 as nonce which is not the same as
  * normal solana PDA convention and goes 0 -> 255
  */
-export async function getSerumVaultOwnerAndNonce(
+export function getSerumVaultOwnerAndNonce(
   market: PublicKey,
   dexPid: PublicKey
-): Promise<[PublicKey, anchor.BN]> {
+): [PublicKey, anchor.BN] {
   const nonce = new BN(0);
   while (nonce.toNumber() < 255) {
     try {
-      const vaultOwner: PublicKey = await PublicKey.createProgramAddress(
+      const vaultOwner: PublicKey = PublicKey.createProgramAddressSync(
         [market.toBuffer(), nonce.toArrayLike(Buffer, "le", 8)],
         dexPid
       );
@@ -629,15 +623,13 @@ export async function getTokenAccountInfo(
   return accountInfo;
 }
 
-export async function getAssociatedTokenAddress(
+export function getAssociatedTokenAddress(
   mint: PublicKey,
   owner: PublicKey
-): Promise<PublicKey> {
-  return (
-    await PublicKey.findProgramAddress(
-      [owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
-      ASSOCIATED_TOKEN_PROGRAM_ID
-    )
+): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+    ASSOCIATED_TOKEN_PROGRAM_ID
   )[0];
 }
 
@@ -998,14 +990,14 @@ export async function getMarginFromOpenOrders(
   openOrders: PublicKey,
   market: Market
 ) {
-  const [openOrdersMap, _openOrdersMapNonce] = await getOpenOrdersMap(
+  const [openOrdersMap, _openOrdersMapNonce] = getOpenOrdersMap(
     Exchange.programId,
     openOrders
   );
   let openOrdersMapInfo = (await Exchange.program.account.openOrdersMap.fetch(
     openOrdersMap
   )) as OpenOrdersMap;
-  const [marginAccount, _marginNonce] = await getMarginAccount(
+  const [marginAccount, _marginNonce] = getMarginAccount(
     Exchange.programId,
     market.zetaGroup,
     openOrdersMapInfo.userKey
@@ -1106,7 +1098,7 @@ export async function settleUsers(
   expiryTs: anchor.BN,
   accountType: types.ProgramAccountType = types.ProgramAccountType.MarginAccount
 ) {
-  let [settlement, settlementNonce] = await getSettlement(
+  let [settlement, settlementNonce] = getSettlement(
     Exchange.programId,
     Exchange.getSubExchange(asset).zetaGroup.underlyingMint,
     expiryTs
@@ -1277,7 +1269,7 @@ export async function pruneExpiredTIFOrders(
 
 export async function expireSeries(asset: Asset, expiryTs: anchor.BN) {
   let subExchange = Exchange.getSubExchange(asset);
-  let [settlement, settlementNonce] = await getSettlement(
+  let [settlement, settlementNonce] = getSettlement(
     Exchange.programId,
     subExchange.zetaGroup.underlyingMint,
     expiryTs
@@ -1342,7 +1334,7 @@ export async function getCancelAllIxs(
   let ixs: TransactionInstruction[] = [];
   await Promise.all(
     orders.map(async (order) => {
-      const [openOrdersMap, _openOrdersMapNonce] = await getOpenOrdersMap(
+      const [openOrdersMap, _openOrdersMapNonce] = getOpenOrdersMap(
         Exchange.programId,
         order.owner
       );
@@ -1352,7 +1344,7 @@ export async function getCancelAllIxs(
           openOrdersMap
         )) as OpenOrdersMap;
 
-      const [marginAccount, _marginNonce] = await getMarginAccount(
+      const [marginAccount, _marginNonce] = getMarginAccount(
         Exchange.programId,
         Exchange.getZetaGroupAddress(asset),
         openOrdersMapInfo.userKey
@@ -1381,7 +1373,7 @@ export async function getCancelAllIxs(
   return ixs;
 }
 
-export async function writeKeypair(filename: string, keypair: Keypair) {
+export function writeKeypair(filename: string, keypair: Keypair) {
   let secret = "[" + keypair.secretKey.toString() + "]";
   fs.writeFileSync(filename, secret);
 }
@@ -1446,26 +1438,25 @@ export async function getAllOpenOrdersAccountsByMarket(
   }
 
   let marginAccounts = await Exchange.program.account.marginAccount.all();
-  await Promise.all(
-    marginAccounts.map(async (acc) => {
-      let marginAccount = acc.account as MarginAccount;
-      if (assets.fromProgramAsset(marginAccount.asset) != asset) {
-        return;
+  marginAccounts.forEach((acc) => {
+    let marginAccount = acc.account as MarginAccount;
+    if (assets.fromProgramAsset(marginAccount.asset) != asset) {
+      return;
+    }
+    for (var market of Exchange.getMarkets(asset)) {
+      let nonce = marginAccount.openOrdersNonce[market.marketIndex];
+      if (nonce == 0) {
+        continue;
       }
-      for (var market of Exchange.getMarkets(asset)) {
-        let nonce = marginAccount.openOrdersNonce[market.marketIndex];
-        if (nonce == 0) {
-          continue;
-        }
-        let [openOrders, _nonce] = await getOpenOrders(
-          Exchange.programId,
-          market.address,
-          marginAccount.authority
-        );
-        openOrdersByMarketIndex.get(market.marketIndex).push(openOrders);
-      }
-    })
-  );
+      let [openOrders, _nonce] = getOpenOrders(
+        Exchange.programId,
+        market.address,
+        marginAccount.authority
+      );
+      openOrdersByMarketIndex.get(market.marketIndex).push(openOrders);
+    }
+  });
+
   return openOrdersByMarketIndex;
 }
 
@@ -1482,7 +1473,7 @@ export async function settleAndBurnVaultTokensByMarket(
     return { pubkey: key, isSigner: false, isWritable: true };
   });
 
-  const [vaultOwner, _vaultSignerNonce] = await getSerumVaultOwnerAndNonce(
+  const [vaultOwner, _vaultSignerNonce] = getSerumVaultOwnerAndNonce(
     market.address,
     constants.DEX_PID[Exchange.network]
   );
@@ -1519,7 +1510,7 @@ export async function settleAndBurnVaultTokens(
       return { pubkey: key, isSigner: false, isWritable: true };
     });
 
-    const [vaultOwner, _vaultSignerNonce] = await getSerumVaultOwnerAndNonce(
+    const [vaultOwner, _vaultSignerNonce] = getSerumVaultOwnerAndNonce(
       market.address,
       constants.DEX_PID[Exchange.network]
     );

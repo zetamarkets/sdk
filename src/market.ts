@@ -19,6 +19,7 @@ import * as types from "./types";
 
 import { EventType, OrderbookEvent } from "./events";
 import { Asset } from "./assets";
+import * as SerumMarketStore from "./serum-market-store";
 
 export class ZetaGroupMarkets {
   /**
@@ -220,7 +221,8 @@ export class ZetaGroupMarkets {
   public static async load(
     asset: Asset,
     opts: ConfirmOptions,
-    throttleMs: number
+    throttleMs: number,
+    loadFromStore: boolean
   ): Promise<ZetaGroupMarkets> {
     let instance = new ZetaGroupMarkets(asset);
     let subExchange = Exchange.getSubExchange(asset);
@@ -236,17 +238,39 @@ export class ZetaGroupMarkets {
       await Promise.all(
         slice.map(async (index) => {
           let marketAddr = subExchange.zetaGroup.products[index].market;
-          let serumMarket = await SerumMarket.load(
-            Exchange.connection,
-            marketAddr,
-            { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
-            constants.DEX_PID[Exchange.network]
-          );
-          let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
+
+          let serumMarket: SerumMarket;
+
+          if (loadFromStore) {
+            const decoded =
+              SerumMarketStore.STATIC_SERUM_MARKETS[Exchange.network][asset][
+                index
+              ];
+            serumMarket = SerumMarket.loadFromDecoded(
+              decoded,
+              {
+                commitment: opts.commitment,
+                skipPreflight: opts.skipPreflight,
+              },
+              constants.DEX_PID[Exchange.network]
+            );
+          } else {
+            serumMarket = await SerumMarket.load(
+              Exchange.connection,
+              marketAddr,
+              {
+                commitment: opts.commitment,
+                skipPreflight: opts.skipPreflight,
+              },
+              constants.DEX_PID[Exchange.network]
+            );
+          }
+
+          let [baseVaultAddr, _baseVaultNonce] = getZetaVault(
             Exchange.programId,
             serumMarket.baseMintAddress
           );
-          let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
+          let [quoteVaultAddr, _quoteVaultNonce] = getZetaVault(
             Exchange.programId,
             serumMarket.quoteMintAddress
           );
@@ -271,17 +295,37 @@ export class ZetaGroupMarkets {
 
     // Perps product/market is separate
     let marketAddr = subExchange.zetaGroup.perp.market;
-    let serumMarket = await SerumMarket.load(
-      Exchange.connection,
-      marketAddr,
-      { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
-      constants.DEX_PID[Exchange.network]
-    );
-    let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
+    let serumMarket: SerumMarket;
+    if (loadFromStore) {
+      const decoded =
+        SerumMarketStore.STATIC_SERUM_MARKETS[Exchange.network][asset][
+          constants.ACTIVE_MARKETS - 1
+        ];
+      serumMarket = SerumMarket.loadFromDecoded(
+        decoded,
+        {
+          commitment: opts.commitment,
+          skipPreflight: opts.skipPreflight,
+        },
+        constants.DEX_PID[Exchange.network]
+      );
+    } else {
+      serumMarket = await SerumMarket.load(
+        Exchange.connection,
+        marketAddr,
+        {
+          commitment: opts.commitment,
+          skipPreflight: opts.skipPreflight,
+        },
+        constants.DEX_PID[Exchange.network]
+      );
+    }
+
+    let [baseVaultAddr, _baseVaultNonce] = getZetaVault(
       Exchange.programId,
       serumMarket.baseMintAddress
     );
-    let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
+    let [quoteVaultAddr, _quoteVaultNonce] = getZetaVault(
       Exchange.programId,
       serumMarket.quoteMintAddress
     );
