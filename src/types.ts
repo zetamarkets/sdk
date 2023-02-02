@@ -7,10 +7,10 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
-import { Asset } from "./assets";
+import { Asset, allAssets } from "./assets";
 import { objectEquals } from "./utils";
 import { MarginAccount } from "./program-types";
-import { Network, types } from ".";
+import { Network, types, utils } from ".";
 import * as constants from "./constants";
 
 /**
@@ -349,10 +349,28 @@ export function defaultOrderOptions(): OrderOptions {
 }
 
 export interface LoadExchangeConfig {
-  assets: Asset[];
   network: Network;
   connection: Connection;
+  assets: Asset[];
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
+}
+
+export function defaultLoadExchangeConfig(
+  network: Network,
+  connection: Connection,
+  assets: Asset[] = allAssets(),
+  opts: ConfirmOptions = utils.defaultCommitment(),
+  throttleMs = 0,
+  loadFromStore = false
+): LoadExchangeConfig {
+  return {
+    network,
+    connection,
+    assets,
+    opts,
+    throttleMs,
+    loadFromStore,
+  };
 }
