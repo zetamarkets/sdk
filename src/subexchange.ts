@@ -236,14 +236,52 @@ export class SubExchange {
 
   /**
    * Refreshes serum markets cache
-   * @param asset    which asset to load
    */
-  public async updateSerumMarkets(asset: Asset, opts: ConfirmOptions) {
+  public async updateSerumMarkets() {
     console.info(
-      `Refreshing Serum markets for ${assetToName(asset)} SubExchange.`
+      `Refreshing Serum markets for ${assetToName(this._asset)} SubExchange.`
     );
 
-    this._markets = await ZetaGroupMarkets.load(this.asset, opts, 0, false);
+    await Promise.all(
+      this._markets.markets
+        .map(async (m) => {
+          return m.serumMarket.updateDecoded(Exchange.connection);
+        })
+        .concat([
+          this._markets.perpMarket.serumMarket.updateDecoded(
+            Exchange.connection
+          ),
+        ])
+    );
+
+    console.log(
+      `${assetToName(this.asset)} SubExchange Serum markets refreshed`
+    );
+  }
+
+  /**
+   * Checks which live serum markets are stale and refreshes only those
+   */
+  public async updateLiveSerumMarketsIfNeeded(epochDelay: number) {
+    console.info(
+      `Refreshing live Serum markets if needed for ${assetToName(
+        this._asset
+      )} SubExchange.`
+    );
+
+    const allLiveMarketsToUpdate = this._markets.markets.filter(
+      (m) =>
+        ((m.kind == types.Kind.PERP || m.expirySeries.isLive()) &&
+          m.serumMarket.epochStartTs + m.serumMarket.epochLength + epochDelay <
+            Exchange.clockTimestamp) ||
+        m.serumMarket.startEpochSeqNum.toNumber() == 0
+    );
+
+    await Promise.all(
+      allLiveMarketsToUpdate.map((m) => {
+        return m.serumMarket.updateDecoded(Exchange.connection);
+      })
+    );
 
     console.log(
       `${assetToName(this.asset)} SubExchange Serum markets refreshed`

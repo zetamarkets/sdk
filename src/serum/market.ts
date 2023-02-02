@@ -220,6 +220,15 @@ export class Market {
     return this._decoded;
   }
 
+  public async updateDecoded(connection: Connection) {
+    const { owner, data } = throwIfNull(
+      await connection.getAccountInfo(this.address),
+      "Market not found"
+    );
+    this._decoded = MARKET_STATE_LAYOUT_V3.decode(data);
+    return;
+  }
+
   async loadBids(connection: Connection): Promise<Orderbook> {
     const { data } = throwIfNull(
       await connection.getAccountInfo(this._decoded.bids)

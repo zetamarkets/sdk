@@ -38,15 +38,16 @@ async function main() {
     headers: { "Content-Type": "application/json" },
   });
 
-  await Exchange.load(
-    ASSETS,
-    PROGRAM_ID,
+  const loadExchangeConfig = types.defaultLoadExchangeConfig(
     Network.DEVNET,
     CONNECTION,
+    ASSETS,
     utils.defaultCommitment(),
-    undefined,
-    undefined
+    0, // ThrottleMs - increase if you are running into rate limit issues on startup.
+    true
   );
+
+  await Exchange.load(loadExchangeConfig);
 
   const client = await Client.load(
     CONNECTION,

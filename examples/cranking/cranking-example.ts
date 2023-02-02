@@ -58,17 +58,17 @@ async function main() {
     await connection.requestAirdrop(wallet.publicKey, 100000000);
   }
 
-  // We load the exchange with a valid wallet containing SOL to call permissionless zeta functions.
-  await Exchange.load(
-    assetList,
-    PROGRAM_ID,
+  const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
+    assets.allAssets(),
     utils.defaultCommitment(),
-    wallet,
-    // ThrottleMs - increase if you are running into rate limit issues on startup.
-    0
+    0, // ThrottleMs - increase if you are running into rate limit issues on startup.
+    true
   );
+
+  // We load the exchange with a valid wallet containing SOL to call permissionless zeta functions.
+  await Exchange.load(loadExchangeConfig, wallet);
 
   // Display state of zeta markets
   setInterval(
