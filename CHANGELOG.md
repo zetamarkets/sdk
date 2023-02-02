@@ -5,8 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## [0.23.0]
 
-- general: Remove a lot of unnecessary async things and improve exchange loading times.
-- general: Add the option to load devnet/mainnet zeta exchange state from serum market stores.
+- general: Remove a lot of unnecessary async things and improve exchange loading times. ([#196](https://github.com/zetamarkets/sdk/pull/196))
+- general: Add the option to load devnet/mainnet zeta exchange state from serum market stores. ([#196](https://github.com/zetamarkets/sdk/pull/196))
+
+## [0.22.1]
+
+- utils: Round price to nearest tick in `utils.convertDecimalToNativeInteger`. ([#195](https://github.com/zetamarkets/sdk/pull/195))
 
 ## [0.22.0]
 
