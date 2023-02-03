@@ -165,51 +165,88 @@ export class Client {
     }
 
     client._useVersionedTxs = useVersionedTxs;
-
     client._usdcAccountAddress = utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
       owner
     );
-
     client._whitelistDepositAddress = undefined;
-    try {
-      let [whitelistDepositAddress, _whitelistTradingFeesNonce] =
-        utils.getUserWhitelistDepositAccount(Exchange.programId, owner);
-      await Exchange.program.account.whitelistDepositAccount.fetch(
-        whitelistDepositAddress
-      );
+    client._whitelistTradingFeesAddress = undefined;
+
+    const ACCS_PER_SUBCLIENT = 2;
+
+    const subClientToFetchPromises = Exchange.assets
+      .map((a) => {
+        let marginAccountAddress = utils.getMarginAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(a),
+          owner
+        )[0];
+
+        let spreadAccountAddress = utils.getSpreadAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(a),
+          owner
+        )[0];
+
+        return [
+          Exchange.program.account.marginAccount.fetchNullable(
+            marginAccountAddress
+          ),
+          Exchange.program.account.spreadAccount.fetchNullable(
+            spreadAccountAddress
+          ),
+        ];
+      })
+      .flat();
+
+    const whitelistDepositAddress = utils.getUserWhitelistDepositAccount(
+      Exchange.programId,
+      owner
+    )[0];
+    const whitelistTradingFeesAddress =
+      utils.getUserWhitelistTradingFeesAccount(Exchange.programId, owner)[0];
+
+    const promiseResults = await Promise.all(
+      subClientToFetchPromises.concat([
+        Exchange.program.account.whitelistDepositAccount.fetchNullable(
+          whitelistDepositAddress
+        ),
+        Exchange.program.account.whitelistTradingFeesAccount.fetchNullable(
+          whitelistTradingFeesAddress
+        ),
+      ])
+    );
+
+    if (promiseResults[Exchange.assets.length * ACCS_PER_SUBCLIENT] != null) {
       console.log("User is whitelisted for unlimited deposits into zeta.");
       client._whitelistDepositAddress = whitelistDepositAddress;
-    } catch (e) {}
-
-    client._whitelistTradingFeesAddress = undefined;
-    try {
-      let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
-        utils.getUserWhitelistTradingFeesAccount(Exchange.programId, owner);
-      await Exchange.program.account.whitelistTradingFeesAccount.fetch(
-        whitelistTradingFeesAddress
-      );
+    }
+    if (
+      promiseResults[Exchange.assets.length * ACCS_PER_SUBCLIENT + 1] != null
+    ) {
       console.log("User is whitelisted for trading fees.");
       client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
-    } catch (e) {}
+    }
 
-    await Promise.all(
-      Exchange.assets.map(async (asset) => {
-        const subClient = await SubClient.load(
-          asset,
-          client,
-          connection,
-          owner,
-          callback,
-          throttle
-        );
-        client.addSubClient(asset, subClient);
-        client._marginAccountToAsset.set(
-          subClient.marginAccountAddress.toString(),
-          asset
-        );
-      })
-    );
+    Exchange.assets.forEach((asset, i) => {
+      const subClient = SubClient.load(
+        asset,
+        client,
+        connection,
+        owner,
+        [
+          promiseResults[i * ACCS_PER_SUBCLIENT],
+          promiseResults[i * ACCS_PER_SUBCLIENT + 1],
+        ],
+        callback,
+        throttle
+      );
+      client.addSubClient(asset, subClient);
+      client._marginAccountToAsset.set(
+        subClient.marginAccountAddress.toString(),
+        asset
+      );
+    });
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
     client._referralAccountAddress = undefined;
@@ -248,8 +285,8 @@ export class Client {
     }
 
     await Promise.all(
-      client.getAllSubClients().map(async (subclient) => {
-        await subclient.updateState();
+      client.getAllSubClients().map(async (subClient) => {
+        return subClient.updateOrders();
       })
     );
 

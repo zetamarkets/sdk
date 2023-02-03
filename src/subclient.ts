@@ -187,14 +187,15 @@ export class SubClient {
    *                    If set to false, margin account callbacks will also call
    *                    `updateState` instead of waiting for the poll.
    */
-  public static async load(
+  public static load(
     asset: Asset,
     parent: Client,
     connection: Connection,
     user: PublicKey,
+    fetchedAccs: any[],
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false
-  ): Promise<SubClient> {
+  ): SubClient {
     let subClient = new SubClient(asset, parent);
     let [marginAccountAddress, _marginAccountNonce] = utils.getMarginAccount(
       Exchange.programId,
@@ -256,28 +257,21 @@ export class SubClient {
       connection.commitment
     );
 
-    try {
-      subClient._marginAccount =
-        (await Exchange.program.account.marginAccount.fetch(
-          subClient._marginAccountAddress
-        )) as unknown as MarginAccount;
-
+    if (fetchedAccs[0] != null) {
+      subClient._marginAccount = fetchedAccs[0] as MarginAccount;
       // Set open order pdas for initialized accounts.
       subClient.updateOpenOrdersAddresses();
       subClient.updateMarginPositions();
       // We don't update orders here to make load faster.
       subClient._pendingUpdate = true;
-    } catch (e) {
+    } else {
       console.log(`User does not have a margin account for ${asset}.`);
     }
 
-    try {
-      subClient._spreadAccount =
-        (await Exchange.program.account.spreadAccount.fetch(
-          subClient._spreadAccountAddress
-        )) as unknown as SpreadAccount;
+    if (fetchedAccs[1] != null) {
+      subClient._spreadAccount = fetchedAccs[1] as SpreadAccount;
       subClient.updateSpreadPositions();
-    } catch (e) {
+    } else {
       console.log(`User does not have a spread account for ${asset}.`);
     }
 
@@ -1804,7 +1798,12 @@ export class SubClient {
     return indexes;
   }
 
-  private async updateOrders() {
+  public async updateOrders() {
+    if (this._marginAccount == null) {
+      console.log("User has no margin account, cannot update orders.");
+      return;
+    }
+
     let orders = [];
     await Promise.all(
       [...this.getRelevantMarketIndexes()].map(async (i) => {

@@ -133,7 +133,6 @@ export class Market {
       throw new Error("Invalid market");
     }
 
-    // console.log(decoded);
     return new Market(decoded, 0, 6, options, programId, layoutOverride);
   }
 
@@ -156,7 +155,6 @@ export class Market {
         (Exchange.clockTimestamp % decoded.epochLength.toNumber())
     );
 
-    // console.log(decoded);
     return new Market(decoded, 0, 6, options, programId, layoutOverride);
   }
 
