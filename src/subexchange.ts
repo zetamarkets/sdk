@@ -153,7 +153,7 @@ export class SubExchange {
     this._asset = asset;
 
     // Load zeta group.
-    let underlyingMint = constants.MINTS[asset];
+    let underlyingMint = utils.getUnderlyingMint(asset);
 
     const [zetaGroup, _zetaGroupNonce] = await utils.getZetaGroup(
       Exchange.programId,
@@ -219,18 +219,24 @@ export class SubExchange {
 
     await this.updateZetaGroup();
 
-    this._markets = await ZetaGroupMarkets.load(this.asset, opts, 0);
+    this._markets = await ZetaGroupMarkets.load(
+      this.asset,
+      opts,
+      0,
+      utils.isFlexUnderlying(asset)
+    );
 
     if (
-      this.zetaGroup.products[this.zetaGroup.products.length - 1].market.equals(
-        PublicKey.default
-      ) ||
-      this.zetaGroup.perp.market.equals(PublicKey.default)
+      !utils.isFlexUnderlying &&
+      (this.zetaGroup.products[
+        this.zetaGroup.products.length - 1
+      ].market.equals(PublicKey.default) ||
+        (utils.isFlexUnderlying(asset) &&
+          this.zetaGroup.perp.market.equals(PublicKey.default)))
     ) {
       throw "Zeta group markets are uninitialized!";
     }
 
-    this._markets = await ZetaGroupMarkets.load(asset, opts, throttleMs);
     this._greeks = (await Exchange.program.account.greeks.fetch(
       this.greeksAddress
     )) as Greeks;
@@ -370,7 +376,7 @@ export class SubExchange {
   /**
    * Initializes the zeta markets for a zeta group.
    */
-  public async initializeZetaMarkets() {
+  public async initializeZetaMarkets(perpOnly: boolean = false) {
     // Initialize market indexes.
     let [marketIndexes, marketIndexesNonce] = await utils.getMarketIndexes(
       Exchange.programId,
@@ -416,8 +422,10 @@ export class SubExchange {
           utils.defaultCommitment(),
           Exchange.useLedger
         );
+        await utils.sleep(100);
       } catch (e) {
         console.error(`Add market indexes failed: ${e}`);
+        console.log(e);
       }
     }
 
@@ -428,6 +436,16 @@ export class SubExchange {
 
     if (!marketIndexesAccount.initialized) {
       throw Error("Market indexes are not initialized!");
+    }
+
+    await this.initializeZetaMarket(
+      constants.PERP_INDEX,
+      marketIndexes,
+      marketIndexesAccount
+    );
+
+    if (perpOnly) {
+      return;
     }
 
     let indexes = [...Array(this.zetaGroup.products.length).keys()];
@@ -446,11 +464,6 @@ export class SubExchange {
         await this.initializeZetaMarket(i, marketIndexes, marketIndexesAccount);
       }
     }
-    await this.initializeZetaMarket(
-      constants.PERP_INDEX,
-      marketIndexes,
-      marketIndexesAccount
-    );
   }
 
   private async initializeZetaMarket(

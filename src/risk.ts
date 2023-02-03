@@ -49,6 +49,16 @@ export class RiskCalculator {
     }
     let oraclePrice = Exchange.oracle.getPrice(asset);
     let spotPrice = oraclePrice === null ? 0 : oraclePrice.price;
+
+    this._perpMarginRequirements.set(
+      asset,
+      calculateProductMargin(asset, constants.PERP_INDEX, spotPrice)
+    );
+
+    if (Exchange.getSubExchange(asset).zetaGroup.perpOnly) {
+        return;
+    }
+
     for (var i = 0; i < this._marginRequirements.get(asset).length; i++) {
       this._marginRequirements.get(asset)[i] = calculateProductMargin(
         asset,
@@ -56,10 +66,6 @@ export class RiskCalculator {
         spotPrice
       );
     }
-    this._perpMarginRequirements.set(
-      asset,
-      calculateProductMargin(asset, constants.PERP_INDEX, spotPrice)
-    );
   }
 
   /**

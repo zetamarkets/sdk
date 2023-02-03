@@ -9,7 +9,8 @@ export interface State {
   serumNonce: number;
   mintAuthNonce: number;
   numUnderlyings: number;
-  null: anchor.BN;
+  numFlexUnderlyings: number;
+  null: Array<number>;
   strikeInitializationThresholdSeconds: number;
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
@@ -113,6 +114,7 @@ export interface ZetaGroup {
   perpParameters: PerpParameters;
   perpSyncQueue: PublicKey;
   oracleBackupFeed: PublicKey;
+  perpOnly: boolean;
   padding: Array<number>;
 }
 

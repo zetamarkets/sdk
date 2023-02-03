@@ -220,10 +220,50 @@ export class ZetaGroupMarkets {
   public static async load(
     asset: Asset,
     opts: ConfirmOptions,
-    throttleMs: number
+    throttleMs: number,
+    perpOnly: boolean = true
   ): Promise<ZetaGroupMarkets> {
     let instance = new ZetaGroupMarkets(asset);
     let subExchange = Exchange.getSubExchange(asset);
+
+    // Perps product/market is separate
+    let marketAddr = subExchange.zetaGroup.perp.market;
+    let serumMarket = await SerumMarket.load(
+      Exchange.connection,
+      marketAddr,
+      { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
+      constants.DEX_PID[Exchange.network]
+    );
+    let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
+      Exchange.programId,
+      serumMarket.baseMintAddress
+    );
+    let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
+      Exchange.programId,
+      serumMarket.quoteMintAddress
+    );
+    instance._perpMarket = new Market(
+      asset,
+      constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
+      null,
+      types.toProductKind(subExchange.zetaGroup.perp.kind),
+      marketAddr,
+      subExchange.zetaGroupAddress,
+      quoteVaultAddr,
+      baseVaultAddr,
+      serumMarket
+    );
+
+    try {
+      instance.updateExpirySeries();
+    } catch (e) {
+      console.log("Test updateExpirySeries");
+      console.log(e);
+    }
+
+    if (perpOnly) {
+      return instance;
+    }
 
     let productsPerExpiry = Math.floor(
       subExchange.zetaGroup.products.length /
@@ -268,34 +308,6 @@ export class ZetaGroupMarkets {
       );
       await sleep(throttleMs);
     }
-
-    // Perps product/market is separate
-    let marketAddr = subExchange.zetaGroup.perp.market;
-    let serumMarket = await SerumMarket.load(
-      Exchange.connection,
-      marketAddr,
-      { commitment: opts.commitment, skipPreflight: opts.skipPreflight },
-      constants.DEX_PID[Exchange.network]
-    );
-    let [baseVaultAddr, _baseVaultNonce] = await getZetaVault(
-      Exchange.programId,
-      serumMarket.baseMintAddress
-    );
-    let [quoteVaultAddr, _quoteVaultNonce] = await getZetaVault(
-      Exchange.programId,
-      serumMarket.quoteMintAddress
-    );
-    instance._perpMarket = new Market(
-      asset,
-      constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
-      null,
-      types.toProductKind(subExchange.zetaGroup.perp.kind),
-      marketAddr,
-      subExchange.zetaGroupAddress,
-      quoteVaultAddr,
-      baseVaultAddr,
-      serumMarket
-    );
 
     instance.updateExpirySeries();
     return instance;

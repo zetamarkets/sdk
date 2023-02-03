@@ -12,7 +12,7 @@ import * as utils from "./utils";
 import * as anchor from "@zetamarkets/anchor";
 import * as types from "./types";
 import * as constants from "./constants";
-import { Asset } from "./assets";
+import { Asset, toProgramAsset } from "./assets";
 import { Market } from "./market";
 
 export function initializeMarginAccountIx(
@@ -1052,46 +1052,50 @@ export async function initializeZetaGroupIx(
   pricingArgs: InitializeZetaGroupPricingArgs,
   perpArgs: UpdatePerpParametersArgs,
   marginArgs: UpdateMarginParametersArgs,
-  expiryArgs: UpdateZetaGroupExpiryArgs
+  expiryArgs: UpdateZetaGroupExpiryArgs,
+  perpOnly: boolean,
+  flexUnderlying: boolean
 ): Promise<TransactionInstruction> {
   let [zetaGroup, zetaGroupNonce] = await utils.getZetaGroup(
     Exchange.programId,
     underlyingMint
   );
 
-  let [underlying, underlyingNonce] = await utils.getUnderlying(
-    Exchange.programId,
-    Exchange.state.numUnderlyings
-  );
-  let subExchange = Exchange.getSubExchange(asset);
+  let [underlying, underlyingNonce] = flexUnderlying
+    ? await utils.getFlexUnderlying(
+        Exchange.programId,
+        Exchange.state.numFlexUnderlyings
+      )
+    : await utils.getUnderlying(
+        Exchange.programId,
+        Exchange.state.numUnderlyings
+      );
+
   let [greeks, greeksNonce] = await utils.getGreeks(
     Exchange.programId,
-    subExchange.zetaGroupAddress
+    zetaGroup
   );
 
   let [perpSyncQueue, perpSyncQueueNonce] = await utils.getPerpSyncQueue(
     Exchange.programId,
-    subExchange.zetaGroupAddress
+    zetaGroup
   );
 
-  let [vault, vaultNonce] = await utils.getVault(
-    Exchange.programId,
-    subExchange.zetaGroupAddress
-  );
+  let [vault, vaultNonce] = await utils.getVault(Exchange.programId, zetaGroup);
 
   let [insuranceVault, insuranceVaultNonce] = await utils.getZetaInsuranceVault(
     Exchange.programId,
-    subExchange.zetaGroupAddress
+    zetaGroup
   );
 
   let [socializedLossAccount, socializedLossAccountNonce] =
-    await utils.getSocializedLossAccount(
-      Exchange.programId,
-      subExchange.zetaGroupAddress
-    );
+    await utils.getSocializedLossAccount(Exchange.programId, zetaGroup);
 
   return Exchange.program.instruction.initializeZetaGroup(
     {
+      perpOnly,
+      flexUnderlying: flexUnderlying,
+      assetOverride: toProgramAsset(asset) as any,
       zetaGroupNonce,
       underlyingNonce,
       greeksNonce,

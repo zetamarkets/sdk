@@ -4654,8 +4654,17 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "numFlexUnderlyings",
+            "type": "u8"
+          },
+          {
             "name": "null",
-            "type": "u64"
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -4931,11 +4940,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "perpOnly",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                966
+                965
               ]
             }
           }
@@ -6141,6 +6154,22 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
+            "name": "perpOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
+            "type": "bool"
+          },
+          {
+            "name": "assetOverride",
+            "type": {
+              "option": {
+                "defined": "Asset"
+              }
+            }
+          },
+          {
             "name": "zetaGroupNonce",
             "type": "u8"
           },
@@ -6447,6 +6476,9 @@ export type Zeta = {
           },
           {
             "name": "ETH"
+          },
+          {
+            "name": "APT"
           },
           {
             "name": "UNDEFINED"
@@ -12182,8 +12214,17 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "numFlexUnderlyings",
+            "type": "u8"
+          },
+          {
             "name": "null",
-            "type": "u64"
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -12459,11 +12500,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "perpOnly",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                966
+                965
               ]
             }
           }
@@ -13669,6 +13714,22 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
+            "name": "perpOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
+            "type": "bool"
+          },
+          {
+            "name": "assetOverride",
+            "type": {
+              "option": {
+                "defined": "Asset"
+              }
+            }
+          },
+          {
             "name": "zetaGroupNonce",
             "type": "u8"
           },
@@ -13975,6 +14036,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "ETH"
+          },
+          {
+            "name": "APT"
           },
           {
             "name": "UNDEFINED"

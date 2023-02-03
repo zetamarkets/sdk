@@ -6,6 +6,7 @@ export enum Asset {
   SOL = "SOL",
   BTC = "BTC",
   ETH = "ETH",
+  APT = "APT",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -43,6 +44,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.SOL) return "SOL";
   if (asset == Asset.BTC) return "BTC";
   if (asset == Asset.ETH) return "ETH";
+  if (asset == Asset.APT) return "APT";
   if (asset == Asset.UNDEFINED) return "UNDEFINED";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   throw Error("Invalid asset");
@@ -64,6 +66,7 @@ export function toProgramAsset(asset: Asset) {
   if (asset == Asset.SOL) return { sol: {} };
   if (asset == Asset.BTC) return { btc: {} };
   if (asset == Asset.ETH) return { eth: {} };
+  if (asset == Asset.APT) return { apt: {} };
   throw Error("Invalid asset");
 }
 
@@ -77,6 +80,9 @@ export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { eth: {} })) {
     return Asset.ETH;
   }
+  if (objectEquals(asset, { apt: {} })) {
+    return Asset.APT;
+  }
   throw Error("Invalid asset");
 }
 
@@ -89,6 +95,9 @@ export function indexToAsset(index: number): Asset {
       return Asset.BTC;
     }
     case 2: {
+      return Asset.ETH;
+    }
+    case 3: {
       return Asset.ETH;
     }
   }
@@ -105,6 +114,9 @@ export function assetToIndex(asset: Asset): number {
     }
     case Asset.ETH: {
       return 2;
+    }
+    case Asset.APT: {
+      return 3;
     }
   }
   throw new Error("Invalid asset");

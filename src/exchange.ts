@@ -356,19 +356,24 @@ export class Exchange {
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
     perpArgs: instructions.UpdatePerpParametersArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
-    expiryArgs: instructions.UpdateZetaGroupExpiryArgs
+    expiryArgs: instructions.UpdateZetaGroupExpiryArgs,
+    perpOnly: boolean = false,
+    flexUnderlying: boolean = false
   ) {
+    let underlyingMint = utils.getUnderlyingMint(asset);
     let tx = new Transaction().add(
       await instructions.initializeZetaGroupIx(
         asset,
-        constants.MINTS[asset],
+        underlyingMint,
         oracle,
         oracleBackupFeed,
         oracleBackupProgram,
         pricingArgs,
         perpArgs,
         marginArgs,
-        expiryArgs
+        expiryArgs,
+        perpOnly,
+        flexUnderlying
       )
     );
     try {
@@ -381,8 +386,16 @@ export class Exchange {
       );
     } catch (e) {
       console.error(`Initialize zeta group failed: ${e}`);
+      console.log(e);
     }
+
     await this.updateState();
+
+    if (this.getSubExchange(asset) == undefined) {
+      await this.addSubExchange(asset, new SubExchange());
+      await this.getSubExchange(asset).initialize(asset);
+    }
+
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
@@ -771,8 +784,8 @@ export class Exchange {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
 
-  public async initializeZetaMarkets(asset: Asset) {
-    await this.getSubExchange(asset).initializeZetaMarkets();
+  public async initializeZetaMarkets(asset: Asset, perpOnly: boolean = false) {
+    await this.getSubExchange(asset).initializeZetaMarkets(perpOnly);
   }
 
   public async initializeZetaMarketsTIFEpochCycle(

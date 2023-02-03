@@ -4654,8 +4654,17 @@
             "type": "u8"
           },
           {
+            "name": "numFlexUnderlyings",
+            "type": "u8"
+          },
+          {
             "name": "null",
-            "type": "u64"
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -4931,11 +4940,15 @@
             "type": "publicKey"
           },
           {
+            "name": "perpOnly",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                966
+                965
               ]
             }
           }
@@ -6141,6 +6154,22 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "perpOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
+            "type": "bool"
+          },
+          {
+            "name": "assetOverride",
+            "type": {
+              "option": {
+                "defined": "Asset"
+              }
+            }
+          },
+          {
             "name": "zetaGroupNonce",
             "type": "u8"
           },
@@ -6447,6 +6476,9 @@
           },
           {
             "name": "ETH"
+          },
+          {
+            "name": "APT"
           },
           {
             "name": "UNDEFINED"
@@ -7523,5 +7555,8 @@
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
+  }
 }

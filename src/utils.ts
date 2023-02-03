@@ -306,6 +306,32 @@ export async function getUnderlying(
   );
 }
 
+export async function getFlexUnderlying(
+  programId: PublicKey,
+  underlyingIndex: number
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("flex-underlying")),
+      Buffer.from([underlyingIndex]),
+    ],
+    programId
+  );
+}
+
+export async function getFlexUnderlyingMint(
+  programId: PublicKey,
+  underlyingIndex: number
+): Promise<[PublicKey, number]> {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("flex-underlying-mint")),
+      Buffer.from([underlyingIndex]),
+    ],
+    programId
+  );
+}
+
 export async function getGreeks(
   programId: PublicKey,
   zetaGroup: PublicKey
@@ -1798,4 +1824,18 @@ export function getZetaLutArr(): AddressLookupTableAccount[] {
     return [];
   }
   return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
+}
+
+export function getUnderlyingMint(asset: assets.Asset) {
+  if (asset in constants.MINTS) {
+    return constants.MINTS[asset];
+  }
+  if (asset in constants.FLEX_MINTS[Exchange.network]) {
+    return constants.FLEX_MINTS[Exchange.network][asset];
+  }
+  throw Error("Underlying mint does not exist!");
+}
+
+export function isFlexUnderlying(asset: assets.Asset) {
+  return asset in constants.FLEX_MINTS[Exchange.network];
 }
