@@ -145,6 +145,10 @@ export class SubExchange {
     return this._zetaGroup.haltState.halted;
   }
 
+  public isPerpsOnly(): boolean {
+    return this._zetaGroup.perpsOnly;
+  }
+
   public async initialize(asset: Asset) {
     if (this.isSetup) {
       throw "SubExchange already initialized.";
@@ -987,6 +991,9 @@ export class SubExchange {
         return utils.getMutMarketAccounts(this.asset, market.marketIndex);
       })
     );
+    if (this.zetaGroup.perpsOnly) {
+      marketAccounts = [];
+    }
     marketAccounts.push(
       (this._markets.perpMarket,
       utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))

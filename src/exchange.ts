@@ -357,7 +357,7 @@ export class Exchange {
     perpArgs: instructions.UpdatePerpParametersArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
     expiryArgs: instructions.UpdateZetaGroupExpiryArgs,
-    perpOnly: boolean = false,
+    perpsOnly: boolean = false,
     flexUnderlying: boolean = false
   ) {
     let underlyingMint = utils.getUnderlyingMint(asset);
@@ -372,7 +372,7 @@ export class Exchange {
         perpArgs,
         marginArgs,
         expiryArgs,
-        perpOnly,
+        perpsOnly,
         flexUnderlying
       )
     );
@@ -695,6 +695,10 @@ export class Exchange {
   }
 
   public getMarkets(asset: Asset): Market[] {
+    let sub = this.getSubExchange(asset);
+    if (sub.isPerpsOnly()) {
+      return [sub.markets.perpMarket];
+    }
     return this.getSubExchange(asset).markets.markets.concat(
       this.getSubExchange(asset).markets.perpMarket
     );
@@ -784,8 +788,8 @@ export class Exchange {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
 
-  public async initializeZetaMarkets(asset: Asset, perpOnly: boolean = false) {
-    await this.getSubExchange(asset).initializeZetaMarkets(perpOnly);
+  public async initializeZetaMarkets(asset: Asset, perpsOnly: boolean = false) {
+    await this.getSubExchange(asset).initializeZetaMarkets(perpsOnly);
   }
 
   public async initializeZetaMarketsTIFEpochCycle(

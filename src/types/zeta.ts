@@ -4404,6 +4404,49 @@ export type Zeta = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "modifyAsset",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newBackupOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newAsset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -4940,7 +4983,11 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "perpOnly",
+            "name": "perpsOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
             "type": "bool"
           },
           {
@@ -4948,7 +4995,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                965
+                964
               ]
             }
           }
@@ -6154,7 +6201,7 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "perpOnly",
+            "name": "perpsOnly",
             "type": "bool"
           },
           {
@@ -11964,6 +12011,49 @@ export const IDL: Zeta = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "modifyAsset",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newBackupOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newAsset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -12500,7 +12590,11 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "perpOnly",
+            "name": "perpsOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
             "type": "bool"
           },
           {
@@ -12508,7 +12602,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                965
+                964
               ]
             }
           }
@@ -13714,7 +13808,7 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "perpOnly",
+            "name": "perpsOnly",
             "type": "bool"
           },
           {

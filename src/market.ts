@@ -354,6 +354,17 @@ export class ZetaGroupMarkets {
     let compare = (a: PublicKey, b: PublicKey) =>
       a.toBuffer().compare(b.toBuffer());
 
+    let sub = Exchange.getSubExchange(this.asset);
+    if (sub.isPerpsOnly()) {
+      if (compare(market, sub.markets.perpMarket.address) == 0) {
+        return constants.PERP_INDEX;
+      } else {
+        throw Error(
+          "Cannot get market index of non perp market on perp only market!"
+        );
+      }
+    }
+
     let m = 0;
     let n = this._markets.length - 1;
     while (m <= n) {

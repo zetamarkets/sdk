@@ -62,7 +62,7 @@ export function getAssetMint(asset: Asset): PublicKey {
   return constants.MINTS[asset];
 }
 
-export function toProgramAsset(asset: Asset) {
+export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.SOL) return { sol: {} };
   if (asset == Asset.BTC) return { btc: {} };
   if (asset == Asset.ETH) return { eth: {} };

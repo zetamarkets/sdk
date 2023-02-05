@@ -1043,6 +1043,26 @@ export async function initializePerpSyncQueueIx(
   });
 }
 
+export function modifyAssetIx(
+  zetaGroup: PublicKey,
+  newAsset: Asset,
+  newOracle: PublicKey,
+  newBackupOracle: PublicKey,
+  oracleBackupProgram: PublicKey,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.modifyAsset(toProgramAsset(newAsset), {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup,
+      admin: admin,
+      newOracle: newOracle,
+      newBackupOracle: newBackupOracle,
+      oracleBackupProgram: oracleBackupProgram,
+    },
+  });
+}
+
 export async function initializeZetaGroupIx(
   asset: Asset,
   underlyingMint: PublicKey,
@@ -1053,7 +1073,7 @@ export async function initializeZetaGroupIx(
   perpArgs: UpdatePerpParametersArgs,
   marginArgs: UpdateMarginParametersArgs,
   expiryArgs: UpdateZetaGroupExpiryArgs,
-  perpOnly: boolean,
+  perpsOnly: boolean,
   flexUnderlying: boolean
 ): Promise<TransactionInstruction> {
   let [zetaGroup, zetaGroupNonce] = await utils.getZetaGroup(
@@ -1093,7 +1113,7 @@ export async function initializeZetaGroupIx(
 
   return Exchange.program.instruction.initializeZetaGroup(
     {
-      perpOnly,
+      perpsOnly,
       flexUnderlying: flexUnderlying,
       assetOverride: toProgramAsset(asset) as any,
       zetaGroupNonce,

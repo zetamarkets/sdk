@@ -114,7 +114,8 @@ export interface ZetaGroup {
   perpParameters: PerpParameters;
   perpSyncQueue: PublicKey;
   oracleBackupFeed: PublicKey;
-  perpOnly: boolean;
+  perpsOnly: boolean;
+  flexUnderlying: boolean;
   padding: Array<number>;
 }
 

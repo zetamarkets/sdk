@@ -55,8 +55,8 @@ export class RiskCalculator {
       calculateProductMargin(asset, constants.PERP_INDEX, spotPrice)
     );
 
-    if (Exchange.getSubExchange(asset).zetaGroup.perpOnly) {
-        return;
+    if (Exchange.getSubExchange(asset).zetaGroup.perpsOnly) {
+      return;
     }
 
     for (var i = 0; i < this._marginRequirements.get(asset).length; i++) {
