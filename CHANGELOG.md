@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+# Unreleased
+
+## [0.23.0] 2023-02-06
+
+- general: support flexible assets. ([#198](https://github.com/zetamarkets/sdk/pull/198))
+- general: add aptos. ([#198](https://github.com/zetamarkets/sdk/pull/198))
+
 ## [0.22.1]
 
 - utils: Round price to nearest tick in `utils.convertDecimalToNativeInteger`. ([#195](https://github.com/zetamarkets/sdk/pull/195))
