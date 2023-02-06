@@ -262,6 +262,7 @@ export class ZetaGroupMarkets {
     }
 
     if (perpOnly) {
+      instance._markets = [];
       return instance;
     }
 
