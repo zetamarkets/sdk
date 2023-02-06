@@ -988,6 +988,12 @@ export function displayState() {
   let subExchanges = Exchange.subExchanges;
 
   for (var [asset, subExchange] of subExchanges) {
+    // Products without expiries, ie perps
+    printMarkets([subExchange.markets.perpMarket], subExchange);
+    if (subExchange.zetaGroup.perpsOnly) {
+      continue;
+    }
+
     let orderedIndexes = [
       subExchange.zetaGroup.frontExpiryIndex,
       getMostRecentExpiredIndex(asset),
@@ -1018,9 +1024,6 @@ export function displayState() {
         subExchange
       );
     }
-
-    // Products without expiries, ie perps
-    printMarkets([subExchange.markets.perpMarket], subExchange);
   }
 }
 

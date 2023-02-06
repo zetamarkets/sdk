@@ -254,16 +254,16 @@ export class ZetaGroupMarkets {
       serumMarket
     );
 
+    if (perpOnly) {
+      instance._markets = [];
+      return instance;
+    }
+
     try {
       instance.updateExpirySeries();
     } catch (e) {
       console.log("Test updateExpirySeries");
       console.log(e);
-    }
-
-    if (perpOnly) {
-      instance._markets = [];
-      return instance;
     }
 
     let productsPerExpiry = Math.floor(

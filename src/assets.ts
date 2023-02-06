@@ -54,6 +54,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "SOL") return Asset.SOL;
   if (name == "BTC") return Asset.BTC;
   if (name == "ETH") return Asset.ETH;
+  if (name == "APT") return Asset.APT;
   if (name == "UNDEFINED") return Asset.UNDEFINED;
   throw Error("Invalid asset");
 }

@@ -231,7 +231,7 @@ export class SubExchange {
     );
 
     if (
-      !utils.isFlexUnderlying &&
+      !utils.isFlexUnderlying(asset) &&
       (this.zetaGroup.products[
         this.zetaGroup.products.length - 1
       ].market.equals(PublicKey.default) ||
@@ -562,24 +562,24 @@ export class SubExchange {
     }
 
     let ixs: TransactionInstruction[] = [];
-    for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
-      if (i == constants.ACTIVE_MARKETS - 1) {
+    ixs.push(
+      instructions.initializeZetaMarketTIFEpochCyclesIx(
+        this.asset,
+        constants.PERP_INDEX,
+        cycleLengthSecs
+      )
+    );
+
+    if (!this.zetaGroup.perpsOnly) {
+      for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
         ixs.push(
           instructions.initializeZetaMarketTIFEpochCyclesIx(
             this.asset,
-            constants.PERP_INDEX,
+            i,
             cycleLengthSecs
           )
         );
-        continue;
       }
-      ixs.push(
-        instructions.initializeZetaMarketTIFEpochCyclesIx(
-          this.asset,
-          i,
-          cycleLengthSecs
-        )
-      );
     }
 
     let txs = utils.splitIxsIntoTx(
