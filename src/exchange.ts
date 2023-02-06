@@ -356,19 +356,24 @@ export class Exchange {
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
     perpArgs: instructions.UpdatePerpParametersArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
-    expiryArgs: instructions.UpdateZetaGroupExpiryArgs
+    expiryArgs: instructions.UpdateZetaGroupExpiryArgs,
+    perpsOnly: boolean = false,
+    flexUnderlying: boolean = false
   ) {
+    let underlyingMint = utils.getUnderlyingMint(asset);
     let tx = new Transaction().add(
       await instructions.initializeZetaGroupIx(
         asset,
-        constants.MINTS[asset],
+        underlyingMint,
         oracle,
         oracleBackupFeed,
         oracleBackupProgram,
         pricingArgs,
         perpArgs,
         marginArgs,
-        expiryArgs
+        expiryArgs,
+        perpsOnly,
+        flexUnderlying
       )
     );
     try {
@@ -381,8 +386,16 @@ export class Exchange {
       );
     } catch (e) {
       console.error(`Initialize zeta group failed: ${e}`);
+      console.log(e);
     }
+
     await this.updateState();
+
+    if (this.getSubExchange(asset) == undefined) {
+      await this.addSubExchange(asset, new SubExchange());
+      await this.getSubExchange(asset).initialize(asset);
+    }
+
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
@@ -682,6 +695,10 @@ export class Exchange {
   }
 
   public getMarkets(asset: Asset): Market[] {
+    let sub = this.getSubExchange(asset);
+    if (sub.isPerpsOnly()) {
+      return [sub.markets.perpMarket];
+    }
     return this.getSubExchange(asset).markets.markets.concat(
       this.getSubExchange(asset).markets.perpMarket
     );
@@ -771,8 +788,8 @@ export class Exchange {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
 
-  public async initializeZetaMarkets(asset: Asset) {
-    await this.getSubExchange(asset).initializeZetaMarkets();
+  public async initializeZetaMarkets(asset: Asset, perpsOnly: boolean = false) {
+    await this.getSubExchange(asset).initializeZetaMarkets(perpsOnly);
   }
 
   public async initializeZetaMarketsTIFEpochCycle(
