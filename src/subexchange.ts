@@ -225,7 +225,8 @@ export class SubExchange {
       asset,
       opts,
       throttleMs,
-      loadFromStore
+      loadFromStore,
+      this.zetaGroup.perpsOnly
     );
 
     Exchange.riskCalculator.updateMarginRequirements(asset);
@@ -591,7 +592,7 @@ export class SubExchange {
     );
 
     if (!this.zetaGroup.perpsOnly) {
-      for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
+      for (let i = 0; i < constants.ACTIVE_MARKETS - 1; i++) {
         ixs.push(
           instructions.initializeZetaMarketTIFEpochCyclesIx(
             this.asset,
