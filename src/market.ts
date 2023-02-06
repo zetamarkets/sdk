@@ -256,6 +256,7 @@ export class ZetaGroupMarkets {
 
     if (perpOnly) {
       instance._markets = [];
+      instance._expirySeries = [];
       return instance;
     }
 
