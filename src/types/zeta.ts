@@ -4404,6 +4404,65 @@ export type Zeta = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "modifyAsset",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newBackupOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newAsset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "resetNumFlexUnderlyings",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -4654,8 +4713,17 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "numFlexUnderlyings",
+            "type": "u8"
+          },
+          {
             "name": "null",
-            "type": "u64"
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -4931,11 +4999,19 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "perpsOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                966
+                964
               ]
             }
           }
@@ -6141,6 +6217,22 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
+            "name": "perpsOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
+            "type": "bool"
+          },
+          {
+            "name": "assetOverride",
+            "type": {
+              "option": {
+                "defined": "Asset"
+              }
+            }
+          },
+          {
             "name": "zetaGroupNonce",
             "type": "u8"
           },
@@ -6447,6 +6539,9 @@ export type Zeta = {
           },
           {
             "name": "ETH"
+          },
+          {
+            "name": "APT"
           },
           {
             "name": "UNDEFINED"
@@ -11932,6 +12027,65 @@ export const IDL: Zeta = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "modifyAsset",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "newBackupOracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newAsset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "resetNumFlexUnderlyings",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -12182,8 +12336,17 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "numFlexUnderlyings",
+            "type": "u8"
+          },
+          {
             "name": "null",
-            "type": "u64"
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           },
           {
             "name": "strikeInitializationThresholdSeconds",
@@ -12459,11 +12622,19 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "perpsOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                966
+                964
               ]
             }
           }
@@ -13669,6 +13840,22 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
+            "name": "perpsOnly",
+            "type": "bool"
+          },
+          {
+            "name": "flexUnderlying",
+            "type": "bool"
+          },
+          {
+            "name": "assetOverride",
+            "type": {
+              "option": {
+                "defined": "Asset"
+              }
+            }
+          },
+          {
             "name": "zetaGroupNonce",
             "type": "u8"
           },
@@ -13975,6 +14162,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "ETH"
+          },
+          {
+            "name": "APT"
           },
           {
             "name": "UNDEFINED"

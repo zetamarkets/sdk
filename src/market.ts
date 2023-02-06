@@ -222,10 +222,72 @@ export class ZetaGroupMarkets {
     asset: Asset,
     opts: ConfirmOptions,
     throttleMs: number,
-    loadFromStore: boolean
+    loadFromStore: boolean,
+    perpOnly: boolean = true
   ): Promise<ZetaGroupMarkets> {
     let instance = new ZetaGroupMarkets(asset);
     let subExchange = Exchange.getSubExchange(asset);
+
+    // Perps product/market is separate
+    let marketAddr = subExchange.zetaGroup.perp.market;
+    let serumMarket: SerumMarket;
+    if (loadFromStore) {
+      const decoded =
+        SerumMarketStore.STATIC_SERUM_MARKETS[Exchange.network][asset][
+          constants.ACTIVE_MARKETS - 1
+        ];
+      serumMarket = SerumMarket.loadFromDecoded(
+        decoded,
+        {
+          commitment: opts.commitment,
+          skipPreflight: opts.skipPreflight,
+        },
+        constants.DEX_PID[Exchange.network]
+      );
+    } else {
+      serumMarket = await SerumMarket.load(
+        Exchange.connection,
+        marketAddr,
+        {
+          commitment: opts.commitment,
+          skipPreflight: opts.skipPreflight,
+        },
+        constants.DEX_PID[Exchange.network]
+      );
+    }
+
+    let [baseVaultAddr, _baseVaultNonce] = getZetaVault(
+      Exchange.programId,
+      serumMarket.baseMintAddress
+    );
+    let [quoteVaultAddr, _quoteVaultNonce] = getZetaVault(
+      Exchange.programId,
+      serumMarket.quoteMintAddress
+    );
+    instance._perpMarket = new Market(
+      asset,
+      constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
+      null,
+      types.toProductKind(subExchange.zetaGroup.perp.kind),
+      marketAddr,
+      subExchange.zetaGroupAddress,
+      quoteVaultAddr,
+      baseVaultAddr,
+      serumMarket
+    );
+
+    if (perpOnly) {
+      instance._markets = [];
+      instance._expirySeries = [];
+      return instance;
+    }
+
+    try {
+      instance.updateExpirySeries();
+    } catch (e) {
+      console.log("Test updateExpirySeries");
+      console.log(e);
+    }
 
     let productsPerExpiry = Math.floor(
       subExchange.zetaGroup.products.length /
@@ -293,54 +355,6 @@ export class ZetaGroupMarkets {
       await sleep(throttleMs);
     }
 
-    // Perps product/market is separate
-    let marketAddr = subExchange.zetaGroup.perp.market;
-    let serumMarket: SerumMarket;
-    if (loadFromStore) {
-      const decoded =
-        SerumMarketStore.STATIC_SERUM_MARKETS[Exchange.network][asset][
-          constants.ACTIVE_MARKETS - 1
-        ];
-      serumMarket = SerumMarket.loadFromDecoded(
-        decoded,
-        {
-          commitment: opts.commitment,
-          skipPreflight: opts.skipPreflight,
-        },
-        constants.DEX_PID[Exchange.network]
-      );
-    } else {
-      serumMarket = await SerumMarket.load(
-        Exchange.connection,
-        marketAddr,
-        {
-          commitment: opts.commitment,
-          skipPreflight: opts.skipPreflight,
-        },
-        constants.DEX_PID[Exchange.network]
-      );
-    }
-
-    let [baseVaultAddr, _baseVaultNonce] = getZetaVault(
-      Exchange.programId,
-      serumMarket.baseMintAddress
-    );
-    let [quoteVaultAddr, _quoteVaultNonce] = getZetaVault(
-      Exchange.programId,
-      serumMarket.quoteMintAddress
-    );
-    instance._perpMarket = new Market(
-      asset,
-      constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
-      null,
-      types.toProductKind(subExchange.zetaGroup.perp.kind),
-      marketAddr,
-      subExchange.zetaGroupAddress,
-      quoteVaultAddr,
-      baseVaultAddr,
-      serumMarket
-    );
-
     instance.updateExpirySeries();
     return instance;
   }
@@ -385,6 +399,17 @@ export class ZetaGroupMarkets {
   public getMarketIndex(market: PublicKey): number {
     let compare = (a: PublicKey, b: PublicKey) =>
       a.toBuffer().compare(b.toBuffer());
+
+    let sub = Exchange.getSubExchange(this.asset);
+    if (sub.isPerpsOnly()) {
+      if (compare(market, sub.markets.perpMarket.address) == 0) {
+        return constants.PERP_INDEX;
+      } else {
+        throw Error(
+          "Cannot get market index of non perp market on perp only market!"
+        );
+      }
+    }
 
     let m = 0;
     let n = this._markets.length - 1;

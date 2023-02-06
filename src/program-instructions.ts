@@ -12,7 +12,7 @@ import * as utils from "./utils";
 import * as anchor from "@zetamarkets/anchor";
 import * as types from "./types";
 import * as constants from "./constants";
-import { Asset } from "./assets";
+import { Asset, toProgramAsset } from "./assets";
 import { Market } from "./market";
 
 export function initializeMarginAccountIx(
@@ -1042,6 +1042,26 @@ export function initializePerpSyncQueueIx(
   });
 }
 
+export function modifyAssetIx(
+  zetaGroup: PublicKey,
+  newAsset: Asset,
+  newOracle: PublicKey,
+  newBackupOracle: PublicKey,
+  oracleBackupProgram: PublicKey,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.modifyAsset(toProgramAsset(newAsset), {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup,
+      admin: admin,
+      newOracle: newOracle,
+      newBackupOracle: newBackupOracle,
+      oracleBackupProgram: oracleBackupProgram,
+    },
+  });
+}
+
 export function initializeZetaGroupIx(
   asset: Asset,
   underlyingMint: PublicKey,
@@ -1051,46 +1071,44 @@ export function initializeZetaGroupIx(
   pricingArgs: InitializeZetaGroupPricingArgs,
   perpArgs: UpdatePerpParametersArgs,
   marginArgs: UpdateMarginParametersArgs,
-  expiryArgs: UpdateZetaGroupExpiryArgs
+  expiryArgs: UpdateZetaGroupExpiryArgs,
+  perpsOnly: boolean,
+  flexUnderlying: boolean
 ): TransactionInstruction {
   let [zetaGroup, zetaGroupNonce] = utils.getZetaGroup(
     Exchange.programId,
     underlyingMint
   );
 
-  let [underlying, underlyingNonce] = utils.getUnderlying(
-    Exchange.programId,
-    Exchange.state.numUnderlyings
-  );
-  let subExchange = Exchange.getSubExchange(asset);
-  let [greeks, greeksNonce] = utils.getGreeks(
-    Exchange.programId,
-    subExchange.zetaGroupAddress
-  );
+  let [underlying, underlyingNonce] = flexUnderlying
+    ? utils.getFlexUnderlying(
+        Exchange.programId,
+        Exchange.state.numFlexUnderlyings
+      )
+    : utils.getUnderlying(Exchange.programId, Exchange.state.numUnderlyings);
+
+  let [greeks, greeksNonce] = utils.getGreeks(Exchange.programId, zetaGroup);
 
   let [perpSyncQueue, perpSyncQueueNonce] = utils.getPerpSyncQueue(
     Exchange.programId,
-    subExchange.zetaGroupAddress
+    zetaGroup
   );
 
-  let [vault, vaultNonce] = utils.getVault(
-    Exchange.programId,
-    subExchange.zetaGroupAddress
-  );
+  let [vault, vaultNonce] = utils.getVault(Exchange.programId, zetaGroup);
 
   let [insuranceVault, insuranceVaultNonce] = utils.getZetaInsuranceVault(
     Exchange.programId,
-    subExchange.zetaGroupAddress
+    zetaGroup
   );
 
   let [socializedLossAccount, socializedLossAccountNonce] =
-    utils.getSocializedLossAccount(
-      Exchange.programId,
-      subExchange.zetaGroupAddress
-    );
+    utils.getSocializedLossAccount(Exchange.programId, zetaGroup);
 
   return Exchange.program.instruction.initializeZetaGroup(
     {
+      perpsOnly,
+      flexUnderlying: flexUnderlying,
+      assetOverride: toProgramAsset(asset) as any,
       zetaGroupNonce,
       underlyingNonce,
       greeksNonce,

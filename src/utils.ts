@@ -300,6 +300,32 @@ export function getUnderlying(
   );
 }
 
+export function getFlexUnderlying(
+  programId: PublicKey,
+  underlyingIndex: number
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("flex-underlying")),
+      Buffer.from([underlyingIndex]),
+    ],
+    programId
+  );
+}
+
+export function getFlexUnderlyingMint(
+  programId: PublicKey,
+  underlyingIndex: number
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("flex-underlying-mint")),
+      Buffer.from([underlyingIndex]),
+    ],
+    programId
+  );
+}
+
 export function getGreeks(
   programId: PublicKey,
   zetaGroup: PublicKey
@@ -954,6 +980,12 @@ export function displayState() {
   let subExchanges = Exchange.subExchanges;
 
   for (var [asset, subExchange] of subExchanges) {
+    // Products without expiries, ie perps
+    printMarkets([subExchange.markets.perpMarket], subExchange);
+    if (subExchange.zetaGroup.perpsOnly) {
+      continue;
+    }
+
     let orderedIndexes = [
       subExchange.zetaGroup.frontExpiryIndex,
       getMostRecentExpiredIndex(asset),
@@ -984,9 +1016,6 @@ export function displayState() {
         subExchange
       );
     }
-
-    // Products without expiries, ie perps
-    printMarkets([subExchange.markets.perpMarket], subExchange);
   }
 }
 
@@ -1789,4 +1818,18 @@ export function getZetaLutArr(): AddressLookupTableAccount[] {
     return [];
   }
   return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
+}
+
+export function getUnderlyingMint(asset: assets.Asset) {
+  if (asset in constants.MINTS) {
+    return constants.MINTS[asset];
+  }
+  if (asset in constants.FLEX_MINTS[Exchange.network]) {
+    return constants.FLEX_MINTS[Exchange.network][asset];
+  }
+  throw Error("Underlying mint does not exist!");
+}
+
+export function isFlexUnderlying(asset: assets.Asset) {
+  return asset in constants.FLEX_MINTS[Exchange.network];
 }
