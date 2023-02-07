@@ -4447,6 +4447,22 @@ export type Zeta = {
           }
         }
       ]
+    },
+    {
+      "name": "resetNumFlexUnderlyings",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -12054,6 +12070,22 @@ export const IDL: Zeta = {
           }
         }
       ]
+    },
+    {
+      "name": "resetNumFlexUnderlyings",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
