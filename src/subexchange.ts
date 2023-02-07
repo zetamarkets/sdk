@@ -225,8 +225,7 @@ export class SubExchange {
       asset,
       opts,
       throttleMs,
-      loadFromStore,
-      this.zetaGroup.perpsOnly
+      loadFromStore
     );
 
     Exchange.riskCalculator.updateMarginRequirements(asset);

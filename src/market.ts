@@ -222,16 +222,16 @@ export class ZetaGroupMarkets {
     asset: Asset,
     opts: ConfirmOptions,
     throttleMs: number,
-    loadFromStore: boolean,
-    perpOnly: boolean = true
+    loadFromStore: boolean
   ): Promise<ZetaGroupMarkets> {
     let instance = new ZetaGroupMarkets(asset);
     let subExchange = Exchange.getSubExchange(asset);
+    let perpsOnly = subExchange.zetaGroup.perpsOnly;
 
     // Perps product/market is separate
     let marketAddr = subExchange.zetaGroup.perp.market;
     let serumMarket: SerumMarket;
-    if (loadFromStore) {
+    if (loadFromStore && !perpsOnly) {
       const decoded =
         SerumMarketStore.STATIC_SERUM_MARKETS[Exchange.network][asset][
           constants.ACTIVE_MARKETS - 1
@@ -264,6 +264,7 @@ export class ZetaGroupMarkets {
       Exchange.programId,
       serumMarket.quoteMintAddress
     );
+
     instance._perpMarket = new Market(
       asset,
       constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
@@ -276,7 +277,7 @@ export class ZetaGroupMarkets {
       serumMarket
     );
 
-    if (perpOnly) {
+    if (perpsOnly) {
       instance._markets = [];
       instance._expirySeries = [];
       return instance;
