@@ -51,6 +51,15 @@ async function main() {
   // Airdropping SOL.
   await connection.requestAirdrop(wallet.publicKey, 100000000);
 
+  const loadExchangeConfig = types.defaultLoadExchangeConfig(
+    Network.DEVNET,
+    connection,
+    assets.allAssets(),
+    utils.defaultCommitment(),
+    0,
+    true
+  );
+
   await fetch(`${SERVER_URL}/faucet/USDC`, {
     method: "post",
     body: JSON.stringify({
@@ -61,15 +70,13 @@ async function main() {
   });
 
   await Exchange.load(
-    [assets.Asset.SOL, assets.Asset.BTC],
-    PROGRAM_ID,
-    Network.DEVNET,
-    connection,
-    utils.defaultCommitment(),
-    undefined,
-    undefined
+    loadExchangeConfig
     // exchangeCallback
   );
+
+  Exchange.getAllSubExchanges().forEach(async (se) => {
+    await se.updateLiveSerumMarketsIfNeeded(0);
+  });
 
   const client = await Client.load(
     connection,

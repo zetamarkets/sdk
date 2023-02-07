@@ -9,6 +9,7 @@ import {
   constants,
   programTypes,
   assets,
+  types,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection } from "@solana/web3.js";
 
@@ -35,18 +36,22 @@ console.log(NETWORK_URL);
 
 async function main() {
   // Create a solana web3 connection to devnet.
+
   const connection: Connection = new Connection(NETWORK_URL, "confirmed");
 
-  await Exchange.load(
-    [asset],
-    PROGRAM_ID,
+  const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
+    [asset],
     utils.defaultCommitment(),
+    0, // ThrottleMs - increase if you are running into rate limit issues on startup.
+    true
+  );
+
+  await Exchange.load(
+    loadExchangeConfig,
     // Exchange wallet can be ignored for normal clients.
-    undefined,
-    // ThrottleMs - increase if you are running into rate limit issues on startup.
-    0
+    undefined
   );
 
   // Friday 8am UTC - 7th of January

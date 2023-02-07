@@ -165,54 +165,88 @@ export class Client {
     }
 
     client._useVersionedTxs = useVersionedTxs;
-
-    client._usdcAccountAddress = await utils.getAssociatedTokenAddress(
+    client._usdcAccountAddress = utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
       owner
     );
-
     client._whitelistDepositAddress = undefined;
-    try {
-      let [whitelistDepositAddress, _whitelistTradingFeesNonce] =
-        await utils.getUserWhitelistDepositAccount(Exchange.programId, owner);
-      await Exchange.program.account.whitelistDepositAccount.fetch(
-        whitelistDepositAddress
-      );
+    client._whitelistTradingFeesAddress = undefined;
+
+    const ACCS_PER_SUBCLIENT = 2;
+
+    const subClientToFetchPromises = Exchange.assets
+      .map((a) => {
+        let marginAccountAddress = utils.getMarginAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(a),
+          owner
+        )[0];
+
+        let spreadAccountAddress = utils.getSpreadAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(a),
+          owner
+        )[0];
+
+        return [
+          Exchange.program.account.marginAccount.fetchNullable(
+            marginAccountAddress
+          ),
+          Exchange.program.account.spreadAccount.fetchNullable(
+            spreadAccountAddress
+          ),
+        ];
+      })
+      .flat();
+
+    const whitelistDepositAddress = utils.getUserWhitelistDepositAccount(
+      Exchange.programId,
+      owner
+    )[0];
+    const whitelistTradingFeesAddress =
+      utils.getUserWhitelistTradingFeesAccount(Exchange.programId, owner)[0];
+
+    const promiseResults = await Promise.all(
+      subClientToFetchPromises.concat([
+        Exchange.program.account.whitelistDepositAccount.fetchNullable(
+          whitelistDepositAddress
+        ),
+        Exchange.program.account.whitelistTradingFeesAccount.fetchNullable(
+          whitelistTradingFeesAddress
+        ),
+      ])
+    );
+
+    if (promiseResults[Exchange.assets.length * ACCS_PER_SUBCLIENT] != null) {
       console.log("User is whitelisted for unlimited deposits into zeta.");
       client._whitelistDepositAddress = whitelistDepositAddress;
-    } catch (e) {}
-
-    client._whitelistTradingFeesAddress = undefined;
-    try {
-      let [whitelistTradingFeesAddress, _whitelistTradingFeesNonce] =
-        await utils.getUserWhitelistTradingFeesAccount(
-          Exchange.programId,
-          owner
-        );
-      await Exchange.program.account.whitelistTradingFeesAccount.fetch(
-        whitelistTradingFeesAddress
-      );
+    }
+    if (
+      promiseResults[Exchange.assets.length * ACCS_PER_SUBCLIENT + 1] != null
+    ) {
       console.log("User is whitelisted for trading fees.");
       client._whitelistTradingFeesAddress = whitelistTradingFeesAddress;
-    } catch (e) {}
+    }
 
-    await Promise.all(
-      Exchange.assets.map(async (asset) => {
-        const subClient = await SubClient.load(
-          asset,
-          client,
-          connection,
-          owner,
-          callback,
-          throttle
-        );
-        client.addSubClient(asset, subClient);
-        client._marginAccountToAsset.set(
-          subClient.marginAccountAddress.toString(),
-          asset
-        );
-      })
-    );
+    Exchange.assets.forEach((asset, i) => {
+      const subClient = SubClient.load(
+        asset,
+        client,
+        connection,
+        owner,
+        [
+          promiseResults[i * ACCS_PER_SUBCLIENT],
+          promiseResults[i * ACCS_PER_SUBCLIENT + 1],
+        ],
+        callback,
+        throttle
+      );
+      client.addSubClient(asset, subClient);
+      client._marginAccountToAsset.set(
+        subClient.marginAccountAddress.toString(),
+        asset
+      );
+    });
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
     client._referralAccountAddress = undefined;
@@ -251,8 +285,8 @@ export class Client {
     }
 
     await Promise.all(
-      client.getAllSubClients().map(async (subclient) => {
-        await subclient.updateState();
+      client.getAllSubClients().map(async (subClient) => {
+        return subClient.updateOrders();
       })
     );
 
@@ -279,7 +313,7 @@ export class Client {
   public async setReferralData() {
     this.delegatedCheck();
     try {
-      let [referrerAccount] = await utils.getReferrerAccountAddress(
+      let [referrerAccount] = utils.getReferrerAccountAddress(
         Exchange.programId,
         this.publicKey
       );
@@ -298,11 +332,10 @@ export class Client {
     } catch (e) {}
 
     try {
-      let [referralAccountAddress, _nonce] =
-        await utils.getReferralAccountAddress(
-          Exchange.programId,
-          this.publicKey
-        );
+      let [referralAccountAddress, _nonce] = utils.getReferralAccountAddress(
+        Exchange.programId,
+        this.publicKey
+      );
 
       this._referralAccountAddress = referralAccountAddress;
       this._referralAccount =
@@ -317,7 +350,7 @@ export class Client {
 
   public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
     this.delegatedCheck();
-    let [referrerAccount] = await utils.getReferrerAccountAddress(
+    let [referrerAccount] = utils.getReferrerAccountAddress(
       Exchange.programId,
       referrer
     );
@@ -328,11 +361,11 @@ export class Client {
       throw Error(`Invalid referrer. ${referrer.toString()}`);
     }
     let tx = new Transaction().add(
-      await referUserIx(this.provider.wallet.publicKey, referrer)
+      referUserIx(this.provider.wallet.publicKey, referrer)
     );
     let txId = await utils.processTransaction(this.provider, tx);
 
-    [this._referralAccountAddress] = await utils.getReferralAccountAddress(
+    [this._referralAccountAddress] = utils.getReferralAccountAddress(
       Exchange.programId,
       this.publicKey
     );
@@ -524,7 +557,7 @@ export class Client {
       );
     }
     tx.add(
-      await instructions.depositIx(
+      instructions.depositIx(
         depositAsset,
         amount,
         depositSubClient.marginAccountAddress,
@@ -1019,7 +1052,7 @@ export class Client {
       throw new Error("Alias cannot be over 15 chars!");
     }
 
-    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
       Exchange.programId,
       this.publicKey
     );
@@ -1050,7 +1083,7 @@ export class Client {
 
   public async claimReferrerRewards(): Promise<TransactionSignature> {
     this.delegatedCheck();
-    let [referrerAccountAddress] = await utils.getReferrerAccountAddress(
+    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
       Exchange.programId,
       this.publicKey
     );
@@ -1066,7 +1099,7 @@ export class Client {
 
   public async claimReferralRewards(): Promise<TransactionSignature> {
     this.delegatedCheck();
-    let [referralAccountAddress] = await utils.getReferralAccountAddress(
+    let [referralAccountAddress] = utils.getReferralAccountAddress(
       Exchange.programId,
       this.publicKey
     );

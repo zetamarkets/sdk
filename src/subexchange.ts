@@ -159,46 +159,30 @@ export class SubExchange {
     // Load zeta group.
     let underlyingMint = utils.getUnderlyingMint(asset);
 
-    const [zetaGroup, _zetaGroupNonce] = await utils.getZetaGroup(
+    this._zetaGroupAddress = utils.getZetaGroup(
       Exchange.programId,
       underlyingMint
-    );
-    this._zetaGroupAddress = zetaGroup;
-
-    let [greeks, _greeksNonce] = await utils.getGreeks(
+    )[0];
+    this._greeksAddress = utils.getGreeks(
       Exchange.programId,
       this.zetaGroupAddress
-    );
-
-    this._greeksAddress = greeks;
-
-    let [perpSyncQueue, _perpSyncQueueNonce] = await utils.getPerpSyncQueue(
+    )[0];
+    this._perpSyncQueueAddress = utils.getPerpSyncQueue(
       Exchange.programId,
       this.zetaGroupAddress
-    );
-
-    this._perpSyncQueueAddress = perpSyncQueue;
-
-    const [vaultAddress, _vaultNonce] = await utils.getVault(
+    )[0];
+    this._vaultAddress = utils.getVault(
       Exchange.programId,
       this._zetaGroupAddress
-    );
-
-    const [insuranceVaultAddress, _insuranceNonce] =
-      await utils.getZetaInsuranceVault(
-        Exchange.programId,
-        this.zetaGroupAddress
-      );
-
-    const [socializedLossAccount, _socializedLossAccountNonce] =
-      await utils.getSocializedLossAccount(
-        Exchange.programId,
-        this._zetaGroupAddress
-      );
-
-    this._vaultAddress = vaultAddress;
-    this._insuranceVaultAddress = insuranceVaultAddress;
-    this._socializedLossAccountAddress = socializedLossAccount;
+    )[0];
+    this._insuranceVaultAddress = utils.getZetaInsuranceVault(
+      Exchange.programId,
+      this.zetaGroupAddress
+    )[0];
+    this._socializedLossAccountAddress = utils.getSocializedLossAccount(
+      Exchange.programId,
+      this._zetaGroupAddress
+    )[0];
 
     this._isSetup = true;
   }
@@ -209,9 +193,9 @@ export class SubExchange {
    */
   public async load(
     asset: Asset,
-    programId: PublicKey,
-    network: Network,
     opts: ConfirmOptions,
+    fetchedAccs: any[],
+    loadFromStore: boolean,
     throttleMs = 0,
     callback?: (asset: Asset, event: EventType, data: any) => void
   ) {
@@ -221,14 +205,10 @@ export class SubExchange {
       throw "SubExchange already loaded.";
     }
 
-    await this.updateZetaGroup();
-
-    this._markets = await ZetaGroupMarkets.load(
-      this.asset,
-      opts,
-      0,
-      utils.isFlexUnderlying(asset)
-    );
+    this._zetaGroup = fetchedAccs[0] as ZetaGroup;
+    this._greeks = fetchedAccs[1] as Greeks;
+    this._perpSyncQueue = fetchedAccs[2] as PerpSyncQueue;
+    this.updateMarginParams();
 
     if (
       !utils.isFlexUnderlying(asset) &&
@@ -241,12 +221,13 @@ export class SubExchange {
       throw "Zeta group markets are uninitialized!";
     }
 
-    this._greeks = (await Exchange.program.account.greeks.fetch(
-      this.greeksAddress
-    )) as Greeks;
-    this._perpSyncQueue = (await Exchange.program.account.perpSyncQueue.fetch(
-      this.perpSyncQueueAddress
-    )) as PerpSyncQueue;
+    this._markets = await ZetaGroupMarkets.load(
+      asset,
+      opts,
+      throttleMs,
+      loadFromStore
+    );
+
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
     // Set callbacks.
@@ -256,19 +237,58 @@ export class SubExchange {
 
     this._isInitialized = true;
 
-    console.log(`${assetToName(this.asset)} SubExchange loaded`);
+    console.info(`${assetToName(this.asset)} SubExchange loaded`);
+    return;
   }
 
   /**
    * Refreshes serum markets cache
-   * @param asset    which asset to load
    */
-  public async updateSerumMarkets(asset: Asset, opts: ConfirmOptions) {
+  public async updateSerumMarkets() {
     console.info(
-      `Refreshing Serum markets for ${assetToName(asset)} SubExchange.`
+      `Refreshing Serum markets for ${assetToName(this._asset)} SubExchange.`
     );
 
-    this._markets = await ZetaGroupMarkets.load(this.asset, opts, 0);
+    await Promise.all(
+      this._markets.markets
+        .map(async (m) => {
+          return m.serumMarket.updateDecoded(Exchange.connection);
+        })
+        .concat([
+          this._markets.perpMarket.serumMarket.updateDecoded(
+            Exchange.connection
+          ),
+        ])
+    );
+
+    console.log(
+      `${assetToName(this.asset)} SubExchange Serum markets refreshed`
+    );
+  }
+
+  /**
+   * Checks which live serum markets are stale and refreshes only those
+   */
+  public async updateLiveSerumMarketsIfNeeded(epochDelay: number) {
+    console.info(
+      `Refreshing live Serum markets if needed for ${assetToName(
+        this._asset
+      )} SubExchange.`
+    );
+
+    const allLiveMarketsToUpdate = this._markets.markets.filter(
+      (m) =>
+        ((m.kind == types.Kind.PERP || m.expirySeries.isLive()) &&
+          m.serumMarket.epochStartTs + m.serumMarket.epochLength + epochDelay <
+            Exchange.clockTimestamp) ||
+        m.serumMarket.startEpochSeqNum.toNumber() == 0
+    );
+
+    await Promise.all(
+      allLiveMarketsToUpdate.map((m) => {
+        return m.serumMarket.updateDecoded(Exchange.connection);
+      })
+    );
 
     console.log(
       `${assetToName(this.asset)} SubExchange Serum markets refreshed`
@@ -283,7 +303,7 @@ export class SubExchange {
     await Promise.all(
       indexes.map(async (index: number) => {
         let tx = new Transaction().add(
-          await instructions.initializeMarketNodeIx(this.asset, index)
+          instructions.initializeMarketNodeIx(this.asset, index)
         );
         await utils.processTransaction(Exchange.provider, tx);
       })
@@ -382,7 +402,7 @@ export class SubExchange {
    */
   public async initializeZetaMarkets(perpOnly: boolean = false) {
     // Initialize market indexes.
-    let [marketIndexes, marketIndexesNonce] = await utils.getMarketIndexes(
+    let [marketIndexes, marketIndexesNonce] = utils.getMarketIndexes(
       Exchange.programId,
       this._zetaGroupAddress
     );
@@ -504,7 +524,7 @@ export class SubExchange {
     if (Exchange.network != Network.LOCALNET) {
       // Validate that the market hasn't already been initialized
       // So no sol is wasted on unnecessary accounts.
-      const [market, _marketNonce] = await utils.getMarketUninitialized(
+      const [market, _marketNonce] = utils.getMarketUninitialized(
         Exchange.programId,
         this._zetaGroupAddress,
         marketIndexesAccount.indexes[i]
@@ -571,7 +591,7 @@ export class SubExchange {
     );
 
     if (!this.zetaGroup.perpsOnly) {
-      for (let i = 0; i < constants.ACTIVE_MARKETS; i++) {
+      for (let i = 0; i < constants.ACTIVE_MARKETS - 1; i++) {
         ixs.push(
           instructions.initializeZetaMarketTIFEpochCyclesIx(
             this.asset,
@@ -772,7 +792,7 @@ export class SubExchange {
    */
   public async whitelistUserForDeposit(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistDepositAccountIx(
+      instructions.initializeWhitelistDepositAccountIx(
         this.asset,
         user,
         Exchange.provider.wallet.publicKey
@@ -786,7 +806,7 @@ export class SubExchange {
    */
   public async whitelistUserForInsuranceVault(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistInsuranceAccountIx(
+      instructions.initializeWhitelistInsuranceAccountIx(
         user,
         Exchange.provider.wallet.publicKey
       )
@@ -799,7 +819,7 @@ export class SubExchange {
    */
   public async whitelistUserForTradingFees(user: PublicKey) {
     let tx = new Transaction().add(
-      await instructions.initializeWhitelistTradingFeesAccountIx(
+      instructions.initializeWhitelistTradingFeesAccountIx(
         user,
         Exchange.provider.wallet.publicKey
       )
