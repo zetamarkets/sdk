@@ -365,6 +365,10 @@ export class ZetaGroupMarkets {
    */
   public async updateExpirySeries() {
     let subExchange = Exchange.getSubExchange(this.asset);
+    if (subExchange.zetaGroup.perpsOnly) {
+      return;
+    }
+
     for (var i = 0; i < subExchange.zetaGroup.products.length; i++) {
       this._markets[i].updateStrike();
     }
