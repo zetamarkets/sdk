@@ -104,3 +104,21 @@ export function assetToIndex(asset: Asset): number {
   }
   throw new Error("Invalid asset");
 }
+
+export function indexToAsset(index: number): Asset {
+  switch (index) {
+    case 0: {
+      return Asset.SOL;
+    }
+    case 1: {
+      return Asset.BTC;
+    }
+    case 2: {
+      return Asset.ETH;
+    }
+    case 3: {
+      return Asset.APT;
+    }
+  }
+  throw new Error("Invalid index");
+}
