@@ -18,7 +18,6 @@ import {
 import * as types from "./types";
 import { EventType, OrderbookEvent } from "./events";
 import { Asset } from "./assets";
-import * as SerumMarketStore from "./serum-market-store";
 import { getDecodedMarket } from "./serum/generate-decoded";
 
 export class ZetaGroupMarkets {
