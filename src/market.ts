@@ -283,13 +283,6 @@ export class ZetaGroupMarkets {
       return instance;
     }
 
-    try {
-      instance.updateExpirySeries();
-    } catch (e) {
-      console.log("Test updateExpirySeries");
-      console.log(e);
-    }
-
     let productsPerExpiry = Math.floor(
       subExchange.zetaGroup.products.length /
         subExchange.zetaGroup.expirySeries.length
