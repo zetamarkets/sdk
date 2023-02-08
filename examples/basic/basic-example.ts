@@ -15,7 +15,6 @@ import fetch from "node-fetch";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
-const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
 const STARTING_BALANCE = 5_000;
 
 async function exchangeCallback(
@@ -49,7 +48,7 @@ async function main() {
   const connection: Connection = new Connection(NETWORK_URL, "confirmed");
 
   // Airdropping SOL.
-  await connection.requestAirdrop(wallet.publicKey, 100000000);
+  await connection.requestAirdrop(wallet.publicKey, 100_000_000);
 
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     Network.DEVNET,
@@ -71,7 +70,8 @@ async function main() {
 
   await Exchange.load(
     loadExchangeConfig
-    // exchangeCallback
+    // , wallet
+    // , exchangeCallback
   );
 
   Exchange.getAllSubExchanges().forEach(async (se) => {
@@ -82,7 +82,7 @@ async function main() {
     connection,
     wallet,
     undefined
-    // clientCallback
+    // , clientCallback
   );
 
   await client.deposit(
