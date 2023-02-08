@@ -32,12 +32,7 @@ const NETWORK_URL = process.env["network_url"]!;
 const MAX_ACCOUNTS_TO_FETCH = 99;
 let crankingMarkets = new Array(constants.ACTIVE_MARKETS - 1).fill(false);
 console.log(NETWORK_URL);
-const assetList = [
-  assets.Asset.SOL,
-  assets.Asset.BTC,
-  assets.Asset.ETH,
-  assets.Asset.APT,
-];
+const assetList = [assets.Asset.BTC];
 
 export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms, undefined));
@@ -66,7 +61,7 @@ async function main() {
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
-    assets.allAssets(),
+    assetList,
     utils.defaultCommitment(),
     0, // ThrottleMs - increase if you are running into rate limit issues on startup.
     true
