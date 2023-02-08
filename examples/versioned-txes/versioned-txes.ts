@@ -15,9 +15,8 @@ import fetch from "node-fetch";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
-const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
 const STARTING_BALANCE = 10_000;
-const ASSETS = [assets.Asset.SOL, assets.Asset.BTC, assets.Asset.ETH];
+const ASSETS = [assets.Asset.ETH];
 const USER_KEY = Keypair.generate();
 const WALLET = new Wallet(USER_KEY);
 const CONNECTION: Connection = new Connection(NETWORK_URL, "confirmed");
@@ -27,7 +26,7 @@ const MAX_ALL_PERP_MARKET_PLACE_ORDER_IXS = 9;
 
 async function main() {
   // Airdropping SOL.
-  await CONNECTION.requestAirdrop(WALLET.publicKey, 1_000000000);
+  await CONNECTION.requestAirdrop(WALLET.publicKey, 1_000_000_000);
 
   await fetch(`${SERVER_URL}/faucet/USDC`, {
     method: "post",
@@ -77,7 +76,7 @@ async function main() {
     console.log(
       `User margin acc balance for ${asset}: ${
         Exchange.riskCalculator.getMarginAccountState(
-          client.getSubClient(asset).marginAccount
+          client.getSubClient(asset).marginAccount!
         ).balance
       }`
     );
