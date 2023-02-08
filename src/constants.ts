@@ -1,6 +1,16 @@
 import { PublicKey, AddressLookupTableAccount } from "@solana/web3.js";
 import { Asset } from "./assets";
 
+export const ZETA_PID: {
+  localnet: PublicKey;
+  devnet: PublicKey;
+  mainnet: PublicKey;
+} = {
+  localnet: new PublicKey("BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"),
+  devnet: new PublicKey("BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"),
+  mainnet: new PublicKey("ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD"),
+};
+
 // Asset keys are wormhole from mainnet.
 export const MINTS = {
   [Asset.SOL]: new PublicKey("So11111111111111111111111111111111111111112"),
@@ -8,13 +18,30 @@ export const MINTS = {
   [Asset.ETH]: new PublicKey("FeGn77dhg1KXRRFeSwwMiykZnZPw5JXW6naf2aQgZDQf"),
 };
 
-export const DEX_PID = {
+// These are generated flexible PDAs and aren't reflective of an spl token mint.
+export const FLEX_MINTS = {
+  localnet: {
+    [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
+  },
+  devnet: {
+    [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
+  },
+  mainnet: {
+    [Asset.APT]: new PublicKey("8z8oShLky1PauW9hxv6AsjnricLqoK9MfmNZJDQNNNPr"),
+  },
+};
+
+export const DEX_PID: {
+  localnet: PublicKey;
+  devnet: PublicKey;
+  mainnet: PublicKey;
+} = {
   localnet: new PublicKey("5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"),
   devnet: new PublicKey("5CmWtUihvSrJpaUrpJ3H1jUa9DRjYz4v2xs6c3EgQWMf"),
   mainnet: new PublicKey("zDEXqXEG7gAyxb1Kg9mK5fPnUdENCGKzWrM21RMdWRq"),
 };
 
-export const CHAINLINK_PID = new PublicKey(
+export const CHAINLINK_PID: PublicKey = new PublicKey(
   "HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny"
 );
 
@@ -54,16 +81,19 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.SOL]: new PublicKey("2pRCJksgaoKRMqBfa7NTdd6tLYe9wbDFGCcCCZ6si3F7"),
     [Asset.BTC]: new PublicKey("9WD5hzrwEtwbYyZ34BRnrSS11TzD7PTMyszKV5Ur4JxJ"),
     [Asset.ETH]: new PublicKey("FkUZhotvECPTBEXXzxBPjnJu6vPiQmptKyUDSXapBgHJ"),
+    [Asset.APT]: new PublicKey("5FBj9HE3oBGXv5pNtYsrABRwt8EYgNVRa2hYoEd9uXCS"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
     [Asset.BTC]: new PublicKey("HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J"),
     [Asset.ETH]: new PublicKey("EdVCmQ9FSPcVe5YySXDPCRmc8aDQLKJ9xvYBMZPie1Vw"),
+    [Asset.APT]: new PublicKey("5d2QJ6u2NveZufmJ4noHja5EHs3Bv1DUMPLG5xfasSVs"),
   },
   mainnet: {
     [Asset.SOL]: new PublicKey("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG"),
     [Asset.BTC]: new PublicKey("GVXRSBjFk6e6J3NbVPXohDJetcTjaeeuykUpbQF8UoMU"),
     [Asset.ETH]: new PublicKey("JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB"),
+    [Asset.APT]: new PublicKey("FNNvb1AFDnDVPkocEri8mWbJ1952HQZtFLuwPiUjSJQ"),
   },
 };
 

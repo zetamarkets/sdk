@@ -11,6 +11,7 @@ import {
 } from "@solana/web3.js";
 import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
+import { exchange as Exchange } from "../exchange";
 
 export const MARKET_STATE_LAYOUT_V3 = struct([
   blob(5),
@@ -131,18 +132,30 @@ export class Market {
     ) {
       throw new Error("Invalid market");
     }
-    const [baseMintDecimals, quoteMintDecimals] = await Promise.all([
-      getMintDecimals(connection, decoded.baseMint),
-      getMintDecimals(connection, decoded.quoteMint),
-    ]);
-    return new Market(
-      decoded,
-      baseMintDecimals,
-      quoteMintDecimals,
-      options,
-      programId,
-      layoutOverride
+
+    return new Market(decoded, 0, 6, options, programId, layoutOverride);
+  }
+
+  /*
+   * This will load a SerumMarket from static constants stored in the zeta sdk
+   * There a few important assumptions that need to be made which is that epochLength
+   * epochLength = 2^16 - 1
+   * epochStartTs = should be dynamically calculated to be the correct current one using Exchange.clockTimestamp
+   * startEpochSeqNum will not necessarily be accurate but if we set it to 0 it's probably safe
+   * for general usage. Will add in a decoded object update specifically
+   */
+  static loadFromDecoded(
+    decoded: any,
+    options: MarketOptions = {},
+    programId: PublicKey,
+    layoutOverride?: any
+  ) {
+    decoded.epochStartTs = new BN(
+      Exchange.clockTimestamp -
+        (Exchange.clockTimestamp % decoded.epochLength.toNumber())
     );
+
+    return new Market(decoded, 0, 6, options, programId, layoutOverride);
   }
 
   get programId(): PublicKey {
@@ -203,6 +216,15 @@ export class Market {
 
   get decoded(): any {
     return this._decoded;
+  }
+
+  public async updateDecoded(connection: Connection) {
+    const { owner, data } = throwIfNull(
+      await connection.getAccountInfo(this.address),
+      "Market not found"
+    );
+    this._decoded = MARKET_STATE_LAYOUT_V3.decode(data);
+    return;
   }
 
   async loadBids(connection: Connection): Promise<Orderbook> {

@@ -115,15 +115,19 @@ async function main() {
     await airdropUsdc(wallet.publicKey, startingBalance);
   }
 
-  // Load the SDK Exchange object.
-  await Exchange.load(
-    [asset],
-    programId,
+  const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
+    [asset],
     utils.defaultCommitment(),
-    new types.DummyWallet(), // Normal clients don't need to use a real wallet for exchange loading.
-    0 // Increase if you are getting rate limited on startup.
+    0, // Increase if you are getting rate limited on startup.
+    true
+  );
+
+  // Load the SDK Exchange object.
+  await Exchange.load(
+    loadExchangeConfig,
+    new types.DummyWallet() // Normal clients don't need to use a real wallet for exchange loading.
   );
 
   client = await Client.load(connection, wallet, utils.defaultCommitment());

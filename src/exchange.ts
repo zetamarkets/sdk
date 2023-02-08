@@ -265,34 +265,31 @@ export class Exchange {
     this._blockhashCommitment = commitment;
   }
 
-  public async initialize(
-    assets: Asset[],
-    programId: PublicKey,
-    network: Network,
-    connection: Connection,
-    opts: ConfirmOptions,
+  public initialize(
+    loadConfig: types.LoadExchangeConfig,
     wallet = new types.DummyWallet()
   ) {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
-    this._assets = assets;
+    this._assets = loadConfig.assets;
     this._provider = new anchor.AnchorProvider(
-      connection,
+      loadConfig.connection,
       wallet instanceof types.DummyWallet ? null : wallet,
-      opts || utils.commitmentConfig(connection.commitment)
+      loadConfig.opts ||
+        utils.commitmentConfig(loadConfig.connection.commitment)
     );
-    this._opts = opts;
-    this._network = network;
+    this._opts = loadConfig.opts;
+    this._network = loadConfig.network;
     this._program = new anchor.Program(
       idl as anchor.Idl,
-      programId,
+      constants.ZETA_PID[loadConfig.network],
       this._provider
     ) as anchor.Program<Zeta>;
 
-    for (var asset of assets) {
-      await this.addSubExchange(asset, new SubExchange());
-      await this.getSubExchange(asset).initialize(asset);
+    for (var asset of loadConfig.assets) {
+      this.addSubExchange(asset, new SubExchange());
+      this.getSubExchange(asset).initialize(asset);
     }
     this._isSetup = true;
   }
@@ -301,21 +298,23 @@ export class Exchange {
     params: instructions.StateParams,
     referralAdmin: PublicKey
   ) {
-    const [mintAuthority, mintAuthorityNonce] = await utils.getMintAuthority(
+    const [mintAuthority, mintAuthorityNonce] = utils.getMintAuthority(
       this.programId
     );
-    const [state, stateNonce] = await utils.getState(this.programId);
-    const [serumAuthority, serumNonce] = await utils.getSerumAuthority(
+    const [state, stateNonce] = utils.getState(this.programId);
+    const [serumAuthority, serumNonce] = utils.getSerumAuthority(
       this.programId
     );
 
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[this.network];
 
-    const [treasuryWallet, _treasuryWalletNonce] =
-      await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
+    const [treasuryWallet, _treasuryWalletNonce] = utils.getZetaTreasuryWallet(
+      this.programId,
+      this._usdcMintAddress
+    );
 
     const [referralRewardsWallet, _referralRewardsWalletNonce] =
-      await utils.getZetaReferralsRewardsWallet(
+      utils.getZetaReferralsRewardsWallet(
         this.programId,
         this._usdcMintAddress
       );
@@ -356,19 +355,24 @@ export class Exchange {
     pricingArgs: instructions.InitializeZetaGroupPricingArgs,
     perpArgs: instructions.UpdatePerpParametersArgs,
     marginArgs: instructions.UpdateMarginParametersArgs,
-    expiryArgs: instructions.UpdateZetaGroupExpiryArgs
+    expiryArgs: instructions.UpdateZetaGroupExpiryArgs,
+    perpsOnly: boolean = false,
+    flexUnderlying: boolean = false
   ) {
+    let underlyingMint = utils.getUnderlyingMint(asset);
     let tx = new Transaction().add(
-      await instructions.initializeZetaGroupIx(
+      instructions.initializeZetaGroupIx(
         asset,
-        constants.MINTS[asset],
+        underlyingMint,
         oracle,
         oracleBackupFeed,
         oracleBackupProgram,
         pricingArgs,
         perpArgs,
         marginArgs,
-        expiryArgs
+        expiryArgs,
+        perpsOnly,
+        flexUnderlying
       )
     );
     try {
@@ -381,88 +385,133 @@ export class Exchange {
       );
     } catch (e) {
       console.error(`Initialize zeta group failed: ${e}`);
+      console.log(e);
     }
+
     await this.updateState();
+
+    if (this.getSubExchange(asset) == undefined) {
+      await this.addSubExchange(asset, new SubExchange());
+      await this.getSubExchange(asset).initialize(asset);
+    }
+
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
   public async load(
-    assets: Asset[],
-    programId: PublicKey,
-    network: Network,
-    connection: Connection,
-    opts: ConfirmOptions,
+    loadConfig: types.LoadExchangeConfig,
     wallet = new types.DummyWallet(),
-    throttleMs = 0,
     callback?: (asset: Asset, event: EventType, data: any) => void
   ) {
     if (this.isInitialized) {
       throw "Exchange already loaded";
     }
 
+    if (loadConfig.network == Network.LOCALNET && loadConfig.loadFromStore) {
+      throw Error("Cannot load localnet from store");
+    }
+
     if (!this.isSetup) {
-      await this.initialize(
-        assets,
-        programId,
-        network,
-        connection,
-        opts,
-        wallet
-      );
+      this.initialize(loadConfig, wallet);
     }
 
     this._riskCalculator = new RiskCalculator(this.assets);
 
     // Load variables from state.
-    const [mintAuthority, _mintAuthorityNonce] = await utils.getMintAuthority(
-      this.programId
-    );
-    const [state, _stateNonce] = await utils.getState(this.programId);
-    const [serumAuthority, _serumNonce] = await utils.getSerumAuthority(
-      this.programId
-    );
-
-    this._mintAuthority = mintAuthority;
-    this._stateAddress = state;
-    this._serumAuthority = serumAuthority;
-    this._usdcMintAddress = constants.USDC_MINT_ADDRESS[network];
-
-    const [treasuryWallet, _treasuryWalletnonce] =
-      await utils.getZetaTreasuryWallet(this.programId, this._usdcMintAddress);
-    this._treasuryWalletAddress = treasuryWallet;
-
-    const [referralsRewardsWallet, _referralsRewardsWalletNonce] =
-      await utils.getZetaReferralsRewardsWallet(
-        this.programId,
-        this._usdcMintAddress
-      );
-    this._referralsRewardsWalletAddress = referralsRewardsWallet;
+    this._mintAuthority = utils.getMintAuthority(this.programId)[0];
+    this._stateAddress = utils.getState(this.programId)[0];
+    this._serumAuthority = utils.getSerumAuthority(this.programId)[0];
+    this._usdcMintAddress = constants.USDC_MINT_ADDRESS[loadConfig.network];
+    this._treasuryWalletAddress = utils.getZetaTreasuryWallet(
+      this.programId,
+      this._usdcMintAddress
+    )[0];
+    this._referralsRewardsWalletAddress = utils.getZetaReferralsRewardsWallet(
+      this.programId,
+      this._usdcMintAddress
+    )[0];
 
     this._lastPollTimestamp = 0;
 
     this._oracle = new Oracle(this.network, this.connection);
-    await this.subscribeOracle(this.assets, callback);
+
+    const ACCS_PER_SUBEXCHANGE = 3;
+
+    const subExchangeToFetchAddrs: PublicKey[] = this.assets
+      .map((a) => {
+        const se = this.getSubExchange(a);
+        return [se.zetaGroupAddress, se.greeksAddress, se.perpSyncQueueAddress];
+      })
+      .flat()
+      .concat([SYSVAR_CLOCK_PUBKEY]);
+
+    const accFetchPromises: Promise<any>[] = subExchangeToFetchAddrs.map(
+      (addr) => {
+        return this.provider.connection.getAccountInfo(addr);
+      }
+    );
+    const allPromises: Promise<any>[] = accFetchPromises.concat([
+      this.subscribeOracle(this.assets, callback),
+      this.updateState(),
+    ]);
+
+    const accFetches = (await Promise.all(allPromises)).slice(
+      0,
+      loadConfig.assets.length * ACCS_PER_SUBEXCHANGE + 1
+    );
+
+    let zetaGroupAccs: ZetaGroup[] = [];
+    let greeksAccs: Greeks[] = [];
+    let perpSyncQueueAccs: PerpSyncQueue[] = [];
+    for (let i = 0; i < accFetches.length - 1; i++) {
+      switch (i % ACCS_PER_SUBEXCHANGE) {
+        case 0:
+          zetaGroupAccs.push(
+            this.program.account.zetaGroup.coder.accounts.decode(
+              types.ProgramAccountType.ZetaGroup,
+              accFetches[i].data
+            ) as ZetaGroup
+          );
+          break;
+        case 1:
+          greeksAccs.push(
+            this.program.account.greeks.coder.accounts.decode(
+              types.ProgramAccountType.Greeks,
+              accFetches[i].data
+            ) as Greeks
+          );
+          break;
+        case 2:
+          perpSyncQueueAccs.push(
+            this.program.account.perpSyncQueue.coder.accounts.decode(
+              types.ProgramAccountType.PerpSyncQueue,
+              accFetches[i].data
+            ) as PerpSyncQueue
+          );
+          break;
+      }
+    }
+
+    const clockData = utils.getClockData(accFetches.at(-1));
+    this.subscribeClock(clockData, callback);
 
     await Promise.all(
-      this.assets.map(async (asset) => {
-        await this.getSubExchange(asset).load(
+      this.assets.map(async (asset, i) => {
+        return this.getSubExchange(asset).load(
           asset,
-          this.programId,
-          this.network,
           this.opts,
-          throttleMs,
+          [zetaGroupAccs[i], greeksAccs[i], perpSyncQueueAccs[i]],
+          loadConfig.loadFromStore,
+          loadConfig.throttleMs,
           callback
         );
       })
     );
 
-    await this.updateState();
-    await this.subscribeClock(callback);
-
     this._isInitialized = true;
   }
 
-  private async addSubExchange(asset: Asset, subExchange: SubExchange) {
+  private addSubExchange(asset: Asset, subExchange: SubExchange) {
     this._subExchanges.set(asset, subExchange);
   }
 
@@ -484,7 +533,7 @@ export class Exchange {
     assets: Asset[],
     callback?: (asset: Asset, type: EventType, data: any) => void
   ) {
-    await this._oracle.subscribePriceFeeds(
+    return this._oracle.subscribePriceFeeds(
       assets,
       (asset: Asset, price: OraclePrice) => {
         if (this.isInitialized) {
@@ -502,7 +551,8 @@ export class Exchange {
     this._clockSlot = data.slot;
   }
 
-  private async subscribeClock(
+  private subscribeClock(
+    clockData: types.ClockData,
     callback?: (asset: Asset, type: EventType, data: any) => void
   ) {
     if (this._clockSubscriptionId !== undefined) {
@@ -534,10 +584,7 @@ export class Exchange {
       },
       this.provider.connection.commitment
     );
-    let accountInfo = await this.provider.connection.getAccountInfo(
-      SYSVAR_CLOCK_PUBKEY
-    );
-    this.setClockData(utils.getClockData(accountInfo));
+    this.setClockData(clockData);
   }
 
   public addProgramSubscriptionId(id: number) {
@@ -682,6 +729,10 @@ export class Exchange {
   }
 
   public getMarkets(asset: Asset): Market[] {
+    let sub = this.getSubExchange(asset);
+    if (sub.isPerpsOnly()) {
+      return [sub.markets.perpMarket];
+    }
     return this.getSubExchange(asset).markets.markets.concat(
       this.getSubExchange(asset).markets.perpMarket
     );
@@ -771,8 +822,8 @@ export class Exchange {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
 
-  public async initializeZetaMarkets(asset: Asset) {
-    await this.getSubExchange(asset).initializeZetaMarkets();
+  public async initializeZetaMarkets(asset: Asset, perpsOnly: boolean = false) {
+    await this.getSubExchange(asset).initializeZetaMarkets(perpsOnly);
   }
 
   public async initializeZetaMarketsTIFEpochCycle(
