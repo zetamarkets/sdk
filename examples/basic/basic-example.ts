@@ -9,6 +9,7 @@ import {
   types,
   assets,
   events,
+  constants,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import fetch from "node-fetch";
@@ -93,7 +94,7 @@ async function main() {
   utils.displayState();
 
   // Show current orderbook for a market.
-  const index = 10;
+  const index = constants.PERP_INDEX;
   await Exchange.updateOrderbook(assets.Asset.BTC, index);
   console.log(`BTC market ${index} orderbook:`);
   console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
