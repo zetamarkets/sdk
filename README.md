@@ -99,6 +99,8 @@ npm install @zetamarkets/sdk
 
 ### Setting up a wallet
 
+Before we start writing any code, we need a fresh Solana wallet - skip this if you already have your own wallet.
+
 ```sh
 # Generate new keypair at ./bot-key.json
 solana-keygen new -o bot-key.json
@@ -111,7 +113,20 @@ solana-keygen pubkey bot-key.json
 echo private_key=`cat bot-key.json` >> .env
 ```
 
+### .env file
+
+At this point there will be .env file with your freshly created private key. Open it up with your favourite text editor and add the following two lines:
+
+```sh
+network_url=https://api.devnet.solana.com
+server_url=https://dex-devnet-webserver.zeta.markets
+```
+
+Note that the default Solana RPC will probably rate-limit you. Now's a good time to find a better one - for starters check out Runnode, Alchemy or RPCPool.
+
 ### Basic setup boilerplate
+
+Now that you're set up, we can start loading the Zeta exchange! Start with the following code, which will set up all necessary connections, airdrop you some SOL + USDC (devnet only) and load the exchange.
 
 ```ts
 // Loads the local .env file into `process.env`.
@@ -127,8 +142,12 @@ import {
   types,
   assets,
   Decimal,
+  constants,
 } from "@zetamarkets/sdk";
 import fetch from "node-fetch";
+
+const NETWORK_URL = process.env["network_url"]!;
+const SERVER_URL = process.env["server_url"];
 
 // Loads the private key in .env
 const privateKey = Keypair.fromSecretKey(
@@ -243,8 +262,14 @@ export interface MarginAccount {
 
   productLedgers: Array<ProductLedger>; // Vector of your positions and open order state.
   _productLedgersPadding: Array<ProductLedger>;
+  perpProductLedger: ProductLedger; // Perps are held separately as they do not expire
   rebalanceAmount: anchor.BN; // Any balance to be changed in the next market crank
   asset: any; // Underlying asset (SOL, BTC, etc.)
+
+  accountType: any; // Specific flag for whitelisted market maker accounts
+  lastFundingDelta: AnchorDecimal; // The last funding rate delta applied to this account
+  delegatedPubkey: PublicKey; // A public key that can perform trading functions on your behalf, set with the editDelegatedPubkey instruction
+
   _padding: Array<number>;
 }
 ```
@@ -253,11 +278,10 @@ The details should be abstracted away into `client.getOrders(asset)` and `client
 
 ### Basic script setup to place a trade and view positions
 
-For examples sake, we want to see the orderbook for SOL market index 2, i.e. the CALL option expiring on Fri Nov 19 with strike 211.
-Different markets (such as perps or futures) are just a different `index`. Try index = constants.PERP_INDEX 😊
+For examples sake, we want to see the orderbook for SOL market index 137, i.e. the perps. Different markets (such as options or futures) are just a different index, which we saw earlier with utils.displayState().
 
 ```ts
-const index = 2;
+const index = constants.PERP_INDEX;
 const asset = assets.Asset.SOL;
 await Exchange.updateOrderbook(asset, index);
 console.log(Exchange.getOrderbook(asset, index));
@@ -267,26 +291,27 @@ console.log(Exchange.getOrderbook(asset, index));
 `
 {
   bids: [
-    { price: 7.71, size: 23 },
-    { price: 6.58, size: 309 },
-    { price: 5.71, size: 251 },
-    { price: 5.52, size: 8 }
+    { price: 17.71, size: 23 },
+    { price: 16.58, size: 309 },
+    { price: 15.71, size: 251 },
+    { price: 15.52, size: 8 }
   ],
-  asks: [ { price: 9.53, size: 23 } ]
+  asks: [ { price: 19.53, size: 23 } ]
 }
 `;
 ```
 
-Placing an order.
+### Placing an order.
 
-- Placing an order on a new market (market index) will create an `OpenOrders` account. This is handled by the SDK.
+Placing an order on a new market (market index) will create an `OpenOrders` account. This is handled by the SDK.
+
 - The minimum price is $0.0001.
 - The minimum trade tick size is 0.001.
 
 ```ts
 // We need to convert price to the native spl token amount (6.dp)
-// utils.convertDecimalToNativeInteger(8) == (8*10^6)
-const orderPrice = utils.convertDecimalToNativeInteger(8);
+// utils.convertDecimalToNativeInteger(18) == (18*10^6)
+const orderPrice = utils.convertDecimalToNativeInteger(18);
 
 // We need to convert to our native option lot size.
 // utils.convertDecimalToNativeLotSize(1) == (1*10^3)
@@ -305,7 +330,9 @@ await client.placeOrder(
 );
 ```
 
-See client order.
+### See client order.
+
+Now that our order is placed we should see it on the orderbook. Either check in the SDK or navigate to https://devnet.zeta.markets/ to see it visually.
 
 ```ts
 await client.updateState();
@@ -315,11 +342,11 @@ console.log(client.getOrders(asset));
 `
 [
   {
-    marketIndex: 2,
+    marketIndex: 137,
     market: PublicKey {
       _bn: <BN: 94cce37bd47128c757766685f012cac541a534ba9ed59e6bf05cd004eae1ae5>
     },    // This is the market address represented as a PublicKey
-    price: 8,
+    price: 18,
     size: 1,
     side: 0, // 0 for bids, 1 for asks
     orderId: <BN: 7a1200fffffffffffdfdc2>, // This is used to cancel.
@@ -335,18 +362,20 @@ console.log(Exchange.getOrderbook(asset, index));
 `
 {
   bids: [
-    { price: 8, size: 1 }, // This is our order
-    { price: 7.99, size: 23 },
-    { price: 6.58, size: 309 },
-    { price: 5.71, size: 251 },
-    { price: 5.52, size: 8 }
+    { price: 18, size: 1 }, // This is our order
+    { price: 17.99, size: 23 },
+    { price: 16.58, size: 309 },
+    { price: 15.71, size: 251 },
+    { price: 15.52, size: 8 }
   ],
-  asks: [ { price: 9.53, size: 23 } ]
+  asks: [ { price: 19.53, size: 23 } ]
 }
 `;
 ```
 
-Place bid order in cross to get a position (Best ask was 9.53)
+### Place bid order in cross to get a position
+
+Let's trade! Instead of just placing a resting order, send a bid order with a higher price to cross the orderbook and execute a trade.
 
 ```ts
 // Place an order in cross with offers to get a position.
@@ -366,20 +395,20 @@ console.log(client.getMarginPositions(asset));
 `
 [
   {
-    marketIndex: 2,
+    marketIndex: 137,
     market: PublicKey {
       _bn: <BN: 94cce37bd47128c757766685f012cac541a534ba9ed59e6bf05cd004eae1ae5>
     },
     position: 1,
-    costOfTrades: 9.53 // 6 d.p, so $9.53
+    costOfTrades: 19.53 // 6 d.p, so $19.53
   }
 ]
 `;
 ```
 
-We have a position of 1, with cost of trades 9530000 / 10^6 = $9.53.
+We have a position of 1, with cost of trades 9530000 / 10^6 = $19.53.
 
-Cancel order.
+### Cancel order.
 
 ```ts
 // We only have one order at the moment.
@@ -387,7 +416,7 @@ let order = client.getOrders(asset)[0];
 await client.cancelOrder(asset, order.market, order.orderId, order.side);
 ```
 
-Cancel all orders.
+### Cancel all orders.
 
 ```ts
 // Optionally can pass in the asset here but we'll choose not to
@@ -398,16 +427,18 @@ See `src/client.ts` for full functionality.
 
 ### Check market mark price
 
-This is the price that position is marked to - (This is calculated by our on chain black scholes pricing that is constantly being cranked.)
+This is the price that position is marked to - (This is calculated by our on-chain Black Scholes pricing that is constantly being cranked)
 
 ```ts
 // Use the market index you wish to check.
-console.log(Exchange.getMarkPrice(asset, index));
+console.log(Exchange.getMarkPrice(asset, 2));
 // The fair price of this option is $8.202024.
 `8.202024`;
 ```
 
 ### Calculate user margin account state
+
+At any point you can view your account state without having to dig through the account definitions yourself, using the `riskCalculator`.
 
 ```ts
 let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
@@ -418,12 +449,15 @@ console.log(marginAccountState);
 // These values have all been normalized (converted from 6 dp fixed point integer to decimal)
 `
 {
-  balance: 10000,                       // Deposited $10,000
-  initialMargin: 8.202024,              // Initial margin, from the 1 open order
-  maintenanceMargin: 8.202024,          // Maintenance margin, from the 1 position
-  totalMargin: 16.404048,               // Sum of initial and maintenance
-  unrealizedPnl: -1.3279759999999996,   // Unrealized pnl, marked to mark price
-  availableBalance: 9982.267976         // Equity available for trading.
+  balance: 10000,                            // Deposited $10,000
+  initialMargin: 8.202024,                   // Initial margin, from the 1 open order
+  initialMarginSkipConcession: 8.202024,     // Initial margin, from the 1 open order (if skipping concession)          
+  maintenanceMargin: 8.202024,               // Maintenance margin, from the 1 position
+  unrealizedPnl: -1.3279759999999996,        // Unrealized pnl, marked to mark price
+  unpaidFunding: 0.013,                      // Funding payments that haven't been applied to the balance yet
+  availableBalanceInitial: 9990.483,         // Equity available for trading
+  availableBalanceMaintenance: 9990.483,
+  availableBalanceWithdrawable: 9990.483
 }
 `;
 ```
@@ -432,7 +466,7 @@ console.log(marginAccountState);
 
 Zeta market data is available through `Exchange.getZetaGroupMarkets(asset)`, which simplifies the data in `Exchange.getZetaGroup(asset)` to be more easily understood.
 
-Markets are indexed via 0..N-1 (N being 46 for now.) and are grouped in `ExpirySeries`. Perps are index 137, and sit beside the dated markets.
+Markets with expiries are indexed via 0..N-1 (N being 46 for now) and are grouped in `ExpirySeries`. Perps are index 137, and sit beside the dated markets.
 
 ```ts
 // Whole zeta group markets object
