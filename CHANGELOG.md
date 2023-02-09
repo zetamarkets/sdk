@@ -4,14 +4,14 @@ All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
 # Unreleased
- - general: Remove a lot of unnecessary async processes and improve exchange loading times. ([#196](https://github.com/zetamarkets/sdk/pull/196))
-- general: Improve loading time for client. ([#196](https://github.com/zetamarkets/sdk/pull/196))
-- general: Add the option to load devnet/mainnet zeta exchange state from serum market stores. ([#196](https://github.com/zetamarkets/sdk/pull/196))
 
 ## [0.23.0] 2023-02-06
 
 - general: support flexible assets. ([#198](https://github.com/zetamarkets/sdk/pull/198))
 - general: add aptos. ([#198](https://github.com/zetamarkets/sdk/pull/198))
+- general: Remove a lot of unnecessary async processes and improve exchange loading times. ([#196](https://github.com/zetamarkets/sdk/pull/196))
+- general: Improve loading time for client. ([#196](https://github.com/zetamarkets/sdk/pull/196))
+- general: Add the option to load devnet/mainnet zeta exchange state from serum market stores. ([#196](https://github.com/zetamarkets/sdk/pull/196))
 
 ## [0.22.1]
 
