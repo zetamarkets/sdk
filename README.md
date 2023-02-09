@@ -21,7 +21,7 @@
 
 This is the typescript library to interact with our Zeta program smart contract.
 
-[Learn more about Zeta.](https://zetamarkets.gitbook.io/zeta/whitepaper/)
+[Learn more about Zeta.](https://docs.zeta.markets/)
 
 [Try out Zeta devnet.](https://devnet.zeta.markets/)
 
