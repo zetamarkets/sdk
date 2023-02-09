@@ -115,11 +115,20 @@ async function main() {
   // Apply funding to any users holding perp positions
   setInterval(
     async function () {
-      await this.applyFunding();
+      await applyFunding();
     }.bind(this),
     process.env.APPLY_FUNDING_INTERVAL
       ? parseInt(process.env.APPLY_FUNDING_INTERVAL)
       : 120_000
+  );
+
+  setInterval(
+    async function () {
+      await pruneExpiredTIFOrders();
+    }.bind(this),
+    process.env.PRUNE_EXPIRED_TIF_INTERVAL
+      ? parseInt(process.env.PRUNE_EXPIRED_TIF_INTERVAL)
+      : 60000
   );
 
   // Retreat pricing on markets
@@ -392,6 +401,36 @@ async function applyFunding() {
     for (var asset of Exchange.assets) {
       await utils.applyPerpFunding(asset, fundingAccounts.get(asset));
     }
+  }
+}
+
+async function pruneExpiredTIFOrders() {
+  let subExchanges = Exchange.getAllSubExchanges();
+
+  try {
+    await Promise.all(
+      subExchanges.map((se) => {
+        let markets = se.getMarkets();
+
+        let marketIndicesToPrune: number[] = [];
+
+        for (let i = 0; i < markets.length; i++) {
+          if (!markets[i].expirySeries) {
+            marketIndicesToPrune.push(markets[i].marketIndex);
+            continue;
+          }
+          if (!markets[i].expirySeries.isLive()) {
+            continue;
+          }
+          marketIndicesToPrune.push(markets[i].marketIndex);
+        }
+
+        return utils.pruneExpiredTIFOrders(se.asset, marketIndicesToPrune);
+      })
+    );
+    console.log("Pruned expired TIF orders.");
+  } catch (e) {
+    this.alert("Failed to prune expired TIF orders.", `Error=${e}`);
   }
 }
 

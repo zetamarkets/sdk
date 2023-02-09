@@ -462,6 +462,29 @@ console.log(marginAccountState);
 `;
 ```
 
+### Priority Fees
+
+Additional priority fees can be set to maximise your transaction's chance of success. The units are microlamports per Compute Unit.
+
+```ts
+// Exchange.load() needs to be called first
+
+let fee = 300; // microlamports per CU
+
+// turn on priority fees for the first time
+Exchange.toggleUsePriorityFees(fee);
+
+// update priority fee amount
+fee = 500;
+Exchange.updatePriorityFee(fee);
+```
+
+### Versioned Transactions
+
+Can't fit all the instructions you want into a single transaction? Try using Address Lookup Tables (ALTs)! By setting `lutAccs = utils.getZetaLutArr()` when calling `utils.processTransaction`, you'll utilise features from Solana's Versioned Transactions to drastically minimise the accounts you pass in, increasing how many instructions you can sandwich together.
+
+A full Versioned Transactions example is available in the examples subpage.
+
 ## Zeta market data
 
 Zeta market data is available through `Exchange.getZetaGroupMarkets(asset)`, which simplifies the data in `Exchange.getZetaGroup(asset)` to be more easily understood.

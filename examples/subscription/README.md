@@ -1,6 +1,6 @@
 ## Setup
 
-This is an example of how to subscribe to all margin account changes using `onProgramAccountChange`.
+Subscribing to changes to onchain is easy using `subscription.subscribeProgramAccounts`. In this example we subscribe to any SOL margin account changes, but you can subscribe to any account types you wish to track.
 
 ```sh
 npm install
