@@ -126,7 +126,7 @@ import {
   utils,
   types,
   assets,
-  Decimal
+  Decimal,
 } from "@zetamarkets/sdk";
 import fetch from "node-fetch";
 
@@ -152,15 +152,18 @@ await fetch(`${SERVER_URL}/faucet/USDC`, {
   headers: { "Content-Type": "application/json" },
 });
 
-// Loads the SDK exchange singleton. This can take up to 10 seconds...
-await Exchange.load(
-  [assets.Asset.SOL, assets.Asset.BTC] // Can be one or more depending on what you wish to trade
-  PROGRAM_ID,
+const loadExchangeConfig = types.defaultLoadExchangeConfig(
   Network.DEVNET,
   connection,
+  [assets.Asset.SOL, assets.Asset.BTC], // Can be one or more depending on what you wish to trade
   utils.defaultCommitment(),
-  undefined, // Exchange wallet can be ignored for normal clients.
   0, // ThrottleMs - increase if you are running into rate limit issues on startup.
+  true // LoadFromStore - whether you wish to load market addresses from the static storage (faster) or fetch everything from the chain (slower)
+);
+
+// Loads the SDK exchange singleton. This can take a few seconds...
+await Exchange.load(
+  loadExchangeConfig,
   undefined // Callback - See below for more details.
 );
 ```
