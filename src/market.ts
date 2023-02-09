@@ -16,10 +16,9 @@ import {
   isOrderExpired,
 } from "./utils";
 import * as types from "./types";
-
 import { EventType, OrderbookEvent } from "./events";
 import { Asset } from "./assets";
-import * as SerumMarketStore from "./serum-market-store";
+import { getDecodedMarket } from "./serum/generate-decoded";
 
 export class ZetaGroupMarkets {
   /**
@@ -231,11 +230,12 @@ export class ZetaGroupMarkets {
     // Perps product/market is separate
     let marketAddr = subExchange.zetaGroup.perp.market;
     let serumMarket: SerumMarket;
-    if (loadFromStore && !perpsOnly) {
-      const decoded =
-        SerumMarketStore.STATIC_SERUM_MARKETS[Exchange.network][asset][
-          constants.ACTIVE_MARKETS - 1
-        ];
+    if (loadFromStore) {
+      const decoded = getDecodedMarket(
+        Exchange.network,
+        asset,
+        constants.PERP_INDEX
+      );
       serumMarket = SerumMarket.loadFromDecoded(
         decoded,
         {
@@ -283,13 +283,6 @@ export class ZetaGroupMarkets {
       return instance;
     }
 
-    try {
-      instance.updateExpirySeries();
-    } catch (e) {
-      console.log("Test updateExpirySeries");
-      console.log(e);
-    }
-
     let productsPerExpiry = Math.floor(
       subExchange.zetaGroup.products.length /
         subExchange.zetaGroup.expirySeries.length
@@ -301,14 +294,10 @@ export class ZetaGroupMarkets {
       await Promise.all(
         slice.map(async (index) => {
           let marketAddr = subExchange.zetaGroup.products[index].market;
-
           let serumMarket: SerumMarket;
 
           if (loadFromStore) {
-            const decoded =
-              SerumMarketStore.STATIC_SERUM_MARKETS[Exchange.network][asset][
-                index
-              ];
+            const decoded = getDecodedMarket(Exchange.network, asset, index);
             serumMarket = SerumMarket.loadFromDecoded(
               decoded,
               {
@@ -365,6 +354,10 @@ export class ZetaGroupMarkets {
    */
   public async updateExpirySeries() {
     let subExchange = Exchange.getSubExchange(this.asset);
+    if (subExchange.zetaGroup.perpsOnly) {
+      return;
+    }
+
     for (var i = 0; i < subExchange.zetaGroup.products.length; i++) {
       this._markets[i].updateStrike();
     }
