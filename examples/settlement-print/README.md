@@ -1,6 +1,6 @@
 ## Setup
 
-This should show how to find previous settlement prints for a given underlying as well as historical strikes for a given expiry timestamp.
+This example shows how to find previous settlement prints for a given underlying, as well as historical strikes for a given expiry timestamp.
 
 You will need to specify the expiration timestamp in the code.
 

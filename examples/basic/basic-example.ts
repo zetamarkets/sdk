@@ -9,13 +9,13 @@ import {
   types,
   assets,
   events,
+  constants,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import fetch from "node-fetch";
 
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
-const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
 const STARTING_BALANCE = 5_000;
 
 async function exchangeCallback(
@@ -49,7 +49,7 @@ async function main() {
   const connection: Connection = new Connection(NETWORK_URL, "confirmed");
 
   // Airdropping SOL.
-  await connection.requestAirdrop(wallet.publicKey, 100000000);
+  await connection.requestAirdrop(wallet.publicKey, 100_000_000);
 
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     Network.DEVNET,
@@ -71,7 +71,8 @@ async function main() {
 
   await Exchange.load(
     loadExchangeConfig
-    // exchangeCallback
+    // , wallet
+    // , exchangeCallback
   );
 
   Exchange.getAllSubExchanges().forEach(async (se) => {
@@ -82,7 +83,7 @@ async function main() {
     connection,
     wallet,
     undefined
-    // clientCallback
+    // , clientCallback
   );
 
   await client.deposit(
@@ -93,7 +94,7 @@ async function main() {
   utils.displayState();
 
   // Show current orderbook for a market.
-  const index = 10;
+  const index = constants.PERP_INDEX;
   await Exchange.updateOrderbook(assets.Asset.BTC, index);
   console.log(`BTC market ${index} orderbook:`);
   console.log(Exchange.getOrderbook(assets.Asset.BTC, index));

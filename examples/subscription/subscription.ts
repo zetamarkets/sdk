@@ -13,8 +13,7 @@ import {
 import { PublicKey, Connection } from "@solana/web3.js";
 
 const NETWORK_URL = process.env["network_url"]!;
-const PROGRAM_ID = new PublicKey(process.env["program_id"]!);
-const assetList = [assets.Asset.SOL, assets.Asset.BTC];
+const assetList = [assets.Asset.BTC, assets.Asset.ETH];
 
 let network: Network;
 
@@ -61,10 +60,10 @@ async function main() {
     }
   );
 
-  await utils.sleep(10_000);
+  await utils.sleep(100_000);
 
   // Close to end the websockets.
-  await Exchange.close();
+  // await Exchange.close();
 }
 
 main().catch(console.error.bind(console));

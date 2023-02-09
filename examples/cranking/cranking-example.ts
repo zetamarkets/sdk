@@ -29,10 +29,10 @@ switch (process.env["network"]) {
 }
 
 const NETWORK_URL = process.env["network_url"]!;
-const PROGRAM_ID = new PublicKey(process.env["program_id"]);
+const MAX_ACCOUNTS_TO_FETCH = 99;
 let crankingMarkets = new Array(constants.ACTIVE_MARKETS - 1).fill(false);
 console.log(NETWORK_URL);
-const assetList = [assets.Asset.SOL, assets.Asset.BTC];
+const assetList = [assets.Asset.BTC];
 
 export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms, undefined));
@@ -61,7 +61,7 @@ async function main() {
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
-    assets.allAssets(),
+    assetList,
     utils.defaultCommitment(),
     0, // ThrottleMs - increase if you are running into rate limit issues on startup.
     true
@@ -115,11 +115,20 @@ async function main() {
   // Apply funding to any users holding perp positions
   setInterval(
     async function () {
-      await this.applyFunding();
+      await applyFunding();
     }.bind(this),
     process.env.APPLY_FUNDING_INTERVAL
       ? parseInt(process.env.APPLY_FUNDING_INTERVAL)
       : 120_000
+  );
+
+  setInterval(
+    async function () {
+      await pruneExpiredTIFOrders();
+    }.bind(this),
+    process.env.PRUNE_EXPIRED_TIF_INTERVAL
+      ? parseInt(process.env.PRUNE_EXPIRED_TIF_INTERVAL)
+      : 60000
   );
 
   // Retreat pricing on markets
@@ -155,19 +164,23 @@ async function updatePricing() {
   // Get relevant expiry indices.
   for (var asset of assetList) {
     let indicesToCrank = [];
-    for (
-      var i = 0;
-      i < Exchange.getZetaGroupMarkets(asset).expirySeries.length;
-      i++
-    ) {
-      let expirySeries = Exchange.getZetaGroupMarkets(asset).expirySeries[i];
-      if (
-        Exchange.clockTimestamp <= expirySeries.expiryTs &&
-        expirySeries.strikesInitialized &&
-        !expirySeries.dirty
+    if (!Exchange.getZetaGroup(asset).perpsOnly) {
+      for (
+        var i = 0;
+        i < Exchange.getZetaGroupMarkets(asset).expirySeries.length;
+        i++
       ) {
-        indicesToCrank.push(i);
+        let expirySeries = Exchange.getZetaGroupMarkets(asset).expirySeries[i];
+        if (
+          Exchange.clockTimestamp <= expirySeries.expiryTs &&
+          expirySeries.strikesInitialized &&
+          !expirySeries.dirty
+        ) {
+          indicesToCrank.push(i);
+        }
       }
+    } else {
+      indicesToCrank.push(0);
     }
     await Promise.all(
       indicesToCrank.map(async (index) => {
@@ -193,6 +206,10 @@ async function updatePricing() {
  * Cranks zeta's on-chain volatility, retreat and interest functionality similiar to update pricing.
  */
 async function retreatMarketNodes(asset: assets.Asset) {
+  if (Exchange.getSubExchange(asset).zetaGroup.perpsOnly) {
+    return;
+  }
+
   // Get relevant expiry indices.
   let indicesToRetreat = [];
   for (
@@ -221,7 +238,12 @@ async function retreatMarketNodes(asset: assets.Asset) {
 }
 
 function getMarketsToCrank(asset: assets.Asset, liveOnly: boolean): Market[] {
+  if (Exchange.getZetaGroup(asset).perpsOnly) {
+    return [Exchange.getPerpMarket(asset)];
+  }
+
   let marketsToCrank = [];
+
   if (liveOnly) {
     let liveExpiryIndices =
       Exchange.getZetaGroupMarkets(asset).getTradeableExpiryIndices();
@@ -382,32 +404,90 @@ async function applyFunding() {
   }
 }
 
+async function pruneExpiredTIFOrders() {
+  let subExchanges = Exchange.getAllSubExchanges();
+
+  try {
+    await Promise.all(
+      subExchanges.map((se) => {
+        let markets = se.getMarkets();
+
+        let marketIndicesToPrune: number[] = [];
+
+        for (let i = 0; i < markets.length; i++) {
+          if (!markets[i].expirySeries) {
+            marketIndicesToPrune.push(markets[i].marketIndex);
+            continue;
+          }
+          if (!markets[i].expirySeries.isLive()) {
+            continue;
+          }
+          marketIndicesToPrune.push(markets[i].marketIndex);
+        }
+
+        return utils.pruneExpiredTIFOrders(se.asset, marketIndicesToPrune);
+      })
+    );
+    console.log("Pruned expired TIF orders.");
+  } catch (e) {
+    this.alert("Failed to prune expired TIF orders.", `Error=${e}`);
+  }
+}
+
 /**
  * Rebalances the zeta vault and the insurance vault to ensure consistent platform security.
  * Checks all margin accounts for non-zero rebalance amounts and rebalances them all.
  */
 async function rebalanceInsuranceVault(asset: assets.Asset) {
-  let accs: any[] = await Exchange.program.account.marginAccount.all();
-  let remainingAccounts: any[] = new Array();
-  for (let i = 0; i < accs.length; i++) {
-    let marginAccount = accs[i].account as programTypes.MarginAccount;
-    if (marginAccount.rebalanceAmount.toNumber() != 0) {
-      remainingAccounts.push({
-        pubkey: accs[i].publicKey,
-        isSigner: false,
-        isWritable: true,
-      });
-    }
-  }
-  console.log(
-    `[${assets.assetToName(asset)}] [REBALANCE INSURANCE VAULT] for ${
-      remainingAccounts.length
-    } accounts.`
-  );
+  let marginAccPubkeys: PublicKey[];
   try {
-    await Exchange.rebalanceInsuranceVault(asset, remainingAccounts);
+    marginAccPubkeys = await utils.getAllProgramAccountAddresses(
+      types.ProgramAccountType.MarginAccount,
+      asset
+    );
   } catch (e) {
-    console.error("Rebalance insurance vault error on transaction!");
+    this.alert(
+      "rebalanceInsuranceVault account address fetch error",
+      `Asset=${assets.assetToName(asset)} Error=${e}`
+    );
+  }
+
+  for (let i = 0; i < marginAccPubkeys.length; i += MAX_ACCOUNTS_TO_FETCH) {
+    let marginAccs: any[];
+    try {
+      marginAccs = await Exchange.program.account.marginAccount.fetchMultiple(
+        marginAccPubkeys.slice(i, i + MAX_ACCOUNTS_TO_FETCH)
+      );
+    } catch (e) {
+      this.alert(
+        "rebalanceInsuranceVault margin account fetch error",
+        `Asset=${assets.assetToName(asset)}, Error=${e}`
+      );
+    }
+
+    let remainingAccounts: any[] = new Array();
+    for (let j = 0; j < marginAccs.length; j++) {
+      if (marginAccs[j].rebalanceAmount.toNumber() != 0) {
+        remainingAccounts.push({
+          pubkey: marginAccPubkeys[i + j],
+          isSigner: false,
+          isWritable: true,
+        });
+      }
+    }
+    console.log(
+      `[${assets.assetToName(asset)}] [REBALANCE INSURANCE VAULT] for ${
+        remainingAccounts.length
+      } accounts.`
+    );
+    try {
+      await Exchange.rebalanceInsuranceVault(asset, remainingAccounts);
+    } catch (e) {
+      this.alert(
+        "rebalanceInsuranceVault vault error on transaction",
+        `Asset=${assets.assetToName(asset)} Error=${e}`
+      );
+    }
   }
 }
 

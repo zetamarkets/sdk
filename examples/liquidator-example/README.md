@@ -12,7 +12,7 @@
     <a href="https://opensource.org/licenses/Apache-2.0"
       ><img
         alt="License"
-        src="https://img.shields.io/github/license/project-serum/anchor?color=blueviolet"
+        src="https://img.shields.io/badge/License-Apache%202.0-blueviolet"
     /></a>
   </p>
 </div>
@@ -41,7 +41,7 @@ PROGRAM_ID is subject to change based on redeployments.
 
 ## Context
 
-Zeta is a protocol that allows the trading of undercollateralized options and futures on Solana, using the Serum DEX for its order matching. Zeta is only available on devnet with SOL as the underlying asset.
+Zeta is a protocol that allows the trading of undercollateralized perps, futures and options on Solana, using an orderbook matching system. Zeta is available with SOL, BTC and ETH as underlying assets, with more to come!
 
 The Zeta liquidator repository contains two basic liquidator examples that should work out of the box and provide baseline examples for how to run a liquidator. Zeta's full-liquidator liquidates any future or option that requires liquidation, as long as there is enough capital in the liquidator's vault.
 
@@ -66,25 +66,28 @@ solana-keygen pubkey bot-key.json
 echo private_key=`cat bot-key.json` >> .env
 ```
 
-| Key         |                    Value                     | Explanation|
-| ----------- | :------------------------------------------: |:------:|
-| check_interval_ms |5000            | The frequency in milliseconds that the script will scan for liquidatable accounts. |
-| connection | https://api.devnet.solana.com | The rpc endpoint to connect to. |
-| program_id  | BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7 | Zeta's Program ID. |
-| private_key  | [insert your private key here] | The private key you will use for your liquidator client. |
-| server_url | server.zeta.markets | The server endpoint to airdrop devnet usdc. |
+| Key               |                    Value                     |                                    Explanation                                     |
+| ----------------- | :------------------------------------------: | :--------------------------------------------------------------------------------: |
+| check_interval_ms |                     5000                     | The frequency in milliseconds that the script will scan for liquidatable accounts. |
+| connection        |        https://api.devnet.solana.com         |                          The rpc endpoint to connect to.                           |
+| program_id        | BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7 |                                 Zeta's Program ID.                                 |
+| private_key       |        [insert your private key here]        |              The private key you will use for your liquidator client.              |
+| server_url        |      dex-devnet-webserver.zeta.markets       |                    The server endpoint to airdrop devnet usdc.                     |
 
 # Install dependencies
+
 ```sh
 npm install
 ```
 
 # Run script
+
 ```
 npm run start
 ```
 
 # Contribute to the Repo
+
 Please reach out on Zeta's Discord or Twitter if you're interested in joining Zeta's awesome open source community and contributing code!
 
 ## Licensing

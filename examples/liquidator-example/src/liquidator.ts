@@ -95,7 +95,6 @@ async function main() {
 
   // Set the network for the SDK to use.
   const network = Network.DEVNET;
-  const programId = new PublicKey(process.env.program_id);
 
   // Load user wallet.
   const keypair = Keypair.generate();
