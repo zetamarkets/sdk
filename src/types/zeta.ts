@@ -7617,6 +7617,11 @@ export type Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "FullBidsNodes",
+      "msg": "Bids struct is full"
     }
   ]
 };
@@ -15240,6 +15245,11 @@ export const IDL: Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "FullBidsNodes",
+      "msg": "Bids struct is full"
     }
   ]
 };
