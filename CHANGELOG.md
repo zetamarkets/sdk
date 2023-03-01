@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 # Unreleased
 
+- program: Add order expiry ts to PlaceOrderEvent. ([#204](https://github.com/zetamarkets/sdk/pull/204))
+
 ## [0.23.0] 2023-02-06
 
 - general: support flexible assets. ([#198](https://github.com/zetamarkets/sdk/pull/198))
