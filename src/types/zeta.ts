@@ -6815,6 +6815,11 @@ export type Zeta = {
           "name": "orderId",
           "type": "u128",
           "index": false
+        },
+        {
+          "name": "expiryTs",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -14437,6 +14442,11 @@ export const IDL: Zeta = {
         {
           "name": "orderId",
           "type": "u128",
+          "index": false
+        },
+        {
+          "name": "expiryTs",
+          "type": "u64",
           "index": false
         }
       ]
