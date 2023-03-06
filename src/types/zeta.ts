@@ -4790,11 +4790,15 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "maxPerpDeltaAge",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                105
               ]
             }
           }
@@ -5991,6 +5995,10 @@ export type Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
@@ -6087,6 +6095,10 @@ export type Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
@@ -12423,11 +12435,15 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "maxPerpDeltaAge",
+            "type": "u16"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                107
+                105
               ]
             }
           }
@@ -13624,6 +13640,10 @@ export const IDL: Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
@@ -13720,6 +13740,10 @@ export const IDL: Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
