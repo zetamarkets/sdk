@@ -5,8 +5,9 @@ Version changes are pinned to SDK releases.
 
 # Unreleased
 
-## [0.23.1] 2023-03-06
+- program: Add order expiry ts to PlaceOrderEvent. ([#204](https://github.com/zetamarkets/sdk/pull/204))
 
+## [0.23.1] 2023-03-06
 - utils: add roundingFactor to conversion utils. ([#206](https://github.com/zetamarkets/sdk/pull/206))
 
 ## [0.23.0] 2023-02-06
