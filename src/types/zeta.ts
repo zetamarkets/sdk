@@ -592,6 +592,11 @@ export type Zeta = {
           "name": "admin",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "secondaryAdmin",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -687,6 +692,27 @@ export type Zeta = {
     },
     {
       "name": "updateAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateSecondaryAdmin",
       "accounts": [
         {
           "name": "state",
@@ -4794,11 +4820,15 @@ export type Zeta = {
             "type": "u16"
           },
           {
+            "name": "secondaryAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                105
+                73
               ]
             }
           }
@@ -8232,6 +8262,11 @@ export const IDL: Zeta = {
           "name": "admin",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "secondaryAdmin",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -8327,6 +8362,27 @@ export const IDL: Zeta = {
     },
     {
       "name": "updateAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateSecondaryAdmin",
       "accounts": [
         {
           "name": "state",
@@ -12434,11 +12490,15 @@ export const IDL: Zeta = {
             "type": "u16"
           },
           {
+            "name": "secondaryAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                105
+                73
               ]
             }
           }
