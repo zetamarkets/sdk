@@ -1,6 +1,7 @@
 import * as anchor from "@zetamarkets/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { Network, assets } from "@zetamarkets/sdk";
+import { Asset } from "../assets";
+import { Network } from "../network";
 import * as devnetStore from "./MARKET-STORE.devnet.json";
 import * as mainnetStore from "./MARKET-STORE.mainnet.json";
 import { DecodeType, returnDecodedType } from "./scripts/market-gen-utils";
@@ -46,7 +47,7 @@ interface MarketStoreRaw {
 
 export function getDecodedMarket(
   network: Network,
-  asset: assets.Asset,
+  asset: Asset,
   index: number
 ): any {
   if (network == Network.LOCALNET) {
