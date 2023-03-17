@@ -528,15 +528,19 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
 
 /**
  * Converts a decimal number to native fixed point integer of precision 6.
+ * roundingFactor argument will round the result to the nearest <roundingFactor>. Default is TICK_SIZE.
  */
-export function convertDecimalToNativeInteger(amount: number): number {
+export function convertDecimalToNativeInteger(
+  amount: number,
+  roundingFactor: number = constants.TICK_SIZE
+): number {
   return (
     parseInt(
       (
         (amount * Math.pow(10, constants.PLATFORM_PRECISION)) /
-        constants.TICK_SIZE
+        roundingFactor
       ).toFixed(0)
-    ) * constants.TICK_SIZE
+    ) * roundingFactor
   );
 }
 
