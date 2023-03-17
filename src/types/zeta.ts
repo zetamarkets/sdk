@@ -4816,6 +4816,10 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "maxPerpDeltaAge",
+            "type": "u16"
+          },
+          {
             "name": "secondaryAdmin",
             "type": "publicKey"
           },
@@ -4824,7 +4828,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                75
+                73
               ]
             }
           }
@@ -6021,6 +6025,10 @@ export type Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
@@ -6117,6 +6125,10 @@ export type Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
@@ -12474,6 +12486,10 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "maxPerpDeltaAge",
+            "type": "u16"
+          },
+          {
             "name": "secondaryAdmin",
             "type": "publicKey"
           },
@@ -12482,7 +12498,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                75
+                73
               ]
             }
           }
@@ -13679,6 +13695,10 @@ export const IDL: Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
@@ -13775,6 +13795,10 @@ export const IDL: Zeta = {
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }

@@ -4816,6 +4816,10 @@
             "type": "u8"
           },
           {
+            "name": "maxPerpDeltaAge",
+            "type": "u16"
+          },
+          {
             "name": "secondaryAdmin",
             "type": "publicKey"
           },
@@ -4824,7 +4828,7 @@
             "type": {
               "array": [
                 "u8",
-                75
+                73
               ]
             }
           }
@@ -6021,6 +6025,10 @@
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
@@ -6117,6 +6125,10 @@
           {
             "name": "marginConcessionPercentage",
             "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
           }
         ]
       }
