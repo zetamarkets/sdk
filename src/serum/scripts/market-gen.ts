@@ -1,14 +1,11 @@
-import {
-  assets,
-  Exchange,
-  utils,
-  instructions,
-  Client,
-  types,
-  Network,
-  constants,
-} from "@zetamarkets/sdk";
-import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import * as assets from "../../assets";
+import * as utils from "../../utils";
+import { exchange as Exchange } from "../../exchange";
+import * as types from "../../types";
+import { Network } from "../../network";
+import * as constants from "../../constants";
+
+import { Connection } from "@solana/web3.js";
 import * as anchor from "@zetamarkets/anchor";
 import * as fs from "fs";
 import { DecodeType, returnDecodedType } from "./market-gen-utils";
