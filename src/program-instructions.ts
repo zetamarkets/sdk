@@ -2336,7 +2336,7 @@ export interface StateParams {
   marginConcessionPercentage: number;
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
-  maxPerpDeltaAgeSeconds: anchor.BN;
+  maxPerpDeltaAgeSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {

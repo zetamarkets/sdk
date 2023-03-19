@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## Unreleased
+
+- types: fix maxPerpDeltaSeconds to number.
+
 # [0.24.0] 2023-03-17
 
 - program: Add order expiry ts to PlaceOrderEvent. ([#204](https://github.com/zetamarkets/sdk/pull/204))
