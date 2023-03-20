@@ -233,7 +233,7 @@ export class SubClient {
 
         if (callback !== undefined) {
           callback(asset, EventType.USER, {
-            UserCallbackType: types.UserCallbackType.ONMARGINACCOUNTCHANGE,
+            UserCallbackType: types.UserCallbackType.MARGINACCOUNTCHANGE,
           });
         }
 
@@ -254,7 +254,7 @@ export class SubClient {
 
         if (callback !== undefined) {
           callback(asset, EventType.USER, {
-            UserCallbackType: types.UserCallbackType.ONSPREADACCOUNTCHANGE,
+            UserCallbackType: types.UserCallbackType.SPREADACCOUNTCHANGE,
           });
         }
       },

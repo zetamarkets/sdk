@@ -70,8 +70,8 @@ export enum Side {
 
 export enum UserCallbackType {
   POLLUPDATE,
-  ONMARGINACCOUNTCHANGE,
-  ONSPREADACCOUNTCHANGE,
+  MARGINACCOUNTCHANGE,
+  SPREADACCOUNTCHANGE,
 }
 
 export function toProgramSide(side: Side) {
