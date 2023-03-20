@@ -232,7 +232,9 @@ export class SubClient {
         subClient._lastUpdateTimestamp = Exchange.clockTimestamp;
 
         if (callback !== undefined) {
-          callback(asset, EventType.USER, null);
+          callback(asset, EventType.USER, {
+            UserCallbackType: types.UserCallbackType.ONMARGINACCOUNTCHANGE,
+          });
         }
 
         subClient.updateOpenOrdersAddresses();
@@ -251,7 +253,9 @@ export class SubClient {
         subClient.updateSpreadPositions();
 
         if (callback !== undefined) {
-          callback(asset, EventType.USER, null);
+          callback(asset, EventType.USER, {
+            UserCallbackType: types.UserCallbackType.ONSPREADACCOUNTCHANGE,
+          });
         }
       },
       connection.commitment
@@ -297,7 +301,9 @@ export class SubClient {
         }
         this._lastUpdateTimestamp = Exchange.clockTimestamp;
         if (this._callback !== undefined) {
-          this._callback(this.asset, EventType.USER, null);
+          this._callback(this.asset, EventType.USER, {
+            UserCallbackType: types.UserCallbackType.POLLUPDATE,
+          });
         }
       } catch (e) {
         console.log(`SubClient poll update failed. Error: ${e}`);
