@@ -368,9 +368,23 @@ export class SubExchange {
     args: instructions.UpdateZetaGroupExpiryArgs
   ) {
     let tx = new Transaction().add(
-      instructions.updateZetaGroupExpiryParameters(
+      instructions.updateZetaGroupExpiryParametersIx(
         this.asset,
         args,
+        Exchange.provider.wallet.publicKey
+      )
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+    await this.updateZetaGroup();
+  }
+
+  /**
+   * Toggles whether a zeta group is perps-only or not
+   */
+  public async toggleZetaGroupPerpsOnly() {
+    let tx = new Transaction().add(
+      instructions.toggleZetaGroupPerpsOnlyIx(
+        this.asset,
         Exchange.provider.wallet.publicKey
       )
     );
@@ -400,7 +414,10 @@ export class SubExchange {
   /**
    * Initializes the zeta markets for a zeta group.
    */
-  public async initializeZetaMarkets(perpOnly: boolean = false) {
+  public async initializeZetaMarkets(
+    perpOnly: boolean = false,
+    datedOnly: boolean = false
+  ) {
     // Initialize market indexes.
     let [marketIndexes, marketIndexesNonce] = utils.getMarketIndexes(
       Exchange.programId,
@@ -462,11 +479,13 @@ export class SubExchange {
       throw Error("Market indexes are not initialized!");
     }
 
-    await this.initializeZetaMarket(
-      constants.PERP_INDEX,
-      marketIndexes,
-      marketIndexesAccount
-    );
+    if (!datedOnly) {
+      await this.initializeZetaMarket(
+        constants.PERP_INDEX,
+        marketIndexes,
+        marketIndexesAccount
+      );
+    }
 
     if (perpOnly) {
       return;

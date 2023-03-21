@@ -420,6 +420,13 @@ export class Client {
     return index;
   }
 
+  // Refresh this._subExchange in the subClients, useful for integration testing
+  public relinkExchange() {
+    for (var subclient of this.subClients.values()) {
+      subclient.updateSubExchange();
+    }
+  }
+
   public async placeOrder(
     asset: Asset,
     market: types.MarketIdentifier,

@@ -1410,12 +1410,25 @@ export function updatePerpParametersIx(
   });
 }
 
-export function updateZetaGroupExpiryParameters(
+export function updateZetaGroupExpiryParametersIx(
   asset: Asset,
   args: UpdateZetaGroupExpiryArgs,
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateZetaGroupExpiryParameters(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      admin,
+    },
+  });
+}
+
+export function toggleZetaGroupPerpsOnlyIx(
+  asset: Asset,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.toggleZetaGroupPerpsOnly({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),

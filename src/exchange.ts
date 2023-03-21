@@ -820,12 +820,27 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroupExpiryParameters(args);
   }
 
+  public async toggleZetaGroupPerpsOnly(asset: Asset) {
+    await this.getSubExchange(asset).toggleZetaGroupPerpsOnly();
+  }
+
+  public async updateSerumMarkets(asset: Asset) {
+    await this.getSubExchange(asset).updateSerumMarkets();
+  }
+
   public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
 
-  public async initializeZetaMarkets(asset: Asset, perpsOnly: boolean = false) {
-    await this.getSubExchange(asset).initializeZetaMarkets(perpsOnly);
+  public async initializeZetaMarkets(
+    asset: Asset,
+    perpsOnly: boolean = false,
+    datedOnly: boolean = false
+  ) {
+    await this.getSubExchange(asset).initializeZetaMarkets(
+      perpsOnly,
+      datedOnly
+    );
   }
 
   public async initializeZetaMarketsTIFEpochCycle(
