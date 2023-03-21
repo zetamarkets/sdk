@@ -6586,7 +6586,7 @@ export type Zeta = {
             "name": "APT"
           },
           {
-            "name": "BNK"
+            "name": "ARB"
           },
           {
             "name": "UNDEFINED"
@@ -14259,7 +14259,7 @@ export const IDL: Zeta = {
             "name": "APT"
           },
           {
-            "name": "BNK"
+            "name": "ARB"
           },
           {
             "name": "UNDEFINED"
