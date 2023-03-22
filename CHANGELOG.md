@@ -3,9 +3,26 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-# Unreleased
+## Unreleased
+
+# [0.25.1] 2023-03-22
+
+- general: Add Arbitrum ([#210](https://github.com/zetamarkets/sdk/pull/210))
+
+# [0.24.1] 2023-03-20
+
+- types: fix maxPerpDeltaSeconds to number.
+- client: Add user callback type. ([#209](https://github.com/zetamarkets/sdk/pull/209))
+
+# [0.24.0] 2023-03-17
 
 - program: Add order expiry ts to PlaceOrderEvent. ([#204](https://github.com/zetamarkets/sdk/pull/204))
+- program: Add max perp delta age to State. ([#207](https://github.com/zetamarkets/sdk/pull/207))
+- program: Add secondary admin to State.([#208](https://github.com/zetamarkets/sdk/pull/208))
+
+## [0.23.1] 2023-03-06
+
+- utils: add roundingFactor to conversion utils. ([#206](https://github.com/zetamarkets/sdk/pull/206))
 
 ## [0.23.0] 2023-02-06
 

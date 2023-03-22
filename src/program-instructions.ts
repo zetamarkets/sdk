@@ -1450,7 +1450,8 @@ export function initializeZetaStateIx(
   serumNonce: number,
   mintAuthority: PublicKey,
   mintAuthorityNonce: number,
-  params: StateParams
+  params: StateParams,
+  secondaryAdmin: PublicKey
 ): TransactionInstruction {
   let args: any = params;
   args["stateNonce"] = stateNonce;
@@ -1470,6 +1471,7 @@ export function initializeZetaStateIx(
       tokenProgram: TOKEN_PROGRAM_ID,
       usdcMint: Exchange.usdcMintAddress,
       admin: Exchange.provider.wallet.publicKey,
+      secondaryAdmin: secondaryAdmin,
     },
   });
 }
@@ -2018,16 +2020,22 @@ export function updateInterestRateIx(
 }
 
 export function updateAdminIx(
+  secondary: boolean,
   admin: PublicKey,
   newAdmin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.updateAdmin({
+  let accounts = {
     accounts: {
       state: Exchange.stateAddress,
       admin,
       newAdmin,
     },
-  });
+  };
+
+  if (secondary) {
+    return Exchange.program.instruction.updateSecondaryAdmin(accounts);
+  }
+  return Exchange.program.instruction.updateAdmin(accounts);
 }
 
 export function updateReferralsAdminIx(
@@ -2328,6 +2336,7 @@ export interface StateParams {
   marginConcessionPercentage: number;
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
+  maxPerpDeltaAgeSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {

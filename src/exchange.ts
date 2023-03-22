@@ -296,7 +296,8 @@ export class Exchange {
 
   public async initializeZetaState(
     params: instructions.StateParams,
-    referralAdmin: PublicKey
+    referralAdmin: PublicKey,
+    secondaryAdmin: PublicKey
   ) {
     const [mintAuthority, mintAuthorityNonce] = utils.getMintAuthority(
       this.programId
@@ -330,7 +331,8 @@ export class Exchange {
         serumNonce,
         mintAuthority,
         mintAuthorityNonce,
-        params
+        params,
+        secondaryAdmin
       )
     );
     try {

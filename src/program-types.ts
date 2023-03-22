@@ -27,6 +27,8 @@ export interface State {
   nativeOptionUnderlyingFeePercentage: anchor.BN;
   referralsAdmin: PublicKey;
   referralsRewardsWalletNonce: number;
+  maxPerpDeltaAge: number;
+  secondaryAdmin: PublicKey;
   padding: Array<number>;
 }
 
