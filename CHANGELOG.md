@@ -5,7 +5,14 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.25.1] 2023-03-22
+
+- general: Add Arbitrum ([#210](https://github.com/zetamarkets/sdk/pull/210))
+
+# [0.24.1] 2023-03-20
+
 - types: fix maxPerpDeltaSeconds to number.
+- client: Add user callback type. ([#209](https://github.com/zetamarkets/sdk/pull/209))
 
 # [0.24.0] 2023-03-17
 

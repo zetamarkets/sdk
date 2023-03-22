@@ -68,6 +68,12 @@ export enum Side {
   ASK,
 }
 
+export enum UserCallbackType {
+  POLLUPDATE,
+  MARGINACCOUNTCHANGE,
+  SPREADACCOUNTCHANGE,
+}
+
 export function toProgramSide(side: Side) {
   if (side == Side.BID) return { bid: {} };
   if (side == Side.ASK) return { ask: {} };
