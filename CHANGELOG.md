@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.25.2] 2023-02-24
+
+- oracle: Bugfix Arbitrum oracle constant. ([#212](https://github.com/zetamarkets/sdk/pull/212))
+
 # [0.25.1] 2023-03-22
 
 - general: Add Arbitrum ([#210](https://github.com/zetamarkets/sdk/pull/210))
