@@ -1012,7 +1012,7 @@ export class Client {
     return this.getSubClient(asset).getSpreadCostOfTrades(index, decimal);
   }
 
-  public getSpreadAccount(asset: Asset): SpreadAccount {
+  public getSpreadAccount(asset: Asset): SpreadAccount | null {
     return this.getSubClient(asset).spreadAccount;
   }
 
@@ -1020,7 +1020,7 @@ export class Client {
     return this.getSubClient(asset).spreadAccountAddress;
   }
 
-  public getMarginAccount(asset: Asset): MarginAccount {
+  public getMarginAccount(asset: Asset): MarginAccount | null {
     return this.getSubClient(asset).marginAccount;
   }
 
