@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.25.3] 2023-02-24
+
+- client: Bugfix MarginAccount and SpreadAccount can be null. ([#213](https://github.com/zetamarkets/sdk/pull/213))
+
 # [0.25.2] 2023-02-24
 
 - oracle: Bugfix Arbitrum oracle constant. ([#212](https://github.com/zetamarkets/sdk/pull/212))
