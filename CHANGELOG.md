@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 # [0.25.4] 2023-03-24
 
-- constants: Update the zeta LUT to include ARB accounts.
+- constants: Update the zeta LUT to include ARB accounts. ([#214](https://github.com/zetamarkets/sdk/pull/214))
 
 # [0.25.3] 2023-03-24
 
