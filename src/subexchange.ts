@@ -667,6 +667,16 @@ export class SubExchange {
   }
 
   /**
+   * Update pricing for perps only.
+   */
+  public async updatePerpPricing() {
+    let tx = new Transaction().add(
+      instructions.updatePerpPricingIx(this.asset)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  /**
    * Update pricing for an expiry index.
    */
   public async updatePricing(expiryIndex: number) {
