@@ -624,11 +624,37 @@ export class Client {
     if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrders();
     } else {
-      let txIds = [];
-      for (var subClient of this.getAllSubClients()) {
-        txIds.push(await subClient.cancelAllOrders());
-      }
-      return txIds.flat();
+      // Grab all cancel instructions across all assets
+      let ixs = [];
+      await Promise.all(
+        this.getAllSubClients().map(async (subclient) => {
+          ixs.push(subclient.cancelAllOrdersIxs());
+        })
+      );
+
+      // Pack them into txs as efficiently as possible
+      let txs = utils.splitIxsIntoTx(
+        ixs,
+        this.useVersionedTxs
+          ? constants.MAX_CANCELS_PER_TX_LUT
+          : constants.MAX_CANCELS_PER_TX
+      );
+      let txIds: string[] = [];
+      await Promise.all(
+        txs.map(async (tx) => {
+          txIds.push(
+            await utils.processTransaction(
+              this.provider,
+              tx,
+              undefined,
+              undefined,
+              undefined,
+              this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            )
+          );
+        })
+      );
+      return txIds;
     }
   }
 
@@ -638,14 +664,37 @@ export class Client {
     if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrdersNoError();
     } else {
-      let allTxIds = [];
+      // Grab all cancel instructions across all assets
+      let ixs = [];
       await Promise.all(
-        this.getAllSubClients().map(async (subClient) => {
-          let txIds = await subClient.cancelAllOrdersNoError();
-          allTxIds = allTxIds.concat(txIds);
+        this.getAllSubClients().map(async (subclient) => {
+          ixs.push(subclient.cancelAllOrdersNoErrorIxs());
         })
       );
-      return allTxIds;
+
+      // Pack them into txs as efficiently as possible
+      let txs = utils.splitIxsIntoTx(
+        ixs,
+        this.useVersionedTxs
+          ? constants.MAX_CANCELS_PER_TX_LUT
+          : constants.MAX_CANCELS_PER_TX
+      );
+      let txIds: string[] = [];
+      await Promise.all(
+        txs.map(async (tx) => {
+          txIds.push(
+            await utils.processTransaction(
+              this.provider,
+              tx,
+              undefined,
+              undefined,
+              undefined,
+              this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            )
+          );
+        })
+      );
+      return txIds;
     }
   }
 
@@ -691,6 +740,22 @@ export class Client {
       side,
       tag
     );
+  }
+
+  public async cancelAllPerpMarketOrders(): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    for (var asset of Exchange.assets) {
+      tx.add(
+        instructions.cancelAllMarketOrdersIx(
+          asset,
+          constants.PERP_INDEX,
+          this.provider.wallet.publicKey,
+          this.getSubClient(asset).marginAccountAddress,
+          this.getSubClient(asset).openOrdersAccounts[constants.PERP_INDEX]
+        )
+      );
+    }
+    return await utils.processTransaction(this.provider, tx);
   }
 
   public async cancelAllMarketOrders(
@@ -840,7 +905,12 @@ export class Client {
       );
       ixs.push(ix);
     }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      this.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
@@ -871,7 +941,12 @@ export class Client {
       );
       ixs.push(ix);
     }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      this.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
