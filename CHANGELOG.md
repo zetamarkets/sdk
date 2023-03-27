@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.26.0] 2023-03-28
+
+- client: Update mass cancel logic to account for LUTs across all functions. ([#215](https://github.com/zetamarkets/sdk/pull/215))
+
 # [0.25.4] 2023-03-24
 
 - constants: Update the zeta LUT to include ARB accounts. ([#214](https://github.com/zetamarkets/sdk/pull/214))
