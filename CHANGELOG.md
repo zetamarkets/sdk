@@ -5,6 +5,18 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.25.4] 2023-03-24
+
+- constants: Update the zeta LUT to include ARB accounts. ([#214](https://github.com/zetamarkets/sdk/pull/214))
+
+# [0.25.3] 2023-03-24
+
+- client: Bugfix MarginAccount and SpreadAccount can be null. ([#213](https://github.com/zetamarkets/sdk/pull/213))
+
+# [0.25.2] 2023-03-24
+
+- oracle: Bugfix Arbitrum oracle constant. ([#212](https://github.com/zetamarkets/sdk/pull/212))
+
 # [0.25.1] 2023-03-22
 
 - general: Add Arbitrum ([#210](https://github.com/zetamarkets/sdk/pull/210))
