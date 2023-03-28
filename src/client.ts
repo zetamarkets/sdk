@@ -626,11 +626,10 @@ export class Client {
     } else {
       // Grab all cancel instructions across all assets
       let ixs = [];
-      await Promise.all(
-        this.getAllSubClients().map(async (subclient) => {
-          ixs = ixs.concat(subclient.cancelAllOrdersIxs());
-        })
-      );
+
+      this.getAllSubClients().map((subclient) => {
+        ixs = ixs.concat(subclient.cancelAllOrdersIxs());
+      });
 
       // Pack them into txs as efficiently as possible
       let txs = utils.splitIxsIntoTx(
@@ -666,11 +665,10 @@ export class Client {
     } else {
       // Grab all cancel instructions across all assets
       let ixs = [];
-      await Promise.all(
-        this.getAllSubClients().map(async (subclient) => {
-          ixs = ixs.concat(subclient.cancelAllOrdersNoErrorIxs());
-        })
-      );
+
+      this.getAllSubClients().map((subclient) => {
+        ixs = ixs.concat(subclient.cancelAllOrdersNoErrorIxs());
+      });
 
       // Pack them into txs as efficiently as possible
       let txs = utils.splitIxsIntoTx(
