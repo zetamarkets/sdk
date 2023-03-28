@@ -742,6 +742,30 @@ export class Client {
     );
   }
 
+  public async cancelAllPerpMarketOrders(): Promise<TransactionSignature> {
+    let tx = new Transaction();
+
+    for (var asset of Exchange.assets) {
+      tx.add(
+        instructions.cancelAllMarketOrdersIx(
+          asset,
+          constants.PERP_INDEX,
+          this.provider.wallet.publicKey,
+          this.getSubClient(asset).marginAccountAddress,
+          this.getSubClient(asset).openOrdersAccounts[constants.PERP_INDEX]
+        )
+      );
+    }
+    return await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
   public async cancelAllMarketOrders(
     asset: Asset,
     market: types.MarketIdentifier
