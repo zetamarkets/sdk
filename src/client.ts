@@ -628,7 +628,7 @@ export class Client {
       let ixs = [];
       await Promise.all(
         this.getAllSubClients().map(async (subclient) => {
-          ixs.push(subclient.cancelAllOrdersIxs());
+          ixs = ixs.concat(subclient.cancelAllOrdersIxs());
         })
       );
 
@@ -668,7 +668,7 @@ export class Client {
       let ixs = [];
       await Promise.all(
         this.getAllSubClients().map(async (subclient) => {
-          ixs.push(subclient.cancelAllOrdersNoErrorIxs());
+          ixs = ixs.concat(subclient.cancelAllOrdersNoErrorIxs());
         })
       );
 
@@ -740,22 +740,6 @@ export class Client {
       side,
       tag
     );
-  }
-
-  public async cancelAllPerpMarketOrders(): Promise<TransactionSignature> {
-    let tx = new Transaction();
-    for (var asset of Exchange.assets) {
-      tx.add(
-        instructions.cancelAllMarketOrdersIx(
-          asset,
-          constants.PERP_INDEX,
-          this.provider.wallet.publicKey,
-          this.getSubClient(asset).marginAccountAddress,
-          this.getSubClient(asset).openOrdersAccounts[constants.PERP_INDEX]
-        )
-      );
-    }
-    return await utils.processTransaction(this.provider, tx);
   }
 
   public async cancelAllMarketOrders(
