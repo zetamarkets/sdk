@@ -1610,7 +1610,9 @@ export class SubClient {
     // Compute is fine.
     let txs = utils.splitIxsIntoTx(
       this.cancelAllOrdersIxs(),
-      constants.MAX_CANCELS_PER_TX
+      this._parent.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
     );
     let txIds: string[] = [];
     await Promise.all(
@@ -1639,7 +1641,9 @@ export class SubClient {
     // Compute is fine.
     let txs = utils.splitIxsIntoTx(
       this.cancelAllOrdersNoErrorIxs(),
-      constants.MAX_CANCELS_PER_TX
+      this._parent.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
     );
     let txIds: string[] = [];
     await Promise.all(
