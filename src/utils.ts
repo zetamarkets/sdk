@@ -1187,17 +1187,18 @@ export async function settleUsers(
 
 /*
  * Allows you to pass in a map that may have cached values for openOrdersAccounts
+ * returns false in case where event queue is empty, true if events were cranked
  */
 export async function crankMarket(
   asset: Asset,
   marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>,
   crankLimit?: number
-) {
+): Promise<boolean> {
   let market = Exchange.getMarket(asset, marketIndex);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
-    return;
+    return true;
   }
   const openOrdersSet = new Set();
   // We pass in a couple of extra accounts for perps so the limit is lower
@@ -1283,6 +1284,7 @@ export async function crankMarket(
     )
   );
   await processTransaction(Exchange.provider, tx);
+  return false;
 }
 
 /*
