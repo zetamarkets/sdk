@@ -644,7 +644,7 @@ export class Exchange {
   }
 
   public async updateOrderbook(asset: Asset, index: number) {
-    await this.getMarket(asset, index).updateOrderbook();
+    return await this.getMarket(asset, index).updateOrderbook();
   }
 
   public async updateAllOrderbooks(live: boolean = true) {
