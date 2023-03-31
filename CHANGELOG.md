@@ -5,6 +5,14 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.26.2] 2023-03-31
+
+- client: Fix cancelAllPerpMarketOrders. ([#217](https://github.com/zetamarkets/sdk/pull/216))
+
+# [0.26.1] 2023-03-29
+
+- markets: Return the slot when an orderbook update occurs. ([#216](https://github.com/zetamarkets/sdk/pull/216))
+
 # [0.26.1] 2023-03-29
 
 - markets: Return the slot when an orderbook update occurs. ([#216](https://github.com/zetamarkets/sdk/pull/216))
