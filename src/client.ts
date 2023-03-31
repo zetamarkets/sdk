@@ -744,6 +744,11 @@ export class Client {
     let tx = new Transaction();
 
     for (var asset of Exchange.assets) {
+      let sc = this.getSubClient(asset);
+      if (sc.marginAccount == null) {
+        continue;
+      }
+
       tx.add(
         instructions.cancelAllMarketOrdersIx(
           asset,
