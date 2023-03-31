@@ -745,7 +745,10 @@ export class Client {
 
     for (var asset of Exchange.assets) {
       let sc = this.getSubClient(asset);
-      if (sc.marginAccount == null) {
+      if (
+        sc.marginAccount == null ||
+        sc.openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
+      ) {
         continue;
       }
 
