@@ -864,10 +864,6 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
-  public async updatePerpPricing(asset: Asset) {
-    await this.getSubExchange(asset).updatePerpPricing();
-  }
-
   public async updatePricing(asset: Asset, expiryIndex: number) {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
   }

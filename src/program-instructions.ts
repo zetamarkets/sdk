@@ -1333,24 +1333,6 @@ export function retreatMarketNodesIx(
   });
 }
 
-export function updatePerpPricingIx(asset: Asset): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-  let marketData = Exchange.getPerpMarket(asset);
-  return Exchange.program.instruction.updatePerpPricing({
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: subExchange.zetaGroupAddress,
-      greeks: subExchange.greeksAddress,
-      oracle: subExchange.zetaGroup.oracle,
-      oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: constants.CHAINLINK_PID,
-      perpMarket: marketData.address,
-      perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
-      perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
-    },
-  });
-}
-
 export function updatePricingIx(
   asset: Asset,
   expiryIndex: number
