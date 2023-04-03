@@ -1335,7 +1335,7 @@ export function retreatMarketNodesIx(
 
 export function updatePricingIx(
   asset: Asset,
-  expiryIndex: number
+  expiryIndex: number | undefined
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
   let marketData = Exchange.getPerpMarket(asset);
@@ -1882,7 +1882,7 @@ export function cleanZetaMarketsHaltedIx(
 
 export function updatePricingHaltedIx(
   asset: Asset,
-  expiryIndex: number,
+  expiryIndex: number | undefined,
   admin: PublicKey
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);

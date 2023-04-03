@@ -864,7 +864,7 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
-  public async updatePricing(asset: Asset, expiryIndex: number) {
+  public async updatePricing(asset: Asset, expiryIndex: number = undefined) {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
   }
 
@@ -947,7 +947,10 @@ export class Exchange {
     await this.getSubExchange(asset).cleanZetaMarketsHalted();
   }
 
-  public async updatePricingHalted(asset: Asset, expiryIndex: number) {
+  public async updatePricingHalted(
+    asset: Asset,
+    expiryIndex: number = undefined
+  ) {
     await this.getSubExchange(asset).updatePricingHalted(expiryIndex);
   }
 

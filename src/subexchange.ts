@@ -669,7 +669,7 @@ export class SubExchange {
   /**
    * Update pricing for an expiry index.
    */
-  public async updatePricing(expiryIndex: number) {
+  public async updatePricing(expiryIndex: number | undefined) {
     let tx = new Transaction().add(
       instructions.updatePricingIx(this.asset, expiryIndex)
     );
@@ -1040,7 +1040,7 @@ export class SubExchange {
     await utils.cleanZetaMarketsHalted(this.asset, marketAccounts);
   }
 
-  public async updatePricingHalted(expiryIndex: number) {
+  public async updatePricingHalted(expiryIndex: number | undefined) {
     let tx = new Transaction().add(
       instructions.updatePricingHaltedIx(
         this.asset,
