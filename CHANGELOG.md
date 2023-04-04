@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.26.3] 2023-04-04
+
+- risk: Allow custom executionPrice and account for fees in calculateUnrealizedPnl ([#218](https://github.com/zetamarkets/sdk/pull/218))
+
 # [0.26.2] 2023-03-31
 
 - client: Fix cancelAllPerpMarketOrders. ([#217](https://github.com/zetamarkets/sdk/pull/216))
