@@ -183,7 +183,9 @@ export class RiskCalculator {
   public calculateUnrealizedPnl(
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
-      .MarginAccount
+      .MarginAccount,
+    executionPrice: number = undefined,
+    addTakerFees: boolean = false
   ): number {
     let pnl = 0;
 
@@ -214,12 +216,21 @@ export class RiskCalculator {
       );
       if (size > 0) {
         pnl +=
-          convertNativeLotSizeToDecimal(size) * subExchange.getMarkPrice(i) -
+          convertNativeLotSizeToDecimal(size) *
+            (executionPrice ? executionPrice : subExchange.getMarkPrice(i)) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
-          convertNativeLotSizeToDecimal(size) * subExchange.getMarkPrice(i) +
+          convertNativeLotSizeToDecimal(size) *
+            (executionPrice ? executionPrice : subExchange.getMarkPrice(i)) +
           convertNativeBNToDecimal(position.costOfTrades);
+      }
+      if (addTakerFees) {
+        pnl -=
+          convertNativeLotSizeToDecimal(Math.abs(size)) *
+          (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
+            100) *
+          subExchange.getMarkPrice(i);
       }
     }
 
@@ -401,10 +412,17 @@ export class RiskCalculator {
    * @param marginAccount   the user's MarginAccount.
    */
   public getMarginAccountState(
-    marginAccount: MarginAccount
+    marginAccount: MarginAccount,
+    pnlExecutionPrice: number = undefined,
+    pnlAddTakerFees: boolean = false
   ): types.MarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
-    let unrealizedPnl = this.calculateUnrealizedPnl(marginAccount);
+    let unrealizedPnl = this.calculateUnrealizedPnl(
+      marginAccount,
+      types.ProgramAccountType.MarginAccount,
+      pnlExecutionPrice,
+      pnlAddTakerFees
+    );
     let unpaidFunding = this.calculateUnpaidFunding(marginAccount);
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let initialMarginSkipConcession = this.calculateTotalInitialMargin(
