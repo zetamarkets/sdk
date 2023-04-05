@@ -3,6 +3,42 @@ export type Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaCrossMarkPrices",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarkPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -1629,11 +1665,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "authority",
           "isMut": false,
           "isSigner": true
@@ -1649,7 +1680,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "greeks",
+          "name": "markPrices",
           "isMut": false,
           "isSigner": false
         }
@@ -4602,7 +4633,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                25
+                20
               ]
             }
           },
@@ -4620,7 +4651,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                25
+                20
               ]
             }
           },
@@ -4642,7 +4673,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                25
+                20
               ]
             }
           },
@@ -4664,7 +4695,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                25
+                20
               ]
             }
           },
@@ -4682,7 +4713,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                25
+                20
               ]
             }
           },
@@ -5030,11 +5061,17 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "crossHaltState",
+            "type": {
+              "defined": "CrossHaltState"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                73
+                6
               ]
             }
           }
@@ -5400,7 +5437,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                25
+                20
               ]
             }
           },
@@ -5435,7 +5472,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                3207
+                3287
               ]
             }
           }
@@ -5762,6 +5799,62 @@ export type Zeta = {
           {
             "name": "mid",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrossHaltState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "halted",
+            "type": "bool"
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "markPricesSet",
+            "type": {
+              "array": [
+                "bool",
+                5
+              ]
+            }
+          },
+          {
+            "name": "markPricesSetPadding",
+            "type": {
+              "array": [
+                "bool",
+                20
+              ]
+            }
+          },
+          {
+            "name": "marketCleaned",
+            "type": {
+              "array": [
+                "bool",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketCleanedPadding",
+            "type": {
+              "array": [
+                "bool",
+                20
+              ]
+            }
           }
         ]
       }
@@ -7996,6 +8089,42 @@ export const IDL: Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaCrossMarkPrices",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarkPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -9622,11 +9751,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "authority",
           "isMut": false,
           "isSigner": true
@@ -9642,7 +9766,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "greeks",
+          "name": "markPrices",
           "isMut": false,
           "isSigner": false
         }
@@ -12595,7 +12719,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                25
+                20
               ]
             }
           },
@@ -12613,7 +12737,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                25
+                20
               ]
             }
           },
@@ -12635,7 +12759,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                25
+                20
               ]
             }
           },
@@ -12657,7 +12781,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                25
+                20
               ]
             }
           },
@@ -12675,7 +12799,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                25
+                20
               ]
             }
           },
@@ -13023,11 +13147,17 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "crossHaltState",
+            "type": {
+              "defined": "CrossHaltState"
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                73
+                6
               ]
             }
           }
@@ -13393,7 +13523,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                25
+                20
               ]
             }
           },
@@ -13428,7 +13558,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                3207
+                3287
               ]
             }
           }
@@ -13755,6 +13885,62 @@ export const IDL: Zeta = {
           {
             "name": "mid",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrossHaltState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "halted",
+            "type": "bool"
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "markPricesSet",
+            "type": {
+              "array": [
+                "bool",
+                5
+              ]
+            }
+          },
+          {
+            "name": "markPricesSetPadding",
+            "type": {
+              "array": [
+                "bool",
+                20
+              ]
+            }
+          },
+          {
+            "name": "marketCleaned",
+            "type": {
+              "array": [
+                "bool",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketCleanedPadding",
+            "type": {
+              "array": [
+                "bool",
+                20
+              ]
+            }
           }
         ]
       }
