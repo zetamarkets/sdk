@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.26.4] 2023-04-12
+
+- constants: Add ZETAGROUP_PUBKEY_ASSET_MAP. ([#220](https://github.com/zetamarkets/sdk/pull/220))
+
 # [0.26.3] 2023-04-11
 
 - exchange: Add handy function Exchange.zetaGroupPubkeyToAsset(). ([#219](https://github.com/zetamarkets/sdk/pull/219))
