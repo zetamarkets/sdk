@@ -12,7 +12,7 @@ import * as utils from "./utils";
 import * as anchor from "@zetamarkets/anchor";
 import * as types from "./types";
 import * as constants from "./constants";
-import { Asset, toProgramAsset } from "./assets";
+import { Asset, toProgramAsset, allAssets, assetToIndex } from "./assets";
 import { Market } from "./market";
 
 export function initializeMarginAccountIx(
@@ -996,6 +996,7 @@ export async function initializeZetaMarketTxs(
           state: Exchange.stateAddress,
           marketIndexes: marketIndexes,
           zetaGroup: subExchange.zetaGroupAddress,
+          markPrices: Exchange.markPricesAddress,
           admin: Exchange.state.admin,
           market,
           requestQueue: requestQueue,
@@ -1047,17 +1048,34 @@ export function modifyAssetIx(
   newAsset: Asset,
   newOracle: PublicKey,
   newBackupOracle: PublicKey,
-  oracleBackupProgram: PublicKey,
-  admin: PublicKey
+  oracleBackupProgram: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.modifyAsset(toProgramAsset(newAsset), {
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup,
-      admin: admin,
+      admin: Exchange.state.admin,
       newOracle: newOracle,
       newBackupOracle: newBackupOracle,
       oracleBackupProgram: oracleBackupProgram,
+    },
+  });
+}
+
+export function initializeZetaCrossMarkPricesIx(
+  perpArgs: UpdatePerpParametersArgs
+): TransactionInstruction {
+  let [crossMarkPrices, _crossMarkPricesNonce] = utils.getCrossMarkPrices(
+    Exchange.programId
+  );
+  return Exchange.program.instruction.initializeZetaCrossMarkPrices(perpArgs, {
+    accounts: {
+      state: Exchange.stateAddress,
+      crossMarkPrices: crossMarkPrices,
+      admin: Exchange.state.admin,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      rent: SYSVAR_RENT_PUBKEY,
     },
   });
 }
@@ -1333,6 +1351,64 @@ export function retreatMarketNodesIx(
   });
 }
 
+export function updatePricingCrossIx(): TransactionInstruction {
+  let remainingAccounts = [];
+
+  // TODO this way of passing assets feels super clunky, must be a better way to handle it
+  let assets = Array(25).fill(255);
+  let assetCount = 0;
+
+  // remaining_accounts contains the oracles + perp markets, grouped by asset
+  // Each asset requires:
+  // 1. (Pyth) oracle
+  // 2. (Chainlink) oracle_backup_feed + oracle_backup_program
+  // 3. perp_market + perp_bids + perp_asks
+  for (var asset of Exchange.assets) {
+    assets[assetCount++] = assetToIndex(asset);
+    let se = Exchange.getSubExchange(asset);
+    remainingAccounts = remainingAccounts.concat([
+      {
+        pubkey: se.zetaGroup.oracle,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: se.zetaGroup.oracleBackupFeed,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: constants.CHAINLINK_PID,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: Exchange.getPerpMarket(asset).address,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: se.markets.perpMarket.serumMarket.bidsAddress,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: se.markets.perpMarket.serumMarket.asksAddress,
+        isSigner: false,
+        isWritable: false,
+      },
+    ]);
+  }
+
+  return Exchange.program.instruction.updatePricingCross(assets, {
+    accounts: {
+      state: Exchange.stateAddress,
+      markPrices: Exchange.markPricesAddress,
+    },
+    remainingAccounts,
+  });
+}
+
 export function updatePricingIx(
   asset: Asset,
   expiryIndex: number
@@ -1405,6 +1481,7 @@ export function updatePerpParametersIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
+      markPrices: Exchange.markPricesAddress,
       admin,
     },
   });
@@ -1436,6 +1513,18 @@ export function updateVolatilityNodesIx(
       zetaGroup: subExchange.zetaGroupAddress,
       greeks: subExchange.greeksAddress,
       admin,
+    },
+  });
+}
+
+export function updateZetaCrossMarkPricePubkeysIx(
+  args: UpdateZetaCrossMarkPricePubkeysArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaCrossMarkPricePubkeys(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      markPrices: Exchange.markPricesAddress,
+      admin: Exchange.state.admin,
     },
   });
 }
@@ -1539,6 +1628,7 @@ export function addMarketIndexesIx(
     accounts: {
       marketIndexes,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
+      markPrices: Exchange.markPricesAddress,
     },
   });
 }
@@ -2407,4 +2497,12 @@ export interface SetReferralsRewardsArgs {
   referralsAccountKey: PublicKey;
   pendingRewards: anchor.BN;
   overwrite: boolean;
+}
+
+export interface UpdateZetaCrossMarkPricePubkeysArgs {
+  asset: any;
+  oracle: PublicKey;
+  oracleBackupFeed: PublicKey;
+  market: PublicKey;
+  perpSyncQueue: PublicKey;
 }

@@ -287,6 +287,13 @@ export function getZetaGroup(
   );
 }
 
+export function getCrossMarkPrices(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("cross-mark-prices"))],
+    programId
+  );
+}
+
 export function getUnderlying(
   programId: PublicKey,
   underlyingIndex: number
@@ -691,6 +698,7 @@ export async function simulateTransaction(
   try {
     response = await provider.simulate(tx);
   } catch (err) {
+    console.log(err); // temp remove me
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -794,6 +802,7 @@ export async function processTransaction(
       opts || commitmentConfig(provider.connection.commitment)
     );
   } catch (err) {
+    console.log(err); // temp remove me
     let parsedErr = parseError(err);
     throw parsedErr;
   }

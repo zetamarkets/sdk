@@ -17,6 +17,7 @@ import {
   ProductGreeks,
   State,
   ZetaGroup,
+  CrossMarkPrices,
 } from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
@@ -26,7 +27,7 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
 import * as types from "./types";
-import { Asset } from "./assets";
+import { Asset, toProgramAsset } from "./assets";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
@@ -55,6 +56,14 @@ export class Exchange {
     return this._state;
   }
   private _state: State;
+
+  /**
+   * Account storing zeta mark prices.
+   */
+  public get markPrices(): CrossMarkPrices {
+    return this._markPrices;
+  }
+  private _markPrices: CrossMarkPrices;
 
   /**
    * The solana network being used.
@@ -158,6 +167,14 @@ export class Exchange {
     return this._stateAddress;
   }
   private _stateAddress: PublicKey;
+
+  /**
+   * Address of mark prices account.
+   */
+  public get markPricesAddress(): PublicKey {
+    return this._markPricesAddress;
+  }
+  private _markPricesAddress: PublicKey;
 
   /**
    * Public key for treasury wallet.
@@ -303,6 +320,10 @@ export class Exchange {
       this.programId
     );
     const [state, stateNonce] = utils.getState(this.programId);
+    const [markPrices, _markPricesNonce] = utils.getCrossMarkPrices(
+      this.programId
+    );
+
     const [serumAuthority, serumNonce] = utils.getSerumAuthority(
       this.programId
     );
@@ -343,10 +364,33 @@ export class Exchange {
 
     this._mintAuthority = mintAuthority;
     this._stateAddress = state;
+    this._markPricesAddress = markPrices;
     this._serumAuthority = serumAuthority;
     this._treasuryWalletAddress = treasuryWallet;
     this._referralsRewardsWalletAddress = referralRewardsWallet;
     await this.updateState();
+  }
+
+  public async initializeZetaCrossMarkPrices(
+    perpArgs: instructions.UpdatePerpParametersArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.initializeZetaCrossMarkPricesIx(perpArgs)
+    );
+    try {
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        [],
+        utils.defaultCommitment(),
+        this.useLedger
+      );
+    } catch (e) {
+      console.error(`Initialize cross mark prices failed: ${e}`);
+      console.log(e);
+    }
+
+    await this.updateMarkPrices();
   }
 
   public async initializeZetaGroup(
@@ -422,6 +466,7 @@ export class Exchange {
     // Load variables from state.
     this._mintAuthority = utils.getMintAuthority(this.programId)[0];
     this._stateAddress = utils.getState(this.programId)[0];
+    this._markPricesAddress = utils.getCrossMarkPrices(this.programId)[0];
     this._serumAuthority = utils.getSerumAuthority(this.programId)[0];
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[loadConfig.network];
     this._treasuryWalletAddress = utils.getZetaTreasuryWallet(
@@ -610,6 +655,15 @@ export class Exchange {
     this._state = (await this.program.account.state.fetch(
       this.stateAddress
     )) as State;
+  }
+
+  /**
+   * Polls the on chain account to update mark prices
+   */
+  public async updateMarkPrices() {
+    this._markPrices = (await this.program.account.crossMarkPrices.fetch(
+      this.markPricesAddress
+    )) as CrossMarkPrices;
   }
 
   /**
@@ -849,8 +903,32 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
+  public async updatePricingCross() {
+    let tx = new Transaction().add(instructions.updatePricingCrossIx());
+    await utils.processTransaction(this.provider, tx);
+  }
+
   public async updatePricing(asset: Asset, expiryIndex: number) {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
+  }
+
+  public async updateCrossMarkPricePubkeys(
+    asset: Asset,
+    oracle: PublicKey,
+    oracleBackupFeed: PublicKey,
+    market: PublicKey,
+    perpSyncQueue: PublicKey
+  ) {
+    let tx = new Transaction().add(
+      instructions.updateZetaCrossMarkPricePubkeysIx({
+        asset: toProgramAsset(asset) as any,
+        oracle,
+        oracleBackupFeed,
+        market,
+        perpSyncQueue,
+      })
+    );
+    await utils.processTransaction(this.provider, tx);
   }
 
   public async retreatMarketNodes(asset: Asset, expiryIndex: number) {

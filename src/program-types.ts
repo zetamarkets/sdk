@@ -32,6 +32,33 @@ export interface State {
   padding: Array<number>;
 }
 
+export interface CrossMarkPrices {
+  nonce: number;
+  markPrices: Array<anchor.BN>;
+  markPricesPadding: Array<anchor.BN>;
+  updateTimestamp: Array<anchor.BN>;
+  updateTimestampPadding: Array<anchor.BN>;
+  fundingDelta: Array<AnchorDecimal>;
+  fundingDeltaPadding: Array<AnchorDecimal>;
+  latestFundingRate: Array<AnchorDecimal>;
+  latestFundingRatePadding: Array<AnchorDecimal>;
+  latestMidpoint: Array<anchor.BN>;
+  latestMidpointPadding: Array<anchor.BN>;
+  oracles: Array<PublicKey>;
+  oraclesPadding: Array<PublicKey>;
+  oracleBackupFeeds: Array<PublicKey>;
+  oracleBackupFeedsPadding: Array<PublicKey>;
+  markets: Array<PublicKey>;
+  marketsPadding: Array<PublicKey>;
+  perpSyncQueues: Array<PublicKey>;
+  perpSyncQueuesPadding: Array<PublicKey>;
+  perpParameters: Array<PerpParameters>;
+  perpParametersPadding: Array<PerpParameters>;
+  products: Array<Product>;
+  productsPadding: Array<Product>;
+  padding: Array<number>;
+}
+
 export interface MarketIndexes {
   nonce: number;
   initialized: boolean;
@@ -153,9 +180,29 @@ export interface OrderState {
   openingOrders: Array<anchor.BN>;
 }
 
+export interface CrossMarginProductLedger {
+  asset: any;
+  productLedger: ProductLedger;
+  padding: Array<number>;
+}
+
 export interface ProductLedger {
   position: Position;
   orderState: OrderState;
+}
+
+export interface CrossMarginAccount {
+  authority: PublicKey;
+  delegatedPubkey: PublicKey;
+  nonce: number;
+  rebalanceAmount: anchor.BN;
+  forceCancelFlag: boolean;
+  lastFundingDeltas: Array<AnchorDecimal>;
+  lastFundingDeltasPadding: Array<AnchorDecimal>;
+  openOrdersNonce: Array<number>;
+  accountType: any;
+  crossMarginProductLedgers: Array<CrossMarginProductLedger>;
+  padding: Array<number>;
 }
 
 export interface MarginAccount {

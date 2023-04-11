@@ -66,6 +66,9 @@ export const CRANK_ACCOUNT_LIMIT = 12;
 export const CRANK_PERP_ACCOUNT_LIMIT = 10;
 export const MAX_MARKETS_TO_FETCH = 50;
 
+export const NUM_ASSETS = 5;
+export const NUM_ASSETS_PADDING = 20;
+
 // This is the most we can load per iteration without
 // hitting the rate limit.
 export const MARKET_LOAD_LIMIT = 12;

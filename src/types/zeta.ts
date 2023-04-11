@@ -36,7 +36,42 @@ export type Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaCrossMarkPricesArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaCrossMarkPricePubkeys",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaCrossMarkPricePubkeysArgs"
+          }
+        }
+      ]
     },
     {
       "name": "initializeZetaGroup",
@@ -598,6 +633,11 @@ export type Zeta = {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []
@@ -965,6 +1005,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -1290,6 +1335,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": true,
           "isSigner": true
@@ -1524,6 +1574,32 @@ export type Zeta = {
       ]
     },
     {
+      "name": "updatePricingCross",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": {
+            "array": [
+              "u8",
+              25
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "updatePricing",
       "accounts": [
         {
@@ -1642,20 +1718,51 @@ export type Zeta = {
       ]
     },
     {
-      "name": "depositCrossMargin",
+      "name": "initializeUserTokenAccount",
       "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
         {
           "name": "crossMarginAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "vault",
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "depositCrossMargin",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1788,6 +1895,52 @@ export type Zeta = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawCrossMargin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "markPrices",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -4718,6 +4871,122 @@ export type Zeta = {
             }
           },
           {
+            "name": "oracles",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oraclesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeeds",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeedsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "markets",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueues",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueuesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "products",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                20
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -6667,6 +6936,56 @@ export type Zeta = {
       }
     },
     {
+      "name": "UpdateZetaCrossMarkPricePubkeysArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "oracle",
+            "type": "publicKey"
+          },
+          {
+            "name": "oracleBackupFeed",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "perpSyncQueue",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeZetaCrossMarkPricesArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitializeZetaGroupArgs",
       "type": {
         "kind": "struct",
@@ -8080,6 +8399,16 @@ export type Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "InvalidUpdatePricingRemainingAccounts",
+      "msg": "Invalid number of remaining accounts in update pricing"
+    },
+    {
+      "code": 6132,
+      "name": "InvalidMarkPricesOracle",
+      "msg": "Invalid oracle for this mark prices account"
     }
   ]
 };
@@ -8122,7 +8451,42 @@ export const IDL: Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaCrossMarkPricesArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaCrossMarkPricePubkeys",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaCrossMarkPricePubkeysArgs"
+          }
+        }
+      ]
     },
     {
       "name": "initializeZetaGroup",
@@ -8684,6 +9048,11 @@ export const IDL: Zeta = {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []
@@ -9051,6 +9420,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -9376,6 +9750,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": true,
           "isSigner": true
@@ -9610,6 +9989,32 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "updatePricingCross",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "markPrices",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assets",
+          "type": {
+            "array": [
+              "u8",
+              25
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "updatePricing",
       "accounts": [
         {
@@ -9728,20 +10133,51 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "depositCrossMargin",
+      "name": "initializeUserTokenAccount",
       "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
         {
           "name": "crossMarginAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "vault",
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "depositCrossMargin",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -9874,6 +10310,52 @@ export const IDL: Zeta = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawCrossMargin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "markPrices",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -12804,6 +13286,122 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "oracles",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oraclesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeeds",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeedsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "markets",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueues",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueuesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "products",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                20
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
@@ -14753,6 +15351,56 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "UpdateZetaCrossMarkPricePubkeysArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "oracle",
+            "type": "publicKey"
+          },
+          {
+            "name": "oracleBackupFeed",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "perpSyncQueue",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeZetaCrossMarkPricesArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitializeZetaGroupArgs",
       "type": {
         "kind": "struct",
@@ -16166,6 +16814,16 @@ export const IDL: Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "InvalidUpdatePricingRemainingAccounts",
+      "msg": "Invalid number of remaining accounts in update pricing"
+    },
+    {
+      "code": 6132,
+      "name": "InvalidMarkPricesOracle",
+      "msg": "Invalid oracle for this mark prices account"
     }
   ]
 };
