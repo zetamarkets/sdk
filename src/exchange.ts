@@ -227,6 +227,13 @@ export class Exchange {
     this._ledgerWallet = wallet;
   }
 
+  // Handy map to grab zetagroup asset by pubkey without an RPC fetch
+  // or having to manually filter all zetaGroups
+  public zetaGroupPubkeyToAsset(key: PublicKey): Asset {
+    return this._zetaGroupPubkeyToAsset.get(key);
+  }
+  private _zetaGroupPubkeyToAsset: Map<PublicKey, Asset> = new Map();
+
   private _useLedger: boolean = false;
 
   private _programSubscriptionIds: number[] = [];
@@ -509,6 +516,10 @@ export class Exchange {
         );
       })
     );
+
+    for (var se of this.getAllSubExchanges()) {
+      this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
+    }
 
     this._isInitialized = true;
   }
