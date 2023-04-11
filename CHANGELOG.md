@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.26.3] 2023-04-11
+
+- exchange: Add handy function Exchange.zetaGroupPubkeyToAsset(). ([#219](https://github.com/zetamarkets/sdk/pull/219))
+
 # [0.26.2] 2023-03-31
 
 - client: Fix cancelAllPerpMarketOrders. ([#217](https://github.com/zetamarkets/sdk/pull/216))
