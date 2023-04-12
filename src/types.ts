@@ -72,6 +72,7 @@ export enum UserCallbackType {
   POLLUPDATE,
   MARGINACCOUNTCHANGE,
   SPREADACCOUNTCHANGE,
+  CROSSMARGINACCOUNTCHANGE,
 }
 
 export function toProgramSide(side: Side) {
@@ -144,6 +145,7 @@ export function orderEquals(
 }
 
 export interface Position {
+  asset: Asset;
   marketIndex: number;
   market: PublicKey;
   size: number;
@@ -231,6 +233,7 @@ export enum ProgramAccountType {
   ZetaGroup = "ZetaGroup",
   Greeks = "Greeks",
   PerpSyncQueue = "PerpSyncQueue",
+  CrossMarginAccount = "CrossMarginAccount",
 }
 
 export interface ClockData {

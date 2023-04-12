@@ -32,6 +32,89 @@ export function initializeMarginAccountIx(
   });
 }
 
+export function initializeUserTokenAccountIx(
+  crossMarginAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  let [userTokenAccount, nonce] = utils.getUserTokenAccount(
+    Exchange.programId,
+    crossMarginAccount,
+    Exchange.usdcMintAddress
+  );
+  return Exchange.program.instruction.initializeUserTokenAccount(nonce, {
+    accounts: {
+      crossMarginAccount,
+      userTokenAccount,
+      authority: user,
+      state: Exchange.stateAddress,
+      usdcMint: Exchange.usdcMintAddress,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    },
+  });
+}
+
+export function initializeCrossMarginAccountIx(
+  crossMarginAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeCrossMarginAccount({
+    accounts: {
+      crossMarginAccount,
+      authority: user,
+      payer: user,
+      zetaProgram: Exchange.programId,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function depositCrossMarginIx(
+  amount: number,
+  crossMarginAccount: PublicKey,
+  userVaultTokenAccount: PublicKey,
+  userPersonalTokenAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.depositCrossMargin(
+    new anchor.BN(amount),
+    {
+      accounts: {
+        crossMarginAccount,
+        userVaultTokenAccount,
+        userPersonalTokenAccount,
+        authority: user,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        state: Exchange.stateAddress,
+        markPrices: Exchange.markPricesAddress,
+      },
+    }
+  );
+}
+
+export function withdrawCrossMarginIx(
+  amount: number,
+  crossMarginAccount: PublicKey,
+  userVaultTokenAccount: PublicKey,
+  userPersonalTokenAccount: PublicKey,
+  user: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.withdrawCrossMargin(
+    new anchor.BN(amount),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        crossMarginAccount,
+        userVaultTokenAccount,
+        userPersonalTokenAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        authority: user,
+        markPrices: Exchange.markPricesAddress,
+      },
+    }
+  );
+}
+
 export function closeMarginAccountIx(
   asset: Asset,
   userKey: PublicKey,

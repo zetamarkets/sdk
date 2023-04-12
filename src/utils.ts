@@ -192,6 +192,21 @@ export function getZetaInsuranceVault(
   );
 }
 
+export function getUserTokenAccount(
+  programId: PublicKey,
+  crossMarginAccount: PublicKey,
+  mint: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("user-token-account")),
+      crossMarginAccount.toBuffer(),
+      mint.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export function getZetaTreasuryWallet(
   programId: PublicKey,
   mint: PublicKey
@@ -393,6 +408,19 @@ export function getQuoteMint(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("quote-mint")),
       market.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getCrossMarginAccount(
+  programId: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-margin")),
+      userKey.toBuffer(),
     ],
     programId
   );

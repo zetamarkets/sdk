@@ -1849,6 +1849,7 @@ export class SubClient {
     for (var i = 0; i < this._marginAccount.productLedgers.length; i++) {
       if (this._marginAccount.productLedgers[i].position.size.toNumber() != 0) {
         positions.push({
+          asset: this._asset,
           marketIndex: i,
           market: this._subExchange.zetaGroup.products[i].market,
           size: utils.convertNativeLotSizeToDecimal(
@@ -1864,6 +1865,7 @@ export class SubClient {
     // perps too
     if (this._marginAccount.perpProductLedger.position.size.toNumber() != 0) {
       positions.push({
+        asset: this._asset,
         marketIndex: constants.PERP_INDEX,
         market: this._subExchange.zetaGroup.perp.market,
         size: utils.convertNativeLotSizeToDecimal(
@@ -1882,6 +1884,7 @@ export class SubClient {
     for (var i = 0; i < this._spreadAccount.positions.length; i++) {
       if (this._spreadAccount.positions[i].size.toNumber() != 0) {
         positions.push({
+          asset: this._asset,
           marketIndex: i,
           market: this._subExchange.zetaGroup.products[i].market,
           size: utils.convertNativeLotSizeToDecimal(

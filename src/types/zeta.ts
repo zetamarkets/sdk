@@ -1756,18 +1756,28 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "depositCrossMargin",
       "accounts": [
         {
           "name": "crossMarginAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userVaultTokenAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenAccount",
+          "name": "userPersonalTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1920,7 +1930,12 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "userTokenAccount",
+          "name": "userVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPersonalTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1936,11 +1951,6 @@ export type Zeta = {
         },
         {
           "name": "markPrices",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -5681,6 +5691,10 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "userTokenAccountNonce",
+            "type": "u8"
+          },
+          {
             "name": "rebalanceAmount",
             "type": "i64"
           },
@@ -5715,7 +5729,16 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                138
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncePadding",
+            "type": {
+              "array": [
+                "u8",
+                20
               ]
             }
           },
@@ -5741,7 +5764,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                3287
+                3399
               ]
             }
           }
@@ -10171,18 +10194,28 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "depositCrossMargin",
       "accounts": [
         {
           "name": "crossMarginAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userVaultTokenAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenAccount",
+          "name": "userPersonalTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -10335,7 +10368,12 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "userTokenAccount",
+          "name": "userVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPersonalTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -10351,11 +10389,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "markPrices",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -14096,6 +14129,10 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "userTokenAccountNonce",
+            "type": "u8"
+          },
+          {
             "name": "rebalanceAmount",
             "type": "i64"
           },
@@ -14130,7 +14167,16 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                138
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncePadding",
+            "type": {
+              "array": [
+                "u8",
+                20
               ]
             }
           },
@@ -14156,7 +14202,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                3287
+                3399
               ]
             }
           }

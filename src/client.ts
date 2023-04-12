@@ -4,6 +4,7 @@ import { exchange as Exchange } from "./exchange";
 import {
   SpreadAccount,
   MarginAccount,
+  CrossMarginAccount,
   PositionMovementEvent,
   ReferralAccount,
   ReferrerAccount,
@@ -18,6 +19,8 @@ import {
   TransactionSignature,
   Transaction,
   TransactionInstruction,
+  AccountInfo,
+  Context,
 } from "@solana/web3.js";
 import * as constants from "./constants";
 import { referUserIx } from "./program-instructions";
@@ -84,6 +87,80 @@ export class Client {
   private _usdcAccountAddress: PublicKey;
 
   /**
+   * Stores the user margin account state.
+   */
+  public get crossMarginAccount(): CrossMarginAccount | null {
+    return this._crossMarginAccount;
+  }
+  private _crossMarginAccount: CrossMarginAccount | null;
+
+  /**
+   * Client cross-margin account address.
+   */
+  public get crossMarginAccountAddress(): PublicKey {
+    return this._crossMarginAccountAddress;
+  }
+  private _crossMarginAccountAddress: PublicKey;
+
+  /**
+   * User token account address (for the cross-margin account).
+   */
+  public get userTokenAccountAddress(): PublicKey {
+    return this._userTokenAccountAddress;
+  }
+  private _userTokenAccountAddress: PublicKey;
+
+  /**
+   * Returns a list of user current margin account positions.
+   */
+  public get crossMarginPositions(): types.Position[] {
+    return this._crossMarginPositions;
+  }
+  private _crossMarginPositions: types.Position[];
+
+  /**
+   * The subscription id for the cross-margin account subscription.
+   */
+  private _crossMarginAccountSubscriptionId: number = undefined;
+
+  /**
+   * Last update timestamp.
+   */
+  private _lastUpdateTimestamp: number;
+
+  /**
+   * Pending update.
+   */
+  private _pendingUpdate: boolean;
+
+  /**
+   * The context slot of the pending update.
+   */
+  private _pendingUpdateSlot: number = 0;
+
+  /**
+   * Polling interval.
+   */
+  public get pollInterval(): number {
+    return this._pollInterval;
+  }
+  public set pollInterval(interval: number) {
+    if (interval < 0) {
+      throw Error("Polling interval invalid!");
+    }
+    this._pollInterval = interval;
+  }
+  private _pollInterval: number = constants.DEFAULT_CLIENT_POLL_INTERVAL;
+
+  /**
+   * User passed callback on load, stored for polling.
+   */
+  private _callback: (asset: Asset, type: EventType, data: any) => void;
+
+  private _updatingState: boolean = false;
+  private _updatingStateTimestamp: number = undefined;
+
+  /**
    * whitelist deposit account.
    */
   public get whitelistDepositAddress(): PublicKey | undefined {
@@ -144,6 +221,7 @@ export class Client {
     this._referralAccount = null;
     this._referrerAccount = null;
     this._referrerAlias = null;
+    this._crossMarginAccount = null;
   }
   private _subClients: Map<Asset, SubClient>;
 
@@ -171,6 +249,46 @@ export class Client {
     );
     client._whitelistDepositAddress = undefined;
     client._whitelistTradingFeesAddress = undefined;
+
+    let [crossMarginAccountAddress, _crossMarginAccountNonce] =
+      utils.getCrossMarginAccount(Exchange.programId, owner);
+    client._crossMarginAccountAddress = crossMarginAccountAddress;
+
+    let [userTokenAccount, _userTokenAccountNonce] = utils.getUserTokenAccount(
+      Exchange.programId,
+      crossMarginAccountAddress,
+      Exchange.usdcMintAddress
+    );
+    client._userTokenAccountAddress = userTokenAccount;
+
+    client._crossMarginAccountSubscriptionId = connection.onAccountChange(
+      client._crossMarginAccountAddress,
+      async (accountInfo: AccountInfo<Buffer>, context: Context) => {
+        client._crossMarginAccount = Exchange.program.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccount,
+          accountInfo.data
+        );
+
+        if (throttle || client._updatingState) {
+          client._pendingUpdate = true;
+          client._pendingUpdateSlot = context.slot;
+          return;
+        }
+
+        await client.updateState(undefined, false);
+        client._lastUpdateTimestamp = Exchange.clockTimestamp;
+
+        if (callback !== undefined) {
+          callback(null, EventType.USER, {
+            UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
+          });
+        }
+
+        // TODO once placeorder etc works
+        // client.updateOpenOrdersAddresses();
+      },
+      connection.commitment
+    );
 
     const ACCS_PER_SUBCLIENT = 2;
 
@@ -570,6 +688,52 @@ export class Client {
     return await utils.processTransaction(this._provider, tx);
   }
 
+  public async depositCrossMargin(
+    amount: number
+  ): Promise<TransactionSignature> {
+    await this.usdcAccountCheck();
+    this.delegatedCheck();
+
+    // Check if the user has a cross margin account.
+    let tx = new Transaction();
+    if (this._crossMarginAccount === null) {
+      console.log(
+        "User has no cross-margin account. Creating cross-margin account..."
+      );
+      tx.add(
+        instructions.initializeCrossMarginAccountIx(
+          this._crossMarginAccountAddress,
+          this.provider.wallet.publicKey
+        )
+      );
+      tx.add(
+        instructions.initializeUserTokenAccountIx(
+          this._crossMarginAccountAddress,
+          this.provider.wallet.publicKey
+        )
+      );
+    }
+
+    tx.add(
+      instructions.depositCrossMarginIx(
+        amount,
+        this._crossMarginAccountAddress,
+        this._userTokenAccountAddress,
+        this._usdcAccountAddress,
+        this.provider.wallet.publicKey
+      )
+    );
+
+    return await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
   public async deposit(
     asset: Asset,
     amount: number
@@ -596,6 +760,8 @@ export class Client {
     }
   }
 
+  public async updateCrossmarginAccount(fetch, force) {}
+
   /**
    * Polls the margin account for the latest state.
    * @param asset The underlying asset (eg SOL, BTC)
@@ -608,7 +774,7 @@ export class Client {
     force = false
   ) {
     if (asset != undefined) {
-      await this.getSubClient(asset).updateState(fetch, force);
+      await Promise.all([this.getSubClient(asset).updateState(fetch, force)]);
     } else {
       await Promise.all(
         this.getAllSubClients().map(async (subClient) => {
@@ -616,6 +782,44 @@ export class Client {
         })
       );
     }
+
+    // TODO add a this._updatingState like in subclient
+    // So that we can use `fetch` and `force`
+    this._crossMarginAccount =
+      (await Exchange.program.account.crossMarginAccount.fetch(
+        this._crossMarginAccountAddress
+      )) as unknown as CrossMarginAccount;
+
+    let positions: types.Position[] = [];
+    for (
+      var i = 0;
+      i < this._crossMarginAccount.crossMarginProductLedgers.length;
+      i++
+    ) {
+      if (
+        this._crossMarginAccount.crossMarginProductLedgers[
+          i
+        ].productLedger.position.size.toNumber() != 0
+      ) {
+        positions.push({
+          asset: assets.fromProgramAsset(
+            this._crossMarginAccount.crossMarginProductLedgers[i].asset
+          ),
+          marketIndex: constants.PERP_INDEX,
+          market: Exchange.getPerpMarket(asset).address,
+          size: utils.convertNativeLotSizeToDecimal(
+            this._crossMarginAccount.crossMarginProductLedgers[
+              i
+            ].productLedger.position.size.toNumber()
+          ),
+          costOfTrades: utils.convertNativeBNToDecimal(
+            this._crossMarginAccount.crossMarginProductLedgers[i].productLedger
+              .position.costOfTrades
+          ),
+        });
+      }
+    }
+    this._crossMarginPositions = positions;
   }
 
   public async cancelAllOrders(
@@ -708,6 +912,30 @@ export class Client {
 
   public async closeSpreadAccount(asset: Asset): Promise<TransactionSignature> {
     return await this.getSubClient(asset).closeSpreadAccount();
+  }
+
+  public async withdrawCrossMargin(
+    amount: number
+  ): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    let tx = new Transaction();
+    tx.add(
+      instructions.withdrawCrossMarginIx(
+        amount,
+        this._crossMarginAccountAddress,
+        this._userTokenAccountAddress,
+        this._usdcAccountAddress,
+        this.provider.wallet.publicKey
+      )
+    );
+    return await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   public async withdraw(
@@ -1117,6 +1345,14 @@ export class Client {
     return addresses;
   }
 
+  public getCrossMarginAccount(): CrossMarginAccount | null {
+    return this.crossMarginAccount;
+  }
+
+  public getCrossMarginAccountAddress(): PublicKey {
+    return this.crossMarginAccountAddress;
+  }
+
   public async initializeReferrerAccount() {
     this.delegatedCheck();
     let tx = new Transaction().add(
@@ -1199,6 +1435,12 @@ export class Client {
   }
 
   public async close() {
+    if (this._crossMarginAccountSubscriptionId !== undefined) {
+      await this.provider.connection.removeAccountChangeListener(
+        this._crossMarginAccountSubscriptionId
+      );
+      this._crossMarginAccountSubscriptionId = undefined;
+    }
     await Promise.all(
       this.getAllSubClients().map(async (subClient) => {
         subClient.close();

@@ -1756,18 +1756,28 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "depositCrossMargin",
       "accounts": [
         {
           "name": "crossMarginAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userVaultTokenAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenAccount",
+          "name": "userPersonalTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1920,7 +1930,12 @@
           "isSigner": false
         },
         {
-          "name": "userTokenAccount",
+          "name": "userVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userPersonalTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1936,11 +1951,6 @@
         },
         {
           "name": "markPrices",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -5681,6 +5691,10 @@
             "type": "u8"
           },
           {
+            "name": "userTokenAccountNonce",
+            "type": "u8"
+          },
+          {
             "name": "rebalanceAmount",
             "type": "i64"
           },
@@ -5715,7 +5729,16 @@
             "type": {
               "array": [
                 "u8",
-                138
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncePadding",
+            "type": {
+              "array": [
+                "u8",
+                20
               ]
             }
           },
@@ -5741,7 +5764,7 @@
             "type": {
               "array": [
                 "u8",
-                3287
+                3399
               ]
             }
           }
