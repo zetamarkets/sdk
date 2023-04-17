@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.26.6] 2023-04-17
+
+- risk: Allow custom executionPrice and account for fees in calculateUnrealizedPnl ([#218](https://github.com/zetamarkets/sdk/pull/218))
+
 # [0.26.5] 2023-04-17
 
 - client: Add asset to positions object. ([#223](https://github.com/zetamarkets/sdk/pull/223))
