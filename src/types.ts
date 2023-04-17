@@ -148,6 +148,7 @@ export interface Position {
   market: PublicKey;
   size: number;
   costOfTrades: number;
+  asset: Asset;
 }
 
 export function positionEquals(a: Position, b: Position): boolean {
