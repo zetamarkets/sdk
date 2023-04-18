@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+# [0.26.7] 2023-04-18
+
+- market: Add asset to order object. ([#224](https://github.com/zetamarkets/sdk/pull/224))
+
 # [0.26.6] 2023-04-17
 
 - risk: Allow custom executionPrice and account for fees in calculateUnrealizedPnl ([#218](https://github.com/zetamarkets/sdk/pull/218))

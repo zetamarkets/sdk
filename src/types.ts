@@ -120,6 +120,7 @@ export interface Order {
   // Client order id.
   clientOrderId: BN;
   tifOffset: number;
+  asset: Asset;
 }
 
 export function orderEquals(
