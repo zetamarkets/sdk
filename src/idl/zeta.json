@@ -3510,6 +3510,16 @@
           "name": "perpSyncQueue",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "userVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3528,9 +3538,9 @@
           }
         },
         {
-          "name": "assetIndex",
+          "name": "asset",
           "type": {
-            "defined": "usize"
+            "defined": "Asset"
           }
         },
         {
@@ -4982,7 +4992,7 @@
             }
           },
           {
-            "name": "updateTimestamp",
+            "name": "updateTimestamps",
             "type": {
               "array": [
                 "u64",
@@ -4991,7 +5001,7 @@
             }
           },
           {
-            "name": "updateTimestampPadding",
+            "name": "updateTimestampsPadding",
             "type": {
               "array": [
                 "u64",
@@ -5000,7 +5010,7 @@
             }
           },
           {
-            "name": "fundingDelta",
+            "name": "fundingDeltas",
             "type": {
               "array": [
                 {
@@ -5011,29 +5021,7 @@
             }
           },
           {
-            "name": "fundingDeltaPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "AnchorDecimal"
-                },
-                20
-              ]
-            }
-          },
-          {
-            "name": "latestFundingRate",
-            "type": {
-              "array": [
-                {
-                  "defined": "AnchorDecimal"
-                },
-                5
-              ]
-            }
-          },
-          {
-            "name": "latestFundingRatePadding",
+            "name": "fundingDeltasPadding",
             "type": {
               "array": [
                 {
@@ -5044,7 +5032,29 @@
             }
           },
           {
-            "name": "latestMidpoint",
+            "name": "latestFundingRates",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestMidpoints",
             "type": {
               "array": [
                 "u64",
@@ -5053,7 +5063,7 @@
             }
           },
           {
-            "name": "latestMidpointPadding",
+            "name": "latestMidpointsPadding",
             "type": {
               "array": [
                 "u64",
@@ -5156,6 +5166,28 @@
             }
           },
           {
+            "name": "marginParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
             "name": "products",
             "type": {
               "array": [
@@ -5182,7 +5214,7 @@
             "type": {
               "array": [
                 "u8",
-                2000
+                700
               ]
             }
           }
@@ -7184,6 +7216,14 @@
           },
           {
             "name": "perpImpactCashDelta",
+            "type": "u64"
+          },
+          {
+            "name": "marginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "marginMaintenance",
             "type": "u64"
           }
         ]

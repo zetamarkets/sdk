@@ -372,10 +372,11 @@ export class Exchange {
   }
 
   public async initializeZetaCrossMarkPrices(
-    perpArgs: instructions.UpdatePerpParametersArgs
+    perpArgs: instructions.UpdatePerpParametersArgs,
+    marginArgs: instructions.UpdateMarginParametersArgs
   ) {
     let tx = new Transaction().add(
-      instructions.initializeZetaCrossMarkPricesIx(perpArgs)
+      instructions.initializeZetaCrossMarkPricesIx(perpArgs, marginArgs)
     );
     try {
       await utils.processTransaction(

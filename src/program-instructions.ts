@@ -1146,21 +1146,31 @@ export function modifyAssetIx(
 }
 
 export function initializeZetaCrossMarkPricesIx(
-  perpArgs: UpdatePerpParametersArgs
+  perpArgs: UpdatePerpParametersArgs,
+  marginArgs: UpdateMarginParametersArgs
 ): TransactionInstruction {
   let [crossMarkPrices, _crossMarkPricesNonce] = utils.getCrossMarkPrices(
     Exchange.programId
   );
-  return Exchange.program.instruction.initializeZetaCrossMarkPrices(perpArgs, {
-    accounts: {
-      state: Exchange.stateAddress,
-      crossMarkPrices: crossMarkPrices,
-      admin: Exchange.state.admin,
-      systemProgram: SystemProgram.programId,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      rent: SYSVAR_RENT_PUBKEY,
+  return Exchange.program.instruction.initializeZetaCrossMarkPrices(
+    {
+      minFundingRatePercent: perpArgs.minFundingRatePercent,
+      maxFundingRatePercent: perpArgs.maxFundingRatePercent,
+      perpImpactCashDelta: perpArgs.perpImpactCashDelta,
+      marginInitial: marginArgs.futureMarginInitial,
+      marginMaintenance: marginArgs.futureMarginMaintenance,
     },
-  });
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        crossMarkPrices: crossMarkPrices,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: SYSVAR_RENT_PUBKEY,
+      },
+    }
+  );
 }
 
 export function initializeZetaGroupIx(

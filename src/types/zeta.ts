@@ -3510,6 +3510,16 @@ export type Zeta = {
           "name": "perpSyncQueue",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "userVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -3528,9 +3538,9 @@ export type Zeta = {
           }
         },
         {
-          "name": "assetIndex",
+          "name": "asset",
           "type": {
-            "defined": "usize"
+            "defined": "Asset"
           }
         },
         {
@@ -4982,7 +4992,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "updateTimestamp",
+            "name": "updateTimestamps",
             "type": {
               "array": [
                 "u64",
@@ -4991,7 +5001,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "updateTimestampPadding",
+            "name": "updateTimestampsPadding",
             "type": {
               "array": [
                 "u64",
@@ -5000,7 +5010,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "fundingDelta",
+            "name": "fundingDeltas",
             "type": {
               "array": [
                 {
@@ -5011,29 +5021,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "fundingDeltaPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "AnchorDecimal"
-                },
-                20
-              ]
-            }
-          },
-          {
-            "name": "latestFundingRate",
-            "type": {
-              "array": [
-                {
-                  "defined": "AnchorDecimal"
-                },
-                5
-              ]
-            }
-          },
-          {
-            "name": "latestFundingRatePadding",
+            "name": "fundingDeltasPadding",
             "type": {
               "array": [
                 {
@@ -5044,7 +5032,29 @@ export type Zeta = {
             }
           },
           {
-            "name": "latestMidpoint",
+            "name": "latestFundingRates",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestMidpoints",
             "type": {
               "array": [
                 "u64",
@@ -5053,7 +5063,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "latestMidpointPadding",
+            "name": "latestMidpointsPadding",
             "type": {
               "array": [
                 "u64",
@@ -5156,6 +5166,28 @@ export type Zeta = {
             }
           },
           {
+            "name": "marginParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
             "name": "products",
             "type": {
               "array": [
@@ -5182,7 +5214,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                2000
+                700
               ]
             }
           }
@@ -7184,6 +7216,14 @@ export type Zeta = {
           },
           {
             "name": "perpImpactCashDelta",
+            "type": "u64"
+          },
+          {
+            "name": "marginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "marginMaintenance",
             "type": "u64"
           }
         ]
@@ -12137,6 +12177,16 @@ export const IDL: Zeta = {
           "name": "perpSyncQueue",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "userVaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -12155,9 +12205,9 @@ export const IDL: Zeta = {
           }
         },
         {
-          "name": "assetIndex",
+          "name": "asset",
           "type": {
-            "defined": "usize"
+            "defined": "Asset"
           }
         },
         {
@@ -13609,7 +13659,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "updateTimestamp",
+            "name": "updateTimestamps",
             "type": {
               "array": [
                 "u64",
@@ -13618,7 +13668,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "updateTimestampPadding",
+            "name": "updateTimestampsPadding",
             "type": {
               "array": [
                 "u64",
@@ -13627,7 +13677,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "fundingDelta",
+            "name": "fundingDeltas",
             "type": {
               "array": [
                 {
@@ -13638,29 +13688,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "fundingDeltaPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "AnchorDecimal"
-                },
-                20
-              ]
-            }
-          },
-          {
-            "name": "latestFundingRate",
-            "type": {
-              "array": [
-                {
-                  "defined": "AnchorDecimal"
-                },
-                5
-              ]
-            }
-          },
-          {
-            "name": "latestFundingRatePadding",
+            "name": "fundingDeltasPadding",
             "type": {
               "array": [
                 {
@@ -13671,7 +13699,29 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "latestMidpoint",
+            "name": "latestFundingRates",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestMidpoints",
             "type": {
               "array": [
                 "u64",
@@ -13680,7 +13730,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "latestMidpointPadding",
+            "name": "latestMidpointsPadding",
             "type": {
               "array": [
                 "u64",
@@ -13783,6 +13833,28 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "marginParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
             "name": "products",
             "type": {
               "array": [
@@ -13809,7 +13881,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                2000
+                700
               ]
             }
           }
@@ -15811,6 +15883,14 @@ export const IDL: Zeta = {
           },
           {
             "name": "perpImpactCashDelta",
+            "type": "u64"
+          },
+          {
+            "name": "marginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "marginMaintenance",
             "type": "u64"
           }
         ]
