@@ -6798,7 +6798,9 @@
         },
         {
           "name": "asset",
-          "type": "u8",
+          "type": {
+            "defined": "Asset"
+          },
           "index": false
         },
         {

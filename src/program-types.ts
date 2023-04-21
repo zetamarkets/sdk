@@ -317,7 +317,7 @@ export interface TradeEventV2 {
   isBid: boolean;
   clientOrderId: anchor.BN;
   orderId: anchor.BN;
-  asset: number;
+  asset: Object;
   user: PublicKey;
   isTaker: boolean;
   sequenceNumber: anchor.BN; // Unique id for the given market

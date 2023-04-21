@@ -6798,7 +6798,9 @@ export type Zeta = {
         },
         {
           "name": "asset",
-          "type": "u8",
+          "type": {
+            "defined": "Asset"
+          },
           "index": false
         },
         {
@@ -14471,7 +14473,9 @@ export const IDL: Zeta = {
         },
         {
           "name": "asset",
-          "type": "u8",
+          "type": {
+            "defined": "Asset"
+          },
           "index": false
         },
         {
