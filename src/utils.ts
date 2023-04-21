@@ -1282,7 +1282,7 @@ export async function crankMarket(
       remainingAccounts
     )
   );
-  await processTransaction(Exchange.provider, tx);
+  return processTransaction(Exchange.provider, tx);
 }
 
 /*
