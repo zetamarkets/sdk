@@ -2075,6 +2075,79 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializeOpenOrdersCrossMargin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersMap",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeOpenOrders",
       "accounts": [
         {
@@ -3524,6 +3597,12 @@ export type Zeta = {
       ],
       "args": [
         {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
           "name": "price",
           "type": "u64"
         },
@@ -3535,12 +3614,6 @@ export type Zeta = {
           "name": "side",
           "type": {
             "defined": "Side"
-          }
-        },
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
           }
         },
         {
@@ -3566,6 +3639,84 @@ export type Zeta = {
           "type": {
             "option": "u16"
           }
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderCross",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "crossMarginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
         }
       ]
     },
@@ -5968,7 +6119,18 @@ export type Zeta = {
                 {
                   "defined": "CrossMarginProductLedger"
                 },
-                100
+                5
+              ]
+            }
+          },
+          {
+            "name": "crossMarginProductLedgersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginProductLedger"
+                },
+                20
               ]
             }
           },
@@ -5977,7 +6139,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                3399
+                4000
               ]
             }
           }
@@ -10742,6 +10904,79 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializeOpenOrdersCrossMargin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersMap",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeOpenOrders",
       "accounts": [
         {
@@ -12191,6 +12426,12 @@ export const IDL: Zeta = {
       ],
       "args": [
         {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
           "name": "price",
           "type": "u64"
         },
@@ -12202,12 +12443,6 @@ export const IDL: Zeta = {
           "name": "side",
           "type": {
             "defined": "Side"
-          }
-        },
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
           }
         },
         {
@@ -12233,6 +12468,84 @@ export const IDL: Zeta = {
           "type": {
             "option": "u16"
           }
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderCross",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "crossMarginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
         }
       ]
     },
@@ -14635,7 +14948,18 @@ export const IDL: Zeta = {
                 {
                   "defined": "CrossMarginProductLedger"
                 },
-                100
+                5
+              ]
+            }
+          },
+          {
+            "name": "crossMarginProductLedgersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginProductLedger"
+                },
+                20
               ]
             }
           },
@@ -14644,7 +14968,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                3399
+                4000
               ]
             }
           }

@@ -314,6 +314,48 @@ export function initializeOpenOrdersIx(
   ];
 }
 
+export function initializeOpenOrdersCrossMarginIx(
+  asset: Asset,
+  market: PublicKey,
+  userKey: PublicKey,
+  authority: PublicKey,
+  crossMarginAccount: PublicKey
+): [TransactionInstruction, PublicKey] {
+  const [openOrdersPda, _openOrdersNonce] = utils.getOpenOrders(
+    Exchange.programId,
+    market,
+    userKey
+  );
+
+  const [openOrdersMap, _openOrdersMapNonce] = utils.getOpenOrdersMap(
+    Exchange.programId,
+    openOrdersPda
+  );
+
+  return [
+    Exchange.program.instruction.initializeOpenOrdersCrossMargin(
+      toProgramAsset(asset),
+      {
+        accounts: {
+          state: Exchange.stateAddress,
+          zetaGroup: Exchange.getZetaGroupAddress(asset),
+          dexProgram: constants.DEX_PID[Exchange.network],
+          systemProgram: SystemProgram.programId,
+          openOrders: openOrdersPda,
+          crossMarginAccount: crossMarginAccount,
+          authority: authority,
+          payer: authority,
+          market: market,
+          rent: SYSVAR_RENT_PUBKEY,
+          serumAuthority: Exchange.serumAuthority,
+          openOrdersMap,
+        },
+      }
+    ),
+    openOrdersPda,
+  ];
+}
+
 export function closeOpenOrdersIx(
   asset: Asset,
   market: PublicKey,
@@ -665,6 +707,123 @@ export function placePerpOrderV2Ix(
         perpSyncQueue: subExchange.zetaGroup.perpSyncQueue,
       },
       remainingAccounts,
+    }
+  );
+}
+
+export function placeOrderCrossMarginIx(
+  asset: Asset,
+  price: number,
+  size: number,
+  side: types.Side,
+  orderType: types.OrderType,
+  clientOrderId: number,
+  tag: String,
+  tifOffset: number,
+  crossMarginAccount: PublicKey,
+  authority: PublicKey,
+  openOrders: PublicKey,
+  userVaultTokenAccount: PublicKey,
+  whitelistTradingFeesAccount: PublicKey | undefined
+): TransactionInstruction {
+  if (tag.length > constants.MAX_ORDER_TAG_LENGTH) {
+    throw Error(
+      `Tag is too long! Max length = ${constants.MAX_ORDER_TAG_LENGTH}`
+    );
+  }
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = Exchange.getMarket(asset, constants.PERP_INDEX);
+  let remainingAccounts =
+    whitelistTradingFeesAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistTradingFeesAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+  return Exchange.program.instruction.placeOrderCrossMargin(
+    toProgramAsset(asset),
+    new anchor.BN(price),
+    new anchor.BN(size),
+    types.toProgramSide(side),
+    types.toProgramOrderType(orderType),
+    clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
+    new String(tag),
+    tifOffset == 0 ? null : tifOffset,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        markPrices: Exchange.markPricesAddress,
+        crossMarginAccount: crossMarginAccount,
+        authority: authority,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        tokenProgram: TOKEN_PROGRAM_ID,
+        serumAuthority: Exchange.serumAuthority,
+        openOrders: openOrders,
+        rent: SYSVAR_RENT_PUBKEY,
+        marketAccounts: {
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
+          // User params.
+          orderPayerTokenAccount:
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
+          coinWallet: marketData.baseVault,
+          pcWallet: marketData.quoteVault,
+        },
+        oracle: subExchange.zetaGroup.oracle,
+        oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
+        oracleBackupProgram: constants.CHAINLINK_PID,
+        marketMint:
+          side == types.Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
+        mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: subExchange.zetaGroup.perpSyncQueue,
+        userVaultTokenAccount: userVaultTokenAccount,
+        treasuryWallet: Exchange.treasuryWalletAddress,
+      },
+      remainingAccounts,
+    }
+  );
+}
+
+export function cancelOrderCrossMarginIx(
+  asset: Asset,
+  userKey: PublicKey,
+  crossMarginAccount: PublicKey,
+  openOrders: PublicKey,
+  orderId: anchor.BN,
+  side: types.Side
+): TransactionInstruction {
+  let marketData = Exchange.getMarket(asset, constants.PERP_INDEX);
+  return Exchange.program.instruction.cancelOrderCross(
+    toProgramAsset(asset),
+    types.toProgramSide(side),
+    orderId,
+    {
+      accounts: {
+        authority: userKey,
+        cancelAccounts: {
+          state: Exchange.stateAddress,
+          crossMarginAccount,
+          dexProgram: constants.DEX_PID[Exchange.network],
+          serumAuthority: Exchange.serumAuthority,
+          openOrders,
+          market: marketData.address,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+        },
+      },
     }
   );
 }

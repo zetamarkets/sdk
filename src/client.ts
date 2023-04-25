@@ -79,6 +79,15 @@ export class Client {
   }
 
   /**
+   * User open order addresses.
+   * If a user hasn't initialized it, it is set to PublicKey.default
+   */
+  public get crossMarginOpenOrdersAccounts(): Map<Asset, PublicKey> {
+    return this._crossMarginOpenOrdersAccounts;
+  }
+  private _crossMarginOpenOrdersAccounts: Map<Asset, PublicKey>;
+
+  /**
    * Client usdc account address.
    */
   public get usdcAccountAddress(): PublicKey {
@@ -222,6 +231,7 @@ export class Client {
     this._referrerAccount = null;
     this._referrerAlias = null;
     this._crossMarginAccount = null;
+    this._crossMarginOpenOrdersAccounts = new Map();
   }
   private _subClients: Map<Asset, SubClient>;
 
@@ -284,8 +294,7 @@ export class Client {
           });
         }
 
-        // TODO once placeorder etc works
-        // client.updateOpenOrdersAddresses();
+        client.updateOpenOrdersAddresses();
       },
       connection.commitment
     );
@@ -364,6 +373,7 @@ export class Client {
         subClient.marginAccountAddress.toString(),
         asset
       );
+      client._crossMarginOpenOrdersAccounts.set(asset, PublicKey.default);
     });
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
@@ -536,6 +546,79 @@ export class Client {
       index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(market);
     }
     return index;
+  }
+
+  public async placeOrderCrossMargin(
+    asset: Asset,
+    price: number,
+    size: number,
+    side: types.Side,
+    options: types.OrderOptions = types.defaultOrderOptions()
+  ): Promise<TransactionSignature> {
+    let marketPubkey = Exchange.getPerpMarket(asset).address;
+
+    let tx = new Transaction();
+
+    let openOrdersPda = null;
+    if (
+      this._crossMarginOpenOrdersAccounts.get(asset).equals(PublicKey.default)
+    ) {
+      console.log(
+        `[${assets.assetToName(
+          asset
+        )}] User doesn't have open orders account. Initialising...`
+      );
+
+      let [initIx, _openOrdersPda] =
+        instructions.initializeOpenOrdersCrossMarginIx(
+          asset,
+          marketPubkey,
+          this.publicKey,
+          this.provider.wallet.publicKey,
+          this.crossMarginAccountAddress
+        );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._crossMarginOpenOrdersAccounts.get(asset);
+    }
+
+    let tifOffsetToUse = utils.getTIFOffset(
+      Exchange.getZetaGroupMarkets(asset).getMarket(marketPubkey),
+      options.tifOptions
+    );
+
+    let orderIx = instructions.placeOrderCrossMarginIx(
+      asset,
+      price,
+      size,
+      side,
+      options.orderType != undefined
+        ? options.orderType
+        : types.OrderType.LIMIT,
+      options.clientOrderId != undefined ? options.clientOrderId : 0,
+      options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+      tifOffsetToUse,
+      this.crossMarginAccountAddress,
+      this.provider.wallet.publicKey,
+      openOrdersPda,
+      this._userTokenAccountAddress,
+      this.whitelistTradingFeesAddress
+    );
+
+    tx.add(orderIx);
+
+    let txId: TransactionSignature = await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this.useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      options.blockhash
+    );
+    this._crossMarginOpenOrdersAccounts.set(asset, openOrdersPda);
+    return txId;
   }
 
   public async placeOrder(
@@ -1011,6 +1094,37 @@ export class Client {
     return await utils.processTransaction(this.provider, tx);
   }
 
+  /**
+   * Cancels a user order by orderId
+   * @param market     the market address of the order to be cancelled.
+   * @param orderId    the order id of the order.
+   * @param side       the side of the order. bid / ask.
+   */
+  public async cancelOrderCrossMargin(
+    asset: Asset,
+    orderId: anchor.BN,
+    side: types.Side
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let ix = instructions.cancelOrderCrossMarginIx(
+      asset,
+      this.provider.wallet.publicKey,
+      this._crossMarginAccountAddress,
+      this._crossMarginOpenOrdersAccounts[assets.assetToIndex(asset)],
+      orderId,
+      side
+    );
+    tx.add(ix);
+    return await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
   public async cancelOrder(
     asset: Asset,
     market: types.MarketIdentifier,
@@ -1432,6 +1546,27 @@ export class Client {
 
   public getProductLedger(asset: Asset, marketIndex: number): ProductLedger {
     return this.getSubClient(asset).getProductLedger(marketIndex);
+  }
+
+  private updateOpenOrdersAddresses() {
+    Exchange.markPrices.products.map((product, index) => {
+      let asset_index = assets.indexToAsset(index);
+      if (
+        // If the nonce is not zero, we know there is an open orders account.
+        this._crossMarginAccount.openOrdersNonce[index] !== 0 &&
+        // If this is equal to default, it means we haven't added the PDA yet.
+        this._crossMarginOpenOrdersAccounts
+          .get(asset_index)
+          .equals(PublicKey.default)
+      ) {
+        let [openOrdersPda, _openOrdersNonce] = utils.getOpenOrders(
+          Exchange.programId,
+          product.market,
+          this.publicKey
+        );
+        this._crossMarginOpenOrdersAccounts.set(asset_index, openOrdersPda);
+      }
+    });
   }
 
   public async close() {
