@@ -814,10 +814,10 @@ export function cancelOrderCrossMarginIx(
         authority: userKey,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          crossMarginAccount,
+          crossMarginAccount: crossMarginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
-          openOrders,
+          openOrders: openOrders,
           market: marketData.address,
           bids: marketData.serumMarket.bidsAddress,
           asks: marketData.serumMarket.asksAddress,

@@ -120,12 +120,20 @@ export class Client {
   private _userTokenAccountAddress: PublicKey;
 
   /**
-   * Returns a list of user current margin account positions.
+   * Returns a list of user current cross-margin account positions.
    */
   public get crossMarginPositions(): types.Position[] {
     return this._crossMarginPositions;
   }
   private _crossMarginPositions: types.Position[];
+
+  /**
+   * Returns a list of the user's current cross-margin account orders.
+   */
+  public get crossMarginOrders(): types.Order[] {
+    return this._crossMarginOrders;
+  }
+  private _crossMarginOrders: types.Order[];
 
   /**
    * The subscription id for the cross-margin account subscription.
@@ -903,6 +911,42 @@ export class Client {
       }
     }
     this._crossMarginPositions = positions;
+
+    let allAssetOrders = [];
+    await Promise.all(
+      Exchange.assets.map(async (asset, _i) => {
+        let orders = [];
+        let market = Exchange.getPerpMarket(asset);
+        await market.updateOrderbook();
+        orders.push(
+          market.getOrdersForAccount(
+            this._crossMarginOpenOrdersAccounts.get(asset)
+          )
+        );
+
+        let allOrders = [].concat(...orders);
+        allAssetOrders = allAssetOrders.concat(
+          allOrders.filter(function (order: types.Order) {
+            let seqNum = utils.getSeqNumFromSerumOrderKey(
+              order.orderId,
+              order.side == types.Side.BID
+            );
+            let serumMarket = Exchange.getMarket(
+              asset,
+              order.marketIndex
+            ).serumMarket;
+
+            return !utils.isOrderExpired(
+              order.tifOffset,
+              seqNum,
+              serumMarket.epochStartTs.toNumber(),
+              serumMarket.startEpochSeqNum
+            );
+          })
+        );
+      })
+    );
+    this._crossMarginOrders = allAssetOrders;
   }
 
   public async cancelAllOrders(
@@ -1110,7 +1154,7 @@ export class Client {
       asset,
       this.provider.wallet.publicKey,
       this._crossMarginAccountAddress,
-      this._crossMarginOpenOrdersAccounts[assets.assetToIndex(asset)],
+      this._crossMarginOpenOrdersAccounts.get(asset),
       orderId,
       side
     );
@@ -1396,6 +1440,10 @@ export class Client {
   }
   public getOrders(asset: Asset) {
     return this.getSubClient(asset).orders;
+  }
+
+  public getCrossMarginOrders() {
+    // return this.getSubClient(asset).orders;
   }
 
   public getOpeningOrders(
