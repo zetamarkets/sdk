@@ -7,7 +7,7 @@ import {
   PositionMovementEvent,
   ReferralAccount,
   ReferrerAccount,
-  TradeEventV2,
+  TradeEventV3,
   OrderCompleteEvent,
   ProductLedger,
 } from "./program-types";
@@ -100,9 +100,9 @@ export class Client {
   private _whitelistTradingFeesAddress: PublicKey | undefined;
 
   /**
-   * The listener for trade v2 events.
+   * The listener for trade v3 events.
    */
-  private _tradeEventV2Listener: any;
+  private _tradeEventV3Listener: any;
 
   /**
    * The listener for OrderComplete events.
@@ -253,15 +253,15 @@ export class Client {
     client._referrerAlias = undefined;
 
     if (callback !== undefined) {
-      client._tradeEventV2Listener = Exchange.program.addEventListener(
-        "TradeEventV2",
-        (event: TradeEventV2, _slot) => {
+      client._tradeEventV3Listener = Exchange.program.addEventListener(
+        "TradeEventV3",
+        (event: TradeEventV3, _slot) => {
           if (
             client._marginAccountToAsset.has(event.marginAccount.toString())
           ) {
             callback(
               client._marginAccountToAsset.get(event.marginAccount.toString()),
-              EventType.TRADEV2,
+              EventType.TRADEV3,
               event
             );
           }
@@ -1223,9 +1223,9 @@ export class Client {
       this._pollIntervalId = undefined;
     }
 
-    if (this._tradeEventV2Listener !== undefined) {
-      await Exchange.program.removeEventListener(this._tradeEventV2Listener);
-      this._tradeEventV2Listener = undefined;
+    if (this._tradeEventV3Listener !== undefined) {
+      await Exchange.program.removeEventListener(this._tradeEventV3Listener);
+      this._tradeEventV3Listener = undefined;
     }
 
     if (this._orderCompleteEventListener !== undefined) {

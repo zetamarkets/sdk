@@ -317,6 +317,20 @@ export interface TradeEventV2 {
   isBid: boolean;
   clientOrderId: anchor.BN;
   orderId: anchor.BN;
+  asset: number;
+  user: PublicKey;
+  isTaker: boolean;
+  sequenceNumber: anchor.BN; // Unique id for the given market
+}
+
+export interface TradeEventV3 {
+  marginAccount: PublicKey;
+  index: number;
+  costOfTrades: anchor.BN;
+  size: anchor.BN;
+  isBid: boolean;
+  clientOrderId: anchor.BN;
+  orderId: anchor.BN;
   asset: Object;
   user: PublicKey;
   isTaker: boolean;

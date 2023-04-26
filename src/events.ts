@@ -29,6 +29,10 @@ export enum EventType {
    */
   TRADEV2,
   /**
+   * A trade v3 event for the user margin account.
+   */
+  TRADEV3,
+  /**
    * An OrderComplete event for the user margin account.
    * Happens when an order is either fully filled or cancelled
    */
@@ -63,6 +67,8 @@ export function eventTypeToString(event: EventType) {
       return "TRADE";
     case EventType.TRADEV2:
       return "TRADEV2";
+    case EventType.TRADEV3:
+      return "TRADEV3";
     case EventType.ORDERCOMPLETE:
       return "ORDERCOMPLETE";
     case EventType.ORDERBOOK:
