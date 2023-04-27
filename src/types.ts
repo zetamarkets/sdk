@@ -140,6 +140,7 @@ export function orderEquals(
     a.size === b.size &&
     a.side === b.side &&
     a.tifOffset === b.tifOffset &&
+    a.asset === b.asset &&
     orderIdMatch
   );
 }
