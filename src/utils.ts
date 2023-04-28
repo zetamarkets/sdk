@@ -35,7 +35,7 @@ import { Market } from "./market";
 import {
   MarginAccount,
   ReferrerAlias,
-  TradeEventV2,
+  TradeEventV3,
   OpenOrdersMap,
 } from "./program-types";
 import * as types from "./types";
@@ -549,7 +549,7 @@ export function convertDecimalToNativeInteger(
  * does not divide perfectly by tick size (0.0001) if your order traded
  * against orders at different prices.
  */
-export function getTradeEventPrice(event: TradeEventV2): number {
+export function getTradeEventPrice(event: TradeEventV3): number {
   let decimalCostOfTrades = convertNativeBNToDecimal(event.costOfTrades);
   let decimalSize = convertNativeLotSizeToDecimal(event.size.toNumber());
   return decimalCostOfTrades / decimalSize;
