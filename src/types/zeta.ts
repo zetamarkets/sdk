@@ -1053,6 +1053,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "toggleZetaGroupPerpsOnly",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cleanZetaMarkets",
       "accounts": [
         {
@@ -7960,6 +7981,68 @@ export type Zeta = {
       ]
     },
     {
+      "name": "TradeEventV3",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "index",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isBid",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "sequenceNumber",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "PositionMovementEvent",
       "fields": [
         {
@@ -8050,6 +8133,23 @@ export type Zeta = {
         {
           "name": "underlyingPrice",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "liquidatee",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
           "index": false
         }
       ]
@@ -9882,6 +9982,27 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "toggleZetaGroupPerpsOnly",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cleanZetaMarkets",
       "accounts": [
         {
@@ -16789,6 +16910,68 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "TradeEventV3",
+      "fields": [
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "index",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "size",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "costOfTrades",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "isBid",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "isTaker",
+          "type": "bool",
+          "index": false
+        },
+        {
+          "name": "sequenceNumber",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "PositionMovementEvent",
       "fields": [
         {
@@ -16879,6 +17062,23 @@ export const IDL: Zeta = {
         {
           "name": "underlyingPrice",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "liquidatee",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
           "index": false
         }
       ]

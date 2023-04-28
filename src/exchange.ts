@@ -244,6 +244,13 @@ export class Exchange {
     this._ledgerWallet = wallet;
   }
 
+  // Handy map to grab zetagroup asset by pubkey without an RPC fetch
+  // or having to manually filter all zetaGroups
+  public zetaGroupPubkeyToAsset(key: PublicKey): Asset {
+    return this._zetaGroupPubkeyToAsset.get(key);
+  }
+  private _zetaGroupPubkeyToAsset: Map<PublicKey, Asset> = new Map();
+
   private _useLedger: boolean = false;
 
   private _programSubscriptionIds: number[] = [];
@@ -555,6 +562,10 @@ export class Exchange {
         );
       })
     );
+
+    for (var se of this.getAllSubExchanges()) {
+      this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
+    }
 
     this._isInitialized = true;
   }
@@ -875,12 +886,27 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroupExpiryParameters(args);
   }
 
+  public async toggleZetaGroupPerpsOnly(asset: Asset) {
+    await this.getSubExchange(asset).toggleZetaGroupPerpsOnly();
+  }
+
+  public async updateSerumMarkets(asset: Asset) {
+    await this.getSubExchange(asset).updateSerumMarkets();
+  }
+
   public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
 
-  public async initializeZetaMarkets(asset: Asset, perpsOnly: boolean = false) {
-    await this.getSubExchange(asset).initializeZetaMarkets(perpsOnly);
+  public async initializeZetaMarkets(
+    asset: Asset,
+    perpsOnly: boolean = false,
+    datedOnly: boolean = false
+  ) {
+    await this.getSubExchange(asset).initializeZetaMarkets(
+      perpsOnly,
+      datedOnly
+    );
   }
 
   public async initializeZetaMarketsTIFEpochCycle(
@@ -909,7 +935,7 @@ export class Exchange {
     await utils.processTransaction(this.provider, tx);
   }
 
-  public async updatePricing(asset: Asset, expiryIndex: number) {
+  public async updatePricing(asset: Asset, expiryIndex: number = undefined) {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
   }
 
@@ -1011,7 +1037,10 @@ export class Exchange {
     await this.getSubExchange(asset).cleanZetaMarketsHalted();
   }
 
-  public async updatePricingHalted(asset: Asset, expiryIndex: number) {
+  public async updatePricingHalted(
+    asset: Asset,
+    expiryIndex: number = undefined
+  ) {
     await this.getSubExchange(asset).updatePricingHalted(expiryIndex);
   }
 
