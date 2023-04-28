@@ -340,6 +340,9 @@ export interface LiquidationEvent {
   remainingLiquidatorBalance: anchor.BN;
   markPrice: anchor.BN;
   underlyingPrice: anchor.BN;
+  liquidatee: PublicKey;
+  liquidator: PublicKey;
+  asset: Object;
 }
 
 export interface OrderCompleteEvent {
