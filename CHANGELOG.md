@@ -5,9 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-# [0.26.8] 2023-04-27
+# [0.26.9] 2023-04-28
 
 - events: Add new TradeEventV3. ([#225](https://github.com/zetamarkets/sdk/pull/225))
+
+# [0.26.8] 2023-04-28
+
+- events: Add authority pubkeys and asset to LiquidationEvent. ([#226](https://github.com/zetamarkets/sdk/pull/226))
 
 # [0.26.7] 2023-04-18
 

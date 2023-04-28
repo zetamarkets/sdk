@@ -6972,6 +6972,23 @@ export type Zeta = {
           "name": "underlyingPrice",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "liquidatee",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
         }
       ]
     },
@@ -14706,6 +14723,23 @@ export const IDL: Zeta = {
         {
           "name": "underlyingPrice",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "liquidatee",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
           "index": false
         }
       ]
