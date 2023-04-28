@@ -831,12 +831,27 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroupExpiryParameters(args);
   }
 
+  public async toggleZetaGroupPerpsOnly(asset: Asset) {
+    await this.getSubExchange(asset).toggleZetaGroupPerpsOnly();
+  }
+
+  public async updateSerumMarkets(asset: Asset) {
+    await this.getSubExchange(asset).updateSerumMarkets();
+  }
+
   public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {
     await this.getSubExchange(asset).updateVolatilityNodes(nodes);
   }
 
-  public async initializeZetaMarkets(asset: Asset, perpsOnly: boolean = false) {
-    await this.getSubExchange(asset).initializeZetaMarkets(perpsOnly);
+  public async initializeZetaMarkets(
+    asset: Asset,
+    perpsOnly: boolean = false,
+    datedOnly: boolean = false
+  ) {
+    await this.getSubExchange(asset).initializeZetaMarkets(
+      perpsOnly,
+      datedOnly
+    );
   }
 
   public async initializeZetaMarketsTIFEpochCycle(
@@ -860,7 +875,7 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
-  public async updatePricing(asset: Asset, expiryIndex: number) {
+  public async updatePricing(asset: Asset, expiryIndex: number = undefined) {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
   }
 
@@ -943,7 +958,10 @@ export class Exchange {
     await this.getSubExchange(asset).cleanZetaMarketsHalted();
   }
 
-  public async updatePricingHalted(asset: Asset, expiryIndex: number) {
+  public async updatePricingHalted(
+    asset: Asset,
+    expiryIndex: number = undefined
+  ) {
     await this.getSubExchange(asset).updatePricingHalted(expiryIndex);
   }
 

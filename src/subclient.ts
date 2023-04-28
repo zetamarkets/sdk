@@ -1372,6 +1372,10 @@ export class SubClient {
     return txId;
   }
 
+  public updateSubExchange() {
+    this._subExchange = Exchange.getSubExchange(this._asset);
+  }
+
   /**
    * Closes multiple user open orders account for a given set of markets.
    * Cannot pass in multiple of the same market address

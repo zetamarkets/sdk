@@ -1187,7 +1187,7 @@ export async function settleUsers(
 
 /*
  * Allows you to pass in a map that may have cached values for openOrdersAccounts
- * returns false in case where event queue is empty, true if events were cranked
+ * returns true in case where event queue is empty, false if events were cranked
  */
 export async function crankMarket(
   asset: Asset,

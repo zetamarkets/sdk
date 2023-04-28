@@ -941,6 +941,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "toggleZetaGroupPerpsOnly",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cleanZetaMarkets",
       "accounts": [
         {
@@ -8691,6 +8712,27 @@ export const IDL: Zeta = {
           }
         }
       ]
+    },
+    {
+      "name": "toggleZetaGroupPerpsOnly",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     },
     {
       "name": "cleanZetaMarkets",

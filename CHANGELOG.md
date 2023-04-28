@@ -5,68 +5,72 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-# [0.26.9] 2023-04-28
+## [0.27.0] 2023-04-28
+
+- general: Allow toggling zetaGroup perpsOnly on/off. ([#211](https://github.com/zetamarkets/sdk/pull/211/))
+
+## [0.26.9] 2023-04-28
 
 - events: Add new TradeEventV3. ([#225](https://github.com/zetamarkets/sdk/pull/225))
 
-# [0.26.8] 2023-04-28
+## [0.26.8] 2023-04-28
 
 - events: Add authority pubkeys and asset to LiquidationEvent. ([#226](https://github.com/zetamarkets/sdk/pull/226))
 
-# [0.26.7] 2023-04-18
+## [0.26.7] 2023-04-18
 
 - market: Add asset to order object. ([#224](https://github.com/zetamarkets/sdk/pull/224))
 
-# [0.26.6] 2023-04-17
+## [0.26.6] 2023-04-17
 
 - risk: Allow custom executionPrice and account for fees in calculateUnrealizedPnl ([#218](https://github.com/zetamarkets/sdk/pull/218))
 
-# [0.26.5] 2023-04-17
+## [0.26.5] 2023-04-17
 
 - client: Add asset to positions object. ([#223](https://github.com/zetamarkets/sdk/pull/223))
 
-# [0.26.4] 2023-04-12
+## [0.26.4] 2023-04-12
 
 - constants: Add ZETAGROUP_PUBKEY_ASSET_MAP. ([#220](https://github.com/zetamarkets/sdk/pull/220))
 
-# [0.26.3] 2023-04-11
+## [0.26.3] 2023-04-11
 
 - exchange: Add handy function Exchange.zetaGroupPubkeyToAsset(). ([#219](https://github.com/zetamarkets/sdk/pull/219))
 
-# [0.26.2] 2023-03-31
+## [0.26.2] 2023-03-31
 
 - client: Fix cancelAllPerpMarketOrders. ([#217](https://github.com/zetamarkets/sdk/pull/216))
 
-# [0.26.1] 2023-03-29
+## [0.26.1] 2023-03-29
 
 - markets: Return the slot when an orderbook update occurs. ([#216](https://github.com/zetamarkets/sdk/pull/216))
 
-# [0.26.0] 2023-03-28
+## [0.26.0] 2023-03-28
 
 - client: Update mass cancel logic to account for LUTs across all functions. ([#215](https://github.com/zetamarkets/sdk/pull/215))
 
-# [0.25.4] 2023-03-24
+## [0.25.4] 2023-03-24
 
 - constants: Update the zeta LUT to include ARB accounts. ([#214](https://github.com/zetamarkets/sdk/pull/214))
 
-# [0.25.3] 2023-03-24
+## [0.25.3] 2023-03-24
 
 - client: Bugfix MarginAccount and SpreadAccount can be null. ([#213](https://github.com/zetamarkets/sdk/pull/213))
 
-# [0.25.2] 2023-03-24
+## [0.25.2] 2023-03-24
 
 - oracle: Bugfix Arbitrum oracle constant. ([#212](https://github.com/zetamarkets/sdk/pull/212))
 
-# [0.25.1] 2023-03-22
+## [0.25.1] 2023-03-22
 
 - general: Add Arbitrum ([#210](https://github.com/zetamarkets/sdk/pull/210))
 
-# [0.24.1] 2023-03-20
+## [0.24.1] 2023-03-20
 
 - types: fix maxPerpDeltaSeconds to number.
 - client: Add user callback type. ([#209](https://github.com/zetamarkets/sdk/pull/209))
 
-# [0.24.0] 2023-03-17
+## [0.24.0] 2023-03-17
 
 - program: Add order expiry ts to PlaceOrderEvent. ([#204](https://github.com/zetamarkets/sdk/pull/204))
 - program: Add max perp delta age to State. ([#207](https://github.com/zetamarkets/sdk/pull/207))

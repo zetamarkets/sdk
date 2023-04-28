@@ -1335,7 +1335,7 @@ export function retreatMarketNodesIx(
 
 export function updatePricingIx(
   asset: Asset,
-  expiryIndex: number
+  expiryIndex: number | undefined
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
   let marketData = Exchange.getPerpMarket(asset);
@@ -1410,12 +1410,25 @@ export function updatePerpParametersIx(
   });
 }
 
-export function updateZetaGroupExpiryParameters(
+export function updateZetaGroupExpiryParametersIx(
   asset: Asset,
   args: UpdateZetaGroupExpiryArgs,
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateZetaGroupExpiryParameters(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      admin,
+    },
+  });
+}
+
+export function toggleZetaGroupPerpsOnlyIx(
+  asset: Asset,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.toggleZetaGroupPerpsOnly({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
@@ -1869,7 +1882,7 @@ export function cleanZetaMarketsHaltedIx(
 
 export function updatePricingHaltedIx(
   asset: Asset,
-  expiryIndex: number,
+  expiryIndex: number | undefined,
   admin: PublicKey
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
