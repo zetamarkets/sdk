@@ -1614,7 +1614,9 @@ export class SubClient {
     // Compute is fine.
     let txs = utils.splitIxsIntoTx(
       this.cancelAllOrdersIxs(),
-      constants.MAX_CANCELS_PER_TX
+      this._parent.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
     );
     let txIds: string[] = [];
     await Promise.all(
@@ -1643,7 +1645,9 @@ export class SubClient {
     // Compute is fine.
     let txs = utils.splitIxsIntoTx(
       this.cancelAllOrdersNoErrorIxs(),
-      constants.MAX_CANCELS_PER_TX
+      this._parent.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
     );
     let txIds: string[] = [];
     await Promise.all(
@@ -1857,6 +1861,7 @@ export class SubClient {
           costOfTrades: utils.convertNativeBNToDecimal(
             this._marginAccount.productLedgers[i].position.costOfTrades
           ),
+          asset: this._asset,
         });
       }
     }
@@ -1872,6 +1877,7 @@ export class SubClient {
         costOfTrades: utils.convertNativeBNToDecimal(
           this._marginAccount.perpProductLedger.position.costOfTrades
         ),
+        asset: this._asset,
       });
     }
     this._marginPositions = positions;
@@ -1890,6 +1896,7 @@ export class SubClient {
           costOfTrades: utils.convertNativeBNToDecimal(
             this._spreadAccount.positions[i].costOfTrades
           ),
+          asset: this._asset,
         });
       }
     }

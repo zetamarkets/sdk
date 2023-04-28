@@ -35,7 +35,7 @@ import { Market } from "./market";
 import {
   MarginAccount,
   ReferrerAlias,
-  TradeEventV2,
+  TradeEventV3,
   OpenOrdersMap,
 } from "./program-types";
 import * as types from "./types";
@@ -549,7 +549,7 @@ export function convertDecimalToNativeInteger(
  * does not divide perfectly by tick size (0.0001) if your order traded
  * against orders at different prices.
  */
-export function getTradeEventPrice(event: TradeEventV2): number {
+export function getTradeEventPrice(event: TradeEventV3): number {
   let decimalCostOfTrades = convertNativeBNToDecimal(event.costOfTrades);
   let decimalSize = convertNativeLotSizeToDecimal(event.size.toNumber());
   return decimalCostOfTrades / decimalSize;
@@ -1187,17 +1187,18 @@ export async function settleUsers(
 
 /*
  * Allows you to pass in a map that may have cached values for openOrdersAccounts
+ * returns true in case where event queue is empty, false if events were cranked
  */
 export async function crankMarket(
   asset: Asset,
   marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>,
   crankLimit?: number
-) {
+): Promise<boolean> {
   let market = Exchange.getMarket(asset, marketIndex);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
-    return;
+    return true;
   }
   const openOrdersSet = new Set();
   // We pass in a couple of extra accounts for perps so the limit is lower
@@ -1282,7 +1283,8 @@ export async function crankMarket(
       remainingAccounts
     )
   );
-  return processTransaction(Exchange.provider, tx);
+  await processTransaction(Exchange.provider, tx);
+  return false;
 }
 
 /*

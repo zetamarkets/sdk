@@ -623,13 +623,15 @@ export class Market {
     }
   }
 
-  public async updateOrderbook(loadSerum: boolean = true) {
+  public async updateOrderbook(loadSerum: boolean = true): Promise<number> {
     // if not loadSerum, we assume that this._bids and this._asks was set elsewhere manually beforehand
+    let updateSlot = 0;
     if (loadSerum) {
-      [this._bids, this._asks] = await Promise.all([
-        this._serumMarket.loadBids(Exchange.provider.connection),
-        this._serumMarket.loadAsks(Exchange.provider.connection),
-      ]);
+      let loadedOrderbooks = await this._serumMarket.loadBidsAndAsks(
+        Exchange.provider.connection
+      );
+      [this._bids, this._asks] = [loadedOrderbooks.bids, loadedOrderbooks.asks];
+      updateSlot = loadedOrderbooks.slot;
     }
 
     [this._bids, this._asks].map((orderbookSide) => {
@@ -669,6 +671,7 @@ export class Market {
         }
       );
     });
+    return updateSlot;
   }
 
   public getTopLevel(): types.TopLevel {
@@ -693,6 +696,7 @@ export class Market {
       owner: order.openOrdersAddress,
       clientOrderId: order.clientId,
       tifOffset: order.tifOffset,
+      asset: market.asset,
     };
   }
 

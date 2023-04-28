@@ -7,7 +7,7 @@ import {
   PositionMovementEvent,
   ReferralAccount,
   ReferrerAccount,
-  TradeEventV2,
+  TradeEventV3,
   OrderCompleteEvent,
   ProductLedger,
 } from "./program-types";
@@ -100,9 +100,9 @@ export class Client {
   private _whitelistTradingFeesAddress: PublicKey | undefined;
 
   /**
-   * The listener for trade v2 events.
+   * The listener for trade v3 events.
    */
-  private _tradeEventV2Listener: any;
+  private _tradeEventV3Listener: any;
 
   /**
    * The listener for OrderComplete events.
@@ -253,15 +253,15 @@ export class Client {
     client._referrerAlias = undefined;
 
     if (callback !== undefined) {
-      client._tradeEventV2Listener = Exchange.program.addEventListener(
-        "TradeEventV2",
-        (event: TradeEventV2, _slot) => {
+      client._tradeEventV3Listener = Exchange.program.addEventListener(
+        "TradeEventV3",
+        (event: TradeEventV3, _slot) => {
           if (
             client._marginAccountToAsset.has(event.marginAccount.toString())
           ) {
             callback(
               client._marginAccountToAsset.get(event.marginAccount.toString()),
-              EventType.TRADEV2,
+              EventType.TRADEV3,
               event
             );
           }
@@ -631,11 +631,36 @@ export class Client {
     if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrders();
     } else {
-      let txIds = [];
-      for (var subClient of this.getAllSubClients()) {
-        txIds.push(await subClient.cancelAllOrders());
-      }
-      return txIds.flat();
+      // Grab all cancel instructions across all assets
+      let ixs = [];
+
+      this.getAllSubClients().map((subclient) => {
+        ixs = ixs.concat(subclient.cancelAllOrdersIxs());
+      });
+
+      // Pack them into txs as efficiently as possible
+      let txs = utils.splitIxsIntoTx(
+        ixs,
+        this.useVersionedTxs
+          ? constants.MAX_CANCELS_PER_TX_LUT
+          : constants.MAX_CANCELS_PER_TX
+      );
+      let txIds: string[] = [];
+      await Promise.all(
+        txs.map(async (tx) => {
+          txIds.push(
+            await utils.processTransaction(
+              this.provider,
+              tx,
+              undefined,
+              undefined,
+              undefined,
+              this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            )
+          );
+        })
+      );
+      return txIds;
     }
   }
 
@@ -645,20 +670,48 @@ export class Client {
     if (asset != undefined) {
       return await this.getSubClient(asset).cancelAllOrdersNoError();
     } else {
-      let allTxIds = [];
+      // Grab all cancel instructions across all assets
+      let ixs = [];
+
+      this.getAllSubClients().map((subclient) => {
+        ixs = ixs.concat(subclient.cancelAllOrdersNoErrorIxs());
+      });
+
+      // Pack them into txs as efficiently as possible
+      let txs = utils.splitIxsIntoTx(
+        ixs,
+        this.useVersionedTxs
+          ? constants.MAX_CANCELS_PER_TX_LUT
+          : constants.MAX_CANCELS_PER_TX
+      );
+      let txIds: string[] = [];
       await Promise.all(
-        this.getAllSubClients().map(async (subClient) => {
-          let txIds = await subClient.cancelAllOrdersNoError();
-          allTxIds = allTxIds.concat(txIds);
+        txs.map(async (tx) => {
+          txIds.push(
+            await utils.processTransaction(
+              this.provider,
+              tx,
+              undefined,
+              undefined,
+              undefined,
+              this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            )
+          );
         })
       );
-      return allTxIds;
+      return txIds;
     }
   }
 
-  public getMarginAccountState(asset: Asset): types.MarginAccountState {
+  public getMarginAccountState(
+    asset: Asset,
+    pnlExecutionPrice: number = undefined,
+    pnlAddTakerFees: boolean = false
+  ): types.MarginAccountState {
     return Exchange.riskCalculator.getMarginAccountState(
-      this.getSubClient(asset).marginAccount
+      this.getSubClient(asset).marginAccount,
+      pnlExecutionPrice,
+      pnlAddTakerFees
     );
   }
 
@@ -697,6 +750,38 @@ export class Client {
       size,
       side,
       tag
+    );
+  }
+
+  public async cancelAllPerpMarketOrders(): Promise<TransactionSignature> {
+    let tx = new Transaction();
+
+    for (var asset of Exchange.assets) {
+      let sc = this.getSubClient(asset);
+      if (
+        sc.marginAccount == null ||
+        sc.openOrdersAccounts[constants.PERP_INDEX].equals(PublicKey.default)
+      ) {
+        continue;
+      }
+
+      tx.add(
+        instructions.cancelAllMarketOrdersIx(
+          asset,
+          constants.PERP_INDEX,
+          this.provider.wallet.publicKey,
+          this.getSubClient(asset).marginAccountAddress,
+          this.getSubClient(asset).openOrdersAccounts[constants.PERP_INDEX]
+        )
+      );
+    }
+    return await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this.useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
   }
 
@@ -847,7 +932,12 @@ export class Client {
       );
       ixs.push(ix);
     }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      this.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
@@ -878,7 +968,12 @@ export class Client {
       );
       ixs.push(ix);
     }
-    let txs = utils.splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      this.useVersionedTxs
+        ? constants.MAX_CANCELS_PER_TX_LUT
+        : constants.MAX_CANCELS_PER_TX
+    );
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
@@ -1019,7 +1114,7 @@ export class Client {
     return this.getSubClient(asset).getSpreadCostOfTrades(index, decimal);
   }
 
-  public getSpreadAccount(asset: Asset): SpreadAccount {
+  public getSpreadAccount(asset: Asset): SpreadAccount | null {
     return this.getSubClient(asset).spreadAccount;
   }
 
@@ -1027,7 +1122,7 @@ export class Client {
     return this.getSubClient(asset).spreadAccountAddress;
   }
 
-  public getMarginAccount(asset: Asset): MarginAccount {
+  public getMarginAccount(asset: Asset): MarginAccount | null {
     return this.getSubClient(asset).marginAccount;
   }
 
@@ -1135,9 +1230,9 @@ export class Client {
       this._pollIntervalId = undefined;
     }
 
-    if (this._tradeEventV2Listener !== undefined) {
-      await Exchange.program.removeEventListener(this._tradeEventV2Listener);
-      this._tradeEventV2Listener = undefined;
+    if (this._tradeEventV3Listener !== undefined) {
+      await Exchange.program.removeEventListener(this._tradeEventV3Listener);
+      this._tradeEventV3Listener = undefined;
     }
 
     if (this._orderCompleteEventListener !== undefined) {

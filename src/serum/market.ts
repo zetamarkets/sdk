@@ -8,10 +8,12 @@ import {
   Commitment,
   Connection,
   PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
 import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
 import { exchange as Exchange } from "../exchange";
+import { getClockData } from "../utils";
 
 export const MARKET_STATE_LAYOUT_V3 = struct([
   blob(5),
@@ -239,6 +241,22 @@ export class Market {
       await connection.getAccountInfo(this._decoded.asks)
     );
     return Orderbook.decode(this, data);
+  }
+
+  async loadBidsAndAsks(connection: Connection): Promise<any> {
+    let [clockInfo, bidsInfo, asksInfo] =
+      await connection.getMultipleAccountsInfo([
+        SYSVAR_CLOCK_PUBKEY,
+        this._decoded.bids,
+        this._decoded.asks,
+      ]);
+    let slot = getClockData(clockInfo).slot;
+
+    return {
+      slot: slot,
+      bids: Orderbook.decode(this, throwIfNull(bidsInfo).data),
+      asks: Orderbook.decode(this, throwIfNull(asksInfo).data),
+    };
   }
 
   async loadRequestQueue(connection: Connection) {
