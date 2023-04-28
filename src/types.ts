@@ -147,7 +147,6 @@ export function orderEquals(
 }
 
 export interface Position {
-  asset: Asset;
   marketIndex: number;
   market: PublicKey;
   size: number;
@@ -160,7 +159,8 @@ export function positionEquals(a: Position, b: Position): boolean {
     a.marketIndex === b.marketIndex &&
     a.market.equals(b.market) &&
     a.size === b.size &&
-    a.costOfTrades === b.costOfTrades
+    a.costOfTrades === b.costOfTrades &&
+    a.asset === b.asset
   );
 }
 

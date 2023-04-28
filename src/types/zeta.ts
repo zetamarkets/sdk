@@ -5716,12 +5716,36 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "rebalanceAmount",
-            "type": "i64"
-          },
-          {
             "name": "forceCancelFlag",
             "type": "bool"
+          },
+          {
+            "name": "accountType",
+            "type": {
+              "defined": "MarginAccountType"
+            }
+          },
+          {
+            "name": "openOrdersNonce",
+            "type": {
+              "array": [
+                "u8",
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncePadding",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "rebalanceAmount",
+            "type": "i64"
           },
           {
             "name": "lastFundingDeltas",
@@ -5746,37 +5770,13 @@ export type Zeta = {
             }
           },
           {
-            "name": "openOrdersNonce",
-            "type": {
-              "array": [
-                "u8",
-                5
-              ]
-            }
-          },
-          {
-            "name": "openOrdersNoncePadding",
-            "type": {
-              "array": [
-                "u8",
-                20
-              ]
-            }
-          },
-          {
-            "name": "accountType",
-            "type": {
-              "defined": "MarginAccountType"
-            }
-          },
-          {
             "name": "crossMarginProductLedgers",
             "type": {
               "array": [
                 {
                   "defined": "CrossMarginProductLedger"
                 },
-                100
+                150
               ]
             }
           },
@@ -5785,7 +5785,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                3399
+                3349
               ]
             }
           }
@@ -6516,15 +6516,6 @@ export type Zeta = {
             "name": "productLedger",
             "type": {
               "defined": "ProductLedger"
-            }
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                20
-              ]
             }
           }
         ]
@@ -14254,12 +14245,36 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "rebalanceAmount",
-            "type": "i64"
-          },
-          {
             "name": "forceCancelFlag",
             "type": "bool"
+          },
+          {
+            "name": "accountType",
+            "type": {
+              "defined": "MarginAccountType"
+            }
+          },
+          {
+            "name": "openOrdersNonce",
+            "type": {
+              "array": [
+                "u8",
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncePadding",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "rebalanceAmount",
+            "type": "i64"
           },
           {
             "name": "lastFundingDeltas",
@@ -14284,37 +14299,13 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "openOrdersNonce",
-            "type": {
-              "array": [
-                "u8",
-                5
-              ]
-            }
-          },
-          {
-            "name": "openOrdersNoncePadding",
-            "type": {
-              "array": [
-                "u8",
-                20
-              ]
-            }
-          },
-          {
-            "name": "accountType",
-            "type": {
-              "defined": "MarginAccountType"
-            }
-          },
-          {
             "name": "crossMarginProductLedgers",
             "type": {
               "array": [
                 {
                   "defined": "CrossMarginProductLedger"
                 },
-                100
+                150
               ]
             }
           },
@@ -14323,7 +14314,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                3399
+                3349
               ]
             }
           }
@@ -15054,15 +15045,6 @@ export const IDL: Zeta = {
             "name": "productLedger",
             "type": {
               "defined": "ProductLedger"
-            }
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                20
-              ]
             }
           }
         ]

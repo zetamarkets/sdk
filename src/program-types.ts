@@ -183,7 +183,6 @@ export interface OrderState {
 export interface CrossMarginProductLedger {
   asset: any;
   productLedger: ProductLedger;
-  padding: Array<number>;
 }
 
 export interface ProductLedger {
@@ -195,12 +194,14 @@ export interface CrossMarginAccount {
   authority: PublicKey;
   delegatedPubkey: PublicKey;
   nonce: number;
-  rebalanceAmount: anchor.BN;
+  userTokenAccountNonce: number;
   forceCancelFlag: boolean;
+  accountType: any;
+  openOrdersNonce: Array<number>;
+  openOrdersNoncePadding: Array<number>;
+  rebalanceAmount: anchor.BN;
   lastFundingDeltas: Array<AnchorDecimal>;
   lastFundingDeltasPadding: Array<AnchorDecimal>;
-  openOrdersNonce: Array<number>;
-  accountType: any;
   crossMarginProductLedgers: Array<CrossMarginProductLedger>;
   padding: Array<number>;
 }
