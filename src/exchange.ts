@@ -930,8 +930,8 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
-  public async updatePricingCross() {
-    let tx = new Transaction().add(instructions.updatePricingCrossIx());
+  public async updatePricingCross(asset: Asset) {
+    let tx = new Transaction().add(instructions.updatePricingCrossIx(asset));
     await utils.processTransaction(this.provider, tx);
   }
 

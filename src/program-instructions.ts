@@ -1603,62 +1603,27 @@ export function retreatMarketNodesIx(
   });
 }
 
-export function updatePricingCrossIx(): TransactionInstruction {
-  let remainingAccounts = [];
-
-  // TODO this way of passing assets feels super clunky, must be a better way to handle it
-  let assets = Array(25).fill(255);
-  let assetCount = 0;
-
-  // remaining_accounts contains the oracles + perp markets, grouped by asset
-  // Each asset requires:
-  // 1. (Pyth) oracle
-  // 2. (Chainlink) oracle_backup_feed + oracle_backup_program
-  // 3. perp_market + perp_bids + perp_asks
-  for (var asset of Exchange.assets) {
-    assets[assetCount++] = assetToIndex(asset);
-    let se = Exchange.getSubExchange(asset);
-    remainingAccounts = remainingAccounts.concat([
-      {
-        pubkey: se.zetaGroup.oracle,
-        isSigner: false,
-        isWritable: false,
+export function updatePricingCrossIx(asset: Asset): TransactionInstruction {
+  let asset_index = assetToIndex(asset);
+  return Exchange.program.instruction.updatePricingCross(
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        markPrices: Exchange.markPricesAddress,
+        oracle: Exchange.markPrices.oracles[asset_index],
+        oracleBackupFeed: Exchange.markPrices.oracleBackupFeeds[asset_index],
+        oracleBackupProgram: constants.CHAINLINK_PID,
+        perpMarket: Exchange.getPerpMarket(asset).address,
+        perpBids:
+          Exchange.getZetaGroupMarkets(asset).perpMarket.serumMarket
+            .bidsAddress,
+        perpAsks:
+          Exchange.getZetaGroupMarkets(asset).perpMarket.serumMarket
+            .asksAddress,
       },
-      {
-        pubkey: se.zetaGroup.oracleBackupFeed,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: constants.CHAINLINK_PID,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: Exchange.getPerpMarket(asset).address,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: se.markets.perpMarket.serumMarket.bidsAddress,
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: se.markets.perpMarket.serumMarket.asksAddress,
-        isSigner: false,
-        isWritable: false,
-      },
-    ]);
-  }
-
-  return Exchange.program.instruction.updatePricingCross(assets, {
-    accounts: {
-      state: Exchange.stateAddress,
-      markPrices: Exchange.markPricesAddress,
-    },
-    remainingAccounts,
-  });
+    }
+  );
 }
 
 export function updatePricingIx(
