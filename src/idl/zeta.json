@@ -6080,12 +6080,36 @@
             "type": "u8"
           },
           {
-            "name": "rebalanceAmount",
-            "type": "i64"
-          },
-          {
             "name": "forceCancelFlag",
             "type": "bool"
+          },
+          {
+            "name": "accountType",
+            "type": {
+              "defined": "MarginAccountType"
+            }
+          },
+          {
+            "name": "openOrdersNonce",
+            "type": {
+              "array": [
+                "u8",
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncePadding",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "rebalanceAmount",
+            "type": "i64"
           },
           {
             "name": "lastFundingDeltas",
@@ -6110,48 +6134,13 @@
             }
           },
           {
-            "name": "openOrdersNonce",
-            "type": {
-              "array": [
-                "u8",
-                5
-              ]
-            }
-          },
-          {
-            "name": "openOrdersNoncePadding",
-            "type": {
-              "array": [
-                "u8",
-                20
-              ]
-            }
-          },
-          {
-            "name": "accountType",
-            "type": {
-              "defined": "MarginAccountType"
-            }
-          },
-          {
             "name": "crossMarginProductLedgers",
             "type": {
               "array": [
                 {
                   "defined": "CrossMarginProductLedger"
                 },
-                5
-              ]
-            }
-          },
-          {
-            "name": "crossMarginProductLedgersPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "CrossMarginProductLedger"
-                },
-                20
+                150
               ]
             }
           },
@@ -6160,7 +6149,7 @@
             "type": {
               "array": [
                 "u8",
-                4000
+                3349
               ]
             }
           }
@@ -6891,15 +6880,6 @@
             "name": "productLedger",
             "type": {
               "defined": "ProductLedger"
-            }
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                20
-              ]
             }
           }
         ]

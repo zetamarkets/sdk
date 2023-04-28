@@ -1862,7 +1862,6 @@ export class SubClient {
           costOfTrades: utils.convertNativeBNToDecimal(
             this._marginAccount.productLedgers[i].position.costOfTrades
           ),
-          asset: this._asset,
         });
       }
     }
@@ -1879,7 +1878,6 @@ export class SubClient {
         costOfTrades: utils.convertNativeBNToDecimal(
           this._marginAccount.perpProductLedger.position.costOfTrades
         ),
-        asset: this._asset,
       });
     }
     this._marginPositions = positions;
@@ -1899,7 +1897,6 @@ export class SubClient {
           costOfTrades: utils.convertNativeBNToDecimal(
             this._spreadAccount.positions[i].costOfTrades
           ),
-          asset: this._asset,
         });
       }
     }
