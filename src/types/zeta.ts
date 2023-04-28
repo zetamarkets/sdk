@@ -1606,16 +1606,43 @@ export type Zeta = {
           "name": "markPrices",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
-          "name": "assets",
+          "name": "asset",
           "type": {
-            "array": [
-              "u8",
-              25
-            ]
+            "defined": "Asset"
           }
         }
       ]
@@ -10135,16 +10162,43 @@ export const IDL: Zeta = {
           "name": "markPrices",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
-          "name": "assets",
+          "name": "asset",
           "type": {
-            "array": [
-              "u8",
-              25
-            ]
+            "defined": "Asset"
           }
         }
       ]
