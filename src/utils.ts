@@ -35,7 +35,7 @@ import { Market } from "./market";
 import {
   MarginAccount,
   ReferrerAlias,
-  TradeEventV2,
+  TradeEventV3,
   OpenOrdersMap,
 } from "./program-types";
 import * as types from "./types";
@@ -584,7 +584,7 @@ export function convertDecimalToNativeInteger(
  * does not divide perfectly by tick size (0.0001) if your order traded
  * against orders at different prices.
  */
-export function getTradeEventPrice(event: TradeEventV2): number {
+export function getTradeEventPrice(event: TradeEventV3): number {
   let decimalCostOfTrades = convertNativeBNToDecimal(event.costOfTrades);
   let decimalSize = convertNativeLotSizeToDecimal(event.size.toNumber());
   return decimalCostOfTrades / decimalSize;
@@ -1224,7 +1224,7 @@ export async function settleUsers(
 
 /*
  * Allows you to pass in a map that may have cached values for openOrdersAccounts
- * returns false in case where event queue is empty, true if events were cranked
+ * returns true in case where event queue is empty, false if events were cranked
  */
 export async function crankMarket(
   asset: Asset,

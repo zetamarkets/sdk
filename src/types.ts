@@ -121,6 +121,7 @@ export interface Order {
   // Client order id.
   clientOrderId: BN;
   tifOffset: number;
+  asset: Asset;
 }
 
 export function orderEquals(
@@ -140,6 +141,7 @@ export function orderEquals(
     a.size === b.size &&
     a.side === b.side &&
     a.tifOffset === b.tifOffset &&
+    a.asset === b.asset &&
     orderIdMatch
   );
 }
@@ -150,6 +152,7 @@ export interface Position {
   market: PublicKey;
   size: number;
   costOfTrades: number;
+  asset: Asset;
 }
 
 export function positionEquals(a: Position, b: Position): boolean {

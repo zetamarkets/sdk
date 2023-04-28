@@ -696,6 +696,7 @@ export class Market {
       owner: order.openOrdersAddress,
       clientOrderId: order.clientId,
       tifOffset: order.tifOffset,
+      asset: market.asset,
     };
   }
 
