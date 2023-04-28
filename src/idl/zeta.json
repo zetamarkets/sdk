@@ -6140,7 +6140,18 @@
                 {
                   "defined": "CrossMarginProductLedger"
                 },
-                150
+                5
+              ]
+            }
+          },
+          {
+            "name": "crossMarginProductLedgersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginProductLedger"
+                },
+                20
               ]
             }
           },
@@ -6149,7 +6160,7 @@
             "type": {
               "array": [
                 "u8",
-                3349
+                4000
               ]
             }
           }
