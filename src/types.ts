@@ -9,7 +9,7 @@ import {
 } from "@solana/web3.js";
 import { Asset, allAssets } from "./assets";
 import { objectEquals } from "./utils";
-import { MarginAccount } from "./program-types";
+import { CrossMarginAccount, MarginAccount } from "./program-types";
 import { Network, types, utils } from ".";
 import * as constants from "./constants";
 
@@ -216,6 +216,12 @@ export interface CancelArgs {
   cancelSide: Side;
 }
 
+export interface CrossMarginCancelArgs {
+  asset: Asset;
+  orderId: anchor.BN;
+  cancelSide: Side;
+}
+
 export interface MarginParams {
   futureMarginInitial: number;
   futureMarginMaintenance: number;
@@ -301,7 +307,9 @@ export function fromProgramMarginAccountType(
   throw Error("Invalid margin account type");
 }
 
-export function isMarketMaker(marginAccount: MarginAccount) {
+export function isMarketMaker(
+  marginAccount: MarginAccount | CrossMarginAccount
+) {
   return (
     fromProgramMarginAccountType(marginAccount.accountType) ==
     MarginAccountType.MARKET_MAKER

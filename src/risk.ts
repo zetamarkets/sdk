@@ -1,12 +1,16 @@
 import { exchange as Exchange } from "./exchange";
 import * as types from "./types";
 import * as constants from "./constants";
-import { MarginAccount, PositionMovementEvent } from "./program-types";
+import {
+  MarginAccount,
+  CrossMarginAccount,
+  PositionMovementEvent,
+} from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
-import { Asset, fromProgramAsset } from "./assets";
+import { Asset, assetToIndex, fromProgramAsset } from "./assets";
 import { BN } from "@zetamarkets/anchor";
 import { assets, Client, Decimal, instructions, utils } from ".";
 import { cloneDeep } from "lodash";
@@ -160,20 +164,47 @@ export class RiskCalculator {
       return 0;
     }
 
-    const position = account.perpProductLedger.position;
-    const size =
-      position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
-    let asset = fromProgramAsset(account.asset);
-    let greeks = Exchange.getGreeks(asset);
+    if (accountType == types.ProgramAccountType.MarginAccount) {
+      const position = account.perpProductLedger.position;
+      const size =
+        position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
+      let asset = fromProgramAsset(account.asset);
+      let greeks = Exchange.getGreeks(asset);
 
-    let deltaDiff =
-      (Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
-        Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber()) /
-      Math.pow(10, constants.PLATFORM_PRECISION);
+      let deltaDiff =
+        (Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
+          Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber()) /
+        Math.pow(10, constants.PLATFORM_PRECISION);
 
-    // Note that there is some rounding occurs here in the Zeta program
-    // but we omit it in this function for simplicity
-    return -1 * size * deltaDiff;
+      // Note that there is some rounding occurs here in the Zeta program
+      // but we omit it in this function for simplicity
+      return -1 * size * deltaDiff;
+    }
+
+    if (accountType == types.ProgramAccountType.CrossMarginAccount) {
+      let unpaidFundingSum = 0;
+      for (var ledger of account.crossMarginProductLedgers) {
+        const position = ledger.productLedger.position;
+        const size =
+          position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
+        let asset = fromProgramAsset(ledger.asset);
+        let markPrices = Exchange.markPrices;
+
+        let deltaDiff =
+          (Decimal.fromAnchorDecimal(
+            markPrices.fundingDeltas[assetToIndex(asset)]
+          ).toNumber() -
+            Decimal.fromAnchorDecimal(
+              account.lastFundingDeltas[assetToIndex(asset)]
+            ).toNumber()) /
+          Math.pow(10, constants.PLATFORM_PRECISION);
+
+        // Note that there is some rounding occurs here in the Zeta program
+        // but we omit it in this function for simplicity
+        unpaidFundingSum += -1 * size * deltaDiff;
+      }
+      return unpaidFundingSum;
+    }
   }
 
   /**
@@ -231,6 +262,54 @@ export class RiskCalculator {
           (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
             100) *
           subExchange.getMarkPrice(i);
+      }
+    }
+
+    return pnl;
+  }
+
+  /**
+   * Returns the unrealized pnl for a given margin or spread account.
+   * @param account the user's spread or margin account.
+   */
+  public calculateUnrealizedPnlCross(
+    account: CrossMarginAccount,
+    executionPrice: number = undefined,
+    addTakerFees: boolean = false
+  ): number {
+    let pnl = 0;
+
+    let markPrices = Exchange.markPrices;
+
+    for (var ledger of account.crossMarginProductLedgers) {
+      const position = ledger.productLedger.position;
+      const asset = fromProgramAsset(ledger.asset);
+      const asset_index = assetToIndex(asset);
+      const size = position.size.toNumber();
+      if (size == 0) {
+        continue;
+      }
+      if (size > 0) {
+        pnl +=
+          convertNativeLotSizeToDecimal(size) *
+            (executionPrice
+              ? executionPrice
+              : markPrices.markPrices[asset_index]) -
+          convertNativeBNToDecimal(position.costOfTrades);
+      } else {
+        pnl +=
+          convertNativeLotSizeToDecimal(size) *
+            (executionPrice
+              ? executionPrice
+              : markPrices.markPrices[asset_index]) +
+          convertNativeBNToDecimal(position.costOfTrades);
+      }
+      if (addTakerFees) {
+        pnl -=
+          convertNativeLotSizeToDecimal(Math.abs(size)) *
+          (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
+            100) *
+          markPrices.markPrices[asset_index];
       }
     }
 
@@ -320,6 +399,85 @@ export class RiskCalculator {
   }
 
   /**
+   * Returns the total initial margin requirement for a given account.
+   * This includes initial margin on positions which is used for
+   * Place order, withdrawal and force cancels
+   * @param marginAccount   the user's MarginAccount.
+   */
+  public calculateTotalInitialMarginCross(
+    marginAccount: CrossMarginAccount,
+    skipConcession: boolean = false
+  ): number {
+    let marketMaker = types.isMarketMaker(marginAccount);
+    let margin = 0;
+
+    let ledgers = marginAccount.crossMarginProductLedgers;
+    for (var i = 0; i < ledgers.length; i++) {
+      let ledger = ledgers[i].productLedger;
+      let size = ledger.position.size.toNumber();
+      let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
+      let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+      if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
+        continue;
+      }
+
+      let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
+      let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
+
+      if (!marketMaker || skipConcession) {
+        if (size > 0) {
+          longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        } else if (size < 0) {
+          shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        }
+      }
+
+      let marginForMarket: number = undefined;
+      let longLotsMarginReq = this.getMarginRequirement(
+        assets.fromProgramAsset(ledgers[i].asset),
+        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
+        // Positive for buys.
+        longLots,
+        types.MarginType.INITIAL
+      );
+      let shortLotsMarginReq = this.getMarginRequirement(
+        assets.fromProgramAsset(ledgers[i].asset),
+        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
+        // Negative for sells.
+        -shortLots,
+        types.MarginType.INITIAL
+      );
+      if (
+        (i + 1) % constants.PRODUCTS_PER_EXPIRY == 0 ||
+        i == constants.PERP_INDEX
+      ) {
+        marginForMarket =
+          longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
+      } else {
+        marginForMarket = longLotsMarginReq + shortLotsMarginReq;
+      }
+
+      if (marketMaker && !skipConcession) {
+        // Mark initial margin to concession (only contains open order margin).
+        marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
+        // Add position margin which doesn't get concessions.
+        marginForMarket += this.getMarginRequirement(
+          assets.fromProgramAsset(ledgers[i].asset),
+          i == ledgers.length - 1 ? constants.PERP_INDEX : i,
+          // This is signed.
+          convertNativeLotSizeToDecimal(size),
+          types.MarginType.MAINTENANCE
+        );
+      }
+
+      if (marginForMarket !== undefined) {
+        margin += marginForMarket;
+      }
+    }
+    return margin;
+  }
+
+  /**
    * Returns the total maintenance margin requirement for a given account.
    * This only uses maintenance margin on positions and is used for
    * liquidations.
@@ -340,6 +498,38 @@ export class RiskCalculator {
       }
       let positionMargin = this.getMarginRequirement(
         asset,
+        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
+        // This is signed.
+        convertNativeLotSizeToDecimal(size),
+        types.MarginType.MAINTENANCE
+      );
+      if (positionMargin !== undefined) {
+        margin += positionMargin;
+      }
+    }
+    return margin;
+  }
+
+  /**
+   * Returns the total maintenance margin requirement for a given cross-margin account.
+   * This only uses maintenance margin on positions and is used for
+   * liquidations.
+   * @param asset           underlying asset type
+   * @param marginAccount   the user's MarginAccount.
+   */
+  public calculateTotalMaintenanceMarginCross(
+    marginAccount: CrossMarginAccount
+  ): number {
+    let margin = 0;
+    let ledgers = marginAccount.crossMarginProductLedgers;
+    for (var i = 0; i < ledgers.length; i++) {
+      let position = ledgers[i].productLedger.position;
+      let size = position.size.toNumber();
+      if (size == 0) {
+        continue;
+      }
+      let positionMargin = this.getMarginRequirement(
+        assets.fromProgramAsset(ledgers[i].asset),
         i == ledgers.length - 1 ? constants.PERP_INDEX : i,
         // This is signed.
         convertNativeLotSizeToDecimal(size),
@@ -430,6 +620,49 @@ export class RiskCalculator {
       true
     );
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
+    let availableBalanceInitial: number =
+      balance + unrealizedPnl + unpaidFunding - initialMargin;
+    let availableBalanceWithdrawable: number =
+      balance + unrealizedPnl + unpaidFunding - initialMarginSkipConcession;
+    let availableBalanceMaintenance: number =
+      balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
+    return {
+      balance,
+      initialMargin,
+      initialMarginSkipConcession,
+      maintenanceMargin,
+      unrealizedPnl,
+      unpaidFunding,
+      availableBalanceInitial,
+      availableBalanceMaintenance,
+      availableBalanceWithdrawable,
+    };
+  }
+
+  /**
+   * Returns the aggregate cross-margin account state.
+   * @param marginAccount   the user's MarginAccount.
+   */
+  public getCrossMarginAccountState(
+    marginAccount: CrossMarginAccount,
+    balance: number,
+    pnlExecutionPrice: number = undefined,
+    pnlAddTakerFees: boolean = false
+  ): types.MarginAccountState {
+    // TODO let these take CrossMarginAccount too, or write new functions
+    let unrealizedPnl = this.calculateUnrealizedPnlCross(
+      marginAccount,
+      pnlExecutionPrice,
+      pnlAddTakerFees
+    );
+    let unpaidFunding = this.calculateUnpaidFunding(marginAccount);
+    let initialMargin = this.calculateTotalInitialMarginCross(marginAccount);
+    let initialMarginSkipConcession = this.calculateTotalInitialMarginCross(
+      marginAccount,
+      true
+    );
+    let maintenanceMargin =
+      this.calculateTotalMaintenanceMarginCross(marginAccount);
     let availableBalanceInitial: number =
       balance + unrealizedPnl + unpaidFunding - initialMargin;
     let availableBalanceWithdrawable: number =
