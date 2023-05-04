@@ -29,6 +29,9 @@ export interface State {
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
   secondaryAdmin: PublicKey;
+  nativeWithdrawLimit: anchor.BN;
+  withdrawLimitEpochSeconds: number;
+  nativeOpenInterestLimit: anchor.BN;
   padding: Array<number>;
 }
 
@@ -173,6 +176,8 @@ export interface MarginAccount {
   accountType: any;
   lastFundingDelta: AnchorDecimal;
   delegatedPubkey: PublicKey;
+  lastWithdrawTimestamp: anchor.BN;
+  withdrawalsSum: anchor.BN;
   padding: Array<number>;
 }
 

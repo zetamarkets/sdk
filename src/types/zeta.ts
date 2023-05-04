@@ -4845,11 +4845,23 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                73
+                53
               ]
             }
           }
@@ -5270,11 +5282,19 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawalsSum",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                322
               ]
             }
           }
@@ -6050,6 +6070,18 @@ export type Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -6150,6 +6182,18 @@ export type Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -7767,6 +7811,16 @@ export type Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "OpenInterestLimitBreach",
+      "msg": "Open interest limit breach, decrease your position"
+    },
+    {
+      "code": 6132,
+      "name": "DailyWithdrawLimitBreach",
+      "msg": "Daily withdraw limit breach, wait to withdraw more"
     }
   ]
 };
@@ -12618,11 +12672,23 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                73
+                53
               ]
             }
           }
@@ -13043,11 +13109,19 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawalsSum",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                322
               ]
             }
           }
@@ -13823,6 +13897,18 @@ export const IDL: Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -13923,6 +14009,18 @@ export const IDL: Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -15540,6 +15638,16 @@ export const IDL: Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "OpenInterestLimitBreach",
+      "msg": "Open interest limit breach, decrease your position"
+    },
+    {
+      "code": 6132,
+      "name": "DailyWithdrawLimitBreach",
+      "msg": "Daily withdraw limit breach, wait to withdraw more"
     }
   ]
 };

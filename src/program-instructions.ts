@@ -2350,6 +2350,9 @@ export interface StateParams {
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
   maxPerpDeltaAgeSeconds: number;
+  nativeWithdrawLimit: anchor.BN;
+  withdrawLimitEpochSeconds: anchor.BN;
+  nativeOpenInterestLimit: anchor.BN;
 }
 
 export interface UpdatePricingParametersArgs {
