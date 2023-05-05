@@ -7819,8 +7819,8 @@ export type Zeta = {
     },
     {
       "code": 6132,
-      "name": "DailyWithdrawLimitBreach",
-      "msg": "Daily withdraw limit breach, wait to withdraw more"
+      "name": "WithdrawLimitBreach",
+      "msg": "Withdraw limit breach, wait to withdraw more"
     }
   ]
 };
@@ -15646,8 +15646,8 @@ export const IDL: Zeta = {
     },
     {
       "code": 6132,
-      "name": "DailyWithdrawLimitBreach",
-      "msg": "Daily withdraw limit breach, wait to withdraw more"
+      "name": "WithdrawLimitBreach",
+      "msg": "Withdraw limit breach, wait to withdraw more"
     }
   ]
 };
