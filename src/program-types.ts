@@ -32,6 +32,8 @@ export interface State {
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;
   nativeOpenInterestLimit: anchor.BN;
+  lastWithdrawTimestamp: anchor.BN;
+  netOutflowSum: anchor.BN;
   padding: Array<number>;
 }
 
@@ -176,8 +178,6 @@ export interface MarginAccount {
   accountType: any;
   lastFundingDelta: AnchorDecimal;
   delegatedPubkey: PublicKey;
-  lastWithdrawTimestamp: anchor.BN;
-  withdrawalsSum: anchor.BN;
   padding: Array<number>;
 }
 

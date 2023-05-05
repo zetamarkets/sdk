@@ -1635,7 +1635,7 @@ export type Zeta = {
         },
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -1707,7 +1707,7 @@ export type Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -4857,11 +4857,19 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "netOutflowSum",
+            "type": "i64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                53
+                37
               ]
             }
           }
@@ -5282,19 +5290,11 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "lastWithdrawTimestamp",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawalsSum",
-            "type": "u64"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                322
+                338
               ]
             }
           }
@@ -9462,7 +9462,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -9534,7 +9534,7 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -12684,11 +12684,19 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "netOutflowSum",
+            "type": "i64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                53
+                37
               ]
             }
           }
@@ -13109,19 +13117,11 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "lastWithdrawTimestamp",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawalsSum",
-            "type": "u64"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                322
+                338
               ]
             }
           }
