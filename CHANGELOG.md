@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- program: Add withdrawal and open interest limits. ([#228](https://github.com/zetamarkets/sdk/pull/228))
+
 ## [0.27.0] 2023-04-28
 
 - general: Allow toggling zetaGroup perpsOnly on/off. ([#211](https://github.com/zetamarkets/sdk/pull/211/))
