@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.27.1] 2023-05-09
+
+- risk: Clean up risk calculator code for margining. ([#229](https://github.com/zetamarkets/sdk/pull/229))
+
 ## [0.27.0] 2023-04-28
 
 - general: Allow toggling zetaGroup perpsOnly on/off. ([#211](https://github.com/zetamarkets/sdk/pull/211/))
