@@ -259,8 +259,6 @@ export class RiskCalculator {
       return 0;
     }
 
-    console.log(bidOpenOrders, askOpenOrders, size);
-
     let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
     let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
