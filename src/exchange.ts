@@ -176,6 +176,30 @@ export class Exchange {
   private _referralsRewardsWalletAddress: PublicKey;
 
   /**
+   * Public key for combined insurance fund.
+   */
+  public get combinedInsuranceVaultAddress(): PublicKey {
+    return this._combinedInsuranceVaultAddress;
+  }
+  private _combinedInsuranceVaultAddress: PublicKey;
+
+  /**
+   * Public key for combined deposit vault.
+   */
+  public get combinedVaultAddress(): PublicKey {
+    return this._combinedVaultAddress;
+  }
+  private _combinedVaultAddress: PublicKey;
+
+  /**
+   * Public key for combined socialized loss account.
+   */
+  public get combinedSocializedLossAccountAddress(): PublicKey {
+    return this._combinedSocializedLossAccountAddress;
+  }
+  private _combinedSocializedLossAccountAddress: PublicKey;
+
+  /**
    * Stores the latest timestamp received by websocket subscription
    * to the system clock account.
    */
@@ -299,6 +323,49 @@ export class Exchange {
       this.getSubExchange(asset).initialize(asset);
     }
     this._isSetup = true;
+  }
+
+  public async initializeCombinedInsuranceVault() {
+    let tx = new Transaction().add(
+      instructions.initializeCombinedInsuranceVaultIx()
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`initializeCombinedInsuranceVault failed: ${e}`);
+    }
+
+    let [insuranceVault, _insuranceVaultNonce] =
+      utils.getZetaCombinedInsuranceVault(this.programId);
+    this._combinedInsuranceVaultAddress = insuranceVault;
+  }
+
+  public async initializeCombinedVault() {
+    let tx = new Transaction().add(instructions.initializeCombinedVaultIx());
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`initializeCombinedVault failed: ${e}`);
+    }
+
+    let [vault, _vaultNonce] = utils.getCombinedVault(this.programId);
+    this._combinedVaultAddress = vault;
+  }
+
+  public async initializeCombinedSocializedLossAccount() {
+    let tx = new Transaction().add(
+      instructions.initializeCombinedSocializedLossAccountIx()
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`initializeCombinedSocializedLossAccount failed: ${e}`);
+    }
+
+    let [account, _accountNonce] = utils.getCombinedSocializedLossAccount(
+      this.programId
+    );
+    this._combinedSocializedLossAccountAddress = account;
   }
 
   public async initializeZetaState(

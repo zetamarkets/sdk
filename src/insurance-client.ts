@@ -140,7 +140,7 @@ export class InsuranceClient {
         "User has no insurance vault deposit account. Creating insurance vault deposit account..."
       );
       tx.add(
-        await instructions.initializeInsuranceDepositAccountIx(
+        await instructions.initializeInsuranceDepositAccountOldIx(
           this.asset,
           this.publicKey,
           this.whitelistInsuranceAccountAddress

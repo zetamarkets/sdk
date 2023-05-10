@@ -153,6 +153,13 @@ export function getVault(
   );
 }
 
+export function getCombinedVault(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("combined-vault"))],
+    programId
+  );
+}
+
 export function getSerumVault(
   programId: PublicKey,
   mint: PublicKey
@@ -187,6 +194,19 @@ export function getZetaInsuranceVault(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("zeta-insurance-vault")),
       zetaGroup.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getZetaCombinedInsuranceVault(
+  programId: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(
+        anchor.utils.bytes.utf8.encode("zeta-combined-insurance-vault")
+      ),
     ],
     programId
   );
@@ -445,6 +465,15 @@ export function getSocializedLossAccount(
       Buffer.from(anchor.utils.bytes.utf8.encode("socialized-loss")),
       zetaGroup.toBuffer(),
     ],
+    programId
+  );
+}
+
+export function getCombinedSocializedLossAccount(
+  programId: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("combined-socialized-loss"))],
     programId
   );
 }
