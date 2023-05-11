@@ -325,6 +325,58 @@ export class Exchange {
     this._isSetup = true;
   }
 
+  public async migrateToCombinedInsuranceVault() {
+    let tx = new Transaction().add(
+      instructions.migrateToCombinedInsuranceVaultIx()
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`migrateToCombinedInsuranceVault failed: ${e}`);
+    }
+  }
+
+  public async migrateToCombinedVault() {
+    let tx = new Transaction().add(instructions.migrateToCombinedVaultIx());
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`migrateToCombinedVault failed: ${e}`);
+    }
+  }
+
+  public async migrateToCombinedSocializedLossAccount() {
+    let tx = new Transaction().add(
+      instructions.migrateToCombinedSocializedLossAccountIx()
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`migrateToCombinedSocializedLossAccount failed: ${e}`);
+    }
+  }
+
+  public async migrateInsuranceDepositAccount(
+    asset: Asset,
+    oldAccount: PublicKey,
+    newAccount: PublicKey,
+    owner: PublicKey
+  ) {
+    let tx = new Transaction().add(
+      instructions.migrateInsuranceDepositAccountIx(
+        asset,
+        oldAccount,
+        newAccount,
+        owner
+      )
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`migrateInsuranceDepositAccount failed: ${e}`);
+    }
+  }
+
   public async initializeCombinedInsuranceVault() {
     let tx = new Transaction().add(
       instructions.initializeCombinedInsuranceVaultIx()

@@ -1596,6 +1596,62 @@ export type Zeta = {
       ]
     },
     {
+      "name": "depositOld",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "deposit",
       "accounts": [
         {
@@ -1712,11 +1768,6 @@ export type Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -1839,11 +1890,6 @@ export type Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -2111,6 +2157,37 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializeInsuranceDepositAccount",
+      "accounts": [
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelistInsuranceAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "initializeInsuranceDepositAccountOld",
       "accounts": [
         {
@@ -2185,14 +2262,19 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "newNonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "migrateToCombinedInsuranceVault",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -2227,6 +2309,31 @@ export type Zeta = {
         },
         {
           "name": "combinedVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "solZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "btcZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ethZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arbZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "aptZetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -2320,6 +2427,31 @@ export type Zeta = {
         {
           "name": "combinedVault",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "solZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "btcZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ethZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "arbZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "aptZetaGroup",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2456,7 +2588,12 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "placeOrder",
@@ -4344,6 +4481,47 @@ export type Zeta = {
       ]
     },
     {
+      "name": "rebalanceInsuranceVaultOld",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "rebalanceInsuranceVault",
       "accounts": [
         {
@@ -5231,11 +5409,15 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                71
+                63
               ]
             }
           }
@@ -5408,7 +5590,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "totalInsuranceVaultDeposits",
+            "name": "deprecatedTotalInsuranceVaultDeposits",
             "type": "u64"
           },
           {
@@ -9760,6 +9942,62 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "depositOld",
+      "accounts": [
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "deposit",
       "accounts": [
         {
@@ -9876,11 +10114,6 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -10003,11 +10236,6 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -10275,6 +10503,37 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializeInsuranceDepositAccount",
+      "accounts": [
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelistInsuranceAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "initializeInsuranceDepositAccountOld",
       "accounts": [
         {
@@ -10349,14 +10608,19 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "newNonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "migrateToCombinedInsuranceVault",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -10391,6 +10655,31 @@ export const IDL: Zeta = {
         },
         {
           "name": "combinedVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "solZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "btcZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ethZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "arbZetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "aptZetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -10484,6 +10773,31 @@ export const IDL: Zeta = {
         {
           "name": "combinedVault",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "solZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "btcZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ethZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "arbZetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "aptZetaGroup",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -10620,7 +10934,12 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "placeOrder",
@@ -12508,6 +12827,47 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "rebalanceInsuranceVaultOld",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "rebalanceInsuranceVault",
       "accounts": [
         {
@@ -13395,11 +13755,15 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                71
+                63
               ]
             }
           }
@@ -13572,7 +13936,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "totalInsuranceVaultDeposits",
+            "name": "deprecatedTotalInsuranceVaultDeposits",
             "type": "u64"
           },
           {

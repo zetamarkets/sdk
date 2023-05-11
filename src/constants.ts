@@ -22,6 +22,7 @@ export const MINTS = {
 export const FLEX_MINTS = {
   localnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
+    [Asset.ARB]: new PublicKey("w8h6r5ogLihfuWeCA1gs7boxNjzbwWeQbXMB3UATaC6"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -107,8 +108,9 @@ export const PYTH_PRICE_FEEDS = {
   localnet: {
     [Asset.SOL]: new PublicKey("2pRCJksgaoKRMqBfa7NTdd6tLYe9wbDFGCcCCZ6si3F7"),
     [Asset.BTC]: new PublicKey("9WD5hzrwEtwbYyZ34BRnrSS11TzD7PTMyszKV5Ur4JxJ"),
-    [Asset.ETH]: new PublicKey("FkUZhotvECPTBEXXzxBPjnJu6vPiQmptKyUDSXapBgHJ"),
-    [Asset.APT]: new PublicKey("5FBj9HE3oBGXv5pNtYsrABRwt8EYgNVRa2hYoEd9uXCS"),
+    [Asset.ETH]: new PublicKey("4L2jLMAy8L7BbHKuaPoH7M7sxdYF9wE7B655WR5dTevM"),
+    [Asset.APT]: new PublicKey("64nz875oGiwcDCx9RuwUjj188hBWPP4GRdJvYk6hrgay"),
+    [Asset.ARB]: new PublicKey("APN6KouMoYPF3rR8KxSmWCWQwEW8PykMVpyTAPdLogk4"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),

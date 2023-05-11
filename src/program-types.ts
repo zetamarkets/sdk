@@ -29,6 +29,7 @@ export interface State {
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
   secondaryAdmin: PublicKey;
+  totalInsuranceVaultDeposits: anchor.BN;
   padding: Array<number>;
 }
 
@@ -109,7 +110,7 @@ export interface ZetaGroup {
   perp: Product;
   expirySeries: Array<ExpirySeries>;
   expirySeriesPadding: Array<ExpirySeries>;
-  totalInsuranceVaultDeposits: anchor.BN;
+  deprecatedTotalInsuranceVaultDeposits: anchor.BN;
   asset: any;
   expiryIntervalSeconds: number;
   newExpiryThresholdSeconds: number;

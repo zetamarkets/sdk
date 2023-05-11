@@ -242,6 +242,21 @@ export function getZetaReferralsRewardsWallet(
 
 export function getUserInsuranceDepositAccount(
   programId: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(
+        anchor.utils.bytes.utf8.encode("combined-user-insurance-deposit")
+      ),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getUserInsuranceDepositAccountOld(
+  programId: PublicKey,
   zetaGroup: PublicKey,
   userKey: PublicKey
 ): [PublicKey, number] {

@@ -48,19 +48,22 @@ export function initializeCombinedVaultIx(): TransactionInstruction {
 }
 
 export function initializeCombinedSocializedLossAccountIx(): TransactionInstruction {
-  let [account, _accountNonce] = utils.getCombinedSocializedLossAccount(
+  let [account, accountNonce] = utils.getCombinedSocializedLossAccount(
     Exchange.programId
   );
-  return Exchange.program.instruction.initializeCombinedSocializedLossAccount({
-    accounts: {
-      state: Exchange.stateAddress,
-      socializedLossAccount: account,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      usdcMint: Exchange.usdcMintAddress,
-      admin: Exchange.state.admin,
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return Exchange.program.instruction.initializeCombinedSocializedLossAccount(
+    accountNonce,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        socializedLossAccount: account,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        usdcMint: Exchange.usdcMintAddress,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function migrateToCombinedInsuranceVaultIx(): TransactionInstruction {
@@ -97,6 +100,11 @@ export function migrateToCombinedInsuranceVaultIx(): TransactionInstruction {
       arbVault: arbVault,
       aptVault: aptVault,
       combinedVault: insuranceVault,
+      solZetaGroup: Exchange.getZetaGroupAddress(Asset.SOL),
+      btcZetaGroup: Exchange.getZetaGroupAddress(Asset.BTC),
+      ethZetaGroup: Exchange.getZetaGroupAddress(Asset.ETH),
+      arbZetaGroup: Exchange.getZetaGroupAddress(Asset.ARB),
+      aptZetaGroup: Exchange.getZetaGroupAddress(Asset.APT),
       tokenProgram: TOKEN_PROGRAM_ID,
     },
   });
@@ -135,6 +143,11 @@ export function migrateToCombinedVaultIx(): TransactionInstruction {
       arbVault: arbVault,
       aptVault: aptVault,
       combinedVault: vault,
+      solZetaGroup: Exchange.getZetaGroupAddress(Asset.SOL),
+      btcZetaGroup: Exchange.getZetaGroupAddress(Asset.BTC),
+      ethZetaGroup: Exchange.getZetaGroupAddress(Asset.ETH),
+      arbZetaGroup: Exchange.getZetaGroupAddress(Asset.ARB),
+      aptZetaGroup: Exchange.getZetaGroupAddress(Asset.APT),
       tokenProgram: TOKEN_PROGRAM_ID,
     },
   });
@@ -217,11 +230,12 @@ export function initializeInsuranceDepositAccountOldIx(
   userWhitelistInsuranceKey: PublicKey
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  let [insuranceDepositAccount, nonce] = utils.getUserInsuranceDepositAccount(
-    Exchange.programId,
-    subExchange.zetaGroupAddress,
-    userKey
-  );
+  let [insuranceDepositAccount, nonce] =
+    utils.getUserInsuranceDepositAccountOld(
+      Exchange.programId,
+      Exchange.getZetaGroupAddress(asset),
+      userKey
+    );
 
   return Exchange.program.instruction.initializeInsuranceDepositAccountOld(
     nonce,
@@ -235,6 +249,25 @@ export function initializeInsuranceDepositAccountOldIx(
       },
     }
   );
+}
+
+export function initializeInsuranceDepositAccountIx(
+  userKey: PublicKey,
+  userWhitelistInsuranceKey: PublicKey
+): TransactionInstruction {
+  let [insuranceDepositAccount, nonce] = utils.getUserInsuranceDepositAccount(
+    Exchange.programId,
+    userKey
+  );
+
+  return Exchange.program.instruction.initializeInsuranceDepositAccount(nonce, {
+    accounts: {
+      insuranceDepositAccount,
+      authority: userKey,
+      systemProgram: SystemProgram.programId,
+      whitelistInsuranceAccount: userWhitelistInsuranceKey,
+    },
+  });
 }
 
 /**
@@ -265,6 +298,46 @@ export function depositIx(
     accounts: {
       zetaGroup: subExchange.zetaGroupAddress,
       marginAccount: marginAccount,
+      vault: Exchange.combinedVaultAddress,
+      userTokenAccount: usdcAccount,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+      authority: userKey,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      state: Exchange.stateAddress,
+      greeks: subExchange.zetaGroup.greeks,
+    },
+    remainingAccounts,
+  });
+}
+
+/**
+ * @param amount the native amount to deposit (6dp)
+ */
+export function depositOldIx(
+  asset: Asset,
+  amount: number,
+  marginAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey,
+  whitelistDepositAccount: PublicKey | undefined
+): TransactionInstruction {
+  let remainingAccounts =
+    whitelistDepositAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistDepositAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+  let subExchange = Exchange.getSubExchange(asset);
+
+  // TODO: Probably use mint to find decimal places in future.
+  return Exchange.program.instruction.depositOld(new anchor.BN(amount), {
+    accounts: {
+      zetaGroup: subExchange.zetaGroupAddress,
+      marginAccount: marginAccount,
       vault: subExchange.vaultAddress,
       userTokenAccount: usdcAccount,
       socializedLossAccount: subExchange.socializedLossAccountAddress,
@@ -284,6 +357,35 @@ export function depositIx(
  * @param userKey
  */
 export function depositInsuranceVaultIx(
+  amount: number,
+  insuranceDepositAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.depositInsuranceVault(
+    new anchor.BN(amount),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        insuranceVault: Exchange.combinedInsuranceVaultAddress,
+        insuranceDepositAccount,
+        userTokenAccount: usdcAccount,
+        zetaVault: Exchange.combinedVaultAddress,
+        socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+        authority: userKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    }
+  );
+}
+
+/**
+ * @param amount
+ * @param insuranceDepositAccount
+ * @param usdcAccount
+ * @param userKey
+ */
+export function depositInsuranceVaultOldIx(
   asset: Asset,
   amount: number,
   insuranceDepositAccount: PublicKey,
@@ -291,7 +393,7 @@ export function depositInsuranceVaultIx(
   userKey: PublicKey
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
-  return Exchange.program.instruction.depositInsuranceVault(
+  return Exchange.program.instruction.depositInsuranceVaultOld(
     new anchor.BN(amount),
     {
       accounts: {
@@ -310,20 +412,17 @@ export function depositInsuranceVaultIx(
 }
 
 export function withdrawInsuranceVaultIx(
-  asset: Asset,
   percentageAmount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.withdrawInsuranceVault(
     new anchor.BN(percentageAmount),
     {
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: subExchange.zetaGroupAddress,
-        insuranceVault: subExchange.insuranceVaultAddress,
+        insuranceVault: Exchange.combinedInsuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
         authority: userKey,
@@ -348,7 +447,7 @@ export function withdrawIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: subExchange.zetaGroupAddress,
-      vault: subExchange.vaultAddress,
+      vault: Exchange.combinedVaultAddress,
       marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
@@ -357,7 +456,30 @@ export function withdrawIx(
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
       oracleBackupProgram: constants.CHAINLINK_PID,
-      socializedLossAccount: subExchange.socializedLossAccountAddress,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+    },
+  });
+}
+
+export function migrateInsuranceDepositAccountIx(
+  asset: Asset,
+  oldAccount: PublicKey,
+  newAccount: PublicKey,
+  owner: PublicKey
+) {
+  let [_account, newNonce] = utils.getUserInsuranceDepositAccount(
+    Exchange.programId,
+    owner
+  );
+  return Exchange.program.instruction.migrateInsuranceDepositAccount(newNonce, {
+    accounts: {
+      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      oldInsuranceDepositAccount: oldAccount,
+      newInsuranceDepositAccount: newAccount,
+      state: Exchange.stateAddress,
+      admin: Exchange.state.admin,
+      authority: owner,
+      systemProgram: SystemProgram.programId,
     },
   });
 }
@@ -1391,6 +1513,25 @@ export function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
 ): TransactionInstruction {
   return Exchange.program.instruction.rebalanceInsuranceVault({
+    accounts: {
+      state: Exchange.stateAddress,
+      zetaGroup: Exchange.getZetaGroupAddress(asset), // still used for margin account
+      zetaVault: Exchange.combinedVaultAddress,
+      insuranceVault: Exchange.combinedInsuranceVaultAddress,
+      treasuryWallet: Exchange.treasuryWalletAddress,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    },
+    remainingAccounts,
+  });
+}
+
+// TODO remove old
+export function rebalanceInsuranceVaultOldIx(
+  asset: Asset,
+  remainingAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.rebalanceInsuranceVaultOld({
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
