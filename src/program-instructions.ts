@@ -1498,7 +1498,7 @@ export function treasuryMovementIx(
       accounts: {
         state: Exchange.stateAddress,
         zetaGroup: Exchange.getZetaGroupAddress(asset),
-        insuranceVault: Exchange.getInsuranceVaultAddress(asset),
+        insuranceVault: Exchange.getInsuranceVaultAddress(),
         treasuryWallet: Exchange.treasuryWalletAddress,
         referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -1535,10 +1535,11 @@ export function rebalanceInsuranceVaultOldIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
-      zetaVault: Exchange.getVaultAddress(asset),
-      insuranceVault: Exchange.getInsuranceVaultAddress(asset),
+      zetaVault: Exchange.getSubExchange(asset).vaultAddress,
+      insuranceVault: Exchange.getSubExchange(asset).insuranceVaultAddress,
       treasuryWallet: Exchange.treasuryWalletAddress,
-      socializedLossAccount: Exchange.getSocializedLossAccountAddress(asset),
+      socializedLossAccount:
+        Exchange.getSubExchange(asset).socializedLossAccountAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,

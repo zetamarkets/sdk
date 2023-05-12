@@ -906,16 +906,16 @@ export class Exchange {
     return this.getSubExchange(asset).getMarkPrice(index);
   }
 
-  public getInsuranceVaultAddress(asset: Asset): PublicKey {
-    return this.getSubExchange(asset).insuranceVaultAddress;
+  public getInsuranceVaultAddress(): PublicKey {
+    return this._combinedInsuranceVaultAddress;
   }
 
-  public getVaultAddress(asset: Asset): PublicKey {
-    return this.getSubExchange(asset).vaultAddress;
+  public getVaultAddress(): PublicKey {
+    return this._combinedVaultAddress;
   }
 
-  public getSocializedLossAccountAddress(asset: Asset): PublicKey {
-    return this.getSubExchange(asset).socializedLossAccountAddress;
+  public getSocializedLossAccountAddress(): PublicKey {
+    return this._combinedSocializedLossAccountAddress;
   }
 
   public async updatePricingParameters(
