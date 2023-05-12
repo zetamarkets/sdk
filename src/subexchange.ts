@@ -267,31 +267,40 @@ export class SubExchange {
   }
 
   /**
-   * Checks which live serum markets are stale and refreshes only those
+   * Checks only if the perp serum markets are stale and refreshes it if so
    */
-  public async updateLiveSerumMarketsIfNeeded(epochDelay: number) {
-    console.info(
-      `Refreshing live Serum markets if needed for ${assetToName(
-        this._asset
-      )} SubExchange.`
-    );
+  public async updatePerpSerumMarketIfNeeded(epochDelay: number) {
+    // const allLiveMarketsToUpdate = this._markets.markets.filter(
+    //   (m) =>
+    //     (m.kind == types.Kind.PERP &&
+    //       m.serumMarket.epochStartTs + m.serumMarket.epochLength + epochDelay <
+    //         Exchange.clockTimestamp) ||
+    //     m.serumMarket.startEpochSeqNum.toNumber() == 0
+    // );
 
-    const allLiveMarketsToUpdate = this._markets.markets.filter(
-      (m) =>
-        ((m.kind == types.Kind.PERP || m.expirySeries.isLive()) &&
-          m.serumMarket.epochStartTs + m.serumMarket.epochLength + epochDelay <
-            Exchange.clockTimestamp) ||
-        m.serumMarket.startEpochSeqNum.toNumber() == 0
-    );
+    let m = this._markets.perpMarket;
 
-    await Promise.all(
-      allLiveMarketsToUpdate.map((m) => {
-        return m.serumMarket.updateDecoded(Exchange.connection);
-      })
-    );
+    if (
+      m.serumMarket.epochLength.toNumber() == 0 ||
+      m.serumMarket.epochStartTs.toNumber() +
+        m.serumMarket.epochLength.toNumber() +
+        epochDelay >
+        Exchange.clockTimestamp
+    ) {
+      return;
+    }
 
     console.log(
-      `${assetToName(this.asset)} SubExchange Serum markets refreshed`
+      m.serumMarket.epochLength.toNumber(),
+      m.serumMarket.epochStartTs.toNumber(),
+      Exchange.clockTimestamp,
+      m.serumMarket.startEpochSeqNum.toNumber()
+    );
+
+    await m.serumMarket.updateDecoded(Exchange.connection);
+
+    console.log(
+      `${assetToName(this.asset)} SubExchange perp Serum market refreshed`
     );
   }
 
@@ -637,6 +646,8 @@ export class SubExchange {
         );
       })
     );
+
+    await this.updateSerumMarkets();
   }
 
   /**
