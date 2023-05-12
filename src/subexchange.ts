@@ -270,14 +270,6 @@ export class SubExchange {
    * Checks only if the perp serum markets are stale and refreshes it if so
    */
   public async updatePerpSerumMarketIfNeeded(epochDelay: number) {
-    // const allLiveMarketsToUpdate = this._markets.markets.filter(
-    //   (m) =>
-    //     (m.kind == types.Kind.PERP &&
-    //       m.serumMarket.epochStartTs + m.serumMarket.epochLength + epochDelay <
-    //         Exchange.clockTimestamp) ||
-    //     m.serumMarket.startEpochSeqNum.toNumber() == 0
-    // );
-
     let m = this._markets.perpMarket;
 
     if (
@@ -289,13 +281,6 @@ export class SubExchange {
     ) {
       return;
     }
-
-    console.log(
-      m.serumMarket.epochLength.toNumber(),
-      m.serumMarket.epochStartTs.toNumber(),
-      Exchange.clockTimestamp,
-      m.serumMarket.startEpochSeqNum.toNumber()
-    );
 
     await m.serumMarket.updateDecoded(Exchange.connection);
 
