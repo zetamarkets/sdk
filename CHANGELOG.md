@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.27.2] 2023-05-15
+
+- general: Refresh tif parameters on clock event. ([#231](https://github.com/zetamarkets/sdk/pull/231))
+
 ## [0.27.1] 2023-05-09
 
 - risk: Clean up risk calculator code for margining. ([#229](https://github.com/zetamarkets/sdk/pull/229))
