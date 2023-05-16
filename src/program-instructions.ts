@@ -1422,23 +1422,6 @@ export function initializeZetaGroupIx(
       maxVolatility: pricingArgs.maxVolatility,
       futureMarginInitial: marginArgs.futureMarginInitial,
       futureMarginMaintenance: marginArgs.futureMarginMaintenance,
-      optionMarkPercentageLongInitial:
-        marginArgs.optionMarkPercentageLongInitial,
-      optionSpotPercentageLongInitial:
-        marginArgs.optionSpotPercentageLongInitial,
-      optionSpotPercentageShortInitial:
-        marginArgs.optionSpotPercentageShortInitial,
-      optionDynamicPercentageShortInitial:
-        marginArgs.optionDynamicPercentageShortInitial,
-      optionMarkPercentageLongMaintenance:
-        marginArgs.optionMarkPercentageLongMaintenance,
-      optionSpotPercentageLongMaintenance:
-        marginArgs.optionSpotPercentageLongMaintenance,
-      optionSpotPercentageShortMaintenance:
-        marginArgs.optionSpotPercentageShortMaintenance,
-      optionDynamicPercentageShortMaintenance:
-        marginArgs.optionDynamicPercentageShortMaintenance,
-      optionShortPutCapPercentage: marginArgs.optionShortPutCapPercentage,
       expiryIntervalSeconds: expiryArgs.expiryIntervalSeconds,
       newExpiryThresholdSeconds: expiryArgs.newExpiryThresholdSeconds,
       minFundingRatePercent: perpArgs.minFundingRatePercent,
@@ -2695,15 +2678,6 @@ export interface InitializeZetaGroupPricingArgs {
 export interface UpdateMarginParametersArgs {
   futureMarginInitial: anchor.BN;
   futureMarginMaintenance: anchor.BN;
-  optionMarkPercentageLongInitial: anchor.BN;
-  optionSpotPercentageLongInitial: anchor.BN;
-  optionSpotPercentageShortInitial: anchor.BN;
-  optionDynamicPercentageShortInitial: anchor.BN;
-  optionMarkPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageShortMaintenance: anchor.BN;
-  optionDynamicPercentageShortMaintenance: anchor.BN;
-  optionShortPutCapPercentage: anchor.BN;
 }
 
 export interface UpdatePerpParametersArgs {

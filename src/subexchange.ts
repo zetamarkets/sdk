@@ -902,42 +902,6 @@ export class SubExchange {
         this.zetaGroup.marginParameters.futureMarginMaintenance,
         constants.MARGIN_PRECISION
       ),
-      optionMarkPercentageLongInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionMarkPercentageLongInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageLongInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageLongInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageShortInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageShortInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionDynamicPercentageShortInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionDynamicPercentageShortInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionMarkPercentageLongMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionMarkPercentageLongMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageLongMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageLongMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageShortMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageShortMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionDynamicPercentageShortMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionDynamicPercentageShortMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionShortPutCapPercentage: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionShortPutCapPercentage,
-        constants.MARGIN_PRECISION
-      ),
     };
   }
 

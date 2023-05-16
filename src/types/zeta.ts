@@ -3,6 +3,49 @@ export type Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaPricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaPricingArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -5070,6 +5113,263 @@ export type Zeta = {
   ],
   "accounts": [
     {
+      "name": "pricing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "markPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "markPricesPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "updateTimestamps",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "updateTimestampsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltas",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltasPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRates",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestMidpoints",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestMidpointsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracles",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oraclesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeeds",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeedsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "markets",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueues",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueuesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "marginParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "products",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                724
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "greeks",
       "type": {
         "kind": "struct",
@@ -5417,7 +5717,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                63
+                808
               ]
             }
           }
@@ -6216,47 +6516,11 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                32
+                104
               ]
             }
           }
@@ -6782,42 +7046,6 @@ export type Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
           }
         ]
       }
@@ -6953,42 +7181,6 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
             "name": "expiryIntervalSeconds",
             "type": "u32"
           },
@@ -7067,6 +7259,34 @@ export type Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeZetaPricingArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
+          },
+          {
+            "name": "marginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "marginMaintenance",
+            "type": "u64"
           }
         ]
       }
@@ -8349,6 +8569,49 @@ export const IDL: Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaPricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaPricingArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -13416,6 +13679,263 @@ export const IDL: Zeta = {
   ],
   "accounts": [
     {
+      "name": "pricing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "markPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "markPricesPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "updateTimestamps",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "updateTimestampsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltas",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltasPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRates",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestMidpoints",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestMidpointsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracles",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oraclesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeeds",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeedsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "markets",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueues",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueuesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "marginParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "products",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                724
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "greeks",
       "type": {
         "kind": "struct",
@@ -13763,7 +14283,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                63
+                808
               ]
             }
           }
@@ -14562,47 +15082,11 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                32
+                104
               ]
             }
           }
@@ -15128,42 +15612,6 @@ export const IDL: Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
           }
         ]
       }
@@ -15299,42 +15747,6 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
             "name": "expiryIntervalSeconds",
             "type": "u32"
           },
@@ -15413,6 +15825,34 @@ export const IDL: Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeZetaPricingArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
+          },
+          {
+            "name": "marginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "marginMaintenance",
+            "type": "u64"
           }
         ]
       }

@@ -64,15 +64,6 @@ export interface PricingParameters {
 export interface MarginParameters {
   futureMarginInitial: anchor.BN;
   futureMarginMaintenance: anchor.BN;
-  optionMarkPercentageLongInitial: anchor.BN;
-  optionSpotPercentageLongInitial: anchor.BN;
-  optionSpotPercentageShortInitial: anchor.BN;
-  optionDynamicPercentageShortInitial: anchor.BN;
-  optionMarkPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageShortMaintenance: anchor.BN;
-  optionDynamicPercentageShortMaintenance: anchor.BN;
-  optionShortPutCapPercentage: anchor.BN;
   padding: Array<number>;
 }
 
