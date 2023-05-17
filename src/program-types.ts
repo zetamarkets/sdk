@@ -29,7 +29,42 @@ export interface State {
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
   secondaryAdmin: PublicKey;
+  nativeWithdrawLimit: anchor.BN;
+  withdrawLimitEpochSeconds: number;
+  nativeOpenInterestLimit: anchor.BN;
+  haltState: HaltStateV2;
+  padding: Array<number>;
+}
+
+export interface Pricing {
+  nonce: number;
+  markPrices: Array<anchor.BN>;
+  markPricesPadding: Array<anchor.BN>;
+  updateTimestamps: Array<anchor.BN>;
+  updateTimestampsPadding: Array<anchor.BN>;
+  fundingDeltas: Array<AnchorDecimal>;
+  fundingDeltasPadding: Array<AnchorDecimal>;
+  latestFundingRates: Array<AnchorDecimal>;
+  latestFundingRatesPadding: Array<AnchorDecimal>;
+  latestMidpoints: Array<anchor.BN>;
+  latestMidpointsPadding: Array<anchor.BN>;
+  oracles: Array<PublicKey>;
+  oraclesPadding: Array<PublicKey>;
+  oracleBackupFeeds: Array<PublicKey>;
+  oracleBackupFeedsPadding: Array<PublicKey>;
+  markets: Array<PublicKey>;
+  marketsPadding: Array<PublicKey>;
+  perpSyncQueues: Array<PublicKey>;
+  perpSyncQueuesPadding: Array<PublicKey>;
+  perpParameters: Array<PerpParameters>;
+  perpParametersPadding: Array<PerpParameters>;
+  marginParameters: Array<MarginParameters>;
+  marginParametersPadding: Array<MarginParameters>;
+  products: Array<Product>;
+  productsPadding: Array<Product>;
   totalInsuranceVaultDeposits: anchor.BN;
+  lastWithdrawTimestamp: anchor.BN;
+  netOutflowSum: anchor.BN;
   padding: Array<number>;
 }
 
@@ -81,6 +116,15 @@ export interface HaltState {
   markPricesSetPadding: Array<boolean>;
   marketNodesCleaned: Array<boolean>;
   marketNodesCleanedPadding: Array<boolean>;
+  marketCleaned: Array<boolean>;
+  marketCleanedPadding: Array<boolean>;
+}
+
+export interface HaltStateV2 {
+  halted: boolean;
+  timestamp: anchor.BN;
+  spotPrices: Array<number>;
+  spotPricesPadding: Array<number>;
   marketCleaned: Array<boolean>;
   marketCleanedPadding: Array<boolean>;
 }

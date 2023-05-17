@@ -677,6 +677,14 @@ export class SubExchange {
   }
 
   /**
+   * Update pricing for an expiry index.
+   */
+  public async updatePricingV2() {
+    let tx = new Transaction().add(instructions.updatePricingV2Ix(this.asset));
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  /**
    * Retreat volatility surface and interest rates for an expiry index.
    */
   public async retreatMarketNodes(expiryIndex: number) {

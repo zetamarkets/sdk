@@ -46,6 +46,34 @@
       ]
     },
     {
+      "name": "updateZetaPricingPubkeys",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaPricingPubkeysArgs"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -430,6 +458,71 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "globalHalt",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "globalUnhalt",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateHaltStateV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "HaltZetaGroupArgs"
+          }
+        }
+      ]
     },
     {
       "name": "unhaltZetaGroup",
@@ -1037,6 +1130,17 @@
       "args": []
     },
     {
+      "name": "cleanZetaMarketsHaltedV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "settlePositions",
       "accounts": [
         {
@@ -1577,6 +1681,59 @@
       ]
     },
     {
+      "name": "updatePricingV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "applyPerpFunding",
       "accounts": [
         {
@@ -1751,6 +1908,57 @@
       ]
     },
     {
+      "name": "depositV2",
+      "accounts": [
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "depositInsuranceVaultOld",
       "accounts": [
         {
@@ -1811,6 +2019,62 @@
       "accounts": [
         {
           "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -1929,10 +2193,122 @@
       ]
     },
     {
+      "name": "withdrawV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "withdrawInsuranceVault",
       "accounts": [
         {
           "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "percentageAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -2267,128 +2643,6 @@
       ]
     },
     {
-      "name": "migrateInsuranceDepositAccount",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oldInsuranceDepositAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "newInsuranceDepositAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "newNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "migrateToCombinedInsuranceVault",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "solVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "btcVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "ethVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "arbVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "aptVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "combinedVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "solZetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "btcZetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "ethZetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "arbZetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "aptZetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "initializeCombinedInsuranceVault",
       "accounts": [
         {
@@ -2430,82 +2684,6 @@
       ]
     },
     {
-      "name": "migrateToCombinedVault",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "solVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "btcVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "ethVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "arbVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "aptVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "combinedVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "solZetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "btcZetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ethZetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "arbZetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "aptZetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "initializeCombinedVault",
       "accounts": [
         {
@@ -2545,57 +2723,6 @@
           "type": "u8"
         }
       ]
-    },
-    {
-      "name": "migrateToCombinedSocializedLossAccount",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "solAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "btcAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "ethAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "arbAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "aptAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "combinedAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "initializeCombinedSocializedLossAccount",
@@ -5358,11 +5485,23 @@
             }
           },
           {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "netOutflowSum",
+            "type": "i64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                724
+                700
               ]
             }
           }
@@ -5709,15 +5848,29 @@
             "type": "u8"
           },
           {
-            "name": "totalInsuranceVaultDeposits",
+            "name": "nativeWithdrawLimit",
             "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          },
+          {
+            "name": "haltState",
+            "type": {
+              "defined": "HaltStateV2"
+            }
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                808
+                512
               ]
             }
           }
@@ -6365,6 +6518,58 @@
       }
     },
     {
+      "name": "HaltStateV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "halted",
+            "type": "bool"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "spotPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "spotPricesPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "marketCleaned",
+            "type": {
+              "array": [
+                "bool",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketCleanedPadding",
+            "type": {
+              "array": [
+                "bool",
+                20
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltState",
       "type": {
         "kind": "struct",
@@ -6694,6 +6899,48 @@
       }
     },
     {
+      "name": "HaltStateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "spotPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalHaltArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "spotPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "UpdateVolatilityArgs",
       "type": {
         "kind": "struct",
@@ -6882,6 +7129,18 @@
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -6982,6 +7241,18 @@
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -7259,6 +7530,36 @@
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateZetaPricingPubkeysArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "oracle",
+            "type": "publicKey"
+          },
+          {
+            "name": "oracleBackupFeed",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "perpSyncQueue",
+            "type": "publicKey"
           }
         ]
       }
@@ -8560,6 +8861,21 @@
       "code": 6131,
       "name": "InsuranceVaultSeedsMismatch",
       "msg": "Insurance vault seeds mismatch"
+    },
+    {
+      "code": 6132,
+      "name": "OpenInterestLimitBreach",
+      "msg": "Open interest limit breach, decrease your position"
+    },
+    {
+      "code": 6133,
+      "name": "WithdrawLimitBreach",
+      "msg": "Withdraw limit breach, wait to withdraw more"
+    },
+    {
+      "code": 6134,
+      "name": "InvalidPricingOracle",
+      "msg": "Invalid oracle for this pricing account"
     }
   ]
 }

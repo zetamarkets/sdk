@@ -322,6 +322,13 @@ export function getZetaGroup(
   );
 }
 
+export function getPricing(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("pricing"))],
+    programId
+  );
+}
+
 export function getUnderlying(
   programId: PublicKey,
   underlyingIndex: number

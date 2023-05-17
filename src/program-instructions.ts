@@ -12,7 +12,7 @@ import * as utils from "./utils";
 import * as anchor from "@zetamarkets/anchor";
 import * as types from "./types";
 import * as constants from "./constants";
-import { Asset, toProgramAsset } from "./assets";
+import { Asset, assetToIndex, toProgramAsset } from "./assets";
 import { Market } from "./market";
 
 export function initializeCombinedInsuranceVaultIx(): TransactionInstruction {
@@ -64,133 +64,6 @@ export function initializeCombinedSocializedLossAccountIx(): TransactionInstruct
       },
     }
   );
-}
-
-export function migrateToCombinedInsuranceVaultIx(): TransactionInstruction {
-  let [insuranceVault, _insuranceVaultNonce] =
-    utils.getZetaCombinedInsuranceVault(Exchange.programId);
-
-  let [solVault, _solVaultNonce] = utils.getZetaInsuranceVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.SOL)
-  );
-  let [btcVault, _btcVaultNonce] = utils.getZetaInsuranceVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.BTC)
-  );
-  let [ethVault, _ethVaultNonce] = utils.getZetaInsuranceVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.ETH)
-  );
-  let [arbVault, _arbVaultNonce] = utils.getZetaInsuranceVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.ARB)
-  );
-  let [aptVault, _aptVaultNonce] = utils.getZetaInsuranceVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.APT)
-  );
-  return Exchange.program.instruction.migrateToCombinedInsuranceVault({
-    accounts: {
-      state: Exchange.stateAddress,
-      admin: Exchange.state.admin,
-      solVault: solVault,
-      btcVault: btcVault,
-      ethVault: ethVault,
-      arbVault: arbVault,
-      aptVault: aptVault,
-      combinedVault: insuranceVault,
-      solZetaGroup: Exchange.getZetaGroupAddress(Asset.SOL),
-      btcZetaGroup: Exchange.getZetaGroupAddress(Asset.BTC),
-      ethZetaGroup: Exchange.getZetaGroupAddress(Asset.ETH),
-      arbZetaGroup: Exchange.getZetaGroupAddress(Asset.ARB),
-      aptZetaGroup: Exchange.getZetaGroupAddress(Asset.APT),
-      tokenProgram: TOKEN_PROGRAM_ID,
-    },
-  });
-}
-
-export function migrateToCombinedVaultIx(): TransactionInstruction {
-  let [vault, _vaultNonce] = utils.getCombinedVault(Exchange.programId);
-
-  let [solVault, _solVaultNonce] = utils.getVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.SOL)
-  );
-  let [btcVault, _btcVaultNonce] = utils.getVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.BTC)
-  );
-  let [ethVault, _ethVaultNonce] = utils.getVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.ETH)
-  );
-  let [arbVault, _arbVaultNonce] = utils.getVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.ARB)
-  );
-  let [aptVault, _aptVaultNonce] = utils.getVault(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.APT)
-  );
-  return Exchange.program.instruction.migrateToCombinedVault({
-    accounts: {
-      state: Exchange.stateAddress,
-      admin: Exchange.state.admin,
-      solVault: solVault,
-      btcVault: btcVault,
-      ethVault: ethVault,
-      arbVault: arbVault,
-      aptVault: aptVault,
-      combinedVault: vault,
-      solZetaGroup: Exchange.getZetaGroupAddress(Asset.SOL),
-      btcZetaGroup: Exchange.getZetaGroupAddress(Asset.BTC),
-      ethZetaGroup: Exchange.getZetaGroupAddress(Asset.ETH),
-      arbZetaGroup: Exchange.getZetaGroupAddress(Asset.ARB),
-      aptZetaGroup: Exchange.getZetaGroupAddress(Asset.APT),
-      tokenProgram: TOKEN_PROGRAM_ID,
-    },
-  });
-}
-
-export function migrateToCombinedSocializedLossAccountIx(): TransactionInstruction {
-  let [account, _accountNonce] = utils.getCombinedSocializedLossAccount(
-    Exchange.programId
-  );
-
-  let [solAccount, _solAccountNonce] = utils.getSocializedLossAccount(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.SOL)
-  );
-  let [btcAccount, _btcAccountNonce] = utils.getSocializedLossAccount(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.BTC)
-  );
-  let [ethAccount, _ethAccountNonce] = utils.getSocializedLossAccount(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.ETH)
-  );
-  let [arbAccount, _arbAccountNonce] = utils.getSocializedLossAccount(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.ARB)
-  );
-  let [aptAccount, _aptAccountNonce] = utils.getSocializedLossAccount(
-    Exchange.programId,
-    Exchange.getZetaGroupAddress(Asset.APT)
-  );
-  return Exchange.program.instruction.migrateToCombinedSocializedLossAccount({
-    accounts: {
-      state: Exchange.stateAddress,
-      admin: Exchange.state.admin,
-      solAccount: solAccount,
-      btcAccount: btcAccount,
-      ethAccount: ethAccount,
-      arbAccount: arbAccount,
-      aptAccount: aptAccount,
-      combinedAccount: account,
-      tokenProgram: TOKEN_PROGRAM_ID,
-    },
-  });
 }
 
 export function initializeMarginAccountIx(
@@ -267,6 +140,45 @@ export function initializeInsuranceDepositAccountIx(
       systemProgram: SystemProgram.programId,
       whitelistInsuranceAccount: userWhitelistInsuranceKey,
     },
+  });
+}
+
+/**
+ * @param amount the native amount to deposit (6dp)
+ */
+export function depositV2Ix(
+  asset: Asset,
+  amount: number,
+  marginAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey,
+  whitelistDepositAccount: PublicKey | undefined
+): TransactionInstruction {
+  let remainingAccounts =
+    whitelistDepositAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistDepositAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+  let subExchange = Exchange.getSubExchange(asset);
+
+  // TODO: Probably use mint to find decimal places in future.
+  return Exchange.program.instruction.depositV2(new anchor.BN(amount), {
+    accounts: {
+      pricing: Exchange.pricingAddress,
+      marginAccount: marginAccount,
+      vault: Exchange.combinedVaultAddress,
+      userTokenAccount: usdcAccount,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+      authority: userKey,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      state: Exchange.stateAddress,
+    },
+    remainingAccounts,
   });
 }
 
@@ -461,25 +373,31 @@ export function withdrawIx(
   });
 }
 
-export function migrateInsuranceDepositAccountIx(
+/**
+ * @param amount the native amount to withdraw (6dp)
+ */
+export function withdrawV2Ix(
   asset: Asset,
-  oldAccount: PublicKey,
-  newAccount: PublicKey,
-  owner: PublicKey
-) {
-  let [_account, newNonce] = utils.getUserInsuranceDepositAccount(
-    Exchange.programId,
-    owner
-  );
-  return Exchange.program.instruction.migrateInsuranceDepositAccount(newNonce, {
+  amount: number,
+  marginAccount: PublicKey,
+  usdcAccount: PublicKey,
+  userKey: PublicKey
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+
+  return Exchange.program.instruction.withdrawV2(new anchor.BN(amount), {
     accounts: {
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      oldInsuranceDepositAccount: oldAccount,
-      newInsuranceDepositAccount: newAccount,
       state: Exchange.stateAddress,
-      admin: Exchange.state.admin,
-      authority: owner,
-      systemProgram: SystemProgram.programId,
+      pricing: Exchange.pricingAddress,
+      vault: Exchange.combinedVaultAddress,
+      marginAccount: marginAccount,
+      userTokenAccount: usdcAccount,
+      authority: userKey,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      oracle: subExchange.zetaGroup.oracle,
+      oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
+      oracleBackupProgram: constants.CHAINLINK_PID,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
     },
   });
 }
@@ -1649,6 +1567,24 @@ export function updatePricingIx(
   });
 }
 
+export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = Exchange.getPerpMarket(asset);
+  let asset_index = assetToIndex(asset);
+  return Exchange.program.instruction.updatePricingV2(toProgramAsset(asset), {
+    accounts: {
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
+      oracle: Exchange.pricing.oracles[asset_index],
+      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[asset_index],
+      oracleBackupProgram: constants.CHAINLINK_PID,
+      perpMarket: marketData.address,
+      perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
+      perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
+    },
+  });
+}
+
 export function applyPerpFundingIx(
   asset: Asset,
   remainingAccounts: any[]
@@ -1744,6 +1680,44 @@ export function updateVolatilityNodesIx(
       zetaGroup: subExchange.zetaGroupAddress,
       greeks: subExchange.greeksAddress,
       admin,
+    },
+  });
+}
+
+export function initializeZetaPricingIx(
+  perpArgs: UpdatePerpParametersArgs,
+  marginArgs: UpdateMarginParametersArgs
+): TransactionInstruction {
+  let [pricing, _pricingNonce] = utils.getPricing(Exchange.programId);
+  return Exchange.program.instruction.initializeZetaPricing(
+    {
+      minFundingRatePercent: perpArgs.minFundingRatePercent,
+      maxFundingRatePercent: perpArgs.maxFundingRatePercent,
+      perpImpactCashDelta: perpArgs.perpImpactCashDelta,
+      marginInitial: marginArgs.futureMarginInitial,
+      marginMaintenance: marginArgs.futureMarginMaintenance,
+    },
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: pricing,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: SYSVAR_RENT_PUBKEY,
+      },
+    }
+  );
+}
+
+export function updateZetaPricingPubkeysIx(
+  args: UpdateZetaPricingPubkeysArgs
+): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaPricingPubkeys(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
+      admin: Exchange.state.admin,
     },
   });
 }
@@ -2645,6 +2619,9 @@ export interface StateParams {
   nativeOptionTradeFeePercentage: anchor.BN;
   nativeOptionUnderlyingFeePercentage: anchor.BN;
   maxPerpDeltaAgeSeconds: number;
+  nativeWithdrawLimit: anchor.BN;
+  withdrawLimitEpochSeconds: number;
+  nativeOpenInterestLimit: anchor.BN;
 }
 
 export interface UpdatePricingParametersArgs {
@@ -2706,4 +2683,12 @@ export interface SetReferralsRewardsArgs {
   referralsAccountKey: PublicKey;
   pendingRewards: anchor.BN;
   overwrite: boolean;
+}
+
+export interface UpdateZetaPricingPubkeysArgs {
+  asset: any;
+  oracle: PublicKey;
+  oracleBackupFeed: PublicKey;
+  market: PublicKey;
+  perpSyncQueue: PublicKey;
 }

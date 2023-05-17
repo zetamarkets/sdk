@@ -17,6 +17,7 @@ import {
   ProductGreeks,
   State,
   ZetaGroup,
+  Pricing,
 } from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
@@ -26,7 +27,7 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
 import * as types from "./types";
-import { Asset } from "./assets";
+import { Asset, toProgramAsset } from "./assets";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
@@ -55,6 +56,14 @@ export class Exchange {
     return this._state;
   }
   private _state: State;
+
+  /**
+   * Account storing zeta pricing.
+   */
+  public get pricing(): Pricing {
+    return this._pricing;
+  }
+  private _pricing: Pricing;
 
   /**
    * The solana network being used.
@@ -158,6 +167,14 @@ export class Exchange {
     return this._stateAddress;
   }
   private _stateAddress: PublicKey;
+
+  /**
+   * Address of zeta pricing account.
+   */
+  public get pricingAddress(): PublicKey {
+    return this._pricingAddress;
+  }
+  private _pricingAddress: PublicKey;
 
   /**
    * Public key for treasury wallet.
@@ -325,58 +342,6 @@ export class Exchange {
     this._isSetup = true;
   }
 
-  public async migrateToCombinedInsuranceVault() {
-    let tx = new Transaction().add(
-      instructions.migrateToCombinedInsuranceVaultIx()
-    );
-    try {
-      await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      console.error(`migrateToCombinedInsuranceVault failed: ${e}`);
-    }
-  }
-
-  public async migrateToCombinedVault() {
-    let tx = new Transaction().add(instructions.migrateToCombinedVaultIx());
-    try {
-      await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      console.error(`migrateToCombinedVault failed: ${e}`);
-    }
-  }
-
-  public async migrateToCombinedSocializedLossAccount() {
-    let tx = new Transaction().add(
-      instructions.migrateToCombinedSocializedLossAccountIx()
-    );
-    try {
-      await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      console.error(`migrateToCombinedSocializedLossAccount failed: ${e}`);
-    }
-  }
-
-  public async migrateInsuranceDepositAccount(
-    asset: Asset,
-    oldAccount: PublicKey,
-    newAccount: PublicKey,
-    owner: PublicKey
-  ) {
-    let tx = new Transaction().add(
-      instructions.migrateInsuranceDepositAccountIx(
-        asset,
-        oldAccount,
-        newAccount,
-        owner
-      )
-    );
-    try {
-      await utils.processTransaction(this._provider, tx);
-    } catch (e) {
-      console.error(`migrateInsuranceDepositAccount failed: ${e}`);
-    }
-  }
-
   public async initializeCombinedInsuranceVault() {
     let tx = new Transaction().add(
       instructions.initializeCombinedInsuranceVaultIx()
@@ -429,6 +394,7 @@ export class Exchange {
       this.programId
     );
     const [state, stateNonce] = utils.getState(this.programId);
+    const [pricing, _pricingNonce] = utils.getPricing(this.programId);
     const [serumAuthority, serumNonce] = utils.getSerumAuthority(
       this.programId
     );
@@ -469,10 +435,34 @@ export class Exchange {
 
     this._mintAuthority = mintAuthority;
     this._stateAddress = state;
+    this._pricingAddress = pricing;
     this._serumAuthority = serumAuthority;
     this._treasuryWalletAddress = treasuryWallet;
     this._referralsRewardsWalletAddress = referralRewardsWallet;
     await this.updateState();
+  }
+
+  public async initializeZetaPricing(
+    perpArgs: instructions.UpdatePerpParametersArgs,
+    marginArgs: instructions.UpdateMarginParametersArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.initializeZetaPricingIx(perpArgs, marginArgs)
+    );
+    try {
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        [],
+        utils.defaultCommitment(),
+        this.useLedger
+      );
+    } catch (e) {
+      console.error(`Initialize zeta pricing failed: ${e}`);
+      console.log(e);
+    }
+
+    await this.updateZetaPricing();
   }
 
   public async initializeZetaGroup(
@@ -548,6 +538,7 @@ export class Exchange {
     // Load variables from state.
     this._mintAuthority = utils.getMintAuthority(this.programId)[0];
     this._stateAddress = utils.getState(this.programId)[0];
+    this._pricingAddress = utils.getPricing(this.programId)[0];
     this._serumAuthority = utils.getSerumAuthority(this.programId)[0];
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[loadConfig.network];
     this._treasuryWalletAddress = utils.getZetaTreasuryWallet(
@@ -740,6 +731,17 @@ export class Exchange {
     this._state = (await this.program.account.state.fetch(
       this.stateAddress
     )) as State;
+  }
+
+  // TODO add subscription to this account
+
+  /**
+   * Polls the on chain account to update mark prices
+   */
+  public async updateZetaPricing() {
+    this._pricing = (await this.program.account.pricing.fetch(
+      this.pricingAddress
+    )) as Pricing;
   }
 
   /**
@@ -996,6 +998,31 @@ export class Exchange {
 
   public async updatePricing(asset: Asset, expiryIndex: number = undefined) {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
+  }
+
+  public async updatePricingV2(asset: Asset) {
+    await this.getSubExchange(asset).updatePricingV2();
+  }
+
+  public async updatePricingPubkeys(
+    asset: Asset,
+    oracle: PublicKey,
+    oracleBackupFeed: PublicKey,
+    market: PublicKey,
+    perpSyncQueue: PublicKey
+  ) {
+    let tx = new Transaction().add(
+      instructions.updateZetaPricingPubkeysIx({
+        asset: toProgramAsset(asset) as any,
+        oracle,
+        oracleBackupFeed,
+        market,
+        perpSyncQueue,
+      })
+    );
+    await utils.processTransaction(this.provider, tx);
+
+    await this.updateZetaPricing();
   }
 
   public async retreatMarketNodes(asset: Asset, expiryIndex: number) {

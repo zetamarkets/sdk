@@ -395,7 +395,7 @@ export class SubClient {
       );
     }
     tx.add(
-      instructions.depositIx(
+      instructions.depositV2Ix(
         this.asset,
         amount,
         this._marginAccountAddress,
@@ -487,7 +487,7 @@ export class SubClient {
     this.delegatedCheck();
     let tx = new Transaction();
     tx.add(
-      instructions.withdrawIx(
+      instructions.withdrawV2Ix(
         this.asset,
         amount,
         this._marginAccountAddress,
