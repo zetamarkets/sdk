@@ -2166,6 +2166,11 @@ export type Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -2262,12 +2267,7 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "newNonce",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "migrateToCombinedInsuranceVault",
@@ -10512,6 +10512,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -10608,12 +10613,7 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "newNonce",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "migrateToCombinedInsuranceVault",

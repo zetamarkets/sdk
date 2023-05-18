@@ -252,6 +252,7 @@ export function initializeInsuranceDepositAccountOldIx(
 }
 
 export function initializeInsuranceDepositAccountIx(
+  payer: PublicKey,
   userKey: PublicKey,
   userWhitelistInsuranceKey: PublicKey
 ): TransactionInstruction {
@@ -263,6 +264,7 @@ export function initializeInsuranceDepositAccountIx(
   return Exchange.program.instruction.initializeInsuranceDepositAccount(nonce, {
     accounts: {
       insuranceDepositAccount,
+      payer,
       authority: userKey,
       systemProgram: SystemProgram.programId,
       whitelistInsuranceAccount: userWhitelistInsuranceKey,
@@ -467,11 +469,7 @@ export function migrateInsuranceDepositAccountIx(
   newAccount: PublicKey,
   owner: PublicKey
 ) {
-  let [_account, newNonce] = utils.getUserInsuranceDepositAccount(
-    Exchange.programId,
-    owner
-  );
-  return Exchange.program.instruction.migrateInsuranceDepositAccount(newNonce, {
+  return Exchange.program.instruction.migrateInsuranceDepositAccount({
     accounts: {
       zetaGroup: Exchange.getZetaGroupAddress(asset),
       oldInsuranceDepositAccount: oldAccount,

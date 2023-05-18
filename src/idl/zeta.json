@@ -2166,6 +2166,11 @@
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -2262,12 +2267,7 @@
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "newNonce",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "migrateToCombinedInsuranceVault",
