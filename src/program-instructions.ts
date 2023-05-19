@@ -125,6 +125,7 @@ export function initializeInsuranceDepositAccountOldIx(
 }
 
 export function initializeInsuranceDepositAccountIx(
+  payer: PublicKey,
   userKey: PublicKey,
   userWhitelistInsuranceKey: PublicKey
 ): TransactionInstruction {
@@ -136,6 +137,7 @@ export function initializeInsuranceDepositAccountIx(
   return Exchange.program.instruction.initializeInsuranceDepositAccount(nonce, {
     accounts: {
       insuranceDepositAccount,
+      payer,
       authority: userKey,
       systemProgram: SystemProgram.programId,
       whitelistInsuranceAccount: userWhitelistInsuranceKey,

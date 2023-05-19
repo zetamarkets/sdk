@@ -143,6 +143,7 @@ export class InsuranceClient {
       tx.add(
         await instructions.initializeInsuranceDepositAccountIx(
           this.publicKey,
+          this.publicKey,
           this.whitelistInsuranceAccountAddress
         )
       );
