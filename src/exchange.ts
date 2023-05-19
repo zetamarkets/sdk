@@ -322,6 +322,14 @@ export class Exchange {
       this.addSubExchange(asset, new SubExchange());
       this.getSubExchange(asset).initialize(asset);
     }
+
+    this._combinedVaultAddress = utils.getCombinedVault(this.programId)[0];
+    this._combinedInsuranceVaultAddress = utils.getZetaCombinedInsuranceVault(
+      this.programId
+    )[0];
+    this._combinedSocializedLossAccountAddress =
+      utils.getCombinedSocializedLossAccount(this.programId)[0];
+
     this._isSetup = true;
   }
 
