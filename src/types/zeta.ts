@@ -5558,6 +5558,24 @@ export type Zeta = {
             }
           },
           {
+            "name": "zetaGroupKeys",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "zetaGroupKeysPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
             "name": "totalInsuranceVaultDeposits",
             "type": "u64"
           },
@@ -5574,7 +5592,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                700
+                1700
               ]
             }
           }
@@ -5943,7 +5961,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                512
+                552
               ]
             }
           }
@@ -7632,6 +7650,10 @@ export type Zeta = {
           },
           {
             "name": "perpSyncQueue",
+            "type": "publicKey"
+          },
+          {
+            "name": "zetaGroupKey",
             "type": "publicKey"
           }
         ]
@@ -14513,6 +14535,24 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "zetaGroupKeys",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "zetaGroupKeysPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
             "name": "totalInsuranceVaultDeposits",
             "type": "u64"
           },
@@ -14529,7 +14569,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                700
+                1700
               ]
             }
           }
@@ -14898,7 +14938,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                512
+                552
               ]
             }
           }
@@ -16587,6 +16627,10 @@ export const IDL: Zeta = {
           },
           {
             "name": "perpSyncQueue",
+            "type": "publicKey"
+          },
+          {
+            "name": "zetaGroupKey",
             "type": "publicKey"
           }
         ]

@@ -1009,7 +1009,8 @@ export class Exchange {
     oracle: PublicKey,
     oracleBackupFeed: PublicKey,
     market: PublicKey,
-    perpSyncQueue: PublicKey
+    perpSyncQueue: PublicKey,
+    zetaGroupKey: PublicKey
   ) {
     let tx = new Transaction().add(
       instructions.updateZetaPricingPubkeysIx({
@@ -1018,6 +1019,7 @@ export class Exchange {
         oracleBackupFeed,
         market,
         perpSyncQueue,
+        zetaGroupKey,
       })
     );
     await utils.processTransaction(this.provider, tx);

@@ -5558,6 +5558,24 @@
             }
           },
           {
+            "name": "zetaGroupKeys",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "zetaGroupKeysPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
             "name": "totalInsuranceVaultDeposits",
             "type": "u64"
           },
@@ -5574,7 +5592,7 @@
             "type": {
               "array": [
                 "u8",
-                700
+                1700
               ]
             }
           }
@@ -5943,7 +5961,7 @@
             "type": {
               "array": [
                 "u8",
-                512
+                552
               ]
             }
           }
@@ -7632,6 +7650,10 @@
           },
           {
             "name": "perpSyncQueue",
+            "type": "publicKey"
+          },
+          {
+            "name": "zetaGroupKey",
             "type": "publicKey"
           }
         ]

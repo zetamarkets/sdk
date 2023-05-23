@@ -2737,4 +2737,5 @@ export interface UpdateZetaPricingPubkeysArgs {
   oracleBackupFeed: PublicKey;
   market: PublicKey;
   perpSyncQueue: PublicKey;
+  zetaGroupKey: PublicKey;
 }
