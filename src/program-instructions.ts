@@ -1620,13 +1620,17 @@ export function updateMarginParametersIx(
   args: UpdateMarginParametersArgs,
   admin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.updateMarginParameters(args, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      admin,
-    },
-  });
+  return Exchange.program.instruction.updateMarginParameters(
+    args,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        admin,
+      },
+    }
+  );
 }
 
 export function updatePerpParametersIx(
@@ -1634,13 +1638,53 @@ export function updatePerpParametersIx(
   args: UpdatePerpParametersArgs,
   admin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.updatePerpParameters(args, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      admin,
-    },
-  });
+  return Exchange.program.instruction.updatePerpParameters(
+    args,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateZetaGroupMarginParametersIx(
+  asset: Asset,
+  args: UpdateMarginParametersArgs,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaGroupMarginParameters(
+    args,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: Exchange.getZetaGroupAddress(asset),
+        admin,
+      },
+    }
+  );
+}
+
+export function updateZetaGroupPerpParametersIx(
+  asset: Asset,
+  args: UpdatePerpParametersArgs,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateZetaGroupPerpParameters(
+    args,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        zetaGroup: Exchange.getZetaGroupAddress(asset),
+        admin,
+      },
+    }
+  );
 }
 
 export function updateZetaGroupExpiryParametersIx(

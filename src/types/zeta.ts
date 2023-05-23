@@ -1001,6 +1001,40 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMarginParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupMarginParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
@@ -1022,6 +1056,40 @@ export type Zeta = {
     },
     {
       "name": "updatePerpParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePerpParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupPerpParameters",
       "accounts": [
         {
           "name": "state",
@@ -9888,6 +9956,40 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMarginParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupMarginParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
@@ -9909,6 +10011,40 @@ export const IDL: Zeta = {
     },
     {
       "name": "updatePerpParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePerpParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupPerpParameters",
       "accounts": [
         {
           "name": "state",
