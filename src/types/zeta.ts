@@ -5592,7 +5592,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                1700
+                2500
               ]
             }
           }
@@ -6810,15 +6810,6 @@ export type Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                104
-              ]
-            }
           }
         ]
       }
@@ -14569,7 +14560,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                1700
+                2500
               ]
             }
           }
@@ -15787,15 +15778,6 @@ export const IDL: Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                104
-              ]
-            }
           }
         ]
       }

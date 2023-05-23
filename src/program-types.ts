@@ -99,7 +99,6 @@ export interface PricingParameters {
 export interface MarginParameters {
   futureMarginInitial: anchor.BN;
   futureMarginMaintenance: anchor.BN;
-  padding: Array<number>;
 }
 
 export interface PerpParameters {
