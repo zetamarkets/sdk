@@ -139,6 +139,7 @@ export interface ZetaGroup {
   greeks: PublicKey;
   pricingParameters: PricingParameters;
   marginParameters: MarginParameters;
+  marginParametersPadding: Array<number>;
   products: Array<Product>;
   productsPadding: Array<Product>;
   perp: Product;
