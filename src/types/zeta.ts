@@ -5587,7 +5587,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                132
+                2732
               ]
             }
           }
@@ -6076,6 +6076,15 @@ export type Zeta = {
             "name": "marginParameters",
             "type": {
               "defined": "MarginParameters"
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                "u8",
+                104
+              ]
             }
           },
           {
@@ -6805,15 +6814,6 @@ export type Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                104
-              ]
-            }
           }
         ]
       }
@@ -14559,7 +14559,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                132
+                2732
               ]
             }
           }
@@ -15048,6 +15048,15 @@ export const IDL: Zeta = {
             "name": "marginParameters",
             "type": {
               "defined": "MarginParameters"
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                "u8",
+                104
+              ]
             }
           },
           {
@@ -15777,15 +15786,6 @@ export const IDL: Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                104
-              ]
-            }
           }
         ]
       }

@@ -5587,7 +5587,7 @@
             "type": {
               "array": [
                 "u8",
-                132
+                2732
               ]
             }
           }
@@ -6076,6 +6076,15 @@
             "name": "marginParameters",
             "type": {
               "defined": "MarginParameters"
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                "u8",
+                104
+              ]
             }
           },
           {
@@ -6805,15 +6814,6 @@
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                104
-              ]
-            }
           }
         ]
       }
