@@ -4073,6 +4073,53 @@ export type Zeta = {
       ]
     },
     {
+      "name": "cancelOrderV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
       "name": "cancelOrder",
       "accounts": [
         {
@@ -4134,6 +4181,53 @@ export type Zeta = {
               "isSigner": false
             }
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderNoErrorV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -4227,6 +4321,42 @@ export type Zeta = {
       ]
     },
     {
+      "name": "cancelAllMarketOrdersV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancelAllMarketOrders",
       "accounts": [
         {
@@ -4291,6 +4421,78 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "cancelOrderHaltedV2",
+      "accounts": [
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
     },
     {
       "name": "cancelOrderHalted",
@@ -4365,6 +4567,47 @@ export type Zeta = {
       ]
     },
     {
+      "name": "cancelOrderByClientOrderIdV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "cancelOrderByClientOrderId",
       "accounts": [
         {
@@ -4426,6 +4669,47 @@ export type Zeta = {
               "isSigner": false
             }
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderByClientOrderIdNoErrorV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -4620,6 +4904,98 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "forceCancelOrderByOrderIdV2",
+      "accounts": [
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
       "name": "forceCancelOrderByOrderId",
       "accounts": [
         {
@@ -4712,6 +5088,87 @@ export type Zeta = {
       ]
     },
     {
+      "name": "forceCancelOrdersV2",
+      "accounts": [
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "forceCancelOrders",
       "accounts": [
         {
@@ -4791,6 +5248,57 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "crankEventQueueV2",
+      "docs": [
+        "The only events that need to be cranked are maker fills."
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "crankEventQueue",
@@ -13339,6 +13847,53 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "cancelOrderV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
       "name": "cancelOrder",
       "accounts": [
         {
@@ -13400,6 +13955,53 @@ export const IDL: Zeta = {
               "isSigner": false
             }
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderNoErrorV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -13493,6 +14095,42 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "cancelAllMarketOrdersV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancelAllMarketOrders",
       "accounts": [
         {
@@ -13557,6 +14195,78 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "cancelOrderHaltedV2",
+      "accounts": [
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
     },
     {
       "name": "cancelOrderHalted",
@@ -13631,6 +14341,47 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "cancelOrderByClientOrderIdV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "cancelOrderByClientOrderId",
       "accounts": [
         {
@@ -13692,6 +14443,47 @@ export const IDL: Zeta = {
               "isSigner": false
             }
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "clientOrderId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "cancelOrderByClientOrderIdNoErrorV2",
+      "accounts": [
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -13886,6 +14678,98 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "forceCancelOrderByOrderIdV2",
+      "accounts": [
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
       "name": "forceCancelOrderByOrderId",
       "accounts": [
         {
@@ -13978,6 +14862,87 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "forceCancelOrdersV2",
+      "accounts": [
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "forceCancelOrders",
       "accounts": [
         {
@@ -14057,6 +15022,57 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "crankEventQueueV2",
+      "docs": [
+        "The only events that need to be cranked are maker fills."
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "crankEventQueue",
