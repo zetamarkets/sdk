@@ -1411,6 +1411,23 @@ export function treasuryMovementIx(
   );
 }
 
+export function rebalanceInsuranceVaultV2Ix(
+  remainingAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.rebalanceInsuranceVaultV2({
+    accounts: {
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
+      zetaVault: Exchange.combinedVaultAddress,
+      insuranceVault: Exchange.combinedInsuranceVaultAddress,
+      treasuryWallet: Exchange.treasuryWalletAddress,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    },
+    remainingAccounts,
+  });
+}
+
 export function rebalanceInsuranceVaultIx(
   asset: Asset,
   remainingAccounts: any[]
@@ -1446,6 +1463,31 @@ export function rebalanceInsuranceVaultOldIx(
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,
+  });
+}
+
+export function liquidateV2Ix(
+  asset: Asset,
+  liquidator: PublicKey,
+  liquidatorMarginAccount: PublicKey,
+  market: PublicKey,
+  liquidatedMarginAccount: PublicKey,
+  size: number
+): TransactionInstruction {
+  let liquidateSize: any = new anchor.BN(size);
+  let asset_index = assetToIndex(asset);
+  return Exchange.program.instruction.liquidateV2(liquidateSize, {
+    accounts: {
+      state: Exchange.stateAddress,
+      liquidator,
+      liquidatorMarginAccount,
+      pricing: Exchange.pricingAddress,
+      oracle: Exchange.pricing.oracles[asset_index],
+      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[asset_index],
+      oracleBackupProgram: constants.CHAINLINK_PID,
+      market,
+      liquidatedMarginAccount,
+    },
   });
 }
 
@@ -2114,6 +2156,36 @@ export function settleSpreadPositionsHaltedTxs(
     );
   }
   return txs;
+}
+
+export function settlePositionsHaltedV2Txs(
+  marginAccounts: AccountMeta[],
+  admin: PublicKey
+): Transaction[] {
+  let txs = [];
+  for (
+    var i = 0;
+    i < marginAccounts.length;
+    i += constants.MAX_SETTLEMENT_ACCOUNTS
+  ) {
+    let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
+    txs.push(new Transaction().add(settlePositionsHaltedV2Ix(slice, admin)));
+  }
+  return txs;
+}
+
+export function settlePositionsHaltedV2Ix(
+  marginAccounts: AccountMeta[],
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.settlePositionsHaltedV2({
+    accounts: {
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
+      admin,
+    },
+    remainingAccounts: marginAccounts,
+  });
 }
 
 export function settlePositionsHaltedTxs(
