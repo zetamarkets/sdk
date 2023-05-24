@@ -5384,11 +5384,6 @@
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "insuranceVault",
           "isMut": true,
           "isSigner": false
@@ -6393,7 +6388,7 @@
             "type": {
               "array": [
                 "u8",
-                2500
+                132
               ]
             }
           }
