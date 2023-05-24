@@ -6331,7 +6331,7 @@ export type Zeta = {
           {
             name: "padding";
             type: {
-              array: ["u8", 132];
+              array: ["u8", 2732];
             };
           }
         ];
@@ -6765,6 +6765,12 @@ export type Zeta = {
             name: "marginParameters";
             type: {
               defined: "MarginParameters";
+            };
+          },
+          {
+            name: "marginParametersPadding";
+            type: {
+              array: ["u8", 104];
             };
           },
           {
@@ -15916,7 +15922,7 @@ export const IDL: Zeta = {
           {
             name: "padding",
             type: {
-              array: ["u8", 132],
+              array: ["u8", 2732],
             },
           },
         ],
@@ -16350,6 +16356,12 @@ export const IDL: Zeta = {
             name: "marginParameters",
             type: {
               defined: "MarginParameters",
+            },
+          },
+          {
+            name: "marginParametersPadding",
+            type: {
+              array: ["u8", 104],
             },
           },
           {
