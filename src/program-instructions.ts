@@ -1485,7 +1485,6 @@ export function collectTreasuryFundsIx(
 }
 
 export function treasuryMovementIx(
-  asset: Asset,
   treasuryMovementType: types.TreasuryMovementType,
   amount: anchor.BN
 ): TransactionInstruction {
@@ -1495,7 +1494,6 @@ export function treasuryMovementIx(
     {
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: Exchange.getZetaGroupAddress(asset),
         insuranceVault: Exchange.getInsuranceVaultAddress(),
         treasuryWallet: Exchange.treasuryWalletAddress,
         referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,

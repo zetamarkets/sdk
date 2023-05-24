@@ -856,7 +856,7 @@ export class SubExchange {
     amount: anchor.BN
   ) {
     let tx = new Transaction().add(
-      instructions.treasuryMovementIx(this.asset, treasuryMovementType, amount)
+      instructions.treasuryMovementIx(treasuryMovementType, amount)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
