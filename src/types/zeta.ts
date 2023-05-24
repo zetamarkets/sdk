@@ -519,7 +519,7 @@ export type Zeta = {
         {
           "name": "args",
           "type": {
-            "defined": "HaltZetaGroupArgs"
+            "defined": "HaltStateArgs"
           }
         }
       ]
@@ -5587,7 +5587,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                1700
+                132
               ]
             }
           }
@@ -9491,7 +9491,7 @@ export const IDL: Zeta = {
         {
           "name": "args",
           "type": {
-            "defined": "HaltZetaGroupArgs"
+            "defined": "HaltStateArgs"
           }
         }
       ]
@@ -14559,7 +14559,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                1700
+                132
               ]
             }
           }

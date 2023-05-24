@@ -519,7 +519,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "HaltZetaGroupArgs"
+            "defined": "HaltStateArgs"
           }
         }
       ]
@@ -5587,7 +5587,7 @@
             "type": {
               "array": [
                 "u8",
-                1700
+                132
               ]
             }
           }
