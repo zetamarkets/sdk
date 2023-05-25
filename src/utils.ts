@@ -255,21 +255,6 @@ export function getUserInsuranceDepositAccount(
   );
 }
 
-export function getUserInsuranceDepositAccountOld(
-  programId: PublicKey,
-  zetaGroup: PublicKey,
-  userKey: PublicKey
-): [PublicKey, number] {
-  return anchor.web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode("user-insurance-deposit")),
-      zetaGroup.toBuffer(),
-      userKey.toBuffer(),
-    ],
-    programId
-  );
-}
-
 export function getUserWhitelistDepositAccount(
   programId: PublicKey,
   userKey: PublicKey

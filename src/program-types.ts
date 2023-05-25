@@ -130,8 +130,7 @@ export interface HaltStateV2 {
 
 export interface ZetaGroup {
   nonce: number;
-  vaultNonce: number;
-  insuranceVaultNonce: number;
+  noncePadding: Array<number>;
   frontExpiryIndex: number;
   haltState: HaltState;
   underlyingMint: PublicKey;
@@ -145,7 +144,7 @@ export interface ZetaGroup {
   perp: Product;
   expirySeries: Array<ExpirySeries>;
   expirySeriesPadding: Array<ExpirySeries>;
-  deprecatedTotalInsuranceVaultDeposits: anchor.BN;
+  deprecatedPadding: Array<number>;
   asset: any;
   expiryIntervalSeconds: number;
   newExpiryThresholdSeconds: number;

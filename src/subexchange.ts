@@ -69,30 +69,6 @@ export class SubExchange {
   private _zetaGroupAddress: PublicKey;
 
   /**
-   * Public key for a given zeta group vault.
-   */
-  public get vaultAddress(): PublicKey {
-    return this._vaultAddress;
-  }
-  private _vaultAddress: PublicKey;
-
-  /**
-   * Public key for insurance vault.
-   */
-  public get insuranceVaultAddress(): PublicKey {
-    return this._insuranceVaultAddress;
-  }
-  private _insuranceVaultAddress: PublicKey;
-
-  /**
-   * Public key for socialized loss account.
-   */
-  public get socializedLossAccountAddress(): PublicKey {
-    return this._socializedLossAccountAddress;
-  }
-  private _socializedLossAccountAddress: PublicKey;
-
-  /**
    * Returns the markets object.
    */
   public get markets(): ZetaGroupMarkets {
@@ -170,18 +146,6 @@ export class SubExchange {
     this._perpSyncQueueAddress = utils.getPerpSyncQueue(
       Exchange.programId,
       this.zetaGroupAddress
-    )[0];
-    this._vaultAddress = utils.getVault(
-      Exchange.programId,
-      this._zetaGroupAddress
-    )[0];
-    this._insuranceVaultAddress = utils.getZetaInsuranceVault(
-      Exchange.programId,
-      this.zetaGroupAddress
-    )[0];
-    this._socializedLossAccountAddress = utils.getSocializedLossAccount(
-      Exchange.programId,
-      this._zetaGroupAddress
     )[0];
 
     this._isSetup = true;
@@ -267,31 +231,25 @@ export class SubExchange {
   }
 
   /**
-   * Checks which live serum markets are stale and refreshes only those
+   * Checks only if the perp serum markets are stale and refreshes it if so
    */
-  public async updateLiveSerumMarketsIfNeeded(epochDelay: number) {
-    console.info(
-      `Refreshing live Serum markets if needed for ${assetToName(
-        this._asset
-      )} SubExchange.`
-    );
+  public async updatePerpSerumMarketIfNeeded(epochDelay: number) {
+    let m = this._markets.perpMarket;
 
-    const allLiveMarketsToUpdate = this._markets.markets.filter(
-      (m) =>
-        ((m.kind == types.Kind.PERP || m.expirySeries.isLive()) &&
-          m.serumMarket.epochStartTs + m.serumMarket.epochLength + epochDelay <
-            Exchange.clockTimestamp) ||
-        m.serumMarket.startEpochSeqNum.toNumber() == 0
-    );
+    if (
+      m.serumMarket.epochLength.toNumber() == 0 ||
+      m.serumMarket.epochStartTs.toNumber() +
+        m.serumMarket.epochLength.toNumber() +
+        epochDelay >
+        Exchange.clockTimestamp
+    ) {
+      return;
+    }
 
-    await Promise.all(
-      allLiveMarketsToUpdate.map((m) => {
-        return m.serumMarket.updateDecoded(Exchange.connection);
-      })
-    );
+    await m.serumMarket.updateDecoded(Exchange.connection);
 
     console.log(
-      `${assetToName(this.asset)} SubExchange Serum markets refreshed`
+      `${assetToName(this.asset)} SubExchange perp Serum market refreshed`
     );
   }
 
@@ -637,6 +595,8 @@ export class SubExchange {
         );
       })
     );
+
+    await this.updateSerumMarkets();
   }
 
   /**
