@@ -5060,12 +5060,13 @@
             "type": "u8"
           },
           {
-            "name": "vaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "insuranceVaultNonce",
-            "type": "u8"
+            "name": "noncePadding",
+            "type": {
+              "array": [
+                "u8",
+                2
+              ]
+            }
           },
           {
             "name": "frontExpiryIndex",
@@ -5152,8 +5153,13 @@
             }
           },
           {
-            "name": "deprecatedTotalInsuranceVaultDeposits",
-            "type": "u64"
+            "name": "deprecatedPadding",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
+            }
           },
           {
             "name": "asset",

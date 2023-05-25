@@ -5060,12 +5060,13 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "vaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "insuranceVaultNonce",
-            "type": "u8"
+            "name": "noncePadding",
+            "type": {
+              "array": [
+                "u8",
+                2
+              ]
+            }
           },
           {
             "name": "frontExpiryIndex",
@@ -5152,8 +5153,13 @@ export type Zeta = {
             }
           },
           {
-            "name": "deprecatedTotalInsuranceVaultDeposits",
-            "type": "u64"
+            "name": "deprecatedPadding",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
+            }
           },
           {
             "name": "asset",
@@ -12968,12 +12974,13 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "vaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "insuranceVaultNonce",
-            "type": "u8"
+            "name": "noncePadding",
+            "type": {
+              "array": [
+                "u8",
+                2
+              ]
+            }
           },
           {
             "name": "frontExpiryIndex",
@@ -13060,8 +13067,13 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "deprecatedTotalInsuranceVaultDeposits",
-            "type": "u64"
+            "name": "deprecatedPadding",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
+            }
           },
           {
             "name": "asset",
