@@ -5767,7 +5767,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                552
+                562
               ]
             }
           }
@@ -14556,7 +14556,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                552
+                562
               ]
             }
           }
