@@ -693,6 +693,13 @@ export class Exchange {
       SYSVAR_CLOCK_PUBKEY,
       async (accountInfo: AccountInfo<Buffer>, _context: any) => {
         this.setClockData(utils.getClockData(accountInfo));
+
+        await Promise.all(
+          this._assets.map((a) => {
+            return this.updatePerpSerumMarketIfNeeded(a, 0);
+          })
+        );
+
         if (callback !== undefined) {
           callback(null, EventType.CLOCK, null);
         }
@@ -966,6 +973,10 @@ export class Exchange {
 
   public async updateSerumMarkets(asset: Asset) {
     await this.getSubExchange(asset).updateSerumMarkets();
+  }
+
+  public async updatePerpSerumMarketIfNeeded(asset: Asset, epochDelay: number) {
+    await this.getSubExchange(asset).updatePerpSerumMarketIfNeeded(epochDelay);
   }
 
   public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {

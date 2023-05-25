@@ -249,74 +249,60 @@ export class RiskCalculator {
   ): number {
     let asset = fromProgramAsset(marginAccount.asset);
     let marketMaker = types.isMarketMaker(marginAccount);
-    let margin = 0;
 
-    let ledgers = marginAccount.productLedgers.concat(
-      marginAccount.perpProductLedger
-    );
-    for (var i = 0; i < ledgers.length; i++) {
-      let ledger = ledgers[i];
-      let size = ledger.position.size.toNumber();
-      let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
-      let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
-      if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
-        continue;
-      }
+    let ledger = marginAccount.perpProductLedger;
 
-      let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
-      let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
+    let size = ledger.position.size.toNumber();
+    let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
+    let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+    if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
+      return 0;
+    }
 
-      if (!marketMaker || skipConcession) {
-        if (size > 0) {
-          longLots += Math.abs(convertNativeLotSizeToDecimal(size));
-        } else if (size < 0) {
-          shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
-        }
-      }
+    let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
+    let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
-      let marginForMarket: number = undefined;
-      let longLotsMarginReq = this.getMarginRequirement(
-        asset,
-        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
-        // Positive for buys.
-        longLots,
-        types.MarginType.INITIAL
-      );
-      let shortLotsMarginReq = this.getMarginRequirement(
-        asset,
-        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
-        // Negative for sells.
-        -shortLots,
-        types.MarginType.INITIAL
-      );
-      if (
-        (i + 1) % constants.PRODUCTS_PER_EXPIRY == 0 ||
-        i == constants.PERP_INDEX
-      ) {
-        marginForMarket =
-          longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
-      } else {
-        marginForMarket = longLotsMarginReq + shortLotsMarginReq;
-      }
-
-      if (marketMaker && !skipConcession) {
-        // Mark initial margin to concession (only contains open order margin).
-        marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
-        // Add position margin which doesn't get concessions.
-        marginForMarket += this.getMarginRequirement(
-          asset,
-          i == ledgers.length - 1 ? constants.PERP_INDEX : i,
-          // This is signed.
-          convertNativeLotSizeToDecimal(size),
-          types.MarginType.MAINTENANCE
-        );
-      }
-
-      if (marginForMarket !== undefined) {
-        margin += marginForMarket;
+    if (!marketMaker || skipConcession) {
+      if (size > 0) {
+        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      } else if (size < 0) {
+        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
       }
     }
-    return margin;
+
+    let marginForMarket: number = undefined;
+    let longLotsMarginReq = this.getMarginRequirement(
+      asset,
+      constants.PERP_INDEX,
+      // Positive for buys.
+      longLots,
+      types.MarginType.INITIAL
+    );
+    let shortLotsMarginReq = this.getMarginRequirement(
+      asset,
+      constants.PERP_INDEX,
+      // Negative for sells.
+      -shortLots,
+      types.MarginType.INITIAL
+    );
+
+    marginForMarket =
+      longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
+
+    if (marketMaker && !skipConcession) {
+      // Mark initial margin to concession (only contains open order margin).
+      marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
+      // Add position margin which doesn't get concessions.
+      marginForMarket += this.getMarginRequirement(
+        asset,
+        constants.PERP_INDEX,
+        // This is signed.
+        convertNativeLotSizeToDecimal(size),
+        types.MarginType.MAINTENANCE
+      );
+    }
+
+    return marginForMarket;
   }
 
   /**
@@ -328,28 +314,22 @@ export class RiskCalculator {
    */
   public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
     let asset = fromProgramAsset(marginAccount.asset);
-    let margin = 0;
-    let ledgers = marginAccount.productLedgers.concat(
-      marginAccount.perpProductLedger
-    );
-    for (var i = 0; i < ledgers.length; i++) {
-      let position = ledgers[i].position;
-      let size = position.size.toNumber();
-      if (size == 0) {
-        continue;
-      }
-      let positionMargin = this.getMarginRequirement(
-        asset,
-        i == ledgers.length - 1 ? constants.PERP_INDEX : i,
-        // This is signed.
-        convertNativeLotSizeToDecimal(size),
-        types.MarginType.MAINTENANCE
-      );
-      if (positionMargin !== undefined) {
-        margin += positionMargin;
-      }
+    let ledger = marginAccount.perpProductLedger;
+
+    let position = ledger.position;
+    let size = position.size.toNumber();
+    if (size == 0) {
+      return 0;
     }
-    return margin;
+    let positionMargin = this.getMarginRequirement(
+      asset,
+      constants.PERP_INDEX,
+      // This is signed.
+      convertNativeLotSizeToDecimal(size),
+      types.MarginType.MAINTENANCE
+    );
+
+    return positionMargin;
   }
 
   /**
@@ -363,48 +343,40 @@ export class RiskCalculator {
     marginAccount: MarginAccount
   ): number {
     let asset = fromProgramAsset(marginAccount.asset);
-    let margin = 0;
-    let ledgers = marginAccount.productLedgers.concat(
-      marginAccount.perpProductLedger
-    );
-    for (var i = 0; i < ledgers.length; i++) {
-      let ledger = ledgers[i];
-      let size = ledger.position.size.toNumber();
-      let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
-      let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
-      if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
-        continue;
-      }
-
-      let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
-      let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
-
-      if (size > 0) {
-        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
-      } else if (size < 0) {
-        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
-      }
-
-      let marginForMarket =
-        this.getMarginRequirement(
-          asset,
-          i == ledgers.length - 1 ? constants.PERP_INDEX : i,
-          // Positive for buys.
-          longLots,
-          types.MarginType.MAINTENANCE
-        ) +
-        this.getMarginRequirement(
-          asset,
-          i == ledgers.length - 1 ? constants.PERP_INDEX : i,
-          // Negative for sells.
-          -shortLots,
-          types.MarginType.MAINTENANCE
-        );
-      if (marginForMarket !== undefined) {
-        margin += marginForMarket;
-      }
+    let ledger = marginAccount.perpProductLedger;
+    let size = ledger.position.size.toNumber();
+    let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
+    let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+    if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
+      return 0;
     }
-    return margin;
+
+    let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
+    let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
+
+    if (size > 0) {
+      longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+    } else if (size < 0) {
+      shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+    }
+
+    let marginForMarket =
+      this.getMarginRequirement(
+        asset,
+        constants.PERP_INDEX,
+        // Positive for buys.
+        longLots,
+        types.MarginType.MAINTENANCE
+      ) +
+      this.getMarginRequirement(
+        asset,
+        constants.PERP_INDEX,
+        // Negative for sells.
+        -shortLots,
+        types.MarginType.MAINTENANCE
+      );
+
+    return marginForMarket;
   }
 
   /**
