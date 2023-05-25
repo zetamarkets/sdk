@@ -460,7 +460,7 @@
       "args": []
     },
     {
-      "name": "globalHalt",
+      "name": "halt",
       "accounts": [
         {
           "name": "state",
@@ -473,10 +473,17 @@
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
-      "name": "globalUnhalt",
+      "name": "unhalt",
       "accounts": [
         {
           "name": "state",
@@ -494,7 +501,14 @@
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "updateHaltStateV2",
@@ -5757,9 +5771,25 @@
             "type": "u64"
           },
           {
-            "name": "haltState",
+            "name": "haltStates",
             "type": {
-              "defined": "HaltStateV2"
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "haltStatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                20
+              ]
             }
           },
           {
@@ -5767,7 +5797,7 @@
             "type": {
               "array": [
                 "u8",
-                562
+                346
               ]
             }
           }
@@ -6443,40 +6473,12 @@
             "type": "u64"
           },
           {
-            "name": "spotPrices",
-            "type": {
-              "array": [
-                "u64",
-                5
-              ]
-            }
-          },
-          {
-            "name": "spotPricesPadding",
-            "type": {
-              "array": [
-                "u64",
-                20
-              ]
-            }
+            "name": "spotPrice",
+            "type": "u64"
           },
           {
             "name": "marketCleaned",
-            "type": {
-              "array": [
-                "bool",
-                5
-              ]
-            }
-          },
-          {
-            "name": "marketCleanedPadding",
-            "type": {
-              "array": [
-                "bool",
-                20
-              ]
-            }
+            "type": "bool"
           }
         ]
       }
@@ -6807,13 +6809,14 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "spotPrices",
+            "name": "asset",
             "type": {
-              "array": [
-                "u64",
-                5
-              ]
+              "defined": "Asset"
             }
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
           },
           {
             "name": "timestamp",
@@ -6823,7 +6826,7 @@
       }
     },
     {
-      "name": "GlobalHaltArgs",
+      "name": "HaltArgs",
       "type": {
         "kind": "struct",
         "fields": [

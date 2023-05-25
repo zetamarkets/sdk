@@ -460,7 +460,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "globalHalt",
+      "name": "halt",
       "accounts": [
         {
           "name": "state",
@@ -473,10 +473,17 @@ export type Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
-      "name": "globalUnhalt",
+      "name": "unhalt",
       "accounts": [
         {
           "name": "state",
@@ -494,7 +501,14 @@ export type Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "updateHaltStateV2",
@@ -5757,9 +5771,25 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "haltState",
+            "name": "haltStates",
             "type": {
-              "defined": "HaltStateV2"
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "haltStatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                20
+              ]
             }
           },
           {
@@ -5767,7 +5797,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                562
+                346
               ]
             }
           }
@@ -6443,40 +6473,12 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "spotPrices",
-            "type": {
-              "array": [
-                "u64",
-                5
-              ]
-            }
-          },
-          {
-            "name": "spotPricesPadding",
-            "type": {
-              "array": [
-                "u64",
-                20
-              ]
-            }
+            "name": "spotPrice",
+            "type": "u64"
           },
           {
             "name": "marketCleaned",
-            "type": {
-              "array": [
-                "bool",
-                5
-              ]
-            }
-          },
-          {
-            "name": "marketCleanedPadding",
-            "type": {
-              "array": [
-                "bool",
-                20
-              ]
-            }
+            "type": "bool"
           }
         ]
       }
@@ -6807,13 +6809,14 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "spotPrices",
+            "name": "asset",
             "type": {
-              "array": [
-                "u64",
-                5
-              ]
+              "defined": "Asset"
             }
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
           },
           {
             "name": "timestamp",
@@ -6823,7 +6826,7 @@ export type Zeta = {
       }
     },
     {
-      "name": "GlobalHaltArgs",
+      "name": "HaltArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -9249,7 +9252,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "globalHalt",
+      "name": "halt",
       "accounts": [
         {
           "name": "state",
@@ -9262,10 +9265,17 @@ export const IDL: Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
-      "name": "globalUnhalt",
+      "name": "unhalt",
       "accounts": [
         {
           "name": "state",
@@ -9283,7 +9293,14 @@ export const IDL: Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "updateHaltStateV2",
@@ -14546,9 +14563,25 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "haltState",
+            "name": "haltStates",
             "type": {
-              "defined": "HaltStateV2"
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "haltStatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                20
+              ]
             }
           },
           {
@@ -14556,7 +14589,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                562
+                346
               ]
             }
           }
@@ -15232,40 +15265,12 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "spotPrices",
-            "type": {
-              "array": [
-                "u64",
-                5
-              ]
-            }
-          },
-          {
-            "name": "spotPricesPadding",
-            "type": {
-              "array": [
-                "u64",
-                20
-              ]
-            }
+            "name": "spotPrice",
+            "type": "u64"
           },
           {
             "name": "marketCleaned",
-            "type": {
-              "array": [
-                "bool",
-                5
-              ]
-            }
-          },
-          {
-            "name": "marketCleanedPadding",
-            "type": {
-              "array": [
-                "bool",
-                20
-              ]
-            }
+            "type": "bool"
           }
         ]
       }
@@ -15596,13 +15601,14 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "spotPrices",
+            "name": "asset",
             "type": {
-              "array": [
-                "u64",
-                5
-              ]
+              "defined": "Asset"
             }
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
           },
           {
             "name": "timestamp",
@@ -15612,7 +15618,7 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "GlobalHaltArgs",
+      "name": "HaltArgs",
       "type": {
         "kind": "struct",
         "fields": [
