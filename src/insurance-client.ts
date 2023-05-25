@@ -120,10 +120,7 @@ export class InsuranceClient {
 
   public async reloadInsuranceDepositAccount(): Promise<void> {
     let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
-      await utils.getUserInsuranceDepositAccount(
-        Exchange.programId,
-        this.publicKey
-      );
+      utils.getUserInsuranceDepositAccount(Exchange.programId, this.publicKey);
 
     this._insuranceDepositAccountAddress = insuranceDepositAccountAddress;
     await this.updateInsuranceDepositAccount();
