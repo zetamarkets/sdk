@@ -32,7 +32,8 @@ export interface State {
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;
   nativeOpenInterestLimit: anchor.BN;
-  haltState: HaltStateV2;
+  haltStates: Array<HaltStateV2>;
+  haltStatesPadding: Array<HaltStateV2>;
   padding: Array<number>;
 }
 
@@ -122,10 +123,8 @@ export interface HaltState {
 export interface HaltStateV2 {
   halted: boolean;
   timestamp: anchor.BN;
-  spotPrices: Array<number>;
-  spotPricesPadding: Array<number>;
-  marketCleaned: Array<boolean>;
-  marketCleanedPadding: Array<boolean>;
+  spotPrice: number;
+  marketCleaned: boolean;
 }
 
 export interface ZetaGroup {
