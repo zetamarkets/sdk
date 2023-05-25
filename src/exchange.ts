@@ -333,6 +333,49 @@ export class Exchange {
     this._isSetup = true;
   }
 
+  public async initializeCombinedInsuranceVault() {
+    let tx = new Transaction().add(
+      instructions.initializeCombinedInsuranceVaultIx()
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`initializeCombinedInsuranceVault failed: ${e}`);
+    }
+
+    let [insuranceVault, _insuranceVaultNonce] =
+      utils.getZetaCombinedInsuranceVault(this.programId);
+    this._combinedInsuranceVaultAddress = insuranceVault;
+  }
+
+  public async initializeCombinedVault() {
+    let tx = new Transaction().add(instructions.initializeCombinedVaultIx());
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`initializeCombinedVault failed: ${e}`);
+    }
+
+    let [vault, _vaultNonce] = utils.getCombinedVault(this.programId);
+    this._combinedVaultAddress = vault;
+  }
+
+  public async initializeCombinedSocializedLossAccount() {
+    let tx = new Transaction().add(
+      instructions.initializeCombinedSocializedLossAccountIx()
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`initializeCombinedSocializedLossAccount failed: ${e}`);
+    }
+
+    let [account, _accountNonce] = utils.getCombinedSocializedLossAccount(
+      this.programId
+    );
+    this._combinedSocializedLossAccountAddress = account;
+  }
+
   public async initializeZetaState(
     params: instructions.StateParams,
     referralAdmin: PublicKey,

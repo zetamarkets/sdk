@@ -1172,6 +1172,57 @@ export function initializeZetaGroupIx(
   );
 }
 
+export function initializeCombinedInsuranceVaultIx(): TransactionInstruction {
+  let [insuranceVault, insuranceVaultNonce] =
+    utils.getZetaCombinedInsuranceVault(Exchange.programId);
+  return Exchange.program.instruction.initializeCombinedInsuranceVault(
+    insuranceVaultNonce,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        insuranceVault: insuranceVault,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        usdcMint: Exchange.usdcMintAddress,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
+}
+
+export function initializeCombinedVaultIx(): TransactionInstruction {
+  let [vault, vaultNonce] = utils.getCombinedVault(Exchange.programId);
+  return Exchange.program.instruction.initializeCombinedVault(vaultNonce, {
+    accounts: {
+      state: Exchange.stateAddress,
+      vault: vault,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      usdcMint: Exchange.usdcMintAddress,
+      admin: Exchange.state.admin,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function initializeCombinedSocializedLossAccountIx(): TransactionInstruction {
+  let [account, accountNonce] = utils.getCombinedSocializedLossAccount(
+    Exchange.programId
+  );
+  return Exchange.program.instruction.initializeCombinedSocializedLossAccount(
+    accountNonce,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        socializedLossAccount: account,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        usdcMint: Exchange.usdcMintAddress,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
+}
+
 export function collectTreasuryFundsIx(
   collectionTokenAccount: PublicKey,
   amount: anchor.BN,
