@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.28.0] 2023-05-24
+
+- general: Migrate per-asset insurance vault, deposit vault and socialized loss account to be global accounts. ([#230](https://github.com/zetamarkets/sdk/pull/230))
+- accounts: Increase the size of the State account to 1000. ([#230](https://github.com/zetamarkets/sdk/pull/230))
+
 ## [0.27.2] 2023-05-15
 
 - general: Refresh tif parameters on clock event. ([#231](https://github.com/zetamarkets/sdk/pull/231))

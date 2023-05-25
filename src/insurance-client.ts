@@ -15,7 +15,6 @@ import {
 import idl from "./idl/zeta.json";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
-import { Asset } from "./assets";
 
 export class InsuranceClient {
   /**
@@ -28,6 +27,9 @@ export class InsuranceClient {
   /**
    * Anchor provider for client, including wallet.
    */
+  public get provider(): anchor.AnchorProvider {
+    return this._provider;
+  }
   private _provider: anchor.AnchorProvider;
 
   /**
@@ -67,21 +69,11 @@ export class InsuranceClient {
   }
   private _usdcAccountAddress: PublicKey;
 
-  /**
-   * The underlying asset the client is using
-   */
-  public get asset(): Asset {
-    return this._asset;
-  }
-  private _asset: Asset;
-
   private constructor(
-    asset: Asset,
     connection: Connection,
     wallet: types.Wallet,
     opts: ConfirmOptions
   ) {
-    this._asset = asset;
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._program = new anchor.Program(
       idl as anchor.Idl,
@@ -96,20 +88,18 @@ export class InsuranceClient {
    * Requires Exchange to be loaded
    */
   public static async load(
-    asset: Asset,
     connection: Connection,
     wallet: types.Wallet,
     opts: ConfirmOptions = utils.defaultCommitment()
   ): Promise<InsuranceClient> {
     console.log(`Loading insurance client: ${wallet.publicKey.toString()}`);
-    let insuranceClient = new InsuranceClient(asset, connection, wallet, opts);
+    let insuranceClient = new InsuranceClient(connection, wallet, opts);
 
     await insuranceClient.insuranceWhitelistCheck();
 
     let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
       await utils.getUserInsuranceDepositAccount(
         Exchange.programId,
-        Exchange.getZetaGroupAddress(asset),
         wallet.publicKey
       );
 
@@ -128,6 +118,14 @@ export class InsuranceClient {
     return insuranceClient;
   }
 
+  public async reloadInsuranceDepositAccount(): Promise<void> {
+    let [insuranceDepositAccountAddress, _insuranceDepositAccountNonce] =
+      utils.getUserInsuranceDepositAccount(Exchange.programId, this.publicKey);
+
+    this._insuranceDepositAccountAddress = insuranceDepositAccountAddress;
+    await this.updateInsuranceDepositAccount();
+  }
+
   /**
    * @param amount the native amount to deposit to the insurance vault (6 d.p)
    */
@@ -141,7 +139,7 @@ export class InsuranceClient {
       );
       tx.add(
         await instructions.initializeInsuranceDepositAccountIx(
-          this.asset,
+          this.publicKey,
           this.publicKey,
           this.whitelistInsuranceAccountAddress
         )
@@ -149,7 +147,6 @@ export class InsuranceClient {
     }
     tx.add(
       instructions.depositInsuranceVaultIx(
-        this.asset,
         amount,
         this._insuranceDepositAccountAddress,
         this._usdcAccountAddress,
@@ -176,7 +173,6 @@ export class InsuranceClient {
     let tx = new Transaction();
     tx.add(
       instructions.withdrawInsuranceVaultIx(
-        this.asset,
         percentageAmount,
         this._insuranceDepositAccountAddress,
         this._usdcAccountAddress,

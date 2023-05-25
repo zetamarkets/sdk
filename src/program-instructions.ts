@@ -47,21 +47,19 @@ export function closeMarginAccountIx(
 }
 
 export function initializeInsuranceDepositAccountIx(
-  asset: Asset,
+  payer: PublicKey,
   userKey: PublicKey,
   userWhitelistInsuranceKey: PublicKey
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
   let [insuranceDepositAccount, nonce] = utils.getUserInsuranceDepositAccount(
     Exchange.programId,
-    subExchange.zetaGroupAddress,
     userKey
   );
 
   return Exchange.program.instruction.initializeInsuranceDepositAccount(nonce, {
     accounts: {
-      zetaGroup: subExchange.zetaGroupAddress,
       insuranceDepositAccount,
+      payer,
       authority: userKey,
       systemProgram: SystemProgram.programId,
       whitelistInsuranceAccount: userWhitelistInsuranceKey,
@@ -97,9 +95,9 @@ export function depositIx(
     accounts: {
       zetaGroup: subExchange.zetaGroupAddress,
       marginAccount: marginAccount,
-      vault: subExchange.vaultAddress,
+      vault: Exchange.combinedVaultAddress,
       userTokenAccount: usdcAccount,
-      socializedLossAccount: subExchange.socializedLossAccountAddress,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
       state: Exchange.stateAddress,
@@ -116,23 +114,21 @@ export function depositIx(
  * @param userKey
  */
 export function depositInsuranceVaultIx(
-  asset: Asset,
   amount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.depositInsuranceVault(
     new anchor.BN(amount),
     {
       accounts: {
-        zetaGroup: subExchange.zetaGroupAddress,
-        insuranceVault: subExchange.insuranceVaultAddress,
+        state: Exchange.stateAddress,
+        insuranceVault: Exchange.combinedInsuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
-        zetaVault: subExchange.vaultAddress,
-        socializedLossAccount: subExchange.socializedLossAccountAddress,
+        zetaVault: Exchange.combinedVaultAddress,
+        socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
         authority: userKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       },
@@ -141,19 +137,17 @@ export function depositInsuranceVaultIx(
 }
 
 export function withdrawInsuranceVaultIx(
-  asset: Asset,
   percentageAmount: number,
   insuranceDepositAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
   return Exchange.program.instruction.withdrawInsuranceVault(
     new anchor.BN(percentageAmount),
     {
       accounts: {
-        zetaGroup: subExchange.zetaGroupAddress,
-        insuranceVault: subExchange.insuranceVaultAddress,
+        state: Exchange.stateAddress,
+        insuranceVault: Exchange.combinedInsuranceVaultAddress,
         insuranceDepositAccount,
         userTokenAccount: usdcAccount,
         authority: userKey,
@@ -178,7 +172,7 @@ export function withdrawIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: subExchange.zetaGroupAddress,
-      vault: subExchange.vaultAddress,
+      vault: Exchange.combinedVaultAddress,
       marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
@@ -187,7 +181,7 @@ export function withdrawIx(
       oracle: subExchange.zetaGroup.oracle,
       oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
       oracleBackupProgram: constants.CHAINLINK_PID,
-      socializedLossAccount: subExchange.socializedLossAccountAddress,
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
     },
   });
 }
@@ -1178,6 +1172,57 @@ export function initializeZetaGroupIx(
   );
 }
 
+export function initializeCombinedInsuranceVaultIx(): TransactionInstruction {
+  let [insuranceVault, insuranceVaultNonce] =
+    utils.getZetaCombinedInsuranceVault(Exchange.programId);
+  return Exchange.program.instruction.initializeCombinedInsuranceVault(
+    insuranceVaultNonce,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        insuranceVault: insuranceVault,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        usdcMint: Exchange.usdcMintAddress,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
+}
+
+export function initializeCombinedVaultIx(): TransactionInstruction {
+  let [vault, vaultNonce] = utils.getCombinedVault(Exchange.programId);
+  return Exchange.program.instruction.initializeCombinedVault(vaultNonce, {
+    accounts: {
+      state: Exchange.stateAddress,
+      vault: vault,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      usdcMint: Exchange.usdcMintAddress,
+      admin: Exchange.state.admin,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function initializeCombinedSocializedLossAccountIx(): TransactionInstruction {
+  let [account, accountNonce] = utils.getCombinedSocializedLossAccount(
+    Exchange.programId
+  );
+  return Exchange.program.instruction.initializeCombinedSocializedLossAccount(
+    accountNonce,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        socializedLossAccount: account,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        usdcMint: Exchange.usdcMintAddress,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
+}
+
 export function collectTreasuryFundsIx(
   collectionTokenAccount: PublicKey,
   amount: anchor.BN,
@@ -1195,7 +1240,6 @@ export function collectTreasuryFundsIx(
 }
 
 export function treasuryMovementIx(
-  asset: Asset,
   treasuryMovementType: types.TreasuryMovementType,
   amount: anchor.BN
 ): TransactionInstruction {
@@ -1205,8 +1249,7 @@ export function treasuryMovementIx(
     {
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: Exchange.getZetaGroupAddress(asset),
-        insuranceVault: Exchange.getInsuranceVaultAddress(asset),
+        insuranceVault: Exchange.getInsuranceVaultAddress(),
         treasuryWallet: Exchange.treasuryWalletAddress,
         referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -1223,11 +1266,11 @@ export function rebalanceInsuranceVaultIx(
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      zetaVault: Exchange.getVaultAddress(asset),
-      insuranceVault: Exchange.getInsuranceVaultAddress(asset),
+      zetaGroup: Exchange.getZetaGroupAddress(asset), // still used for margin account
+      zetaVault: Exchange.combinedVaultAddress,
+      insuranceVault: Exchange.combinedInsuranceVaultAddress,
       treasuryWallet: Exchange.treasuryWalletAddress,
-      socializedLossAccount: Exchange.getSocializedLossAccountAddress(asset),
+      socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
     remainingAccounts,

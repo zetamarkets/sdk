@@ -29,6 +29,7 @@ export interface State {
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
   secondaryAdmin: PublicKey;
+  totalInsuranceVaultDeposits: anchor.BN;
   padding: Array<number>;
 }
 
@@ -95,8 +96,7 @@ export interface HaltState {
 
 export interface ZetaGroup {
   nonce: number;
-  vaultNonce: number;
-  insuranceVaultNonce: number;
+  noncePadding: Array<number>;
   frontExpiryIndex: number;
   haltState: HaltState;
   underlyingMint: PublicKey;
@@ -109,7 +109,7 @@ export interface ZetaGroup {
   perp: Product;
   expirySeries: Array<ExpirySeries>;
   expirySeriesPadding: Array<ExpirySeries>;
-  totalInsuranceVaultDeposits: anchor.BN;
+  deprecatedPadding: Array<number>;
   asset: any;
   expiryIntervalSeconds: number;
   newExpiryThresholdSeconds: number;

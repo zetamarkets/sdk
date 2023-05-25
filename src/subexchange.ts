@@ -69,30 +69,6 @@ export class SubExchange {
   private _zetaGroupAddress: PublicKey;
 
   /**
-   * Public key for a given zeta group vault.
-   */
-  public get vaultAddress(): PublicKey {
-    return this._vaultAddress;
-  }
-  private _vaultAddress: PublicKey;
-
-  /**
-   * Public key for insurance vault.
-   */
-  public get insuranceVaultAddress(): PublicKey {
-    return this._insuranceVaultAddress;
-  }
-  private _insuranceVaultAddress: PublicKey;
-
-  /**
-   * Public key for socialized loss account.
-   */
-  public get socializedLossAccountAddress(): PublicKey {
-    return this._socializedLossAccountAddress;
-  }
-  private _socializedLossAccountAddress: PublicKey;
-
-  /**
    * Returns the markets object.
    */
   public get markets(): ZetaGroupMarkets {
@@ -170,18 +146,6 @@ export class SubExchange {
     this._perpSyncQueueAddress = utils.getPerpSyncQueue(
       Exchange.programId,
       this.zetaGroupAddress
-    )[0];
-    this._vaultAddress = utils.getVault(
-      Exchange.programId,
-      this._zetaGroupAddress
-    )[0];
-    this._insuranceVaultAddress = utils.getZetaInsuranceVault(
-      Exchange.programId,
-      this.zetaGroupAddress
-    )[0];
-    this._socializedLossAccountAddress = utils.getSocializedLossAccount(
-      Exchange.programId,
-      this._zetaGroupAddress
     )[0];
 
     this._isSetup = true;
@@ -852,7 +816,7 @@ export class SubExchange {
     amount: anchor.BN
   ) {
     let tx = new Transaction().add(
-      instructions.treasuryMovementIx(this.asset, treasuryMovementType, amount)
+      instructions.treasuryMovementIx(treasuryMovementType, amount)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }

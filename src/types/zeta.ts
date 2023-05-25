@@ -1655,7 +1655,7 @@ export type Zeta = {
       "name": "depositInsuranceVault",
       "accounts": [
         {
-          "name": "zetaGroup",
+          "name": "state",
           "isMut": true,
           "isSigner": false
         },
@@ -1777,7 +1777,7 @@ export type Zeta = {
       "name": "withdrawInsuranceVault",
       "accounts": [
         {
-          "name": "zetaGroup",
+          "name": "state",
           "isMut": true,
           "isSigner": false
         },
@@ -2048,17 +2048,17 @@ export type Zeta = {
       "name": "initializeInsuranceDepositAccount",
       "accounts": [
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "insuranceDepositAccount",
           "isMut": true,
           "isSigner": false
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -2069,6 +2069,129 @@ export type Zeta = {
         },
         {
           "name": "whitelistInsuranceAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeCombinedInsuranceVault",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeCombinedVault",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeCombinedSocializedLossAccount",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -3922,11 +4045,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "insuranceVault",
           "isMut": true,
           "isSigner": false
@@ -4845,11 +4963,23 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "vaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "insuranceVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                73
+                808
               ]
             }
           }
@@ -4930,12 +5060,13 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "vaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "insuranceVaultNonce",
-            "type": "u8"
+            "name": "noncePadding",
+            "type": {
+              "array": [
+                "u8",
+                2
+              ]
+            }
           },
           {
             "name": "frontExpiryIndex",
@@ -5022,8 +5153,13 @@ export type Zeta = {
             }
           },
           {
-            "name": "totalInsuranceVaultDeposits",
-            "type": "u64"
+            "name": "deprecatedPadding",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
+            }
           },
           {
             "name": "asset",
@@ -7767,6 +7903,11 @@ export type Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "InsuranceVaultSeedsMismatch",
+      "msg": "Insurance vault seeds mismatch"
     }
   ]
 };
@@ -9428,7 +9569,7 @@ export const IDL: Zeta = {
       "name": "depositInsuranceVault",
       "accounts": [
         {
-          "name": "zetaGroup",
+          "name": "state",
           "isMut": true,
           "isSigner": false
         },
@@ -9550,7 +9691,7 @@ export const IDL: Zeta = {
       "name": "withdrawInsuranceVault",
       "accounts": [
         {
-          "name": "zetaGroup",
+          "name": "state",
           "isMut": true,
           "isSigner": false
         },
@@ -9821,17 +9962,17 @@ export const IDL: Zeta = {
       "name": "initializeInsuranceDepositAccount",
       "accounts": [
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "insuranceDepositAccount",
           "isMut": true,
           "isSigner": false
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -9842,6 +9983,129 @@ export const IDL: Zeta = {
         },
         {
           "name": "whitelistInsuranceAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeCombinedInsuranceVault",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeCombinedVault",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeCombinedSocializedLossAccount",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -11695,11 +11959,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "insuranceVault",
           "isMut": true,
           "isSigner": false
@@ -12618,11 +12877,23 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "vaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "insuranceVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                73
+                808
               ]
             }
           }
@@ -12703,12 +12974,13 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "vaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "insuranceVaultNonce",
-            "type": "u8"
+            "name": "noncePadding",
+            "type": {
+              "array": [
+                "u8",
+                2
+              ]
+            }
           },
           {
             "name": "frontExpiryIndex",
@@ -12795,8 +13067,13 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "totalInsuranceVaultDeposits",
-            "type": "u64"
+            "name": "deprecatedPadding",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
+            }
           },
           {
             "name": "asset",
@@ -15540,6 +15817,11 @@ export const IDL: Zeta = {
       "code": 6130,
       "name": "InvalidOpenOrdersAuthority",
       "msg": "Invalid open orders authority"
+    },
+    {
+      "code": 6131,
+      "name": "InsuranceVaultSeedsMismatch",
+      "msg": "Insurance vault seeds mismatch"
     }
   ]
 };
