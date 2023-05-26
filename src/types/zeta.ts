@@ -5759,6 +5759,10 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "deprecatedTotalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
             "name": "nativeWithdrawLimit",
             "type": "u64"
           },
@@ -5797,7 +5801,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                346
+                338
               ]
             }
           }
@@ -14551,6 +14555,10 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "deprecatedTotalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
             "name": "nativeWithdrawLimit",
             "type": "u64"
           },
@@ -14589,7 +14597,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                346
+                338
               ]
             }
           }
