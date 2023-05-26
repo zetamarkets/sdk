@@ -639,6 +639,8 @@ export class Exchange {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 
+    await this.updateZetaPricing();
+
     this._isInitialized = true;
   }
 
@@ -712,6 +714,7 @@ export class Exchange {
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
               this.getAllSubExchanges().map(async (subExchange) => {
+                await this.updateZetaPricing();
                 await subExchange.handlePolling(callback);
               })
             );

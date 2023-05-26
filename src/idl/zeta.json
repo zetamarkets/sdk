@@ -6560,6 +6560,10 @@
             "type": "u8"
           },
           {
+            "name": "deprecatedTotalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
             "name": "nativeWithdrawLimit",
             "type": "u64"
           },
@@ -6598,7 +6602,7 @@
             "type": {
               "array": [
                 "u8",
-                346
+                338
               ]
             }
           }
