@@ -3942,34 +3942,64 @@
       "name": "cancelOrderV2",
       "accounts": [
         {
-          "name": "market",
+          "name": "authority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": true
         },
         {
-          "name": "marketBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAsks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventQueue",
-          "isMut": false,
-          "isSigner": false
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
         }
       ],
       "args": [
@@ -4066,34 +4096,64 @@
       "name": "cancelOrderNoErrorV2",
       "accounts": [
         {
-          "name": "market",
+          "name": "authority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": true
         },
         {
-          "name": "marketBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAsks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventQueue",
-          "isMut": false,
-          "isSigner": false
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
         }
       ],
       "args": [
@@ -4190,34 +4250,64 @@
       "name": "cancelAllMarketOrdersV2",
       "accounts": [
         {
-          "name": "market",
+          "name": "authority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": true
         },
         {
-          "name": "marketBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAsks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventQueue",
-          "isMut": false,
-          "isSigner": false
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
         }
       ],
       "args": []
@@ -4436,34 +4526,64 @@
       "name": "cancelOrderByClientOrderIdV2",
       "accounts": [
         {
-          "name": "market",
+          "name": "authority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": true
         },
         {
-          "name": "marketBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAsks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventQueue",
-          "isMut": false,
-          "isSigner": false
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
         }
       ],
       "args": [
@@ -4548,34 +4668,64 @@
       "name": "cancelOrderByClientOrderIdNoErrorV2",
       "accounts": [
         {
-          "name": "market",
+          "name": "authority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": true
         },
         {
-          "name": "marketBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAsks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "eventQueue",
-          "isMut": false,
-          "isSigner": false
+          "name": "cancelAccounts",
+          "accounts": [
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "bids",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "asks",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "eventQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
         }
       ],
       "args": [

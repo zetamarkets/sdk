@@ -782,9 +782,8 @@ export class SubClient {
       options.tifOptions
     );
 
-    let orderIx = instructions.placePerpOrderV2Ix(
+    let orderIx = instructions.placePerpOrderV3Ix(
       this.asset,
-      marketIndex,
       price,
       size,
       side,
@@ -958,7 +957,7 @@ export class SubClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let index = this._subExchange.markets.getMarketIndex(market);
-    let ix = instructions.cancelOrderIx(
+    let ix = instructions.cancelOrderV2Ix(
       this.asset,
       index,
       this._parent.provider.wallet.publicKey,
