@@ -29,6 +29,8 @@ export interface State {
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
   secondaryAdmin: PublicKey;
+  vaultNonce: number;
+  insuranceVaultNonce: number;
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;
   nativeOpenInterestLimit: anchor.BN;
@@ -123,7 +125,7 @@ export interface HaltState {
 export interface HaltStateV2 {
   halted: boolean;
   timestamp: anchor.BN;
-  spotPrice: number;
+  spotPrice: anchor.BN;
   marketCleaned: boolean;
 }
 
