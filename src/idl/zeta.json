@@ -519,11 +519,6 @@
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -1246,6 +1241,27 @@
           "type": "u8"
         }
       ]
+    },
+    {
+      "name": "settlePositionsHaltedV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     },
     {
       "name": "settlePositionsHalted",
@@ -8794,6 +8810,16 @@
       "code": 6134,
       "name": "InvalidPricingOracle",
       "msg": "Invalid oracle for this pricing account"
+    },
+    {
+      "code": 6135,
+      "name": "ZetaHalted",
+      "msg": "Zeta exchange is halted"
+    },
+    {
+      "code": 6136,
+      "name": "ZetaNotHalted",
+      "msg": "Zeta exchange is not halted"
     }
   ]
 }

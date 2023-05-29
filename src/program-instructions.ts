@@ -1996,6 +1996,36 @@ export function settleSpreadPositionsHaltedTxs(
   return txs;
 }
 
+export function settlePositionsHaltedV2Txs(
+  marginAccounts: AccountMeta[],
+  admin: PublicKey
+): Transaction[] {
+  let txs = [];
+  for (
+    var i = 0;
+    i < marginAccounts.length;
+    i += constants.MAX_SETTLEMENT_ACCOUNTS
+  ) {
+    let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
+    txs.push(new Transaction().add(settlePositionsHaltedV2Ix(slice, admin)));
+  }
+  return txs;
+}
+
+export function settlePositionsHaltedV2Ix(
+  marginAccounts: AccountMeta[],
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.settlePositionsHaltedV2({
+    accounts: {
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
+      admin,
+    },
+    remainingAccounts: marginAccounts,
+  });
+}
+
 export function settlePositionsHaltedTxs(
   asset: Asset,
   marginAccounts: AccountMeta[],
@@ -2057,6 +2087,17 @@ export function cleanZetaMarketsIx(
     accounts: {
       state: Exchange.stateAddress,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
+    },
+    remainingAccounts: marketAccounts,
+  });
+}
+
+export function cleanZetaMarketsHaltedV2Ix(
+  marketAccounts: any[]
+): TransactionInstruction {
+  return Exchange.program.instruction.cleanZetaMarketsHaltedV2({
+    accounts: {
+      state: Exchange.stateAddress,
     },
     remainingAccounts: marketAccounts,
   });
@@ -2152,6 +2193,15 @@ export function cancelOrderHaltedIx(
   );
 }
 
+export function haltIx(asset: Asset, admin: PublicKey): TransactionInstruction {
+  return Exchange.program.instruction.halt(toProgramAsset(asset), {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+    },
+  });
+}
+
 export function haltZetaGroupIx(
   asset: Asset,
   zetaGroupAddress: PublicKey,
@@ -2162,6 +2212,19 @@ export function haltZetaGroupIx(
       state: Exchange.stateAddress,
       zetaGroup: zetaGroupAddress,
       greeks: Exchange.getSubExchange(asset).greeksAddress,
+      admin,
+    },
+  });
+}
+
+export function unhaltIx(
+  asset: Asset,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.unhalt(toProgramAsset(asset), {
+    accounts: {
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
       admin,
     },
   });
@@ -2181,9 +2244,21 @@ export function unhaltZetaGroupIx(
   });
 }
 
+export function updateHaltStateV2Ix(
+  args: UpdateHaltStateArgs,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateHaltStateV2(args, {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+    },
+  });
+}
+
 export function updateHaltStateIx(
   zetaGroupAddress: PublicKey,
-  args: UpdateHaltStateArgs,
+  args: UpdateHaltStateArgsOld,
   admin: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.updateHaltState(args, {
@@ -2516,6 +2591,12 @@ export interface ExpireSeriesOverrideArgs {
 }
 
 export interface UpdateHaltStateArgs {
+  asset: any;
+  spotPrice: anchor.BN;
+  timestamp: anchor.BN;
+}
+
+export interface UpdateHaltStateArgsOld {
   spotPrice: anchor.BN;
   timestamp: anchor.BN;
 }

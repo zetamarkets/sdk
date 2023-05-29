@@ -1088,6 +1088,14 @@ export class Exchange {
     this.getSubExchange(asset).updateMarginParams();
   }
 
+  public async halt(asset: Asset) {
+    await this.getSubExchange(asset).halt();
+  }
+
+  public async unhalt(asset: Asset) {
+    await this.getSubExchange(asset).unhalt();
+  }
+
   public async haltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
     await this.getSubExchange(asset).haltZetaGroup(zetaGroupAddress);
   }
@@ -1098,10 +1106,21 @@ export class Exchange {
 
   public async updateHaltState(
     asset: Asset,
+    timestamp: anchor.BN,
+    spotPrice: anchor.BN
+  ) {
+    await this.getSubExchange(asset).updateHaltState(timestamp, spotPrice);
+  }
+
+  public async updateZetaGroupHaltState(
+    asset: Asset,
     zetaGroupAddress: PublicKey,
     args: instructions.UpdateHaltStateArgs
   ) {
-    await this.getSubExchange(asset).updateHaltState(zetaGroupAddress, args);
+    await this.getSubExchange(asset).updateZetaGroupHaltState(
+      zetaGroupAddress,
+      args
+    );
   }
 
   public async settlePositionsHalted(

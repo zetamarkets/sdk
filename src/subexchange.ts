@@ -19,7 +19,7 @@ import {
 import { Market, ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
 import { Network } from "./network";
-import { Asset, assetToName } from "./assets";
+import { Asset, assetToIndex, assetToName, toProgramAsset } from "./assets";
 import * as instructions from "./program-instructions";
 import * as fs from "fs";
 import * as os from "os";
@@ -878,9 +878,29 @@ export class SubExchange {
    */
 
   public assertHalted() {
+    if (!Exchange.state.haltStates[assetToIndex(this.asset)].halted) {
+      throw "Not halted.";
+    }
+  }
+
+  public assertZetaGroupHalted() {
     if (!this.zetaGroup.haltState.halted) {
       throw "Zeta group not halted.";
     }
+  }
+
+  public async halt() {
+    let tx = new Transaction().add(
+      instructions.haltIx(this.asset, Exchange.provider.wallet.publicKey)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  public async unhalt() {
+    let tx = new Transaction().add(
+      instructions.unhaltIx(this.asset, Exchange.provider.wallet.publicKey)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
   }
 
   public async haltZetaGroup(zetaGroupAddress: PublicKey) {
@@ -904,7 +924,21 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async updateHaltState(
+  public async updateHaltState(timestamp: anchor.BN, spotPrice: anchor.BN) {
+    let tx = new Transaction().add(
+      instructions.updateHaltStateV2Ix(
+        {
+          asset: toProgramAsset(this.asset),
+          spotPrice: spotPrice,
+          timestamp: timestamp,
+        },
+        Exchange.provider.wallet.publicKey
+      )
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  public async updateZetaGroupHaltState(
     zetaGroupAddress: PublicKey,
     args: instructions.UpdateHaltStateArgs
   ) {
@@ -919,8 +953,7 @@ export class SubExchange {
   }
 
   public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
-    let txs = instructions.settlePositionsHaltedTxs(
-      this.asset,
+    let txs = instructions.settlePositionsHaltedV2Txs(
       marginAccounts,
       Exchange.provider.wallet.publicKey
     );
@@ -969,7 +1002,7 @@ export class SubExchange {
       (this._markets.perpMarket,
       utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
     );
-    await utils.cleanZetaMarketsHalted(this.asset, marketAccounts);
+    await utils.cleanZetaMarketsHalted(marketAccounts);
   }
 
   public async updatePricingHalted(expiryIndex: number | undefined) {

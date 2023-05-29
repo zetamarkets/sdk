@@ -519,11 +519,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -1246,6 +1241,27 @@ export type Zeta = {
           "type": "u8"
         }
       ]
+    },
+    {
+      "name": "settlePositionsHaltedV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     },
     {
       "name": "settlePositionsHalted",
@@ -8794,6 +8810,16 @@ export type Zeta = {
       "code": 6134,
       "name": "InvalidPricingOracle",
       "msg": "Invalid oracle for this pricing account"
+    },
+    {
+      "code": 6135,
+      "name": "ZetaHalted",
+      "msg": "Zeta exchange is halted"
+    },
+    {
+      "code": 6136,
+      "name": "ZetaNotHalted",
+      "msg": "Zeta exchange is not halted"
     }
   ]
 };
@@ -9319,11 +9345,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -10046,6 +10067,27 @@ export const IDL: Zeta = {
           "type": "u8"
         }
       ]
+    },
+    {
+      "name": "settlePositionsHaltedV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
     },
     {
       "name": "settlePositionsHalted",
@@ -17594,6 +17636,16 @@ export const IDL: Zeta = {
       "code": 6134,
       "name": "InvalidPricingOracle",
       "msg": "Invalid oracle for this pricing account"
+    },
+    {
+      "code": 6135,
+      "name": "ZetaHalted",
+      "msg": "Zeta exchange is halted"
+    },
+    {
+      "code": 6136,
+      "name": "ZetaNotHalted",
+      "msg": "Zeta exchange is not halted"
     }
   ]
 };
