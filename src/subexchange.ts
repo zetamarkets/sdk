@@ -842,7 +842,7 @@ export class SubExchange {
     ) {
       let tx = new Transaction();
       let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
-      tx.add(instructions.rebalanceInsuranceVaultIx(this.asset, slice));
+      tx.add(instructions.rebalanceInsuranceVaultV2Ix(slice));
       txs.push(tx);
     }
     try {

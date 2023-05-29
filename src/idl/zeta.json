@@ -519,11 +519,6 @@
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -4923,11 +4918,6 @@
       "name": "forceCancelOrderByOrderIdV2",
       "accounts": [
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -5106,11 +5096,6 @@
     {
       "name": "forceCancelOrdersV2",
       "accounts": [
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
         {
           "name": "oracle",
           "isMut": false,
@@ -8453,6 +8438,10 @@
           {
             "name": "marginMaintenance",
             "type": "u64"
+          },
+          {
+            "name": "pricingNonce",
+            "type": "u8"
           }
         ]
       }

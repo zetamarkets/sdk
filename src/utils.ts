@@ -1311,7 +1311,7 @@ export async function crankMarket(
   }
 
   let tx = new Transaction().add(
-    instructions.crankMarketIx(
+    instructions.crankMarketV2Ix(
       asset,
       market.address,
       market.serumMarket.eventQueueAddress,

@@ -519,11 +519,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -4923,11 +4918,6 @@ export type Zeta = {
       "name": "forceCancelOrderByOrderIdV2",
       "accounts": [
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -5106,11 +5096,6 @@ export type Zeta = {
     {
       "name": "forceCancelOrdersV2",
       "accounts": [
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
         {
           "name": "oracle",
           "isMut": false,
@@ -8453,6 +8438,10 @@ export type Zeta = {
           {
             "name": "marginMaintenance",
             "type": "u64"
+          },
+          {
+            "name": "pricingNonce",
+            "type": "u8"
           }
         ]
       }
@@ -10271,11 +10260,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -14675,11 +14659,6 @@ export const IDL: Zeta = {
       "name": "forceCancelOrderByOrderIdV2",
       "accounts": [
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -14858,11 +14837,6 @@ export const IDL: Zeta = {
     {
       "name": "forceCancelOrdersV2",
       "accounts": [
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
         {
           "name": "oracle",
           "isMut": false,
@@ -18205,6 +18179,10 @@ export const IDL: Zeta = {
           {
             "name": "marginMaintenance",
             "type": "u64"
+          },
+          {
+            "name": "pricingNonce",
+            "type": "u8"
           }
         ]
       }
