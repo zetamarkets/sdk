@@ -1144,10 +1144,7 @@ export async function cleanZetaMarkets(
   );
 }
 
-export async function cleanZetaMarketsHalted(
-  asset: Asset,
-  marketAccountTuples: any[]
-) {
+export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
   let txs: Transaction[] = [];
   for (
     var i = 0;
@@ -1156,7 +1153,7 @@ export async function cleanZetaMarketsHalted(
   ) {
     let tx = new Transaction();
     let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
-    tx.add(instructions.cleanZetaMarketsHaltedIx(asset, slice.flat()));
+    tx.add(instructions.cleanZetaMarketsHaltedV2Ix(slice.flat()));
     txs.push(tx);
   }
   await Promise.all(
@@ -1420,7 +1417,7 @@ export async function getCancelAllIxs(
             order.orderId,
             order.side
           )
-        : instructions.cancelOrderHaltedIx(
+        : instructions.cancelOrderHaltedV2Ix(
             asset,
             order.marketIndex,
             marginAccount,

@@ -9735,6 +9735,16 @@ export type Zeta = {
       "code": 6135,
       "name": "PricingAccountSeedsMismatch",
       "msg": "Pricing account seeds mismatch"
+    },
+    {
+      "code": 6136,
+      "name": "ZetaHalted",
+      "msg": "Zeta exchange is halted"
+    },
+    {
+      "code": 6137,
+      "name": "ZetaNotHalted",
+      "msg": "Zeta exchange is not halted"
     }
   ]
 };
@@ -19476,6 +19486,16 @@ export const IDL: Zeta = {
       "code": 6135,
       "name": "PricingAccountSeedsMismatch",
       "msg": "Pricing account seeds mismatch"
+    },
+    {
+      "code": 6136,
+      "name": "ZetaHalted",
+      "msg": "Zeta exchange is halted"
+    },
+    {
+      "code": 6137,
+      "name": "ZetaNotHalted",
+      "msg": "Zeta exchange is not halted"
     }
   ]
 };
