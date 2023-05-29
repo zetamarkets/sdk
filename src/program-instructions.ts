@@ -1613,7 +1613,7 @@ export function initializeZetaPricingIx(
   perpArgs: UpdatePerpParametersArgs,
   marginArgs: UpdateMarginParametersArgs
 ): TransactionInstruction {
-  let [pricing, _pricingNonce] = utils.getPricing(Exchange.programId);
+  let [pricing, pricingNonce] = utils.getPricing(Exchange.programId);
   return Exchange.program.instruction.initializeZetaPricing(
     {
       minFundingRatePercent: perpArgs.minFundingRatePercent,
@@ -1621,6 +1621,7 @@ export function initializeZetaPricingIx(
       perpImpactCashDelta: perpArgs.perpImpactCashDelta,
       marginInitial: marginArgs.futureMarginInitial,
       marginMaintenance: marginArgs.futureMarginMaintenance,
+      pricingNonce: pricingNonce,
     },
     {
       accounts: {

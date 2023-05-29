@@ -7502,6 +7502,10 @@ export type Zeta = {
           {
             "name": "marginMaintenance",
             "type": "u64"
+          },
+          {
+            "name": "pricingNonce",
+            "type": "u8"
           }
         ]
       }
@@ -16298,6 +16302,10 @@ export const IDL: Zeta = {
           {
             "name": "marginMaintenance",
             "type": "u64"
+          },
+          {
+            "name": "pricingNonce",
+            "type": "u8"
           }
         ]
       }
