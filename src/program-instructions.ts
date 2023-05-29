@@ -1755,7 +1755,7 @@ export function crankMarketV2Ix(
   dexProgram: PublicKey,
   remainingAccounts: any[]
 ): TransactionInstruction {
-  return Exchange.program.instruction.crankEventQueueV2({
+  return Exchange.program.instruction.crankEventQueueV2(toProgramAsset(asset), {
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,

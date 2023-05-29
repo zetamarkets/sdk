@@ -1295,21 +1295,6 @@ export async function crankMarket(
     })
   );
 
-  if (marketIndex == constants.PERP_INDEX) {
-    remainingAccounts.unshift(
-      {
-        pubkey: Exchange.getSubExchange(asset).greeksAddress,
-        isSigner: false,
-        isWritable: true,
-      },
-      {
-        pubkey: Exchange.getSubExchange(asset).perpSyncQueueAddress,
-        isSigner: false,
-        isWritable: true,
-      }
-    );
-  }
-
   let tx = new Transaction().add(
     instructions.crankMarketV2Ix(
       asset,
