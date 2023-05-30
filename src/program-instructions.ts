@@ -1973,22 +1973,23 @@ export function cleanZetaMarketsHaltedV2Ix(
 
 export function updatePricingHaltedIx(
   asset: Asset,
-  expiryIndex: number | undefined,
   admin: PublicKey
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
   let marketData = Exchange.getPerpMarket(asset);
-  return Exchange.program.instruction.updatePricingHalted(expiryIndex, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: subExchange.zetaGroupAddress,
-      greeks: subExchange.greeksAddress,
-      admin,
-      perpMarket: marketData.address,
-      perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
-      perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
-    },
-  });
+  return Exchange.program.instruction.updatePricingHaltedV2(
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        admin,
+        perpMarket: marketData.address,
+        perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
+        perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
+      },
+    }
+  );
 }
 
 export function cleanMarketNodesIx(
@@ -2403,12 +2404,6 @@ export interface ExpireSeriesOverrideArgs {
 
 export interface UpdateHaltStateArgs {
   asset: any;
-  spotPrice: anchor.BN;
-  timestamp: anchor.BN;
-}
-
-// TODO delete me once zetagroup is gone
-export interface UpdateHaltStateArgsOld {
   spotPrice: anchor.BN;
   timestamp: anchor.BN;
 }
