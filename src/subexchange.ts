@@ -954,11 +954,10 @@ export class SubExchange {
     await utils.cleanZetaMarketsHalted(marketAccounts);
   }
 
-  public async updatePricingHalted(expiryIndex: number | undefined) {
+  public async updatePricingHalted() {
     let tx = new Transaction().add(
       instructions.updatePricingHaltedIx(
         this.asset,
-        expiryIndex,
         Exchange.provider.wallet.publicKey
       )
     );
