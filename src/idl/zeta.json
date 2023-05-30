@@ -233,13 +233,18 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
-      "name": "initializeCrossMarginAccount",
+      "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
-          "name": "crossMarginAccount",
+          "name": "crossMarginAccountManager",
           "isMut": true,
           "isSigner": false
         },
@@ -265,6 +270,47 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "initializeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "initializeMarginAccount",
@@ -337,6 +383,37 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "closeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -7181,6 +7258,33 @@
       }
     },
     {
+      "name": "CrossMarginAccountManager",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginAccountInfo"
+                },
+                256
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "CrossMarginAccount",
       "type": {
         "kind": "struct",
@@ -7192,6 +7296,10 @@
           {
             "name": "delegatedPubkey",
             "type": "publicKey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
           },
           {
             "name": "nonce",
@@ -7936,6 +8044,27 @@
             "name": "orderState",
             "type": {
               "defined": "OrderState"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrossMarginAccountInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized",
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "type": {
+              "array": [
+                "u8",
+                10
+              ]
             }
           }
         ]

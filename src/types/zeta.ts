@@ -233,13 +233,18 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
-      "name": "initializeCrossMarginAccount",
+      "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
-          "name": "crossMarginAccount",
+          "name": "crossMarginAccountManager",
           "isMut": true,
           "isSigner": false
         },
@@ -265,6 +270,47 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "initializeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "initializeMarginAccount",
@@ -337,6 +383,37 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "closeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -7181,6 +7258,33 @@ export type Zeta = {
       }
     },
     {
+      "name": "crossMarginAccountManager",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginAccountInfo"
+                },
+                256
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "crossMarginAccount",
       "type": {
         "kind": "struct",
@@ -7192,6 +7296,10 @@ export type Zeta = {
           {
             "name": "delegatedPubkey",
             "type": "publicKey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
           },
           {
             "name": "nonce",
@@ -7936,6 +8044,27 @@ export type Zeta = {
             "name": "orderState",
             "type": {
               "defined": "OrderState"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrossMarginAccountInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized",
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "type": {
+              "array": [
+                "u8",
+                10
+              ]
             }
           }
         ]
@@ -10203,13 +10332,18 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
-      "name": "initializeCrossMarginAccount",
+      "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
-          "name": "crossMarginAccount",
+          "name": "crossMarginAccountManager",
           "isMut": true,
           "isSigner": false
         },
@@ -10235,6 +10369,47 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "initializeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "initializeMarginAccount",
@@ -10307,6 +10482,37 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "closeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -17151,6 +17357,33 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "crossMarginAccountManager",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginAccountInfo"
+                },
+                256
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "crossMarginAccount",
       "type": {
         "kind": "struct",
@@ -17162,6 +17395,10 @@ export const IDL: Zeta = {
           {
             "name": "delegatedPubkey",
             "type": "publicKey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
           },
           {
             "name": "nonce",
@@ -17906,6 +18143,27 @@ export const IDL: Zeta = {
             "name": "orderState",
             "type": {
               "defined": "OrderState"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CrossMarginAccountInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized",
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "type": {
+              "array": [
+                "u8",
+                10
+              ]
             }
           }
         ]
