@@ -543,7 +543,7 @@ export class Client {
 
     // Create withdraw ix
     tx.add(
-      instructions.withdrawIx(
+      instructions.withdrawV2Ix(
         withdrawAsset,
         amount,
         withdrawSubClient.marginAccountAddress,
@@ -564,7 +564,7 @@ export class Client {
       );
     }
     tx.add(
-      instructions.depositIx(
+      instructions.depositV2Ix(
         depositAsset,
         amount,
         depositSubClient.marginAccountAddress,
@@ -766,7 +766,7 @@ export class Client {
       }
 
       tx.add(
-        instructions.cancelAllMarketOrdersIx(
+        instructions.cancelAllMarketOrdersV2Ix(
           asset,
           constants.PERP_INDEX,
           this.provider.wallet.publicKey,
@@ -793,7 +793,7 @@ export class Client {
     let index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
       this.marketIdentifierToPublicKey(asset, market)
     );
-    let ix = instructions.cancelAllMarketOrdersIx(
+    let ix = instructions.cancelAllMarketOrdersV2Ix(
       asset,
       index,
       this.provider.wallet.publicKey,
@@ -921,7 +921,7 @@ export class Client {
       let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
         cancelArguments[i].market
       );
-      let ix = instructions.cancelOrderIx(
+      let ix = instructions.cancelOrderV2Ix(
         asset,
         marketIndex,
         this.provider.wallet.publicKey,
@@ -957,7 +957,7 @@ export class Client {
       let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
         cancelArguments[i].market
       );
-      let ix = instructions.cancelOrderNoErrorIx(
+      let ix = instructions.cancelOrderNoErrorV2Ix(
         asset,
         marketIndex,
         this.provider.wallet.publicKey,

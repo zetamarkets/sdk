@@ -629,17 +629,7 @@ export class SubExchange {
   /**
    * Update pricing for an expiry index.
    */
-  public async updatePricing(expiryIndex: number | undefined) {
-    let tx = new Transaction().add(
-      instructions.updatePricingIx(this.asset, expiryIndex)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
-   * Update pricing for an expiry index.
-   */
-  public async updatePricingV2() {
+  public async updatePricing() {
     let tx = new Transaction().add(instructions.updatePricingV2Ix(this.asset));
     await utils.processTransaction(Exchange.provider, tx);
   }
@@ -883,12 +873,6 @@ export class SubExchange {
     }
   }
 
-  public assertZetaGroupHalted() {
-    if (!this.zetaGroup.haltState.halted) {
-      throw "Zeta group not halted.";
-    }
-  }
-
   public async halt() {
     let tx = new Transaction().add(
       instructions.haltIx(this.asset, Exchange.provider.wallet.publicKey)
@@ -903,27 +887,6 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async haltZetaGroup(zetaGroupAddress: PublicKey) {
-    let tx = new Transaction().add(
-      instructions.haltZetaGroupIx(
-        this.asset,
-        zetaGroupAddress,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async unhaltZetaGroup() {
-    let tx = new Transaction().add(
-      instructions.unhaltZetaGroupIx(
-        this._asset,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
   public async updateHaltState(timestamp: anchor.BN, spotPrice: anchor.BN) {
     let tx = new Transaction().add(
       instructions.updateHaltStateV2Ix(
@@ -932,20 +895,6 @@ export class SubExchange {
           spotPrice: spotPrice,
           timestamp: timestamp,
         },
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async updateZetaGroupHaltState(
-    zetaGroupAddress: PublicKey,
-    args: instructions.UpdateHaltStateArgs
-  ) {
-    let tx = new Transaction().add(
-      instructions.updateHaltStateIx(
-        zetaGroupAddress,
-        args,
         Exchange.provider.wallet.publicKey
       )
     );

@@ -1018,12 +1018,8 @@ export class Exchange {
     await this.getSubExchange(asset).updateZetaGroup();
   }
 
-  public async updatePricing(asset: Asset, expiryIndex: number = undefined) {
-    await this.getSubExchange(asset).updatePricing(expiryIndex);
-  }
-
-  public async updatePricingV2(asset: Asset) {
-    await this.getSubExchange(asset).updatePricingV2();
+  public async updatePricing(asset: Asset) {
+    await this.getSubExchange(asset).updatePricing();
   }
 
   public async updatePricingPubkeys(
@@ -1096,31 +1092,12 @@ export class Exchange {
     await this.getSubExchange(asset).unhalt();
   }
 
-  public async haltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
-    await this.getSubExchange(asset).haltZetaGroup(zetaGroupAddress);
-  }
-
-  public async unhaltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
-    await this.getSubExchange(asset).unhaltZetaGroup();
-  }
-
   public async updateHaltState(
     asset: Asset,
     timestamp: anchor.BN,
     spotPrice: anchor.BN
   ) {
     await this.getSubExchange(asset).updateHaltState(timestamp, spotPrice);
-  }
-
-  public async updateZetaGroupHaltState(
-    asset: Asset,
-    zetaGroupAddress: PublicKey,
-    args: instructions.UpdateHaltStateArgs
-  ) {
-    await this.getSubExchange(asset).updateZetaGroupHaltState(
-      zetaGroupAddress,
-      args
-    );
   }
 
   public async settlePositionsHalted(
