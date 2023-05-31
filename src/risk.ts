@@ -1,7 +1,11 @@
 import { exchange as Exchange } from "./exchange";
 import * as types from "./types";
 import * as constants from "./constants";
-import { MarginAccount, PositionMovementEvent } from "./program-types";
+import {
+  CrossMarginAccount,
+  MarginAccount,
+  PositionMovementEvent,
+} from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
@@ -377,6 +381,62 @@ export class RiskCalculator {
       );
 
     return marginForMarket;
+  }
+
+  /**
+   * Returns the aggregate margin account state.
+   * @param crossMarginAccount   the user's CrossMarginAccount.
+   */
+  public getCrossMarginAccountState(
+    marginAccount: CrossMarginAccount,
+    pnlExecutionPrice: number = undefined,
+    pnlAddTakerFees: boolean = false
+  ): types.MarginAccountState {
+    let balance = convertNativeBNToDecimal(marginAccount.balance);
+    let unrealizedPnl = this.calculateUnrealizedPnl(
+      marginAccount,
+      types.ProgramAccountType.MarginAccount,
+      pnlExecutionPrice,
+      pnlAddTakerFees
+    );
+    // let unpaidFunding = this.calculateUnpaidFunding(marginAccount);
+    // let initialMargin = this.calculateTotalInitialMargin(marginAccount);
+    // let initialMarginSkipConcession = this.calculateTotalInitialMargin(
+    // marginAccount,
+    // true
+    // );
+    // let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
+    // let availableBalanceInitial: number =
+    //   balance + unrealizedPnl + unpaidFunding - initialMargin;
+    // let availableBalanceWithdrawable: number =
+    //   balance + unrealizedPnl + unpaidFunding - initialMarginSkipConcession;
+    // let availableBalanceMaintenance: number =
+    //   balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
+    // return {
+    //   balance,
+    //   initialMargin,
+    //   initialMarginSkipConcession,
+    //   maintenanceMargin,
+    //   unrealizedPnl,
+    //   unpaidFunding,
+    //   availableBalanceInitial,
+    //   availableBalanceMaintenance,
+    //   availableBalanceWithdrawable,
+    // };
+
+    console.log("TODO");
+
+    return {
+      balance,
+      initialMargin: 0,
+      initialMarginSkipConcession: 0,
+      maintenanceMargin: 0,
+      unrealizedPnl: 0,
+      unpaidFunding: 0,
+      availableBalanceInitial: 0,
+      availableBalanceMaintenance: 0,
+      availableBalanceWithdrawable: 0,
+    };
   }
 
   /**

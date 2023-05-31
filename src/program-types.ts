@@ -194,6 +194,34 @@ export interface ProductLedger {
   orderState: OrderState;
 }
 
+export interface CrossMarginAccountInfo {
+  initialized: boolean;
+  name: Array<number>; // 10 byte string, stored as [u8; 10] onchain
+}
+
+export interface CrossMarginAccountManager {
+  nonce: number;
+  authority: PublicKey;
+  accounts: Array<CrossMarginAccountInfo>;
+}
+
+export interface CrossMarginAccount {
+  authority: PublicKey;
+  delegatedPubkey: PublicKey;
+  balance: anchor.BN;
+  nonce: number;
+  forceCancelFlag: boolean;
+  accountType: any;
+  openOrdersNonces: Array<number>;
+  openOrdersNoncesPadding: Array<number>;
+  rebalanceAmount: anchor.BN;
+  lastFundingDeltas: Array<anchor.BN>;
+  lastFundingDeltasPadding: Array<anchor.BN>;
+  productLedgers: Array<ProductLedger>;
+  productLedgersPadding: Array<ProductLedger>;
+  padding: Array<number>;
+}
+
 export interface MarginAccount {
   authority: PublicKey;
   nonce: number;

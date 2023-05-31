@@ -37,6 +37,7 @@ import {
   ReferrerAlias,
   TradeEventV3,
   OpenOrdersMap,
+  CrossMarginAccount,
 } from "./program-types";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
@@ -413,6 +414,34 @@ export function getQuoteMint(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("quote-mint")),
       market.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getCrossMarginAccountManager(
+  programId: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-margin-manager")),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getCrossMarginAccount(
+  programId: PublicKey,
+  userKey: PublicKey,
+  seedNumber: Uint8Array
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-margin")),
+      userKey.toBuffer(),
+      seedNumber,
     ],
     programId
   );
