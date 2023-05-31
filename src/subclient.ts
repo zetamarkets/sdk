@@ -568,8 +568,7 @@ export class SubClient {
       console.log(
         `User doesn't have open orders account. Initialising for market ${market.toString()}.`
       );
-      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersIx(
-        this.asset,
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV2Ix(
         market,
         this._parent.publicKey,
         this._parent.provider.wallet.publicKey,
@@ -681,8 +680,7 @@ export class SubClient {
         )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
       );
 
-      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersIx(
-        this.asset,
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV2Ix(
         market,
         this._parent.publicKey,
         this._parent.provider.wallet.publicKey,
@@ -764,8 +762,7 @@ export class SubClient {
         )}] User doesn't have open orders account. Initialising for market ${market.toString()}.`
       );
 
-      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersIx(
-        this.asset,
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV2Ix(
         market,
         this._parent.publicKey,
         this._parent.provider.wallet.publicKey,
@@ -1298,8 +1295,7 @@ export class SubClient {
       throw Error("User already has an open orders account for market!");
     }
 
-    let [initIx, openOrdersPda] = instructions.initializeOpenOrdersIx(
-      this.asset,
+    let [initIx, openOrdersPda] = instructions.initializeOpenOrdersV2Ix(
       market,
       this._parent.publicKey,
       this._parent.provider.wallet.publicKey,
@@ -1347,8 +1343,7 @@ export class SubClient {
     );
 
     tx.add(
-      instructions.closeOpenOrdersIx(
-        this.asset,
+      instructions.closeOpenOrdersV2Ix(
         market,
         this._parent.provider.wallet.publicKey,
         this.marginAccountAddress,
@@ -1397,8 +1392,7 @@ export class SubClient {
         vaultOwner,
         this._openOrdersAccounts[marketIndex]
       );
-      let closeIx = instructions.closeOpenOrdersIx(
-        this.asset,
+      let closeIx = instructions.closeOpenOrdersV2Ix(
         market,
         this._parent.provider.wallet.publicKey,
         this.marginAccountAddress,

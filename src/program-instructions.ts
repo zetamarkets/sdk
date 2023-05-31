@@ -238,8 +238,7 @@ export function withdrawV2Ix(
   });
 }
 
-export function initializeOpenOrdersIx(
-  asset: Asset,
+export function initializeOpenOrdersV2Ix(
   market: PublicKey,
   userKey: PublicKey,
   authority: PublicKey,
@@ -257,10 +256,10 @@ export function initializeOpenOrdersIx(
   );
 
   return [
-    Exchange.program.instruction.initializeOpenOrders({
+    Exchange.program.instruction.initializeOpenOrdersV2({
       accounts: {
         state: Exchange.stateAddress,
-        zetaGroup: Exchange.getZetaGroupAddress(asset),
+        pricing: Exchange.pricingAddress,
         dexProgram: constants.DEX_PID[Exchange.network],
         systemProgram: SystemProgram.programId,
         openOrders: openOrdersPda,
@@ -277,8 +276,7 @@ export function initializeOpenOrdersIx(
   ];
 }
 
-export function closeOpenOrdersIx(
-  asset: Asset,
+export function closeOpenOrdersV2Ix(
   market: PublicKey,
   userKey: PublicKey,
   marginAccount: PublicKey,
@@ -289,10 +287,10 @@ export function closeOpenOrdersIx(
     openOrders
   );
 
-  return Exchange.program.instruction.closeOpenOrders(openOrdersMapNonce, {
+  return Exchange.program.instruction.closeOpenOrdersV2(openOrdersMapNonce, {
     accounts: {
       state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
+      pricing: Exchange.pricingAddress,
       dexProgram: constants.DEX_PID[Exchange.network],
       openOrders,
       marginAccount: marginAccount,
