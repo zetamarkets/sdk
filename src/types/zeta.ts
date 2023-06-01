@@ -7030,14 +7030,14 @@ export type Zeta = {
       ],
       "args": [
         {
-          "name": "size",
-          "type": "u64"
-        },
-        {
           "name": "asset",
           "type": {
             "defined": "Asset"
           }
+        },
+        {
+          "name": "size",
+          "type": "u64"
         }
       ]
     },
@@ -18541,14 +18541,14 @@ export const IDL: Zeta = {
       ],
       "args": [
         {
-          "name": "size",
-          "type": "u64"
-        },
-        {
           "name": "asset",
           "type": {
             "defined": "Asset"
           }
+        },
+        {
+          "name": "size",
+          "type": "u64"
         }
       ]
     },

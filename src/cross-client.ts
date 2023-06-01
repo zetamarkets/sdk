@@ -175,18 +175,18 @@ export class CrossClient {
   /**
    * Returns a list of the user's current orders.
    */
-  public get orders(): types.Order[] {
+  public get orders(): Map<Asset, types.Order[]> {
     return this._orders;
   }
-  private _orders: types.Order[];
+  private _orders: Map<Asset, types.Order[]>;
 
   /**
    * Returns a list of user current margin account positions.
    */
-  public get positions(): types.Position[] {
+  public get positions(): Map<Asset, types.Position[]> {
     return this._positions;
   }
-  private _positions: types.Position[];
+  private _positions: Map<Asset, types.Position[]>;
 
   /**
    * The subscription id for the margin account subscription.
@@ -240,8 +240,13 @@ export class CrossClient {
       PublicKey.default
     );
 
-    this._positions = [];
-    this._orders = [];
+    this._positions = new Map();
+    this._orders = new Map();
+    for (var asset of Exchange.assets) {
+      this._positions.set(asset, []);
+      this._orders.set(asset, []);
+    }
+
     this._lastUpdateTimestamp = 0;
     this._pendingUpdate = false;
     this._account = null;
@@ -365,7 +370,7 @@ export class CrossClient {
     }
 
     if (promiseResults[1] != null) {
-      client._account = promiseResults[0] as CrossMarginAccount;
+      client._account = promiseResults[1] as CrossMarginAccount;
       // Set open order pdas for initialized accounts.
       client.updateOpenOrdersAddresses();
       client.updatePositions();
@@ -1560,13 +1565,13 @@ export class CrossClient {
    */
   public cancelAllOrdersIxs(asset: Asset): TransactionInstruction[] {
     let ixs = [];
-    for (var i = 0; i < this._orders.length; i++) {
-      let order = this._orders[i];
+    for (var i = 0; i < this._orders.get(asset).length; i++) {
+      let order = this._orders.get(asset)[i];
       let ix = instructions.cancelOrderV3Ix(
         asset,
         this._provider.wallet.publicKey,
         this._accountAddress,
-        this._openOrdersAccounts[order.marketIndex],
+        this._openOrdersAccounts[assetToIndex(asset)],
         order.orderId,
         order.side
       );
@@ -1581,13 +1586,13 @@ export class CrossClient {
    */
   public cancelAllOrdersNoErrorIxs(asset: Asset): TransactionInstruction[] {
     let ixs = [];
-    for (var i = 0; i < this._orders.length; i++) {
-      let order = this._orders[i];
+    for (var i = 0; i < this._orders.get(asset).length; i++) {
+      let order = this._orders.get(asset)[i];
       let ix = instructions.cancelOrderNoErrorV3Ix(
         asset,
         this._provider.wallet.publicKey,
         this._accountAddress,
-        this._openOrdersAccounts[order.marketIndex],
+        this._openOrdersAccounts[assetToIndex(asset)],
         order.orderId,
         order.side
       );
@@ -1706,7 +1711,7 @@ export class CrossClient {
     );
 
     let allOrders = [].concat(...orders);
-    this._orders = allOrders.filter(function (order: types.Order) {
+    let allOrdersFiltered = allOrders.filter(function (order: types.Order) {
       let seqNum = utils.getSeqNumFromSerumOrderKey(
         order.orderId,
         order.side == types.Side.BID
@@ -1723,6 +1728,9 @@ export class CrossClient {
         serumMarket.startEpochSeqNum
       );
     });
+    for (var order of allOrdersFiltered) {
+      this._orders.get(order.asset).push(order);
+    }
   }
 
   private updatePositions() {
@@ -1744,7 +1752,9 @@ export class CrossClient {
       }
     }
 
-    this._positions = positions;
+    for (var position of positions) {
+      this._positions.get(position.asset).push(position);
+    }
   }
 
   private updateOpenOrdersAddresses() {
@@ -1756,7 +1766,7 @@ export class CrossClient {
         // If this is equal to default, it means we haven't added the PDA yet.
         this._openOrdersAccounts[assetIndex].equals(PublicKey.default)
       ) {
-        let [openOrdersPda, _openOrdersNonce] = utils.getOpenOrders(
+        let [openOrdersPda, _openOrdersNonce] = utils.getCrossOpenOrders(
           Exchange.programId,
           Exchange.getPerpMarket(asset).address,
           this.publicKey
