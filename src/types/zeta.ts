@@ -319,6 +319,47 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "initializeUnderlying",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "underlying",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "underlyingMint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "flexUnderlying",
+          "type": "bool"
+        }
+      ]
+    },
+    {
       "name": "initializePerpSyncQueue",
       "accounts": [
         {
@@ -10233,6 +10274,47 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "initializeUnderlying",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "underlying",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "underlyingMint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "flexUnderlying",
+          "type": "bool"
+        }
+      ]
     },
     {
       "name": "initializePerpSyncQueue",
