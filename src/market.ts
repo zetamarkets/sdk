@@ -226,7 +226,7 @@ export class ZetaGroupMarkets {
     let subExchange = Exchange.getSubExchange(asset);
 
     // Perps product/market is separate
-    let marketAddr = Exchange.getPerpMarket(asset).address;
+    let marketAddr = Exchange.pricing.products[assetToIndex(asset)].market;
     let serumMarket: SerumMarket;
     if (loadFromStore) {
       const decoded = getDecodedMarket(
@@ -267,7 +267,7 @@ export class ZetaGroupMarkets {
       asset,
       constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
       null,
-      types.toProductKind(types.Kind.PERP),
+      types.Kind.PERP,
       marketAddr,
       subExchange.zetaGroupAddress,
       quoteVaultAddr,
@@ -277,6 +277,7 @@ export class ZetaGroupMarkets {
 
     instance._markets = [];
     instance._expirySeries = [];
+
     return instance;
   }
 

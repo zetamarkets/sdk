@@ -101,14 +101,19 @@ export class SubExchange {
 
     this._asset = asset;
 
-    this._perpSyncQueueAddress = utils.getPerpSyncQueue(
+    // Load zeta group.
+    let underlyingMint = utils.getUnderlyingMint(asset);
+
+    // Grab zetagroupaddress manually because Pricing acc isnt loaded yet at this point
+    this._zetaGroupAddress = utils.getZetaGroup(
       Exchange.programId,
-      this.zetaGroupAddress
+      underlyingMint
     )[0];
 
-    // Hard coded since we removed the usage of the actual zetagroup acc
-    this._zetaGroupAddress =
-      Exchange.pricing.zetaGroupKeys[assetToIndex(asset)];
+    this._perpSyncQueueAddress = utils.getPerpSyncQueue(
+      Exchange.programId,
+      this._zetaGroupAddress
+    )[0];
 
     this._isSetup = true;
   }

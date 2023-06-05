@@ -552,7 +552,7 @@ export class Exchange {
     )[0];
 
     this._lastPollTimestamp = 0;
-
+    await this.updateZetaPricing();
     this._oracle = new Oracle(this.network, this.connection);
 
     const subExchangeToFetchAddrs: PublicKey[] = this.assets
@@ -608,8 +608,6 @@ export class Exchange {
     for (var se of this.getAllSubExchanges()) {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
-
-    await this.updateZetaPricing();
 
     this._isInitialized = true;
   }
