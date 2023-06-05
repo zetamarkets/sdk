@@ -41,10 +41,7 @@ export class RiskCalculator {
   }
 
   public updateMarginRequirements(asset: Asset) {
-    if (
-      Exchange.getSubExchange(asset).greeks === undefined ||
-      Exchange.oracle === undefined
-    ) {
+    if (Exchange.pricing === undefined || Exchange.oracle === undefined) {
       throw Error("Pricing (greeks and/or oracle) is not initialized");
     }
     let oraclePrice = Exchange.oracle.getPrice(asset);
@@ -55,17 +52,7 @@ export class RiskCalculator {
       calculateProductMargin(asset, constants.PERP_INDEX, spotPrice)
     );
 
-    if (Exchange.getSubExchange(asset).zetaGroup.perpsOnly) {
-      return;
-    }
-
-    for (var i = 0; i < this._marginRequirements.get(asset).length; i++) {
-      this._marginRequirements.get(asset)[i] = calculateProductMargin(
-        asset,
-        i,
-        spotPrice
-      );
-    }
+    return;
   }
 
   /**
@@ -164,10 +151,11 @@ export class RiskCalculator {
     const size =
       position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
     let asset = fromProgramAsset(account.asset);
-    let greeks = Exchange.getGreeks(asset);
 
     let deltaDiff =
-      (Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
+      (Decimal.fromAnchorDecimal(
+        Exchange.pricing.fundingDeltas[assets.assetToIndex(asset)]
+      ).toNumber() -
         Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber()) /
       Math.pow(10, constants.PLATFORM_PRECISION);
 
@@ -217,12 +205,12 @@ export class RiskCalculator {
       if (size > 0) {
         pnl +=
           convertNativeLotSizeToDecimal(size) *
-            (executionPrice ? executionPrice : subExchange.getMarkPrice(i)) -
+            (executionPrice ? executionPrice : subExchange.getMarkPrice()) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         pnl +=
           convertNativeLotSizeToDecimal(size) *
-            (executionPrice ? executionPrice : subExchange.getMarkPrice(i)) +
+            (executionPrice ? executionPrice : subExchange.getMarkPrice()) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
       if (addTakerFees) {
@@ -230,7 +218,7 @@ export class RiskCalculator {
           convertNativeLotSizeToDecimal(Math.abs(size)) *
           (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
             100) *
-          subExchange.getMarkPrice(i);
+          subExchange.getMarkPrice();
       }
     }
 
@@ -481,7 +469,6 @@ export class RiskCalculator {
 
     // Perform movement by movement type onto new margin and spread accounts
     movePositions(
-      Exchange.getZetaGroup(asset),
       simulatedSpreadAccount,
       simulatedMarginAccount,
       movementType,

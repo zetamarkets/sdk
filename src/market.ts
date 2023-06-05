@@ -17,7 +17,7 @@ import {
 } from "./utils";
 import * as types from "./types";
 import { EventType, OrderbookEvent } from "./events";
-import { Asset } from "./assets";
+import { Asset, assetToIndex } from "./assets";
 import { getDecodedMarket } from "./serum/generate-decoded";
 
 export class ZetaGroupMarkets {
@@ -146,10 +146,9 @@ export class ZetaGroupMarkets {
   }
 
   private constructor(asset: Asset) {
-    let subExchange = Exchange.getSubExchange(asset);
     this._asset = asset;
-    this._expirySeries = new Array(subExchange.zetaGroup.expirySeries.length);
-    this._markets = new Array(subExchange.zetaGroup.products.length);
+    this._expirySeries = [];
+    this._markets = [];
     this._subscribedMarketIndexes = new Set<number>();
     this._lastPollTimestamp = 0;
   }
@@ -225,10 +224,9 @@ export class ZetaGroupMarkets {
   ): Promise<ZetaGroupMarkets> {
     let instance = new ZetaGroupMarkets(asset);
     let subExchange = Exchange.getSubExchange(asset);
-    let perpsOnly = subExchange.zetaGroup.perpsOnly;
 
     // Perps product/market is separate
-    let marketAddr = subExchange.zetaGroup.perp.market;
+    let marketAddr = Exchange.getPerpMarket(asset).address;
     let serumMarket: SerumMarket;
     if (loadFromStore) {
       const decoded = getDecodedMarket(
@@ -269,7 +267,7 @@ export class ZetaGroupMarkets {
       asset,
       constants.PERP_INDEX, // not in use but technically sits at the end of the list of Products in the ZetaGroup
       null,
-      types.toProductKind(subExchange.zetaGroup.perp.kind),
+      types.toProductKind(types.Kind.PERP),
       marketAddr,
       subExchange.zetaGroupAddress,
       quoteVaultAddr,
@@ -277,75 +275,8 @@ export class ZetaGroupMarkets {
       serumMarket
     );
 
-    if (perpsOnly) {
-      instance._markets = [];
-      instance._expirySeries = [];
-      return instance;
-    }
-
-    let productsPerExpiry = Math.floor(
-      subExchange.zetaGroup.products.length /
-        subExchange.zetaGroup.expirySeries.length
-    );
-
-    let indexes = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
-    for (var i = 0; i < indexes.length; i += constants.MARKET_LOAD_LIMIT) {
-      let slice = indexes.slice(i, i + constants.MARKET_LOAD_LIMIT);
-      await Promise.all(
-        slice.map(async (index) => {
-          let marketAddr = subExchange.zetaGroup.products[index].market;
-          let serumMarket: SerumMarket;
-
-          if (loadFromStore) {
-            const decoded = getDecodedMarket(Exchange.network, asset, index);
-            serumMarket = SerumMarket.loadFromDecoded(
-              decoded,
-              {
-                commitment: opts.commitment,
-                skipPreflight: opts.skipPreflight,
-              },
-              constants.DEX_PID[Exchange.network]
-            );
-          } else {
-            serumMarket = await SerumMarket.load(
-              Exchange.connection,
-              marketAddr,
-              {
-                commitment: opts.commitment,
-                skipPreflight: opts.skipPreflight,
-              },
-              constants.DEX_PID[Exchange.network]
-            );
-          }
-
-          let [baseVaultAddr, _baseVaultNonce] = getZetaVault(
-            Exchange.programId,
-            serumMarket.baseMintAddress
-          );
-          let [quoteVaultAddr, _quoteVaultNonce] = getZetaVault(
-            Exchange.programId,
-            serumMarket.quoteMintAddress
-          );
-
-          let expiryIndex = Math.floor(index / productsPerExpiry);
-
-          instance._markets[index] = new Market(
-            asset,
-            index,
-            expiryIndex,
-            types.toProductKind(subExchange.zetaGroup.products[index].kind),
-            marketAddr,
-            subExchange.zetaGroupAddress,
-            quoteVaultAddr,
-            baseVaultAddr,
-            serumMarket
-          );
-        })
-      );
-      await sleep(throttleMs);
-    }
-
-    instance.updateExpirySeries();
+    instance._markets = [];
+    instance._expirySeries = [];
     return instance;
   }
 
@@ -353,28 +284,7 @@ export class ZetaGroupMarkets {
    * Updates the option series state based off state in SubExchange.
    */
   public async updateExpirySeries() {
-    let subExchange = Exchange.getSubExchange(this.asset);
-    if (subExchange.zetaGroup.perpsOnly) {
-      return;
-    }
-
-    for (var i = 0; i < subExchange.zetaGroup.products.length; i++) {
-      this._markets[i].updateStrike();
-    }
-
-    this._frontExpiryIndex = subExchange.zetaGroup.frontExpiryIndex;
-    for (var i = 0; i < subExchange.zetaGroup.expirySeries.length; i++) {
-      let strikesInitialized =
-        this._markets[i * this.productsPerExpiry()].strike != null;
-      this._expirySeries[i] = new ExpirySeries(
-        this.asset,
-        i,
-        subExchange.zetaGroup.expirySeries[i].activeTs.toNumber(),
-        subExchange.zetaGroup.expirySeries[i].expiryTs.toNumber(),
-        subExchange.zetaGroup.expirySeries[i].dirty,
-        strikesInitialized
-      );
-    }
+    return;
   }
 
   /**
@@ -395,33 +305,13 @@ export class ZetaGroupMarkets {
       a.toBuffer().compare(b.toBuffer());
 
     let sub = Exchange.getSubExchange(this.asset);
-    if (sub.isPerpsOnly()) {
-      if (compare(market, sub.markets.perpMarket.address) == 0) {
-        return constants.PERP_INDEX;
-      } else {
-        throw Error(
-          "Cannot get market index of non perp market on perp only market!"
-        );
-      }
-    }
-
-    let m = 0;
-    let n = this._markets.length - 1;
-    while (m <= n) {
-      let k = (n + m) >> 1;
-      let cmp = compare(market, this._markets[k].address);
-      if (cmp > 0) {
-        m = k + 1;
-      } else if (cmp < 0) {
-        n = k - 1;
-      } else {
-        return k;
-      }
-    }
-    if (compare(market, this._perpMarket.address) == 0) {
+    if (compare(market, sub.markets.perpMarket.address) == 0) {
       return constants.PERP_INDEX;
+    } else {
+      throw Error(
+        "Cannot get market index of non perp market on perp only market!"
+      );
     }
-    throw Error("Market doesn't exist!");
   }
 
   /**
@@ -609,12 +499,7 @@ export class Market {
   }
 
   public updateStrike() {
-    let strike =
-      this._marketIndex == constants.PERP_INDEX
-        ? Exchange.getSubExchange(this.asset).zetaGroup.perp.strike
-        : Exchange.getSubExchange(this.asset).zetaGroup.products[
-            this._marketIndex
-          ].strike;
+    let strike = Exchange.pricing.products[assetToIndex(this._asset)].strike;
 
     if (!strike.isSet) {
       this._strike = null;

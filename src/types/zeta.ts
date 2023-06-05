@@ -1873,6 +1873,22 @@ export type Zeta = {
       ]
     },
     {
+      "name": "applyPerpFundingV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "applyPerpFunding",
       "accounts": [
         {
@@ -11828,6 +11844,22 @@ export const IDL: Zeta = {
           }
         }
       ]
+    },
+    {
+      "name": "applyPerpFundingV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "applyPerpFunding",

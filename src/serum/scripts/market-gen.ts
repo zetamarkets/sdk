@@ -30,13 +30,7 @@ const main = async () => {
 
     await Exchange.load(LOAD_CONFIG);
     for (var asset of assetList) {
-      let sub = Exchange.getSubExchange(asset);
-      let perpsOnly = sub.zetaGroup.perpsOnly;
       populateMarketStore(marketStore, network, asset, constants.PERP_INDEX);
-      if (perpsOnly) continue;
-      for (var i = 0; i < sub.markets.markets.length; i++) {
-        populateMarketStore(marketStore, network, asset, i);
-      }
     }
     await Exchange.close();
 
