@@ -619,6 +619,7 @@ export function placePerpOrderV4Ix(
     new anchor.BN(price),
     new anchor.BN(size),
     types.toProgramSide(side),
+    toProgramAsset(asset),
     types.toProgramOrderType(orderType),
     clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     new String(tag),
