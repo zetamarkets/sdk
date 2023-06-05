@@ -10,7 +10,7 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
-import { Asset, fromProgramAsset } from "./assets";
+import { Asset, assetToIndex, fromProgramAsset } from "./assets";
 import { BN } from "@zetamarkets/anchor";
 import { assets, Client, Decimal, instructions, utils } from ".";
 import { cloneDeep } from "lodash";
@@ -166,10 +166,13 @@ export class RiskCalculator {
 
       const size =
         position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
-      let greeks = Exchange.getGreeks(asset);
 
       let deltaDiff =
-        (Decimal.fromAnchorDecimal(greeks.perpFundingDelta).toNumber() -
+        (Decimal.fromAnchorDecimal(
+          Exchange.pricing.fundingDeltas[
+            assetToIndex(assets.fromProgramAsset(account.asset))
+          ]
+        ).toNumber() -
           Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber()) /
         Math.pow(10, constants.PLATFORM_PRECISION);
 

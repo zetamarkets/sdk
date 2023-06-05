@@ -11600,6 +11600,11 @@ export type Zeta = {
       "code": 6139,
       "name": "CannotCloseNonEmptyMarginAccountManager",
       "msg": "Cannot close margin account manager that is not empty"
+    },
+    {
+      "code": 6140,
+      "name": "CannotMigrateWithOpenOrders",
+      "msg": "Cannot migrate to cross margin account with open orders, close all open orders"
     }
   ]
 };
@@ -23206,6 +23211,11 @@ export const IDL: Zeta = {
       "code": 6139,
       "name": "CannotCloseNonEmptyMarginAccountManager",
       "msg": "Cannot close margin account manager that is not empty"
+    },
+    {
+      "code": 6140,
+      "name": "CannotMigrateWithOpenOrders",
+      "msg": "Cannot migrate to cross margin account with open orders, close all open orders"
     }
   ]
 };
