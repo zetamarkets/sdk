@@ -655,7 +655,6 @@ export class CrossClient {
   }
 
   public getAccountState(
-    asset: Asset,
     pnlExecutionPrice: number = undefined,
     pnlAddTakerFees: boolean = false
   ): types.MarginAccountState {
@@ -729,7 +728,6 @@ export class CrossClient {
     let tx = new Transaction();
     tx.add(
       instructions.withdrawV3Ix(
-        Asset.SOL, // temp remove asset
         amount,
         this._accountAddress,
         this._usdcAccountAddress,
@@ -757,7 +755,6 @@ export class CrossClient {
     let tx = new Transaction();
     tx.add(
       instructions.withdrawV3Ix(
-        Asset.SOL, // temp remove asset
         this._account.balance.toNumber(),
         this._accountAddress,
         this._usdcAccountAddress,

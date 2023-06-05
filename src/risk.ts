@@ -169,11 +169,13 @@ export class RiskCalculator {
 
       let deltaDiff =
         (Decimal.fromAnchorDecimal(
-          Exchange.pricing.fundingDeltas[
-            assetToIndex(assets.fromProgramAsset(account.asset))
-          ]
+          Exchange.pricing.fundingDeltas[assetToIndex(asset)]
         ).toNumber() -
-          Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber()) /
+          Decimal.fromAnchorDecimal(
+            accountType == types.ProgramAccountType.MarginAccount
+              ? account.lastFundingDelta
+              : account.lastFundingDeltas[assetToIndex(asset)]
+          ).toNumber()) /
         Math.pow(10, constants.PLATFORM_PRECISION);
 
       // Note that there is some rounding occurs here in the Zeta program
@@ -214,12 +216,15 @@ export class RiskCalculator {
         continue;
       }
 
-      const position =
-        accountType == types.ProgramAccountType.MarginAccount
-          ? i == constants.PERP_INDEX
-            ? account.perpProductLedger.position // Margin account perp
-            : account.productLedgers[i].position // Margin account non-perp and CrossMarginAccount
-          : account.positions[i]; // Spread account
+      let position: any;
+      if (accountType == types.ProgramAccountType.MarginAccount) {
+        position = account.perpProductLedger.position;
+      } else if (accountType == types.ProgramAccountType.SpreadAccount) {
+        position = account.positions[i];
+      } else {
+        position = account.productLedgers[i].position;
+      }
+
       const size = position.size.toNumber();
       if (size == 0) {
         continue;
@@ -459,7 +464,7 @@ export class RiskCalculator {
       pnlExecutionPrice,
       pnlAddTakerFees
     );
-    let unpaidFunding = this.calculateUnpaidFunding(marginAccount);
+    let unpaidFunding = this.calculateUnpaidFunding(marginAccount, accType);
     let initialMargin = this.calculateTotalInitialMargin(
       marginAccount,
       accType
@@ -469,37 +474,26 @@ export class RiskCalculator {
       accType,
       true
     );
-    // let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
-    // let availableBalanceInitial: number =
-    //   balance + unrealizedPnl + unpaidFunding - initialMargin;
-    // let availableBalanceWithdrawable: number =
-    //   balance + unrealizedPnl + unpaidFunding - initialMarginSkipConcession;
-    // let availableBalanceMaintenance: number =
-    //   balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
-    // return {
-    //   balance,
-    //   initialMargin,
-    //   initialMarginSkipConcession,
-    //   maintenanceMargin,
-    //   unrealizedPnl,
-    //   unpaidFunding,
-    //   availableBalanceInitial,
-    //   availableBalanceMaintenance,
-    //   availableBalanceWithdrawable,
-    // };
-
-    console.log("TODO");
-
+    let maintenanceMargin = this.calculateTotalMaintenanceMargin(
+      marginAccount,
+      accType
+    );
+    let availableBalanceInitial: number =
+      balance + unrealizedPnl + unpaidFunding - initialMargin;
+    let availableBalanceWithdrawable: number =
+      balance + unrealizedPnl + unpaidFunding - initialMarginSkipConcession;
+    let availableBalanceMaintenance: number =
+      balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
     return {
       balance,
-      initialMargin: 0,
-      initialMarginSkipConcession: 0,
-      maintenanceMargin: 0,
+      initialMargin,
+      initialMarginSkipConcession,
+      maintenanceMargin,
       unrealizedPnl,
-      unpaidFunding: 0,
-      availableBalanceInitial: 0,
-      availableBalanceMaintenance: 0,
-      availableBalanceWithdrawable: 0,
+      unpaidFunding,
+      availableBalanceInitial,
+      availableBalanceMaintenance,
+      availableBalanceWithdrawable,
     };
   }
 

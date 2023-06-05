@@ -2650,16 +2650,6 @@
           "isSigner": true
         },
         {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "oracleBackupProgram",
           "isMut": false,
           "isSigner": false

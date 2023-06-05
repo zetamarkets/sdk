@@ -308,14 +308,24 @@ export function withdrawInsuranceVaultV2Ix(
  * @param amount the native amount to withdraw (6dp)
  */
 export function withdrawV3Ix(
-  asset: Asset,
   amount: number,
   crossMarginAccount: PublicKey,
   usdcAccount: PublicKey,
   userKey: PublicKey
 ): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-
+  let remainingAccounts = [];
+  for (var asset of Exchange.assets) {
+    remainingAccounts.push({
+      pubkey: Exchange.pricing.oracles[assetToIndex(asset)],
+      isSigner: false,
+      isWritable: false,
+    });
+    remainingAccounts.push({
+      pubkey: Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+      isSigner: false,
+      isWritable: false,
+    });
+  }
   return Exchange.program.instruction.withdrawV3(new anchor.BN(amount), {
     accounts: {
       state: Exchange.stateAddress,
@@ -325,11 +335,10 @@ export function withdrawV3Ix(
       userTokenAccount: usdcAccount,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
-      oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
       oracleBackupProgram: constants.CHAINLINK_PID,
       socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
     },
+    remainingAccounts,
   });
 }
 
