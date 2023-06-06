@@ -1105,11 +1105,10 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
  */
 export async function crankMarket(
   asset: Asset,
-  marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>,
   crankLimit?: number
 ): Promise<boolean> {
-  let market = Exchange.getMarket(asset, marketIndex);
+  let market = Exchange.getPerpMarket(asset);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
     return true;

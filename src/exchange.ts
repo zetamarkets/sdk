@@ -272,6 +272,8 @@ export class Exchange {
 
   private _programSubscriptionIds: number[] = [];
 
+  private _eventEmitters: any[] = [];
+
   // Micro lamports per CU of fees.
   public get priorityFee(): number {
     return this._priorityFee;
@@ -591,6 +593,7 @@ export class Exchange {
 
     const clockData = utils.getClockData(accFetches.at(-1));
     this.subscribeClock(clockData, callback);
+    this.subscribePricing(callback);
 
     await Promise.all(
       this.assets.map(async (asset, i) => {
@@ -628,6 +631,29 @@ export class Exchange {
 
   public getAllSubExchanges(): SubExchange[] {
     return [...this._subExchanges.values()];
+  }
+
+  private subscribePricing(
+    callback?: (asset: Asset, type: EventType, data: any) => void
+  ) {
+    let eventEmitter = this._program.account.pricing.subscribe(
+      this._pricingAddress,
+      this._provider.connection.commitment
+    );
+
+    eventEmitter.on("change", async (pricing: Pricing) => {
+      this._pricing = pricing;
+      if (this._isInitialized) {
+        for (var asset of this._assets) {
+          this._riskCalculator.updateMarginRequirements(asset);
+        }
+      }
+      if (callback !== undefined) {
+        callback(null, EventType.EXCHANGE, null);
+      }
+    });
+
+    this._eventEmitters.push(eventEmitter);
   }
 
   private async subscribeOracle(
@@ -680,9 +706,9 @@ export class Exchange {
             this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
+            await this.updateExchangeState();
             await Promise.all(
               this.getAllSubExchanges().map(async (subExchange) => {
-                await this.updateZetaPricing();
                 await subExchange.handlePolling(callback);
               })
             );
@@ -1083,6 +1109,12 @@ export class Exchange {
       );
     }
     this._programSubscriptionIds = [];
+
+    await this._program.account.pricing.unsubscribe(this._pricingAddress);
+    for (var i = 0; i < this._eventEmitters.length; i++) {
+      this._eventEmitters[i].removeListener("change");
+    }
+    this._eventEmitters = [];
   }
 }
 

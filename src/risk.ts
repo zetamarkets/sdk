@@ -46,7 +46,7 @@ export class RiskCalculator {
 
   public updateMarginRequirements(asset: Asset) {
     if (Exchange.pricing === undefined || Exchange.oracle === undefined) {
-      throw Error("Pricing (greeks and/or oracle) is not initialized");
+      throw Error("Pricing is not initialized");
     }
     let oraclePrice = Exchange.oracle.getPrice(asset);
     let spotPrice = oraclePrice === null ? 0 : oraclePrice.price;
@@ -234,10 +234,10 @@ export class RiskCalculator {
       if (accountType == types.ProgramAccountType.CrossMarginAccount) {
         asset = assets.indexToAsset(i);
       } else {
-        asset = account.asset;
+        asset = fromProgramAsset(account.asset);
       }
 
-      let subExchange = Exchange.getSubExchange(fromProgramAsset(asset));
+      let subExchange = Exchange.getSubExchange(asset);
       if (size > 0) {
         pnl +=
           convertNativeLotSizeToDecimal(size) *

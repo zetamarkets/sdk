@@ -780,18 +780,6 @@ export class CrossClient {
     return txId;
   }
 
-  // Helper function to maintain backwards compatibility :)
-  public async placeOrder(
-    asset: Asset,
-    _market: types.MarketIdentifier,
-    price: number,
-    size: number,
-    side: types.Side,
-    options: types.OrderOptions = types.defaultOrderOptions()
-  ): Promise<TransactionSignature> {
-    return this.placePerpOrder(asset, price, size, side, options);
-  }
-
   /**
    * Places an order on a zeta perp market.
    * @param price           the native price of the order (6 d.p as integer)
@@ -806,7 +794,7 @@ export class CrossClient {
    * from the user open orders account before cancelling the second order.
    * (Depending on the order in which the order was cancelled).
    */
-  public async placePerpOrder(
+  public async placeOrder(
     asset: Asset,
     price: number,
     size: number,
@@ -1709,6 +1697,12 @@ export class CrossClient {
     let orders = [];
     await Promise.all(
       Exchange.assets.map(async (asset) => {
+        this._orders.set(asset, []);
+      })
+    );
+
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
         let market = Exchange.getPerpMarket(asset);
         await market.updateOrderbook();
         orders.push(
@@ -1744,6 +1738,10 @@ export class CrossClient {
 
   private updatePositions() {
     let positions: types.Position[] = [];
+    for (var asset of Exchange.assets) {
+      this._positions.set(asset, []);
+    }
+
     for (var i = 0; i < this._account.productLedgers.length; i++) {
       if (this._account.productLedgers[i].position.size.toNumber() != 0) {
         let asset = indexToAsset(i);
