@@ -548,6 +548,53 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializePerpSyncQueueV2",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializePerpSyncQueue",
       "accounts": [
         {
@@ -621,6 +668,48 @@ export type Zeta = {
         {
           "name": "nonce",
           "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeMarketIndexesV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -878,6 +967,29 @@ export type Zeta = {
           "name": "args",
           "type": {
             "defined": "UpdateInterestRateArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addPerpMarketIndex",
+      "accounts": [
+        {
+          "name": "marketIndexes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
           }
         }
       ]
@@ -1728,6 +1840,129 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializeZetaMarketV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "requestQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "baseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "quoteMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vaultOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarketV2Args"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaMarket",
       "accounts": [
         {
@@ -2075,6 +2310,29 @@ export type Zeta = {
         },
         {
           "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "applyPerpFundingV3",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         }
@@ -9689,6 +9947,52 @@ export type Zeta = {
           },
           {
             "name": "settlementPrice",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarketV2Args",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "marketNonce",
+            "type": "u8"
+          },
+          {
+            "name": "baseMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "quoteMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "vaultSignerNonce",
             "type": "u64"
           }
         ]
@@ -12149,6 +12453,53 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializePerpSyncQueueV2",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializePerpSyncQueue",
       "accounts": [
         {
@@ -12222,6 +12573,48 @@ export const IDL: Zeta = {
         {
           "name": "nonce",
           "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeMarketIndexesV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -12479,6 +12872,29 @@ export const IDL: Zeta = {
           "name": "args",
           "type": {
             "defined": "UpdateInterestRateArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addPerpMarketIndex",
+      "accounts": [
+        {
+          "name": "marketIndexes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
           }
         }
       ]
@@ -13329,6 +13745,129 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializeZetaMarketV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "requestQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "baseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "quoteMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vaultOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarketV2Args"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaMarket",
       "accounts": [
         {
@@ -13676,6 +14215,29 @@ export const IDL: Zeta = {
         },
         {
           "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "applyPerpFundingV3",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         }
@@ -21290,6 +21852,52 @@ export const IDL: Zeta = {
           },
           {
             "name": "settlementPrice",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarketV2Args",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "marketNonce",
+            "type": "u8"
+          },
+          {
+            "name": "baseMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "quoteMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "vaultSignerNonce",
             "type": "u64"
           }
         ]

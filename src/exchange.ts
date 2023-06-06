@@ -719,8 +719,6 @@ export class Exchange {
     )) as State;
   }
 
-  // TODO add subscription to this account
-
   /**
    * Polls the on chain account to update mark prices
    */
@@ -984,7 +982,6 @@ export class Exchange {
       })
     );
     await utils.processTransaction(this.provider, tx);
-
     await this.updateZetaPricing();
   }
 

@@ -780,6 +780,18 @@ export class CrossClient {
     return txId;
   }
 
+  // Helper function to maintain backwards compatibility :)
+  public async placeOrder(
+    asset: Asset,
+    _market: types.MarketIdentifier,
+    price: number,
+    size: number,
+    side: types.Side,
+    options: types.OrderOptions = types.defaultOrderOptions()
+  ): Promise<TransactionSignature> {
+    return this.placePerpOrder(asset, price, size, side, options);
+  }
+
   /**
    * Places an order on a zeta perp market.
    * @param price           the native price of the order (6 d.p as integer)
@@ -1892,6 +1904,22 @@ export class CrossClient {
         this._accountSubscriptionId
       );
       this._accountSubscriptionId = undefined;
+    }
+    if (this._pollIntervalId !== undefined) {
+      clearInterval(this._pollIntervalId);
+      this._pollIntervalId = undefined;
+    }
+
+    if (this._tradeEventV3Listener !== undefined) {
+      await Exchange.program.removeEventListener(this._tradeEventV3Listener);
+      this._tradeEventV3Listener = undefined;
+    }
+
+    if (this._orderCompleteEventListener !== undefined) {
+      await Exchange.program.removeEventListener(
+        this._orderCompleteEventListener
+      );
+      this._orderCompleteEventListener = undefined;
     }
   }
 

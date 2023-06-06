@@ -1179,6 +1179,146 @@ export function initializeZetaMarketTIFEpochCyclesIx(
   );
 }
 
+export async function initializeZetaMarketV2Txs(
+  asset: Asset,
+  seedIndex: number,
+  requestQueue: PublicKey,
+  eventQueue: PublicKey,
+  bids: PublicKey,
+  asks: PublicKey,
+  marketIndexes: PublicKey
+): Promise<[Transaction, Transaction]> {
+  let subExchange = Exchange.getSubExchange(asset);
+  const [market, marketNonce] = utils.getMarketUninitialized(
+    Exchange.programId,
+    subExchange.zetaGroupAddress,
+    seedIndex
+  );
+
+  const [vaultOwner, vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
+    market,
+    constants.DEX_PID[Exchange.network]
+  );
+
+  const [baseMint, baseMintNonce] = utils.getBaseMint(
+    Exchange.program.programId,
+    market
+  );
+  const [quoteMint, quoteMintNonce] = utils.getQuoteMint(
+    Exchange.program.programId,
+    market
+  );
+  // Create SPL token vaults for serum trading owned by the Zeta program
+  const [zetaBaseVault, zetaBaseVaultNonce] = utils.getZetaVault(
+    Exchange.program.programId,
+    baseMint
+  );
+  const [zetaQuoteVault, zetaQuoteVaultNonce] = utils.getZetaVault(
+    Exchange.program.programId,
+    quoteMint
+  );
+  // Create SPL token vaults for serum trading owned by the DEX program
+  const [dexBaseVault, dexBaseVaultNonce] = utils.getSerumVault(
+    Exchange.program.programId,
+    baseMint
+  );
+  const [dexQuoteVault, dexQuoteVaultNonce] = utils.getSerumVault(
+    Exchange.program.programId,
+    quoteMint
+  );
+
+  let fromPubkey = Exchange.useLedger
+    ? Exchange.ledgerWallet.publicKey
+    : Exchange.provider.wallet.publicKey;
+
+  const tx = new Transaction();
+  tx.add(
+    SystemProgram.createAccount({
+      fromPubkey,
+      newAccountPubkey: requestQueue,
+      lamports:
+        await Exchange.provider.connection.getMinimumBalanceForRentExemption(
+          5120 + 12
+        ),
+      space: 5120 + 12,
+      programId: constants.DEX_PID[Exchange.network],
+    }),
+    SystemProgram.createAccount({
+      fromPubkey,
+      newAccountPubkey: eventQueue,
+      lamports:
+        await Exchange.provider.connection.getMinimumBalanceForRentExemption(
+          262144 + 12
+        ),
+      space: 262144 + 12,
+      programId: constants.DEX_PID[Exchange.network],
+    }),
+    SystemProgram.createAccount({
+      fromPubkey,
+      newAccountPubkey: bids,
+      lamports:
+        await Exchange.provider.connection.getMinimumBalanceForRentExemption(
+          65536 + 12
+        ),
+      space: 65536 + 12,
+      programId: constants.DEX_PID[Exchange.network],
+    }),
+    SystemProgram.createAccount({
+      fromPubkey,
+      newAccountPubkey: asks,
+      lamports:
+        await Exchange.provider.connection.getMinimumBalanceForRentExemption(
+          65536 + 12
+        ),
+      space: 65536 + 12,
+      programId: constants.DEX_PID[Exchange.network],
+    })
+  );
+
+  let tx2 = new Transaction().add(
+    Exchange.program.instruction.initializeZetaMarketV2(
+      {
+        asset: toProgramAsset(asset),
+        marketNonce,
+        baseMintNonce,
+        quoteMintNonce,
+        zetaBaseVaultNonce,
+        zetaQuoteVaultNonce,
+        dexBaseVaultNonce,
+        dexQuoteVaultNonce,
+        vaultSignerNonce,
+      },
+      {
+        accounts: {
+          state: Exchange.stateAddress,
+          marketIndexes: marketIndexes,
+          pricing: Exchange.pricingAddress,
+          admin: Exchange.state.admin,
+          market,
+          requestQueue: requestQueue,
+          eventQueue: eventQueue,
+          bids: bids,
+          asks: asks,
+          baseMint,
+          quoteMint,
+          zetaBaseVault,
+          zetaQuoteVault,
+          dexBaseVault,
+          dexQuoteVault,
+          vaultOwner,
+          mintAuthority: Exchange.mintAuthority,
+          serumAuthority: Exchange.serumAuthority,
+          dexProgram: constants.DEX_PID[Exchange.network],
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY,
+        },
+      }
+    )
+  );
+  return [tx, tx2];
+}
+
 export async function initializeZetaMarketTxs(
   asset: Asset,
   marketIndex: number,
@@ -1318,6 +1458,30 @@ export async function initializeZetaMarketTxs(
     )
   );
   return [tx, tx2];
+}
+
+export function initializePerpSyncQueueV2Ix(
+  asset: Asset
+): TransactionInstruction {
+  let [perpSyncQueue, nonce] = utils.getPerpSyncQueue(
+    Exchange.programId,
+    Exchange.getSubExchange(asset).zetaGroupAddress
+  );
+
+  return Exchange.program.instruction.initializePerpSyncQueueV2(
+    nonce,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        admin: Exchange.state.admin,
+        zetaProgram: Exchange.programId,
+        state: Exchange.stateAddress,
+        perpSyncQueue,
+        pricing: Exchange.pricingAddress,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function initializePerpSyncQueueIx(
@@ -1626,17 +1790,20 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
   });
 }
 
-export function applyPerpFundingV2Ix(
+export function applyPerpFundingV3Ix(
   asset: Asset,
   remainingAccounts: any[]
 ): TransactionInstruction {
-  return Exchange.program.instruction.applyPerpFundingV2({
-    accounts: {
-      state: Exchange.stateAddress,
-      pricing: Exchange.pricingAddress,
-    },
-    remainingAccounts, // margin accounts
-  });
+  return Exchange.program.instruction.applyPerpFundingV3(
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+      },
+      remainingAccounts, // cross margin accounts
+    }
+  );
 }
 
 export function updatePricingParametersIx(
@@ -1882,6 +2049,27 @@ export function initializeMarketIndexesIx(
     },
   });
 }
+
+export function initializeMarketIndexesV2Ix(
+  asset: Asset,
+  marketIndexes: PublicKey,
+  nonce: number
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeMarketIndexesV2(
+    nonce,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        marketIndexes: marketIndexes,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+        pricing: Exchange.pricingAddress,
+      },
+    }
+  );
+}
+
 export function addMarketIndexesIx(
   asset: Asset,
   marketIndexes: PublicKey
@@ -1892,6 +2080,21 @@ export function addMarketIndexesIx(
       zetaGroup: Exchange.getZetaGroupAddress(asset),
     },
   });
+}
+
+export function addPerpMarketIndexIx(
+  asset: Asset,
+  marketIndexes: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.addPerpMarketIndex(
+    toProgramAsset(asset),
+    {
+      accounts: {
+        marketIndexes,
+        pricing: Exchange.pricingAddress,
+      },
+    }
+  );
 }
 
 export function initializeMarketStrikesIx(

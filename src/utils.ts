@@ -772,6 +772,7 @@ export async function simulateTransaction(
   try {
     response = await provider.simulate(tx);
   } catch (err) {
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -875,6 +876,7 @@ export async function processTransaction(
       opts || commitmentConfig(provider.connection.commitment)
     );
   } catch (err) {
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -1015,6 +1017,26 @@ export function displayState() {
   }
 }
 
+export async function getCrossMarginFromOpenOrders(
+  openOrders: PublicKey,
+  seedNumber: Uint8Array = Uint8Array.from([0])
+) {
+  const [openOrdersMap, _openOrdersMapNonce] = getOpenOrdersMap(
+    Exchange.programId,
+    openOrders
+  );
+  let openOrdersMapInfo = (await Exchange.program.account.openOrdersMap.fetch(
+    openOrdersMap
+  )) as OpenOrdersMap;
+  const [crossMarginAccount, _marginNonce] = getCrossMarginAccount(
+    Exchange.programId,
+    openOrdersMapInfo.userKey,
+    seedNumber
+  );
+
+  return crossMarginAccount;
+}
+
 export async function getMarginFromOpenOrders(
   asset: Asset,
   openOrders: PublicKey,
@@ -1119,22 +1141,16 @@ export async function crankMarket(
 
   await Promise.all(
     uniqueOpenOrders.map(async (openOrders, index) => {
-      let marginAccount: PublicKey;
+      // TODO is there a nice way to get the seedNumber here?
+      // for getCrossMarginFromOpenOrders()
+      let crossMarginAccount: PublicKey;
       if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
-        marginAccount = await getMarginFromOpenOrders(
-          asset,
-          openOrders,
-          market
-        );
-        openOrdersToMargin.set(openOrders, marginAccount);
+        crossMarginAccount = await getCrossMarginFromOpenOrders(openOrders);
+        openOrdersToMargin.set(openOrders, crossMarginAccount);
       } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
-        marginAccount = openOrdersToMargin.get(openOrders);
+        crossMarginAccount = openOrdersToMargin.get(openOrders);
       } else {
-        marginAccount = await getMarginFromOpenOrders(
-          asset,
-          openOrders,
-          market
-        );
+        crossMarginAccount = await getCrossMarginFromOpenOrders(openOrders);
       }
 
       let openOrdersIndex = index * 2;
@@ -1144,7 +1160,7 @@ export async function crankMarket(
         isWritable: true,
       };
       remainingAccounts[openOrdersIndex + 1] = {
-        pubkey: marginAccount,
+        pubkey: crossMarginAccount,
         isSigner: false,
         isWritable: true,
       };
@@ -1152,7 +1168,7 @@ export async function crankMarket(
   );
 
   let tx = new Transaction().add(
-    instructions.crankMarketV2Ix(
+    instructions.crankMarketV3Ix(
       asset,
       market.address,
       market.serumMarket.eventQueueAddress,
@@ -1569,7 +1585,7 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
   ) {
     let tx = new Transaction();
     let slice = remainingAccounts.slice(i, i + constants.MAX_FUNDING_ACCOUNTS);
-    tx.add(instructions.applyPerpFundingV2Ix(asset, slice));
+    tx.add(instructions.applyPerpFundingV3Ix(asset, slice));
     txs.push(tx);
   }
 

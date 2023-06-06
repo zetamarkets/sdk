@@ -298,7 +298,7 @@ export class SubExchange {
     console.log("Initializing market indexes.");
 
     let tx = new Transaction().add(
-      instructions.initializeMarketIndexesIx(
+      instructions.initializeMarketIndexesV2Ix(
         this.asset,
         marketIndexes,
         marketIndexesNonce
@@ -318,27 +318,21 @@ export class SubExchange {
 
     // We initialize 50 indexes at a time in the program.
     let tx2 = new Transaction().add(
-      instructions.addMarketIndexesIx(this.asset, marketIndexes)
+      instructions.addPerpMarketIndexIx(this.asset, marketIndexes)
     );
 
-    for (
-      var i = 0;
-      i < constants.TOTAL_MARKETS;
-      i += constants.MARKET_INDEX_LIMIT
-    ) {
-      try {
-        await utils.processTransaction(
-          Exchange.provider,
-          tx2,
-          [],
-          utils.defaultCommitment(),
-          Exchange.useLedger
-        );
-        await utils.sleep(100);
-      } catch (e) {
-        console.error(`Add market indexes failed: ${e}`);
-        console.log(e);
-      }
+    try {
+      await utils.processTransaction(
+        Exchange.provider,
+        tx2,
+        [],
+        utils.defaultCommitment(),
+        Exchange.useLedger
+      );
+      await utils.sleep(100);
+    } catch (e) {
+      console.error(`Add market indexes failed: ${e}`);
+      console.log(e);
     }
 
     let marketIndexesAccount =
@@ -350,31 +344,14 @@ export class SubExchange {
       throw Error("Market indexes are not initialized!");
     }
 
-    if (!datedOnly) {
-      await this.initializeZetaMarket(
-        constants.PERP_INDEX,
-        marketIndexes,
-        marketIndexesAccount
-      );
-    }
-
-    if (perpOnly) {
-      return;
-    }
-
-    await this.initializeZetaMarket(
-      constants.PERP_INDEX,
-      marketIndexes,
-      marketIndexesAccount
-    );
+    await this.initializeZetaMarket(marketIndexes, marketIndexesAccount);
   }
 
   private async initializeZetaMarket(
-    i: number,
     marketIndexes: PublicKey,
     marketIndexesAccount: MarketIndexes
   ) {
-    console.log(`Initializing zeta market ${i}`);
+    console.log(`Initializing zeta perp market`);
 
     const homedir = os.homedir();
     let dir = `${homedir}/keys/${assetToName(this.asset)}`;
@@ -382,14 +359,15 @@ export class SubExchange {
       fs.mkdirSync(dir, { recursive: true });
     }
 
+    let i = constants.PERP_INDEX;
+
     const requestQueue = utils.getOrCreateKeypair(`${dir}/rq-${i}.json`);
     const eventQueue = utils.getOrCreateKeypair(`${dir}/eq-${i}.json`);
     const bids = utils.getOrCreateKeypair(`${dir}/bids-${i}.json`);
     const asks = utils.getOrCreateKeypair(`${dir}/asks-${i}.json`);
 
-    let [tx, tx2] = await instructions.initializeZetaMarketTxs(
+    let [tx, tx2] = await instructions.initializeZetaMarketV2Txs(
       this.asset,
-      i,
       marketIndexesAccount.indexes[i],
       requestQueue.publicKey,
       eventQueue.publicKey,
@@ -501,7 +479,7 @@ export class SubExchange {
 
   public async initializePerpSyncQueue() {
     let tx = new Transaction().add(
-      await instructions.initializePerpSyncQueueIx(this.asset)
+      await instructions.initializePerpSyncQueueV2Ix(this.asset)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
