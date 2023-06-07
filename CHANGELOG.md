@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.29.0] 2023-06-07
+
+- general: New Pricing account to replace ZetaGroup + Greeks. ([#233](https://github.com/zetamarkets/sdk/pull/233))
+
 ## [0.28.0] 2023-05-24
 
 - general: Migrate per-asset insurance vault, deposit vault and socialized loss account to be global accounts. ([#230](https://github.com/zetamarkets/sdk/pull/230))
