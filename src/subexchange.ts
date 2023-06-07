@@ -351,25 +351,6 @@ export class SubExchange {
   }
 
   /**
-   * Update the volatility nodes for a surface.
-   */
-  public async updateVolatilityNodes(nodes: Array<anchor.BN>) {
-    if (nodes.length != constants.VOLATILITY_POINTS) {
-      throw Error(
-        `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
-      );
-    }
-    let tx = new Transaction().add(
-      instructions.updateVolatilityNodesIx(
-        this.asset,
-        nodes,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
    * Initializes the zeta markets for a zeta group.
    */
   public async initializeZetaMarkets(
@@ -644,16 +625,6 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  /**
-   * Retreat volatility surface and interest rates for an expiry index.
-   */
-  public async retreatMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(
-      instructions.retreatMarketNodesIx(this.asset, expiryIndex)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
   public assertInitialized() {
     if (!this.isInitialized) {
       throw "SubExchange uninitialized";
@@ -903,30 +874,9 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async haltZetaGroup(zetaGroupAddress: PublicKey) {
-    let tx = new Transaction().add(
-      instructions.haltZetaGroupIx(
-        this.asset,
-        zetaGroupAddress,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async unhaltZetaGroup() {
-    let tx = new Transaction().add(
-      instructions.unhaltZetaGroupIx(
-        this._asset,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
   public async updateHaltState(timestamp: anchor.BN, spotPrice: anchor.BN) {
     let tx = new Transaction().add(
-      instructions.updateHaltStateV2Ix(
+      instructions.updateHaltStateIx(
         {
           asset: toProgramAsset(this.asset),
           spotPrice: spotPrice,
@@ -938,37 +888,9 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async updateZetaGroupHaltState(
-    zetaGroupAddress: PublicKey,
-    args: instructions.UpdateHaltStateArgs
-  ) {
-    let tx = new Transaction().add(
-      instructions.updateHaltStateIx(
-        zetaGroupAddress,
-        args,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
   public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
-    let txs = instructions.settlePositionsHaltedV2Txs(
+    let txs = instructions.settlePositionsHaltedTxs(
       marginAccounts,
-      Exchange.provider.wallet.publicKey
-    );
-
-    await Promise.all(
-      txs.map(async (tx) => {
-        await utils.processTransaction(Exchange.provider, tx);
-      })
-    );
-  }
-
-  public async settleSpreadPositionsHalted(spreadAccounts: AccountMeta[]) {
-    let txs = instructions.settleSpreadPositionsHaltedTxs(
-      this.asset,
-      spreadAccounts,
       Exchange.provider.wallet.publicKey
     );
 
@@ -1003,24 +925,6 @@ export class SubExchange {
       utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
     );
     await utils.cleanZetaMarketsHalted(marketAccounts);
-  }
-
-  public async updatePricingHalted(expiryIndex: number | undefined) {
-    let tx = new Transaction().add(
-      instructions.updatePricingHaltedIx(
-        this.asset,
-        expiryIndex,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async cleanMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(
-      instructions.cleanMarketNodesIx(this.asset, expiryIndex)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
   }
 
   public async updateVolatility(args: instructions.UpdateVolatilityArgs) {

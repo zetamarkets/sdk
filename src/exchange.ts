@@ -982,10 +982,6 @@ export class Exchange {
     await this.getSubExchange(asset).updatePerpSerumMarketIfNeeded(epochDelay);
   }
 
-  public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {
-    await this.getSubExchange(asset).updateVolatilityNodes(nodes);
-  }
-
   public async initializeZetaMarkets(
     asset: Asset,
     perpsOnly: boolean = false,
@@ -1049,10 +1045,6 @@ export class Exchange {
     await this.updateZetaPricing();
   }
 
-  public async retreatMarketNodes(asset: Asset, expiryIndex: number) {
-    await this.getSubExchange(asset).retreatMarketNodes(expiryIndex);
-  }
-
   public async updateSubExchangeState(asset: Asset) {
     await this.getSubExchange(asset).updateSubExchangeState();
   }
@@ -1096,14 +1088,6 @@ export class Exchange {
     await this.getSubExchange(asset).unhalt();
   }
 
-  public async haltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
-    await this.getSubExchange(asset).haltZetaGroup(zetaGroupAddress);
-  }
-
-  public async unhaltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
-    await this.getSubExchange(asset).unhaltZetaGroup();
-  }
-
   public async updateHaltState(
     asset: Asset,
     timestamp: anchor.BN,
@@ -1112,31 +1096,11 @@ export class Exchange {
     await this.getSubExchange(asset).updateHaltState(timestamp, spotPrice);
   }
 
-  public async updateZetaGroupHaltState(
-    asset: Asset,
-    zetaGroupAddress: PublicKey,
-    args: instructions.UpdateHaltStateArgs
-  ) {
-    await this.getSubExchange(asset).updateZetaGroupHaltState(
-      zetaGroupAddress,
-      args
-    );
-  }
-
   public async settlePositionsHalted(
     asset: Asset,
     marginAccounts: AccountMeta[]
   ) {
     await this.getSubExchange(asset).settlePositionsHalted(marginAccounts);
-  }
-
-  public async settleSpreadPositionsHalted(
-    asset: Asset,
-    marginAccounts: AccountMeta[]
-  ) {
-    await this.getSubExchange(asset).settleSpreadPositionsHalted(
-      marginAccounts
-    );
   }
 
   public async cancelAllOrdersHalted(asset: Asset) {
@@ -1147,19 +1111,8 @@ export class Exchange {
     await this.getSubExchange(asset).cleanZetaMarketsHalted();
   }
 
-  public async updatePricingHalted(
-    asset: Asset,
-    expiryIndex: number = undefined
-  ) {
-    await this.getSubExchange(asset).updatePricingHalted(expiryIndex);
-  }
-
   public isHalted(asset: Asset) {
     return this.getSubExchange(asset).halted;
-  }
-
-  public async cleanMarketNodes(asset: Asset, expiryIndex: number) {
-    await this.getSubExchange(asset).cleanMarketNodes(expiryIndex);
   }
 
   public async updateVolatility(
