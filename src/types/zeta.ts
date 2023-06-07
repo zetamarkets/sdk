@@ -2544,11 +2544,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "dexProgram",
           "isMut": false,
           "isSigner": false
@@ -2662,11 +2657,6 @@ export type Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },
@@ -12555,11 +12545,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "dexProgram",
           "isMut": false,
           "isSigner": false
@@ -12673,11 +12658,6 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },

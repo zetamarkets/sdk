@@ -2544,11 +2544,6 @@
           "isSigner": false
         },
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "dexProgram",
           "isMut": false,
           "isSigner": false
@@ -2662,11 +2657,6 @@
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },
