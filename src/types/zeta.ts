@@ -513,32 +513,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "haltZetaGroup",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "halt",
       "accounts": [
         {
@@ -590,7 +564,7 @@ export type Zeta = {
       ]
     },
     {
-      "name": "updateHaltStateV2",
+      "name": "updateHaltState",
       "accounts": [
         {
           "name": "state",
@@ -608,60 +582,6 @@ export type Zeta = {
           "name": "args",
           "type": {
             "defined": "HaltStateArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "unhaltZetaGroup",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updateHaltState",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "HaltZetaGroupArgs"
           }
         }
       ]
@@ -1274,70 +1194,8 @@ export type Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "cleanZetaMarketsHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "settlePositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "settlePositionsHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
         }
       ],
       "args": []
@@ -1351,63 +1209,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "settleSpreadPositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "settleSpreadPositionsHalted",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },
@@ -1709,99 +1511,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "retreatMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "cleanMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "updateVolatilityNodes",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "nodes",
-          "type": {
-            "array": [
-              "u64",
-              5
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "updatePricing",
       "accounts": [
         {
@@ -1938,98 +1647,14 @@ export type Zeta = {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
-    },
-    {
-      "name": "updatePricingHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updatePricingHalted",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
     },
     {
       "name": "deposit",
@@ -7437,22 +7062,6 @@ export type Zeta = {
             "type": {
               "defined": "OrderState"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "HaltZetaGroupArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "spotPrice",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
           }
         ]
       }
@@ -9978,32 +9587,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "haltZetaGroup",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "halt",
       "accounts": [
         {
@@ -10055,7 +9638,7 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "updateHaltStateV2",
+      "name": "updateHaltState",
       "accounts": [
         {
           "name": "state",
@@ -10073,60 +9656,6 @@ export const IDL: Zeta = {
           "name": "args",
           "type": {
             "defined": "HaltStateArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "unhaltZetaGroup",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updateHaltState",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "HaltZetaGroupArgs"
           }
         }
       ]
@@ -10739,70 +10268,8 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "cleanZetaMarketsHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "settlePositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "settlePositionsHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
         }
       ],
       "args": []
@@ -10816,63 +10283,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "settleSpreadPositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "settleSpreadPositionsHalted",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },
@@ -11174,99 +10585,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "retreatMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "cleanMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "updateVolatilityNodes",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "nodes",
-          "type": {
-            "array": [
-              "u64",
-              5
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "updatePricing",
       "accounts": [
         {
@@ -11403,98 +10721,14 @@ export const IDL: Zeta = {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
-    },
-    {
-      "name": "updatePricingHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updatePricingHalted",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
     },
     {
       "name": "deposit",
@@ -16902,22 +16136,6 @@ export const IDL: Zeta = {
             "type": {
               "defined": "OrderState"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "HaltZetaGroupArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "spotPrice",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
           }
         ]
       }

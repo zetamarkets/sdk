@@ -1465,64 +1465,7 @@ export function claimReferralsRewardsIx(
   });
 }
 
-export function settlePositionsTxs(
-  asset: Asset,
-  expirationTs: anchor.BN,
-  settlementPda: PublicKey,
-  nonce: number,
-  marginAccounts: any[]
-): Transaction[] {
-  let txs = [];
-  for (
-    var i = 0;
-    i < marginAccounts.length;
-    i += constants.MAX_SETTLEMENT_ACCOUNTS
-  ) {
-    let tx = new Transaction();
-    let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
-    tx.add(settlePositionsIx(asset, expirationTs, settlementPda, nonce, slice));
-    txs.push(tx);
-  }
-  return txs;
-}
-
-export function settlePositionsIx(
-  asset: Asset,
-  expirationTs: anchor.BN,
-  settlementPda: PublicKey,
-  nonce: number,
-  marginAccounts: AccountMeta[]
-): TransactionInstruction {
-  return Exchange.program.instruction.settlePositions(expirationTs, nonce, {
-    accounts: {
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      settlementAccount: settlementPda,
-    },
-    remainingAccounts: marginAccounts,
-  });
-}
-
-export function settleSpreadPositionsIx(
-  asset: Asset,
-  expirationTs: anchor.BN,
-  settlementPda: PublicKey,
-  nonce: number,
-  spreadAccounts: AccountMeta[]
-): TransactionInstruction {
-  return Exchange.program.instruction.settleSpreadPositions(
-    expirationTs,
-    nonce,
-    {
-      accounts: {
-        zetaGroup: Exchange.getZetaGroupAddress(asset),
-        settlementAccount: settlementPda,
-      },
-      remainingAccounts: spreadAccounts,
-    }
-  );
-}
-
-export function settlePositionsHaltedV2Txs(
+export function settlePositionsHaltedTxs(
   marginAccounts: AccountMeta[],
   admin: PublicKey
 ): Transaction[] {
@@ -1533,16 +1476,16 @@ export function settlePositionsHaltedV2Txs(
     i += constants.MAX_SETTLEMENT_ACCOUNTS
   ) {
     let slice = marginAccounts.slice(i, i + constants.MAX_SETTLEMENT_ACCOUNTS);
-    txs.push(new Transaction().add(settlePositionsHaltedV2Ix(slice, admin)));
+    txs.push(new Transaction().add(settlePositionsHaltedIx(slice, admin)));
   }
   return txs;
 }
 
-export function settlePositionsHaltedV2Ix(
+export function settlePositionsHaltedIx(
   marginAccounts: AccountMeta[],
   admin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.settlePositionsHaltedV2({
+  return Exchange.program.instruction.settlePositionsHalted({
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
@@ -1565,36 +1508,15 @@ export function cleanZetaMarketsIx(
   });
 }
 
-export function cleanZetaMarketsHaltedV2Ix(
+export function cleanZetaMarketsHaltedIx(
   marketAccounts: any[]
 ): TransactionInstruction {
-  return Exchange.program.instruction.cleanZetaMarketsHaltedV2({
+  return Exchange.program.instruction.cleanZetaMarketsHalted({
     accounts: {
       state: Exchange.stateAddress,
     },
     remainingAccounts: marketAccounts,
   });
-}
-
-export function updatePricingHaltedIx(
-  asset: Asset,
-  admin: PublicKey
-): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-  let marketData = Exchange.getPerpMarket(asset);
-  return Exchange.program.instruction.updatePricingHaltedV2(
-    toProgramAsset(asset),
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        pricing: Exchange.pricingAddress,
-        admin,
-        perpMarket: marketData.address,
-        perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
-        perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
-      },
-    }
-  );
 }
 
 export function cancelOrderHaltedIx(
@@ -1649,11 +1571,11 @@ export function unhaltIx(
   });
 }
 
-export function updateHaltStateV2Ix(
+export function updateHaltStateIx(
   args: UpdateHaltStateArgs,
   admin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.updateHaltStateV2(args, {
+  return Exchange.program.instruction.updateHaltState(args, {
     accounts: {
       state: Exchange.stateAddress,
       admin,

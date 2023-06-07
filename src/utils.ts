@@ -1022,7 +1022,7 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
   ) {
     let tx = new Transaction();
     let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
-    tx.add(instructions.cleanZetaMarketsHaltedV2Ix(slice.flat()));
+    tx.add(instructions.cleanZetaMarketsHaltedIx(slice.flat()));
     txs.push(tx);
   }
   await Promise.all(

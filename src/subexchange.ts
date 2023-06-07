@@ -700,7 +700,7 @@ export class SubExchange {
 
   public async updateHaltState(timestamp: anchor.BN, spotPrice: anchor.BN) {
     let tx = new Transaction().add(
-      instructions.updateHaltStateV2Ix(
+      instructions.updateHaltStateIx(
         {
           asset: toProgramAsset(this.asset),
           spotPrice: spotPrice,
@@ -713,7 +713,7 @@ export class SubExchange {
   }
 
   public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
-    let txs = instructions.settlePositionsHaltedV2Txs(
+    let txs = instructions.settlePositionsHaltedTxs(
       marginAccounts,
       Exchange.provider.wallet.publicKey
     );
@@ -742,16 +742,6 @@ export class SubExchange {
       utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
     );
     await utils.cleanZetaMarketsHalted(marketAccounts);
-  }
-
-  public async updatePricingHalted() {
-    let tx = new Transaction().add(
-      instructions.updatePricingHaltedIx(
-        this.asset,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
   }
 
   /**
