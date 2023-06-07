@@ -1886,49 +1886,6 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updatePricingHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
       "name": "updatePricingHalted",
       "accounts": [
         {
@@ -10791,49 +10748,6 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "updatePricingHaltedV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
     },
     {
       "name": "updatePricingHalted",
