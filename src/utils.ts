@@ -1174,7 +1174,7 @@ export function getMutMarketAccounts(
 export async function getCancelAllIxs(
   asset: Asset,
   orders: any[],
-  expiration: boolean
+  _expiration: boolean
 ): Promise<TransactionInstruction[]> {
   let ixs: TransactionInstruction[] = [];
   await Promise.all(
@@ -1195,23 +1195,14 @@ export async function getCancelAllIxs(
         openOrdersMapInfo.userKey
       );
 
-      let ix = expiration
-        ? instructions.cancelExpiredOrderIx(
-            asset,
-            order.marketIndex,
-            marginAccount,
-            order.owner,
-            order.orderId,
-            order.side
-          )
-        : instructions.cancelOrderHaltedV2Ix(
-            asset,
-            order.marketIndex,
-            marginAccount,
-            order.owner,
-            order.orderId,
-            order.side
-          );
+      let ix = instructions.cancelOrderHaltedIx(
+        asset,
+        order.marketIndex,
+        marginAccount,
+        order.owner,
+        order.orderId,
+        order.side
+      );
       ixs.push(ix);
     })
   );

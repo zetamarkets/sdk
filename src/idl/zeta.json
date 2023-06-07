@@ -4184,83 +4184,6 @@
       ]
     },
     {
-      "name": "cancelOrderV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "cancelOrder",
       "accounts": [
         {
@@ -4271,88 +4194,6 @@
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderNoErrorV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -4426,11 +4267,6 @@
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -4490,72 +4326,6 @@
           "type": "u128"
         }
       ]
-    },
-    {
-      "name": "cancelAllMarketOrdersV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": []
     },
     {
       "name": "cancelAllMarketOrders",
@@ -4569,11 +4339,6 @@
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -4624,89 +4389,12 @@
       "args": []
     },
     {
-      "name": "cancelOrderHaltedV2",
-      "accounts": [
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "cancelOrderHalted",
       "accounts": [
         {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -4764,77 +4452,6 @@
         {
           "name": "orderId",
           "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderByClientOrderIdV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "clientOrderId",
-          "type": "u64"
         }
       ]
     },
@@ -4849,82 +4466,6 @@
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "clientOrderId",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderByClientOrderIdNoErrorV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -4992,11 +4533,6 @@
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -5052,78 +4588,6 @@
       ]
     },
     {
-      "name": "cancelExpiredOrder",
-      "accounts": [
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "pruneExpiredTifOrders",
       "accounts": [
         {
@@ -5168,6 +4632,11 @@
       "name": "forceCancelOrderByOrderIdV2",
       "accounts": [
         {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -5185,11 +4654,6 @@
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -5255,6 +4719,11 @@
       "name": "forceCancelOrderByOrderId",
       "accounts": [
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
@@ -5277,11 +4746,6 @@
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -5347,6 +4811,11 @@
       "name": "forceCancelOrdersV2",
       "accounts": [
         {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -5364,11 +4833,6 @@
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -5423,6 +4887,11 @@
       "name": "forceCancelOrders",
       "accounts": [
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
@@ -5445,11 +4914,6 @@
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,

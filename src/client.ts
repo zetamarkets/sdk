@@ -726,7 +726,7 @@ export class Client {
       }
 
       tx.add(
-        instructions.cancelAllMarketOrdersV2Ix(
+        instructions.cancelAllMarketOrdersIx(
           asset,
           constants.PERP_INDEX,
           this.provider.wallet.publicKey,
@@ -753,7 +753,7 @@ export class Client {
     let index = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
       this.marketIdentifierToPublicKey(asset, market)
     );
-    let ix = instructions.cancelAllMarketOrdersV2Ix(
+    let ix = instructions.cancelAllMarketOrdersIx(
       asset,
       index,
       this.provider.wallet.publicKey,
@@ -881,7 +881,7 @@ export class Client {
       let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
         cancelArguments[i].market
       );
-      let ix = instructions.cancelOrderV2Ix(
+      let ix = instructions.cancelOrderIx(
         asset,
         marketIndex,
         this.provider.wallet.publicKey,
@@ -917,7 +917,7 @@ export class Client {
       let marketIndex = Exchange.getZetaGroupMarkets(asset).getMarketIndex(
         cancelArguments[i].market
       );
-      let ix = instructions.cancelOrderNoErrorV2Ix(
+      let ix = instructions.cancelOrderNoErrorIx(
         asset,
         marketIndex,
         this.provider.wallet.publicKey,

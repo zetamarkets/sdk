@@ -257,7 +257,6 @@ export function initializeOpenOrdersV2Ix(
     Exchange.program.instruction.initializeOpenOrdersV2({
       accounts: {
         state: Exchange.stateAddress,
-        pricing: Exchange.pricingAddress,
         dexProgram: constants.DEX_PID[Exchange.network],
         systemProgram: SystemProgram.programId,
         openOrders: openOrdersPda,
@@ -288,7 +287,6 @@ export function closeOpenOrdersV2Ix(
   return Exchange.program.instruction.closeOpenOrdersV2(openOrdersMapNonce, {
     accounts: {
       state: Exchange.stateAddress,
-      pricing: Exchange.pricingAddress,
       dexProgram: constants.DEX_PID[Exchange.network],
       openOrders,
       marginAccount: marginAccount,
@@ -382,7 +380,7 @@ export function placePerpOrderV3Ix(
   );
 }
 
-export function cancelOrderV2Ix(
+export function cancelOrderIx(
   asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
@@ -392,14 +390,13 @@ export function cancelOrderV2Ix(
   side: types.Side
 ): TransactionInstruction {
   let marketData = Exchange.getMarket(asset, marketIndex);
-  return Exchange.program.instruction.cancelOrderV2(
+  return Exchange.program.instruction.cancelOrder(
     types.toProgramSide(side),
     orderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          pricing: Exchange.pricingAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -415,7 +412,7 @@ export function cancelOrderV2Ix(
   );
 }
 
-export function cancelOrderNoErrorV2Ix(
+export function cancelOrderNoErrorIx(
   asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
@@ -425,14 +422,13 @@ export function cancelOrderNoErrorV2Ix(
   side: types.Side
 ): TransactionInstruction {
   let marketData = Exchange.getMarket(asset, marketIndex);
-  return Exchange.program.instruction.cancelOrderNoErrorV2(
+  return Exchange.program.instruction.cancelOrderNoError(
     types.toProgramSide(side),
     orderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          pricing: Exchange.pricingAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -466,7 +462,7 @@ export function pruneExpiredTIFOrdersIx(
   });
 }
 
-export function cancelAllMarketOrdersV2Ix(
+export function cancelAllMarketOrdersIx(
   asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
@@ -474,11 +470,10 @@ export function cancelAllMarketOrdersV2Ix(
   openOrders: PublicKey
 ): TransactionInstruction {
   let marketData = Exchange.getMarket(asset, marketIndex);
-  return Exchange.program.instruction.cancelAllMarketOrdersV2({
+  return Exchange.program.instruction.cancelAllMarketOrders({
     accounts: {
       authority: userKey,
       cancelAccounts: {
-        pricing: Exchange.pricingAddress,
         state: Exchange.stateAddress,
         marginAccount,
         dexProgram: constants.DEX_PID[Exchange.network],
@@ -493,7 +488,7 @@ export function cancelAllMarketOrdersV2Ix(
   });
 }
 
-export function cancelOrderByClientOrderIdV2Ix(
+export function cancelOrderByClientOrderIdIx(
   asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
@@ -502,13 +497,12 @@ export function cancelOrderByClientOrderIdV2Ix(
   clientOrderId: anchor.BN
 ): TransactionInstruction {
   let marketData = Exchange.getMarket(asset, marketIndex);
-  return Exchange.program.instruction.cancelOrderByClientOrderIdV2(
+  return Exchange.program.instruction.cancelOrderByClientOrderId(
     clientOrderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          pricing: Exchange.pricingAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -524,7 +518,7 @@ export function cancelOrderByClientOrderIdV2Ix(
   );
 }
 
-export function cancelOrderByClientOrderIdNoErrorV2Ix(
+export function cancelOrderByClientOrderIdNoErrorIx(
   asset: Asset,
   marketIndex: number,
   userKey: PublicKey,
@@ -533,45 +527,12 @@ export function cancelOrderByClientOrderIdNoErrorV2Ix(
   clientOrderId: anchor.BN
 ): TransactionInstruction {
   let marketData = Exchange.getMarket(asset, marketIndex);
-  return Exchange.program.instruction.cancelOrderByClientOrderIdNoErrorV2(
+  return Exchange.program.instruction.cancelOrderByClientOrderIdNoError(
     clientOrderId,
     {
       accounts: {
         authority: userKey,
         cancelAccounts: {
-          pricing: Exchange.pricingAddress,
-          state: Exchange.stateAddress,
-          marginAccount,
-          dexProgram: constants.DEX_PID[Exchange.network],
-          serumAuthority: Exchange.serumAuthority,
-          openOrders,
-          market: marketData.address,
-          bids: marketData.serumMarket.bidsAddress,
-          asks: marketData.serumMarket.asksAddress,
-          eventQueue: marketData.serumMarket.eventQueueAddress,
-        },
-      },
-    }
-  );
-}
-
-export function cancelExpiredOrderIx(
-  asset: Asset,
-  marketIndex: number,
-  marginAccount: PublicKey,
-  openOrders: PublicKey,
-  orderId: anchor.BN,
-  side: types.Side
-): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-  let marketData = Exchange.getMarket(asset, marketIndex);
-  return Exchange.program.instruction.cancelExpiredOrder(
-    types.toProgramSide(side),
-    orderId,
-    {
-      accounts: {
-        cancelAccounts: {
-          zetaGroup: subExchange.zetaGroupAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -602,11 +563,11 @@ export function forceCancelOrderByOrderIdV2Ix(
     orderId,
     {
       accounts: {
+        pricing: Exchange.pricingAddress,
         oracle: Exchange.pricing.oracles[assetIndex],
         oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetIndex],
         oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
-          pricing: Exchange.pricingAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
@@ -632,11 +593,11 @@ export function forceCancelOrdersV2Ix(
   let marketData = Exchange.getMarket(asset, marketIndex);
   return Exchange.program.instruction.forceCancelOrdersV2({
     accounts: {
+      pricing: Exchange.pricingAddress,
       oracle: Exchange.pricing.oracles[assetIndex],
       oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetIndex],
       oracleBackupProgram: constants.CHAINLINK_PID,
       cancelAccounts: {
-        pricing: Exchange.pricingAddress,
         state: Exchange.stateAddress,
         marginAccount,
         dexProgram: constants.DEX_PID[Exchange.network],
@@ -1636,7 +1597,7 @@ export function updatePricingHaltedIx(
   );
 }
 
-export function cancelOrderHaltedV2Ix(
+export function cancelOrderHaltedIx(
   asset: Asset,
   marketIndex: number,
   marginAccount: PublicKey,
@@ -1645,13 +1606,12 @@ export function cancelOrderHaltedV2Ix(
   side: types.Side
 ): TransactionInstruction {
   let marketData = Exchange.getMarket(asset, marketIndex);
-  return Exchange.program.instruction.cancelOrderHaltedV2(
+  return Exchange.program.instruction.cancelOrderHalted(
     types.toProgramSide(side),
     orderId,
     {
       accounts: {
         cancelAccounts: {
-          pricing: Exchange.pricingAddress,
           state: Exchange.stateAddress,
           marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],

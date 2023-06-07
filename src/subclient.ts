@@ -629,7 +629,7 @@ export class SubClient {
     orderId: anchor.BN,
     side: types.Side
   ): TransactionInstruction {
-    return instructions.cancelOrderNoErrorV2Ix(
+    return instructions.cancelOrderNoErrorIx(
       this.asset,
       marketIndex,
       this._parent.provider.wallet.publicKey,
@@ -643,7 +643,7 @@ export class SubClient {
   public createCancelAllMarketOrdersInstruction(
     marketIndex: number
   ): TransactionInstruction {
-    return instructions.cancelAllMarketOrdersV2Ix(
+    return instructions.cancelAllMarketOrdersIx(
       this.asset,
       marketIndex,
       this._parent.provider.wallet.publicKey,
@@ -706,7 +706,7 @@ export class SubClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let index = this._subExchange.markets.getMarketIndex(market);
-    let ix = instructions.cancelOrderV2Ix(
+    let ix = instructions.cancelOrderIx(
       this.asset,
       index,
       this._parent.provider.wallet.publicKey,
@@ -741,7 +741,7 @@ export class SubClient {
     }
     let tx = new Transaction();
     let index = this._subExchange.markets.getMarketIndex(market);
-    let ix = instructions.cancelOrderByClientOrderIdV2Ix(
+    let ix = instructions.cancelOrderByClientOrderIdIx(
       this.asset,
       index,
       this._parent.provider.wallet.publicKey,
@@ -784,7 +784,7 @@ export class SubClient {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
     tx.add(
-      instructions.cancelOrderV2Ix(
+      instructions.cancelOrderIx(
         this.asset,
         marketIndex,
         this._parent.provider.wallet.publicKey,
@@ -852,7 +852,7 @@ export class SubClient {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
     tx.add(
-      instructions.cancelOrderByClientOrderIdV2Ix(
+      instructions.cancelOrderByClientOrderIdIx(
         this.asset,
         marketIndex,
         this._parent.provider.wallet.publicKey,
@@ -922,7 +922,7 @@ export class SubClient {
     let tx = new Transaction();
     let marketIndex = this._subExchange.markets.getMarketIndex(market);
     tx.add(
-      instructions.cancelOrderByClientOrderIdNoErrorV2Ix(
+      instructions.cancelOrderByClientOrderIdNoErrorIx(
         this.asset,
         marketIndex,
         this._parent.provider.wallet.publicKey,
@@ -1244,7 +1244,7 @@ export class SubClient {
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
-      let ix = instructions.cancelOrderV2Ix(
+      let ix = instructions.cancelOrderIx(
         this.asset,
         order.marketIndex,
         this._parent.provider.wallet.publicKey,
@@ -1266,7 +1266,7 @@ export class SubClient {
     let ixs = [];
     for (var i = 0; i < this._orders.length; i++) {
       let order = this._orders[i];
-      let ix = instructions.cancelOrderNoErrorV2Ix(
+      let ix = instructions.cancelOrderNoErrorIx(
         this.asset,
         order.marketIndex,
         this._parent.provider.wallet.publicKey,

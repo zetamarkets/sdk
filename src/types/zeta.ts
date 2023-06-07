@@ -4184,83 +4184,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "cancelOrderV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "cancelOrder",
       "accounts": [
         {
@@ -4271,88 +4194,6 @@ export type Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderNoErrorV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -4426,11 +4267,6 @@ export type Zeta = {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -4490,72 +4326,6 @@ export type Zeta = {
           "type": "u128"
         }
       ]
-    },
-    {
-      "name": "cancelAllMarketOrdersV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": []
     },
     {
       "name": "cancelAllMarketOrders",
@@ -4569,11 +4339,6 @@ export type Zeta = {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -4624,89 +4389,12 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "cancelOrderHaltedV2",
-      "accounts": [
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "cancelOrderHalted",
       "accounts": [
         {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -4764,77 +4452,6 @@ export type Zeta = {
         {
           "name": "orderId",
           "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderByClientOrderIdV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "clientOrderId",
-          "type": "u64"
         }
       ]
     },
@@ -4849,82 +4466,6 @@ export type Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "clientOrderId",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderByClientOrderIdNoErrorV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -4992,11 +4533,6 @@ export type Zeta = {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -5052,78 +4588,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "cancelExpiredOrder",
-      "accounts": [
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "pruneExpiredTifOrders",
       "accounts": [
         {
@@ -5168,6 +4632,11 @@ export type Zeta = {
       "name": "forceCancelOrderByOrderIdV2",
       "accounts": [
         {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -5185,11 +4654,6 @@ export type Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -5255,6 +4719,11 @@ export type Zeta = {
       "name": "forceCancelOrderByOrderId",
       "accounts": [
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
@@ -5277,11 +4746,6 @@ export type Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -5347,6 +4811,11 @@ export type Zeta = {
       "name": "forceCancelOrdersV2",
       "accounts": [
         {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -5364,11 +4833,6 @@ export type Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -5423,6 +4887,11 @@ export type Zeta = {
       "name": "forceCancelOrders",
       "accounts": [
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
@@ -5445,11 +4914,6 @@ export type Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -14185,83 +13649,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "cancelOrderV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "cancelOrder",
       "accounts": [
         {
@@ -14272,88 +13659,6 @@ export const IDL: Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderNoErrorV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -14427,11 +13732,6 @@ export const IDL: Zeta = {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -14491,72 +13791,6 @@ export const IDL: Zeta = {
           "type": "u128"
         }
       ]
-    },
-    {
-      "name": "cancelAllMarketOrdersV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": []
     },
     {
       "name": "cancelAllMarketOrders",
@@ -14570,11 +13804,6 @@ export const IDL: Zeta = {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -14625,89 +13854,12 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "cancelOrderHaltedV2",
-      "accounts": [
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "cancelOrderHalted",
       "accounts": [
         {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -14765,77 +13917,6 @@ export const IDL: Zeta = {
         {
           "name": "orderId",
           "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderByClientOrderIdV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "clientOrderId",
-          "type": "u64"
         }
       ]
     },
@@ -14850,82 +13931,6 @@ export const IDL: Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "clientOrderId",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "cancelOrderByClientOrderIdNoErrorV2",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -14993,11 +13998,6 @@ export const IDL: Zeta = {
           "name": "cancelAccounts",
           "accounts": [
             {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
               "name": "state",
               "isMut": false,
               "isSigner": false
@@ -15053,78 +14053,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "cancelExpiredOrder",
-      "accounts": [
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        }
-      ]
-    },
-    {
       "name": "pruneExpiredTifOrders",
       "accounts": [
         {
@@ -15169,6 +14097,11 @@ export const IDL: Zeta = {
       "name": "forceCancelOrderByOrderIdV2",
       "accounts": [
         {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -15186,11 +14119,6 @@ export const IDL: Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -15256,6 +14184,11 @@ export const IDL: Zeta = {
       "name": "forceCancelOrderByOrderId",
       "accounts": [
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
@@ -15278,11 +14211,6 @@ export const IDL: Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -15348,6 +14276,11 @@ export const IDL: Zeta = {
       "name": "forceCancelOrdersV2",
       "accounts": [
         {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "oracle",
           "isMut": false,
           "isSigner": false
@@ -15365,11 +14298,6 @@ export const IDL: Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
@@ -15424,6 +14352,11 @@ export const IDL: Zeta = {
       "name": "forceCancelOrders",
       "accounts": [
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "greeks",
           "isMut": false,
           "isSigner": false
@@ -15446,11 +14379,6 @@ export const IDL: Zeta = {
         {
           "name": "cancelAccounts",
           "accounts": [
-            {
-              "name": "zetaGroup",
-              "isMut": false,
-              "isSigner": false
-            },
             {
               "name": "state",
               "isMut": false,
