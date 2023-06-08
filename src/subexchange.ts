@@ -59,6 +59,14 @@ export class SubExchange {
   private _zetaGroupAddress: PublicKey;
 
   /**
+   * Address of greeks account.
+   */
+  public get greeksAddress(): PublicKey {
+    return this._greeksAddress;
+  }
+  private _greeksAddress: PublicKey;
+
+  /**
    * Returns the markets object.
    */
   public get markets(): ZetaGroupMarkets {
@@ -108,6 +116,11 @@ export class SubExchange {
     this._zetaGroupAddress = utils.getZetaGroup(
       Exchange.programId,
       underlyingMint
+    )[0];
+
+    this._greeksAddress = utils.getGreeks(
+      Exchange.programId,
+      this._zetaGroupAddress
     )[0];
 
     this._perpSyncQueueAddress = utils.getPerpSyncQueue(

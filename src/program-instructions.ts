@@ -1014,9 +1014,11 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
   let marketData = Exchange.getPerpMarket(asset);
   let asset_index = assetToIndex(asset);
-  return Exchange.program.instruction.updatePricingV2(toProgramAsset(asset), {
+  return Exchange.program.instruction.updatePricingV2({
     accounts: {
       state: Exchange.stateAddress,
+      zetaGroup: subExchange.zetaGroupAddress,
+      greeks: subExchange.greeksAddress,
       pricing: Exchange.pricingAddress,
       oracle: Exchange.pricing.oracles[asset_index],
       oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[asset_index],

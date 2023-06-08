@@ -1575,6 +1575,16 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "pricing",
           "isMut": true,
           "isSigner": false
@@ -1610,14 +1620,7 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "applyPerpFundingV2",
@@ -10649,6 +10652,16 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "pricing",
           "isMut": true,
           "isSigner": false
@@ -10684,14 +10697,7 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "applyPerpFundingV2",
