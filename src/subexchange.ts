@@ -19,7 +19,7 @@ import {
 import { Market, ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
 import { Network } from "./network";
-import { Asset, assetToName } from "./assets";
+import { Asset, assetToIndex, assetToName, toProgramAsset } from "./assets";
 import * as instructions from "./program-instructions";
 import * as fs from "fs";
 import * as os from "os";
@@ -351,25 +351,6 @@ export class SubExchange {
   }
 
   /**
-   * Update the volatility nodes for a surface.
-   */
-  public async updateVolatilityNodes(nodes: Array<anchor.BN>) {
-    if (nodes.length != constants.VOLATILITY_POINTS) {
-      throw Error(
-        `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
-      );
-    }
-    let tx = new Transaction().add(
-      instructions.updateVolatilityNodesIx(
-        this.asset,
-        nodes,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
    * Initializes the zeta markets for a zeta group.
    */
   public async initializeZetaMarkets(
@@ -637,12 +618,10 @@ export class SubExchange {
   }
 
   /**
-   * Retreat volatility surface and interest rates for an expiry index.
+   * Update pricing for an expiry index.
    */
-  public async retreatMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(
-      instructions.retreatMarketNodesIx(this.asset, expiryIndex)
-    );
+  public async updatePricingV2() {
+    let tx = new Transaction().add(instructions.updatePricingV2Ix(this.asset));
     await utils.processTransaction(Exchange.provider, tx);
   }
 
@@ -862,42 +841,6 @@ export class SubExchange {
         this.zetaGroup.marginParameters.futureMarginMaintenance,
         constants.MARGIN_PRECISION
       ),
-      optionMarkPercentageLongInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionMarkPercentageLongInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageLongInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageLongInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageShortInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageShortInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionDynamicPercentageShortInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionDynamicPercentageShortInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionMarkPercentageLongMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionMarkPercentageLongMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageLongMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageLongMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageShortMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageShortMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionDynamicPercentageShortMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionDynamicPercentageShortMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionShortPutCapPercentage: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionShortPutCapPercentage,
-        constants.MARGIN_PRECISION
-      ),
     };
   }
 
@@ -906,40 +849,39 @@ export class SubExchange {
    */
 
   public assertHalted() {
+    if (!Exchange.state.haltStates[assetToIndex(this.asset)].halted) {
+      throw "Not halted.";
+    }
+  }
+
+  public assertZetaGroupHalted() {
     if (!this.zetaGroup.haltState.halted) {
       throw "Zeta group not halted.";
     }
   }
 
-  public async haltZetaGroup(zetaGroupAddress: PublicKey) {
+  public async halt() {
     let tx = new Transaction().add(
-      instructions.haltZetaGroupIx(
-        this.asset,
-        zetaGroupAddress,
-        Exchange.provider.wallet.publicKey
-      )
+      instructions.haltIx(this.asset, Exchange.provider.wallet.publicKey)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async unhaltZetaGroup() {
+  public async unhalt() {
     let tx = new Transaction().add(
-      instructions.unhaltZetaGroupIx(
-        this._asset,
-        Exchange.provider.wallet.publicKey
-      )
+      instructions.unhaltIx(this.asset, Exchange.provider.wallet.publicKey)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async updateHaltState(
-    zetaGroupAddress: PublicKey,
-    args: instructions.UpdateHaltStateArgs
-  ) {
+  public async updateHaltState(timestamp: anchor.BN, spotPrice: anchor.BN) {
     let tx = new Transaction().add(
       instructions.updateHaltStateIx(
-        zetaGroupAddress,
-        args,
+        {
+          asset: toProgramAsset(this.asset),
+          spotPrice: spotPrice,
+          timestamp: timestamp,
+        },
         Exchange.provider.wallet.publicKey
       )
     );
@@ -948,22 +890,7 @@ export class SubExchange {
 
   public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
     let txs = instructions.settlePositionsHaltedTxs(
-      this.asset,
       marginAccounts,
-      Exchange.provider.wallet.publicKey
-    );
-
-    await Promise.all(
-      txs.map(async (tx) => {
-        await utils.processTransaction(Exchange.provider, tx);
-      })
-    );
-  }
-
-  public async settleSpreadPositionsHalted(spreadAccounts: AccountMeta[]) {
-    let txs = instructions.settleSpreadPositionsHaltedTxs(
-      this.asset,
-      spreadAccounts,
       Exchange.provider.wallet.publicKey
     );
 
@@ -997,25 +924,7 @@ export class SubExchange {
       (this._markets.perpMarket,
       utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
     );
-    await utils.cleanZetaMarketsHalted(this.asset, marketAccounts);
-  }
-
-  public async updatePricingHalted(expiryIndex: number | undefined) {
-    let tx = new Transaction().add(
-      instructions.updatePricingHaltedIx(
-        this.asset,
-        expiryIndex,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async cleanMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(
-      instructions.cleanMarketNodesIx(this.asset, expiryIndex)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
+    await utils.cleanZetaMarketsHalted(marketAccounts);
   }
 
   public async updateVolatility(args: instructions.UpdateVolatilityArgs) {

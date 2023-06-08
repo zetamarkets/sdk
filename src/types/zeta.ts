@@ -3,6 +3,115 @@ export type Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaPricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaPricingArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaPricingPubkeys",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaPricingPubkeysArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "moveGreeksToZetaPricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -363,20 +472,10 @@ export type Zeta = {
       ]
     },
     {
-      "name": "haltZetaGroup",
+      "name": "halt",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
           "isMut": true,
           "isSigner": false
         },
@@ -386,18 +485,25 @@ export type Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
-      "name": "unhaltZetaGroup",
+      "name": "unhalt",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -405,25 +511,22 @@ export type Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "updateHaltState",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -437,7 +540,7 @@ export type Zeta = {
         {
           "name": "args",
           "type": {
-            "defined": "HaltZetaGroupArgs"
+            "defined": "HaltStateArgs"
           }
         }
       ]
@@ -865,6 +968,40 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMarginParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupMarginParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
@@ -886,6 +1023,40 @@ export type Zeta = {
     },
     {
       "name": "updatePerpParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePerpParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupPerpParameters",
       "accounts": [
         {
           "name": "state",
@@ -982,41 +1153,11 @@ export type Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         }
       ],
       "args": []
-    },
-    {
-      "name": "settlePositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
     },
     {
       "name": "settlePositionsHalted",
@@ -1027,63 +1168,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "settleSpreadPositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "settleSpreadPositionsHalted",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },
@@ -1385,99 +1470,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "retreatMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "cleanMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "updateVolatilityNodes",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "nodes",
-          "type": {
-            "array": [
-              "u64",
-              5
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "updatePricing",
       "accounts": [
         {
@@ -1534,23 +1526,7 @@ export type Zeta = {
       ]
     },
     {
-      "name": "applyPerpFunding",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updatePricingHalted",
+      "name": "updatePricingV2",
       "accounts": [
         {
           "name": "state",
@@ -1559,7 +1535,7 @@ export type Zeta = {
         },
         {
           "name": "zetaGroup",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1568,9 +1544,24 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "admin",
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "perpMarket",
@@ -1588,12 +1579,28 @@ export type Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "applyPerpFunding",
+      "accounts": [
         {
-          "name": "expiryIndex",
-          "type": "u8"
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "deposit",
@@ -1652,10 +1659,117 @@ export type Zeta = {
       ]
     },
     {
+      "name": "depositV2",
+      "accounts": [
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "depositInsuranceVault",
       "accounts": [
         {
           "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -1774,10 +1888,122 @@ export type Zeta = {
       ]
     },
     {
+      "name": "withdrawV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "withdrawInsuranceVault",
       "accounts": [
         {
           "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "percentageAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -4632,6 +4858,293 @@ export type Zeta = {
   ],
   "accounts": [
     {
+      "name": "pricing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "markPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "markPricesPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "updateTimestamps",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "updateTimestampsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltas",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltasPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRates",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestMidpoints",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestMidpointsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracles",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oraclesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeeds",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeedsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "markets",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueues",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueuesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "marginParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "products",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "zetaGroupKeys",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "zetaGroupKeysPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "netOutflowSum",
+            "type": "i64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                2732
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "greeks",
       "type": {
         "kind": "struct",
@@ -4971,15 +5484,49 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "totalInsuranceVaultDeposits",
+            "name": "deprecatedTotalInsuranceVaultDeposits",
             "type": "u64"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          },
+          {
+            "name": "haltStates",
+            "type": {
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "haltStatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                20
+              ]
+            }
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                808
+                338
               ]
             }
           }
@@ -5100,6 +5647,15 @@ export type Zeta = {
             "name": "marginParameters",
             "type": {
               "defined": "MarginParameters"
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                "u8",
+                104
+              ]
             }
           },
           {
@@ -5633,6 +6189,30 @@ export type Zeta = {
       }
     },
     {
+      "name": "HaltStateV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "halted",
+            "type": "bool"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
+          },
+          {
+            "name": "marketCleaned",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltState",
       "type": {
         "kind": "struct",
@@ -5782,51 +6362,6 @@ export type Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
           }
         ]
       }
@@ -5982,13 +6517,40 @@ export type Zeta = {
       }
     },
     {
-      "name": "HaltZetaGroupArgs",
+      "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "spotPrice",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HaltArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "spotPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
           },
           {
             "name": "timestamp",
@@ -6186,6 +6748,18 @@ export type Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -6286,6 +6860,18 @@ export type Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -6349,42 +6935,6 @@ export type Zeta = {
           },
           {
             "name": "futureMarginMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
             "type": "u64"
           }
         ]
@@ -6521,42 +7071,6 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
             "name": "expiryIntervalSeconds",
             "type": "u32"
           },
@@ -6635,6 +7149,72 @@ export type Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateZetaPricingPubkeysArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "oracle",
+            "type": "publicKey"
+          },
+          {
+            "name": "oracleBackupFeed",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "perpSyncQueue",
+            "type": "publicKey"
+          },
+          {
+            "name": "zetaGroupKey",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeZetaPricingArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
+          },
+          {
+            "name": "marginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "marginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "pricingNonce",
+            "type": "u8"
           }
         ]
       }
@@ -7908,6 +8488,31 @@ export type Zeta = {
       "code": 6131,
       "name": "InsuranceVaultSeedsMismatch",
       "msg": "Insurance vault seeds mismatch"
+    },
+    {
+      "code": 6132,
+      "name": "OpenInterestLimitBreach",
+      "msg": "Open interest limit breach, decrease your position"
+    },
+    {
+      "code": 6133,
+      "name": "WithdrawLimitBreach",
+      "msg": "Withdraw limit breach, wait to withdraw more"
+    },
+    {
+      "code": 6134,
+      "name": "InvalidPricingOracle",
+      "msg": "Invalid oracle for this pricing account"
+    },
+    {
+      "code": 6135,
+      "name": "ZetaHalted",
+      "msg": "Zeta exchange is halted"
+    },
+    {
+      "code": 6136,
+      "name": "ZetaNotHalted",
+      "msg": "Zeta exchange is not halted"
     }
   ]
 };
@@ -7917,6 +8522,115 @@ export const IDL: Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaPricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaPricingArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaPricingPubkeys",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaPricingPubkeysArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "moveGreeksToZetaPricing",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -8277,20 +8991,10 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "haltZetaGroup",
+      "name": "halt",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
           "isMut": true,
           "isSigner": false
         },
@@ -8300,18 +9004,25 @@ export const IDL: Zeta = {
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
-      "name": "unhaltZetaGroup",
+      "name": "unhalt",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -8319,25 +9030,22 @@ export const IDL: Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "updateHaltState",
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         },
@@ -8351,7 +9059,7 @@ export const IDL: Zeta = {
         {
           "name": "args",
           "type": {
-            "defined": "HaltZetaGroupArgs"
+            "defined": "HaltStateArgs"
           }
         }
       ]
@@ -8779,6 +9487,40 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMarginParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupMarginParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
@@ -8800,6 +9542,40 @@ export const IDL: Zeta = {
     },
     {
       "name": "updatePerpParameters",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePerpParametersArgs"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupPerpParameters",
       "accounts": [
         {
           "name": "state",
@@ -8896,41 +9672,11 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
           "isMut": true,
           "isSigner": false
         }
       ],
       "args": []
-    },
-    {
-      "name": "settlePositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
     },
     {
       "name": "settlePositionsHalted",
@@ -8941,63 +9687,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "settleSpreadPositions",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "settlementAccount",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryTs",
-          "type": "u64"
-        },
-        {
-          "name": "settlementNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "settleSpreadPositionsHalted",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },
@@ -9299,99 +9989,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "retreatMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "cleanMarketNodes",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "updateVolatilityNodes",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "nodes",
-          "type": {
-            "array": [
-              "u64",
-              5
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "updatePricing",
       "accounts": [
         {
@@ -9448,23 +10045,7 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "applyPerpFunding",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updatePricingHalted",
+      "name": "updatePricingV2",
       "accounts": [
         {
           "name": "state",
@@ -9473,7 +10054,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "zetaGroup",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -9482,9 +10063,24 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "admin",
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "perpMarket",
@@ -9502,12 +10098,28 @@ export const IDL: Zeta = {
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "applyPerpFunding",
+      "accounts": [
         {
-          "name": "expiryIndex",
-          "type": "u8"
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "greeks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "deposit",
@@ -9566,10 +10178,117 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "depositV2",
+      "accounts": [
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "depositInsuranceVault",
       "accounts": [
         {
           "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -9688,10 +10407,122 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "withdrawV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "withdrawInsuranceVault",
       "accounts": [
         {
           "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceDepositAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "percentageAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -12546,6 +13377,293 @@ export const IDL: Zeta = {
   ],
   "accounts": [
     {
+      "name": "pricing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "markPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "markPricesPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "updateTimestamps",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "updateTimestampsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltas",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "fundingDeltasPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRates",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestFundingRatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "latestMidpoints",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          },
+          {
+            "name": "latestMidpointsPadding",
+            "type": {
+              "array": [
+                "u64",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracles",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oraclesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeeds",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "oracleBackupFeedsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "markets",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "marketsPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueues",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpSyncQueuesPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "perpParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "perpParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "PerpParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "marginParameters",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "MarginParameters"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "products",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productsPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "Product"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "zetaGroupKeys",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "zetaGroupKeysPadding",
+            "type": {
+              "array": [
+                "publicKey",
+                20
+              ]
+            }
+          },
+          {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "netOutflowSum",
+            "type": "i64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                2732
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "greeks",
       "type": {
         "kind": "struct",
@@ -12885,15 +14003,49 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "totalInsuranceVaultDeposits",
+            "name": "deprecatedTotalInsuranceVaultDeposits",
             "type": "u64"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          },
+          {
+            "name": "haltStates",
+            "type": {
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "haltStatesPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "HaltStateV2"
+                },
+                20
+              ]
+            }
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                808
+                338
               ]
             }
           }
@@ -13014,6 +14166,15 @@ export const IDL: Zeta = {
             "name": "marginParameters",
             "type": {
               "defined": "MarginParameters"
+            }
+          },
+          {
+            "name": "marginParametersPadding",
+            "type": {
+              "array": [
+                "u8",
+                104
+              ]
             }
           },
           {
@@ -13547,6 +14708,30 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "HaltStateV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "halted",
+            "type": "bool"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
+          },
+          {
+            "name": "marketCleaned",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltState",
       "type": {
         "kind": "struct",
@@ -13696,51 +14881,6 @@ export const IDL: Zeta = {
           {
             "name": "futureMarginMaintenance",
             "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
           }
         ]
       }
@@ -13896,13 +15036,40 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "HaltZetaGroupArgs",
+      "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
             "name": "spotPrice",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HaltArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "spotPrices",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
           },
           {
             "name": "timestamp",
@@ -14100,6 +15267,18 @@ export const IDL: Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -14200,6 +15379,18 @@ export const IDL: Zeta = {
           {
             "name": "maxPerpDeltaAgeSeconds",
             "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
           }
         ]
       }
@@ -14263,42 +15454,6 @@ export const IDL: Zeta = {
           },
           {
             "name": "futureMarginMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
             "type": "u64"
           }
         ]
@@ -14435,42 +15590,6 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "optionMarkPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortInitial",
-            "type": "u64"
-          },
-          {
-            "name": "optionMarkPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageLongMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionSpotPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionDynamicPercentageShortMaintenance",
-            "type": "u64"
-          },
-          {
-            "name": "optionShortPutCapPercentage",
-            "type": "u64"
-          },
-          {
             "name": "expiryIntervalSeconds",
             "type": "u32"
           },
@@ -14549,6 +15668,72 @@ export const IDL: Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateZetaPricingPubkeysArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "oracle",
+            "type": "publicKey"
+          },
+          {
+            "name": "oracleBackupFeed",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "perpSyncQueue",
+            "type": "publicKey"
+          },
+          {
+            "name": "zetaGroupKey",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeZetaPricingArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
+          },
+          {
+            "name": "marginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "marginMaintenance",
+            "type": "u64"
+          },
+          {
+            "name": "pricingNonce",
+            "type": "u8"
           }
         ]
       }
@@ -15822,6 +17007,31 @@ export const IDL: Zeta = {
       "code": 6131,
       "name": "InsuranceVaultSeedsMismatch",
       "msg": "Insurance vault seeds mismatch"
+    },
+    {
+      "code": 6132,
+      "name": "OpenInterestLimitBreach",
+      "msg": "Open interest limit breach, decrease your position"
+    },
+    {
+      "code": 6133,
+      "name": "WithdrawLimitBreach",
+      "msg": "Withdraw limit breach, wait to withdraw more"
+    },
+    {
+      "code": 6134,
+      "name": "InvalidPricingOracle",
+      "msg": "Invalid oracle for this pricing account"
+    },
+    {
+      "code": 6135,
+      "name": "ZetaHalted",
+      "msg": "Zeta exchange is halted"
+    },
+    {
+      "code": 6136,
+      "name": "ZetaNotHalted",
+      "msg": "Zeta exchange is not halted"
     }
   ]
 };

@@ -29,7 +29,45 @@ export interface State {
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
   secondaryAdmin: PublicKey;
+  vaultNonce: number;
+  insuranceVaultNonce: number;
+  nativeWithdrawLimit: anchor.BN;
+  withdrawLimitEpochSeconds: number;
+  nativeOpenInterestLimit: anchor.BN;
+  haltStates: Array<HaltStateV2>;
+  haltStatesPadding: Array<HaltStateV2>;
+  padding: Array<number>;
+}
+
+export interface Pricing {
+  nonce: number;
+  markPrices: Array<anchor.BN>;
+  markPricesPadding: Array<anchor.BN>;
+  updateTimestamps: Array<anchor.BN>;
+  updateTimestampsPadding: Array<anchor.BN>;
+  fundingDeltas: Array<AnchorDecimal>;
+  fundingDeltasPadding: Array<AnchorDecimal>;
+  latestFundingRates: Array<AnchorDecimal>;
+  latestFundingRatesPadding: Array<AnchorDecimal>;
+  latestMidpoints: Array<anchor.BN>;
+  latestMidpointsPadding: Array<anchor.BN>;
+  oracles: Array<PublicKey>;
+  oraclesPadding: Array<PublicKey>;
+  oracleBackupFeeds: Array<PublicKey>;
+  oracleBackupFeedsPadding: Array<PublicKey>;
+  markets: Array<PublicKey>;
+  marketsPadding: Array<PublicKey>;
+  perpSyncQueues: Array<PublicKey>;
+  perpSyncQueuesPadding: Array<PublicKey>;
+  perpParameters: Array<PerpParameters>;
+  perpParametersPadding: Array<PerpParameters>;
+  marginParameters: Array<MarginParameters>;
+  marginParametersPadding: Array<MarginParameters>;
+  products: Array<Product>;
+  productsPadding: Array<Product>;
   totalInsuranceVaultDeposits: anchor.BN;
+  lastWithdrawTimestamp: anchor.BN;
+  netOutflowSum: anchor.BN;
   padding: Array<number>;
 }
 
@@ -64,16 +102,6 @@ export interface PricingParameters {
 export interface MarginParameters {
   futureMarginInitial: anchor.BN;
   futureMarginMaintenance: anchor.BN;
-  optionMarkPercentageLongInitial: anchor.BN;
-  optionSpotPercentageLongInitial: anchor.BN;
-  optionSpotPercentageShortInitial: anchor.BN;
-  optionDynamicPercentageShortInitial: anchor.BN;
-  optionMarkPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageLongMaintenance: anchor.BN;
-  optionSpotPercentageShortMaintenance: anchor.BN;
-  optionDynamicPercentageShortMaintenance: anchor.BN;
-  optionShortPutCapPercentage: anchor.BN;
-  padding: Array<number>;
 }
 
 export interface PerpParameters {
@@ -94,6 +122,13 @@ export interface HaltState {
   marketCleanedPadding: Array<boolean>;
 }
 
+export interface HaltStateV2 {
+  halted: boolean;
+  timestamp: anchor.BN;
+  spotPrice: anchor.BN;
+  marketCleaned: boolean;
+}
+
 export interface ZetaGroup {
   nonce: number;
   noncePadding: Array<number>;
@@ -104,6 +139,7 @@ export interface ZetaGroup {
   greeks: PublicKey;
   pricingParameters: PricingParameters;
   marginParameters: MarginParameters;
+  marginParametersPadding: Array<number>;
   products: Array<Product>;
   productsPadding: Array<Product>;
   perp: Product;

@@ -307,6 +307,13 @@ export function getZetaGroup(
   );
 }
 
+export function getPricing(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("pricing"))],
+    programId
+  );
+}
+
 export function getUnderlying(
   programId: PublicKey,
   underlyingIndex: number
@@ -1137,10 +1144,7 @@ export async function cleanZetaMarkets(
   );
 }
 
-export async function cleanZetaMarketsHalted(
-  asset: Asset,
-  marketAccountTuples: any[]
-) {
+export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
   let txs: Transaction[] = [];
   for (
     var i = 0;
@@ -1149,67 +1153,12 @@ export async function cleanZetaMarketsHalted(
   ) {
     let tx = new Transaction();
     let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
-    tx.add(instructions.cleanZetaMarketsHaltedIx(asset, slice.flat()));
+    tx.add(instructions.cleanZetaMarketsHaltedIx(slice.flat()));
     txs.push(tx);
   }
   await Promise.all(
     txs.map(async (tx) => {
       await processTransaction(Exchange.provider, tx);
-    })
-  );
-}
-
-export async function settleUsers(
-  asset: Asset,
-  keys: PublicKey[],
-  expiryTs: anchor.BN,
-  accountType: types.ProgramAccountType = types.ProgramAccountType.MarginAccount
-) {
-  let [settlement, settlementNonce] = getSettlement(
-    Exchange.programId,
-    Exchange.getSubExchange(asset).zetaGroup.underlyingMint,
-    expiryTs
-  );
-
-  let remainingAccounts = keys.map((key) => {
-    return { pubkey: key, isSigner: false, isWritable: true };
-  });
-
-  let txs = [];
-  for (
-    var i = 0;
-    i < remainingAccounts.length;
-    i += constants.MAX_SETTLEMENT_ACCOUNTS
-  ) {
-    let tx = new Transaction();
-    let slice = remainingAccounts.slice(
-      i,
-      i + constants.MAX_SETTLEMENT_ACCOUNTS
-    );
-    tx.add(
-      accountType == types.ProgramAccountType.MarginAccount
-        ? instructions.settlePositionsIx(
-            asset,
-            expiryTs,
-            settlement,
-            settlementNonce,
-            slice
-          )
-        : instructions.settleSpreadPositionsIx(
-            asset,
-            expiryTs,
-            settlement,
-            settlementNonce,
-            slice
-          )
-    );
-    txs.push(tx);
-  }
-
-  await Promise.all(
-    txs.map(async (tx) => {
-      let txSig = await processTransaction(Exchange.provider, tx);
-      console.log(`Settling users - TxId: ${txSig}`);
     })
   );
 }

@@ -17,6 +17,7 @@ import {
   ProductGreeks,
   State,
   ZetaGroup,
+  Pricing,
 } from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
@@ -26,7 +27,7 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
 import * as types from "./types";
-import { Asset } from "./assets";
+import { Asset, toProgramAsset } from "./assets";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
@@ -55,6 +56,14 @@ export class Exchange {
     return this._state;
   }
   private _state: State;
+
+  /**
+   * Account storing zeta pricing.
+   */
+  public get pricing(): Pricing {
+    return this._pricing;
+  }
+  private _pricing: Pricing;
 
   /**
    * The solana network being used.
@@ -158,6 +167,14 @@ export class Exchange {
     return this._stateAddress;
   }
   private _stateAddress: PublicKey;
+
+  /**
+   * Address of zeta pricing account.
+   */
+  public get pricingAddress(): PublicKey {
+    return this._pricingAddress;
+  }
+  private _pricingAddress: PublicKey;
 
   /**
    * Public key for treasury wallet.
@@ -385,6 +402,7 @@ export class Exchange {
       this.programId
     );
     const [state, stateNonce] = utils.getState(this.programId);
+    const [pricing, _pricingNonce] = utils.getPricing(this.programId);
     const [serumAuthority, serumNonce] = utils.getSerumAuthority(
       this.programId
     );
@@ -425,10 +443,34 @@ export class Exchange {
 
     this._mintAuthority = mintAuthority;
     this._stateAddress = state;
+    this._pricingAddress = pricing;
     this._serumAuthority = serumAuthority;
     this._treasuryWalletAddress = treasuryWallet;
     this._referralsRewardsWalletAddress = referralRewardsWallet;
     await this.updateState();
+  }
+
+  public async initializeZetaPricing(
+    perpArgs: instructions.UpdatePerpParametersArgs,
+    marginArgs: instructions.UpdateMarginParametersArgs
+  ) {
+    let tx = new Transaction().add(
+      instructions.initializeZetaPricingIx(perpArgs, marginArgs)
+    );
+    try {
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        [],
+        utils.defaultCommitment(),
+        this.useLedger
+      );
+    } catch (e) {
+      console.error(`Initialize zeta pricing failed: ${e}`);
+      console.log(e);
+    }
+
+    await this.updateZetaPricing();
   }
 
   public async initializeZetaGroup(
@@ -504,6 +546,7 @@ export class Exchange {
     // Load variables from state.
     this._mintAuthority = utils.getMintAuthority(this.programId)[0];
     this._stateAddress = utils.getState(this.programId)[0];
+    this._pricingAddress = utils.getPricing(this.programId)[0];
     this._serumAuthority = utils.getSerumAuthority(this.programId)[0];
     this._usdcMintAddress = constants.USDC_MINT_ADDRESS[loadConfig.network];
     this._treasuryWalletAddress = utils.getZetaTreasuryWallet(
@@ -596,6 +639,8 @@ export class Exchange {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 
+    await this.updateZetaPricing();
+
     this._isInitialized = true;
   }
 
@@ -669,6 +714,7 @@ export class Exchange {
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
               this.getAllSubExchanges().map(async (subExchange) => {
+                await this.updateZetaPricing();
                 await subExchange.handlePolling(callback);
               })
             );
@@ -703,6 +749,17 @@ export class Exchange {
     this._state = (await this.program.account.state.fetch(
       this.stateAddress
     )) as State;
+  }
+
+  // TODO add subscription to this account
+
+  /**
+   * Polls the on chain account to update mark prices
+   */
+  public async updateZetaPricing() {
+    this._pricing = (await this.program.account.pricing.fetch(
+      this.pricingAddress
+    )) as Pricing;
   }
 
   /**
@@ -925,10 +982,6 @@ export class Exchange {
     await this.getSubExchange(asset).updatePerpSerumMarketIfNeeded(epochDelay);
   }
 
-  public async updateVolatilityNodes(asset: Asset, nodes: Array<anchor.BN>) {
-    await this.getSubExchange(asset).updateVolatilityNodes(nodes);
-  }
-
   public async initializeZetaMarkets(
     asset: Asset,
     perpsOnly: boolean = false,
@@ -965,8 +1018,31 @@ export class Exchange {
     await this.getSubExchange(asset).updatePricing(expiryIndex);
   }
 
-  public async retreatMarketNodes(asset: Asset, expiryIndex: number) {
-    await this.getSubExchange(asset).retreatMarketNodes(expiryIndex);
+  public async updatePricingV2(asset: Asset) {
+    await this.getSubExchange(asset).updatePricingV2();
+  }
+
+  public async updatePricingPubkeys(
+    asset: Asset,
+    oracle: PublicKey,
+    oracleBackupFeed: PublicKey,
+    market: PublicKey,
+    perpSyncQueue: PublicKey,
+    zetaGroupKey: PublicKey
+  ) {
+    let tx = new Transaction().add(
+      instructions.updateZetaPricingPubkeysIx({
+        asset: toProgramAsset(asset) as any,
+        oracle,
+        oracleBackupFeed,
+        market,
+        perpSyncQueue,
+        zetaGroupKey,
+      })
+    );
+    await utils.processTransaction(this.provider, tx);
+
+    await this.updateZetaPricing();
   }
 
   public async updateSubExchangeState(asset: Asset) {
@@ -1004,20 +1080,20 @@ export class Exchange {
     this.getSubExchange(asset).updateMarginParams();
   }
 
-  public async haltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
-    await this.getSubExchange(asset).haltZetaGroup(zetaGroupAddress);
+  public async halt(asset: Asset) {
+    await this.getSubExchange(asset).halt();
   }
 
-  public async unhaltZetaGroup(asset: Asset, zetaGroupAddress: PublicKey) {
-    await this.getSubExchange(asset).unhaltZetaGroup();
+  public async unhalt(asset: Asset) {
+    await this.getSubExchange(asset).unhalt();
   }
 
   public async updateHaltState(
     asset: Asset,
-    zetaGroupAddress: PublicKey,
-    args: instructions.UpdateHaltStateArgs
+    timestamp: anchor.BN,
+    spotPrice: anchor.BN
   ) {
-    await this.getSubExchange(asset).updateHaltState(zetaGroupAddress, args);
+    await this.getSubExchange(asset).updateHaltState(timestamp, spotPrice);
   }
 
   public async settlePositionsHalted(
@@ -1025,15 +1101,6 @@ export class Exchange {
     marginAccounts: AccountMeta[]
   ) {
     await this.getSubExchange(asset).settlePositionsHalted(marginAccounts);
-  }
-
-  public async settleSpreadPositionsHalted(
-    asset: Asset,
-    marginAccounts: AccountMeta[]
-  ) {
-    await this.getSubExchange(asset).settleSpreadPositionsHalted(
-      marginAccounts
-    );
   }
 
   public async cancelAllOrdersHalted(asset: Asset) {
@@ -1044,19 +1111,8 @@ export class Exchange {
     await this.getSubExchange(asset).cleanZetaMarketsHalted();
   }
 
-  public async updatePricingHalted(
-    asset: Asset,
-    expiryIndex: number = undefined
-  ) {
-    await this.getSubExchange(asset).updatePricingHalted(expiryIndex);
-  }
-
   public isHalted(asset: Asset) {
     return this.getSubExchange(asset).halted;
-  }
-
-  public async cleanMarketNodes(asset: Asset, expiryIndex: number) {
-    await this.getSubExchange(asset).cleanMarketNodes(expiryIndex);
   }
 
   public async updateVolatility(
