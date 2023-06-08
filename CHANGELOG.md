@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.28.2] 2023-06-08
+
+- exchange: Add functionality to automatically determine priority fees. ([#236](https://github.com/zetamarkets/sdk/pull/236))
+
 ## [0.28.0] 2023-05-24
 
 - general: Migrate per-asset insurance vault, deposit vault and socialized loss account to be global accounts. ([#230](https://github.com/zetamarkets/sdk/pull/230))
