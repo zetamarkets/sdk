@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [0.28.1] 2023-06-07
 
-- utils: use confirmTransaction() with new BlockheightBasedTransactionConfirmationStrategy. ([#235](https://github.com/zetamarkets/sdk/pull/235))
+- utils: use confirmTransaction() with new BlockheightBasedTransactionConfirmationStrategy, improving tx timeout detection by specifying the last valid blockheight. ([#235](https://github.com/zetamarkets/sdk/pull/235))
 
 ## [0.28.0] 2023-05-24
 
