@@ -1511,62 +1511,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "updatePricing",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "updatePricingV2",
       "accounts": [
         {
@@ -1623,7 +1567,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "applyPerpFundingV2",
+      "name": "applyPerpFunding",
       "accounts": [
         {
           "name": "state",
@@ -1632,27 +1576,6 @@ export type Zeta = {
         },
         {
           "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "applyPerpFunding",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -4593,7 +4516,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "crankEventQueueV2",
+      "name": "crankEventQueue",
       "docs": [
         "The only events that need to be cranked are maker fills."
       ],
@@ -4642,45 +4565,6 @@ export type Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "crankEventQueue",
-      "docs": [
-        "The only events that need to be cranked are maker fills."
-      ],
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "eventQueue",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "collectTreasuryFunds",
@@ -4766,47 +4650,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "rebalanceInsuranceVaultV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "treasuryWallet",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "rebalanceInsuranceVault",
       "accounts": [
         {
@@ -4815,7 +4658,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },
@@ -10588,62 +10431,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "updatePricing",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpMarket",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpBids",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpAsks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "expiryIndex",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "updatePricingV2",
       "accounts": [
         {
@@ -10700,7 +10487,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "applyPerpFundingV2",
+      "name": "applyPerpFunding",
       "accounts": [
         {
           "name": "state",
@@ -10709,27 +10496,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "applyPerpFunding",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -13670,7 +13436,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "crankEventQueueV2",
+      "name": "crankEventQueue",
       "docs": [
         "The only events that need to be cranked are maker fills."
       ],
@@ -13719,45 +13485,6 @@ export const IDL: Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "crankEventQueue",
-      "docs": [
-        "The only events that need to be cranked are maker fills."
-      ],
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "eventQueue",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "collectTreasuryFunds",
@@ -13843,47 +13570,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "rebalanceInsuranceVaultV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "treasuryWallet",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "rebalanceInsuranceVault",
       "accounts": [
         {
@@ -13892,7 +13578,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },

@@ -947,10 +947,10 @@ export function treasuryMovementIx(
   );
 }
 
-export function rebalanceInsuranceVaultV2Ix(
+export function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
 ): TransactionInstruction {
-  return Exchange.program.instruction.rebalanceInsuranceVaultV2({
+  return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
@@ -989,14 +989,14 @@ export function liquidateV2Ix(
   });
 }
 
-export function crankMarketV2Ix(
+export function crankMarketIx(
   asset: Asset,
   market: PublicKey,
   eventQueue: PublicKey,
   dexProgram: PublicKey,
   remainingAccounts: any[]
 ): TransactionInstruction {
-  return Exchange.program.instruction.crankEventQueueV2(toProgramAsset(asset), {
+  return Exchange.program.instruction.crankEventQueue(toProgramAsset(asset), {
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
@@ -1030,11 +1030,11 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
   });
 }
 
-export function applyPerpFundingV2Ix(
+export function applyPerpFundingIx(
   asset: Asset,
   remainingAccounts: any[]
 ): TransactionInstruction {
-  return Exchange.program.instruction.applyPerpFundingV2({
+  return Exchange.program.instruction.applyPerpFunding({
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,

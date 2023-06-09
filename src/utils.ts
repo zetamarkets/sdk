@@ -1107,7 +1107,7 @@ export async function crankMarket(
   );
 
   let tx = new Transaction().add(
-    instructions.crankMarketV2Ix(
+    instructions.crankMarketIx(
       asset,
       market.address,
       market.serumMarket.eventQueueAddress,
@@ -1515,7 +1515,7 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
   ) {
     let tx = new Transaction();
     let slice = remainingAccounts.slice(i, i + constants.MAX_FUNDING_ACCOUNTS);
-    tx.add(instructions.applyPerpFundingV2Ix(asset, slice));
+    tx.add(instructions.applyPerpFundingIx(asset, slice));
     txs.push(tx);
   }
 

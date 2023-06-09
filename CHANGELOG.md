@@ -5,7 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [0.29.0] 2023-06-07
+## [0.29.1] 2023-06-08
+
+- general: New set of instructions for Pricing account. ([#234](https://github.com/zetamarkets/sdk/pull/234))
+
+## [0.29.0] 2023-06-08
 
 - general: New Pricing account to replace ZetaGroup + Greeks. ([#233](https://github.com/zetamarkets/sdk/pull/233))
 
