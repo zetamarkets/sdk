@@ -11,14 +11,7 @@ import {
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
-import {
-  Greeks,
-  PerpSyncQueue,
-  ProductGreeks,
-  State,
-  ZetaGroup,
-  Pricing,
-} from "./program-types";
+import { PerpSyncQueue, ProductGreeks, State, Pricing } from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
@@ -27,7 +20,7 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
 import * as types from "./types";
-import { Asset, toProgramAsset } from "./assets";
+import { Asset, assetToIndex, toProgramAsset } from "./assets";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
@@ -521,7 +514,7 @@ export class Exchange {
       await this.getSubExchange(asset).initialize(asset);
     }
 
-    await this.getSubExchange(asset).updateZetaGroup();
+    await this.updateZetaPricing();
   }
 
   public async load(
@@ -559,15 +552,13 @@ export class Exchange {
     )[0];
 
     this._lastPollTimestamp = 0;
-
+    await this.updateZetaPricing();
     this._oracle = new Oracle(this.network, this.connection);
-
-    const ACCS_PER_SUBEXCHANGE = 3;
 
     const subExchangeToFetchAddrs: PublicKey[] = this.assets
       .map((a) => {
         const se = this.getSubExchange(a);
-        return [se.zetaGroupAddress, se.greeksAddress, se.perpSyncQueueAddress];
+        return [se.perpSyncQueueAddress];
       })
       .flat()
       .concat([SYSVAR_CLOCK_PUBKEY]);
@@ -584,39 +575,18 @@ export class Exchange {
 
     const accFetches = (await Promise.all(allPromises)).slice(
       0,
-      loadConfig.assets.length * ACCS_PER_SUBEXCHANGE + 1
+      loadConfig.assets.length + 1
     );
 
-    let zetaGroupAccs: ZetaGroup[] = [];
-    let greeksAccs: Greeks[] = [];
     let perpSyncQueueAccs: PerpSyncQueue[] = [];
     for (let i = 0; i < accFetches.length - 1; i++) {
-      switch (i % ACCS_PER_SUBEXCHANGE) {
-        case 0:
-          zetaGroupAccs.push(
-            this.program.account.zetaGroup.coder.accounts.decode(
-              types.ProgramAccountType.ZetaGroup,
-              accFetches[i].data
-            ) as ZetaGroup
-          );
-          break;
-        case 1:
-          greeksAccs.push(
-            this.program.account.greeks.coder.accounts.decode(
-              types.ProgramAccountType.Greeks,
-              accFetches[i].data
-            ) as Greeks
-          );
-          break;
-        case 2:
-          perpSyncQueueAccs.push(
-            this.program.account.perpSyncQueue.coder.accounts.decode(
-              types.ProgramAccountType.PerpSyncQueue,
-              accFetches[i].data
-            ) as PerpSyncQueue
-          );
-          break;
-      }
+      perpSyncQueueAccs.push(
+        this.program.account.perpSyncQueue.coder.accounts.decode(
+          types.ProgramAccountType.PerpSyncQueue,
+          accFetches[i].data
+        ) as PerpSyncQueue
+      );
+      break;
     }
 
     const clockData = utils.getClockData(accFetches.at(-1));
@@ -627,7 +597,7 @@ export class Exchange {
         return this.getSubExchange(asset).load(
           asset,
           this.opts,
-          [zetaGroupAccs[i], greeksAccs[i], perpSyncQueueAccs[i]],
+          [perpSyncQueueAccs[i]],
           loadConfig.loadFromStore,
           loadConfig.throttleMs,
           callback
@@ -638,8 +608,6 @@ export class Exchange {
     for (var se of this.getAllSubExchanges()) {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
-
-    await this.updateZetaPricing();
 
     this._isInitialized = true;
   }
@@ -734,9 +702,9 @@ export class Exchange {
 
   public async updateExchangeState() {
     await this.updateState();
+    await this.updateZetaPricing();
     await Promise.all(
       this.assets.map(async (asset) => {
-        await this.updateZetaGroup(asset);
         this.getZetaGroupMarkets(asset).updateExpirySeries();
       })
     );
@@ -771,10 +739,6 @@ export class Exchange {
     );
     await utils.processTransaction(this.provider, tx);
     await this.updateState();
-  }
-
-  public async initializeMarketNodes(asset: Asset, zetaGroup: PublicKey) {
-    await this.getSubExchange(asset).initializeMarketNodes(zetaGroup);
   }
 
   public subscribeMarket(asset: Asset, index: number) {
@@ -882,12 +846,7 @@ export class Exchange {
 
   public getMarkets(asset: Asset): Market[] {
     let sub = this.getSubExchange(asset);
-    if (sub.isPerpsOnly()) {
-      return [sub.markets.perpMarket];
-    }
-    return this.getSubExchange(asset).markets.markets.concat(
-      this.getSubExchange(asset).markets.perpMarket
-    );
+    return [sub.markets.perpMarket];
   }
 
   public getPerpMarket(asset: Asset): Market {
@@ -902,16 +861,8 @@ export class Exchange {
     return this.getSubExchange(asset).markets.expirySeries;
   }
 
-  public getZetaGroup(asset: Asset): ZetaGroup {
-    return this.getSubExchange(asset).zetaGroup;
-  }
-
   public getZetaGroupAddress(asset: Asset): PublicKey {
     return this.getSubExchange(asset).zetaGroupAddress;
-  }
-
-  public getGreeks(asset: Asset): Greeks {
-    return this.getSubExchange(asset).greeks;
   }
 
   public getPerpSyncQueue(asset: Asset): PerpSyncQueue {
@@ -922,8 +873,8 @@ export class Exchange {
     return this.getMarket(asset, index).orderbook;
   }
 
-  public getMarkPrice(asset: Asset, index: number): number {
-    return this.getSubExchange(asset).getMarkPrice(index);
+  public getMarkPrice(asset: Asset): number {
+    return this.getSubExchange(asset).getMarkPrice();
   }
 
   public getInsuranceVaultAddress(): PublicKey {
@@ -1010,16 +961,8 @@ export class Exchange {
     await this.getSubExchange(asset).initializePerpSyncQueue();
   }
 
-  public async updateZetaGroup(asset: Asset) {
-    await this.getSubExchange(asset).updateZetaGroup();
-  }
-
-  public async updatePricing(asset: Asset, expiryIndex: number = undefined) {
-    await this.getSubExchange(asset).updatePricing(expiryIndex);
-  }
-
-  public async updatePricingV2(asset: Asset) {
-    await this.getSubExchange(asset).updatePricingV2();
+  public async updatePricing(asset: Asset) {
+    await this.getSubExchange(asset).updatePricing();
   }
 
   public async updatePricingPubkeys(
@@ -1113,31 +1056,6 @@ export class Exchange {
 
   public isHalted(asset: Asset) {
     return this.getSubExchange(asset).halted;
-  }
-
-  public async updateVolatility(
-    asset: Asset,
-    args: instructions.UpdateVolatilityArgs
-  ) {
-    await this.getSubExchange(asset).updateVolatility(args);
-  }
-
-  public async updateInterestRate(
-    asset: Asset,
-    args: instructions.UpdateInterestRateArgs
-  ) {
-    await this.getSubExchange(asset).updateInterestRate(args);
-  }
-
-  public getProductGreeks(
-    asset: Asset,
-    marketIndex: number,
-    expiryIndex: number
-  ): ProductGreeks {
-    return this.getSubExchange(asset).getProductGreeks(
-      marketIndex,
-      expiryIndex
-    );
   }
 
   public async close() {

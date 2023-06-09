@@ -4,7 +4,6 @@ import { Asset } from "./assets";
 import {
   Position,
   SpreadAccount,
-  ZetaGroup,
   MarginAccount,
   ProductLedger,
 } from "./program-types";
@@ -118,27 +117,9 @@ export function calculatePerpMargin(
 }
 
 export function calculateSpreadAccountMarginRequirement(
-  spreadAccount: SpreadAccount,
-  zetaGroup: ZetaGroup
+  spreadAccount: SpreadAccount
 ) {
-  let marginRequirement = 0;
-  for (let i = 0; i < zetaGroup.expirySeries.length; i++) {
-    // Skip if strikes are uninitialised
-    if (!zetaGroup.products[i].strike.isSet) {
-      continue;
-    }
-    let strikes = Exchange.getSubExchange(
-      assets.fromProgramAsset(zetaGroup.asset)
-    )
-      .markets.getStrikesByExpiryIndex(i)
-      // Convert to native integer, as all calculations are worked in native size
-      .map((strike) => convertDecimalToNativeInteger(strike));
-    let positions = getPositionsByExpiryIndexforSpreadAccount(spreadAccount, i);
-    marginRequirement =
-      marginRequirement + calculateSpreadMarginRequirements(strikes, positions);
-  }
-
-  return marginRequirement;
+  return 0;
 }
 
 /**
@@ -262,7 +243,6 @@ export function checkMarginAccountMarginRequirement(
 }
 
 export function movePositions(
-  zetaGroup: ZetaGroup,
   spreadAccount: SpreadAccount,
   marginAccount: MarginAccount,
   movementType: types.MovementType,
@@ -284,10 +264,8 @@ export function movePositions(
     }
   }
 
-  let spreadMarginRequirements = calculateSpreadAccountMarginRequirement(
-    spreadAccount,
-    zetaGroup
-  );
+  let spreadMarginRequirements =
+    calculateSpreadAccountMarginRequirement(spreadAccount);
 
   if (spreadMarginRequirements > spreadAccount.balance.toNumber()) {
     let diff = spreadMarginRequirements - spreadAccount.balance.toNumber();

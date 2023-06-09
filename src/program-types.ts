@@ -65,6 +65,8 @@ export interface Pricing {
   marginParametersPadding: Array<MarginParameters>;
   products: Array<Product>;
   productsPadding: Array<Product>;
+  zetaGroupKeys: Array<PublicKey>;
+  zetaGroupKeysPadding: Array<PublicKey>;
   totalInsuranceVaultDeposits: anchor.BN;
   lastWithdrawTimestamp: anchor.BN;
   netOutflowSum: anchor.BN;
@@ -127,34 +129,6 @@ export interface HaltStateV2 {
   timestamp: anchor.BN;
   spotPrice: anchor.BN;
   marketCleaned: boolean;
-}
-
-export interface ZetaGroup {
-  nonce: number;
-  noncePadding: Array<number>;
-  frontExpiryIndex: number;
-  haltState: HaltState;
-  underlyingMint: PublicKey;
-  oracle: PublicKey;
-  greeks: PublicKey;
-  pricingParameters: PricingParameters;
-  marginParameters: MarginParameters;
-  marginParametersPadding: Array<number>;
-  products: Array<Product>;
-  productsPadding: Array<Product>;
-  perp: Product;
-  expirySeries: Array<ExpirySeries>;
-  expirySeriesPadding: Array<ExpirySeries>;
-  deprecatedPadding: Array<number>;
-  asset: any;
-  expiryIntervalSeconds: number;
-  newExpiryThresholdSeconds: number;
-  perpParameters: PerpParameters;
-  perpSyncQueue: PublicKey;
-  oracleBackupFeed: PublicKey;
-  perpsOnly: boolean;
-  flexUnderlying: boolean;
-  padding: Array<number>;
 }
 
 export interface Product {
@@ -221,31 +195,6 @@ export interface SpreadAccount {
   positions: Array<Position>;
   positionsPadding: Array<Position>;
   asset: any;
-  padding: Array<number>;
-}
-
-export interface Greeks {
-  nonce: number;
-  markPrices: Array<anchor.BN>;
-  perpMarkPrice: anchor.BN;
-  markPricesPadding: Array<anchor.BN>;
-  productGreeks: Array<ProductGreeks>;
-  productGreeksPadding: Array<ProductGreeks>;
-  updateTimestamp: Array<anchor.BN>;
-  updateTimestampPadding: Array<anchor.BN>;
-  retreatExpirationTimestamp: Array<anchor.BN>;
-  retreatExpirationTimestampPadding: Array<anchor.BN>;
-  interestRate: Array<anchor.BN>;
-  interestRatePadding: Array<anchor.BN>;
-  nodes: Array<anchor.BN>;
-  volatility: Array<anchor.BN>;
-  volatilityPadding: Array<anchor.BN>;
-  nodeKeys: Array<PublicKey>;
-  haltForcePricing: Array<boolean>;
-  perpUpdateTimestamp: anchor.BN;
-  perpFundingDelta: AnchorDecimal;
-  perpLatestFundingRate: AnchorDecimal;
-  perpLatestMidpoint: anchor.BN;
   padding: Array<number>;
 }
 

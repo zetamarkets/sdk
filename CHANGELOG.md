@@ -5,9 +5,20 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [0.29.0] 2023-06-07
+## [0.29.1] 2023-06-08
 
-- general: New Pricing account to replace ZetaGroup + Greeks. ([#233](https://github.com/zetamarkets/sdk/pull/233))
+- general: New set of instructions for Pricing account. ([#234](https://github.com/zetamarkets/sdk/pull/234)). Notable changes:
+  - UpdatePricing() removed (only V2 now)
+  - CrankEventQueue(), RebalanceInsuranceVault() and ApplyPerpFunding() contexts changed to use Pricing account
+  - New InitializeOpenOrdersV2(), CloseOpenOrdersV2()
+  - New PlacePerpOrderV3(), ForceCancelOrdersV2(), LiquidateV2()
+
+## [0.29.0] 2023-06-08
+
+- general: New Pricing account to replace ZetaGroup + Greeks. ([#233](https://github.com/zetamarkets/sdk/pull/233)). Notable changes:
+  - Halting is now in State as HaltStateV2. Halt and unhalt logic changed to support this
+  - New UpdatePricingV2() which updates both Greeks and Pricing accounts
+  - New DepositV2 and WithdrawV2() which use the Pricing account.
 
 ## [0.28.0] 2023-05-24
 
