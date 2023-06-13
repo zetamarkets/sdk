@@ -17,10 +17,6 @@ export enum EventType {
    */
   CLOCK,
   /**
-   * A change in the greeks account.
-   */
-  GREEKS,
-  /**
    * A trade event for the user margin account.
    */
   TRADE,
@@ -45,6 +41,10 @@ export enum EventType {
    * On oracle account change.
    */
   ORACLE,
+  /*
+   * On pricing account change
+   */
+  PRICING,
 }
 
 export interface OrderbookEvent {
@@ -61,8 +61,6 @@ export function eventTypeToString(event: EventType) {
       return "USER";
     case EventType.CLOCK:
       return "CLOCK";
-    case EventType.GREEKS:
-      return "GREEKS";
     case EventType.TRADE:
       return "TRADE";
     case EventType.TRADEV2:
@@ -75,6 +73,8 @@ export function eventTypeToString(event: EventType) {
       return "ORDERBOOK";
     case EventType.ORACLE:
       return "ORACLE";
+    case EventType.PRICING:
+      return "PRICING";
     default:
       throw Error("Invalid event type");
   }
