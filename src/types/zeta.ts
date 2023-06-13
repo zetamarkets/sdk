@@ -421,7 +421,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -435,6 +435,12 @@ export type Zeta = {
         {
           "name": "nonce",
           "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -462,7 +468,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         }
@@ -1365,7 +1371,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -6261,6 +6267,142 @@ export type Zeta = {
       }
     },
     {
+      "name": "crossMarginAccountManager",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginAccountInfo"
+                },
+                256
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "crossMarginAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "forceCancelFlag",
+            "type": "bool"
+          },
+          {
+            "name": "accountType",
+            "type": {
+              "defined": "MarginAccountType"
+            }
+          },
+          {
+            "name": "openOrdersNonces",
+            "type": {
+              "array": [
+                "u8",
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncesPadding",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "rebalanceAmount",
+            "type": "i64"
+          },
+          {
+            "name": "lastFundingDeltas",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "lastFundingDeltasPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "productLedgers",
+            "type": {
+              "array": [
+                {
+                  "defined": "ProductLedger"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productLedgersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "ProductLedger"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                2000
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "marginAccount",
       "type": {
         "kind": "struct",
@@ -6913,6 +7055,27 @@ export type Zeta = {
       }
     },
     {
+      "name": "CrossMarginAccountInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized",
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "type": {
+              "array": [
+                "u8",
+                10
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
@@ -7034,8 +7197,10 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "index",
-            "type": "u8"
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
           },
           {
             "name": "marketNonce",
@@ -8914,6 +9079,21 @@ export type Zeta = {
       "code": 6137,
       "name": "ZetaNotHalted",
       "msg": "Zeta exchange is not halted"
+    },
+    {
+      "code": 6138,
+      "name": "NotFreshCrossMarginAccount",
+      "msg": "Cross margin account is not unused, close it and make a new one"
+    },
+    {
+      "code": 6139,
+      "name": "CannotCloseNonEmptyMarginAccountManager",
+      "msg": "Cannot close margin account manager that is not empty"
+    },
+    {
+      "code": 6140,
+      "name": "CannotMigrateWithOpenOrders",
+      "msg": "Cannot migrate to cross margin account with open orders, close all open orders"
     }
   ]
 };
@@ -9341,7 +9521,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -9355,6 +9535,12 @@ export const IDL: Zeta = {
         {
           "name": "nonce",
           "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -9382,7 +9568,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": false,
           "isSigner": false
         }
@@ -10285,7 +10471,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
+          "name": "pricing",
           "isMut": true,
           "isSigner": false
         },
@@ -15181,6 +15367,142 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "crossMarginAccountManager",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "array": [
+                {
+                  "defined": "CrossMarginAccountInfo"
+                },
+                256
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "crossMarginAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "delegatedPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "forceCancelFlag",
+            "type": "bool"
+          },
+          {
+            "name": "accountType",
+            "type": {
+              "defined": "MarginAccountType"
+            }
+          },
+          {
+            "name": "openOrdersNonces",
+            "type": {
+              "array": [
+                "u8",
+                5
+              ]
+            }
+          },
+          {
+            "name": "openOrdersNoncesPadding",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "rebalanceAmount",
+            "type": "i64"
+          },
+          {
+            "name": "lastFundingDeltas",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "lastFundingDeltasPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "AnchorDecimal"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "productLedgers",
+            "type": {
+              "array": [
+                {
+                  "defined": "ProductLedger"
+                },
+                5
+              ]
+            }
+          },
+          {
+            "name": "productLedgersPadding",
+            "type": {
+              "array": [
+                {
+                  "defined": "ProductLedger"
+                },
+                20
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                2000
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "marginAccount",
       "type": {
         "kind": "struct",
@@ -15833,6 +16155,27 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "CrossMarginAccountInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized",
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "type": {
+              "array": [
+                "u8",
+                10
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
@@ -15954,8 +16297,10 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "index",
-            "type": "u8"
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
           },
           {
             "name": "marketNonce",
@@ -17834,6 +18179,21 @@ export const IDL: Zeta = {
       "code": 6137,
       "name": "ZetaNotHalted",
       "msg": "Zeta exchange is not halted"
+    },
+    {
+      "code": 6138,
+      "name": "NotFreshCrossMarginAccount",
+      "msg": "Cross margin account is not unused, close it and make a new one"
+    },
+    {
+      "code": 6139,
+      "name": "CannotCloseNonEmptyMarginAccountManager",
+      "msg": "Cannot close margin account manager that is not empty"
+    },
+    {
+      "code": 6140,
+      "name": "CannotMigrateWithOpenOrders",
+      "msg": "Cannot migrate to cross margin account with open orders, close all open orders"
     }
   ]
 };

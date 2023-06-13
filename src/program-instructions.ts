@@ -731,7 +731,7 @@ export async function initializeZetaMarketTxs(
   let tx2 = new Transaction().add(
     Exchange.program.instruction.initializeZetaMarket(
       {
-        index: marketIndex,
+        asset: toProgramAsset(asset),
         marketNonce,
         baseMintNonce,
         quoteMintNonce,
@@ -745,7 +745,7 @@ export async function initializeZetaMarketTxs(
         accounts: {
           state: Exchange.stateAddress,
           marketIndexes: marketIndexes,
-          zetaGroup: subExchange.zetaGroupAddress,
+          pricing: Exchange.pricingAddress,
           admin: Exchange.state.admin,
           market,
           requestQueue: requestQueue,
@@ -780,16 +780,20 @@ export function initializePerpSyncQueueIx(
     Exchange.getSubExchange(asset).zetaGroupAddress
   );
 
-  return Exchange.program.instruction.initializePerpSyncQueue(nonce, {
-    accounts: {
-      admin: Exchange.state.admin,
-      zetaProgram: Exchange.programId,
-      state: Exchange.stateAddress,
-      perpSyncQueue,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return Exchange.program.instruction.initializePerpSyncQueue(
+    nonce,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        admin: Exchange.state.admin,
+        zetaProgram: Exchange.programId,
+        state: Exchange.stateAddress,
+        perpSyncQueue,
+        pricing: Exchange.pricingAddress,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function modifyAssetIx(
@@ -1276,15 +1280,19 @@ export function initializeMarketIndexesIx(
   marketIndexes: PublicKey,
   nonce: number
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeMarketIndexes(nonce, {
-    accounts: {
-      state: Exchange.stateAddress,
-      marketIndexes: marketIndexes,
-      admin: Exchange.state.admin,
-      systemProgram: SystemProgram.programId,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-    },
-  });
+  return Exchange.program.instruction.initializeMarketIndexes(
+    nonce,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        marketIndexes: marketIndexes,
+        admin: Exchange.state.admin,
+        systemProgram: SystemProgram.programId,
+        pricing: Exchange.pricingAddress,
+      },
+    }
+  );
 }
 export function addMarketIndexesIx(
   asset: Asset,
