@@ -217,15 +217,6 @@ export interface CancelArgs {
 export interface MarginParams {
   futureMarginInitial: number;
   futureMarginMaintenance: number;
-  optionMarkPercentageLongInitial: number;
-  optionSpotPercentageLongInitial: number;
-  optionSpotPercentageShortInitial: number;
-  optionDynamicPercentageShortInitial: number;
-  optionMarkPercentageLongMaintenance: number;
-  optionSpotPercentageLongMaintenance: number;
-  optionSpotPercentageShortMaintenance: number;
-  optionDynamicPercentageShortMaintenance: number;
-  optionShortPutCapPercentage: number;
 }
 
 export enum ProgramAccountType {

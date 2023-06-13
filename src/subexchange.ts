@@ -9,9 +9,7 @@ import {
 import * as utils from "./utils";
 import * as constants from "./constants";
 import {
-  Greeks,
   ExpirySeries,
-  ZetaGroup,
   MarketIndexes,
   ProductGreeks,
   PerpSyncQueue,
@@ -19,7 +17,7 @@ import {
 import { Market, ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
 import { Network } from "./network";
-import { Asset, assetToName } from "./assets";
+import { Asset, assetToIndex, assetToName, toProgramAsset } from "./assets";
 import * as instructions from "./program-instructions";
 import * as fs from "fs";
 import * as os from "os";
@@ -44,14 +42,6 @@ export class SubExchange {
   private _isInitialized: boolean = false;
 
   /**
-   * Account storing zeta group account info.
-   */
-  public get zetaGroup(): ZetaGroup {
-    return this._zetaGroup;
-  }
-  private _zetaGroup: ZetaGroup;
-
-  /**
    * The asset loaded to the this.
    */
   public get asset(): Asset {
@@ -69,6 +59,14 @@ export class SubExchange {
   private _zetaGroupAddress: PublicKey;
 
   /**
+   * Address of greeks account.
+   */
+  public get greeksAddress(): PublicKey {
+    return this._greeksAddress;
+  }
+  private _greeksAddress: PublicKey;
+
+  /**
    * Returns the markets object.
    */
   public get markets(): ZetaGroupMarkets {
@@ -80,19 +78,6 @@ export class SubExchange {
   private _markets: ZetaGroupMarkets;
 
   private _eventEmitters: any[] = [];
-
-  /**
-   * Account storing all the greeks.
-   */
-  public get greeks(): Greeks {
-    return this._greeks;
-  }
-  private _greeks: Greeks;
-
-  public get greeksAddress(): PublicKey {
-    return this._greeksAddress;
-  }
-  private _greeksAddress: PublicKey;
 
   /**
    * Account storing the queue which synchronises taker/maker perp funding payments.
@@ -113,16 +98,8 @@ export class SubExchange {
   }
   private _marginParams: types.MarginParams;
 
-  public get frontExpirySeries(): ExpirySeries {
-    return this._zetaGroup.expirySeries[this._zetaGroup.frontExpiryIndex];
-  }
-
   public get halted(): boolean {
-    return this._zetaGroup.haltState.halted;
-  }
-
-  public isPerpsOnly(): boolean {
-    return this._zetaGroup.perpsOnly;
+    return Exchange.state.haltStates[assetToIndex(this._asset)].halted;
   }
 
   public async initialize(asset: Asset) {
@@ -135,17 +112,20 @@ export class SubExchange {
     // Load zeta group.
     let underlyingMint = utils.getUnderlyingMint(asset);
 
+    // Grab zetagroupaddress manually because Pricing acc isnt loaded yet at this point
     this._zetaGroupAddress = utils.getZetaGroup(
       Exchange.programId,
       underlyingMint
     )[0];
+
     this._greeksAddress = utils.getGreeks(
       Exchange.programId,
-      this.zetaGroupAddress
+      this._zetaGroupAddress
     )[0];
+
     this._perpSyncQueueAddress = utils.getPerpSyncQueue(
       Exchange.programId,
-      this.zetaGroupAddress
+      this._zetaGroupAddress
     )[0];
 
     this._isSetup = true;
@@ -169,21 +149,8 @@ export class SubExchange {
       throw "SubExchange already loaded.";
     }
 
-    this._zetaGroup = fetchedAccs[0] as ZetaGroup;
-    this._greeks = fetchedAccs[1] as Greeks;
-    this._perpSyncQueue = fetchedAccs[2] as PerpSyncQueue;
+    this._perpSyncQueue = fetchedAccs[0] as PerpSyncQueue;
     this.updateMarginParams();
-
-    if (
-      !utils.isFlexUnderlying(asset) &&
-      (this.zetaGroup.products[
-        this.zetaGroup.products.length - 1
-      ].market.equals(PublicKey.default) ||
-        (utils.isFlexUnderlying(asset) &&
-          this.zetaGroup.perp.market.equals(PublicKey.default)))
-    ) {
-      throw "Zeta group markets are uninitialized!";
-    }
 
     this._markets = await ZetaGroupMarkets.load(
       asset,
@@ -195,8 +162,6 @@ export class SubExchange {
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
     // Set callbacks.
-    this.subscribeZetaGroup(asset, callback);
-    this.subscribeGreeks(asset, callback);
     this.subscribePerpSyncQueue();
 
     this._isInitialized = true;
@@ -254,21 +219,6 @@ export class SubExchange {
   }
 
   /**
-   * Initializes the market nodes for a zeta group.
-   */
-  public async initializeMarketNodes(zetaGroup: PublicKey) {
-    let indexes = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
-    await Promise.all(
-      indexes.map(async (index: number) => {
-        let tx = new Transaction().add(
-          instructions.initializeMarketNodeIx(this.asset, index)
-        );
-        await utils.processTransaction(Exchange.provider, tx);
-      })
-    );
-  }
-
-  /**
    * Update the pricing parameters for a zeta group.
    */
   public async updatePricingParameters(
@@ -282,7 +232,6 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
-    await this.updateZetaGroup();
   }
 
   /**
@@ -299,7 +248,6 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
-    await this.updateZetaGroup();
   }
 
   /**
@@ -316,7 +264,6 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
-    await this.updateZetaGroup();
   }
 
   /**
@@ -333,7 +280,6 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
-    await this.updateZetaGroup();
   }
 
   /**
@@ -343,26 +289,6 @@ export class SubExchange {
     let tx = new Transaction().add(
       instructions.toggleZetaGroupPerpsOnlyIx(
         this.asset,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-    await this.updateZetaGroup();
-  }
-
-  /**
-   * Update the volatility nodes for a surface.
-   */
-  public async updateVolatilityNodes(nodes: Array<anchor.BN>) {
-    if (nodes.length != constants.VOLATILITY_POINTS) {
-      throw Error(
-        `Invalid number of nodes. Expected ${constants.VOLATILITY_POINTS}.`
-      );
-    }
-    let tx = new Transaction().add(
-      instructions.updateVolatilityNodesIx(
-        this.asset,
-        nodes,
         Exchange.provider.wallet.publicKey
       )
     );
@@ -449,22 +375,11 @@ export class SubExchange {
       return;
     }
 
-    let indexes = [...Array(this.zetaGroup.products.length).keys()];
-    if (!Exchange.useLedger) {
-      await Promise.all(
-        indexes.map(async (i) => {
-          await this.initializeZetaMarket(
-            i,
-            marketIndexes,
-            marketIndexesAccount
-          );
-        })
-      );
-    } else {
-      for (var i = 0; i < this.zetaGroup.products.length; i++) {
-        await this.initializeZetaMarket(i, marketIndexes, marketIndexesAccount);
-      }
-    }
+    await this.initializeZetaMarket(
+      constants.PERP_INDEX,
+      marketIndexes,
+      marketIndexesAccount
+    );
   }
 
   private async initializeZetaMarket(
@@ -567,18 +482,6 @@ export class SubExchange {
       )
     );
 
-    if (!this.zetaGroup.perpsOnly) {
-      for (let i = 0; i < constants.ACTIVE_MARKETS - 1; i++) {
-        ixs.push(
-          instructions.initializeZetaMarketTIFEpochCyclesIx(
-            this.asset,
-            i,
-            cycleLengthSecs
-          )
-        );
-      }
-    }
-
     let txs = utils.splitIxsIntoTx(
       ixs,
       constants.MAX_INITIALIZE_MARKET_TIF_EPOCH_CYCLE_IXS_PER_TX
@@ -617,32 +520,10 @@ export class SubExchange {
   }
 
   /**
-   * Polls the on chain account to update zeta group.
-   */
-  public async updateZetaGroup() {
-    this._zetaGroup = (await Exchange.program.account.zetaGroup.fetch(
-      this.zetaGroupAddress
-    )) as ZetaGroup;
-    this.updateMarginParams();
-  }
-
-  /**
    * Update pricing for an expiry index.
    */
-  public async updatePricing(expiryIndex: number | undefined) {
-    let tx = new Transaction().add(
-      instructions.updatePricingIx(this.asset, expiryIndex)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
-   * Retreat volatility surface and interest rates for an expiry index.
-   */
-  public async retreatMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(
-      instructions.retreatMarketNodesIx(this.asset, expiryIndex)
-    );
+  public async updatePricing() {
+    let tx = new Transaction().add(instructions.updatePricingV2Ix(this.asset));
     await utils.processTransaction(Exchange.provider, tx);
   }
 
@@ -652,69 +533,13 @@ export class SubExchange {
     }
   }
 
-  private subscribeZetaGroup(
-    asset: Asset,
-    callback?: (asset: Asset, type: EventType, data: any) => void
-  ) {
-    let eventEmitter = Exchange.program.account.zetaGroup.subscribe(
-      this._zetaGroupAddress,
-      Exchange.provider.connection.commitment
-    );
-
-    eventEmitter.on("change", async (zetaGroup: ZetaGroup) => {
-      let expiry =
-        this._zetaGroup !== undefined &&
-        this._zetaGroup.frontExpiryIndex !== zetaGroup.frontExpiryIndex;
-      this._zetaGroup = zetaGroup;
-      if (this._markets !== undefined) {
-        this._markets.updateExpirySeries();
-      }
-      this.updateMarginParams();
-      if (callback !== undefined) {
-        if (expiry) {
-          callback(this.asset, EventType.EXPIRY, null);
-        } else {
-          callback(this.asset, EventType.EXCHANGE, null);
-        }
-      }
-    });
-
-    this._eventEmitters.push(eventEmitter);
-  }
-
-  private subscribeGreeks(
-    asset: Asset,
-    callback?: (asset: Asset, type: EventType, data: any) => void
-  ) {
-    if (this._zetaGroup === null) {
-      throw Error("Cannot subscribe greeks. ZetaGroup is null.");
-    }
-
-    let eventEmitter = Exchange.program.account.greeks.subscribe(
-      this._zetaGroup.greeks,
-      Exchange.provider.connection.commitment
-    );
-
-    eventEmitter.on("change", async (greeks: Greeks) => {
-      this._greeks = greeks;
-      if (this._isInitialized) {
-        Exchange.riskCalculator.updateMarginRequirements(asset);
-      }
-      if (callback !== undefined) {
-        callback(this.asset, EventType.GREEKS, null);
-      }
-    });
-
-    this._eventEmitters.push(eventEmitter);
-  }
-
   private subscribePerpSyncQueue() {
-    if (this._zetaGroup === null) {
+    if (this._zetaGroupAddress === PublicKey.default) {
       throw Error("Cannot subscribe perpSyncQueue. ZetaGroup is null.");
     }
 
     let eventEmitter = Exchange.program.account.perpSyncQueue.subscribe(
-      this._zetaGroup.perpSyncQueue,
+      Exchange.pricing.perpSyncQueues[assetToIndex(this._asset)],
       Exchange.provider.connection.commitment
     );
 
@@ -733,7 +558,6 @@ export class SubExchange {
     if (!this._isInitialized) {
       return;
     }
-    await this.updateZetaGroup();
     this._markets.updateExpirySeries();
     if (callback !== undefined) {
       callback(this.asset, EventType.EXCHANGE, null);
@@ -743,18 +567,14 @@ export class SubExchange {
   }
 
   public async updateSubExchangeState() {
-    await this.updateZetaGroup();
     this._markets.updateExpirySeries();
   }
 
   /**
    * @param index   market index to get mark price.
    */
-  public getMarkPrice(index: number): number {
-    let price =
-      index == constants.PERP_INDEX
-        ? this._greeks.perpMarkPrice
-        : this._greeks.markPrices[index];
+  public getMarkPrice(): number {
+    let price = Exchange.pricing.markPrices[assetToIndex(this._asset)];
 
     return utils.convertNativeBNToDecimal(price, constants.PLATFORM_PRECISION);
   }
@@ -834,7 +654,7 @@ export class SubExchange {
     ) {
       let tx = new Transaction();
       let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
-      tx.add(instructions.rebalanceInsuranceVaultIx(this.asset, slice));
+      tx.add(instructions.rebalanceInsuranceVaultIx(slice));
       txs.push(tx);
     }
     try {
@@ -850,52 +670,18 @@ export class SubExchange {
   }
 
   public updateMarginParams() {
-    if (this.zetaGroup === undefined) {
+    if (Exchange.pricing === undefined) {
       return;
     }
     this._marginParams = {
       futureMarginInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.futureMarginInitial,
+        Exchange.pricing.marginParameters[assetToIndex(this._asset)]
+          .futureMarginInitial,
         constants.MARGIN_PRECISION
       ),
       futureMarginMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.futureMarginMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionMarkPercentageLongInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionMarkPercentageLongInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageLongInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageLongInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageShortInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageShortInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionDynamicPercentageShortInitial: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionDynamicPercentageShortInitial,
-        constants.MARGIN_PRECISION
-      ),
-      optionMarkPercentageLongMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionMarkPercentageLongMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageLongMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageLongMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionSpotPercentageShortMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionSpotPercentageShortMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionDynamicPercentageShortMaintenance: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionDynamicPercentageShortMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-      optionShortPutCapPercentage: utils.convertNativeBNToDecimal(
-        this.zetaGroup.marginParameters.optionShortPutCapPercentage,
+        Exchange.pricing.marginParameters[assetToIndex(this._asset)]
+          .futureMarginMaintenance,
         constants.MARGIN_PRECISION
       ),
     };
@@ -906,40 +692,33 @@ export class SubExchange {
    */
 
   public assertHalted() {
-    if (!this.zetaGroup.haltState.halted) {
-      throw "Zeta group not halted.";
+    if (!Exchange.state.haltStates[assetToIndex(this.asset)].halted) {
+      throw "Not halted.";
     }
   }
 
-  public async haltZetaGroup(zetaGroupAddress: PublicKey) {
+  public async halt() {
     let tx = new Transaction().add(
-      instructions.haltZetaGroupIx(
-        this.asset,
-        zetaGroupAddress,
-        Exchange.provider.wallet.publicKey
-      )
+      instructions.haltIx(this.asset, Exchange.provider.wallet.publicKey)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async unhaltZetaGroup() {
+  public async unhalt() {
     let tx = new Transaction().add(
-      instructions.unhaltZetaGroupIx(
-        this._asset,
-        Exchange.provider.wallet.publicKey
-      )
+      instructions.unhaltIx(this.asset, Exchange.provider.wallet.publicKey)
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  public async updateHaltState(
-    zetaGroupAddress: PublicKey,
-    args: instructions.UpdateHaltStateArgs
-  ) {
+  public async updateHaltState(timestamp: anchor.BN, spotPrice: anchor.BN) {
     let tx = new Transaction().add(
       instructions.updateHaltStateIx(
-        zetaGroupAddress,
-        args,
+        {
+          asset: toProgramAsset(this.asset),
+          spotPrice: spotPrice,
+          timestamp: timestamp,
+        },
         Exchange.provider.wallet.publicKey
       )
     );
@@ -948,22 +727,7 @@ export class SubExchange {
 
   public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
     let txs = instructions.settlePositionsHaltedTxs(
-      this.asset,
       marginAccounts,
-      Exchange.provider.wallet.publicKey
-    );
-
-    await Promise.all(
-      txs.map(async (tx) => {
-        await utils.processTransaction(Exchange.provider, tx);
-      })
-    );
-  }
-
-  public async settleSpreadPositionsHalted(spreadAccounts: AccountMeta[]) {
-    let txs = instructions.settleSpreadPositionsHaltedTxs(
-      this.asset,
-      spreadAccounts,
       Exchange.provider.wallet.publicKey
     );
 
@@ -985,70 +749,12 @@ export class SubExchange {
 
   public async cleanZetaMarketsHalted() {
     this.assertHalted();
-    let marketAccounts = await Promise.all(
-      this._markets.markets.map(async (market) => {
-        return utils.getMutMarketAccounts(this.asset, market.marketIndex);
-      })
-    );
-    if (this.zetaGroup.perpsOnly) {
-      marketAccounts = [];
-    }
+    let marketAccounts = [];
     marketAccounts.push(
       (this._markets.perpMarket,
       utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
     );
-    await utils.cleanZetaMarketsHalted(this.asset, marketAccounts);
-  }
-
-  public async updatePricingHalted(expiryIndex: number | undefined) {
-    let tx = new Transaction().add(
-      instructions.updatePricingHaltedIx(
-        this.asset,
-        expiryIndex,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async cleanMarketNodes(expiryIndex: number) {
-    let tx = new Transaction().add(
-      instructions.cleanMarketNodesIx(this.asset, expiryIndex)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async updateVolatility(args: instructions.UpdateVolatilityArgs) {
-    let tx = new Transaction().add(
-      instructions.updateVolatilityIx(
-        this.asset,
-        args,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public async updateInterestRate(args: instructions.UpdateInterestRateArgs) {
-    let tx = new Transaction().add(
-      instructions.updateInterestRateIx(
-        this.asset,
-        args,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public getProductGreeks(
-    marketIndex: number,
-    expiryIndex: number
-  ): ProductGreeks {
-    let index =
-      ((marketIndex - expiryIndex * constants.PRODUCTS_PER_EXPIRY) %
-        constants.NUM_STRIKES) +
-      expiryIndex * constants.NUM_STRIKES;
-    return this._greeks.productGreeks[index];
+    await utils.cleanZetaMarketsHalted(marketAccounts);
   }
 
   /**
@@ -1058,12 +764,8 @@ export class SubExchange {
     this._isInitialized = false;
     this._isSetup = false;
 
-    await Exchange.program.account.zetaGroup.unsubscribe(
-      this._zetaGroupAddress
-    );
-    await Exchange.program.account.greeks.unsubscribe(this._zetaGroup.greeks);
     await Exchange.program.account.perpSyncQueue.unsubscribe(
-      this._zetaGroup.perpSyncQueue
+      Exchange.pricing.perpSyncQueues[assetToIndex(this._asset)]
     );
     for (var i = 0; i < this._eventEmitters.length; i++) {
       this._eventEmitters[i].removeListener("change");

@@ -307,6 +307,13 @@ export function getZetaGroup(
   );
 }
 
+export function getPricing(programId: PublicKey): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("pricing"))],
+    programId
+  );
+}
+
 export function getUnderlying(
   programId: PublicKey,
   underlyingIndex: number
@@ -926,34 +933,6 @@ export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms, undefined));
 }
 
-// Returns the market indices ordered such that front expiry indexes are first.
-export function getOrderedMarketIndexes(asset: Asset): number[] {
-  let subExchange = Exchange.getSubExchange(asset);
-  let indexes = Array.from(Array(subExchange.zetaGroup.products.length).keys());
-  let frontExpiryIndex = subExchange.zetaGroup.frontExpiryIndex;
-  let backExpiryIndex = (frontExpiryIndex + 1) % 2;
-  let frontStart = frontExpiryIndex * constants.PRODUCTS_PER_EXPIRY;
-  let backStart = backExpiryIndex * constants.PRODUCTS_PER_EXPIRY;
-  indexes = indexes
-    .slice(frontStart, frontStart + constants.PRODUCTS_PER_EXPIRY)
-    .concat(
-      indexes.slice(backStart, backStart + constants.PRODUCTS_PER_EXPIRY)
-    );
-  return indexes;
-}
-
-export function getDirtySeriesIndices(asset: Asset): number[] {
-  let dirtyIndices = [];
-  let subExchange = Exchange.getSubExchange(asset);
-  for (var i = 0; i < subExchange.zetaGroup.expirySeries.length; i++) {
-    if (subExchange.zetaGroup.expirySeries[i].dirty) {
-      dirtyIndices.push(i);
-    }
-  }
-
-  return dirtyIndices;
-}
-
 /**
  * Given a market index, return the index to access the greeks.productGreeks.
  */
@@ -969,46 +948,19 @@ function printMarkets(markets: Market[], subExchange: SubExchange) {
   for (var j = 0; j < markets.length; j++) {
     let market = markets[j];
 
-    // Custom log for perps
     if (market.kind == types.Kind.PERP) {
-      let markPrice = subExchange.getMarkPrice(market.marketIndex);
+      let markPrice = subExchange.getMarkPrice();
       console.log(
         `[MARKET] INDEX: ${constants.PERP_INDEX} KIND: ${
           market.kind
         } MARK_PRICE ${markPrice.toFixed(6)}`
       );
       return;
+
+      // Non-perps not supported
+    } else {
+      continue;
     }
-
-    let greeksIndex = getGreeksIndex(market.marketIndex);
-    let markPrice = subExchange.getMarkPrice(market.marketIndex);
-
-    let delta = 1;
-    let sigma = 0;
-    let vega = 0;
-
-    if (market.kind != types.Kind.FUTURE) {
-      delta = convertNativeBNToDecimal(
-        subExchange.greeks.productGreeks[greeksIndex].delta,
-        constants.PRICING_PRECISION
-      );
-
-      sigma = Decimal.fromAnchorDecimal(
-        subExchange.greeks.productGreeks[greeksIndex].volatility
-      ).toNumber();
-
-      vega = Decimal.fromAnchorDecimal(
-        subExchange.greeks.productGreeks[greeksIndex].vega
-      ).toNumber();
-    }
-
-    console.log(
-      `[MARKET] INDEX: ${market.marketIndex} KIND: ${market.kind} STRIKE: ${
-        market.strike
-      } MARK_PRICE: ${markPrice.toFixed(6)} DELTA: ${delta.toFixed(
-        2
-      )} IV: ${sigma.toFixed(6)} VEGA: ${vega.toFixed(6)}`
-    );
   }
 }
 
@@ -1018,40 +970,6 @@ export function displayState() {
   for (var [asset, subExchange] of subExchanges) {
     // Products without expiries, ie perps
     printMarkets([subExchange.markets.perpMarket], subExchange);
-    if (subExchange.zetaGroup.perpsOnly) {
-      continue;
-    }
-
-    let orderedIndexes = [
-      subExchange.zetaGroup.frontExpiryIndex,
-      getMostRecentExpiredIndex(asset),
-    ];
-
-    console.log(
-      `[EXCHANGE ${assetToName(subExchange.asset)}] Display market state...`
-    );
-
-    // Products with expiries, ie options and futures
-    for (var i = 0; i < orderedIndexes.length; i++) {
-      let index = orderedIndexes[i];
-      let expirySeries = subExchange.markets.expirySeries[index];
-      console.log(
-        `Active @ ${new Date(
-          expirySeries.activeTs * 1000
-        )}, Expiration @ ${new Date(
-          expirySeries.expiryTs * 1000
-        )} Live: ${expirySeries.isLive()}`
-      );
-      let interestRate = convertNativeBNToDecimal(
-        subExchange.greeks.interestRate[index],
-        constants.PRICING_PRECISION
-      );
-      console.log(`Interest rate: ${interestRate}`);
-      printMarkets(
-        subExchange.markets.getMarketsByExpiryIndex(index),
-        subExchange
-      );
-    }
   }
 }
 
@@ -1076,48 +994,6 @@ export async function getMarginFromOpenOrders(
   return marginAccount;
 }
 
-export function getNextStrikeInitialisationTs(asset: Asset) {
-  let subExchange = Exchange.getSubExchange(asset);
-  // If front expiration index is uninitialized
-  let frontExpirySeries =
-    subExchange.markets.expirySeries[subExchange.markets.frontExpiryIndex];
-  if (!frontExpirySeries.strikesInitialized) {
-    return (
-      frontExpirySeries.activeTs -
-      Exchange.state.strikeInitializationThresholdSeconds
-    );
-  }
-
-  // Checks for the first uninitialized back expiry series after our front expiry index
-  let backExpiryTs = 0;
-  let expiryIndex = subExchange.markets.frontExpiryIndex;
-  for (var i = 0; i < subExchange.markets.expirySeries.length; i++) {
-    // Wrap around
-    if (expiryIndex == subExchange.markets.expirySeries.length) {
-      expiryIndex = 0;
-    }
-
-    if (!subExchange.markets.expirySeries[expiryIndex].strikesInitialized) {
-      return (
-        subExchange.markets.expirySeries[expiryIndex].activeTs -
-        Exchange.state.strikeInitializationThresholdSeconds
-      );
-    }
-    backExpiryTs = Math.max(
-      backExpiryTs,
-      subExchange.markets.expirySeries[expiryIndex].expiryTs
-    );
-
-    expiryIndex++;
-  }
-
-  return (
-    backExpiryTs -
-    Exchange.state.strikeInitializationThresholdSeconds -
-    subExchange.zetaGroup.newExpiryThresholdSeconds
-  );
-}
-
 export async function cleanZetaMarkets(
   asset: Asset,
   marketAccountTuples: any[]
@@ -1140,10 +1016,7 @@ export async function cleanZetaMarkets(
   );
 }
 
-export async function cleanZetaMarketsHalted(
-  asset: Asset,
-  marketAccountTuples: any[]
-) {
+export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
   let txs: Transaction[] = [];
   for (
     var i = 0;
@@ -1152,67 +1025,12 @@ export async function cleanZetaMarketsHalted(
   ) {
     let tx = new Transaction();
     let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
-    tx.add(instructions.cleanZetaMarketsHaltedIx(asset, slice.flat()));
+    tx.add(instructions.cleanZetaMarketsHaltedIx(slice.flat()));
     txs.push(tx);
   }
   await Promise.all(
     txs.map(async (tx) => {
       await processTransaction(Exchange.provider, tx);
-    })
-  );
-}
-
-export async function settleUsers(
-  asset: Asset,
-  keys: PublicKey[],
-  expiryTs: anchor.BN,
-  accountType: types.ProgramAccountType = types.ProgramAccountType.MarginAccount
-) {
-  let [settlement, settlementNonce] = getSettlement(
-    Exchange.programId,
-    Exchange.getSubExchange(asset).zetaGroup.underlyingMint,
-    expiryTs
-  );
-
-  let remainingAccounts = keys.map((key) => {
-    return { pubkey: key, isSigner: false, isWritable: true };
-  });
-
-  let txs = [];
-  for (
-    var i = 0;
-    i < remainingAccounts.length;
-    i += constants.MAX_SETTLEMENT_ACCOUNTS
-  ) {
-    let tx = new Transaction();
-    let slice = remainingAccounts.slice(
-      i,
-      i + constants.MAX_SETTLEMENT_ACCOUNTS
-    );
-    tx.add(
-      accountType == types.ProgramAccountType.MarginAccount
-        ? instructions.settlePositionsIx(
-            asset,
-            expiryTs,
-            settlement,
-            settlementNonce,
-            slice
-          )
-        : instructions.settleSpreadPositionsIx(
-            asset,
-            expiryTs,
-            settlement,
-            settlementNonce,
-            slice
-          )
-    );
-    txs.push(tx);
-  }
-
-  await Promise.all(
-    txs.map(async (tx) => {
-      let txSig = await processTransaction(Exchange.provider, tx);
-      console.log(`Settling users - TxId: ${txSig}`);
     })
   );
 }
@@ -1291,21 +1109,6 @@ export async function crankMarket(
     })
   );
 
-  if (marketIndex == constants.PERP_INDEX) {
-    remainingAccounts.unshift(
-      {
-        pubkey: Exchange.getSubExchange(asset).greeksAddress,
-        isSigner: false,
-        isWritable: true,
-      },
-      {
-        pubkey: Exchange.getSubExchange(asset).perpSyncQueueAddress,
-        isSigner: false,
-        isWritable: true,
-      }
-    );
-  }
-
   let tx = new Transaction().add(
     instructions.crankMarketIx(
       asset,
@@ -1337,33 +1140,6 @@ export async function pruneExpiredTIFOrders(
       return processTransaction(Exchange.provider, tx);
     })
   );
-}
-
-export async function expireSeries(asset: Asset, expiryTs: anchor.BN) {
-  let subExchange = Exchange.getSubExchange(asset);
-  let [settlement, settlementNonce] = getSettlement(
-    Exchange.programId,
-    subExchange.zetaGroup.underlyingMint,
-    expiryTs
-  );
-
-  // TODO add some looping mechanism if called early.
-  let ix = Exchange.program.instruction.expireSeries(settlementNonce, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: subExchange.zetaGroupAddress,
-      oracle: subExchange.zetaGroup.oracle,
-      oracleBackupFeed: subExchange.zetaGroup.oracleBackupFeed,
-      oracleBackupProgram: constants.CHAINLINK_PID,
-      settlementAccount: settlement,
-      payer: Exchange.provider.wallet.publicKey,
-      systemProgram: SystemProgram.programId,
-      greeks: subExchange.zetaGroup.greeks,
-    },
-  });
-
-  let tx = new Transaction().add(ix);
-  await processTransaction(Exchange.provider, tx);
 }
 
 /**
@@ -1401,7 +1177,7 @@ export function getMutMarketAccounts(
 export async function getCancelAllIxs(
   asset: Asset,
   orders: any[],
-  expiration: boolean
+  _expiration: boolean
 ): Promise<TransactionInstruction[]> {
   let ixs: TransactionInstruction[] = [];
   await Promise.all(
@@ -1422,23 +1198,14 @@ export async function getCancelAllIxs(
         openOrdersMapInfo.userKey
       );
 
-      let ix = expiration
-        ? instructions.cancelExpiredOrderIx(
-            asset,
-            order.marketIndex,
-            marginAccount,
-            order.owner,
-            order.orderId,
-            order.side
-          )
-        : instructions.cancelOrderHaltedIx(
-            asset,
-            order.marketIndex,
-            marginAccount,
-            order.owner,
-            order.orderId,
-            order.side
-          );
+      let ix = instructions.cancelOrderHaltedIx(
+        asset,
+        order.marketIndex,
+        marginAccount,
+        order.owner,
+        order.orderId,
+        order.side
+      );
       ixs.push(ix);
     })
   );

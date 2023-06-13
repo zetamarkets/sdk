@@ -4,7 +4,6 @@ import { Asset } from "./assets";
 import {
   Position,
   SpreadAccount,
-  ZetaGroup,
   MarginAccount,
   ProductLedger,
 } from "./program-types";
@@ -70,28 +69,17 @@ export function calculateProductMargin(
   productIndex: number,
   spotPrice: number
 ): types.MarginRequirement {
-  let subExchange = Exchange.getSubExchange(asset);
   let market = Exchange.getMarket(asset, productIndex);
   if (market.strike == null) {
     return null;
   }
   let kind = market.kind;
-  let strike = market.strike;
 
   switch (kind) {
-    case types.Kind.FUTURE:
-      return calculateFutureMargin(asset, spotPrice);
-    case types.Kind.CALL:
-    case types.Kind.PUT:
-      return calculateOptionMargin(
-        asset,
-        spotPrice,
-        convertNativeBNToDecimal(subExchange.greeks.markPrices[productIndex]),
-        kind,
-        strike
-      );
     case types.Kind.PERP:
       return calculatePerpMargin(asset, spotPrice);
+    default:
+      throw Error("Non-perp not supported");
   }
 }
 
@@ -128,147 +116,10 @@ export function calculatePerpMargin(
   return calculateFutureMargin(asset, spotPrice);
 }
 
-/**
- * @param asset             underlying asset (SOL, BTC, etc.)
- * @param markPrice         mark price of product being calculated.
- * @param spotPrice         spot price of the underlying from oracle.
- * @param strike            strike of the option.
- * @param kind              kind of the option (expect CALL/PUT)
- */
-export function calculateOptionMargin(
-  asset: Asset,
-  spotPrice: number,
-  markPrice: number,
-  kind: types.Kind,
-  strike: number
-): types.MarginRequirement {
-  let otmAmount = calculateOtmAmount(kind, strike, spotPrice);
-  let initialLong = calculateLongOptionMargin(
-    asset,
-    spotPrice,
-    markPrice,
-    types.MarginType.INITIAL
-  );
-  let initialShort = calculateShortOptionMargin(
-    asset,
-    spotPrice,
-    otmAmount,
-    types.MarginType.INITIAL
-  );
-  let maintenanceLong = calculateLongOptionMargin(
-    asset,
-    spotPrice,
-    markPrice,
-    types.MarginType.MAINTENANCE
-  );
-  let maintenanceShort = calculateShortOptionMargin(
-    asset,
-    spotPrice,
-    otmAmount,
-    types.MarginType.MAINTENANCE
-  );
-  let subExchange = Exchange.getSubExchange(asset);
-  return {
-    initialLong,
-    initialShort:
-      kind == types.Kind.PUT
-        ? Math.min(
-            initialShort,
-            subExchange.marginParams.optionShortPutCapPercentage * strike
-          )
-        : initialShort,
-    maintenanceLong,
-    maintenanceShort:
-      kind == types.Kind.PUT
-        ? Math.min(
-            maintenanceShort,
-            subExchange.marginParams.optionShortPutCapPercentage * strike
-          )
-        : maintenanceShort,
-  };
-}
-
-/**
- * Calculates the margin requirement for a short option.
- * @param asset        underlying asset (SOL, BTC, etc.)
- * @param spotPrice    margin account balance.
- * @param otmAmount    otm amount calculated `from calculateOtmAmount`
- * @param marginType   type of margin calculation
- */
-export function calculateShortOptionMargin(
-  asset: Asset,
-  spotPrice: number,
-  otmAmount: number,
-  marginType: types.MarginType
-): number {
-  let subExchange = Exchange.getSubExchange(asset);
-  let basePercentageShort =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionDynamicPercentageShortInitial
-      : subExchange.marginParams.optionDynamicPercentageShortMaintenance;
-
-  let spotPricePercentageShort =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionSpotPercentageShortInitial
-      : subExchange.marginParams.optionSpotPercentageShortMaintenance;
-
-  let dynamicMargin = spotPrice * (basePercentageShort - otmAmount / spotPrice);
-  let minMargin = spotPrice * spotPricePercentageShort;
-  return Math.max(dynamicMargin, minMargin);
-}
-
-/**
- * Calculates the margin requirement for a long option.
- * @param asset        underlying asset (SOL, BTC, etc.)
- * @param spotPrice    margin account balance.
- * @param markPrice    mark price of option from greeks account.
- * @param marginType   type of margin calculation
- */
-export function calculateLongOptionMargin(
-  asset: Asset,
-  spotPrice: number,
-  markPrice: number,
-  marginType: types.MarginType
-): number {
-  let subExchange = Exchange.getSubExchange(asset);
-  let markPercentageLong =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionMarkPercentageLongInitial
-      : subExchange.marginParams.optionMarkPercentageLongMaintenance;
-
-  let spotPercentageLong =
-    marginType == types.MarginType.INITIAL
-      ? subExchange.marginParams.optionSpotPercentageLongInitial
-      : subExchange.marginParams.optionSpotPercentageLongMaintenance;
-
-  return Math.min(
-    markPrice * markPercentageLong,
-    spotPrice * spotPercentageLong
-  );
-}
-
 export function calculateSpreadAccountMarginRequirement(
-  spreadAccount: SpreadAccount,
-  zetaGroup: ZetaGroup
+  spreadAccount: SpreadAccount
 ) {
-  let marginRequirement = 0;
-  for (let i = 0; i < zetaGroup.expirySeries.length; i++) {
-    // Skip if strikes are uninitialised
-    if (!zetaGroup.products[i].strike.isSet) {
-      continue;
-    }
-    let strikes = Exchange.getSubExchange(
-      assets.fromProgramAsset(zetaGroup.asset)
-    )
-      .markets.getStrikesByExpiryIndex(i)
-      // Convert to native integer, as all calculations are worked in native size
-      .map((strike) => convertDecimalToNativeInteger(strike));
-    let positions = getPositionsByExpiryIndexforSpreadAccount(spreadAccount, i);
-    marginRequirement =
-      marginRequirement + calculateSpreadMarginRequirements(strikes, positions);
-  }
-
-  return marginRequirement;
+  return 0;
 }
 
 /**
@@ -392,7 +243,6 @@ export function checkMarginAccountMarginRequirement(
 }
 
 export function movePositions(
-  zetaGroup: ZetaGroup,
   spreadAccount: SpreadAccount,
   marginAccount: MarginAccount,
   movementType: types.MovementType,
@@ -414,10 +264,8 @@ export function movePositions(
     }
   }
 
-  let spreadMarginRequirements = calculateSpreadAccountMarginRequirement(
-    spreadAccount,
-    zetaGroup
-  );
+  let spreadMarginRequirements =
+    calculateSpreadAccountMarginRequirement(spreadAccount);
 
   if (spreadMarginRequirements > spreadAccount.balance.toNumber()) {
     let diff = spreadMarginRequirements - spreadAccount.balance.toNumber();
