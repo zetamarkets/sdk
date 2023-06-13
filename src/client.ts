@@ -444,13 +444,7 @@ export class Client {
         options
       );
     } else {
-      return await this.getSubClient(asset).placeOrder(
-        marketPubkey,
-        price,
-        size,
-        side,
-        options
-      );
+      throw Error("Cannot place non-perp order");
     }
   }
 
@@ -477,23 +471,6 @@ export class Client {
     options: types.OrderOptions = types.defaultOrderOptions()
   ): TransactionInstruction {
     return this.getSubClient(asset).createPlacePerpOrderInstruction(
-      price,
-      size,
-      side,
-      options
-    );
-  }
-
-  public createPlaceOrderInstruction(
-    asset: Asset,
-    marketIndex: number,
-    price: number,
-    size: number,
-    side: types.Side,
-    options: types.OrderOptions = types.defaultOrderOptions()
-  ): TransactionInstruction {
-    return this.getSubClient(asset).createPlaceOrderInstruction(
-      marketIndex,
       price,
       size,
       side,
@@ -543,7 +520,7 @@ export class Client {
 
     // Create withdraw ix
     tx.add(
-      instructions.withdrawIx(
+      instructions.withdrawV2Ix(
         withdrawAsset,
         amount,
         withdrawSubClient.marginAccountAddress,
@@ -564,7 +541,7 @@ export class Client {
       );
     }
     tx.add(
-      instructions.depositIx(
+      instructions.depositV2Ix(
         depositAsset,
         amount,
         depositSubClient.marginAccountAddress,
@@ -734,23 +711,6 @@ export class Client {
     asset: Asset
   ): Promise<TransactionSignature> {
     return await this.getSubClient(asset).withdrawAndCloseMarginAccount();
-  }
-
-  public async placeOrderAndLockPosition(
-    asset: Asset,
-    market: types.MarketIdentifier,
-    price: number,
-    size: number,
-    side: types.Side,
-    tag: String = constants.DEFAULT_ORDER_TAG
-  ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).placeOrderAndLockPosition(
-      this.marketIdentifierToPublicKey(asset, market),
-      price,
-      size,
-      side,
-      tag
-    );
   }
 
   public async cancelAllPerpMarketOrders(): Promise<TransactionSignature> {
@@ -1019,28 +979,6 @@ export class Client {
       this.marketIdentifierToPublicKey(asset, market),
       liquidatedMarginAccount,
       size
-    );
-  }
-
-  public async positionMovement(
-    asset: Asset,
-    movementType: types.MovementType,
-    movements: instructions.PositionMovementArg[]
-  ): Promise<TransactionSignature> {
-    return await this.getSubClient(asset).positionMovement(
-      movementType,
-      movements
-    );
-  }
-
-  public async simulatePositionMovement(
-    asset: Asset,
-    movementType: types.MovementType,
-    movements: instructions.PositionMovementArg[]
-  ): Promise<PositionMovementEvent> {
-    return await this.getSubClient(asset).simulatePositionMovement(
-      movementType,
-      movements
     );
   }
 
