@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.29.2] 2023-06-13
+
+- exchange: Better Pricing account subscription.
+
 ## [0.29.1] 2023-06-08
 
 - general: New set of instructions for Pricing account. ([#234](https://github.com/zetamarkets/sdk/pull/234)). Notable changes:
