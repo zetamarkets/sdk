@@ -25,7 +25,8 @@ import {
 import BufferLayout from "buffer-layout";
 const BN = anchor.BN;
 import * as bs58 from "bs58";
-import { Asset, assetToName, nameToAsset } from "./assets";
+import { assetToName, nameToAsset } from "./assets";
+import { Asset } from "./constants";
 import * as fs from "fs";
 import * as constants from "./constants";
 import * as errors from "./errors";
@@ -760,7 +761,7 @@ export async function processTransaction(
 ): Promise<TransactionSignature> {
   let rawTx: Buffer | Uint8Array;
 
-  if (Exchange.usePriorityFees) {
+  if (Exchange.priorityFee != 0) {
     tx.instructions.unshift(
       ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: Exchange.priorityFee,
@@ -1219,7 +1220,7 @@ export function writeKeypair(filename: string, keypair: Keypair) {
 
 export async function getAllProgramAccountAddresses(
   accountType: types.ProgramAccountType,
-  asset: assets.Asset = undefined
+  asset: Asset = undefined
 ): Promise<PublicKey[]> {
   let filters = [
     {
@@ -1625,7 +1626,7 @@ export function getZetaLutArr(): AddressLookupTableAccount[] {
   return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
 }
 
-export function getUnderlyingMint(asset: assets.Asset) {
+export function getUnderlyingMint(asset: Asset) {
   if (asset in constants.MINTS) {
     return constants.MINTS[asset];
   }
@@ -1635,6 +1636,13 @@ export function getUnderlyingMint(asset: assets.Asset) {
   throw Error("Underlying mint does not exist!");
 }
 
-export function isFlexUnderlying(asset: assets.Asset) {
+export function isFlexUnderlying(asset: Asset) {
   return asset in constants.FLEX_MINTS[Exchange.network];
+}
+
+export function median(arr: number[]): number | undefined {
+  if (!arr.length) return undefined;
+  const s = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
 }

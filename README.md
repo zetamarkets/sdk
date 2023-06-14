@@ -469,14 +469,16 @@ Additional priority fees can be set to maximise your transaction's chance of suc
 ```ts
 // Exchange.load() needs to be called first
 
-let fee = 300; // microlamports per CU
-
-// turn on priority fees for the first time
-Exchange.toggleUsePriorityFees(fee);
-
 // update priority fee amount
 fee = 500;
 Exchange.updatePriorityFee(fee);
+
+// turn off priority fees
+Exchange.updatePriorityFee(0);
+
+// turn on automatic priority fee polling
+// this uses the getRecentPrioritizationFees RPC method
+Exchange.toggleAutoPriorityFee();
 ```
 
 ### Versioned Transactions

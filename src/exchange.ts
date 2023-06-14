@@ -20,7 +20,8 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
 import * as types from "./types";
-import { Asset, assetToIndex, toProgramAsset } from "./assets";
+import { assetToIndex, toProgramAsset } from "./assets";
+import { Asset } from "./constants";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
@@ -278,24 +279,18 @@ export class Exchange {
   }
   private _priorityFee: number = 0;
 
-  public get usePriorityFees(): boolean {
-    return this._usePriorityFees;
+  public get useAutoPriorityFee(): boolean {
+    return this._useAutoPriorityFee;
   }
-  private _usePriorityFees: boolean = false;
+  private _useAutoPriorityFee: boolean = false;
 
   public get blockhashCommitment(): Commitment {
     return this._blockhashCommitment;
   }
   private _blockhashCommitment: Commitment = "finalized";
 
-  public toggleUsePriorityFees(
-    microLamportsPerCU: number = constants.DEFAULT_MICRO_LAMPORTS_PER_CU_FEE
-  ) {
-    if (this._usePriorityFees) {
-      throw Error("Priority fees already turned on");
-    }
-    this._usePriorityFees = true;
-    this._priorityFee = microLamportsPerCU;
+  public toggleAutoPriorityFee() {
+    this._useAutoPriorityFee = !this._useAutoPriorityFee;
   }
 
   public updatePriorityFee(microLamportsPerCU: number) {
@@ -591,6 +586,7 @@ export class Exchange {
 
     const clockData = utils.getClockData(accFetches.at(-1));
     this.subscribeClock(clockData, callback);
+    this.subscribePricing(callback);
 
     await Promise.all(
       this.assets.map(async (asset, i) => {
@@ -628,6 +624,41 @@ export class Exchange {
 
   public getAllSubExchanges(): SubExchange[] {
     return [...this._subExchanges.values()];
+  }
+
+  private async updateAutoFee() {
+    let accountList = [];
+
+    // Query the most written-to accounts
+    // Note: getRecentPrioritizationFees() will account for global fees too if no one is writing to our accs
+    for (var asset of this.assets) {
+      let sub = this.getSubExchange(asset);
+      accountList.push(sub.perpSyncQueueAddress.toString());
+      accountList.push(sub.greeksAddress.toString());
+    }
+
+    try {
+      let data = await fetch(this.provider.connection.rpcEndpoint, {
+        method: "post",
+        body: `{"jsonrpc":"2.0", "id":1, "method":"getRecentPrioritizationFees", "params":[["${accountList.join(
+          `","`
+        )}"]]}`,
+        headers: { "Content-Type": "application/json" },
+      });
+
+      let fees = (await data.json()).result
+        .sort((a, b) => b.slot - a.slot) // Sort descending
+        .slice(0, 20) // Grab the latest 20
+        .map((obj) => obj.prioritizationFee); // Take a list of prioritizationFee values only
+
+      let median = utils.median(fees);
+      console.log(
+        `AutoUpdate priority fee. New fee = ${median} microlamports per compute unit`
+      );
+      this._priorityFee = median;
+    } catch (e) {
+      console.log(`updateAutoFee failed ${e}`);
+    }
   }
 
   private async subscribeOracle(
@@ -682,10 +713,12 @@ export class Exchange {
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
               this.getAllSubExchanges().map(async (subExchange) => {
-                await this.updateZetaPricing();
                 await subExchange.handlePolling(callback);
               })
             );
+            if (this.useAutoPriorityFee == true) {
+              await this.updateAutoFee();
+            }
           }
         } catch (e) {
           console.log(`SubExchange polling failed. Error: ${e}`);
@@ -739,6 +772,24 @@ export class Exchange {
     );
     await utils.processTransaction(this.provider, tx);
     await this.updateState();
+  }
+
+  private subscribePricing(
+    callback?: (asset: Asset, type: EventType, data: any) => void
+  ) {
+    let eventEmitter = this._program.account.pricing.subscribe(
+      this._pricingAddress,
+      this.provider.connection.commitment
+    );
+
+    eventEmitter.on("change", async (pricing: Pricing) => {
+      this._pricing = pricing;
+      if (callback !== undefined) {
+        callback(null, EventType.PRICING, null);
+      }
+    });
+
+    this._eventEmitters.push(eventEmitter);
   }
 
   public subscribeMarket(asset: Asset, index: number) {
@@ -1076,12 +1127,19 @@ export class Exchange {
       this._clockSubscriptionId = undefined;
     }
 
+    await this._program.account.pricing.unsubscribe(this._pricingAddress);
+
     for (var i = 0; i < this._programSubscriptionIds.length; i++) {
       await this.connection.removeProgramAccountChangeListener(
         this._programSubscriptionIds[i]
       );
     }
     this._programSubscriptionIds = [];
+
+    for (var i = 0; i < this._eventEmitters.length; i++) {
+      this._eventEmitters[i].removeListener("change");
+    }
+    this._eventEmitters = [];
   }
 }
 

@@ -17,7 +17,8 @@ import {
 } from "./utils";
 import * as types from "./types";
 import { EventType, OrderbookEvent } from "./events";
-import { Asset, assetToIndex } from "./assets";
+import { assetToIndex } from "./assets";
+import { Asset } from "./constants";
 import { getDecodedMarket } from "./serum/generate-decoded";
 
 export class ZetaGroupMarkets {

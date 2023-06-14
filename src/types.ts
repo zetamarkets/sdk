@@ -7,7 +7,8 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
-import { Asset, allAssets } from "./assets";
+import { allAssets } from "./assets";
+import { Asset } from "./constants";
 import { objectEquals } from "./utils";
 import { MarginAccount } from "./program-types";
 import { Network, types, utils } from ".";

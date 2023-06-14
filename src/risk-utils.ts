@@ -1,6 +1,6 @@
 import { BN } from "@zetamarkets/anchor";
 import { types, Exchange, constants, assets, instructions } from ".";
-import { Asset } from "./assets";
+import { Asset } from "./constants";
 import {
   Position,
   SpreadAccount,

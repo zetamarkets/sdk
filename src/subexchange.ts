@@ -17,7 +17,8 @@ import {
 import { Market, ZetaGroupMarkets } from "./market";
 import { EventType } from "./events";
 import { Network } from "./network";
-import { Asset, assetToIndex, assetToName, toProgramAsset } from "./assets";
+import { assetToIndex, assetToName, toProgramAsset } from "./assets";
+import { Asset } from "./constants";
 import * as instructions from "./program-instructions";
 import * as fs from "fs";
 import * as os from "os";

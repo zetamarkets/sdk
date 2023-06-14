@@ -23,7 +23,7 @@ import * as constants from "./constants";
 import { referUserIx } from "./program-instructions";
 import { EventType } from "./events";
 import * as types from "./types";
-import { Asset } from "./assets";
+import { Asset } from "./constants";
 import { SubClient } from "./subclient";
 import * as instructions from "./program-instructions";
 import { assets } from ".";
@@ -509,8 +509,8 @@ export class Client {
 
   public async migrateFunds(
     amount: number,
-    withdrawAsset: assets.Asset,
-    depositAsset: assets.Asset
+    withdrawAsset: Asset,
+    depositAsset: Asset
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
     await this.usdcAccountCheck();
