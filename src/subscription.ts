@@ -2,7 +2,7 @@ import * as types from "./types";
 import { PublicKey, Context, KeyedAccountInfo } from "@solana/web3.js";
 import * as anchor from "@zetamarkets/anchor";
 import * as bs58 from "bs58";
-import { Asset } from "./assets";
+import { Asset } from "./constants";
 import { exchange as Exchange } from "./exchange";
 
 export interface AccountSubscriptionData<T> {

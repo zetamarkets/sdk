@@ -3,14 +3,15 @@ import { parsePythData, Price } from "./oracle-utils";
 import { Network } from "./network";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
-import { assets } from "./";
+import { Asset } from "./constants";
+import { assetToName } from "./assets";
 
 export class Oracle {
   private _connection: Connection;
   private _network: Network;
-  private _data: Map<assets.Asset, OraclePrice>;
-  private _subscriptionIds: Map<assets.Asset, number>;
-  private _callback: (asset: assets.Asset, price: OraclePrice) => void;
+  private _data: Map<Asset, OraclePrice>;
+  private _subscriptionIds: Map<Asset, number>;
+  private _callback: (asset: Asset, price: OraclePrice) => void;
 
   public constructor(network: Network, connection: Connection) {
     this._network = network;
@@ -24,14 +25,14 @@ export class Oracle {
     return Object.keys(constants.PYTH_PRICE_FEEDS[this._network]);
   }
 
-  public getPrice(asset: assets.Asset): OraclePrice {
+  public getPrice(asset: Asset): OraclePrice {
     if (!this._data.has(asset)) {
       return null;
     }
     return this._data.get(asset);
   }
 
-  public getPriceAge(asset: assets.Asset): number {
+  public getPriceAge(asset: Asset): number {
     return Date.now() / 1000 - this.getPrice(asset).lastUpdatedTime;
   }
 
@@ -44,7 +45,7 @@ export class Oracle {
 
   // Fetch and update an oracle price manually
   public async pollPrice(
-    asset: assets.Asset,
+    asset: Asset,
     triggerCallback = true
   ): Promise<OraclePrice> {
     if (!(asset in constants.PYTH_PRICE_FEEDS[this._network])) {
@@ -69,8 +70,8 @@ export class Oracle {
   }
 
   public async subscribePriceFeeds(
-    assetList: assets.Asset[],
-    callback: (asset: assets.Asset, price: OraclePrice) => void
+    assetList: Asset[],
+    callback: (asset: Asset, price: OraclePrice) => void
   ) {
     if (this._callback != undefined) {
       throw Error("Oracle price feeds already subscribed to!");
@@ -79,7 +80,7 @@ export class Oracle {
 
     await Promise.all(
       assetList.map(async (asset) => {
-        console.log(`Oracle subscribing to feed ${assets.assetToName(asset)}`);
+        console.log(`Oracle subscribing to feed ${assetToName(asset)}`);
         let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
         let subscriptionId = this._connection.onAccountChange(
           priceAddress,
@@ -119,7 +120,7 @@ export class Oracle {
 }
 
 export interface OraclePrice {
-  asset: assets.Asset;
+  asset: Asset;
   price: number;
   lastUpdatedTime: number;
   lastUpdatedSlot: bigint;
