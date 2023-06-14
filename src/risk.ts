@@ -1,12 +1,16 @@
 import { exchange as Exchange } from "./exchange";
 import * as types from "./types";
 import * as constants from "./constants";
-import { MarginAccount, PositionMovementEvent } from "./program-types";
+import {
+  CrossMarginAccount,
+  MarginAccount,
+  PositionMovementEvent,
+} from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
-import { Asset, fromProgramAsset } from "./assets";
+import { Asset, assetToIndex, fromProgramAsset } from "./assets";
 import { BN } from "@zetamarkets/anchor";
 import { assets, Client, Decimal, instructions, utils } from ".";
 import { cloneDeep } from "lodash";
@@ -42,7 +46,7 @@ export class RiskCalculator {
 
   public updateMarginRequirements(asset: Asset) {
     if (Exchange.pricing === undefined || Exchange.oracle === undefined) {
-      throw Error("Pricing (greeks and/or oracle) is not initialized");
+      throw Error("Pricing is not initialized");
     }
     let oraclePrice = Exchange.oracle.getPrice(asset);
     let spotPrice = oraclePrice === null ? 0 : oraclePrice.price;
@@ -146,22 +150,39 @@ export class RiskCalculator {
     if (accountType == types.ProgramAccountType.SpreadAccount) {
       return 0;
     }
+    let funding = 0;
 
-    const position = account.perpProductLedger.position;
-    const size =
-      position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
-    let asset = fromProgramAsset(account.asset);
+    // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
+    let assetList =
+      accountType == types.ProgramAccountType.MarginAccount
+        ? [assets.fromProgramAsset(account.asset)]
+        : Exchange.assets;
 
-    let deltaDiff =
-      (Decimal.fromAnchorDecimal(
-        Exchange.pricing.fundingDeltas[assets.assetToIndex(asset)]
-      ).toNumber() -
-        Decimal.fromAnchorDecimal(account.lastFundingDelta).toNumber()) /
-      Math.pow(10, constants.PLATFORM_PRECISION);
+    for (var asset of assetList) {
+      const position =
+        accountType == types.ProgramAccountType.MarginAccount
+          ? account.perpProductLedger.position
+          : account.productLedgers[assets.assetToIndex(asset)].position;
 
-    // Note that there is some rounding occurs here in the Zeta program
-    // but we omit it in this function for simplicity
-    return -1 * size * deltaDiff;
+      const size =
+        position.size.toNumber() / Math.pow(10, constants.POSITION_PRECISION);
+
+      let deltaDiff =
+        (Decimal.fromAnchorDecimal(
+          Exchange.pricing.fundingDeltas[assetToIndex(asset)]
+        ).toNumber() -
+          Decimal.fromAnchorDecimal(
+            accountType == types.ProgramAccountType.MarginAccount
+              ? account.lastFundingDelta
+              : account.lastFundingDeltas[assetToIndex(asset)]
+          ).toNumber()) /
+        Math.pow(10, constants.PLATFORM_PRECISION);
+
+      // Note that there is some rounding occurs here in the Zeta program
+      // but we omit it in this function for simplicity
+      funding += -1 * size * deltaDiff;
+    }
+    return funding;
   }
 
   /**
@@ -177,8 +198,14 @@ export class RiskCalculator {
   ): number {
     let pnl = 0;
 
-    let i_list = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
-    i_list.push(constants.PERP_INDEX);
+    let i_list = [];
+
+    if (accountType == types.ProgramAccountType.CrossMarginAccount) {
+      i_list = [...Array(constants.ACTIVE_PERP_MARKETS - 1).keys()];
+    } else {
+      i_list = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
+      i_list.push(constants.PERP_INDEX);
+    }
 
     for (var i of i_list) {
       // No perps in spread accounts
@@ -189,19 +216,28 @@ export class RiskCalculator {
         continue;
       }
 
-      const position =
-        accountType == types.ProgramAccountType.MarginAccount
-          ? i == constants.PERP_INDEX
-            ? account.perpProductLedger.position // Margin account perp
-            : account.productLedgers[i].position // Margin account non-perp
-          : account.positions[i]; // Spread account
+      let position: any;
+      if (accountType == types.ProgramAccountType.MarginAccount) {
+        position = account.perpProductLedger.position;
+      } else if (accountType == types.ProgramAccountType.SpreadAccount) {
+        position = account.positions[i];
+      } else {
+        position = account.productLedgers[i].position;
+      }
+
       const size = position.size.toNumber();
       if (size == 0) {
         continue;
       }
-      let subExchange = Exchange.getSubExchange(
-        fromProgramAsset(account.asset)
-      );
+
+      let asset;
+      if (accountType == types.ProgramAccountType.CrossMarginAccount) {
+        asset = assets.indexToAsset(i);
+      } else {
+        asset = fromProgramAsset(account.asset);
+      }
+
+      let subExchange = Exchange.getSubExchange(asset);
       if (size > 0) {
         pnl +=
           convertNativeLotSizeToDecimal(size) *
@@ -221,7 +257,6 @@ export class RiskCalculator {
           subExchange.getMarkPrice();
       }
     }
-
     return pnl;
   }
 
@@ -232,65 +267,81 @@ export class RiskCalculator {
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalInitialMargin(
-    marginAccount: MarginAccount,
+    account: any,
+    accountType: types.ProgramAccountType = types.ProgramAccountType
+      .MarginAccount,
     skipConcession: boolean = false
   ): number {
-    let asset = fromProgramAsset(marginAccount.asset);
-    let marketMaker = types.isMarketMaker(marginAccount);
+    // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
+    let assetList =
+      accountType == types.ProgramAccountType.MarginAccount
+        ? [assets.fromProgramAsset(account.asset)]
+        : Exchange.assets;
 
-    let ledger = marginAccount.perpProductLedger;
+    let marginForMarkets = 0;
 
-    let size = ledger.position.size.toNumber();
-    let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
-    let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
-    if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
-      return 0;
-    }
+    for (var asset of assetList) {
+      let marketMaker = types.isMarketMaker(account.accountType);
 
-    let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
-    let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
+      const ledger =
+        accountType == types.ProgramAccountType.MarginAccount
+          ? account.perpProductLedger
+          : account.productLedgers[assets.assetToIndex(asset)];
 
-    if (!marketMaker || skipConcession) {
-      if (size > 0) {
-        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
-      } else if (size < 0) {
-        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      let size = ledger.position.size.toNumber();
+      let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
+      let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+      if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
+        return 0;
       }
-    }
 
-    let marginForMarket: number = undefined;
-    let longLotsMarginReq = this.getMarginRequirement(
-      asset,
-      constants.PERP_INDEX,
-      // Positive for buys.
-      longLots,
-      types.MarginType.INITIAL
-    );
-    let shortLotsMarginReq = this.getMarginRequirement(
-      asset,
-      constants.PERP_INDEX,
-      // Negative for sells.
-      -shortLots,
-      types.MarginType.INITIAL
-    );
+      let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
+      let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
 
-    marginForMarket =
-      longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
+      if (!marketMaker || skipConcession) {
+        if (size > 0) {
+          longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        } else if (size < 0) {
+          shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+        }
+      }
 
-    if (marketMaker && !skipConcession) {
-      // Mark initial margin to concession (only contains open order margin).
-      marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
-      // Add position margin which doesn't get concessions.
-      marginForMarket += this.getMarginRequirement(
+      let marginForMarket: number = undefined;
+      let longLotsMarginReq = this.getMarginRequirement(
         asset,
         constants.PERP_INDEX,
-        // This is signed.
-        convertNativeLotSizeToDecimal(size),
-        types.MarginType.MAINTENANCE
+        // Positive for buys.
+        longLots,
+        types.MarginType.INITIAL
       );
+      let shortLotsMarginReq = this.getMarginRequirement(
+        asset,
+        constants.PERP_INDEX,
+        // Negative for sells.
+        -shortLots,
+        types.MarginType.INITIAL
+      );
+
+      marginForMarket =
+        longLots > shortLots ? longLotsMarginReq : shortLotsMarginReq;
+
+      if (marketMaker && !skipConcession) {
+        // Mark initial margin to concession (only contains open order margin).
+        marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
+        // Add position margin which doesn't get concessions.
+        marginForMarket += this.getMarginRequirement(
+          asset,
+          constants.PERP_INDEX,
+          // This is signed.
+          convertNativeLotSizeToDecimal(size),
+          types.MarginType.MAINTENANCE
+        );
+      }
+
+      marginForMarkets += marginForMarket;
     }
 
-    return marginForMarket;
+    return marginForMarkets;
   }
 
   /**
@@ -300,24 +351,39 @@ export class RiskCalculator {
    * @param asset           underlying asset type
    * @param marginAccount   the user's MarginAccount.
    */
-  public calculateTotalMaintenanceMargin(marginAccount: MarginAccount): number {
-    let asset = fromProgramAsset(marginAccount.asset);
-    let ledger = marginAccount.perpProductLedger;
+  public calculateTotalMaintenanceMargin(
+    account: any,
+    accountType: types.ProgramAccountType = types.ProgramAccountType
+      .MarginAccount
+  ): number {
+    // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
+    let assetList =
+      accountType == types.ProgramAccountType.MarginAccount
+        ? [assets.fromProgramAsset(account.asset)]
+        : Exchange.assets;
 
-    let position = ledger.position;
-    let size = position.size.toNumber();
-    if (size == 0) {
-      return 0;
+    let margins = 0;
+    for (var asset of assetList) {
+      const ledger =
+        accountType == types.ProgramAccountType.MarginAccount
+          ? account.perpProductLedger
+          : account.productLedgers[assets.assetToIndex(asset)];
+
+      let position = ledger.position;
+      let size = position.size.toNumber();
+      if (size == 0) {
+        return 0;
+      }
+      margins += this.getMarginRequirement(
+        asset,
+        constants.PERP_INDEX,
+        // This is signed.
+        convertNativeLotSizeToDecimal(size),
+        types.MarginType.MAINTENANCE
+      );
     }
-    let positionMargin = this.getMarginRequirement(
-      asset,
-      constants.PERP_INDEX,
-      // This is signed.
-      convertNativeLotSizeToDecimal(size),
-      types.MarginType.MAINTENANCE
-    );
 
-    return positionMargin;
+    return margins;
   }
 
   /**
@@ -328,43 +394,106 @@ export class RiskCalculator {
    * @param marginAccount   the user's MarginAccount.
    */
   public calculateTotalMaintenanceMarginIncludingOrders(
-    marginAccount: MarginAccount
+    account: any,
+    accountType: types.ProgramAccountType = types.ProgramAccountType
+      .MarginAccount
   ): number {
-    let asset = fromProgramAsset(marginAccount.asset);
-    let ledger = marginAccount.perpProductLedger;
-    let size = ledger.position.size.toNumber();
-    let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
-    let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
-    if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
-      return 0;
+    // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
+    let assetList =
+      accountType == types.ProgramAccountType.MarginAccount
+        ? [assets.fromProgramAsset(account.asset)]
+        : Exchange.assets;
+
+    let margins = 0;
+    for (var asset of assetList) {
+      const ledger =
+        accountType == types.ProgramAccountType.MarginAccount
+          ? account.perpProductLedger
+          : account.productLedgers[assets.assetToIndex(asset)];
+      let size = ledger.position.size.toNumber();
+      let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
+      let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+      if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
+        return 0;
+      }
+
+      let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
+      let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
+
+      if (size > 0) {
+        longLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      } else if (size < 0) {
+        shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
+      }
+
+      margins +=
+        this.getMarginRequirement(
+          asset,
+          constants.PERP_INDEX,
+          // Positive for buys.
+          longLots,
+          types.MarginType.MAINTENANCE
+        ) +
+        this.getMarginRequirement(
+          asset,
+          constants.PERP_INDEX,
+          // Negative for sells.
+          -shortLots,
+          types.MarginType.MAINTENANCE
+        );
     }
 
-    let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
-    let shortLots = convertNativeLotSizeToDecimal(askOpenOrders);
+    return margins;
+  }
 
-    if (size > 0) {
-      longLots += Math.abs(convertNativeLotSizeToDecimal(size));
-    } else if (size < 0) {
-      shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
-    }
-
-    let marginForMarket =
-      this.getMarginRequirement(
-        asset,
-        constants.PERP_INDEX,
-        // Positive for buys.
-        longLots,
-        types.MarginType.MAINTENANCE
-      ) +
-      this.getMarginRequirement(
-        asset,
-        constants.PERP_INDEX,
-        // Negative for sells.
-        -shortLots,
-        types.MarginType.MAINTENANCE
-      );
-
-    return marginForMarket;
+  /**
+   * Returns the aggregate margin account state.
+   * @param crossMarginAccount   the user's CrossMarginAccount.
+   */
+  public getCrossMarginAccountState(
+    marginAccount: CrossMarginAccount,
+    pnlExecutionPrice: number = undefined,
+    pnlAddTakerFees: boolean = false
+  ): types.MarginAccountState {
+    let balance = convertNativeBNToDecimal(marginAccount.balance);
+    let accType = types.ProgramAccountType.CrossMarginAccount;
+    let unrealizedPnl = this.calculateUnrealizedPnl(
+      marginAccount,
+      accType,
+      pnlExecutionPrice,
+      pnlAddTakerFees
+    );
+    let unpaidFunding = this.calculateUnpaidFunding(marginAccount, accType);
+    let initialMargin = this.calculateTotalInitialMargin(
+      marginAccount,
+      accType
+    );
+    let initialMarginSkipConcession = this.calculateTotalInitialMargin(
+      marginAccount,
+      accType,
+      true
+    );
+    let maintenanceMargin = this.calculateTotalMaintenanceMargin(
+      marginAccount,
+      accType
+    );
+    let availableBalanceInitial: number =
+      balance + unrealizedPnl + unpaidFunding - initialMargin;
+    let availableBalanceWithdrawable: number =
+      balance + unrealizedPnl + unpaidFunding - initialMarginSkipConcession;
+    let availableBalanceMaintenance: number =
+      balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
+    return {
+      balance,
+      initialMargin,
+      initialMarginSkipConcession,
+      maintenanceMargin,
+      unrealizedPnl,
+      unpaidFunding,
+      availableBalanceInitial,
+      availableBalanceMaintenance,
+      availableBalanceWithdrawable,
+    };
   }
 
   /**
@@ -387,6 +516,7 @@ export class RiskCalculator {
     let initialMargin = this.calculateTotalInitialMargin(marginAccount);
     let initialMarginSkipConcession = this.calculateTotalInitialMargin(
       marginAccount,
+      types.ProgramAccountType.MarginAccount,
       true
     );
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);

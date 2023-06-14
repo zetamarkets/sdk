@@ -74,44 +74,6 @@
       ]
     },
     {
-      "name": "moveGreeksToZetaPricing",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -243,6 +205,114 @@
       ]
     },
     {
+      "name": "migrateToCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeCrossMarginAccountManager",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "initializeMarginAccount",
       "accounts": [
         {
@@ -313,6 +383,48 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "closeCrossMarginAccountManager",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "subaccountIndex",
+          "type": "u8"
+        }
+      ]
     },
     {
       "name": "closeMarginAccount",
@@ -477,6 +589,12 @@
         {
           "name": "nonce",
           "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -654,6 +772,29 @@
           "name": "args",
           "type": {
             "defined": "UpdateInterestRateArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addPerpMarketIndex",
+      "accounts": [
+        {
+          "name": "marketIndexes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
           }
         }
       ]
@@ -1225,7 +1366,14 @@
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "initializeMarketStrikes",
@@ -1525,16 +1673,6 @@
           "isSigner": false
         },
         {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "pricing",
           "isMut": true,
           "isSigner": false
@@ -1570,7 +1708,14 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "applyPerpFunding",
@@ -1586,7 +1731,14 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "deposit",
@@ -1648,7 +1800,7 @@
       "name": "depositV2",
       "accounts": [
         {
-          "name": "marginAccount",
+          "name": "account",
           "isMut": true,
           "isSigner": false
         },
@@ -1892,7 +2044,7 @@
           "isSigner": false
         },
         {
-          "name": "marginAccount",
+          "name": "account",
           "isMut": true,
           "isSigner": false
         },
@@ -1910,21 +2062,6 @@
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "socializedLossAccount",
@@ -2154,6 +2291,74 @@
       "args": []
     },
     {
+      "name": "initializeOpenOrdersV3",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersMap",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "closeOpenOrders",
       "accounts": [
         {
@@ -2257,6 +2462,68 @@
         {
           "name": "mapNonce",
           "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "closeOpenOrdersV3",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersMap",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -3579,7 +3846,7 @@
           "isSigner": false
         },
         {
-          "name": "marginAccount",
+          "name": "account",
           "isMut": true,
           "isSigner": false
         },
@@ -3737,6 +4004,12 @@
           "type": {
             "option": "u16"
           }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -3757,7 +4030,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -3809,6 +4082,12 @@
         {
           "name": "orderId",
           "type": "u128"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -3829,7 +4108,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -3881,6 +4160,12 @@
         {
           "name": "orderId",
           "type": "u128"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -3901,7 +4186,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -3943,7 +4228,14 @@
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "cancelOrderHalted",
@@ -3957,7 +4249,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -4009,6 +4301,12 @@
         {
           "name": "orderId",
           "type": "u128"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -4029,7 +4327,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -4075,6 +4373,12 @@
         {
           "name": "clientOrderId",
           "type": "u64"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -4095,7 +4399,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -4141,6 +4445,12 @@
         {
           "name": "clientOrderId",
           "type": "u64"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -4217,7 +4527,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -4269,6 +4579,12 @@
         {
           "name": "orderId",
           "type": "u128"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -4309,7 +4625,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -4361,6 +4677,12 @@
         {
           "name": "orderId",
           "type": "u128"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -4396,7 +4718,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -4438,7 +4760,14 @@
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "forceCancelOrders",
@@ -4477,7 +4806,7 @@
               "isSigner": false
             },
             {
-              "name": "marginAccount",
+              "name": "account",
               "isMut": true,
               "isSigner": false
             },
@@ -4519,7 +4848,14 @@
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "crankEventQueue",
@@ -4710,7 +5046,7 @@
           "isSigner": true
         },
         {
-          "name": "liquidatorMarginAccount",
+          "name": "liquidatorAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -4740,7 +5076,7 @@
           "isSigner": false
         },
         {
-          "name": "liquidatedMarginAccount",
+          "name": "liquidatedAccount",
           "isMut": true,
           "isSigner": false
         }
@@ -4749,6 +5085,12 @@
         {
           "name": "size",
           "type": "u64"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
         }
       ]
     },
@@ -5011,7 +5353,7 @@
           "isSigner": true
         },
         {
-          "name": "marginAccount",
+          "name": "account",
           "isMut": true,
           "isSigner": false
         }
@@ -5166,23 +5508,8 @@
       "name": "editDelegatedPubkey",
       "accounts": [
         {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
+          "name": "account",
           "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
           "isSigner": false
         },
         {
@@ -8013,6 +8340,20 @@
           }
         ]
       }
+    },
+    {
+      "name": "AccountType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MarginAccount"
+          },
+          {
+            "name": "CrossMarginAccount"
+          }
+        ]
+      }
     }
   ],
   "events": [
@@ -9094,6 +9435,16 @@
       "code": 6140,
       "name": "CannotMigrateWithOpenOrders",
       "msg": "Cannot migrate to cross margin account with open orders, close all open orders"
+    },
+    {
+      "code": 6141,
+      "name": "InvalidMarginAccountType",
+      "msg": "Invalid margin account type - account is not MarginAccount or CrossMarginAccount"
+    },
+    {
+      "code": 6142,
+      "name": "MarginAccountAssetMismatch",
+      "msg": "Margin account asset mismatched with instruction argument asset"
     }
   ]
 }

@@ -570,7 +570,6 @@ export class Exchange {
     );
     const allPromises: Promise<any>[] = accFetchPromises.concat([
       this.subscribeOracle(this.assets, callback),
-      this.updateState(),
     ]);
 
     const accFetches = (await Promise.all(allPromises)).slice(
@@ -933,15 +932,8 @@ export class Exchange {
     await this.getSubExchange(asset).updatePerpSerumMarketIfNeeded(epochDelay);
   }
 
-  public async initializeZetaMarkets(
-    asset: Asset,
-    perpsOnly: boolean = false,
-    datedOnly: boolean = false
-  ) {
-    await this.getSubExchange(asset).initializeZetaMarkets(
-      perpsOnly,
-      datedOnly
-    );
+  public async initializeZetaMarkets(asset: Asset) {
+    await this.getSubExchange(asset).initializeZetaMarkets();
   }
 
   public async initializeZetaMarketsTIFEpochCycle(

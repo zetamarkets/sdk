@@ -372,7 +372,6 @@ export class SubClient {
     }
     tx.add(
       instructions.depositV2Ix(
-        this.asset,
         amount,
         this._marginAccountAddress,
         this._parent.usdcAccountAddress,
@@ -464,7 +463,6 @@ export class SubClient {
     let tx = new Transaction();
     tx.add(
       instructions.withdrawV2Ix(
-        this.asset,
         amount,
         this._marginAccountAddress,
         this._parent.usdcAccountAddress,
@@ -492,7 +490,6 @@ export class SubClient {
     let tx = new Transaction();
     tx.add(
       instructions.withdrawV2Ix(
-        this.asset,
         this._marginAccount.balance.toNumber(),
         this._marginAccountAddress,
         this._parent.usdcAccountAddress,
@@ -607,7 +604,6 @@ export class SubClient {
 
     tx.add(
       instructions.editDelegatedPubkeyIx(
-        this._asset,
         delegatedPubkey,
         this.marginAccountAddress,
         this._parent.provider.wallet.publicKey
@@ -631,7 +627,6 @@ export class SubClient {
   ): TransactionInstruction {
     return instructions.cancelOrderNoErrorIx(
       this.asset,
-      marketIndex,
       this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[marketIndex],
@@ -645,7 +640,6 @@ export class SubClient {
   ): TransactionInstruction {
     return instructions.cancelAllMarketOrdersIx(
       this.asset,
-      marketIndex,
       this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[marketIndex]
@@ -708,7 +702,6 @@ export class SubClient {
     let index = this._subExchange.markets.getMarketIndex(market);
     let ix = instructions.cancelOrderIx(
       this.asset,
-      index,
       this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[index],
@@ -743,7 +736,6 @@ export class SubClient {
     let index = this._subExchange.markets.getMarketIndex(market);
     let ix = instructions.cancelOrderByClientOrderIdIx(
       this.asset,
-      index,
       this._parent.provider.wallet.publicKey,
       this._marginAccountAddress,
       this._openOrdersAccounts[index],
@@ -786,7 +778,6 @@ export class SubClient {
     tx.add(
       instructions.cancelOrderIx(
         this.asset,
-        marketIndex,
         this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
@@ -854,7 +845,6 @@ export class SubClient {
     tx.add(
       instructions.cancelOrderByClientOrderIdIx(
         this.asset,
-        marketIndex,
         this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
@@ -924,7 +914,6 @@ export class SubClient {
     tx.add(
       instructions.cancelOrderByClientOrderIdNoErrorIx(
         this.asset,
-        marketIndex,
         this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[marketIndex],
@@ -1146,7 +1135,6 @@ export class SubClient {
     let tx = new Transaction();
     let ix = instructions.forceCancelOrderByOrderIdV2Ix(
       this.asset,
-      marketIndex,
       marginAccountToCancel,
       openOrdersAccountToCancel,
       orderId,
@@ -1189,7 +1177,6 @@ export class SubClient {
     let tx = new Transaction();
     let ix = instructions.forceCancelOrdersV2Ix(
       this.asset,
-      marketIndex,
       marginAccountToCancel,
       openOrdersAccountToCancel
     );
@@ -1246,7 +1233,6 @@ export class SubClient {
       let order = this._orders[i];
       let ix = instructions.cancelOrderIx(
         this.asset,
-        order.marketIndex,
         this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[order.marketIndex],
@@ -1268,7 +1254,6 @@ export class SubClient {
       let order = this._orders[i];
       let ix = instructions.cancelOrderNoErrorIx(
         this.asset,
-        order.marketIndex,
         this._parent.provider.wallet.publicKey,
         this._marginAccountAddress,
         this._openOrdersAccounts[order.marketIndex],

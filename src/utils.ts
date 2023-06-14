@@ -82,6 +82,22 @@ export function getSettlement(
   );
 }
 
+export function getCrossOpenOrders(
+  programId: PublicKey,
+  market: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-open-orders")),
+      constants.DEX_PID[Exchange.network].toBuffer(),
+      market.toBuffer(),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export function getOpenOrders(
   programId: PublicKey,
   market: PublicKey,
@@ -418,6 +434,34 @@ export function getQuoteMint(
   );
 }
 
+export function getCrossMarginAccountManager(
+  programId: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-margin-manager")),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getCrossMarginAccount(
+  programId: PublicKey,
+  userKey: PublicKey,
+  seedNumber: Uint8Array
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-margin")),
+      userKey.toBuffer(),
+      seedNumber,
+    ],
+    programId
+  );
+}
+
 export function getMarginAccount(
   programId: PublicKey,
   zetaGroup: PublicKey,
@@ -727,6 +771,7 @@ export async function simulateTransaction(
   try {
     response = await provider.simulate(tx);
   } catch (err) {
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -830,6 +875,7 @@ export async function processTransaction(
       opts || commitmentConfig(provider.connection.commitment)
     );
   } catch (err) {
+    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -970,6 +1016,26 @@ export function displayState() {
   }
 }
 
+export async function getCrossMarginFromOpenOrders(
+  openOrders: PublicKey,
+  seedNumber: Uint8Array = Uint8Array.from([0])
+) {
+  const [openOrdersMap, _openOrdersMapNonce] = getOpenOrdersMap(
+    Exchange.programId,
+    openOrders
+  );
+  let openOrdersMapInfo = (await Exchange.program.account.openOrdersMap.fetch(
+    openOrdersMap
+  )) as OpenOrdersMap;
+  const [crossMarginAccount, _marginNonce] = getCrossMarginAccount(
+    Exchange.programId,
+    openOrdersMapInfo.userKey,
+    seedNumber
+  );
+
+  return crossMarginAccount;
+}
+
 export async function getMarginFromOpenOrders(
   asset: Asset,
   openOrders: PublicKey,
@@ -1038,11 +1104,10 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
  */
 export async function crankMarket(
   asset: Asset,
-  marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>,
   crankLimit?: number
 ): Promise<boolean> {
-  let market = Exchange.getMarket(asset, marketIndex);
+  let market = Exchange.getPerpMarket(asset);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
     return true;
@@ -1122,21 +1187,9 @@ export async function crankMarket(
 /*
  * prune expired TIF orders from a list of market indices.
  */
-export async function pruneExpiredTIFOrders(
-  asset: Asset,
-  marketIndices: number[]
-) {
-  let ixs = marketIndices.map((i) => {
-    return instructions.pruneExpiredTIFOrdersIx(asset, i);
-  });
-
-  let txs = splitIxsIntoTx(ixs, 5);
-
-  await Promise.all(
-    txs.map(async (tx) => {
-      return processTransaction(Exchange.provider, tx);
-    })
-  );
+export async function pruneExpiredTIFOrders(asset: Asset) {
+  let tx = new Transaction().add(instructions.pruneExpiredTIFOrdersIx(asset));
+  return processTransaction(Exchange.provider, tx);
 }
 
 /**
@@ -1197,7 +1250,6 @@ export async function getCancelAllIxs(
 
       let ix = instructions.cancelOrderHaltedIx(
         asset,
-        order.marketIndex,
         marginAccount,
         order.owner,
         order.orderId,

@@ -521,7 +521,6 @@ export class Client {
     // Create withdraw ix
     tx.add(
       instructions.withdrawV2Ix(
-        withdrawAsset,
         amount,
         withdrawSubClient.marginAccountAddress,
         this.usdcAccountAddress,
@@ -542,7 +541,6 @@ export class Client {
     }
     tx.add(
       instructions.depositV2Ix(
-        depositAsset,
         amount,
         depositSubClient.marginAccountAddress,
         this.usdcAccountAddress,
@@ -728,7 +726,6 @@ export class Client {
       tx.add(
         instructions.cancelAllMarketOrdersIx(
           asset,
-          constants.PERP_INDEX,
           this.provider.wallet.publicKey,
           this.getSubClient(asset).marginAccountAddress,
           this.getSubClient(asset).openOrdersAccounts[constants.PERP_INDEX]
@@ -755,7 +752,6 @@ export class Client {
     );
     let ix = instructions.cancelAllMarketOrdersIx(
       asset,
-      index,
       this.provider.wallet.publicKey,
       this.getSubClient(asset).marginAccountAddress,
       this.getSubClient(asset).openOrdersAccounts[index]
@@ -883,7 +879,6 @@ export class Client {
       );
       let ix = instructions.cancelOrderIx(
         asset,
-        marketIndex,
         this.provider.wallet.publicKey,
         this.getSubClient(asset).marginAccountAddress,
         this.getSubClient(asset).openOrdersAccounts[marketIndex],
@@ -919,7 +914,6 @@ export class Client {
       );
       let ix = instructions.cancelOrderNoErrorIx(
         asset,
-        marketIndex,
         this.provider.wallet.publicKey,
         this.getSubClient(asset).marginAccountAddress,
         this.getSubClient(asset).openOrdersAccounts[marketIndex],

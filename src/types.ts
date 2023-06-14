@@ -72,6 +72,7 @@ export enum UserCallbackType {
   POLLUPDATE,
   MARGINACCOUNTCHANGE,
   SPREADACCOUNTCHANGE,
+  CROSSMARGINACCOUNTCHANGE,
 }
 
 export function toProgramSide(side: Side) {
@@ -220,6 +221,7 @@ export interface MarginParams {
 }
 
 export enum ProgramAccountType {
+  CrossMarginAccount = "CrossMarginAccount",
   MarginAccount = "MarginAccount",
   SpreadAccount = "SpreadAccount",
   ZetaGroup = "ZetaGroup",
