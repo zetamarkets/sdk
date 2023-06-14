@@ -5,6 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.29.3] 2023-06-15
+
+### Breaking
+
+- Move Asset object to constants, removing circular imports and improving browser-based UX. This will cause syntax errors if you're importing the Asset object. ([#239](https://github.com/zetamarkets/sdk/pull/239))
+
 ## [0.29.2] 2023-06-13
 
 - exchange: Better Pricing account subscription. ([#237](https://github.com/zetamarkets/sdk/pull/237))
