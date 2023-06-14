@@ -1137,24 +1137,18 @@ export async function crankMarket(
 
   let remainingAccounts: any[] = new Array(uniqueOpenOrders.length * 2);
 
+  // TODO i think we need a 2nd openordersmap for cross margin accounts? that holds the seed_number too
+
   await Promise.all(
     uniqueOpenOrders.map(async (openOrders, index) => {
       let marginAccount: PublicKey;
       if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
-        marginAccount = await getMarginFromOpenOrders(
-          asset,
-          openOrders,
-          market
-        );
+        marginAccount = await getCrossMarginFromOpenOrders(openOrders);
         openOrdersToMargin.set(openOrders, marginAccount);
       } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
         marginAccount = openOrdersToMargin.get(openOrders);
       } else {
-        marginAccount = await getMarginFromOpenOrders(
-          asset,
-          openOrders,
-          market
-        );
+        marginAccount = await getCrossMarginFromOpenOrders(openOrders);
       }
 
       let openOrdersIndex = index * 2;

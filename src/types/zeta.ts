@@ -8342,7 +8342,7 @@ export type Zeta = {
       }
     },
     {
-      "name": "AccountType",
+      "name": "TraitType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -17793,7 +17793,7 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "AccountType",
+      "name": "TraitType",
       "type": {
         "kind": "enum",
         "variants": [

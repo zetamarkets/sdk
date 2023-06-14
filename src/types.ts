@@ -291,9 +291,9 @@ export function fromProgramMarginAccountType(
   throw Error("Invalid margin account type");
 }
 
-export function isMarketMaker(marginAccount: MarginAccount) {
+export function isMarketMaker(account: any) {
   return (
-    fromProgramMarginAccountType(marginAccount.accountType) ==
+    fromProgramMarginAccountType(account.accountType) ==
     MarginAccountType.MARKET_MAKER
   );
 }

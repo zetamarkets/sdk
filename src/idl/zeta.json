@@ -8342,7 +8342,7 @@
       }
     },
     {
-      "name": "AccountType",
+      "name": "TraitType",
       "type": {
         "kind": "enum",
         "variants": [

@@ -279,10 +279,8 @@ export class RiskCalculator {
         : Exchange.assets;
 
     let marginForMarkets = 0;
-
+    let marketMaker = types.isMarketMaker(account);
     for (var asset of assetList) {
-      let marketMaker = types.isMarketMaker(account.accountType);
-
       const ledger =
         accountType == types.ProgramAccountType.MarginAccount
           ? account.perpProductLedger
