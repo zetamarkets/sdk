@@ -11,8 +11,9 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import * as utils from "./utils";
 import * as anchor from "@zetamarkets/anchor";
 import * as types from "./types";
+import { Asset } from "./constants";
 import * as constants from "./constants";
-import { Asset, assetToIndex, toProgramAsset } from "./assets";
+import { assetToIndex, toProgramAsset } from "./assets";
 import { Market } from "./market";
 
 export function initializeCombinedInsuranceVaultIx(): TransactionInstruction {
