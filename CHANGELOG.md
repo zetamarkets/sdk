@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [0.29.4] 2023-06-13
+## [0.29.4] 2023-06-15
 
 - exchange: Add functionality to automatically determine priority fees. ([#236](https://github.com/zetamarkets/sdk/pull/236))
 
