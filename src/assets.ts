@@ -1,15 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { objectEquals } from "./utils";
-
-// Ordered in underlying sequence number.
-export enum Asset {
-  SOL = "SOL",
-  BTC = "BTC",
-  ETH = "ETH",
-  APT = "APT",
-  ARB = "ARB",
-  UNDEFINED = "UNDEFINED",
-}
+import { Asset } from "./constants";
 
 import * as constants from "./constants";
 

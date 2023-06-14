@@ -20,7 +20,8 @@ import { Oracle, OraclePrice } from "./oracle";
 import idl from "./idl/zeta.json";
 import { Zeta } from "./types/zeta";
 import * as types from "./types";
-import { Asset, assetToIndex, toProgramAsset } from "./assets";
+import { assetToIndex, toProgramAsset } from "./assets";
+import { Asset } from "./constants";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
@@ -585,6 +586,7 @@ export class Exchange {
 
     const clockData = utils.getClockData(accFetches.at(-1));
     this.subscribeClock(clockData, callback);
+    this.subscribePricing(callback);
 
     await Promise.all(
       this.assets.map(async (asset, i) => {
@@ -711,7 +713,6 @@ export class Exchange {
             this._lastPollTimestamp = this._clockTimestamp;
             await Promise.all(
               this.getAllSubExchanges().map(async (subExchange) => {
-                await this.updateZetaPricing();
                 await subExchange.handlePolling(callback);
               })
             );
@@ -771,6 +772,24 @@ export class Exchange {
     );
     await utils.processTransaction(this.provider, tx);
     await this.updateState();
+  }
+
+  private subscribePricing(
+    callback?: (asset: Asset, type: EventType, data: any) => void
+  ) {
+    let eventEmitter = this._program.account.pricing.subscribe(
+      this._pricingAddress,
+      this.provider.connection.commitment
+    );
+
+    eventEmitter.on("change", async (pricing: Pricing) => {
+      this._pricing = pricing;
+      if (callback !== undefined) {
+        callback(null, EventType.PRICING, null);
+      }
+    });
+
+    this._eventEmitters.push(eventEmitter);
   }
 
   public subscribeMarket(asset: Asset, index: number) {
@@ -1108,12 +1127,19 @@ export class Exchange {
       this._clockSubscriptionId = undefined;
     }
 
+    await this._program.account.pricing.unsubscribe(this._pricingAddress);
+
     for (var i = 0; i < this._programSubscriptionIds.length; i++) {
       await this.connection.removeProgramAccountChangeListener(
         this._programSubscriptionIds[i]
       );
     }
     this._programSubscriptionIds = [];
+
+    for (var i = 0; i < this._eventEmitters.length; i++) {
+      this._eventEmitters[i].removeListener("change");
+    }
+    this._eventEmitters = [];
   }
 }
 
