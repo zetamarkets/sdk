@@ -273,6 +273,8 @@ export class Exchange {
 
   private _programSubscriptionIds: number[] = [];
 
+  private _eventEmitters: any[] = [];
+  
   // Micro lamports per CU of fees.
   public get priorityFee(): number {
     return this._priorityFee;
