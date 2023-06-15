@@ -323,7 +323,7 @@ export interface OrderOptions {
   orderType?: types.OrderType;
   clientOrderId?: number;
   tag?: string;
-  blockhash?: string;
+  blockhash?: { blockhash: string; lastValidBlockHeight: number };
 }
 
 /**

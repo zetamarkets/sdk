@@ -757,7 +757,7 @@ export async function processTransaction(
   opts?: ConfirmOptions,
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
-  blockhash?: string
+  blockhash?: { blockhash: string; lastValidBlockHeight: number }
 ): Promise<TransactionSignature> {
   let rawTx: Buffer | Uint8Array;
 
@@ -769,6 +769,12 @@ export async function processTransaction(
     );
   }
 
+  let recentBlockhash =
+    blockhash ??
+    (await provider.connection.getLatestBlockhash(
+      Exchange.blockhashCommitment
+    ));
+
   if (lutAccs) {
     if (useLedger) {
       throw Error("Ledger does not support versioned transactions");
@@ -777,13 +783,7 @@ export async function processTransaction(
     let v0Tx: VersionedTransaction = new VersionedTransaction(
       new TransactionMessage({
         payerKey: provider.wallet.publicKey,
-        recentBlockhash:
-          blockhash ??
-          (
-            await provider.connection.getLatestBlockhash(
-              Exchange.blockhashCommitment
-            )
-          ).blockhash,
+        recentBlockhash: recentBlockhash.blockhash,
         instructions: tx.instructions,
       }).compileToV0Message(lutAccs)
     );
@@ -799,13 +799,7 @@ export async function processTransaction(
     )) as VersionedTransaction;
     rawTx = v0Tx.serialize();
   } else {
-    tx.recentBlockhash =
-      blockhash ??
-      (
-        await provider.connection.getLatestBlockhash(
-          Exchange.blockhashCommitment
-        )
-      ).blockhash;
+    tx.recentBlockhash = recentBlockhash.blockhash;
     tx.feePayer = useLedger
       ? Exchange.ledgerWallet.publicKey
       : provider.wallet.publicKey;
@@ -825,11 +819,20 @@ export async function processTransaction(
   }
 
   try {
-    return await anchor.sendAndConfirmRawTransaction(
-      provider.connection,
+    let txSig = await provider.connection.sendRawTransaction(
       rawTx,
       opts || commitmentConfig(provider.connection.commitment)
     );
+    let result = await provider.connection.confirmTransaction({
+      blockhash: recentBlockhash.blockhash,
+      lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
+      signature: txSig,
+    });
+    if (result.value.err != null) {
+      let parsedErr = parseError(result.value.err);
+      throw parsedErr;
+    }
+    return txSig;
   } catch (err) {
     let parsedErr = parseError(err);
     throw parsedErr;

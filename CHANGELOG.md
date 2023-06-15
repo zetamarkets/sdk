@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.29.5] 2023-06-15
+
+- utils: use confirmTransaction() with new BlockheightBasedTransactionConfirmationStrategy, improving tx timeout detection by specifying the last valid blockheight. ([#235](https://github.com/zetamarkets/sdk/pull/235))
+
 ## [0.29.4] 2023-06-15
 
 - exchange: Add functionality to automatically determine priority fees. ([#236](https://github.com/zetamarkets/sdk/pull/236))
