@@ -74,6 +74,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "zeroZetaPricingHaltBools",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -5877,6 +5898,18 @@ export type Zeta = {
             }
           },
           {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "netOutflowSum",
+            "type": "i64"
+          },
+          {
             "name": "haltForcePricing",
             "type": {
               "array": [
@@ -5895,23 +5928,11 @@ export type Zeta = {
             }
           },
           {
-            "name": "totalInsuranceVaultDeposits",
-            "type": "u64"
-          },
-          {
-            "name": "lastWithdrawTimestamp",
-            "type": "u64"
-          },
-          {
-            "name": "netOutflowSum",
-            "type": "i64"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2702
+                2707
               ]
             }
           }
@@ -9590,6 +9611,27 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "zeroZetaPricingHaltBools",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -15393,6 +15435,18 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "totalInsuranceVaultDeposits",
+            "type": "u64"
+          },
+          {
+            "name": "lastWithdrawTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "netOutflowSum",
+            "type": "i64"
+          },
+          {
             "name": "haltForcePricing",
             "type": {
               "array": [
@@ -15411,23 +15465,11 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "totalInsuranceVaultDeposits",
-            "type": "u64"
-          },
-          {
-            "name": "lastWithdrawTimestamp",
-            "type": "u64"
-          },
-          {
-            "name": "netOutflowSum",
-            "type": "i64"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2702
+                2707
               ]
             }
           }
