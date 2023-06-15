@@ -149,6 +149,11 @@ export interface ExpirySeries {
   dirty: boolean;
 }
 
+export interface CrossOpenOrdersMap {
+  userKey: PublicKey;
+  subaccountIndex: number;
+}
+
 export interface OpenOrdersMap {
   userKey: PublicKey;
 }

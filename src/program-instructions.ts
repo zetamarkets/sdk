@@ -338,7 +338,7 @@ export function initializeOpenOrdersV3Ix(
     userKey
   );
 
-  const [openOrdersMap, _openOrdersMapNonce] = utils.getOpenOrdersMap(
+  const [openOrdersMap, _openOrdersMapNonce] = utils.getCrossOpenOrdersMap(
     Exchange.programId,
     openOrdersPda
   );
@@ -369,7 +369,7 @@ export function closeOpenOrdersV3Ix(
   crossMarginAccount: PublicKey,
   openOrders: PublicKey
 ): TransactionInstruction {
-  const [openOrdersMap, openOrdersMapNonce] = utils.getOpenOrdersMap(
+  const [openOrdersMap, openOrdersMapNonce] = utils.getCrossOpenOrdersMap(
     Exchange.programId,
     openOrders
   );

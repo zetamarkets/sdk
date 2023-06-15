@@ -6095,6 +6095,22 @@
       }
     },
     {
+      "name": "CrossOpenOrdersMap",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "userKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "subaccountIndex",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "State",
       "type": {
         "kind": "struct",
@@ -6636,6 +6652,10 @@
           {
             "name": "balance",
             "type": "u64"
+          },
+          {
+            "name": "subaccountIndex",
+            "type": "u8"
           },
           {
             "name": "nonce",

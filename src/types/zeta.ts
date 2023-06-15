@@ -6095,6 +6095,22 @@ export type Zeta = {
       }
     },
     {
+      "name": "crossOpenOrdersMap",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "userKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "subaccountIndex",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "state",
       "type": {
         "kind": "struct",
@@ -6636,6 +6652,10 @@ export type Zeta = {
           {
             "name": "balance",
             "type": "u64"
+          },
+          {
+            "name": "subaccountIndex",
+            "type": "u8"
           },
           {
             "name": "nonce",
@@ -15546,6 +15566,22 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "crossOpenOrdersMap",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "userKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "subaccountIndex",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "state",
       "type": {
         "kind": "struct",
@@ -16087,6 +16123,10 @@ export const IDL: Zeta = {
           {
             "name": "balance",
             "type": "u64"
+          },
+          {
+            "name": "subaccountIndex",
+            "type": "u8"
           },
           {
             "name": "nonce",
