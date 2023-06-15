@@ -645,6 +645,11 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -1337,15 +1342,37 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "cleanZetaMarketsHalted",
+      "name": "cleanZetaMarketHalted",
       "accounts": [
         {
           "name": "state",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "settlePositionsHalted",
@@ -5850,6 +5877,24 @@ export type Zeta = {
             }
           },
           {
+            "name": "haltForcePricing",
+            "type": {
+              "array": [
+                "bool",
+                5
+              ]
+            }
+          },
+          {
+            "name": "haltForcePricingPadding",
+            "type": {
+              "array": [
+                "bool",
+                20
+              ]
+            }
+          },
+          {
             "name": "totalInsuranceVaultDeposits",
             "type": "u64"
           },
@@ -5866,7 +5911,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                2732
+                2702
               ]
             }
           }
@@ -10116,6 +10161,11 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -10808,15 +10858,37 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "cleanZetaMarketsHalted",
+      "name": "cleanZetaMarketHalted",
       "accounts": [
         {
           "name": "state",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
     },
     {
       "name": "settlePositionsHalted",
@@ -15321,6 +15393,24 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "haltForcePricing",
+            "type": {
+              "array": [
+                "bool",
+                5
+              ]
+            }
+          },
+          {
+            "name": "haltForcePricingPadding",
+            "type": {
+              "array": [
+                "bool",
+                20
+              ]
+            }
+          },
+          {
             "name": "totalInsuranceVaultDeposits",
             "type": "u64"
           },
@@ -15337,7 +15427,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                2732
+                2702
               ]
             }
           }

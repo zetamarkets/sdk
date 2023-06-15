@@ -1662,15 +1662,19 @@ export function cleanZetaMarketsIx(
   });
 }
 
-export function cleanZetaMarketsHaltedIx(
-  marketAccounts: any[]
-): TransactionInstruction {
-  return Exchange.program.instruction.cleanZetaMarketsHalted({
-    accounts: {
-      state: Exchange.stateAddress,
-    },
-    remainingAccounts: marketAccounts,
-  });
+export function cleanZetaMarketHaltedIx(asset: Asset): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
+  return Exchange.program.instruction.cleanZetaMarketHalted(
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        market: marketData.address,
+        bids: marketData.serumMarket.bidsAddress,
+        asks: marketData.serumMarket.asksAddress,
+      },
+    }
+  );
 }
 
 export function cancelOrderHaltedIx(
@@ -1707,6 +1711,7 @@ export function haltIx(asset: Asset, admin: PublicKey): TransactionInstruction {
   return Exchange.program.instruction.halt(toProgramAsset(asset), {
     accounts: {
       state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
       admin,
     },
   });

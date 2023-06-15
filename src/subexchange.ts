@@ -720,14 +720,9 @@ export class SubExchange {
     );
   }
 
-  public async cleanZetaMarketsHalted() {
+  public async cleanZetaMarketHalted() {
     this.assertHalted();
-    let marketAccounts = [];
-    marketAccounts.push(
-      (this._markets.perpMarket,
-      utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
-    );
-    await utils.cleanZetaMarketsHalted(marketAccounts);
+    await utils.cleanZetaMarketHalted(this._asset);
   }
 
   /**

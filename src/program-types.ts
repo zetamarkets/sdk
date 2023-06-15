@@ -67,6 +67,8 @@ export interface Pricing {
   productsPadding: Array<Product>;
   zetaGroupKeys: Array<PublicKey>;
   zetaGroupKeysPadding: Array<PublicKey>;
+  haltForcePricing: Array<boolean>;
+  haltForcePricingPadding: Array<boolean>;
   totalInsuranceVaultDeposits: anchor.BN;
   lastWithdrawTimestamp: anchor.BN;
   netOutflowSum: anchor.BN;

@@ -1042,8 +1042,8 @@ export class Exchange {
     await this.getSubExchange(asset).cancelAllOrdersHalted();
   }
 
-  public async cleanZetaMarketsHalted(asset: Asset) {
-    await this.getSubExchange(asset).cleanZetaMarketsHalted();
+  public async cleanZetaMarketHalted(asset: Asset) {
+    await this.getSubExchange(asset).cleanZetaMarketHalted();
   }
 
   public isHalted(asset: Asset) {
