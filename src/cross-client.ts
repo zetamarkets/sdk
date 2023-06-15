@@ -898,7 +898,32 @@ export class CrossClient {
     );
   }
 
-  public async cancelAllPerpMarketOrders(): Promise<TransactionSignature> {
+  public async cancelMarketOrders(asset: Asset): Promise<TransactionSignature> {
+    let tx = new Transaction();
+    let assetIndex = assetToIndex(asset);
+    if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
+      return null;
+    }
+
+    tx.add(
+      instructions.cancelAllMarketOrdersIx(
+        asset,
+        this.provider.wallet.publicKey,
+        this._accountAddress,
+        this._openOrdersAccounts[assetIndex]
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
+  public async cancelAllMarketOrders(): Promise<TransactionSignature> {
     let tx = new Transaction();
 
     for (var asset of Exchange.assets) {
@@ -1690,6 +1715,14 @@ export class CrossClient {
     return txIds;
   }
 
+  public getOrders(asset: Asset): types.Order[] {
+    return this._orders.get(asset);
+  }
+
+  public getPositions(asset: Asset): types.Position[] {
+    return this._positions.get(asset);
+  }
+
   public async updateOrders() {
     if (this._account == null) {
       console.log("User has no margin account, cannot update orders.");
@@ -1697,11 +1730,6 @@ export class CrossClient {
     }
 
     let orders = [];
-    await Promise.all(
-      Exchange.assets.map(async (asset) => {
-        this._orders.set(asset, []);
-      })
-    );
 
     await Promise.all(
       Exchange.assets.map(async (asset) => {
@@ -1733,21 +1761,29 @@ export class CrossClient {
         serumMarket.startEpochSeqNum
       );
     });
+    let ordersByAsset = new Map();
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
+        ordersByAsset.set(asset, []);
+      })
+    );
     for (var order of allOrdersFiltered) {
-      this._orders.get(order.asset).push(order);
+      ordersByAsset.get(order.asset).push(order);
     }
+
+    this._orders = ordersByAsset;
   }
 
   private updatePositions() {
-    let positions: types.Position[] = [];
+    let positions = new Map();
     for (var asset of Exchange.assets) {
-      this._positions.set(asset, []);
+      positions.set(asset, []);
     }
 
     for (var i = 0; i < this._account.productLedgers.length; i++) {
       if (this._account.productLedgers[i].position.size.toNumber() != 0) {
         let asset = indexToAsset(i);
-        positions.push({
+        positions.get(asset).push({
           marketIndex: i,
           market: Exchange.getPerpMarket(asset).address,
           size: utils.convertNativeLotSizeToDecimal(
@@ -1761,9 +1797,11 @@ export class CrossClient {
       }
     }
 
-    for (var position of positions) {
-      this._positions.get(position.asset).push(position);
+    for (var asset of Exchange.assets) {
+      this._positions.set(asset, []);
     }
+
+    this._positions = positions;
   }
 
   private updateOpenOrdersAddresses() {
