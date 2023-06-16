@@ -6690,7 +6690,7 @@ export type Zeta = {
                 {
                   "defined": "CrossMarginAccountInfo"
                 },
-                256
+                25
               ]
             }
           }
@@ -16222,7 +16222,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "CrossMarginAccountInfo"
                 },
-                256
+                25
               ]
             }
           }
