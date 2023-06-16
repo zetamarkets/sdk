@@ -5048,11 +5048,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "zetaVault",
           "isMut": true,
           "isSigner": false
@@ -14581,11 +14576,6 @@ export const IDL: Zeta = {
       "accounts": [
         {
           "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
           "isMut": false,
           "isSigner": false
         },

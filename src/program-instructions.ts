@@ -1077,7 +1077,6 @@ export function rebalanceInsuranceVaultIx(
   return Exchange.program.instruction.rebalanceInsuranceVault({
     accounts: {
       state: Exchange.stateAddress,
-      pricing: Exchange.pricingAddress,
       zetaVault: Exchange.combinedVaultAddress,
       insuranceVault: Exchange.combinedInsuranceVaultAddress,
       treasuryWallet: Exchange.treasuryWalletAddress,
@@ -1972,14 +1971,8 @@ export function overrideExpiryIx(
 
 export function toggleMarketMakerIx(
   isMarketMaker: boolean,
-  zetaGroup: PublicKey,
-  user: PublicKey
+  account: PublicKey
 ): TransactionInstruction {
-  let [account, _nonce] = utils.getMarginAccount(
-    Exchange.programId,
-    zetaGroup,
-    user
-  );
   return Exchange.program.instruction.toggleMarketMaker(isMarketMaker, {
     accounts: {
       state: Exchange.stateAddress,

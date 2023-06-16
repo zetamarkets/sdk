@@ -134,6 +134,24 @@ export function createOpenOrdersAddress(
   );
 }
 
+export function createCrossOpenOrdersAddress(
+  programId: PublicKey,
+  market: PublicKey,
+  userKey: PublicKey,
+  nonce: number
+): PublicKey {
+  return PublicKey.createProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-open-orders")),
+      constants.DEX_PID[Exchange.network].toBuffer(),
+      market.toBuffer(),
+      userKey.toBuffer(),
+      Buffer.from([nonce]),
+    ],
+    programId
+  );
+}
+
 export function getCrossOpenOrdersMap(
   programId: PublicKey,
   openOrders: PublicKey
@@ -786,8 +804,6 @@ export async function simulateTransaction(
   try {
     response = await provider.simulate(tx);
   } catch (err) {
-    // TODO REMOVE LOG
-    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }
@@ -891,8 +907,6 @@ export async function processTransaction(
       opts || commitmentConfig(provider.connection.commitment)
     );
   } catch (err) {
-    // TODO REMOVE LOG
-    console.log(err);
     let parsedErr = parseError(err);
     throw parsedErr;
   }

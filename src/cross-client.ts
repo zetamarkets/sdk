@@ -1527,7 +1527,7 @@ export class CrossClient {
       crossMarginAccountToCancel
     )) as unknown as CrossMarginAccount;
 
-    let openOrdersAccountToCancel = utils.createOpenOrdersAddress(
+    let openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
       Exchange.programId,
       Exchange.getPerpMarket(asset).address,
       account.authority,

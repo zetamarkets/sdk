@@ -5048,11 +5048,6 @@
           "isSigner": false
         },
         {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "zetaVault",
           "isMut": true,
           "isSigner": false
