@@ -74,27 +74,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "zeroZetaPricingHaltBools",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -827,17 +806,6 @@ export type Zeta = {
     },
     {
       "name": "addMarketIndexes",
-      "docs": [
-        "This instruction allows us to generate the market PDA index seed we require",
-        "to initialize markets in an order that remains sorted.",
-        "Future unlisted markets can still retain this sorted property.",
-        "",
-        "There are two stages of this instruction:",
-        "1. Generating the market pdas that use their respective index as seed 0..TOTAL_MARKETS -1",
-        "and populating the keys inside zeta_group. These will be set back to default.",
-        "2. Sorting the generated market pdas and storing their respective index seed within",
-        "market indexes."
-      ],
       "accounts": [
         {
           "name": "marketIndexes",
@@ -9606,27 +9574,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "zeroZetaPricingHaltBools",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "initializeZetaGroup",
       "accounts": [
         {
@@ -10359,17 +10306,6 @@ export const IDL: Zeta = {
     },
     {
       "name": "addMarketIndexes",
-      "docs": [
-        "This instruction allows us to generate the market PDA index seed we require",
-        "to initialize markets in an order that remains sorted.",
-        "Future unlisted markets can still retain this sorted property.",
-        "",
-        "There are two stages of this instruction:",
-        "1. Generating the market pdas that use their respective index as seed 0..TOTAL_MARKETS -1",
-        "and populating the keys inside zeta_group. These will be set back to default.",
-        "2. Sorting the generated market pdas and storing their respective index seed within",
-        "market indexes."
-      ],
       "accounts": [
         {
           "name": "marketIndexes",

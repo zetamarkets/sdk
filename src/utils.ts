@@ -1047,6 +1047,36 @@ export function displayState() {
   }
 }
 
+// Either margin or cross margin acc
+export async function getAccountFromOpenOrders(
+  openOrders: PublicKey,
+  asset: Asset
+) {
+  let crossOpenOrdersMapInfo =
+    (await Exchange.program.account.crossOpenOrdersMap.fetchNullable(
+      getCrossOpenOrdersMap(Exchange.programId, openOrders)[0]
+    )) as CrossOpenOrdersMap;
+
+  // If it was a CrossMarginAccount, just proceed
+  if (crossOpenOrdersMapInfo != null) {
+    return getCrossMarginAccount(
+      Exchange.programId,
+      crossOpenOrdersMapInfo.userKey,
+      Uint8Array.from([crossOpenOrdersMapInfo.subaccountIndex])
+    )[0];
+  }
+
+  // If it wasn't a CrossMarginAccount, it should be a MarginAccount or error
+  let openOrdersMapInfo = (await Exchange.program.account.openOrdersMap.fetch(
+    getOpenOrdersMap(Exchange.programId, openOrders)[0]
+  )) as OpenOrdersMap;
+  return getMarginAccount(
+    Exchange.programId,
+    Exchange.pricing.zetaGroupKeys[assets.assetToIndex(asset)],
+    openOrdersMapInfo.userKey
+  )[0];
+}
+
 export async function getCrossMarginFromOpenOrders(openOrders: PublicKey) {
   const [openOrdersMap, _openOrdersMapNonce] = getCrossOpenOrdersMap(
     Exchange.programId,
@@ -1153,18 +1183,17 @@ export async function crankMarket(
 
   let remainingAccounts: any[] = new Array(uniqueOpenOrders.length * 2);
 
-  // TODO i think we need a 2nd openordersmap for cross margin accounts? that holds the seed_number too
-
+  // TODO test support for both crossmargin and marginaccounts
   await Promise.all(
     uniqueOpenOrders.map(async (openOrders, index) => {
       let marginAccount: PublicKey;
       if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
-        marginAccount = await getCrossMarginFromOpenOrders(openOrders);
+        marginAccount = await getAccountFromOpenOrders(openOrders, asset);
         openOrdersToMargin.set(openOrders, marginAccount);
       } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
         marginAccount = openOrdersToMargin.get(openOrders);
       } else {
-        marginAccount = await getCrossMarginFromOpenOrders(openOrders);
+        marginAccount = await getAccountFromOpenOrders(openOrders, asset);
       }
 
       let openOrdersIndex = index * 2;
