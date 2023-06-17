@@ -25,6 +25,7 @@ import { Asset } from "./constants";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
+import fetch from "cross-fetch";
 
 export class Exchange {
   /**
@@ -274,7 +275,7 @@ export class Exchange {
   private _programSubscriptionIds: number[] = [];
 
   private _eventEmitters: any[] = [];
-  
+
   // Micro lamports per CU of fees.
   public get priorityFee(): number {
     return this._priorityFee;
@@ -285,6 +286,13 @@ export class Exchange {
     return this._useAutoPriorityFee;
   }
   private _useAutoPriorityFee: boolean = false;
+
+  // Micro lamports per CU of fees.
+  public get autoPriorityFeeUpperLimit(): number {
+    return this._autoPriorityFeeUpperLimit;
+  }
+  private _autoPriorityFeeUpperLimit: number =
+    constants.DEFAULT_MICRO_LAMPORTS_PER_CU_FEE;
 
   public get blockhashCommitment(): Commitment {
     return this._blockhashCommitment;
@@ -297,6 +305,10 @@ export class Exchange {
 
   public updatePriorityFee(microLamportsPerCU: number) {
     this._priorityFee = microLamportsPerCU;
+  }
+
+  public updateAutoPriorityFeeUpperLimit(microLamportsPerCU: number) {
+    this._autoPriorityFeeUpperLimit = microLamportsPerCU;
   }
 
   public updateBlockhashCommitment(commitment: Commitment) {
@@ -654,10 +666,10 @@ export class Exchange {
         .map((obj) => obj.prioritizationFee); // Take a list of prioritizationFee values only
 
       let median = utils.median(fees);
+      this._priorityFee = Math.min(median, this._autoPriorityFeeUpperLimit);
       console.log(
-        `AutoUpdate priority fee. New fee = ${median} microlamports per compute unit`
+        `AutoUpdate priority fee. New fee = ${this._priorityFee} microlamports per compute unit`
       );
-      this._priorityFee = median;
     } catch (e) {
       console.log(`updateAutoFee failed ${e}`);
     }
@@ -718,7 +730,7 @@ export class Exchange {
                 await subExchange.handlePolling(callback);
               })
             );
-            if (this.useAutoPriorityFee == true) {
+            if (this._useAutoPriorityFee == true) {
               await this.updateAutoFee();
             }
           }
