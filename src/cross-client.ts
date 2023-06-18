@@ -1926,6 +1926,31 @@ export class CrossClient {
     let size = orderState.closingOrders.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
   }
+
+  public async initializeReferrerAccount() {
+    this.delegatedCheck();
+    let tx = new Transaction().add(
+      await instructions.initializeReferrerAccountIx(this.publicKey)
+    );
+    await utils.processTransaction(this._provider, tx);
+  }
+
+  public async claimReferrerRewards(): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
+      Exchange.programId,
+      this.publicKey
+    );
+    let tx = new Transaction().add(
+      await instructions.claimReferralsRewardsIx(
+        referrerAccountAddress,
+        this._usdcAccountAddress,
+        this.provider.wallet.publicKey
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
   /**
    * Getter function to grab the correct product ledger because perps is separate
    */
