@@ -491,6 +491,16 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
+  public async initializeUnderlying(flexUnderlying: boolean) {
+    let tx = new Transaction().add(
+      instructions.initializeUnderlyingIx(
+        await utils.getUnderlyingMint(this._asset),
+        flexUnderlying
+      )
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
   /**
    * Update pricing for an expiry index.
    */

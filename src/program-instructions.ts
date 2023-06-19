@@ -892,6 +892,29 @@ export async function initializeZetaMarketTxs(
   return [tx, tx2];
 }
 
+export function initializeUnderlyingIx(
+  underlyingMint: PublicKey,
+  flexUnderlying: boolean
+): TransactionInstruction {
+  let [underlying, _underlyingNonce] = flexUnderlying
+    ? utils.getFlexUnderlying(
+        Exchange.programId,
+        Exchange.state.numFlexUnderlyings
+      )
+    : utils.getUnderlying(Exchange.programId, Exchange.state.numUnderlyings);
+
+  return Exchange.program.instruction.initializeUnderlying(flexUnderlying, {
+    accounts: {
+      admin: Exchange.state.admin,
+      zetaProgram: Exchange.programId,
+      state: Exchange.stateAddress,
+      systemProgram: SystemProgram.programId,
+      underlying: underlying,
+      underlyingMint: underlyingMint,
+    },
+  });
+}
+
 export function initializePerpSyncQueueIx(
   asset: Asset
 ): TransactionInstruction {

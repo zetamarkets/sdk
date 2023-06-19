@@ -953,6 +953,10 @@ export class Exchange {
     await this.getSubExchange(asset).initializePerpSyncQueue();
   }
 
+  public async initializeUnderlying(asset: Asset, flexUnderlying: boolean) {
+    await this.getSubExchange(asset).initializeUnderlying(flexUnderlying);
+  }
+
   public async updatePricing(asset: Asset) {
     await this.getSubExchange(asset).updatePricing();
   }
