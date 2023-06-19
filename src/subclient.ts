@@ -1,6 +1,7 @@
 import * as anchor from "@zetamarkets/anchor";
 import * as utils from "./utils";
-import { Asset, assetToIndex, assetToName, fromProgramAsset } from "./assets";
+import { assetToIndex, assetToName, fromProgramAsset } from "./assets";
+import { Asset } from "./constants";
 import * as constants from "./constants";
 import { exchange as Exchange } from "./exchange";
 import {

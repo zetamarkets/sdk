@@ -25,7 +25,8 @@ import {
 import BufferLayout from "buffer-layout";
 const BN = anchor.BN;
 import * as bs58 from "bs58";
-import { Asset, assetToName, nameToAsset } from "./assets";
+import { assetToName, nameToAsset } from "./assets";
+import { Asset } from "./constants";
 import * as fs from "fs";
 import * as constants from "./constants";
 import * as errors from "./errors";
@@ -833,17 +834,23 @@ export async function processTransaction(
   opts?: ConfirmOptions,
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
-  blockhash?: string
+  blockhash?: { blockhash: string; lastValidBlockHeight: number }
 ): Promise<TransactionSignature> {
   let rawTx: Buffer | Uint8Array;
 
-  if (Exchange.usePriorityFees) {
+  if (Exchange.priorityFee != 0) {
     tx.instructions.unshift(
       ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: Exchange.priorityFee,
       })
     );
   }
+
+  let recentBlockhash =
+    blockhash ??
+    (await provider.connection.getLatestBlockhash(
+      Exchange.blockhashCommitment
+    ));
 
   if (lutAccs) {
     if (useLedger) {
@@ -853,13 +860,7 @@ export async function processTransaction(
     let v0Tx: VersionedTransaction = new VersionedTransaction(
       new TransactionMessage({
         payerKey: provider.wallet.publicKey,
-        recentBlockhash:
-          blockhash ??
-          (
-            await provider.connection.getLatestBlockhash(
-              Exchange.blockhashCommitment
-            )
-          ).blockhash,
+        recentBlockhash: recentBlockhash.blockhash,
         instructions: tx.instructions,
       }).compileToV0Message(lutAccs)
     );
@@ -875,13 +876,7 @@ export async function processTransaction(
     )) as VersionedTransaction;
     rawTx = v0Tx.serialize();
   } else {
-    tx.recentBlockhash =
-      blockhash ??
-      (
-        await provider.connection.getLatestBlockhash(
-          Exchange.blockhashCommitment
-        )
-      ).blockhash;
+    tx.recentBlockhash = recentBlockhash.blockhash;
     tx.feePayer = useLedger
       ? Exchange.ledgerWallet.publicKey
       : provider.wallet.publicKey;
@@ -901,11 +896,20 @@ export async function processTransaction(
   }
 
   try {
-    return await anchor.sendAndConfirmRawTransaction(
-      provider.connection,
+    let txSig = await provider.connection.sendRawTransaction(
       rawTx,
       opts || commitmentConfig(provider.connection.commitment)
     );
+    let result = await provider.connection.confirmTransaction({
+      blockhash: recentBlockhash.blockhash,
+      lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
+      signature: txSig,
+    });
+    if (result.value.err != null) {
+      let parsedErr = parseError(result.value.err);
+      throw parsedErr;
+    }
+    return txSig;
   } catch (err) {
     let parsedErr = parseError(err);
     throw parsedErr;
@@ -1308,7 +1312,7 @@ export function writeKeypair(filename: string, keypair: Keypair) {
 
 export async function getAllProgramAccountAddresses(
   accountType: types.ProgramAccountType,
-  asset: assets.Asset = undefined
+  asset: Asset = undefined
 ): Promise<PublicKey[]> {
   let filters = [
     {
@@ -1697,7 +1701,7 @@ export function getZetaLutArr(): AddressLookupTableAccount[] {
   return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
 }
 
-export function getUnderlyingMint(asset: assets.Asset) {
+export function getUnderlyingMint(asset: Asset) {
   if (asset in constants.MINTS) {
     return constants.MINTS[asset];
   }
@@ -1707,6 +1711,13 @@ export function getUnderlyingMint(asset: assets.Asset) {
   throw Error("Underlying mint does not exist!");
 }
 
-export function isFlexUnderlying(asset: assets.Asset) {
+export function isFlexUnderlying(asset: Asset) {
   return asset in constants.FLEX_MINTS[Exchange.network];
+}
+
+export function median(arr: number[]): number | undefined {
+  if (!arr.length) return undefined;
+  const s = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
 }

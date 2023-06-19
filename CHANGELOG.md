@@ -5,6 +5,28 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [0.29.6] 2023-06-17
+
+- exchange: Add an upper limit to automatic priority fees. ([#240](https://github.com/zetamarkets/sdk/pull/240))
+
+## [0.29.5] 2023-06-15
+
+- utils: use confirmTransaction() with new BlockheightBasedTransactionConfirmationStrategy, improving tx timeout detection by specifying the last valid blockheight. ([#235](https://github.com/zetamarkets/sdk/pull/235))
+
+## [0.29.4] 2023-06-15
+
+- exchange: Add functionality to automatically determine priority fees. ([#236](https://github.com/zetamarkets/sdk/pull/236))
+
+## [0.29.3] 2023-06-15
+
+### Breaking
+
+- Move Asset object to constants, removing circular imports and improving browser-based UX. This will cause syntax errors if you're importing the Asset object. ([#239](https://github.com/zetamarkets/sdk/pull/239))
+
+## [0.29.2] 2023-06-13
+
+- exchange: Better Pricing account subscription. ([#237](https://github.com/zetamarkets/sdk/pull/237))
+
 ## [0.29.1] 2023-06-08
 
 - general: New set of instructions for Pricing account. ([#234](https://github.com/zetamarkets/sdk/pull/234)). Notable changes:

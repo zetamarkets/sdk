@@ -1,5 +1,14 @@
 import { PublicKey, AddressLookupTableAccount } from "@solana/web3.js";
-import { Asset } from "./assets";
+
+// Ordered in underlying sequence number.
+export enum Asset {
+  SOL = "SOL",
+  BTC = "BTC",
+  ETH = "ETH",
+  APT = "APT",
+  ARB = "ARB",
+  UNDEFINED = "UNDEFINED",
+}
 
 export const ZETA_PID: {
   localnet: PublicKey;

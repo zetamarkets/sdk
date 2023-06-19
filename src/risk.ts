@@ -10,7 +10,8 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
 } from "./utils";
-import { Asset, assetToIndex, fromProgramAsset } from "./assets";
+import { assetToIndex, fromProgramAsset } from "./assets";
+import { Asset } from "./constants";
 import { BN } from "@zetamarkets/anchor";
 import { assets, Client, Decimal, instructions, utils } from ".";
 import { cloneDeep } from "lodash";

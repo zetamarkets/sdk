@@ -1,6 +1,6 @@
 import * as anchor from "@zetamarkets/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { Asset } from "../assets";
+import { Asset } from "../constants";
 import { Network } from "../network";
 import * as devnetStore from "./MARKET-STORE.devnet.json";
 import * as mainnetStore from "./MARKET-STORE.mainnet.json";

@@ -4,6 +4,7 @@ import { exchange as Exchange } from "../../exchange";
 import * as types from "../../types";
 import { Network } from "../../network";
 import * as constants from "../../constants";
+import { Asset } from "../../constants";
 
 import { Connection } from "@solana/web3.js";
 import * as anchor from "@zetamarkets/anchor";
@@ -44,7 +45,7 @@ main().catch(console.error.bind(console));
 function populateMarketStore(
   marketStore: Object,
   network: Network,
-  asset: assets.Asset,
+  asset: Asset,
   index: number
 ) {
   if (!(network in marketStore)) {
