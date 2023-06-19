@@ -896,6 +896,15 @@ export async function processTransaction(
   }
 
   try {
+    // Integration tests don't like the split send + confirm :(
+    if (Exchange.network == Network.LOCALNET) {
+      return await anchor.sendAndConfirmRawTransaction(
+        provider.connection,
+        rawTx,
+        opts || commitmentConfig(provider.connection.commitment)
+      );
+    }
+
     let txSig = await provider.connection.sendRawTransaction(
       rawTx,
       opts || commitmentConfig(provider.connection.commitment)

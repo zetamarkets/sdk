@@ -1,13 +1,13 @@
 import * as anchor from "@zetamarkets/anchor";
 import * as utils from "./utils";
 import {
-  Asset,
   assetToIndex,
   assetToName,
   fromProgramAsset,
   indexToAsset,
 } from "./assets";
 import * as constants from "./constants";
+import { Asset } from "./constants";
 import { exchange as Exchange } from "./exchange";
 import {
   CrossMarginAccount,
