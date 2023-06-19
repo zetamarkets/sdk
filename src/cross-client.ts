@@ -659,6 +659,18 @@ export class CrossClient {
       let acc = closeAccs[i] as programTypes.MarginAccount;
       let asset = assets.fromProgramAsset(acc.asset);
       let market = Exchange.getPerpMarket(asset).address;
+      const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
+        market,
+        constants.DEX_PID[Exchange.network]
+      );
+      tx.add(
+        instructions.settleDexFundsIx(
+          asset,
+          market,
+          vaultOwner,
+          utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
+        )
+      );
       tx.add(
         instructions.closeOpenOrdersV2Ix(
           market,
