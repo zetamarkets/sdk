@@ -67,6 +67,33 @@ export function initializeCombinedSocializedLossAccountIx(): TransactionInstruct
   );
 }
 
+export function migrateToCrossMarginAccountIx(
+  marginAccounts: PublicKey[],
+  crossMarginAccount: PublicKey,
+  userKey: PublicKey,
+  subaccountIndex: number = 0
+): TransactionInstruction {
+  let remainingAccounts = [];
+  for (var account of marginAccounts) {
+    remainingAccounts.push({
+      pubkey: account,
+      isSigner: false,
+      isWritable: true,
+    });
+  }
+  return Exchange.program.instruction.migrateToCrossMarginAccount(
+    subaccountIndex,
+    {
+      accounts: {
+        crossMarginAccount,
+        pricing: Exchange.pricingAddress,
+        authority: userKey,
+      },
+      remainingAccounts,
+    }
+  );
+}
+
 export function initializeCrossMarginAccountManagerIx(
   crossMarginAccountManager: PublicKey,
   user: PublicKey

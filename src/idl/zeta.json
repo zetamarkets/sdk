@@ -213,11 +213,6 @@
           "isSigner": false
         },
         {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "pricing",
           "isMut": false,
           "isSigner": false
@@ -226,11 +221,6 @@
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [

@@ -213,11 +213,6 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "pricing",
           "isMut": false,
           "isSigner": false
@@ -226,11 +221,6 @@ export type Zeta = {
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -9713,11 +9703,6 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "pricing",
           "isMut": false,
           "isSigner": false
@@ -9726,11 +9711,6 @@ export const IDL: Zeta = {
           "name": "authority",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [

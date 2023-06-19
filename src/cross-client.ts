@@ -34,6 +34,7 @@ import * as instructions from "./program-instructions";
 import { EventType } from "./events";
 import { Client } from "./client";
 import { SubExchange } from "./subexchange";
+import { assets, programTypes } from ".";
 
 export class CrossClient {
   /**
@@ -189,6 +190,14 @@ export class CrossClient {
   private _positions: Map<Asset, types.Position[]>;
 
   /**
+   * Index in CrossMarginAccountManager
+   */
+  public get subaccountIndex(): number {
+    return this._subaccountIndex;
+  }
+  private _subaccountIndex: number;
+
+  /**
    * The subscription id for the margin account subscription.
    */
   private _accountSubscriptionId: number = undefined;
@@ -273,7 +282,8 @@ export class CrossClient {
     callback: (asset: Asset, type: EventType, data: any) => void = undefined,
     throttle: boolean = false,
     delegator: PublicKey = undefined,
-    useVersionedTxs: boolean = false
+    useVersionedTxs: boolean = false,
+    subaccountIndex: number = 0
   ): Promise<CrossClient> {
     let client = new CrossClient(connection, wallet, opts);
     let owner = wallet.publicKey;
@@ -282,6 +292,7 @@ export class CrossClient {
       client._delegatorKey = delegator;
     }
 
+    client._subaccountIndex = subaccountIndex;
     client._useVersionedTxs = useVersionedTxs;
     client._usdcAccountAddress = utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
@@ -300,7 +311,7 @@ export class CrossClient {
     let accountAddress = utils.getCrossMarginAccount(
       Exchange.programId,
       owner,
-      Uint8Array.from([0]) // seed number for subaccounts
+      Uint8Array.from([subaccountIndex]) // seed number for subaccounts
     )[0];
 
     let accountManagerAddress = utils.getCrossMarginAccountManager(
@@ -603,6 +614,75 @@ export class CrossClient {
         "User has no USDC associated token account. Please create one and deposit USDC."
       );
     }
+  }
+
+  public async migrateToCrossMarginAccount(
+    marginAccounts: PublicKey[]
+  ): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    this.usdcAccountCheck();
+    // Check if the user has a USDC account.
+    let tx = new Transaction();
+    if (this._account === null) {
+      console.log(
+        "User has no cross margin account manager. Creating account manager..."
+      );
+      tx.add(
+        instructions.initializeCrossMarginAccountManagerIx(
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
+    if (this._account === null) {
+      console.log("User has no cross margin account. Creating account...");
+      tx.add(
+        instructions.initializeCrossMarginAccountIx(
+          this._accountAddress,
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
+    tx.add(
+      instructions.migrateToCrossMarginAccountIx(
+        marginAccounts,
+        this._accountAddress,
+        this.publicKey,
+        this._subaccountIndex
+      )
+    );
+    let closeAccs = await Exchange.program.account.marginAccount.fetchMultiple(
+      marginAccounts
+    );
+    for (var i = 0; i < closeAccs.length; i++) {
+      let acc = closeAccs[i] as programTypes.MarginAccount;
+      let asset = assets.fromProgramAsset(acc.asset);
+      let market = Exchange.getPerpMarket(asset).address;
+      tx.add(
+        instructions.closeOpenOrdersV2Ix(
+          market,
+          this.publicKey,
+          marginAccounts[i],
+          utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
+        )
+      );
+      tx.add(
+        instructions.closeMarginAccountIx(
+          asset,
+          this.publicKey,
+          marginAccounts[i]
+        )
+      );
+    }
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
