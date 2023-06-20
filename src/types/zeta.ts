@@ -5527,49 +5527,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "modifyAsset",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "newOracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "newBackupOracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "newAsset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
       "name": "resetNumFlexUnderlyings",
       "accounts": [
         {
@@ -15013,49 +14970,6 @@ export const IDL: Zeta = {
         {
           "name": "newKey",
           "type": "publicKey"
-        }
-      ]
-    },
-    {
-      "name": "modifyAsset",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "newOracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "newBackupOracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "newAsset",
-          "type": {
-            "defined": "Asset"
-          }
         }
       ]
     },

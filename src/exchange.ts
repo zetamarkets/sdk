@@ -618,6 +618,8 @@ export class Exchange {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 
+    await this.updateExchangeState();
+
     this._isInitialized = true;
   }
 

@@ -967,26 +967,6 @@ export function initializePerpSyncQueueIx(
   );
 }
 
-export function modifyAssetIx(
-  zetaGroup: PublicKey,
-  newAsset: Asset,
-  newOracle: PublicKey,
-  newBackupOracle: PublicKey,
-  oracleBackupProgram: PublicKey,
-  admin: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.modifyAsset(toProgramAsset(newAsset), {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup,
-      admin: admin,
-      newOracle: newOracle,
-      newBackupOracle: newBackupOracle,
-      oracleBackupProgram: oracleBackupProgram,
-    },
-  });
-}
-
 export function initializeZetaGroupIx(
   asset: Asset,
   underlyingMint: PublicKey,
