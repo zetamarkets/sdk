@@ -618,9 +618,12 @@ export class CrossClient {
 
   public async migrateToCrossMarginAccount(
     marginAccounts: PublicKey[]
-  ): Promise<TransactionSignature> {
+  ): Promise<TransactionSignature[]> {
     this.delegatedCheck();
     this.usdcAccountCheck();
+
+    let txs = [];
+
     // Check if the user has a USDC account.
     let tx = new Transaction();
     if (this._account === null) {
@@ -652,6 +655,8 @@ export class CrossClient {
         this._subaccountIndex
       )
     );
+    txs.push(tx);
+
     let closeAccs = await Exchange.program.account.marginAccount.fetchMultiple(
       marginAccounts
     );
@@ -663,6 +668,7 @@ export class CrossClient {
         market,
         constants.DEX_PID[Exchange.network]
       );
+      tx = new Transaction();
       tx.add(
         instructions.settleDexFundsIx(
           asset,
@@ -686,15 +692,24 @@ export class CrossClient {
           marginAccounts[i]
         )
       );
+      txs.push(tx);
     }
-    return await utils.processTransaction(
-      this._provider,
-      tx,
-      undefined,
-      undefined,
-      undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
-    );
+
+    // Needs to be in order, can't do this async
+    let sigs = [];
+    for (var t of txs) {
+      sigs.push(
+        await utils.processTransaction(
+          this._provider,
+          t,
+          undefined,
+          undefined,
+          undefined,
+          this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+        )
+      );
+    }
+    return sigs;
   }
 
   /**
@@ -1876,7 +1891,7 @@ export class CrossClient {
       if (this._account.productLedgers[i].position.size.toNumber() != 0) {
         let asset = indexToAsset(i);
         positions.get(asset).push({
-          marketIndex: i,
+          marketIndex: constants.PERP_INDEX,
           market: Exchange.getPerpMarket(asset).address,
           size: utils.convertNativeLotSizeToDecimal(
             this._account.productLedgers[i].position.size.toNumber()
