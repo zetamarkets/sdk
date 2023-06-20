@@ -1590,11 +1590,13 @@ export class CrossClient {
     side: types.Side
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
+
+    // TODO this should support margin + cross margin automatically
     let account = (await Exchange.program.account.crossMarginAccount.fetch(
       crossMarginAccountToCancel
     )) as unknown as CrossMarginAccount;
 
-    let openOrdersAccountToCancel = utils.createOpenOrdersAddress(
+    let openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
       Exchange.programId,
       Exchange.getPerpMarket(asset).address,
       account.authority,
@@ -1630,6 +1632,8 @@ export class CrossClient {
     crossMarginAccountToCancel: PublicKey
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
+
+    // TODO this should support margin + cross margin automatically
     let account = (await Exchange.program.account.crossMarginAccount.fetch(
       crossMarginAccountToCancel
     )) as unknown as CrossMarginAccount;

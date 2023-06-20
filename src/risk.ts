@@ -291,7 +291,7 @@ export class RiskCalculator {
       let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
       let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
       if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
-        return 0;
+        continue;
       }
 
       let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
@@ -371,7 +371,7 @@ export class RiskCalculator {
       let position = ledger.position;
       let size = position.size.toNumber();
       if (size == 0) {
-        return 0;
+        continue;
       }
       margins += this.getMarginRequirement(
         asset,
@@ -413,7 +413,7 @@ export class RiskCalculator {
       let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
       let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
       if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
-        return 0;
+        continue;
       }
 
       let longLots = convertNativeLotSizeToDecimal(bidOpenOrders);
