@@ -61,15 +61,13 @@ export function calculateOtmAmount(
 /**
  * Calculates the margin requirement for given market index.
  * @param asset         underlying asset (SOL, BTC, etc.)
- * @param productIndex  market index of the product.
  * @param spotPrice     price of the spot.
  */
 export function calculateProductMargin(
   asset: Asset,
-  productIndex: number,
   spotPrice: number
 ): types.MarginRequirement {
-  let market = Exchange.getMarket(asset, productIndex);
+  let market = Exchange.getPerpMarket(asset);
   if (market.strike == null) {
     return null;
   }

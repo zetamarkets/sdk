@@ -54,7 +54,7 @@ export class RiskCalculator {
 
     this._perpMarginRequirements.set(
       asset,
-      calculateProductMargin(asset, constants.PERP_INDEX, spotPrice)
+      calculateProductMargin(asset, spotPrice)
     );
 
     return;

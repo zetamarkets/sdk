@@ -190,14 +190,15 @@ export interface CrossMarginAccount {
   authority: PublicKey;
   delegatedPubkey: PublicKey;
   balance: anchor.BN;
+  subaccountIndex: number;
   nonce: number;
   forceCancelFlag: boolean;
   accountType: any;
   openOrdersNonces: Array<number>;
   openOrdersNoncesPadding: Array<number>;
   rebalanceAmount: anchor.BN;
-  lastFundingDeltas: Array<anchor.BN>;
-  lastFundingDeltasPadding: Array<anchor.BN>;
+  lastFundingDeltas: Array<AnchorDecimal>;
+  lastFundingDeltasPadding: Array<AnchorDecimal>;
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
   padding: Array<number>;

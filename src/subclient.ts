@@ -1382,15 +1382,11 @@ export class SubClient {
       return;
     }
 
-    let orders = [];
-    await Promise.all(
-      [...this.getRelevantMarketIndexes()].map(async (i) => {
-        let market = Exchange.getMarket(this._asset, i);
-        await market.updateOrderbook();
-        orders.push(market.getOrdersForAccount(this._openOrdersAccounts[i]));
-      })
+    let market = Exchange.getPerpMarket(this._asset);
+    await market.updateOrderbook();
+    let orders = market.getOrdersForAccount(
+      this._openOrdersAccounts[constants.PERP_INDEX]
     );
-
     let allOrders = [].concat(...orders);
     const asset = this._asset;
     this._orders = allOrders.filter(function (order: types.Order) {
@@ -1398,10 +1394,7 @@ export class SubClient {
         order.orderId,
         order.side == types.Side.BID
       );
-      let serumMarket = Exchange.getMarket(
-        asset,
-        order.marketIndex
-      ).serumMarket;
+      let serumMarket = Exchange.getPerpMarket(asset).serumMarket;
 
       return !utils.isOrderExpired(
         order.tifOffset,

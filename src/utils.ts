@@ -1256,11 +1256,8 @@ export function getMostRecentExpiredIndex(asset: Asset) {
   }
 }
 
-export function getMutMarketAccounts(
-  asset: Asset,
-  marketIndex: number
-): Object[] {
-  let market = Exchange.getMarket(asset, marketIndex);
+export function getMutMarketAccounts(asset: Asset): Object[] {
+  let market = Exchange.getPerpMarket(asset);
   return [
     { pubkey: market.address, isSigner: false, isWritable: false },
     {
@@ -1411,44 +1408,6 @@ export async function getAllOpenOrdersAccounts(
   });
 
   return allOpenOrders;
-}
-
-export async function settleAndBurnVaultTokensByMarket(
-  asset: Asset,
-  provider: anchor.AnchorProvider,
-  openOrdersByMarketIndex: Map<number, Array<PublicKey>>,
-  marketIndex: number
-) {
-  console.log(`Burning tokens for market index ${marketIndex}`);
-  let market = Exchange.getMarket(asset, marketIndex);
-  let openOrders = openOrdersByMarketIndex.get(marketIndex);
-  let remainingAccounts = openOrders.map((key) => {
-    return { pubkey: key, isSigner: false, isWritable: true };
-  });
-
-  const [vaultOwner, _vaultSignerNonce] = getSerumVaultOwnerAndNonce(
-    market.address,
-    constants.DEX_PID[Exchange.network]
-  );
-
-  let txs = instructions.settleDexFundsTxs(
-    asset,
-    market.address,
-    vaultOwner,
-    remainingAccounts
-  );
-
-  for (var j = 0; j < txs.length; j += 5) {
-    let txSlice = txs.slice(j, j + 5);
-    await Promise.all(
-      txSlice.map(async (tx) => {
-        await processTransaction(provider, tx);
-      })
-    );
-  }
-
-  let burnTx = instructions.burnVaultTokenTx(asset, market.address);
-  await processTransaction(provider, burnTx);
 }
 
 export async function settleAndBurnVaultTokens(

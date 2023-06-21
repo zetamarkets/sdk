@@ -1860,10 +1860,7 @@ export class CrossClient {
         order.orderId,
         order.side == types.Side.BID
       );
-      let serumMarket = Exchange.getMarket(
-        order.asset,
-        order.marketIndex
-      ).serumMarket;
+      let serumMarket = Exchange.getPerpMarket(order.asset).serumMarket;
 
       return !utils.isOrderExpired(
         order.tifOffset,

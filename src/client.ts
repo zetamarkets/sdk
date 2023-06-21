@@ -403,7 +403,10 @@ export class Client {
     // marketIndex is either number or PublicKey
     let marketPubkey: PublicKey;
     if (typeof market == "number") {
-      marketPubkey = Exchange.getMarket(asset, market).address;
+      if (market != constants.PERP_INDEX) {
+        throw Error("Non-perp market");
+      }
+      marketPubkey = Exchange.getPerpMarket(asset).address;
     } else {
       marketPubkey = market;
     }

@@ -594,7 +594,6 @@ export class Exchange {
           accFetches[i].data
         ) as PerpSyncQueue
       );
-      break;
     }
 
     const clockData = utils.getClockData(accFetches.at(-1));
@@ -807,12 +806,12 @@ export class Exchange {
     this._eventEmitters.push(eventEmitter);
   }
 
-  public subscribeMarket(asset: Asset, index: number) {
-    this.getSubExchange(asset).markets.subscribeMarket(index);
+  public subscribeMarket(asset: Asset) {
+    this.getSubExchange(asset).markets.subscribeMarket(constants.PERP_INDEX);
   }
 
-  public unsubscribeMarket(asset: Asset, index: number) {
-    this.getSubExchange(asset).markets.unsubscribeMarket(index);
+  public unsubscribeMarket(asset: Asset) {
+    this.getSubExchange(asset).markets.unsubscribeMarket(constants.PERP_INDEX);
   }
 
   public subscribePerp(asset: Asset) {
@@ -823,8 +822,8 @@ export class Exchange {
     this.getSubExchange(asset).markets.unsubscribePerp();
   }
 
-  public async updateOrderbook(asset: Asset, index: number) {
-    return await this.getMarket(asset, index).updateOrderbook();
+  public async updateOrderbook(asset: Asset) {
+    return await this.getPerpMarket(asset).updateOrderbook();
   }
 
   public async updateAllOrderbooks(live: boolean = true) {
@@ -903,13 +902,6 @@ export class Exchange {
     return this.getSubExchange(asset).markets;
   }
 
-  public getMarket(asset: Asset, index: number): Market {
-    if (index == constants.PERP_INDEX) {
-      return this.getPerpMarket(asset);
-    }
-    return this.getSubExchange(asset).markets.markets[index];
-  }
-
   public getMarkets(asset: Asset): Market[] {
     let sub = this.getSubExchange(asset);
     return [sub.markets.perpMarket];
@@ -935,8 +927,8 @@ export class Exchange {
     return this.getSubExchange(asset).perpSyncQueue;
   }
 
-  public getOrderbook(asset: Asset, index: number): types.DepthOrderbook {
-    return this.getMarket(asset, index).orderbook;
+  public getOrderbook(asset: Asset): types.DepthOrderbook {
+    return this.getPerpMarket(asset).orderbook;
   }
 
   public getMarkPrice(asset: Asset): number {
