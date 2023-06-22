@@ -609,49 +609,6 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  /**
-   *
-   * @param movementType move funds from treasury wallet to insurance fund or the opposite
-   * @param amount an array of remaining accounts (margin accounts) that will be rebalanced
-   */
-  public async treasuryMovement(
-    treasuryMovementType: types.TreasuryMovementType,
-    amount: anchor.BN
-  ) {
-    let tx = new Transaction().add(
-      instructions.treasuryMovementIx(treasuryMovementType, amount)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
-   *
-   * @param marginAccounts an array of remaining accounts (margin accounts) that will be rebalanced
-   */
-  public async rebalanceInsuranceVault(marginAccounts: any[]) {
-    let txs = [];
-    for (
-      var i = 0;
-      i < marginAccounts.length;
-      i += constants.MAX_REBALANCE_ACCOUNTS
-    ) {
-      let tx = new Transaction();
-      let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
-      tx.add(instructions.rebalanceInsuranceVaultIx(slice));
-      txs.push(tx);
-    }
-    try {
-      await Promise.all(
-        txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(Exchange.provider, tx);
-          console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
-        })
-      );
-    } catch (e) {
-      console.log(`Error in rebalancing the insurance vault ${e}`);
-    }
-  }
-
   public updateMarginParams() {
     if (Exchange.pricing === undefined) {
       return;

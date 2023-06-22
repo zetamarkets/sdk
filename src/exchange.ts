@@ -1060,18 +1060,37 @@ export class Exchange {
   }
 
   public async treasuryMovement(
-    asset: Asset,
     treasuryMovementType: types.TreasuryMovementType,
     amount: anchor.BN
   ) {
-    await this.getSubExchange(asset).treasuryMovement(
-      treasuryMovementType,
-      amount
+    let tx = new Transaction().add(
+      instructions.treasuryMovementIx(treasuryMovementType, amount)
     );
+    await utils.processTransaction(this._provider, tx);
   }
 
-  public async rebalanceInsuranceVault(asset: Asset, marginAccounts: any[]) {
-    await this.getSubExchange(asset).rebalanceInsuranceVault(marginAccounts);
+  public async rebalanceInsuranceVault(marginAccounts: any[]) {
+    let txs = [];
+    for (
+      var i = 0;
+      i < marginAccounts.length;
+      i += constants.MAX_REBALANCE_ACCOUNTS
+    ) {
+      let tx = new Transaction();
+      let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
+      tx.add(instructions.rebalanceInsuranceVaultIx(slice));
+      txs.push(tx);
+    }
+    try {
+      await Promise.all(
+        txs.map(async (tx) => {
+          let txSig = await utils.processTransaction(this._provider, tx);
+          console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
+        })
+      );
+    } catch (e) {
+      console.log(`Error in rebalancing the insurance vault ${e}`);
+    }
   }
 
   public updateMarginParams(asset: Asset) {
