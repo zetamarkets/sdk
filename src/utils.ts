@@ -1423,7 +1423,7 @@ export async function getAllOpenOrdersAccounts(
       let [openOrders, _nonce] = getCrossOpenOrders(
         Exchange.programId,
         market.address,
-        crossMarginAccount.authority
+        acc.publicKey
       );
       allOpenOrders.push(openOrders);
     }
