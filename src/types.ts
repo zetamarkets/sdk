@@ -354,7 +354,6 @@ export function defaultOrderOptions(): OrderOptions {
 export interface LoadExchangeConfig {
   network: Network;
   connection: Connection;
-  assets: Asset[];
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
@@ -363,7 +362,6 @@ export interface LoadExchangeConfig {
 export function defaultLoadExchangeConfig(
   network: Network,
   connection: Connection,
-  assets: Asset[] = allAssets(),
   opts: ConfirmOptions = utils.defaultCommitment(),
   throttleMs = 0,
   loadFromStore = false
@@ -371,7 +369,6 @@ export function defaultLoadExchangeConfig(
   return {
     network,
     connection,
-    assets,
     opts,
     throttleMs,
     loadFromStore,

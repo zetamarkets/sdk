@@ -1891,17 +1891,19 @@ export class CrossClient {
     for (var i = 0; i < this._account.productLedgers.length; i++) {
       if (this._account.productLedgers[i].position.size.toNumber() != 0) {
         let asset = indexToAsset(i);
-        positions.get(asset).push({
-          marketIndex: constants.PERP_INDEX,
-          market: Exchange.getPerpMarket(asset).address,
-          size: utils.convertNativeLotSizeToDecimal(
-            this._account.productLedgers[i].position.size.toNumber()
-          ),
-          costOfTrades: utils.convertNativeBNToDecimal(
-            this._account.productLedgers[i].position.costOfTrades
-          ),
-          asset: asset,
-        });
+        if (asset in Exchange.assets) {
+          positions.get(asset).push({
+            marketIndex: constants.PERP_INDEX,
+            market: Exchange.getPerpMarket(asset).address,
+            size: utils.convertNativeLotSizeToDecimal(
+              this._account.productLedgers[i].position.size.toNumber()
+            ),
+            costOfTrades: utils.convertNativeBNToDecimal(
+              this._account.productLedgers[i].position.costOfTrades
+            ),
+            asset: asset,
+          });
+        }
       }
     }
 

@@ -11,6 +11,7 @@ import {
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
+import * as assets from "./assets";
 import { PerpSyncQueue, ProductGreeks, State, Pricing } from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
@@ -322,7 +323,7 @@ export class Exchange {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
-    this._assets = loadConfig.assets;
+    this._assets = assets.allAssets();
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
       wallet instanceof types.DummyWallet ? null : wallet,
@@ -337,7 +338,7 @@ export class Exchange {
       this._provider
     ) as anchor.Program<Zeta>;
 
-    for (var asset of loadConfig.assets) {
+    for (var asset of assets.allAssets()) {
       this.addSubExchange(asset, new SubExchange());
       this.getSubExchange(asset).initialize(asset);
     }
@@ -583,7 +584,7 @@ export class Exchange {
 
     const accFetches = (await Promise.all(allPromises)).slice(
       0,
-      loadConfig.assets.length + 1
+      assets.allAssets().length + 1
     );
 
     let perpSyncQueueAccs: PerpSyncQueue[] = [];

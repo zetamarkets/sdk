@@ -1281,26 +1281,48 @@ export async function getCancelAllIxs(
   let ixs: TransactionInstruction[] = [];
   await Promise.all(
     orders.map(async (order) => {
-      // TODO support both crossmargin and margin accounts
       const [openOrdersMap, _openOrdersMapNonce] = getCrossOpenOrdersMap(
         Exchange.programId,
         order.owner
       );
 
       let openOrdersMapInfo =
-        (await Exchange.program.account.crossOpenOrdersMap.fetch(
+        await Exchange.program.account.crossOpenOrdersMap.fetchNullable(
           openOrdersMap
-        )) as CrossOpenOrdersMap;
+        );
 
-      const [marginAccount, _marginNonce] = getCrossMarginAccount(
-        Exchange.programId,
-        openOrdersMapInfo.userKey,
-        Uint8Array.from([openOrdersMapInfo.subaccountIndex])
-      );
+      let account;
+
+      // MarginAccount
+      if (openOrdersMapInfo == null) {
+        const [openOrdersMap, _openOrdersMapNonce] = getOpenOrdersMap(
+          Exchange.programId,
+          order.owner
+        );
+        let map = (await Exchange.program.account.openOrdersMap.fetch(
+          openOrdersMap
+        )) as OpenOrdersMap;
+        const [marginAccount, _marginNonce] = getMarginAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(asset),
+          map.userKey
+        );
+        account = marginAccount;
+      }
+      // CrossMarginAccount
+      else {
+        let map = openOrdersMapInfo as CrossOpenOrdersMap;
+        const [marginAccount, _marginNonce] = getCrossMarginAccount(
+          Exchange.programId,
+          map.userKey,
+          Uint8Array.from([map.subaccountIndex])
+        );
+        account = marginAccount;
+      }
 
       let ix = instructions.cancelOrderHaltedIx(
         asset,
-        marginAccount,
+        account,
         order.owner,
         order.orderId,
         order.side
