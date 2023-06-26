@@ -1724,7 +1724,7 @@ export type Zeta = {
       "name": "depositV2",
       "accounts": [
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -1968,7 +1968,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -3770,7 +3770,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -3954,7 +3954,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4032,7 +4032,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4110,7 +4110,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4173,7 +4173,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4251,7 +4251,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4323,7 +4323,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4451,7 +4451,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4549,7 +4549,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4642,7 +4642,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -4730,7 +4730,7 @@ export type Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -5272,7 +5272,7 @@ export type Zeta = {
           "isSigner": true
         },
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         }
@@ -5427,7 +5427,7 @@ export type Zeta = {
       "name": "editDelegatedPubkey",
       "accounts": [
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -11089,7 +11089,7 @@ export const IDL: Zeta = {
       "name": "depositV2",
       "accounts": [
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -11333,7 +11333,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -13135,7 +13135,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -13319,7 +13319,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -13397,7 +13397,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -13475,7 +13475,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -13538,7 +13538,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -13616,7 +13616,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -13688,7 +13688,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -13816,7 +13816,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -13914,7 +13914,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -14007,7 +14007,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -14095,7 +14095,7 @@ export const IDL: Zeta = {
               "isSigner": false
             },
             {
-              "name": "account",
+              "name": "marginAccount",
               "isMut": true,
               "isSigner": false
             },
@@ -14637,7 +14637,7 @@ export const IDL: Zeta = {
           "isSigner": true
         },
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         }
@@ -14792,7 +14792,7 @@ export const IDL: Zeta = {
       "name": "editDelegatedPubkey",
       "accounts": [
         {
-          "name": "account",
+          "name": "marginAccount",
           "isMut": true,
           "isSigner": false
         },
