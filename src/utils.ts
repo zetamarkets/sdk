@@ -88,14 +88,14 @@ export function getSettlement(
 export function getCrossOpenOrders(
   programId: PublicKey,
   market: PublicKey,
-  userKey: PublicKey
+  account: PublicKey
 ): [PublicKey, number] {
   return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("cross-open-orders")),
       constants.DEX_PID[Exchange.network].toBuffer(),
       market.toBuffer(),
-      userKey.toBuffer(),
+      account.toBuffer(),
     ],
     programId
   );

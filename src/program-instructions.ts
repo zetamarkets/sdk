@@ -70,8 +70,7 @@ export function initializeCombinedSocializedLossAccountIx(): TransactionInstruct
 export function migrateToCrossMarginAccountIx(
   marginAccounts: PublicKey[],
   crossMarginAccount: PublicKey,
-  userKey: PublicKey,
-  subaccountIndex: number = 0
+  userKey: PublicKey
 ): TransactionInstruction {
   let remainingAccounts = [];
   for (var account of marginAccounts) {
@@ -81,17 +80,14 @@ export function migrateToCrossMarginAccountIx(
       isWritable: true,
     });
   }
-  return Exchange.program.instruction.migrateToCrossMarginAccount(
-    subaccountIndex,
-    {
-      accounts: {
-        crossMarginAccount,
-        pricing: Exchange.pricingAddress,
-        authority: userKey,
-      },
-      remainingAccounts,
-    }
-  );
+  return Exchange.program.instruction.migrateToCrossMarginAccount({
+    accounts: {
+      crossMarginAccount,
+      pricing: Exchange.pricingAddress,
+      authority: userKey,
+    },
+    remainingAccounts,
+  });
 }
 
 export function initializeCrossMarginAccountManagerIx(
@@ -356,14 +352,13 @@ export function initializeOpenOrdersV2Ix(
 export function initializeOpenOrdersV3Ix(
   asset: Asset,
   market: PublicKey,
-  userKey: PublicKey,
   authority: PublicKey,
   crossMarginAccount: PublicKey
 ): [TransactionInstruction, PublicKey] {
   const [openOrdersPda, _openOrdersNonce] = utils.getCrossOpenOrders(
     Exchange.programId,
     market,
-    userKey
+    crossMarginAccount
   );
 
   const [openOrdersMap, _openOrdersMapNonce] = utils.getCrossOpenOrdersMap(

@@ -223,12 +223,7 @@ export type Zeta = {
           "isSigner": true
         }
       ],
-      "args": [
-        {
-          "name": "subaccountIndex",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "initializeCrossMarginAccountManager",
@@ -9593,12 +9588,7 @@ export const IDL: Zeta = {
           "isSigner": true
         }
       ],
-      "args": [
-        {
-          "name": "subaccountIndex",
-          "type": "u8"
-        }
-      ]
+      "args": []
     },
     {
       "name": "initializeCrossMarginAccountManager",

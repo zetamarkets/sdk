@@ -651,8 +651,7 @@ export class CrossClient {
       instructions.migrateToCrossMarginAccountIx(
         marginAccounts,
         this._accountAddress,
-        this.publicKey,
-        this._subaccountIndex
+        this.publicKey
       )
     );
     txs.push(tx);
@@ -922,7 +921,6 @@ export class CrossClient {
       let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV3Ix(
         asset,
         Exchange.getPerpMarket(asset).address,
-        this.publicKey,
         this._provider.wallet.publicKey,
         this._accountAddress
       );
@@ -1445,7 +1443,6 @@ export class CrossClient {
     let [initIx, openOrdersPda] = instructions.initializeOpenOrdersV3Ix(
       asset,
       Exchange.getPerpMarket(asset).address,
-      this.publicKey,
       this._provider.wallet.publicKey,
       this.accountAddress
     );
@@ -1926,7 +1923,7 @@ export class CrossClient {
         let [openOrdersPda, _openOrdersNonce] = utils.getCrossOpenOrders(
           Exchange.programId,
           Exchange.getPerpMarket(asset).address,
-          this.publicKey
+          this.accountAddress
         );
         this._openOrdersAccounts[assetIndex] = openOrdersPda;
       }
