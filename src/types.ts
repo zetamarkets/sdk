@@ -10,7 +10,7 @@ import {
 import { allAssets } from "./assets";
 import { Asset } from "./constants";
 import { objectEquals } from "./utils";
-import { MarginAccount } from "./program-types";
+import { CrossMarginAccount, MarginAccount } from "./program-types";
 import { Network, types, utils } from ".";
 import * as constants from "./constants";
 
@@ -292,7 +292,7 @@ export function fromProgramMarginAccountType(
   throw Error("Invalid margin account type");
 }
 
-export function isMarketMaker(account: any) {
+export function isMarketMaker(account: CrossMarginAccount | MarginAccount) {
   return (
     fromProgramMarginAccountType(account.accountType) ==
     MarginAccountType.MARKET_MAKER

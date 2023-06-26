@@ -114,119 +114,6 @@ export function calculatePerpMargin(
   return calculateFutureMargin(asset, spotPrice);
 }
 
-export function calculateSpreadAccountMarginRequirement(
-  spreadAccount: SpreadAccount
-) {
-  return 0;
-}
-
-/**
- * Note: BN maths below are achieved through a BN -> number -> BN method.
- * If overflow errors occur, change this in future to pure BN math.
- */
-
-function calculateSpreadMarginRequirements(
-  strikes: number[],
-  positions: Position[]
-) {
-  if (strikes.length !== constants.NUM_STRIKES) return;
-  // Structure the strikes as such [0, s0, s1, ..., sN-1]
-  // with 0 being the 0 strike call (future).
-  let adjustedStrikes = new Array(constants.NUM_STRIKES + 1).fill(0);
-  for (let i = 0; i < constants.NUM_STRIKES; i++) {
-    if (strikes[i] === null) continue;
-    adjustedStrikes[i + 1] = strikes[i];
-  }
-
-  let callPositions = positions.slice(0, constants.NUM_STRIKES);
-  let putPositions = positions.slice(
-    constants.NUM_STRIKES,
-    constants.NUM_STRIKES * 2
-  );
-  let futurePosition = positions[constants.SERIES_FUTURE_INDEX].size.toNumber();
-
-  let cumCallPnl = calculateCallCumPnl(
-    adjustedStrikes,
-    callPositions,
-    futurePosition
-  );
-  let cumPutPnl = calculatePutCumPnl(adjustedStrikes, putPositions);
-  let totalPositionPnl = new Array(constants.NUM_STRIKES + 1).fill(0);
-
-  for (let i = 0; i < cumCallPnl.length; i++) {
-    totalPositionPnl[i] = cumCallPnl[i] + cumPutPnl[i];
-  }
-
-  let minPositionPnl = Math.min(...totalPositionPnl);
-  let totalCostOfTrades = 0;
-  for (let i = 0; i < positions.length; i++) {
-    totalCostOfTrades +=
-      positions[i].size.toNumber() > 0
-        ? positions[i].costOfTrades.toNumber()
-        : -positions[i].costOfTrades.toNumber();
-  }
-
-  return Math.abs(Math.min(minPositionPnl - totalCostOfTrades, 0));
-}
-
-function calculateCallCumPnl(
-  strikes: number[],
-  callPositions: Position[],
-  futurePosition: number
-) {
-  let cumCallPositions = new Array(constants.NUM_STRIKES + 1).fill(0);
-  let cumCallPnl = new Array(constants.NUM_STRIKES + 1).fill(0);
-  cumCallPositions[0] = futurePosition;
-  for (let i = 0; i < constants.NUM_STRIKES; i++) {
-    cumCallPositions[i + 1] =
-      callPositions[i].size.toNumber() + cumCallPositions[i];
-    let strikeDiff = strikes[i + 1] - strikes[i];
-    // The incremental change in pnl is the cumulative position from the previous index
-    // multiplied by the difference in strike price
-    let pnlDelta = calculateSignedCostOfTrades(strikeDiff, cumCallPositions[i]);
-    cumCallPnl[i + 1] = cumCallPnl[i] + pnlDelta;
-  }
-
-  if (cumCallPositions[constants.NUM_STRIKES] < 0) {
-    throw Error("Naked short call is not allowed.");
-  }
-  return cumCallPnl;
-}
-
-export function calculatePutCumPnl(
-  strikes: number[],
-  putPositions: Position[]
-) {
-  let cumPutPositions = new Array(constants.NUM_STRIKES + 1).fill(0);
-  let cumPutPnl = new Array(constants.NUM_STRIKES + 1).fill(0);
-  cumPutPositions[constants.NUM_STRIKES] =
-    putPositions[constants.NUM_STRIKES - 1].size.toNumber();
-  for (let i = constants.NUM_STRIKES - 1; i >= 0; i--) {
-    let positionSize = i === 0 ? 0 : putPositions[i - 1].size.toNumber();
-    cumPutPositions[i] = positionSize + cumPutPositions[i + 1];
-    let strikeDiff = strikes[i + 1] - strikes[i];
-    // The incremental change in pnl is the cumulative position from the previous index
-    // multiplied by the difference in strike price
-    let pnlDelta = calculateSignedCostOfTrades(
-      strikeDiff,
-      cumPutPositions[i + 1]
-    );
-    cumPutPnl[i] = cumPutPnl[i + 1] + pnlDelta;
-  }
-  return cumPutPnl;
-}
-
-function getPositionsByExpiryIndexforSpreadAccount(
-  spreadAccount: SpreadAccount,
-  expiryIndex: number
-): Position[] {
-  let head = expiryIndex * constants.PRODUCTS_PER_EXPIRY;
-  return spreadAccount.positions.slice(
-    head,
-    head + constants.PRODUCTS_PER_EXPIRY
-  );
-}
-
 export function checkMarginAccountMarginRequirement(
   marginAccount: MarginAccount
 ) {
@@ -238,58 +125,6 @@ export function checkMarginAccountMarginRequirement(
     Exchange.riskCalculator.calculateTotalMaintenanceMargin(marginAccount);
   let buffer = marginAccount.balance.toNumber() + pnl - totalMaintenanceMargin;
   return buffer > 0;
-}
-
-export function movePositions(
-  spreadAccount: SpreadAccount,
-  marginAccount: MarginAccount,
-  movementType: types.MovementType,
-  movements: instructions.PositionMovementArg[]
-) {
-  for (let i = 0; i < movements.length; i++) {
-    let size = movements[i].size.toNumber();
-    let index = movements[i].index;
-    if (size === 0 || index >= constants.ACTIVE_MARKETS - 1) {
-      throw Error("Invalid movement.");
-    }
-
-    if (movementType === types.MovementType.LOCK) {
-      lockMarginAccountPosition(marginAccount, spreadAccount, index, size);
-    } else if (movementType === types.MovementType.UNLOCK) {
-      unlockSpreadAccountPosition(marginAccount, spreadAccount, index, size);
-    } else {
-      throw Error("Invalid movement type.");
-    }
-  }
-
-  let spreadMarginRequirements =
-    calculateSpreadAccountMarginRequirement(spreadAccount);
-
-  if (spreadMarginRequirements > spreadAccount.balance.toNumber()) {
-    let diff = spreadMarginRequirements - spreadAccount.balance.toNumber();
-    if (diff > marginAccount.balance.toNumber()) {
-      throw Error("Insufficient funds to collateralize spread account.");
-    }
-    // Move funds from margin to spread.
-    spreadAccount.balance = new BN(spreadAccount.balance.toNumber() + diff);
-    marginAccount.balance = new BN(marginAccount.balance.toNumber() - diff);
-  } else if (spreadMarginRequirements < spreadAccount.balance.toNumber()) {
-    let diff = spreadAccount.balance.toNumber() - spreadMarginRequirements;
-    // Move funds from spread to margin.
-    spreadAccount.balance = new BN(spreadAccount.balance.toNumber() - diff);
-    marginAccount.balance = new BN(marginAccount.balance.toNumber() + diff);
-  }
-}
-
-function unlockSpreadAccountPosition(
-  marginAccount: MarginAccount,
-  spreadAccount: SpreadAccount,
-  index: number,
-  size: number
-) {
-  let position = spreadAccount.positions[index];
-  let costOfTrades = moveSize(position, size);
-  handleExecutionCostOfTrades(marginAccount, index, size, costOfTrades, false);
 }
 
 export function handleExecutionCostOfTrades(
@@ -334,19 +169,6 @@ export function handleExecutionCostOfTrades(
 
   openPosition(ledger.position, signedOpenSize, openCostOfTrades);
   rebalanceOrders(ledger);
-}
-
-function lockMarginAccountPosition(
-  marginAccount: MarginAccount,
-  spreadAccount: SpreadAccount,
-  index: number,
-  size: number
-) {
-  let ledger = getProductLedger(marginAccount, index);
-  resetClosingOrders(ledger);
-  let costOfTrades = moveSize(ledger.position, size);
-  rebalanceOrders(ledger);
-  lockSpreadAccountPosition(spreadAccount, index, size, costOfTrades);
 }
 
 function rebalanceOrders(ledger: ProductLedger) {
@@ -420,29 +242,6 @@ function moveSize(position: Position, size: number) {
   }
 
   return costOfTrades;
-}
-
-export function lockSpreadAccountPosition(
-  spreadAccount: SpreadAccount,
-  index: number,
-  size: number,
-  costOfTrades: number
-) {
-  let position = spreadAccount.positions[index];
-  let [openSize, closeSize] = getExecutionOpenCloseSize(
-    position.size.toNumber(),
-    size
-  );
-  // Prorata cost of trades here.
-  let [openCostOfTrades, closeCostOfTrades] = getOpenCloseCostOfTrades(
-    openSize,
-    closeSize,
-    costOfTrades
-  );
-
-  closePosition(position, spreadAccount, closeSize, closeCostOfTrades);
-  let signedOpenSize = size >= 0 ? openSize : -openSize;
-  openPosition(position, signedOpenSize, openCostOfTrades);
 }
 
 function getExecutionOpenCloseSize(

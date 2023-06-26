@@ -1472,11 +1472,10 @@ export async function burnVaultTokens(
   asset: Asset,
   provider: anchor.AnchorProvider
 ) {
-  for (var market of Exchange.getMarkets(asset)) {
-    console.log(`Burning tokens for market index ${market.marketIndex}`);
-    let burnTx = instructions.burnVaultTokenTx(asset, market.address);
-    await processTransaction(provider, burnTx);
-  }
+  let market = Exchange.getPerpMarket(asset);
+  console.log(`Burning tokens for market index ${market.marketIndex}`);
+  let burnTx = instructions.burnVaultTokenTx(asset, market.address);
+  await processTransaction(provider, burnTx);
 }
 
 /**

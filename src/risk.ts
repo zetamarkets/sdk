@@ -1,11 +1,7 @@
 import { exchange as Exchange } from "./exchange";
 import * as types from "./types";
 import * as constants from "./constants";
-import {
-  CrossMarginAccount,
-  MarginAccount,
-  PositionMovementEvent,
-} from "./program-types";
+import { CrossMarginAccount, MarginAccount } from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
@@ -17,7 +13,6 @@ import { assets, Client, Decimal, instructions, utils } from ".";
 import { cloneDeep } from "lodash";
 import {
   calculateProductMargin,
-  movePositions,
   calculateNormalizedCostOfTrades,
   checkMarginAccountMarginRequirement,
 } from "./risk-utils";
@@ -535,119 +530,6 @@ export class RiskCalculator {
       availableBalanceInitial,
       availableBalanceMaintenance,
       availableBalanceWithdrawable,
-    };
-  }
-
-  public calculatePositionMovement(
-    user: Client,
-    asset: Asset,
-    movementType: types.MovementType,
-    movements: instructions.PositionMovementArg[]
-  ): PositionMovementEvent {
-    if (movements.length > constants.MAX_POSITION_MOVEMENTS) {
-      throw Error("Exceeded max position movements.");
-    }
-
-    let marginAccount = user.getMarginAccount(asset);
-    let spreadAccount = user.getSpreadAccount(asset);
-
-    if (spreadAccount === null) {
-      let positions = [];
-      let positionsPadding = [];
-      let seriesExpiry = [];
-      for (let i = 0; i < constants.ACTIVE_MARKETS - 1; i++) {
-        positions.push({
-          size: new BN(0),
-          costOfTrades: new BN(0),
-        });
-      }
-      for (let i = 0; i < constants.TOTAL_MARKETS; i++) {
-        positionsPadding.push({
-          size: new BN(0),
-          costOfTrades: new BN(0),
-        });
-      }
-      for (
-        let i = 0;
-        i < constants.TOTAL_MARKETS - (constants.ACTIVE_MARKETS - 1);
-        i++
-      ) {
-        seriesExpiry.push(new BN(0));
-      }
-
-      spreadAccount = {
-        authority: marginAccount.authority,
-        nonce: 0,
-        balance: new BN(0),
-        seriesExpiry,
-        seriesExpiryPadding: new BN(0),
-        positions,
-        positionsPadding,
-        asset: assets.toProgramAsset(asset),
-        padding: new Array(262).fill(0),
-      };
-    }
-
-    // Copy account objects to perform simulated position movement
-    let simulatedMarginAccount = cloneDeep(marginAccount);
-    let simulatedSpreadAccount = cloneDeep(spreadAccount);
-
-    let nativeSpot = utils.convertDecimalToNativeInteger(
-      Exchange.oracle.getPrice(asset).price
-    );
-
-    // Perform movement by movement type onto new margin and spread accounts
-    movePositions(
-      simulatedSpreadAccount,
-      simulatedMarginAccount,
-      movementType,
-      movements
-    );
-
-    // Calculate margin requirements for new margin and spread accounts
-    // Calculate margin requirements for old margin and spread accounts
-    let totalContracts = 0;
-    for (let i = 0; i < movements.length; i++) {
-      totalContracts = totalContracts + Math.abs(movements[i].size.toNumber());
-    }
-    let movementNotional = calculateNormalizedCostOfTrades(
-      nativeSpot,
-      totalContracts
-    );
-    let movementFees =
-      (movementNotional / constants.BPS_DENOMINATOR) *
-      Exchange.state.positionMovementFeeBps;
-    simulatedMarginAccount.balance = new BN(
-      simulatedMarginAccount.balance.toNumber() - movementFees
-    );
-    simulatedMarginAccount.rebalanceAmount = new BN(
-      simulatedMarginAccount.rebalanceAmount.toNumber() + movementFees
-    );
-
-    if (!checkMarginAccountMarginRequirement(simulatedMarginAccount))
-      throw Error("Failed maintenance margin requirement.");
-
-    // Temporarily add limitation for maximum contracts locked as a safety.
-    // Set to 100k total contracts for now.
-    totalContracts = 0;
-    for (let i = 0; i < simulatedSpreadAccount.positions.length; i++) {
-      totalContracts =
-        totalContracts +
-        Math.abs(simulatedSpreadAccount.positions[i].size.toNumber());
-    }
-
-    if (totalContracts > constants.MAX_TOTAL_SPREAD_ACCOUNT_CONTRACTS)
-      throw Error("Exceeded max spread account contracts.");
-
-    let netTransfer =
-      simulatedSpreadAccount.balance.toNumber() -
-      spreadAccount.balance.toNumber();
-
-    return {
-      netBalanceTransfer: new BN(netTransfer),
-      marginAccountBalance: simulatedMarginAccount.balance,
-      spreadAccountBalance: simulatedSpreadAccount.balance,
-      movementFees: new BN(movementFees),
     };
   }
 }

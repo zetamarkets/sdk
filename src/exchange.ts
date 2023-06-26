@@ -618,8 +618,6 @@ export class Exchange {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 
-    await this.updateExchangeState();
-
     this._isInitialized = true;
   }
 
@@ -831,7 +829,7 @@ export class Exchange {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
     let allLiveMarkets = [];
     this.assets.forEach((asset) => {
-      allLiveMarkets = allLiveMarkets.concat(this.getMarkets(asset));
+      allLiveMarkets = allLiveMarkets.concat([this.getPerpMarket(asset)]);
     });
 
     if (live) {
@@ -901,11 +899,6 @@ export class Exchange {
 
   public getZetaGroupMarkets(asset: Asset): ZetaGroupMarkets {
     return this.getSubExchange(asset).markets;
-  }
-
-  public getMarkets(asset: Asset): Market[] {
-    let sub = this.getSubExchange(asset);
-    return [sub.markets.perpMarket];
   }
 
   public getPerpMarket(asset: Asset): Market {

@@ -624,7 +624,7 @@ export class CrossClient {
 
     let txs = [];
 
-    // Check if the user has a USDC account.
+    // Check if the user has accounts set up
     let tx = new Transaction();
     if (this._account === null) {
       console.log(
@@ -717,7 +717,7 @@ export class CrossClient {
   public async deposit(amount: number): Promise<TransactionSignature> {
     this.delegatedCheck();
     this.usdcAccountCheck();
-    // Check if the user has a USDC account.
+    // Check if the user has accounts set up
     let tx = new Transaction();
     if (this._account === null) {
       console.log(
