@@ -1596,7 +1596,7 @@ export class CrossClient {
     let openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
       Exchange.programId,
       Exchange.getPerpMarket(asset).address,
-      account.authority,
+      crossMarginAccountToCancel,
       account.openOrdersNonces[assetToIndex(asset)]
     );
 
@@ -1638,7 +1638,7 @@ export class CrossClient {
     let openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
       Exchange.programId,
       Exchange.getPerpMarket(asset).address,
-      account.authority,
+      crossMarginAccountToCancel,
       account.openOrdersNonces[assetToIndex(asset)]
     );
 
