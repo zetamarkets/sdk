@@ -225,7 +225,7 @@ export function depositV2Ix(
   return Exchange.program.instruction.depositV2(new anchor.BN(amount), {
     accounts: {
       pricing: Exchange.pricingAddress,
-      account: marginAccount,
+      marginAccount: marginAccount,
       vault: Exchange.combinedVaultAddress,
       userTokenAccount: usdcAccount,
       socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
@@ -303,7 +303,7 @@ export function withdrawV2Ix(
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
       vault: Exchange.combinedVaultAddress,
-      account: marginAccount,
+      marginAccount: marginAccount,
       userTokenAccount: usdcAccount,
       authority: userKey,
       tokenProgram: TOKEN_PROGRAM_ID,
@@ -485,7 +485,7 @@ export function placePerpOrderV3Ix(
       accounts: {
         state: Exchange.stateAddress,
         pricing: Exchange.pricingAddress,
-        account: marginAccount,
+        marginAccount: marginAccount,
         authority: authority,
         dexProgram: constants.DEX_PID[Exchange.network],
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -542,7 +542,7 @@ export function cancelOrderIx(
         authority: userKey,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account: marginAccount,
+          marginAccount: marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -574,7 +574,7 @@ export function cancelOrderNoErrorIx(
         authority: userKey,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account: marginAccount,
+          marginAccount: marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -617,7 +617,7 @@ export function cancelAllMarketOrdersIx(
         authority: userKey,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account: marginAccount,
+          marginAccount: marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -647,7 +647,7 @@ export function cancelOrderByClientOrderIdIx(
         authority: userKey,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account: marginAccount,
+          marginAccount: marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -677,7 +677,7 @@ export function cancelOrderByClientOrderIdNoErrorIx(
         authority: userKey,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account: marginAccount,
+          marginAccount: marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -712,7 +712,7 @@ export function forceCancelOrderByOrderIdV2Ix(
         oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account: marginAccount,
+          marginAccount: marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -743,7 +743,7 @@ export function forceCancelOrdersV2Ix(
         oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account: marginAccount,
+          marginAccount: marginAccount,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -1718,7 +1718,7 @@ export function cancelOrderHaltedIx(
       accounts: {
         cancelAccounts: {
           state: Exchange.stateAddress,
-          account,
+          marginAccount: account,
           dexProgram: constants.DEX_PID[Exchange.network],
           serumAuthority: Exchange.serumAuthority,
           openOrders,
@@ -2003,7 +2003,7 @@ export function toggleMarketMakerIx(
     accounts: {
       state: Exchange.stateAddress,
       admin: Exchange.state.admin,
-      account,
+      marginAccount: account,
     },
   });
 }
@@ -2015,7 +2015,7 @@ export function editDelegatedPubkeyIx(
 ): TransactionInstruction {
   return Exchange.program.instruction.editDelegatedPubkey(delegatedPubkey, {
     accounts: {
-      account,
+      marginAccount: account,
       authority,
     },
   });
