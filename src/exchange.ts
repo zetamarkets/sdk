@@ -11,6 +11,7 @@ import {
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
+import * as assets from "./assets";
 import { PerpSyncQueue, ProductGreeks, State, Pricing } from "./program-types";
 import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
@@ -322,7 +323,7 @@ export class Exchange {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
-    this._assets = loadConfig.assets;
+    this._assets = assets.allAssets();
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
       wallet instanceof types.DummyWallet ? null : wallet,
@@ -337,7 +338,7 @@ export class Exchange {
       this._provider
     ) as anchor.Program<Zeta>;
 
-    for (var asset of loadConfig.assets) {
+    for (var asset of assets.allAssets()) {
       this.addSubExchange(asset, new SubExchange());
       this.getSubExchange(asset).initialize(asset);
     }
@@ -579,12 +580,11 @@ export class Exchange {
     );
     const allPromises: Promise<any>[] = accFetchPromises.concat([
       this.subscribeOracle(this.assets, callback),
-      this.updateState(),
     ]);
 
     const accFetches = (await Promise.all(allPromises)).slice(
       0,
-      loadConfig.assets.length + 1
+      assets.allAssets().length + 1
     );
 
     let perpSyncQueueAccs: PerpSyncQueue[] = [];
@@ -595,7 +595,6 @@ export class Exchange {
           accFetches[i].data
         ) as PerpSyncQueue
       );
-      break;
     }
 
     const clockData = utils.getClockData(accFetches.at(-1));
@@ -618,6 +617,8 @@ export class Exchange {
     for (var se of this.getAllSubExchanges()) {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
+
+    await this.updateExchangeState();
 
     this._isInitialized = true;
   }
@@ -806,12 +807,12 @@ export class Exchange {
     this._eventEmitters.push(eventEmitter);
   }
 
-  public subscribeMarket(asset: Asset, index: number) {
-    this.getSubExchange(asset).markets.subscribeMarket(index);
+  public subscribeMarket(asset: Asset) {
+    this.getSubExchange(asset).markets.subscribeMarket(constants.PERP_INDEX);
   }
 
-  public unsubscribeMarket(asset: Asset, index: number) {
-    this.getSubExchange(asset).markets.unsubscribeMarket(index);
+  public unsubscribeMarket(asset: Asset) {
+    this.getSubExchange(asset).markets.unsubscribeMarket(constants.PERP_INDEX);
   }
 
   public subscribePerp(asset: Asset) {
@@ -822,15 +823,15 @@ export class Exchange {
     this.getSubExchange(asset).markets.unsubscribePerp();
   }
 
-  public async updateOrderbook(asset: Asset, index: number) {
-    return await this.getMarket(asset, index).updateOrderbook();
+  public async updateOrderbook(asset: Asset) {
+    return await this.getPerpMarket(asset).updateOrderbook();
   }
 
   public async updateAllOrderbooks(live: boolean = true) {
     // This assumes that every market has 1 asksAddress and 1 bidsAddress
     let allLiveMarkets = [];
     this.assets.forEach((asset) => {
-      allLiveMarkets = allLiveMarkets.concat(this.getMarkets(asset));
+      allLiveMarkets = allLiveMarkets.concat([this.getPerpMarket(asset)]);
     });
 
     if (live) {
@@ -902,18 +903,6 @@ export class Exchange {
     return this.getSubExchange(asset).markets;
   }
 
-  public getMarket(asset: Asset, index: number): Market {
-    if (index == constants.PERP_INDEX) {
-      return this.getPerpMarket(asset);
-    }
-    return this.getSubExchange(asset).markets.markets[index];
-  }
-
-  public getMarkets(asset: Asset): Market[] {
-    let sub = this.getSubExchange(asset);
-    return [sub.markets.perpMarket];
-  }
-
   public getPerpMarket(asset: Asset): Market {
     return this.getSubExchange(asset).markets.perpMarket;
   }
@@ -934,8 +923,8 @@ export class Exchange {
     return this.getSubExchange(asset).perpSyncQueue;
   }
 
-  public getOrderbook(asset: Asset, index: number): types.DepthOrderbook {
-    return this.getMarket(asset, index).orderbook;
+  public getOrderbook(asset: Asset): types.DepthOrderbook {
+    return this.getPerpMarket(asset).orderbook;
   }
 
   public getMarkPrice(asset: Asset): number {
@@ -998,15 +987,8 @@ export class Exchange {
     await this.getSubExchange(asset).updatePerpSerumMarketIfNeeded(epochDelay);
   }
 
-  public async initializeZetaMarkets(
-    asset: Asset,
-    perpsOnly: boolean = false,
-    datedOnly: boolean = false
-  ) {
-    await this.getSubExchange(asset).initializeZetaMarkets(
-      perpsOnly,
-      datedOnly
-    );
+  public async initializeZetaMarkets(asset: Asset) {
+    await this.getSubExchange(asset).initializeZetaMarkets();
   }
 
   public async initializeZetaMarketsTIFEpochCycle(
@@ -1024,6 +1006,10 @@ export class Exchange {
 
   public async initializePerpSyncQueue(asset: Asset) {
     await this.getSubExchange(asset).initializePerpSyncQueue();
+  }
+
+  public async initializeUnderlying(asset: Asset, flexUnderlying: boolean) {
+    await this.getSubExchange(asset).initializeUnderlying(flexUnderlying);
   }
 
   public async updatePricing(asset: Asset) {
@@ -1070,18 +1056,37 @@ export class Exchange {
   }
 
   public async treasuryMovement(
-    asset: Asset,
     treasuryMovementType: types.TreasuryMovementType,
     amount: anchor.BN
   ) {
-    await this.getSubExchange(asset).treasuryMovement(
-      treasuryMovementType,
-      amount
+    let tx = new Transaction().add(
+      instructions.treasuryMovementIx(treasuryMovementType, amount)
     );
+    await utils.processTransaction(this._provider, tx);
   }
 
-  public async rebalanceInsuranceVault(asset: Asset, marginAccounts: any[]) {
-    await this.getSubExchange(asset).rebalanceInsuranceVault(marginAccounts);
+  public async rebalanceInsuranceVault(marginAccounts: any[]) {
+    let txs = [];
+    for (
+      var i = 0;
+      i < marginAccounts.length;
+      i += constants.MAX_REBALANCE_ACCOUNTS
+    ) {
+      let tx = new Transaction();
+      let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
+      tx.add(instructions.rebalanceInsuranceVaultIx(slice));
+      txs.push(tx);
+    }
+    try {
+      await Promise.all(
+        txs.map(async (tx) => {
+          let txSig = await utils.processTransaction(this._provider, tx);
+          console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
+        })
+      );
+    } catch (e) {
+      console.log(`Error in rebalancing the insurance vault ${e}`);
+    }
   }
 
   public updateMarginParams(asset: Asset) {
@@ -1115,8 +1120,8 @@ export class Exchange {
     await this.getSubExchange(asset).cancelAllOrdersHalted();
   }
 
-  public async cleanZetaMarketsHalted(asset: Asset) {
-    await this.getSubExchange(asset).cleanZetaMarketsHalted();
+  public async cleanZetaMarketHalted(asset: Asset) {
+    await this.getSubExchange(asset).cleanZetaMarketHalted();
   }
 
   public isHalted(asset: Asset) {

@@ -615,21 +615,6 @@ export class Market {
     });
   }
 
-  public async cancelAllExpiredOrders() {
-    await this.updateOrderbook();
-    let orders = this.getMarketOrders();
-
-    // Assumption of similar MAX number of instructions as regular cancel
-    let ixs = await getCancelAllIxs(this.asset, orders, true);
-    let txs = splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
-
-    await Promise.all(
-      txs.map(async (tx) => {
-        await processTransaction(Exchange.provider, tx);
-      })
-    );
-  }
-
   public async cancelAllOrdersHalted() {
     Exchange.getSubExchange(this.asset).assertHalted();
 

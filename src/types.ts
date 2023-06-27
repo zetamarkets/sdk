@@ -10,7 +10,7 @@ import {
 import { allAssets } from "./assets";
 import { Asset } from "./constants";
 import { objectEquals } from "./utils";
-import { MarginAccount } from "./program-types";
+import { CrossMarginAccount, MarginAccount } from "./program-types";
 import { Network, types, utils } from ".";
 import * as constants from "./constants";
 
@@ -73,6 +73,7 @@ export enum UserCallbackType {
   POLLUPDATE,
   MARGINACCOUNTCHANGE,
   SPREADACCOUNTCHANGE,
+  CROSSMARGINACCOUNTCHANGE,
 }
 
 export function toProgramSide(side: Side) {
@@ -221,6 +222,7 @@ export interface MarginParams {
 }
 
 export enum ProgramAccountType {
+  CrossMarginAccount = "CrossMarginAccount",
   MarginAccount = "MarginAccount",
   SpreadAccount = "SpreadAccount",
   ZetaGroup = "ZetaGroup",
@@ -290,9 +292,9 @@ export function fromProgramMarginAccountType(
   throw Error("Invalid margin account type");
 }
 
-export function isMarketMaker(marginAccount: MarginAccount) {
+export function isMarketMaker(account: CrossMarginAccount | MarginAccount) {
   return (
-    fromProgramMarginAccountType(marginAccount.accountType) ==
+    fromProgramMarginAccountType(account.accountType) ==
     MarginAccountType.MARKET_MAKER
   );
 }
@@ -352,7 +354,6 @@ export function defaultOrderOptions(): OrderOptions {
 export interface LoadExchangeConfig {
   network: Network;
   connection: Connection;
-  assets: Asset[];
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
@@ -361,7 +362,6 @@ export interface LoadExchangeConfig {
 export function defaultLoadExchangeConfig(
   network: Network,
   connection: Connection,
-  assets: Asset[] = allAssets(),
   opts: ConfirmOptions = utils.defaultCommitment(),
   throttleMs = 0,
   loadFromStore = false
@@ -369,7 +369,6 @@ export function defaultLoadExchangeConfig(
   return {
     network,
     connection,
-    assets,
     opts,
     throttleMs,
     loadFromStore,

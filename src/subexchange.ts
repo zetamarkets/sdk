@@ -299,10 +299,7 @@ export class SubExchange {
   /**
    * Initializes the zeta markets for a zeta group.
    */
-  public async initializeZetaMarkets(
-    perpOnly: boolean = false,
-    datedOnly: boolean = false
-  ) {
+  public async initializeZetaMarkets() {
     // Initialize market indexes.
     let [marketIndexes, marketIndexesNonce] = utils.getMarketIndexes(
       Exchange.programId,
@@ -313,7 +310,7 @@ export class SubExchange {
 
     let tx = new Transaction().add(
       instructions.initializeMarketIndexesIx(
-        this.asset,
+        this._asset,
         marketIndexes,
         marketIndexesNonce
       )
@@ -330,29 +327,22 @@ export class SubExchange {
       console.error(`Initialize market indexes failed: ${e}`);
     }
 
-    // We initialize 50 indexes at a time in the program.
     let tx2 = new Transaction().add(
-      instructions.addMarketIndexesIx(this.asset, marketIndexes)
+      instructions.addPerpMarketIndexIx(this.asset, marketIndexes)
     );
 
-    for (
-      var i = 0;
-      i < constants.TOTAL_MARKETS;
-      i += constants.MARKET_INDEX_LIMIT
-    ) {
-      try {
-        await utils.processTransaction(
-          Exchange.provider,
-          tx2,
-          [],
-          utils.defaultCommitment(),
-          Exchange.useLedger
-        );
-        await utils.sleep(100);
-      } catch (e) {
-        console.error(`Add market indexes failed: ${e}`);
-        console.log(e);
-      }
+    try {
+      await utils.processTransaction(
+        Exchange.provider,
+        tx2,
+        [],
+        utils.defaultCommitment(),
+        Exchange.useLedger
+      );
+      await utils.sleep(100);
+    } catch (e) {
+      console.error(`Add market indexes failed: ${e}`);
+      console.log(e);
     }
 
     let marketIndexesAccount =
@@ -363,38 +353,22 @@ export class SubExchange {
     if (!marketIndexesAccount.initialized) {
       throw Error("Market indexes are not initialized!");
     }
-
-    if (!datedOnly) {
-      await this.initializeZetaMarket(
-        constants.PERP_INDEX,
-        marketIndexes,
-        marketIndexesAccount
-      );
-    }
-
-    if (perpOnly) {
-      return;
-    }
-
-    await this.initializeZetaMarket(
-      constants.PERP_INDEX,
-      marketIndexes,
-      marketIndexesAccount
-    );
+    await this.initializeZetaMarket(marketIndexes, marketIndexesAccount);
   }
 
   private async initializeZetaMarket(
-    i: number,
     marketIndexes: PublicKey,
     marketIndexesAccount: MarketIndexes
   ) {
-    console.log(`Initializing zeta market ${i}`);
+    console.log(`Initializing zeta market`);
 
     const homedir = os.homedir();
     let dir = `${homedir}/keys/${assetToName(this.asset)}`;
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
+
+    let i = constants.PERP_INDEX;
 
     const requestQueue = utils.getOrCreateKeypair(`${dir}/rq-${i}.json`);
     const eventQueue = utils.getOrCreateKeypair(`${dir}/eq-${i}.json`);
@@ -403,7 +377,6 @@ export class SubExchange {
 
     let [tx, tx2] = await instructions.initializeZetaMarketTxs(
       this.asset,
-      i,
       marketIndexesAccount.indexes[i],
       requestQueue.publicKey,
       eventQueue.publicKey,
@@ -478,7 +451,6 @@ export class SubExchange {
     ixs.push(
       instructions.initializeZetaMarketTIFEpochCyclesIx(
         this.asset,
-        constants.PERP_INDEX,
         cycleLengthSecs
       )
     );
@@ -516,6 +488,16 @@ export class SubExchange {
   public async initializePerpSyncQueue() {
     let tx = new Transaction().add(
       await instructions.initializePerpSyncQueueIx(this.asset)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
+  public async initializeUnderlying(flexUnderlying: boolean) {
+    let tx = new Transaction().add(
+      instructions.initializeUnderlyingIx(
+        await utils.getUnderlyingMint(this._asset),
+        flexUnderlying
+      )
     );
     await utils.processTransaction(Exchange.provider, tx);
   }
@@ -627,49 +609,6 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  /**
-   *
-   * @param movementType move funds from treasury wallet to insurance fund or the opposite
-   * @param amount an array of remaining accounts (margin accounts) that will be rebalanced
-   */
-  public async treasuryMovement(
-    treasuryMovementType: types.TreasuryMovementType,
-    amount: anchor.BN
-  ) {
-    let tx = new Transaction().add(
-      instructions.treasuryMovementIx(treasuryMovementType, amount)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
-   *
-   * @param marginAccounts an array of remaining accounts (margin accounts) that will be rebalanced
-   */
-  public async rebalanceInsuranceVault(marginAccounts: any[]) {
-    let txs = [];
-    for (
-      var i = 0;
-      i < marginAccounts.length;
-      i += constants.MAX_REBALANCE_ACCOUNTS
-    ) {
-      let tx = new Transaction();
-      let slice = marginAccounts.slice(i, i + constants.MAX_REBALANCE_ACCOUNTS);
-      tx.add(instructions.rebalanceInsuranceVaultIx(slice));
-      txs.push(tx);
-    }
-    try {
-      await Promise.all(
-        txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(Exchange.provider, tx);
-          console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
-        })
-      );
-    } catch (e) {
-      console.log(`Error in rebalancing the insurance vault ${e}`);
-    }
-  }
-
   public updateMarginParams() {
     if (Exchange.pricing === undefined) {
       return;
@@ -728,6 +667,7 @@ export class SubExchange {
 
   public async settlePositionsHalted(marginAccounts: AccountMeta[]) {
     let txs = instructions.settlePositionsHaltedTxs(
+      this._asset,
       marginAccounts,
       Exchange.provider.wallet.publicKey
     );
@@ -748,14 +688,9 @@ export class SubExchange {
     );
   }
 
-  public async cleanZetaMarketsHalted() {
+  public async cleanZetaMarketHalted() {
     this.assertHalted();
-    let marketAccounts = [];
-    marketAccounts.push(
-      (this._markets.perpMarket,
-      utils.getMutMarketAccounts(this.asset, constants.PERP_INDEX))
-    );
-    await utils.cleanZetaMarketsHalted(marketAccounts);
+    await utils.cleanZetaMarketHalted(this._asset);
   }
 
   /**

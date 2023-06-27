@@ -38,6 +38,8 @@ import {
   ReferrerAlias,
   TradeEventV3,
   OpenOrdersMap,
+  CrossOpenOrdersMap,
+  CrossMarginAccount,
 } from "./program-types";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
@@ -83,6 +85,22 @@ export function getSettlement(
   );
 }
 
+export function getCrossOpenOrders(
+  programId: PublicKey,
+  market: PublicKey,
+  account: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-open-orders")),
+      constants.DEX_PID[Exchange.network].toBuffer(),
+      market.toBuffer(),
+      account.toBuffer(),
+    ],
+    programId
+  );
+}
+
 export function getOpenOrders(
   programId: PublicKey,
   market: PublicKey,
@@ -112,6 +130,37 @@ export function createOpenOrdersAddress(
       market.toBuffer(),
       userKey.toBuffer(),
       Buffer.from([nonce]),
+    ],
+    programId
+  );
+}
+
+export function createCrossOpenOrdersAddress(
+  programId: PublicKey,
+  market: PublicKey,
+  userKey: PublicKey,
+  nonce: number
+): PublicKey {
+  return PublicKey.createProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-open-orders")),
+      constants.DEX_PID[Exchange.network].toBuffer(),
+      market.toBuffer(),
+      userKey.toBuffer(),
+      Buffer.from([nonce]),
+    ],
+    programId
+  );
+}
+
+export function getCrossOpenOrdersMap(
+  programId: PublicKey,
+  openOrders: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-open-orders-map")),
+      openOrders.toBuffer(),
     ],
     programId
   );
@@ -414,6 +463,34 @@ export function getQuoteMint(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("quote-mint")),
       market.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getCrossMarginAccountManager(
+  programId: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-margin-manager")),
+      userKey.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getCrossMarginAccount(
+  programId: PublicKey,
+  userKey: PublicKey,
+  seedNumber: Uint8Array
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("cross-margin")),
+      userKey.toBuffer(),
+      seedNumber,
     ],
     programId
   );
@@ -819,6 +896,15 @@ export async function processTransaction(
   }
 
   try {
+    // Integration tests don't like the split send + confirm :(
+    if (Exchange.network == Network.LOCALNET) {
+      return await anchor.sendAndConfirmRawTransaction(
+        provider.connection,
+        rawTx,
+        opts || commitmentConfig(provider.connection.commitment)
+      );
+    }
+
     let txSig = await provider.connection.sendRawTransaction(
       rawTx,
       opts || commitmentConfig(provider.connection.commitment)
@@ -974,6 +1060,54 @@ export function displayState() {
   }
 }
 
+// Either margin or cross margin acc
+export async function getAccountFromOpenOrders(
+  openOrders: PublicKey,
+  asset: Asset
+) {
+  let crossOpenOrdersMapInfo =
+    (await Exchange.program.account.crossOpenOrdersMap.fetchNullable(
+      getCrossOpenOrdersMap(Exchange.programId, openOrders)[0]
+    )) as CrossOpenOrdersMap;
+
+  // If it was a CrossMarginAccount, just proceed
+  if (crossOpenOrdersMapInfo != null) {
+    return getCrossMarginAccount(
+      Exchange.programId,
+      crossOpenOrdersMapInfo.userKey,
+      Uint8Array.from([crossOpenOrdersMapInfo.subaccountIndex])
+    )[0];
+  }
+
+  // If it wasn't a CrossMarginAccount, it should be a MarginAccount or error
+  let openOrdersMapInfo = (await Exchange.program.account.openOrdersMap.fetch(
+    getOpenOrdersMap(Exchange.programId, openOrders)[0]
+  )) as OpenOrdersMap;
+  return getMarginAccount(
+    Exchange.programId,
+    Exchange.pricing.zetaGroupKeys[assets.assetToIndex(asset)],
+    openOrdersMapInfo.userKey
+  )[0];
+}
+
+export async function getCrossMarginFromOpenOrders(openOrders: PublicKey) {
+  const [openOrdersMap, _openOrdersMapNonce] = getCrossOpenOrdersMap(
+    Exchange.programId,
+    openOrders
+  );
+  let openOrdersMapInfo =
+    (await Exchange.program.account.crossOpenOrdersMap.fetch(
+      openOrdersMap
+    )) as CrossOpenOrdersMap;
+  const [crossMarginAccount, _marginNonce] = getCrossMarginAccount(
+    Exchange.programId,
+    openOrdersMapInfo.userKey,
+    Uint8Array.from([openOrdersMapInfo.subaccountIndex])
+  );
+
+  return crossMarginAccount;
+}
+
 export async function getMarginFromOpenOrders(
   asset: Asset,
   openOrders: PublicKey,
@@ -1017,23 +1151,10 @@ export async function cleanZetaMarkets(
   );
 }
 
-export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
-  let txs: Transaction[] = [];
-  for (
-    var i = 0;
-    i < marketAccountTuples.length;
-    i += constants.CLEAN_MARKET_LIMIT
-  ) {
-    let tx = new Transaction();
-    let slice = marketAccountTuples.slice(i, i + constants.CLEAN_MARKET_LIMIT);
-    tx.add(instructions.cleanZetaMarketsHaltedIx(slice.flat()));
-    txs.push(tx);
-  }
-  await Promise.all(
-    txs.map(async (tx) => {
-      await processTransaction(Exchange.provider, tx);
-    })
-  );
+export async function cleanZetaMarketHalted(asset: Asset) {
+  let tx = new Transaction();
+  tx.add(instructions.cleanZetaMarketHaltedIx(asset));
+  await processTransaction(Exchange.provider, tx);
 }
 
 /*
@@ -1042,11 +1163,10 @@ export async function cleanZetaMarketsHalted(marketAccountTuples: any[]) {
  */
 export async function crankMarket(
   asset: Asset,
-  marketIndex: number,
   openOrdersToMargin?: Map<PublicKey, PublicKey>,
   crankLimit?: number
 ): Promise<boolean> {
-  let market = Exchange.getMarket(asset, marketIndex);
+  let market = Exchange.getPerpMarket(asset);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
     return true;
@@ -1076,24 +1196,17 @@ export async function crankMarket(
 
   let remainingAccounts: any[] = new Array(uniqueOpenOrders.length * 2);
 
+  // TODO test support for both crossmargin and marginaccounts
   await Promise.all(
     uniqueOpenOrders.map(async (openOrders, index) => {
       let marginAccount: PublicKey;
       if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
-        marginAccount = await getMarginFromOpenOrders(
-          asset,
-          openOrders,
-          market
-        );
+        marginAccount = await getAccountFromOpenOrders(openOrders, asset);
         openOrdersToMargin.set(openOrders, marginAccount);
       } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
         marginAccount = openOrdersToMargin.get(openOrders);
       } else {
-        marginAccount = await getMarginFromOpenOrders(
-          asset,
-          openOrders,
-          market
-        );
+        marginAccount = await getAccountFromOpenOrders(openOrders, asset);
       }
 
       let openOrdersIndex = index * 2;
@@ -1126,21 +1239,9 @@ export async function crankMarket(
 /*
  * prune expired TIF orders from a list of market indices.
  */
-export async function pruneExpiredTIFOrders(
-  asset: Asset,
-  marketIndices: number[]
-) {
-  let ixs = marketIndices.map((i) => {
-    return instructions.pruneExpiredTIFOrdersIx(asset, i);
-  });
-
-  let txs = splitIxsIntoTx(ixs, 5);
-
-  await Promise.all(
-    txs.map(async (tx) => {
-      return processTransaction(Exchange.provider, tx);
-    })
-  );
+export async function pruneExpiredTIFOrders(asset: Asset) {
+  let tx = new Transaction().add(instructions.pruneExpiredTIFOrdersIx(asset));
+  return processTransaction(Exchange.provider, tx);
 }
 
 /**
@@ -1155,11 +1256,8 @@ export function getMostRecentExpiredIndex(asset: Asset) {
   }
 }
 
-export function getMutMarketAccounts(
-  asset: Asset,
-  marketIndex: number
-): Object[] {
-  let market = Exchange.getMarket(asset, marketIndex);
+export function getMutMarketAccounts(asset: Asset): Object[] {
+  let market = Exchange.getPerpMarket(asset);
   return [
     { pubkey: market.address, isSigner: false, isWritable: false },
     {
@@ -1183,26 +1281,48 @@ export async function getCancelAllIxs(
   let ixs: TransactionInstruction[] = [];
   await Promise.all(
     orders.map(async (order) => {
-      const [openOrdersMap, _openOrdersMapNonce] = getOpenOrdersMap(
+      const [openOrdersMap, _openOrdersMapNonce] = getCrossOpenOrdersMap(
         Exchange.programId,
         order.owner
       );
 
       let openOrdersMapInfo =
-        (await Exchange.program.account.openOrdersMap.fetch(
+        await Exchange.program.account.crossOpenOrdersMap.fetchNullable(
+          openOrdersMap
+        );
+
+      let account;
+
+      // MarginAccount
+      if (openOrdersMapInfo == null) {
+        const [openOrdersMap, _openOrdersMapNonce] = getOpenOrdersMap(
+          Exchange.programId,
+          order.owner
+        );
+        let map = (await Exchange.program.account.openOrdersMap.fetch(
           openOrdersMap
         )) as OpenOrdersMap;
-
-      const [marginAccount, _marginNonce] = getMarginAccount(
-        Exchange.programId,
-        Exchange.getZetaGroupAddress(asset),
-        openOrdersMapInfo.userKey
-      );
+        const [marginAccount, _marginNonce] = getMarginAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(asset),
+          map.userKey
+        );
+        account = marginAccount;
+      }
+      // CrossMarginAccount
+      else {
+        let map = openOrdersMapInfo as CrossOpenOrdersMap;
+        const [marginAccount, _marginNonce] = getCrossMarginAccount(
+          Exchange.programId,
+          map.userKey,
+          Uint8Array.from([map.subaccountIndex])
+        );
+        account = marginAccount;
+      }
 
       let ix = instructions.cancelOrderHaltedIx(
         asset,
-        order.marketIndex,
-        marginAccount,
+        account,
         order.owner,
         order.orderId,
         order.side
@@ -1269,13 +1389,11 @@ export async function getAllProgramAccountAddresses(
   return pubkeys;
 }
 
-export async function getAllOpenOrdersAccountsByMarket(
+export async function getAllOpenOrdersAccounts(
   asset: Asset
-): Promise<Map<number, Array<PublicKey>>> {
-  let openOrdersByMarketIndex = new Map<number, Array<PublicKey>>();
-  for (var market of Exchange.getMarkets(asset)) {
-    openOrdersByMarketIndex.set(market.marketIndex, []);
-  }
+): Promise<PublicKey[]> {
+  let allOpenOrders: PublicKey[] = [];
+  let market = Exchange.getPerpMarket(asset);
 
   let marginAccounts = await Exchange.program.account.marginAccount.all();
   marginAccounts.forEach((acc) => {
@@ -1283,32 +1401,44 @@ export async function getAllOpenOrdersAccountsByMarket(
     if (assets.fromProgramAsset(marginAccount.asset) != asset) {
       return;
     }
-    for (var market of Exchange.getMarkets(asset)) {
-      let nonce = marginAccount.openOrdersNonce[market.marketIndex];
-      if (nonce == 0) {
-        continue;
-      }
+
+    let nonce = marginAccount.openOrdersNonce[market.marketIndex];
+    if (nonce != 0) {
       let [openOrders, _nonce] = getOpenOrders(
         Exchange.programId,
         market.address,
         marginAccount.authority
       );
-      openOrdersByMarketIndex.get(market.marketIndex).push(openOrders);
+      allOpenOrders.push(openOrders);
     }
   });
 
-  return openOrdersByMarketIndex;
+  let crossMarginAccounts =
+    await Exchange.program.account.crossMarginAccount.all();
+  crossMarginAccounts.forEach((acc) => {
+    let crossMarginAccount = acc.account as CrossMarginAccount;
+
+    let nonce = crossMarginAccount.openOrdersNonces[assets.assetToIndex(asset)];
+    if (nonce != 0) {
+      let [openOrders, _nonce] = getCrossOpenOrders(
+        Exchange.programId,
+        market.address,
+        acc.publicKey
+      );
+      allOpenOrders.push(openOrders);
+    }
+  });
+
+  return allOpenOrders;
 }
 
-export async function settleAndBurnVaultTokensByMarket(
+export async function settleAndBurnVaultTokens(
   asset: Asset,
-  provider: anchor.AnchorProvider,
-  openOrdersByMarketIndex: Map<number, Array<PublicKey>>,
-  marketIndex: number
+  provider: anchor.AnchorProvider
 ) {
-  console.log(`Burning tokens for market index ${marketIndex}`);
-  let market = Exchange.getMarket(asset, marketIndex);
-  let openOrders = openOrdersByMarketIndex.get(marketIndex);
+  let openOrders = await getAllOpenOrdersAccounts(asset);
+  let market = Exchange.getPerpMarket(asset);
+  console.log(`Burning tokens for market index ${market.marketIndex}`);
   let remainingAccounts = openOrders.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
   });
@@ -1338,80 +1468,14 @@ export async function settleAndBurnVaultTokensByMarket(
   await processTransaction(provider, burnTx);
 }
 
-export async function settleAndBurnVaultTokens(
-  asset: Asset,
-  provider: anchor.AnchorProvider
-) {
-  let openOrdersByMarketIndex = await getAllOpenOrdersAccountsByMarket(asset);
-  for (var market of Exchange.getMarkets(asset)) {
-    console.log(`Burning tokens for market index ${market.marketIndex}`);
-    let openOrders = openOrdersByMarketIndex.get(market.marketIndex);
-    let remainingAccounts = openOrders.map((key) => {
-      return { pubkey: key, isSigner: false, isWritable: true };
-    });
-
-    const [vaultOwner, _vaultSignerNonce] = getSerumVaultOwnerAndNonce(
-      market.address,
-      constants.DEX_PID[Exchange.network]
-    );
-
-    let txs = instructions.settleDexFundsTxs(
-      asset,
-      market.address,
-      vaultOwner,
-      remainingAccounts
-    );
-
-    for (var j = 0; j < txs.length; j += 5) {
-      let txSlice = txs.slice(j, j + 5);
-      await Promise.all(
-        txSlice.map(async (tx) => {
-          await processTransaction(provider, tx);
-        })
-      );
-    }
-
-    let burnTx = instructions.burnVaultTokenTx(asset, market.address);
-    await processTransaction(provider, burnTx);
-  }
-}
-
 export async function burnVaultTokens(
   asset: Asset,
   provider: anchor.AnchorProvider
 ) {
-  for (var market of Exchange.getMarkets(asset)) {
-    console.log(`Burning tokens for market index ${market.marketIndex}`);
-    let burnTx = instructions.burnVaultTokenTx(asset, market.address);
-    await processTransaction(provider, burnTx);
-  }
-}
-
-export async function cancelExpiredOrdersAndCleanMarkets(
-  asset: Asset,
-  expiryIndex: number
-) {
-  let marketsToClean =
-    Exchange.getSubExchange(asset).markets.getMarketsByExpiryIndex(expiryIndex);
-  let marketAccounts = await Promise.all(
-    marketsToClean.map(async (market) => {
-      await market.cancelAllExpiredOrders();
-      return [
-        { pubkey: market.address, isSigner: false, isWritable: false },
-        {
-          pubkey: market.serumMarket.bidsAddress,
-          isSigner: false,
-          isWritable: false,
-        },
-        {
-          pubkey: market.serumMarket.asksAddress,
-          isSigner: false,
-          isWritable: false,
-        },
-      ];
-    })
-  );
-  await cleanZetaMarkets(asset, marketAccounts);
+  let market = Exchange.getPerpMarket(asset);
+  console.log(`Burning tokens for market index ${market.marketIndex}`);
+  let burnTx = instructions.burnVaultTokenTx(asset, market.address);
+  await processTransaction(provider, burnTx);
 }
 
 /**

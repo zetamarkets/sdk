@@ -21,7 +21,6 @@ const main = async () => {
     let marketStore = {};
     let connectionUrl = network == Network.DEVNET ? devnetUrl : mainnetUrl;
     const LOAD_CONFIG: types.LoadExchangeConfig = {
-      assets: assetList,
       network: network,
       connection: new Connection(connectionUrl, utils.defaultCommitment()),
       opts: utils.defaultCommitment(),

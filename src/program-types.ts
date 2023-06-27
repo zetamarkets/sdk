@@ -70,6 +70,8 @@ export interface Pricing {
   totalInsuranceVaultDeposits: anchor.BN;
   lastWithdrawTimestamp: anchor.BN;
   netOutflowSum: anchor.BN;
+  haltForcePricing: Array<boolean>;
+  haltForcePricingPadding: Array<boolean>;
   padding: Array<number>;
 }
 
@@ -149,6 +151,11 @@ export interface ExpirySeries {
   dirty: boolean;
 }
 
+export interface CrossOpenOrdersMap {
+  userKey: PublicKey;
+  subaccountIndex: number;
+}
+
 export interface OpenOrdersMap {
   userKey: PublicKey;
 }
@@ -166,6 +173,35 @@ export interface OrderState {
 export interface ProductLedger {
   position: Position;
   orderState: OrderState;
+}
+
+export interface CrossMarginAccountInfo {
+  initialized: boolean;
+  name: Array<number>; // 10 byte string, stored as [u8; 10] onchain
+}
+
+export interface CrossMarginAccountManager {
+  nonce: number;
+  authority: PublicKey;
+  accounts: Array<CrossMarginAccountInfo>;
+}
+
+export interface CrossMarginAccount {
+  authority: PublicKey;
+  delegatedPubkey: PublicKey;
+  balance: anchor.BN;
+  subaccountIndex: number;
+  nonce: number;
+  forceCancelFlag: boolean;
+  accountType: any;
+  openOrdersNonces: Array<number>;
+  openOrdersNoncesPadding: Array<number>;
+  rebalanceAmount: anchor.BN;
+  lastFundingDeltas: Array<AnchorDecimal>;
+  lastFundingDeltasPadding: Array<AnchorDecimal>;
+  productLedgers: Array<ProductLedger>;
+  productLedgersPadding: Array<ProductLedger>;
+  padding: Array<number>;
 }
 
 export interface MarginAccount {
