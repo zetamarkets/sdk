@@ -9359,6 +9359,11 @@ export type Zeta = {
       "code": 6142,
       "name": "MarginAccountAssetMismatch",
       "msg": "Margin account asset mismatched with instruction argument asset"
+    },
+    {
+      "code": 6143,
+      "name": "FeatureUnavailable",
+      "msg": "Feature is not available yet"
     }
   ]
 };
@@ -18724,6 +18729,11 @@ export const IDL: Zeta = {
       "code": 6142,
       "name": "MarginAccountAssetMismatch",
       "msg": "Margin account asset mismatched with instruction argument asset"
+    },
+    {
+      "code": 6143,
+      "name": "FeatureUnavailable",
+      "msg": "Feature is not available yet"
     }
   ]
 };
