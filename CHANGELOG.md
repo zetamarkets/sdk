@@ -5,6 +5,17 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.0.0] 2023-06-27
+
+- New CrossClient that allows for trading using CrossMarginAccounts (Note: SDK only for now! Frontend support coming with V2). ([#238](https://github.com/zetamarkets/sdk/pull/238))
+- Options + futures functionality removed as much as possible, mainly from risk.ts, exchange.ts and client.ts.
+- SpreadAccount functionality removed, mainly from risk.ts and client.ts.
+
+### Breaking
+
+- general: Almost all instructions break due to changing accounts or arguments. Notably all core instructions support MarginAccount and CrossMarginAccount interchangeably. ([#238](https://github.com/zetamarkets/sdk/pull/238))
+- exchange: Remove assets argument in Exchange.load(), forcing all assets. ([#238](https://github.com/zetamarkets/sdk/pull/238))
+
 ## [0.29.6] 2023-06-17
 
 - exchange: Add an upper limit to automatic priority fees. ([#240](https://github.com/zetamarkets/sdk/pull/240))
