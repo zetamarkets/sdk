@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.1.0] 2023-06-27
+
+- Update Zeta LUTs. ([#243](https://github.com/zetamarkets/sdk/pull/243))
+- Add new error FeatureUnavailable. ([#243](https://github.com/zetamarkets/sdk/pull/243))
+
 ## [1.0.0] 2023-06-27
 
 - New CrossClient that allows for trading using CrossMarginAccounts (Note: SDK only for now! Frontend support coming with V2). ([#238](https://github.com/zetamarkets/sdk/pull/238))
