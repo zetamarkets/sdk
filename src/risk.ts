@@ -199,8 +199,7 @@ export class RiskCalculator {
     if (accountType == types.ProgramAccountType.CrossMarginAccount) {
       i_list = [...Array(constants.ACTIVE_PERP_MARKETS - 1).keys()];
     } else {
-      i_list = [...Array(constants.ACTIVE_MARKETS - 1).keys()];
-      i_list.push(constants.PERP_INDEX);
+      i_list = [constants.PERP_INDEX];
     }
 
     for (var i of i_list) {
