@@ -616,11 +616,38 @@ export class CrossClient {
     }
   }
 
-  public async migrateToCrossMarginAccount(
-    marginAccounts: PublicKey[]
-  ): Promise<TransactionSignature[]> {
+  public async findUserMarginAccounts(): Promise<PublicKey[]> {
+    let marginAccounts = [];
+
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
+        // Address
+        let [address, _nonce] = utils.getMarginAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(asset),
+          this.publicKey
+        );
+
+        // Check if the address is valid
+        let account =
+          Exchange.program.account.marginAccount.fetchNullable(address);
+
+        if (account != null) {
+          console.log(`Found ${asset} MarginAccount`);
+          marginAccounts.push(account);
+        }
+      })
+    );
+
+    return marginAccounts;
+  }
+
+  public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {
     this.delegatedCheck();
     this.usdcAccountCheck();
+
+    // Dynamically figure out the user's existing margin accounts
+    let marginAccounts = await this.findUserMarginAccounts();
 
     let txs = [];
 

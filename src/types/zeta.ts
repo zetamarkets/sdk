@@ -1127,6 +1127,38 @@ export type Zeta = {
       ]
     },
     {
+      "name": "updateExtraMarginScaling",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "scaling",
+          "type": "u32"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "updateMarginParameters",
       "accounts": [
         {
@@ -5756,11 +5788,29 @@ export type Zeta = {
             }
           },
           {
+            "name": "extraMarginScalingPercentage",
+            "type": {
+              "array": [
+                "u32",
+                5
+              ]
+            }
+          },
+          {
+            "name": "extraMarginScalingPercentagePadding",
+            "type": {
+              "array": [
+                "u32",
+                20
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2707
+                2607
               ]
             }
           }
@@ -9364,6 +9414,11 @@ export type Zeta = {
       "code": 6143,
       "name": "FeatureUnavailable",
       "msg": "Feature is not available yet"
+    },
+    {
+      "code": 6144,
+      "name": "MarginAccountCannotLiquidateCrossMarginAccount",
+      "msg": "MarginAccount cannot liquidate CrossMarginAccount"
     }
   ]
 };
@@ -10497,6 +10552,38 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "updateExtraMarginScaling",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "scaling",
+          "type": "u32"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "updateMarginParameters",
       "accounts": [
         {
@@ -15126,11 +15213,29 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "extraMarginScalingPercentage",
+            "type": {
+              "array": [
+                "u32",
+                5
+              ]
+            }
+          },
+          {
+            "name": "extraMarginScalingPercentagePadding",
+            "type": {
+              "array": [
+                "u32",
+                20
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2707
+                2607
               ]
             }
           }
@@ -18734,6 +18839,11 @@ export const IDL: Zeta = {
       "code": 6143,
       "name": "FeatureUnavailable",
       "msg": "Feature is not available yet"
+    },
+    {
+      "code": 6144,
+      "name": "MarginAccountCannotLiquidateCrossMarginAccount",
+      "msg": "MarginAccount cannot liquidate CrossMarginAccount"
     }
   ]
 };
