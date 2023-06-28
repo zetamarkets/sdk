@@ -72,6 +72,8 @@ export interface Pricing {
   netOutflowSum: anchor.BN;
   haltForcePricing: Array<boolean>;
   haltForcePricingPadding: Array<boolean>;
+  extraMarginScalingPercentage: Array<number>;
+  extraMarginScalingPercentagePadding: Array<number>;
   padding: Array<number>;
 }
 
