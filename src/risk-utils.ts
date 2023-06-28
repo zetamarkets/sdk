@@ -1,5 +1,5 @@
 import { BN } from "@zetamarkets/anchor";
-import { types, Exchange, constants, assets, instructions } from ".";
+import { types, Exchange, constants, assets, instructions, utils } from ".";
 import { Asset } from "./constants";
 import {
   Position,
@@ -91,9 +91,16 @@ export function calculateFutureMargin(
   spotPrice: number
 ): types.MarginRequirement {
   let subExchange = Exchange.getSubExchange(asset);
-  let initial = spotPrice * subExchange.marginParams.futureMarginInitial;
+  let scaling =
+    1 +
+    utils.convertNativeIntegerToDecimal(
+      Exchange.pricing.extraMarginScalingPercentage[assets.assetToIndex(asset)]
+    ) /
+      100;
+  let initial =
+    scaling * spotPrice * subExchange.marginParams.futureMarginInitial;
   let maintenance =
-    spotPrice * subExchange.marginParams.futureMarginMaintenance;
+    scaling * spotPrice * subExchange.marginParams.futureMarginMaintenance;
   return {
     initialLong: initial,
     initialShort: initial,

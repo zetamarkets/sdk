@@ -1411,17 +1411,16 @@ export function initializeZetaReferralsRewardsWalletIx(): TransactionInstruction
 }
 
 export function updateExtraMarginScalingIx(
-  scaling: number,
   asset: Asset,
-  admin: PublicKey
+  scaling: number
 ): TransactionInstruction {
   return Exchange.program.instruction.updateExtraMarginScaling(
-    scaling,
+    new anchor.BN(scaling),
     toProgramAsset(asset),
     {
       accounts: {
         state: Exchange.stateAddress,
-        admin,
+        admin: Exchange.state.admin,
         pricing: Exchange.pricingAddress,
       },
     }
