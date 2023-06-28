@@ -1410,6 +1410,24 @@ export function initializeZetaReferralsRewardsWalletIx(): TransactionInstruction
   });
 }
 
+export function updateExtraMarginScalingIx(
+  scaling: number,
+  asset: Asset,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateExtraMarginScaling(
+    scaling,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+        pricing: Exchange.pricingAddress,
+      },
+    }
+  );
+}
+
 export function updateZetaStateIx(
   params: StateParams,
   admin: PublicKey
