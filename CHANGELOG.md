@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.3.0] 2023-06-30
+
+- Support both marginAccount and crossMarginAccount in forceCancelOrderByOrderId() and forceCancelOrders(). ([#245](https://github.com/zetamarkets/sdk/pull/245))
+
 ## [1.2.0] 2023-06-29
 
 - Improve CrossMarginAccount migration UX. ([#244](https://github.com/zetamarkets/sdk/pull/244))
