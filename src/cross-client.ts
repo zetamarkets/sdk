@@ -1609,28 +1609,45 @@ export class CrossClient {
    */
   public async forceCancelOrderByOrderId(
     asset: Asset,
-    crossMarginAccountToCancel: PublicKey,
+    marginAccountToCancel: PublicKey,
     orderId: anchor.BN,
     side: types.Side
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
 
-    // TODO this should support margin + cross margin automatically
-    let account = (await Exchange.program.account.crossMarginAccount.fetch(
-      crossMarginAccountToCancel
-    )) as unknown as CrossMarginAccount;
+    let account =
+      await Exchange.program.account.crossMarginAccount.fetchNullable(
+        marginAccountToCancel
+      );
 
-    let openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
-      Exchange.programId,
-      Exchange.getPerpMarket(asset).address,
-      crossMarginAccountToCancel,
-      account.openOrdersNonces[assetToIndex(asset)]
-    );
+    let openOrdersAccountToCancel: PublicKey;
+
+    // CrossMarginAccount
+    if (account) {
+      openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
+        Exchange.programId,
+        Exchange.getPerpMarket(asset).address,
+        marginAccountToCancel,
+        account.openOrdersNonces[assetToIndex(asset)]
+      );
+    }
+    // MarginAccount
+    else {
+      let account = await Exchange.program.account.marginAccount.fetchNullable(
+        marginAccountToCancel
+      );
+      openOrdersAccountToCancel = utils.createOpenOrdersAddress(
+        Exchange.programId,
+        Exchange.getPerpMarket(asset).address,
+        marginAccountToCancel,
+        account.openOrdersNonces[constants.PERP_INDEX]
+      );
+    }
 
     let tx = new Transaction();
     let ix = instructions.forceCancelOrderByOrderIdV2Ix(
       asset,
-      crossMarginAccountToCancel,
+      marginAccountToCancel,
       openOrdersAccountToCancel,
       orderId,
       side
