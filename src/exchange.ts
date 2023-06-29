@@ -789,13 +789,6 @@ export class Exchange {
     await this.updateState();
   }
 
-  public async updateExtraMarginScaling(asset: Asset, scaling: number) {
-    let tx = new Transaction().add(
-      instructions.updateExtraMarginScalingIx(asset, scaling)
-    );
-    await utils.processTransaction(this.provider, tx);
-  }
-
   private subscribePricing(
     callback?: (asset: Asset, type: EventType, data: any) => void
   ) {

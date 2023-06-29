@@ -91,16 +91,9 @@ export function calculateFutureMargin(
   spotPrice: number
 ): types.MarginRequirement {
   let subExchange = Exchange.getSubExchange(asset);
-  let scaling =
-    1 +
-    utils.convertNativeIntegerToDecimal(
-      Exchange.pricing.extraMarginScalingPercentage[assets.assetToIndex(asset)]
-    ) /
-      100;
-  let initial =
-    scaling * spotPrice * subExchange.marginParams.futureMarginInitial;
+  let initial = spotPrice * subExchange.marginParams.futureMarginInitial;
   let maintenance =
-    scaling * spotPrice * subExchange.marginParams.futureMarginMaintenance;
+    spotPrice * subExchange.marginParams.futureMarginMaintenance;
   return {
     initialLong: initial,
     initialShort: initial,
