@@ -1,5 +1,5 @@
 import { BN } from "@zetamarkets/anchor";
-import { types, Exchange, constants, assets, instructions, utils } from ".";
+import { types, Exchange, constants, assets, instructions } from ".";
 import { Asset } from "./constants";
 import {
   Position,

@@ -8,6 +8,7 @@ Version changes are pinned to SDK releases.
 ## [1.2.0] 2023-06-29
 
 - Improve CrossMarginAccount migration UX. ([#244](https://github.com/zetamarkets/sdk/pull/244))
+- New error if a MarginAccount tries to liquidate a CrossMarginAccount. ([#244](https://github.com/zetamarkets/sdk/pull/244))
 
 ## [1.1.0] 2023-06-27
 
