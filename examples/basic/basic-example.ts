@@ -19,7 +19,7 @@ const SERVER_URL = process.env["server_url"];
 const STARTING_BALANCE = 5_000;
 
 async function exchangeCallback(
-  asset: assets.Asset,
+  asset: constants.Asset,
   _eventType: events.EventType,
   _data: any
 ) {
@@ -27,7 +27,7 @@ async function exchangeCallback(
 }
 
 async function clientCallback(
-  asset: assets.Asset,
+  asset: constants.Asset,
   _eventType: events.EventType,
   _data: any
 ) {
@@ -54,7 +54,6 @@ async function main() {
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     Network.DEVNET,
     connection,
-    assets.allAssets(),
     utils.defaultCommitment(),
     0,
     true
@@ -76,7 +75,7 @@ async function main() {
   );
 
   Exchange.getAllSubExchanges().forEach(async (se) => {
-    await se.updateLiveSerumMarketsIfNeeded(0);
+    await se.updatePerpSerumMarketIfNeeded(0);
   });
 
   const client = await Client.load(
@@ -86,8 +85,10 @@ async function main() {
     // , clientCallback
   );
 
+  let tradingAsset = constants.Asset.APT;
+
   await client.deposit(
-    assets.Asset.BTC,
+    tradingAsset,
     utils.convertDecimalToNativeInteger(STARTING_BALANCE)
   );
 
@@ -95,13 +96,13 @@ async function main() {
 
   // Show current orderbook for a market.
   const index = constants.PERP_INDEX;
-  await Exchange.updateOrderbook(assets.Asset.BTC, index);
-  console.log(`BTC market ${index} orderbook:`);
-  console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
+  await Exchange.updateOrderbook(tradingAsset);
+  console.log(`${tradingAsset} Market ${index} orderbook:`);
+  console.log(Exchange.getOrderbook(tradingAsset));
 
   // Place bid orders
   await client.placeOrder(
-    assets.Asset.BTC,
+    tradingAsset,
     index,
     utils.convertDecimalToNativeInteger(0.1),
     utils.convertDecimalToNativeLotSize(2),
@@ -110,26 +111,26 @@ async function main() {
   );
 
   // See our order in the orderbook.
-  await Exchange.updateOrderbook(assets.Asset.BTC, index);
-  console.log(`BTC market ${index} orderbook after our order:`);
-  console.log(Exchange.getOrderbook(assets.Asset.BTC, index));
+  await Exchange.updateOrderbook(tradingAsset);
+  console.log(`${tradingAsset} Market ${index} orderbook after our order:`);
+  console.log(Exchange.getOrderbook(tradingAsset));
 
   // See our positions
-  await client.updateState(assets.Asset.BTC);
+  await client.updateState(tradingAsset);
   console.log(
-    "BTC margin account positions:",
-    client.getMarginPositions(assets.Asset.BTC)
+    `${tradingAsset} margin account positions: ${client.getMarginPositions(
+      tradingAsset
+    )}`
   );
 
   // Check mark prices for the product.
   console.log(
-    "BTC mark price:",
-    Exchange.getMarkPrice(assets.Asset.BTC, index)
+    `${tradingAsset} Mark price: ${Exchange.getMarkPrice(tradingAsset)}`
   );
 
   // Calculate user margin account state.
-  let marginAccountState = client.getMarginAccountState(assets.Asset.BTC);
-  console.log("BTC Margin account state:", marginAccountState);
+  let marginAccountState = client.getMarginAccountState(tradingAsset);
+  console.log(`${tradingAsset} Margin account state:`, marginAccountState);
 }
 
 main().catch(console.error.bind(console));
