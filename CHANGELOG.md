@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.2.0] 2023-06-29
+
+- Improve CrossMarginAccount migration UX. ([#244](https://github.com/zetamarkets/sdk/pull/244))
+
 ## [1.1.0] 2023-06-27
 
 - Update Zeta LUTs. ([#243](https://github.com/zetamarkets/sdk/pull/243))

@@ -632,7 +632,7 @@ export class CrossClient {
         let account =
           Exchange.program.account.marginAccount.fetchNullable(address);
 
-        if (account != null) {
+        if (account) {
           console.log(`Found ${asset} MarginAccount`);
           marginAccounts.push(account);
         }
