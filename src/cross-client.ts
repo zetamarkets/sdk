@@ -616,11 +616,38 @@ export class CrossClient {
     }
   }
 
-  public async migrateToCrossMarginAccount(
-    marginAccounts: PublicKey[]
-  ): Promise<TransactionSignature[]> {
+  public async findUserMarginAccounts(): Promise<PublicKey[]> {
+    let marginAccounts = [];
+
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
+        // Address
+        let [address, _nonce] = utils.getMarginAccount(
+          Exchange.programId,
+          Exchange.getZetaGroupAddress(asset),
+          this.publicKey
+        );
+
+        // Check if the address is valid
+        let account =
+          Exchange.program.account.marginAccount.fetchNullable(address);
+
+        if (account) {
+          console.log(`Found ${asset} MarginAccount`);
+          marginAccounts.push(account);
+        }
+      })
+    );
+
+    return marginAccounts;
+  }
+
+  public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {
     this.delegatedCheck();
     this.usdcAccountCheck();
+
+    // Dynamically figure out the user's existing margin accounts
+    let marginAccounts = await this.findUserMarginAccounts();
 
     let txs = [];
 
@@ -1888,26 +1915,23 @@ export class CrossClient {
     for (var i = 0; i < this._account.productLedgers.length; i++) {
       if (this._account.productLedgers[i].position.size.toNumber() != 0) {
         let asset = indexToAsset(i);
-        if (asset in Exchange.assets) {
-          positions.get(asset).push({
-            marketIndex: constants.PERP_INDEX,
-            market: Exchange.getPerpMarket(asset).address,
-            size: utils.convertNativeLotSizeToDecimal(
-              this._account.productLedgers[i].position.size.toNumber()
-            ),
-            costOfTrades: utils.convertNativeBNToDecimal(
-              this._account.productLedgers[i].position.costOfTrades
-            ),
-            asset: asset,
-          });
-        }
+        positions.get(asset).push({
+          marketIndex: constants.PERP_INDEX,
+          market: Exchange.getPerpMarket(asset).address,
+          size: utils.convertNativeLotSizeToDecimal(
+            this._account.productLedgers[i].position.size.toNumber()
+          ),
+          costOfTrades: utils.convertNativeBNToDecimal(
+            this._account.productLedgers[i].position.costOfTrades
+          ),
+          asset: asset,
+        });
       }
     }
 
     for (var asset of Exchange.assets) {
       this._positions.set(asset, []);
     }
-
     this._positions = positions;
   }
 

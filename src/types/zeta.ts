@@ -9364,6 +9364,11 @@ export type Zeta = {
       "code": 6143,
       "name": "FeatureUnavailable",
       "msg": "Feature is not available yet"
+    },
+    {
+      "code": 6144,
+      "name": "MarginAccountCannotLiquidateCrossMarginAccount",
+      "msg": "MarginAccount cannot liquidate CrossMarginAccount"
     }
   ]
 };
@@ -18734,6 +18739,11 @@ export const IDL: Zeta = {
       "code": 6143,
       "name": "FeatureUnavailable",
       "msg": "Feature is not available yet"
+    },
+    {
+      "code": 6144,
+      "name": "MarginAccountCannotLiquidateCrossMarginAccount",
+      "msg": "MarginAccount cannot liquidate CrossMarginAccount"
     }
   ]
 };
