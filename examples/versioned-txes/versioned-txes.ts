@@ -16,7 +16,7 @@ import fetch from "node-fetch";
 const NETWORK_URL = process.env["network_url"]!;
 const SERVER_URL = process.env["server_url"];
 const STARTING_BALANCE = 10_000;
-const ASSETS = [assets.Asset.ETH];
+const ASSETS = [constants.Asset.SOL, constants.Asset.ARB, constants.Asset.APT];
 const USER_KEY = Keypair.generate();
 const WALLET = new Wallet(USER_KEY);
 const CONNECTION: Connection = new Connection(NETWORK_URL, "confirmed");
@@ -40,7 +40,6 @@ async function main() {
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     Network.DEVNET,
     CONNECTION,
-    ASSETS,
     utils.defaultCommitment(),
     0, // ThrottleMs - increase if you are running into rate limit issues on startup.
     true
@@ -90,11 +89,10 @@ async function main() {
   );
 
   let singleMarketTx = new Transaction();
-  let subClient = client.getSubClient(ASSETS[0]);
   for (let i = 0; i < MAX_SINGLE_MARKET_PLACE_ORDER_IXS; i++) {
     singleMarketTx.add(
-      subClient.createPlaceOrderInstruction(
-        constants.PERP_INDEX,
+      client.createPlacePerpOrderInstruction(
+        ASSETS[0],
         utils.convertDecimalToNativeInteger(i + 1),
         utils.convertDecimalToNativeLotSize(1),
         types.Side.BID
@@ -122,30 +120,15 @@ async function main() {
   await client.cancelAllOrders(ASSETS[0]);
 
   let multiMarketTx = new Transaction();
-  ASSETS.forEach((asset, index) => {
-    let subClient = client.getSubClient(asset);
-
-    if (index == 0) {
-      for (let i = 0; i < MAX_ALL_PERP_MARKET_PLACE_ORDER_IXS - 2; i++) {
-        multiMarketTx.add(
-          subClient.createPlaceOrderInstruction(
-            constants.PERP_INDEX,
-            utils.convertDecimalToNativeInteger(i + 1),
-            utils.convertDecimalToNativeLotSize(0.01),
-            types.Side.BID
-          )
-        );
-      }
-    } else {
-      multiMarketTx.add(
-        subClient.createPlaceOrderInstruction(
-          constants.PERP_INDEX,
-          utils.convertDecimalToNativeInteger(1),
-          utils.convertDecimalToNativeLotSize(0.01),
-          types.Side.BID
-        )
-      );
-    }
+  ASSETS.forEach((asset) => {
+    multiMarketTx.add(
+      client.createPlacePerpOrderInstruction(
+        asset,
+        utils.convertDecimalToNativeInteger(1),
+        utils.convertDecimalToNativeLotSize(0.01),
+        types.Side.BID
+      )
+    );
   });
 
   await utils.processTransaction(
