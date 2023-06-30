@@ -616,8 +616,12 @@ export class CrossClient {
     }
   }
 
-  public async findUserMarginAccounts(): Promise<PublicKey[]> {
-    let marginAccounts = [];
+  public async findUserMarginAccounts(): Promise<{
+    addresses: PublicKey[];
+    accounts: programTypes.MarginAccount[];
+  }> {
+    let marginAddresses: PublicKey[] = [];
+    let marginAccounts: programTypes.MarginAccount[] = [];
 
     await Promise.all(
       Exchange.assets.map(async (asset) => {
@@ -630,16 +634,17 @@ export class CrossClient {
 
         // Check if the address is valid
         let account =
-          Exchange.program.account.marginAccount.fetchNullable(address);
+          await Exchange.program.account.marginAccount.fetchNullable(address);
 
         if (account) {
           console.log(`Found ${asset} MarginAccount`);
-          marginAccounts.push(account);
+          marginAddresses.push(address);
+          marginAccounts.push(account as programTypes.MarginAccount);
         }
       })
     );
 
-    return marginAccounts;
+    return { addresses: marginAddresses, accounts: marginAccounts };
   }
 
   public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {
@@ -647,7 +652,9 @@ export class CrossClient {
     this.usdcAccountCheck();
 
     // Dynamically figure out the user's existing margin accounts
-    let marginAccounts = await this.findUserMarginAccounts();
+    let accs = await this.findUserMarginAccounts();
+    let marginAddresses = accs.addresses;
+    let marginAccounts = accs.accounts;
 
     let txs = [];
 
@@ -676,18 +683,15 @@ export class CrossClient {
     }
     tx.add(
       instructions.migrateToCrossMarginAccountIx(
-        marginAccounts,
+        marginAddresses,
         this._accountAddress,
         this.publicKey
       )
     );
     txs.push(tx);
 
-    let closeAccs = await Exchange.program.account.marginAccount.fetchMultiple(
-      marginAccounts
-    );
-    for (var i = 0; i < closeAccs.length; i++) {
-      let acc = closeAccs[i] as programTypes.MarginAccount;
+    for (var i = 0; i < marginAccounts.length; i++) {
+      let acc = marginAccounts[i];
       let asset = assets.fromProgramAsset(acc.asset);
       let market = Exchange.getPerpMarket(asset).address;
       const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
@@ -695,27 +699,29 @@ export class CrossClient {
         constants.DEX_PID[Exchange.network]
       );
       tx = new Transaction();
-      tx.add(
-        instructions.settleDexFundsIx(
-          asset,
-          market,
-          vaultOwner,
-          utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
-        )
-      );
-      tx.add(
-        instructions.closeOpenOrdersV2Ix(
-          market,
-          this.publicKey,
-          marginAccounts[i],
-          utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
-        )
-      );
+      if (acc.openOrdersNonce[constants.PERP_INDEX] != 0) {
+        tx.add(
+          instructions.settleDexFundsIx(
+            asset,
+            market,
+            vaultOwner,
+            utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
+          )
+        );
+        tx.add(
+          instructions.closeOpenOrdersV2Ix(
+            market,
+            this.publicKey,
+            marginAddresses[i],
+            utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
+          )
+        );
+      }
       tx.add(
         instructions.closeMarginAccountIx(
           asset,
           this.publicKey,
-          marginAccounts[i]
+          marginAddresses[i]
         )
       );
       txs.push(tx);
