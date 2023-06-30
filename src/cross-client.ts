@@ -1615,32 +1615,36 @@ export class CrossClient {
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
 
-    let account =
-      await Exchange.program.account.crossMarginAccount.fetchNullable(
-        marginAccountToCancel
-      );
+    let accountInfo = await Exchange.connection.getAccountInfo(
+      marginAccountToCancel
+    );
 
+    let account: programTypes.MarginAccount | programTypes.CrossMarginAccount;
     let openOrdersAccountToCancel: PublicKey;
 
-    // CrossMarginAccount
-    if (account) {
+    try {
+      account =
+        Exchange.program.account.crossMarginAccount.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccount,
+          accountInfo.data
+        ) as programTypes.CrossMarginAccount;
+
       openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
         Exchange.programId,
         Exchange.getPerpMarket(asset).address,
         marginAccountToCancel,
         account.openOrdersNonces[assetToIndex(asset)]
       );
-    }
-    // MarginAccount
-    else {
-      let account = await Exchange.program.account.marginAccount.fetchNullable(
-        marginAccountToCancel
-      );
+    } catch (e) {
+      account = Exchange.program.account.marginAccount.coder.accounts.decode(
+        types.ProgramAccountType.MarginAccount,
+        accountInfo.data
+      ) as programTypes.MarginAccount;
       openOrdersAccountToCancel = utils.createOpenOrdersAddress(
         Exchange.programId,
         Exchange.getPerpMarket(asset).address,
         marginAccountToCancel,
-        account.openOrdersNonces[constants.PERP_INDEX]
+        account.openOrdersNonce[constants.PERP_INDEX]
       );
     }
 
@@ -1674,32 +1678,36 @@ export class CrossClient {
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
 
-    let account =
-      await Exchange.program.account.crossMarginAccount.fetchNullable(
-        marginAccountToCancel
-      );
+    let accountInfo = await Exchange.connection.getAccountInfo(
+      marginAccountToCancel
+    );
 
+    let account: programTypes.MarginAccount | programTypes.CrossMarginAccount;
     let openOrdersAccountToCancel: PublicKey;
 
-    // CrossMarginAccount
-    if (account) {
+    try {
+      account =
+        Exchange.program.account.crossMarginAccount.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccount,
+          accountInfo.data
+        ) as programTypes.CrossMarginAccount;
+
       openOrdersAccountToCancel = utils.createCrossOpenOrdersAddress(
         Exchange.programId,
         Exchange.getPerpMarket(asset).address,
         marginAccountToCancel,
         account.openOrdersNonces[assetToIndex(asset)]
       );
-    }
-    // MarginAccount
-    else {
-      let account = await Exchange.program.account.marginAccount.fetchNullable(
-        marginAccountToCancel
-      );
+    } catch (e) {
+      account = Exchange.program.account.marginAccount.coder.accounts.decode(
+        types.ProgramAccountType.MarginAccount,
+        accountInfo.data
+      ) as programTypes.MarginAccount;
       openOrdersAccountToCancel = utils.createOpenOrdersAddress(
         Exchange.programId,
         Exchange.getPerpMarket(asset).address,
         marginAccountToCancel,
-        account.openOrdersNonces[constants.PERP_INDEX]
+        account.openOrdersNonce[constants.PERP_INDEX]
       );
     }
 
