@@ -94,7 +94,7 @@ async function main() {
       for (let i = 0; i < MAX_SINGLE_MARKET_PLACE_ORDER_IXS; i++) {
         singleMarketTx.add(
           client.createPlacePerpOrderInstruction(
-            ASSETS[0],
+            asset,
             utils.convertDecimalToNativeInteger(i + 1),
             utils.convertDecimalToNativeLotSize(1),
             types.Side.BID
@@ -120,6 +120,29 @@ async function main() {
       `client has ${client.getOrders(asset).length} orders on ${asset}`
     );
   });
+
+  await client.cancelAllPerpMarketOrders();
+  let multiMarketTx = new Transaction();
+
+  for (let i = 0; i < MAX_ALL_PERP_MARKET_PLACE_ORDER_IXS; i++) {
+    multiMarketTx.add(
+      client.createPlacePerpOrderInstruction(
+        ASSETS[0],
+        utils.convertDecimalToNativeInteger(i + 1),
+        utils.convertDecimalToNativeLotSize(0.01),
+        types.Side.BID
+      )
+    );
+  }
+
+  await utils.processTransaction(
+    client.provider,
+    multiMarketTx,
+    undefined,
+    undefined,
+    undefined,
+    utils.getZetaLutArr()
+  );
 
   await Exchange.close();
   await client.close();
