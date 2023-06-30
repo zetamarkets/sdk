@@ -7,13 +7,12 @@ import {
   types,
   programTypes,
   subscription,
-  assets,
+  constants,
 } from "@zetamarkets/sdk";
 
 import { PublicKey, Connection } from "@solana/web3.js";
 
 const NETWORK_URL = process.env["network_url"]!;
-const assetList = [assets.Asset.BTC, assets.Asset.ETH];
 
 let network: Network;
 
@@ -38,7 +37,6 @@ async function main() {
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
-    assetList,
     utils.defaultCommitment(),
     0, // ThrottleMs - increase if you are running into rate limit issues on startup.
     true
@@ -51,7 +49,7 @@ async function main() {
   );
 
   subscription.subscribeProgramAccounts<programTypes.MarginAccount>(
-    assets.Asset.SOL,
+    constants.Asset.SOL,
     types.ProgramAccountType.MarginAccount,
     async (
       data: subscription.AccountSubscriptionData<programTypes.MarginAccount>
