@@ -32,7 +32,7 @@ const NETWORK_URL = process.env["network_url"]!;
 const MAX_ACCOUNTS_TO_FETCH = 99;
 let crankingMarkets = new Array(constants.ACTIVE_MARKETS - 1).fill(false);
 console.log(NETWORK_URL);
-const assetList = [assets.Asset.BTC];
+const assetList = [constants.Asset.BTC];
 
 export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms, undefined));
@@ -61,7 +61,6 @@ async function main() {
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
-    assetList,
     utils.defaultCommitment(),
     0, // ThrottleMs - increase if you are running into rate limit issues on startup.
     true
@@ -84,12 +83,11 @@ async function main() {
   setInterval(
     async function () {
       assetList.map(async (asset) => {
-        await crankExchange(asset, true);
+        await crankExchange(asset);
         // Use this instead of `crankExchange` if you wish to throttle your cranking.
         /*
       await crankExchangeThrottled(
         asset,
-        true,
         process.env.CRANK_EXCHANGE_THROTTLE_MS
           ? parseInt(process.env.CRANK_EXCHANGE_THROTTLE_MS)
           : 1000
@@ -131,24 +129,10 @@ async function main() {
       : 60000
   );
 
-  // Retreat pricing on markets
-  setInterval(
-    async function () {
-      assetList.map(async (asset) => {
-        await retreatMarketNodes(asset);
-      });
-    },
-    process.env.RETREAT_MARKET_NODES_INTERVAL
-      ? parseInt(process.env.RETREAT_MARKET_NODES_INTERVAL)
-      : 5000
-  );
-
   // Rebalance zeta vault and insurance fund
   setInterval(
     async function () {
-      assetList.map(async (asset) => {
-        await rebalanceInsuranceVault(asset);
-      });
+      await rebalanceInsuranceVault();
     }.bind(this),
     process.env.REBALANCE_INSURANCE_VAULT_INTERVAL
       ? parseInt(process.env.REBALANCE_INSURANCE_VAULT_INTERVAL)
@@ -162,101 +146,19 @@ async function main() {
  */
 async function updatePricing() {
   // Get relevant expiry indices.
-  for (var asset of assetList) {
-    let indicesToCrank = [];
-    if (!Exchange.getZetaGroup(asset).perpsOnly) {
-      for (
-        var i = 0;
-        i < Exchange.getZetaGroupMarkets(asset).expirySeries.length;
-        i++
-      ) {
-        let expirySeries = Exchange.getZetaGroupMarkets(asset).expirySeries[i];
-        if (
-          Exchange.clockTimestamp <= expirySeries.expiryTs &&
-          expirySeries.strikesInitialized &&
-          !expirySeries.dirty
-        ) {
-          indicesToCrank.push(i);
-        }
-      }
-    } else {
-      indicesToCrank.push(0);
-    }
-    await Promise.all(
-      indicesToCrank.map(async (index) => {
-        try {
-          console.log(
-            `[${assets.assetToName(asset)}] Update pricing index ${index}`
-          );
-          await Exchange.updatePricing(asset, index);
-        } catch (e) {
-          console.error(
-            `[${assets.assetToName(
-              asset
-            )}] Index ${index}: Update pricing failed. ${e}`
-          );
-        }
-      })
-    );
-  }
-}
 
-/**
- * This calls zeta's permissionless retreat market nodes function through the Exchange object.
- * Cranks zeta's on-chain volatility, retreat and interest functionality similiar to update pricing.
- */
-async function retreatMarketNodes(asset: assets.Asset) {
-  if (Exchange.getSubExchange(asset).zetaGroup.perpsOnly) {
-    return;
-  }
-
-  // Get relevant expiry indices.
-  let indicesToRetreat = [];
-  for (
-    var i = 0;
-    i < Exchange.getZetaGroupMarkets(asset).expirySeries.length;
-    i++
-  ) {
-    if (Exchange.getZetaGroupMarkets(asset).expirySeries[i].isLive()) {
-      indicesToRetreat.push(i);
-    }
-  }
   await Promise.all(
-    indicesToRetreat.map(async (index) => {
+    assetList.map(async (asset) => {
       try {
-        console.log(`[${assets.assetToName(asset)}] Retreating index ${index}`);
-        await Exchange.retreatMarketNodes(asset, index);
+        console.log(`[${assets.assetToName(asset)}] Update pricing`);
+        await Exchange.updatePricing(asset);
       } catch (e) {
         console.error(
-          `[${assets.assetToName(
-            asset
-          )}] Index ${index}: Retreat market nodes failed. ${e}`
+          `[${assets.assetToName(asset)}] Update pricing failed. ${e}`
         );
       }
     })
   );
-}
-
-function getMarketsToCrank(asset: assets.Asset, liveOnly: boolean): Market[] {
-  if (Exchange.getZetaGroup(asset).perpsOnly) {
-    return [Exchange.getPerpMarket(asset)];
-  }
-
-  let marketsToCrank = [];
-
-  if (liveOnly) {
-    let liveExpiryIndices =
-      Exchange.getZetaGroupMarkets(asset).getTradeableExpiryIndices();
-    liveExpiryIndices.map(async (index) => {
-      marketsToCrank.push(
-        Exchange.getZetaGroupMarkets(asset).getMarketsByExpiryIndex(index)
-      );
-    });
-    marketsToCrank = marketsToCrank.flat(1);
-  } else {
-    marketsToCrank = Exchange.getMarkets(asset);
-  }
-  return marketsToCrank;
 }
 
 /**
@@ -268,44 +170,42 @@ function getMarketsToCrank(asset: assets.Asset, liveOnly: boolean): Market[] {
  * This function will poll all market event queues asynchronously so is quite expensive in terms of RPC requests per second.
  * Use crankExchangeThrottle if you are running into rate limit issues.
  */
-async function crankExchange(asset: assets.Asset, liveOnly: boolean) {
-  let marketsToCrank: Market[] = getMarketsToCrank(asset, liveOnly);
-  marketsToCrank.map(async (market) => {
-    let eventQueue = await market.serumMarket.loadEventQueue(
-      Exchange.provider.connection
-    );
+async function crankExchange(asset: constants.Asset) {
+  let market = Exchange.getPerpMarket(asset);
+  let eventQueue = await market.serumMarket.loadEventQueue(
+    Exchange.provider.connection
+  );
 
-    if (eventQueue.length > 0 && !crankingMarkets[market.marketIndex]) {
-      crankingMarkets[market.marketIndex] = true;
-      try {
-        while (eventQueue.length != 0) {
-          try {
-            await utils.crankMarket(asset, market.marketIndex);
-          } catch (e) {
-            console.error(
-              `Cranking failed on market ${market.marketIndex}, ${e}`
-            );
-          }
-
-          let currLength = eventQueue.length;
-
-          eventQueue = await market.serumMarket.loadEventQueue(
-            Exchange.provider.connection
-          );
-
-          let numCranked = currLength - eventQueue.length;
-          console.log(
-            `[${assets.assetToName(
-              asset
-            )}] Cranked ${numCranked} events for market ${market.marketIndex}`
+  if (eventQueue.length > 0 && !crankingMarkets[market.marketIndex]) {
+    crankingMarkets[market.marketIndex] = true;
+    try {
+      while (eventQueue.length != 0) {
+        try {
+          await utils.crankMarket(asset);
+        } catch (e) {
+          console.error(
+            `Cranking failed on market ${market.marketIndex}, ${e}`
           );
         }
-      } catch (e) {
-        console.error(`${e}`);
+
+        let currLength = eventQueue.length;
+
+        eventQueue = await market.serumMarket.loadEventQueue(
+          Exchange.provider.connection
+        );
+
+        let numCranked = currLength - eventQueue.length;
+        console.log(
+          `[${assets.assetToName(
+            asset
+          )}] Cranked ${numCranked} events for market ${market.marketIndex}`
+        );
       }
-      crankingMarkets[market.marketIndex] = false;
+    } catch (e) {
+      console.error(`${e}`);
     }
-  });
+    crankingMarkets[market.marketIndex] = false;
+  }
 }
 
 /**
@@ -313,47 +213,43 @@ async function crankExchange(asset: assets.Asset, liveOnly: boolean) {
  * Allows an optional argument for `throttleMs` which is the duration it will sleep after each market crank.
  */
 async function crankExchangeThrottled(
-  asset: assets.Asset,
-  liveOnly: boolean,
+  asset: constants.Asset,
   throttleMs: number
 ) {
-  let marketsToCrank: Market[] = getMarketsToCrank(asset, liveOnly);
-  for (var i = 0; i < marketsToCrank.length; i++) {
-    let market = marketsToCrank[i];
-    let eventQueue = await market.serumMarket.loadEventQueue(
-      Exchange.provider.connection
-    );
-    if (eventQueue.length > 0 && !crankingMarkets[market.marketIndex]) {
-      crankingMarkets[market.marketIndex] = true;
-      try {
-        while (eventQueue.length != 0) {
-          try {
-            await utils.crankMarket(asset, market.marketIndex);
-          } catch (e) {
-            console.error(
-              `Cranking failed on market ${market.marketIndex}, ${e}`
-            );
-          }
-
-          let currLength = eventQueue.length;
-
-          eventQueue = await market.serumMarket.loadEventQueue(
-            Exchange.provider.connection
-          );
-
-          let numCranked = currLength - eventQueue.length;
-          console.log(
-            `[${assets.assetToName(
-              asset
-            )}] Cranked ${numCranked} events for market ${market.marketIndex}`
+  let market = Exchange.getPerpMarket(asset);
+  let eventQueue = await market.serumMarket.loadEventQueue(
+    Exchange.provider.connection
+  );
+  if (eventQueue.length > 0 && !crankingMarkets[market.marketIndex]) {
+    crankingMarkets[market.marketIndex] = true;
+    try {
+      while (eventQueue.length != 0) {
+        try {
+          await utils.crankMarket(asset);
+        } catch (e) {
+          console.error(
+            `Cranking failed on market ${market.marketIndex}, ${e}`
           );
         }
-      } catch (e) {
-        console.error(`${e}`);
+
+        let currLength = eventQueue.length;
+
+        eventQueue = await market.serumMarket.loadEventQueue(
+          Exchange.provider.connection
+        );
+
+        let numCranked = currLength - eventQueue.length;
+        console.log(
+          `[${assets.assetToName(
+            asset
+          )}] Cranked ${numCranked} events for market ${market.marketIndex}`
+        );
       }
-      crankingMarkets[market.marketIndex] = false;
-      await sleep(throttleMs);
+    } catch (e) {
+      console.error(`${e}`);
     }
+    crankingMarkets[market.marketIndex] = false;
+    await sleep(throttleMs);
   }
 }
 
@@ -384,7 +280,7 @@ async function applyFunding() {
 
     // In that set: Check if any have non-zero perp positions
     // If they do, apply funding on them
-    let fundingAccounts = new Map<assets.Asset, PublicKey[]>();
+    let fundingAccounts = new Map<constants.Asset, PublicKey[]>();
     for (var asset of Exchange.assets) {
       fundingAccounts.set(asset, []);
     }
@@ -410,27 +306,12 @@ async function pruneExpiredTIFOrders() {
   try {
     await Promise.all(
       subExchanges.map((se) => {
-        let markets = se.getMarkets();
-
-        let marketIndicesToPrune: number[] = [];
-
-        for (let i = 0; i < markets.length; i++) {
-          if (!markets[i].expirySeries) {
-            marketIndicesToPrune.push(markets[i].marketIndex);
-            continue;
-          }
-          if (!markets[i].expirySeries.isLive()) {
-            continue;
-          }
-          marketIndicesToPrune.push(markets[i].marketIndex);
-        }
-
-        return utils.pruneExpiredTIFOrders(se.asset, marketIndicesToPrune);
+        return utils.pruneExpiredTIFOrders(se.asset);
       })
     );
     console.log("Pruned expired TIF orders.");
   } catch (e) {
-    this.alert("Failed to prune expired TIF orders.", `Error=${e}`);
+    console.log("Failed to prune expired TIF orders.", `Error=${e}`);
   }
 }
 
@@ -438,17 +319,16 @@ async function pruneExpiredTIFOrders() {
  * Rebalances the zeta vault and the insurance vault to ensure consistent platform security.
  * Checks all margin accounts for non-zero rebalance amounts and rebalances them all.
  */
-async function rebalanceInsuranceVault(asset: assets.Asset) {
+async function rebalanceInsuranceVault() {
   let marginAccPubkeys: PublicKey[];
   try {
     marginAccPubkeys = await utils.getAllProgramAccountAddresses(
-      types.ProgramAccountType.MarginAccount,
-      asset
+      types.ProgramAccountType.MarginAccount
     );
   } catch (e) {
-    this.alert(
+    console.log(
       "rebalanceInsuranceVault account address fetch error",
-      `Asset=${assets.assetToName(asset)} Error=${e}`
+      `Error=${e}`
     );
   }
 
@@ -459,9 +339,9 @@ async function rebalanceInsuranceVault(asset: assets.Asset) {
         marginAccPubkeys.slice(i, i + MAX_ACCOUNTS_TO_FETCH)
       );
     } catch (e) {
-      this.alert(
+      console.log(
         "rebalanceInsuranceVault margin account fetch error",
-        `Asset=${assets.assetToName(asset)}, Error=${e}`
+        `Error=${e}`
       );
     }
 
@@ -476,16 +356,14 @@ async function rebalanceInsuranceVault(asset: assets.Asset) {
       }
     }
     console.log(
-      `[${assets.assetToName(asset)}] [REBALANCE INSURANCE VAULT] for ${
-        remainingAccounts.length
-      } accounts.`
+      `[REBALANCE INSURANCE VAULT] for ${remainingAccounts.length} accounts.`
     );
     try {
-      await Exchange.rebalanceInsuranceVault(asset, remainingAccounts);
+      await Exchange.rebalanceInsuranceVault(remainingAccounts);
     } catch (e) {
-      this.alert(
+      console.log(
         "rebalanceInsuranceVault vault error on transaction",
-        `Asset=${assets.assetToName(asset)} Error=${e}`
+        `Error=${e}`
       );
     }
   }
