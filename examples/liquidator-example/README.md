@@ -72,7 +72,7 @@ echo private_key=`cat bot-key.json` >> .env
 | connection        |        https://api.devnet.solana.com         |                          The rpc endpoint to connect to.                           |
 | program_id        | BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7 |                                 Zeta's Program ID.                                 |
 | private_key       |        [insert your private key here]        |              The private key you will use for your liquidator client.              |
-| server_url        |      dex-devnet-webserver.zeta.markets       |                    The server endpoint to airdrop devnet usdc.                     |
+| server_url        |    dex-devnet-webserver-ecs.zeta.markets     |                    The server endpoint to airdrop devnet usdc.                     |
 
 # Install dependencies
 

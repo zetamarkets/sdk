@@ -7,6 +7,7 @@ import {
   types,
   assets,
   programTypes,
+  constants,
 } from "@zetamarkets/sdk";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import { Wallet } from "@zetamarkets/anchor";
@@ -24,7 +25,7 @@ let client: Client;
 let scanning: boolean = false;
 
 // Underlying to run on. Can technically run on multiple at a time but will require some code modifications.
-export const asset = assets.Asset.BTC;
+export const asset = constants.Asset.BTC;
 
 // Function that will do a few things sequentially.
 // 1. Get all margin accounts for the program.
@@ -117,7 +118,6 @@ async function main() {
   const loadExchangeConfig = types.defaultLoadExchangeConfig(
     network,
     connection,
-    [asset],
     utils.defaultCommitment(),
     0, // Increase if you are getting rate limited on startup.
     true
