@@ -88,56 +88,29 @@ async function main() {
     })
   );
 
-  let singleMarketTx = new Transaction();
-  for (let i = 0; i < MAX_SINGLE_MARKET_PLACE_ORDER_IXS; i++) {
-    singleMarketTx.add(
-      client.createPlacePerpOrderInstruction(
-        ASSETS[0],
-        utils.convertDecimalToNativeInteger(i + 1),
-        utils.convertDecimalToNativeLotSize(1),
-        types.Side.BID
-      )
-    );
-  }
+  await Promise.all(
+    ASSETS.map(async (asset) => {
+      let singleMarketTx = new Transaction();
+      for (let i = 0; i < MAX_SINGLE_MARKET_PLACE_ORDER_IXS; i++) {
+        singleMarketTx.add(
+          client.createPlacePerpOrderInstruction(
+            ASSETS[0],
+            utils.convertDecimalToNativeInteger(i + 1),
+            utils.convertDecimalToNativeLotSize(1),
+            types.Side.BID
+          )
+        );
+      }
 
-  await utils.processTransaction(
-    client.provider,
-    singleMarketTx,
-    undefined,
-    undefined,
-    undefined,
-    utils.getZetaLutArr()
-  );
-
-  await utils.sleep(2000);
-
-  ASSETS.forEach((asset) => {
-    console.log(
-      `client has ${client.getOrders(asset).length} orders on ${asset}`
-    );
-  });
-
-  await client.cancelAllOrders(ASSETS[0]);
-
-  let multiMarketTx = new Transaction();
-  ASSETS.forEach((asset) => {
-    multiMarketTx.add(
-      client.createPlacePerpOrderInstruction(
-        asset,
-        utils.convertDecimalToNativeInteger(1),
-        utils.convertDecimalToNativeLotSize(0.01),
-        types.Side.BID
-      )
-    );
-  });
-
-  await utils.processTransaction(
-    client.provider,
-    multiMarketTx,
-    undefined,
-    undefined,
-    undefined,
-    utils.getZetaLutArr()
+      await utils.processTransaction(
+        client.provider,
+        singleMarketTx,
+        undefined,
+        undefined,
+        undefined,
+        utils.getZetaLutArr()
+      );
+    })
   );
 
   await utils.sleep(2000);
