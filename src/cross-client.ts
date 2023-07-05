@@ -796,7 +796,7 @@ export class CrossClient {
   public getAccountState(
     pnlExecutionPrice: number = undefined,
     pnlAddTakerFees: boolean = false
-  ): types.MarginAccountState {
+  ): types.CrossMarginAccountState {
     return Exchange.riskCalculator.getCrossMarginAccountState(
       this._account,
       pnlExecutionPrice,

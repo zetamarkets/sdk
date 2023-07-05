@@ -8,6 +8,7 @@ export enum Asset {
   APT = "APT",
   ARB = "ARB",
   UNDEFINED = "UNDEFINED",
+  TOTAL = "TOTAL",
 }
 
 export const ZETA_PID: {

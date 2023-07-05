@@ -32,10 +32,6 @@ export class RiskCalculator {
     }
   }
 
-  public getMarginRequirements(asset: Asset): Array<types.MarginRequirement> {
-    return this._marginRequirements.get(asset);
-  }
-
   public getPerpMarginRequirements(asset: Asset): types.MarginRequirement {
     return this._perpMarginRequirements.get(asset);
   }
@@ -58,23 +54,9 @@ export class RiskCalculator {
   /**
    * Returns the margin requirement for a given market and size.
    * @param asset          underlying asset type.
-   * @param productIndex   market index of the product to calculate margin for.
    * @param size           signed integer of size for margin requirements (short orders should be negative)
    * @param marginType     type of margin calculation.
    */
-  public getMarginRequirement(
-    asset: Asset,
-    productIndex: number,
-    size: number,
-    marginType: types.MarginType
-  ): number {
-    let marginRequirement =
-      productIndex == constants.PERP_INDEX
-        ? this._perpMarginRequirements.get(asset)
-        : this._marginRequirements.get(asset)[productIndex];
-    return this.calculateMarginRequirement(marginRequirement, size, marginType);
-  }
-
   public getPerpMarginRequirement(
     asset: Asset,
     size: number,
@@ -141,7 +123,7 @@ export class RiskCalculator {
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount
-  ): number {
+  ): number | Map<Asset, number> {
     // Spread accounts cannot hold perps and therefore have no unpaid funding
     if (accountType == types.ProgramAccountType.SpreadAccount) {
       return 0;
@@ -154,6 +136,7 @@ export class RiskCalculator {
         ? [assets.fromProgramAsset(account.asset)]
         : Exchange.assets;
 
+    let fundingMap: Map<Asset, number> = new Map();
     for (var asset of assetList) {
       const position =
         accountType == types.ProgramAccountType.MarginAccount
@@ -174,11 +157,18 @@ export class RiskCalculator {
           ).toNumber()) /
         Math.pow(10, constants.PLATFORM_PRECISION);
 
+      let assetFunding = -1 * size * deltaDiff;
+      fundingMap.set(asset, assetFunding);
       // Note that there is some rounding occurs here in the Zeta program
       // but we omit it in this function for simplicity
-      funding += -1 * size * deltaDiff;
+      funding += assetFunding;
     }
-    return funding;
+    fundingMap.set(Asset.TOTAL, funding);
+    if (accountType == types.ProgramAccountType.MarginAccount) {
+      return funding;
+    } else {
+      return fundingMap;
+    }
   }
 
   /**
@@ -191,7 +181,7 @@ export class RiskCalculator {
       .MarginAccount,
     executionPrice: number = undefined,
     addTakerFees: boolean = false
-  ): number {
+  ): number | Map<Asset, number> {
     let pnl = 0;
 
     let i_list = [];
@@ -202,6 +192,7 @@ export class RiskCalculator {
       i_list = [constants.PERP_INDEX];
     }
 
+    let upnlMap: Map<Asset, number> = new Map();
     for (var i of i_list) {
       // No perps in spread accounts
       if (
@@ -225,7 +216,8 @@ export class RiskCalculator {
         continue;
       }
 
-      let asset;
+      let asset: Asset;
+      let assetPnl: number = 0;
       if (accountType == types.ProgramAccountType.CrossMarginAccount) {
         asset = assets.indexToAsset(i);
       } else {
@@ -234,25 +226,33 @@ export class RiskCalculator {
 
       let subExchange = Exchange.getSubExchange(asset);
       if (size > 0) {
-        pnl +=
+        assetPnl +=
           convertNativeLotSizeToDecimal(size) *
             (executionPrice ? executionPrice : subExchange.getMarkPrice()) -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
-        pnl +=
+        assetPnl +=
           convertNativeLotSizeToDecimal(size) *
             (executionPrice ? executionPrice : subExchange.getMarkPrice()) +
           convertNativeBNToDecimal(position.costOfTrades);
       }
       if (addTakerFees) {
-        pnl -=
+        assetPnl -=
           convertNativeLotSizeToDecimal(Math.abs(size)) *
           (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
             100) *
           subExchange.getMarkPrice();
       }
+      upnlMap.set(asset, assetPnl);
+      pnl += assetPnl;
     }
-    return pnl;
+    upnlMap.set(Asset.TOTAL, pnl);
+
+    if (accountType == types.ProgramAccountType.MarginAccount) {
+      return pnl;
+    } else {
+      return upnlMap;
+    }
   }
 
   /**
@@ -266,7 +266,7 @@ export class RiskCalculator {
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
     skipConcession: boolean = false
-  ): number {
+  ): number | Map<Asset, number> {
     // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
     let assetList =
       accountType == types.ProgramAccountType.MarginAccount
@@ -275,6 +275,8 @@ export class RiskCalculator {
 
     let marginForMarkets = 0;
     let marketMaker = types.isMarketMaker(account);
+
+    let imMap: Map<Asset, number> = new Map();
     for (var asset of assetList) {
       const ledger =
         accountType == types.ProgramAccountType.MarginAccount
@@ -300,16 +302,14 @@ export class RiskCalculator {
       }
 
       let marginForMarket: number = undefined;
-      let longLotsMarginReq = this.getMarginRequirement(
+      let longLotsMarginReq = this.getPerpMarginRequirement(
         asset,
-        constants.PERP_INDEX,
         // Positive for buys.
         longLots,
         types.MarginType.INITIAL
       );
-      let shortLotsMarginReq = this.getMarginRequirement(
+      let shortLotsMarginReq = this.getPerpMarginRequirement(
         asset,
-        constants.PERP_INDEX,
         // Negative for sells.
         -shortLots,
         types.MarginType.INITIAL
@@ -322,19 +322,23 @@ export class RiskCalculator {
         // Mark initial margin to concession (only contains open order margin).
         marginForMarket *= Exchange.state.marginConcessionPercentage / 100;
         // Add position margin which doesn't get concessions.
-        marginForMarket += this.getMarginRequirement(
+        marginForMarket += this.getPerpMarginRequirement(
           asset,
-          constants.PERP_INDEX,
           // This is signed.
           convertNativeLotSizeToDecimal(size),
           types.MarginType.MAINTENANCE
         );
       }
-
+      imMap.set(asset, marginForMarket);
       marginForMarkets += marginForMarket;
     }
 
-    return marginForMarkets;
+    imMap.set(Asset.TOTAL, marginForMarkets);
+    if (accountType == types.ProgramAccountType.MarginAccount) {
+      return marginForMarkets;
+    } else {
+      return imMap;
+    }
   }
 
   /**
@@ -348,7 +352,7 @@ export class RiskCalculator {
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount
-  ): number {
+  ): number | Map<Asset, number> {
     // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
     let assetList =
       accountType == types.ProgramAccountType.MarginAccount
@@ -356,6 +360,7 @@ export class RiskCalculator {
         : Exchange.assets;
 
     let margins = 0;
+    let marginMap: Map<Asset, number> = new Map();
     for (var asset of assetList) {
       const ledger =
         accountType == types.ProgramAccountType.MarginAccount
@@ -367,16 +372,24 @@ export class RiskCalculator {
       if (size == 0) {
         continue;
       }
-      margins += this.getMarginRequirement(
+
+      let assetMargin = this.getPerpMarginRequirement(
         asset,
-        constants.PERP_INDEX,
         // This is signed.
         convertNativeLotSizeToDecimal(size),
         types.MarginType.MAINTENANCE
       );
+
+      marginMap.set(asset, assetMargin);
+      margins += assetMargin;
     }
 
-    return margins;
+    marginMap.set(Asset.TOTAL, margins);
+    if (accountType == types.ProgramAccountType.MarginAccount) {
+      return margins;
+    } else {
+      return marginMap;
+    }
   }
 
   /**
@@ -420,16 +433,14 @@ export class RiskCalculator {
       }
 
       margins +=
-        this.getMarginRequirement(
+        this.getPerpMarginRequirement(
           asset,
-          constants.PERP_INDEX,
           // Positive for buys.
           longLots,
           types.MarginType.MAINTENANCE
         ) +
-        this.getMarginRequirement(
+        this.getPerpMarginRequirement(
           asset,
-          constants.PERP_INDEX,
           // Negative for sells.
           -shortLots,
           types.MarginType.MAINTENANCE
@@ -447,7 +458,7 @@ export class RiskCalculator {
     marginAccount: CrossMarginAccount,
     pnlExecutionPrice: number = undefined,
     pnlAddTakerFees: boolean = false
-  ): types.MarginAccountState {
+  ): types.CrossMarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let accType = types.ProgramAccountType.CrossMarginAccount;
     let unrealizedPnl = this.calculateUnrealizedPnl(
@@ -455,37 +466,45 @@ export class RiskCalculator {
       accType,
       pnlExecutionPrice,
       pnlAddTakerFees
-    );
-    let unpaidFunding = this.calculateUnpaidFunding(marginAccount, accType);
+    ) as Map<Asset, number>;
+    let unpaidFunding = this.calculateUnpaidFunding(
+      marginAccount,
+      accType
+    ) as Map<Asset, number>;
     let initialMargin = this.calculateTotalInitialMargin(
       marginAccount,
       accType
-    );
+    ) as Map<Asset, number>;
     let initialMarginSkipConcession = this.calculateTotalInitialMargin(
       marginAccount,
       accType,
       true
-    );
+    ) as Map<Asset, number>;
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(
       marginAccount,
       accType
-    );
+    ) as Map<Asset, number>;
     let availableBalanceInitial: number =
-      balance + unrealizedPnl + unpaidFunding - initialMargin;
+      balance +
+      unrealizedPnl.get(Asset.TOTAL) +
+      unpaidFunding.get(Asset.TOTAL) -
+      initialMargin.get(Asset.TOTAL);
     let availableBalanceWithdrawable: number =
-      balance + unrealizedPnl + unpaidFunding - initialMarginSkipConcession;
+      balance +
+      unrealizedPnl.get(Asset.TOTAL) +
+      unpaidFunding.get(Asset.TOTAL) -
+      initialMarginSkipConcession.get(Asset.TOTAL);
     let availableBalanceMaintenance: number =
-      balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
+      balance +
+      unrealizedPnl.get(Asset.TOTAL) +
+      unpaidFunding.get(Asset.TOTAL) -
+      maintenanceMargin.get(Asset.TOTAL);
     return {
       balance,
-      initialMargin,
-      initialMarginSkipConcession,
-      maintenanceMargin,
-      unrealizedPnl,
-      unpaidFunding,
       availableBalanceInitial,
       availableBalanceMaintenance,
       availableBalanceWithdrawable,
+      state: new Map(),
     };
   }
 
@@ -504,15 +523,19 @@ export class RiskCalculator {
       types.ProgramAccountType.MarginAccount,
       pnlExecutionPrice,
       pnlAddTakerFees
-    );
-    let unpaidFunding = this.calculateUnpaidFunding(marginAccount);
-    let initialMargin = this.calculateTotalInitialMargin(marginAccount);
+    ) as number;
+    let unpaidFunding = this.calculateUnpaidFunding(marginAccount) as number;
+    let initialMargin = this.calculateTotalInitialMargin(
+      marginAccount
+    ) as number;
     let initialMarginSkipConcession = this.calculateTotalInitialMargin(
       marginAccount,
       types.ProgramAccountType.MarginAccount,
       true
-    );
-    let maintenanceMargin = this.calculateTotalMaintenanceMargin(marginAccount);
+    ) as number;
+    let maintenanceMargin = this.calculateTotalMaintenanceMargin(
+      marginAccount
+    ) as number;
     let availableBalanceInitial: number =
       balance + unrealizedPnl + unpaidFunding - initialMargin;
     let availableBalanceWithdrawable: number =

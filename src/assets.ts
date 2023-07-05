@@ -25,7 +25,7 @@ export function isValidStr(asset: string): boolean {
 export function allAssets(): Asset[] {
   let allAssets: Asset[] = [];
   for (var a in Asset) {
-    if (typeof Asset[a] === "string" && a != "UNDEFINED") {
+    if (typeof Asset[a] === "string" && a != "UNDEFINED" && a != "TOTAL") {
       allAssets.push(nameToAsset(a));
     }
   }
@@ -54,6 +54,7 @@ export function nameToAsset(name: string): Asset {
 }
 
 export function getAssetMint(asset: Asset): PublicKey {
+  if (asset == Asset.TOTAL) throw Error("Invalid asset");
   return constants.MINTS[asset];
 }
 

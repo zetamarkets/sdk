@@ -122,7 +122,9 @@ export function checkMarginAccountMarginRequirement(
     types.ProgramAccountType.MarginAccount
   );
   let totalMaintenanceMargin =
-    Exchange.riskCalculator.calculateTotalMaintenanceMargin(marginAccount);
+    Exchange.riskCalculator.calculateTotalMaintenanceMargin(
+      marginAccount
+    ) as number;
   let buffer = marginAccount.balance.toNumber() + pnl - totalMaintenanceMargin;
   return buffer > 0;
 }
