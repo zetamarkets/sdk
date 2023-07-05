@@ -23,16 +23,7 @@ export function collectRiskMaps(
   mmMap: Map<Asset, Number>,
   upnlMap: Map<Asset, Number>,
   unpaidFundingMap: Map<Asset, Number>
-): Map<
-  Asset,
-  {
-    initialMargin: number;
-    initialMarginSkipConcession: number;
-    maintenanceMargin: number;
-    unrealizedPnl: number;
-    unpaidFunding: number;
-  }
-> {
+): Map<Asset, types.AssetRiskState> {
   let allAssets = assets.allAssets();
   let collectedRiskState = new Map();
   for (let a of allAssets) {
