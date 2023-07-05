@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.4.0] 2023-07-05
+## [1.4.1] 2023-07-05
 
 - Add in per asset risk state for cross margin accounts. ([#247](https://github.com/zetamarkets/sdk/pull/247))
 

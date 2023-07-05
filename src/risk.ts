@@ -180,7 +180,7 @@ export class RiskCalculator {
     let i_list = [];
 
     if (accountType == types.ProgramAccountType.CrossMarginAccount) {
-      i_list = [...Array(constants.ACTIVE_PERP_MARKETS - 1).keys()];
+      i_list = [...Array(constants.ACTIVE_PERP_MARKETS).keys()];
     } else {
       i_list = [constants.PERP_INDEX];
     }
