@@ -214,10 +214,9 @@ export interface CrossMarginAccountState {
   availableBalanceInitial: number;
   availableBalanceMaintenance: number;
   availableBalanceWithdrawable: number;
-  state: Map<
+  assetState: Map<
     Asset,
     {
-      balance: number;
       initialMargin: number;
       initialMarginSkipConcession: number;
       maintenanceMargin: number;
@@ -225,6 +224,11 @@ export interface CrossMarginAccountState {
       unpaidFunding: number;
     }
   >;
+  initialMarginTotal: number;
+  initalMarginSkipConcessionTotal: number;
+  maintenanceMarginTotal: number;
+  unrealizedPnlTotal: number;
+  unpaidFundingTotal: number;
 }
 
 export interface CancelArgs {

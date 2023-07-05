@@ -1,5 +1,5 @@
 import { BN } from "@zetamarkets/anchor";
-import { types, Exchange, constants, assets, instructions } from ".";
+import { types, Exchange, constants, assets } from ".";
 import { Asset } from "./constants";
 import {
   Position,
@@ -7,11 +7,45 @@ import {
   MarginAccount,
   ProductLedger,
 } from "./program-types";
-import {
-  convertNativeBNToDecimal,
-  convertDecimalToNativeInteger,
-  getProductLedger,
-} from "./utils";
+import { getProductLedger } from "./utils";
+
+export function collectIteratorSum(x: IterableIterator<number>) {
+  let sum = 0;
+  for (let e of x) {
+    sum += e;
+  }
+  return sum;
+}
+
+export function collectRiskMaps(
+  imMap: Map<Asset, Number>,
+  imSCMap: Map<Asset, Number>,
+  mmMap: Map<Asset, Number>,
+  upnlMap: Map<Asset, Number>,
+  unpaidFundingMap: Map<Asset, Number>
+): Map<
+  Asset,
+  {
+    initialMargin: number;
+    initialMarginSkipConcession: number;
+    maintenanceMargin: number;
+    unrealizedPnl: number;
+    unpaidFunding: number;
+  }
+> {
+  let allAssets = assets.allAssets();
+  let collectedRiskState = new Map();
+  for (let a of allAssets) {
+    collectedRiskState.set(a, {
+      initialMargin: imMap.get(a),
+      initialMarginSkipConcession: imSCMap.get(a),
+      maintenanceMargin: mmMap.get(a),
+      unrealizedPnl: upnlMap.get(a),
+      unpaidFunding: unpaidFundingMap.get(a),
+    });
+  }
+  return collectedRiskState;
+}
 
 /**
  * Calculates the price at which a position will be liquidated.

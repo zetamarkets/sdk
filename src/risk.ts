@@ -8,13 +8,11 @@ import {
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
-import { BN } from "@zetamarkets/anchor";
-import { assets, Client, Decimal, instructions, utils } from ".";
-import { cloneDeep } from "lodash";
+import { assets, Decimal } from ".";
 import {
   calculateProductMargin,
-  calculateNormalizedCostOfTrades,
-  checkMarginAccountMarginRequirement,
+  collectIteratorSum,
+  collectRiskMaps,
 } from "./risk-utils";
 
 export class RiskCalculator {
@@ -163,7 +161,6 @@ export class RiskCalculator {
       // but we omit it in this function for simplicity
       funding += assetFunding;
     }
-    fundingMap.set(Asset.TOTAL, funding);
     if (accountType == types.ProgramAccountType.MarginAccount) {
       return funding;
     } else {
@@ -246,7 +243,6 @@ export class RiskCalculator {
       upnlMap.set(asset, assetPnl);
       pnl += assetPnl;
     }
-    upnlMap.set(Asset.TOTAL, pnl);
 
     if (accountType == types.ProgramAccountType.MarginAccount) {
       return pnl;
@@ -332,8 +328,6 @@ export class RiskCalculator {
       imMap.set(asset, marginForMarket);
       marginForMarkets += marginForMarket;
     }
-
-    imMap.set(Asset.TOTAL, marginForMarkets);
     if (accountType == types.ProgramAccountType.MarginAccount) {
       return marginForMarkets;
     } else {
@@ -383,8 +377,6 @@ export class RiskCalculator {
       marginMap.set(asset, assetMargin);
       margins += assetMargin;
     }
-
-    marginMap.set(Asset.TOTAL, margins);
     if (accountType == types.ProgramAccountType.MarginAccount) {
       return margins;
     } else {
@@ -484,27 +476,38 @@ export class RiskCalculator {
       marginAccount,
       accType
     ) as Map<Asset, number>;
+
+    let upnlTotal = collectIteratorSum(unrealizedPnl.values());
+    let unpaidFundingTotal = collectIteratorSum(unpaidFunding.values());
+    let imTotal = collectIteratorSum(initialMargin.values());
+    let imSkipConcessionTotal = collectIteratorSum(
+      initialMarginSkipConcession.values()
+    );
+    let mmTotal = collectIteratorSum(maintenanceMargin.values());
+
     let availableBalanceInitial: number =
-      balance +
-      unrealizedPnl.get(Asset.TOTAL) +
-      unpaidFunding.get(Asset.TOTAL) -
-      initialMargin.get(Asset.TOTAL);
+      balance + upnlTotal + unpaidFundingTotal - imTotal;
     let availableBalanceWithdrawable: number =
-      balance +
-      unrealizedPnl.get(Asset.TOTAL) +
-      unpaidFunding.get(Asset.TOTAL) -
-      initialMarginSkipConcession.get(Asset.TOTAL);
+      balance + upnlTotal + unpaidFundingTotal - imSkipConcessionTotal;
     let availableBalanceMaintenance: number =
-      balance +
-      unrealizedPnl.get(Asset.TOTAL) +
-      unpaidFunding.get(Asset.TOTAL) -
-      maintenanceMargin.get(Asset.TOTAL);
+      balance + upnlTotal + unpaidFundingTotal - mmTotal;
     return {
       balance,
       availableBalanceInitial,
       availableBalanceMaintenance,
       availableBalanceWithdrawable,
-      state: new Map(),
+      assetState: collectRiskMaps(
+        initialMargin,
+        initialMarginSkipConcession,
+        maintenanceMargin,
+        unrealizedPnl,
+        unpaidFunding
+      ),
+      initialMarginTotal: imTotal,
+      initalMarginSkipConcessionTotal: imSkipConcessionTotal,
+      maintenanceMarginTotal: mmTotal,
+      unrealizedPnlTotal: upnlTotal,
+      unpaidFundingTotal: unpaidFundingTotal,
     };
   }
 
