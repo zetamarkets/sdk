@@ -9,11 +9,7 @@ import {
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
 import { assets, Decimal } from ".";
-import {
-  calculateProductMargin,
-  collectIteratorSum,
-  collectRiskMaps,
-} from "./risk-utils";
+import { calculateProductMargin, collectRiskMaps } from "./risk-utils";
 
 export class RiskCalculator {
   private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
@@ -208,17 +204,18 @@ export class RiskCalculator {
         position = account.productLedgers[i].position;
       }
 
-      const size = position.size.toNumber();
-      if (size == 0) {
-        continue;
-      }
-
       let asset: Asset;
       let assetPnl: number = 0;
       if (accountType == types.ProgramAccountType.CrossMarginAccount) {
         asset = assets.indexToAsset(i);
       } else {
         asset = fromProgramAsset(account.asset);
+      }
+
+      const size = position.size.toNumber();
+      if (size == 0) {
+        upnlMap.set(asset, 0);
+        continue;
       }
 
       let subExchange = Exchange.getSubExchange(asset);
@@ -283,6 +280,7 @@ export class RiskCalculator {
       let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
       let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
       if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
+        imMap.set(asset, 0);
         continue;
       }
 
@@ -364,6 +362,7 @@ export class RiskCalculator {
       let position = ledger.position;
       let size = position.size.toNumber();
       if (size == 0) {
+        marginMap.set(asset, 0);
         continue;
       }
 
@@ -477,13 +476,22 @@ export class RiskCalculator {
       accType
     ) as Map<Asset, number>;
 
-    let upnlTotal = collectIteratorSum(unrealizedPnl.values());
-    let unpaidFundingTotal = collectIteratorSum(unpaidFunding.values());
-    let imTotal = collectIteratorSum(initialMargin.values());
-    let imSkipConcessionTotal = collectIteratorSum(
-      initialMarginSkipConcession.values()
+    let upnlTotal = Array.from(unrealizedPnl.values()).reduce(
+      (a, b) => a + b,
+      0
     );
-    let mmTotal = collectIteratorSum(maintenanceMargin.values());
+    let unpaidFundingTotal = Array.from(unpaidFunding.values()).reduce(
+      (a, b) => a + b,
+      0
+    );
+    let imTotal = Array.from(initialMargin.values()).reduce((a, b) => a + b, 0);
+    let imSkipConcessionTotal = Array.from(
+      initialMarginSkipConcession.values()
+    ).reduce((a, b) => a + b, 0);
+    let mmTotal = Array.from(maintenanceMargin.values()).reduce(
+      (a, b) => a + b,
+      0
+    );
 
     let availableBalanceInitial: number =
       balance + upnlTotal + unpaidFundingTotal - imTotal;

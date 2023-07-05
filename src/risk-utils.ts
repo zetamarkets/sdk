@@ -9,14 +9,6 @@ import {
 } from "./program-types";
 import { getProductLedger } from "./utils";
 
-export function collectIteratorSum(x: IterableIterator<number>) {
-  let sum = 0;
-  for (let e of x) {
-    sum += e;
-  }
-  return sum;
-}
-
 export function collectRiskMaps(
   imMap: Map<Asset, Number>,
   imSCMap: Map<Asset, Number>,
