@@ -209,6 +209,27 @@ export interface MarginAccountState {
   availableBalanceWithdrawable: number;
 }
 
+export interface AssetRiskState {
+  initialMargin: number;
+  initialMarginSkipConcession: number;
+  maintenanceMargin: number;
+  unrealizedPnl: number;
+  unpaidFunding: number;
+}
+
+export interface CrossMarginAccountState {
+  balance: number;
+  availableBalanceInitial: number;
+  availableBalanceMaintenance: number;
+  availableBalanceWithdrawable: number;
+  assetState: Map<Asset, AssetRiskState>;
+  initialMarginTotal: number;
+  initalMarginSkipConcessionTotal: number;
+  maintenanceMarginTotal: number;
+  unrealizedPnlTotal: number;
+  unpaidFundingTotal: number;
+}
+
 export interface CancelArgs {
   asset: Asset;
   market: PublicKey;
