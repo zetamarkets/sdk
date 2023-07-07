@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- Separate sdk calls for migrating from MA to CMA and then closing OOAs and MAs. ([#248](https://github.com/zetamarkets/sdk/pull/247))
+
 ## [1.4.2] 2023-07-05
 
 - Add in per asset risk state for cross margin accounts. ([#247](https://github.com/zetamarkets/sdk/pull/247))
