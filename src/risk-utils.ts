@@ -1,5 +1,5 @@
 import { BN } from "@zetamarkets/anchor";
-import { types, Exchange, constants, assets, instructions } from ".";
+import { types, Exchange, constants, assets } from ".";
 import { Asset } from "./constants";
 import {
   Position,
@@ -7,11 +7,28 @@ import {
   MarginAccount,
   ProductLedger,
 } from "./program-types";
-import {
-  convertNativeBNToDecimal,
-  convertDecimalToNativeInteger,
-  getProductLedger,
-} from "./utils";
+import { getProductLedger } from "./utils";
+
+export function collectRiskMaps(
+  imMap: Map<Asset, Number>,
+  imSCMap: Map<Asset, Number>,
+  mmMap: Map<Asset, Number>,
+  upnlMap: Map<Asset, Number>,
+  unpaidFundingMap: Map<Asset, Number>
+): Map<Asset, types.AssetRiskState> {
+  let allAssets = assets.allAssets();
+  let collectedRiskState = new Map();
+  for (let a of allAssets) {
+    collectedRiskState.set(a, {
+      initialMargin: imMap.get(a),
+      initialMarginSkipConcession: imSCMap.get(a),
+      maintenanceMargin: mmMap.get(a),
+      unrealizedPnl: upnlMap.get(a),
+      unpaidFunding: unpaidFundingMap.get(a),
+    });
+  }
+  return collectedRiskState;
+}
 
 /**
  * Calculates the price at which a position will be liquidated.
@@ -122,7 +139,9 @@ export function checkMarginAccountMarginRequirement(
     types.ProgramAccountType.MarginAccount
   );
   let totalMaintenanceMargin =
-    Exchange.riskCalculator.calculateTotalMaintenanceMargin(marginAccount);
+    Exchange.riskCalculator.calculateTotalMaintenanceMargin(
+      marginAccount
+    ) as number;
   let buffer = marginAccount.balance.toNumber() + pnl - totalMaintenanceMargin;
   return buffer > 0;
 }
