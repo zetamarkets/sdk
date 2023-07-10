@@ -2,7 +2,7 @@ require("dotenv").config();
 
 import {
   Wallet,
-  Client,
+  CrossClient,
   Exchange,
   Network,
   utils,
@@ -21,8 +21,8 @@ const USER_KEY = Keypair.generate();
 const WALLET = new Wallet(USER_KEY);
 const CONNECTION: Connection = new Connection(NETWORK_URL, "confirmed");
 
-const MAX_SINGLE_MARKET_PLACE_ORDER_IXS = 13;
-const MAX_ALL_PERP_MARKET_PLACE_ORDER_IXS = 9;
+const MAX_SINGLE_MARKET_PLACE_ORDER_IXS = 6;
+const MAX_ALL_PERP_MARKET_PLACE_ORDER_IXS = 6;
 
 async function main() {
   // Airdropping SOL.
@@ -47,7 +47,7 @@ async function main() {
 
   await Exchange.load(loadExchangeConfig);
 
-  const client = await Client.load(
+  const client = await CrossClient.load(
     CONNECTION,
     WALLET,
     undefined,
@@ -59,32 +59,20 @@ async function main() {
 
   console.log("client loaded:", client.publicKey.toBase58());
 
-  const amountToDeposit = (STARTING_BALANCE - 1000) / 3;
-  await Promise.all(
-    ASSETS.map(async (asset) => {
-      return await client.deposit(
-        asset,
-        utils.convertDecimalToNativeInteger(amountToDeposit)
-      );
-    })
-  );
+  await client.deposit(utils.convertDecimalToNativeInteger(STARTING_BALANCE));
 
   await utils.sleep(500);
 
-  ASSETS.forEach((asset) => {
-    console.log(
-      `User margin acc balance for ${asset}: ${
-        Exchange.riskCalculator.getMarginAccountState(
-          client.getSubClient(asset).marginAccount!
-        ).balance
-      }`
-    );
-  });
+  console.log(
+    `User margin acc balance: ${
+      Exchange.riskCalculator.getCrossMarginAccountState(client.account!)
+        .balance
+    }`
+  );
 
   await Promise.all(
     ASSETS.map(async (asset) => {
-      let perpMa = Exchange.getPerpMarket(asset).address;
-      return client.initializeOpenOrdersAccount(asset, perpMa);
+      return client.initializeOpenOrdersAccount(asset);
     })
   );
 
@@ -95,7 +83,7 @@ async function main() {
         singleMarketTx.add(
           client.createPlacePerpOrderInstruction(
             asset,
-            utils.convertDecimalToNativeInteger(i + 1),
+            utils.convertDecimalToNativeInteger((i + 1) / 100),
             utils.convertDecimalToNativeLotSize(1),
             types.Side.BID
           )
@@ -121,14 +109,14 @@ async function main() {
     );
   });
 
-  await client.cancelAllPerpMarketOrders();
+  await client.cancelAllMarketOrders();
   let multiMarketTx = new Transaction();
 
   for (let i = 0; i < MAX_ALL_PERP_MARKET_PLACE_ORDER_IXS; i++) {
     multiMarketTx.add(
       client.createPlacePerpOrderInstruction(
         ASSETS[0],
-        utils.convertDecimalToNativeInteger(i + 1),
+        utils.convertDecimalToNativeInteger((i + 1) / 100),
         utils.convertDecimalToNativeLotSize(0.01),
         types.Side.BID
       )
@@ -143,6 +131,14 @@ async function main() {
     undefined,
     utils.getZetaLutArr()
   );
+
+  await utils.sleep(2000);
+
+  ASSETS.forEach((asset) => {
+    console.log(
+      `client has ${client.getOrders(asset).length} orders on ${asset}`
+    );
+  });
 
   await Exchange.close();
   await client.close();
