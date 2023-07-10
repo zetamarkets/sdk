@@ -57,7 +57,7 @@ Use our helper functions in `src/utils.ts` to convert.
 let asset = constants.Asset.BTC;
 
 // A variable of type BN (big number)
-let balance: BN = client.getMarginAccount(asset).balance;
+let balance: BN = client.account.balance;
 
 // If you had deposited $10,000 USDC
 balance.toNumber(); // == 10_000_000_000
@@ -117,7 +117,7 @@ require("dotenv").config();
 
 import { Connection, Keypair } from "@solana/web3.js";
 import {
-  Client,
+  CrossClient,
   Exchange,
   Network,
   Wallet,
@@ -171,61 +171,51 @@ await Exchange.load(
 
 ### User margin accounts
 
-A user's state is represented by a `MarginAccount` in the Zeta program. This is per asset per user.
+A user's state is represented by a `CrossMarginAccount` in the Zeta program. This is one account for all assets.
 
 It stores all the state related to a user's balance, open orders and positions.
 
 Creation is baked into the `deposit` function if you don't have one already.
 
 ```ts
-// Load the user SDK client.
+// Load the user SDK cross-margin client.
 // Note that this client is active for the same assets you passed into Exchange.load() earlier
-const client = await Client.load(
+const client = await CrossClient.load(
   connection,
   wallet, // Use the loaded wallet.
   utils.defaultCommitment(),
   undefined // Callback - See below for more details.
 );
 
-// This will create a MarginAccount on first deposit.
-await client.deposit(asset, utils.convertDecimalToNativeInteger(10_000));
-
-// This will move funds from a BTC MarginAccount to a SOL MarginAccount, provided that you have both
-await client.migrateFunds(
-  utils.convertDecimalToNativeInteger(10_000),
-  constants.Asset.BTC,
-  constants.Asset.SOL
-);
+// This will create a CrossMarginAccount on first deposit.
+await client.deposit(utils.convertDecimalToNativeInteger(10_000));
 ```
 
 Structure
 
 ```ts
-// client.getMarginAccount(asset)
-export interface MarginAccount {
+// client.account
+
+export interface CrossMarginAccount {
   authority: PublicKey; // Wallet publickey.
-  nonce: number; // Margin account PDA nonce.
-  balance: anchor.BN; // Balance - doesn't take into account unrealized pnl.
-  forceCancelFlag: boolean; // If you are underwater, liquidators can cancel your open orders in consecutive transactions.
-
-  openOrdersNonce: Array<number>; // Open orders account PDA nonce.
-  seriesExpiry: Array<anchor.BN>; // Expiry timestamp for your orders and positions (used for settlement)
-
-  productLedgers: Array<ProductLedger>; // Vector of your (deprecated, options+futures) positions and open order state.
-  _productLedgersPadding: Array<ProductLedger>;
-  perpProductLedger: ProductLedger; // Perps are held separately as they do not expire
-  rebalanceAmount: anchor.BN; // Any balance to be changed in the next market crank
-  asset: any; // Underlying asset (SOL, BTC, etc.)
-
-  accountType: any; // Specific flag for whitelisted market maker accounts
-  lastFundingDelta: AnchorDecimal; // The last funding rate delta applied to this account
   delegatedPubkey: PublicKey; // A public key that can perform trading functions on your behalf, set with the editDelegatedPubkey instruction
-
-  _padding: Array<number>;
+  balance: anchor.BN; // Balance - doesn't take into account unrealized pnl.
+  subaccountIndex: number; // Users can have multiple CrossMarginAccounts, separated by this index
+  nonce: number; // Margin account PDA nonce.
+  forceCancelFlag: boolean; // If you are underwater, liquidators can cancel your open orders in consecutive transactions
+  accountType: any; // Specific flag for whitelisted market maker accounts
+  openOrdersNonces: Array<number>; // Open orders account PDA nonce, per asset
+  openOrdersNoncesPadding: Array<number>;
+  rebalanceAmount: anchor.BN; // Any balance to be changed in the next market crank
+  lastFundingDeltas: Array<AnchorDecimal>; // The last funding rate delta applied to this account, per asset
+  lastFundingDeltasPadding: Array<AnchorDecimal>;
+  productLedgers: Array<ProductLedger>; // Vector of your positions and open order state, per asset
+  productLedgersPadding: Array<ProductLedger>;
+  padding: Array<number>;
 }
 ```
 
-The details should be abstracted away into `client.getOrders(asset)` and `client.getMarginPositions(asset)` in the SDK.
+The details should be abstracted away into `client.getOrders(asset)` and `client.getPositions(asset)` in the SDK.
 
 ### Basic script setup to place a trade and view positions
 
@@ -271,13 +261,7 @@ const orderLots = utils.convertDecimalToNativeLotSize(1);
 const asset = constants.Asset.SOL;
 
 // Place a bid order.
-await client.placeOrder(
-  asset,
-  index, // Either market index or market address pubkey is fine here
-  orderPrice,
-  orderLots,
-  types.Side.BID
-);
+await client.placeOrder(asset, orderPrice, orderLots, types.Side.BID);
 ```
 
 ### See client order.
@@ -331,7 +315,6 @@ Let's trade! Instead of just placing a resting order, send a bid order with a hi
 // Place an order in cross with offers to get a position.
 await client.placeOrder(
   asset,
-  index,
   utils.convertDecimalToNativeInteger(10),
   orderLots,
   types.Side.BID
@@ -339,9 +322,9 @@ await client.placeOrder(
 
 // View our position
 await client.updateState();
-console.log(client.getMarginPositions(asset));
+console.log(client.getPositions(asset));
 
-// `client.getMarginPositions` is a list of marginAccount positions in market index order.
+// `client.getPositions` is a list of crossMarginAccount positions
 `
 [
   {
@@ -363,7 +346,7 @@ We have a position of 1, with cost of trades 9530000 / 10^6 = $19.53.
 ```ts
 // We only have one order at the moment.
 let order = client.getOrders(asset)[0];
-await client.cancelOrder(asset, order.market, order.orderId, order.side);
+await client.cancelOrder(asset, order.orderId, order.side);
 ```
 
 ### Cancel all orders.
@@ -391,8 +374,8 @@ console.log(Exchange.getMarkPrice(asset, 2));
 At any point you can view your account state without having to dig through the account definitions yourself, using the `riskCalculator`.
 
 ```ts
-let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
-  client.getMarginAccount(asset)
+let marginAccountState = Exchange.riskCalculator.getCrossMarginAccountState(
+  client.account
 );
 console.log(marginAccountState);
 
@@ -499,28 +482,28 @@ There are two categories of callbacks, one relating to user state and the other 
 The callback function is passed in either
 
 - `Exchange.load` - for non user events.
-- `Client.load` - for user events.
+- `CrossClient.load` - for user events.
 
 You can see these `EventType` in `src/events.ts`.
 
 **NOTE: Some callbacks are done on poll so don't always reflect a change in state.**
 
-| Event              |     Type     |                                                                                   Meaning                                                                                   |                                             Change |
-| ------------------ | :----------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | -------------------------------------------------: |
-| EXCHANGE           |   Program    |                                                                           Exchange polling update                                                                           |                                   Exchange polling |
-| EXPIRY             |   Program    |                                                                         On option series expiration                                                                         |                                 Exchange's markets |
-| PRICING            |   Program    |                                                                    When pricing is updated (mark prices)                                                                    | Exchange's pricing or <br> Exchange.riskCalculator |
-| ORDERBOOK          |   Program    |                                                                       When an orderbook poll occurs.                                                                        |                                   Exchange.markets |
-| ORACLE             | Pyth oracle  |                                                                             Pyth price update.                                                                              |                                    Exchange.oracle |
-| CLOCK              | Solana clock |                                                                        Solana clock account change.                                                                         |                            Exchange.clockTimestamp |
-| TRADEV3            |     User     |                                                                            On user trade event.                                                                             |                               client.marginAccount |
-| ORDERCOMPLETEEVENT |     User     |                                                                  User order is fully filled or cancelled.                                                                   |                               client.marginAccount |
-| USER               |     User     | When the user's marginAccount <br> changes, which can occur on <br> inserts, cancels, trades, withdrawals, <br> deposits, settlement, liquidation, <br> force cancellations |                               client.marginAccount |
+| Event              |     Type     |                                                                                     Meaning                                                                                      |                                             Change |
+| ------------------ | :----------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | -------------------------------------------------: |
+| EXCHANGE           |   Program    |                                                                             Exchange polling update                                                                              |                                   Exchange polling |
+| EXPIRY             |   Program    |                                                                           On option series expiration                                                                            |                                 Exchange's markets |
+| PRICING            |   Program    |                                                                      When pricing is updated (mark prices)                                                                       | Exchange's pricing or <br> Exchange.riskCalculator |
+| ORDERBOOK          |   Program    |                                                                          When an orderbook poll occurs.                                                                          |                                   Exchange.markets |
+| ORACLE             | Pyth oracle  |                                                                                Pyth price update.                                                                                |                                    Exchange.oracle |
+| CLOCK              | Solana clock |                                                                           Solana clock account change.                                                                           |                            Exchange.clockTimestamp |
+| TRADEV3            |     User     |                                                                               On user trade event.                                                                               |                                     client.account |
+| ORDERCOMPLETEEVENT |     User     |                                                                     User order is fully filled or cancelled.                                                                     |                                     client.account |
+| USER               |     User     | When the user's crossMarginAccount <br> changes, which can occur on <br> inserts, cancels, trades, withdrawals, <br> deposits, settlement, liquidation, <br> force cancellations |                                     client.account |
 
-These callbacks should eliminate the need to poll for most accounts, unless you need certainty on the state, in which case there are polling functions available in `Exchange` and `Client`.
+These callbacks should eliminate the need to poll for most accounts, unless you need certainty on the state, in which case there are polling functions available in `Exchange` and `CrossClient`.
 
 ```ts
-// Generic callback function to pass into `Exchange.load` or `Client.load`.
+// Generic callback function to pass into `Exchange.load` or `CrossClient.load`.
 async function callback(asset: assets.Asset, eventType: events.EventType, data: any) {
   switch (eventType) {
     case events.EventType.CLOCK:
@@ -563,7 +546,7 @@ After receiving an orderbook update, you can assume `Exchange.getOrderbook(asset
 
 ## Native polling in SDK
 
-There is polling natively built into the SDK `Exchange` and `Client` objects since state relies quite heavily on websockets.
+There is polling natively built into the SDK `Exchange` and `CrossClient` objects since state relies quite heavily on websockets.
 
 This was to ensure that:
 
@@ -599,19 +582,19 @@ await Exchange.updateOrderbook(asset, index);
 
 ### Client polling and throttle
 
-`Client` has a default poll interval of `constants.DEFAULT_CLIENT_POLL_INTERVAL` (set to 20 seconds).
+`CrossClient` has a default poll interval of `constants.DEFAULT_CLIENT_POLL_INTERVAL` (set to 20 seconds).
 
-You can change this via `client.setPollInterval(asset)`.
+You can change this via `client.setPollInterval()`.
 
 This is _almost_ how often the SDK will call `await client.updateState()`, which is the manual way of polling user state.
 
 There is a timer that on default fires every 2 seconds, checking the last poll timestamp. If time greater than client.pollInterval has elapsed or there is a pending update, it will poll.
 
-Pending update refers to a margin account websocket change callback. (The SDK subscribes to user `MarginAccount` on `Client.load`.)
+Pending update refers to a margin account websocket change callback. (The SDK subscribes to user `CrossMarginAccount` on `CrossClient.load`.)
 
 This will do multiple things (`client.updateState()`):
 
-1. Fetch user margin account (`client.getMarginAccount(asset)`).
+1. Fetch user margin account (`client.account`).
 2. Update user orders (this will poll the market orderbook for each market that the user has a non zero position or open orders in - `client.getOrders(asset)`).
 3. Update user positions (`client.getPositions(asset)`).
 
@@ -621,7 +604,7 @@ Tying into this, the motivation behind this complexity is that if a user is asyn
 
 If each call back polls relevant markets for the latest user order state (2 polls per market), you can easily hit rate limits.
 
-If `throttle` is set to `true`, in `Client.load`, then this timer allows users to batch client polling to the next timer interval (i.e. optimistically, 5 consecutive slot updates will only trigger 1 poll).
+If `throttle` is set to `true`, in `CrossClient.load`, then this timer allows users to batch client polling to the next timer interval (i.e. optimistically, 5 consecutive slot updates will only trigger 1 poll).
 
 Alternatively, `throttle` can be set to `false`, and `client.updateState` will be called on every margin account change and ensure you have the latest state at all times.
 

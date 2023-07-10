@@ -585,7 +585,7 @@ export class CrossClient {
   }
 
   /**
-   * @param timerInterval   desired interval for subClient polling.
+   * @param timerInterval   desired interval for client polling.
    */
   private setPolling(timerInterval: number) {
     if (this._pollIntervalId !== undefined) {
