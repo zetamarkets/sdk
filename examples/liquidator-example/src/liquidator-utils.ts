@@ -1,5 +1,10 @@
 import * as anchor from "@zetamarkets/anchor";
-import { constants, Client, Exchange, programTypes } from "@zetamarkets/sdk";
+import {
+  constants,
+  CrossClient,
+  Exchange,
+  programTypes,
+} from "@zetamarkets/sdk";
 import { asset } from "./liquidator";
 
 export async function findAccountsAtRisk(
@@ -69,7 +74,7 @@ export async function findLiquidatableAccounts(
 }
 
 export async function cancelAllActiveOrders(
-  client: Client,
+  client: CrossClient,
   accountsAtRisk: anchor.ProgramAccount[]
 ) {
   await Promise.all(
@@ -82,14 +87,9 @@ export async function cancelAllActiveOrders(
         position.openingOrders[1].toNumber() != 0 ||
         position.closingOrders.toNumber() != 0
       ) {
-        let market = Exchange.getPerpMarket(asset);
         console.log("[FORCE_CANCEL] " + programAccount.publicKey.toString());
         try {
-          await client.forceCancelOrders(
-            asset,
-            market.address,
-            programAccount.publicKey
-          );
+          await client.forceCancelOrders(asset, programAccount.publicKey);
         } catch (e) {
           console.log(e);
         }
@@ -100,7 +100,7 @@ export async function cancelAllActiveOrders(
 
 // Naively liquidates all accounts up to initial margin requirement limits.
 export async function liquidateAccounts(
-  client: Client,
+  client: CrossClient,
   accounts: anchor.ProgramAccount[]
 ) {
   for (var i = 0; i < accounts.length; i++) {
@@ -117,8 +117,8 @@ export async function liquidateAccounts(
 
     // Get latest state for your margin account.
     await client.updateState();
-    let clientState = Exchange.riskCalculator.getMarginAccountState(
-      client.getMarginAccount(asset)
+    let clientState = Exchange.riskCalculator.getCrossMarginAccountState(
+      client.account
     );
 
     let marginConstrainedSize = calculateMaxLiquidationNativeSize(
@@ -128,8 +128,6 @@ export async function liquidateAccounts(
 
     const size = Math.min(marginConstrainedSize, Math.abs(position));
     const side = position > 0 ? "Bid" : "Ask";
-
-    let market = Exchange.getPerpMarket(asset);
 
     console.log(
       "[LIQUIDATE] " +
@@ -144,12 +142,7 @@ export async function liquidateAccounts(
         Math.abs(position)
     );
     try {
-      let txId = await client.liquidate(
-        asset,
-        market.address,
-        liquidateeKey,
-        size
-      );
+      let txId = await client.liquidate(asset, liquidateeKey, size);
       console.log(`TX ID: ${txId}`);
     } catch (e) {
       console.log(e);

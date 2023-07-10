@@ -1,6 +1,6 @@
 require("dotenv").config();
 import {
-  Client,
+  CrossClient,
   Exchange,
   Network,
   utils,
@@ -21,7 +21,7 @@ import * as anchor from "@zetamarkets/anchor";
 
 import { airdropUsdc } from "./utils";
 
-let client: Client;
+let client: CrossClient;
 let scanning: boolean = false;
 
 // Underlying to run on. Can technically run on multiple at a time but will require some code modifications.
@@ -76,9 +76,8 @@ export async function scanMarginAccounts() {
 
   // Display the latest client state.
   await client.updateState();
-  let clientMarginAccountState = Exchange.riskCalculator.getMarginAccountState(
-    client.getMarginAccount(asset)
-  );
+  let clientMarginAccountState =
+    Exchange.riskCalculator.getCrossMarginAccountState(client.account);
   console.log(
     `Client margin account state: ${JSON.stringify(clientMarginAccountState)}`
   );
@@ -129,14 +128,15 @@ async function main() {
     new types.DummyWallet() // Normal clients don't need to use a real wallet for exchange loading.
   );
 
-  client = await Client.load(connection, wallet, utils.defaultCommitment());
+  client = await CrossClient.load(
+    connection,
+    wallet,
+    utils.defaultCommitment()
+  );
 
   // The deposit function for client will initialize a margin account for you
   // atomically in the same transaction if you haven't created one already.
-  await client.deposit(
-    asset,
-    utils.convertDecimalToNativeInteger(startingBalance)
-  );
+  await client.deposit(utils.convertDecimalToNativeInteger(startingBalance));
 
   setInterval(
     async () => {
