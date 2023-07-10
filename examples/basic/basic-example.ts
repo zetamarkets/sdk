@@ -2,7 +2,7 @@ require("dotenv").config();
 
 import {
   Wallet,
-  Client,
+  CrossClient,
   Exchange,
   Network,
   utils,
@@ -78,7 +78,7 @@ async function main() {
     await se.updatePerpSerumMarketIfNeeded(0);
   });
 
-  const client = await Client.load(
+  const client = await CrossClient.load(
     connection,
     wallet,
     undefined
@@ -87,23 +87,18 @@ async function main() {
 
   let tradingAsset = constants.Asset.APT;
 
-  await client.deposit(
-    tradingAsset,
-    utils.convertDecimalToNativeInteger(STARTING_BALANCE)
-  );
+  await client.deposit(utils.convertDecimalToNativeInteger(STARTING_BALANCE));
 
   utils.displayState();
 
   // Show current orderbook for a market.
-  const index = constants.PERP_INDEX;
   await Exchange.updateOrderbook(tradingAsset);
-  console.log(`${tradingAsset} Market ${index} orderbook:`);
+  console.log(`${tradingAsset} Market orderbook:`);
   console.log(Exchange.getOrderbook(tradingAsset));
 
   // Place bid orders
   await client.placeOrder(
     tradingAsset,
-    index,
     utils.convertDecimalToNativeInteger(0.1),
     utils.convertDecimalToNativeLotSize(2),
     types.Side.BID,
@@ -112,15 +107,13 @@ async function main() {
 
   // See our order in the orderbook.
   await Exchange.updateOrderbook(tradingAsset);
-  console.log(`${tradingAsset} Market ${index} orderbook after our order:`);
+  console.log(`${tradingAsset} Market orderbook after our order:`);
   console.log(Exchange.getOrderbook(tradingAsset));
 
   // See our positions
-  await client.updateState(tradingAsset);
+  await client.updateState();
   console.log(
-    `${tradingAsset} margin account positions: ${client.getMarginPositions(
-      tradingAsset
-    )}`
+    `${tradingAsset} positions: ${client.getPositions(tradingAsset)}`
   );
 
   // Check mark prices for the product.
@@ -128,9 +121,9 @@ async function main() {
     `${tradingAsset} Mark price: ${Exchange.getMarkPrice(tradingAsset)}`
   );
 
-  // Calculate user margin account state.
-  let marginAccountState = client.getMarginAccountState(tradingAsset);
-  console.log(`${tradingAsset} Margin account state:`, marginAccountState);
+  // Calculate user account state.
+  let accountState = client.getAccountState();
+  console.log(`${tradingAsset} Account state:`, accountState);
 }
 
 main().catch(console.error.bind(console));
