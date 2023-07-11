@@ -360,12 +360,10 @@ See `src/cross-client.ts` for full functionality.
 
 ### Check market mark price
 
-This is the price that position is marked to - (This is calculated by our on-chain Black Scholes pricing that is constantly being cranked)
+This is the price that we receive from on-chain Oracles.
 
 ```ts
-// Use the market index you wish to check.
-console.log(Exchange.getMarkPrice(asset, 2));
-// The fair price of this option is $8.202024.
+console.log(Exchange.getMarkPrice(asset));
 `8.202024`;
 ```
 
@@ -491,7 +489,6 @@ You can see these `EventType` in `src/events.ts`.
 | Event              |     Type     |                                                                                     Meaning                                                                                      |                                             Change |
 | ------------------ | :----------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | -------------------------------------------------: |
 | EXCHANGE           |   Program    |                                                                             Exchange polling update                                                                              |                                   Exchange polling |
-| EXPIRY             |   Program    |                                                                           On option series expiration                                                                            |                                 Exchange's markets |
 | PRICING            |   Program    |                                                                      When pricing is updated (mark prices)                                                                       | Exchange's pricing or <br> Exchange.riskCalculator |
 | ORDERBOOK          |   Program    |                                                                          When an orderbook poll occurs.                                                                          |                                   Exchange.markets |
 | ORACLE             | Pyth oracle  |                                                                                Pyth price update.                                                                                |                                    Exchange.oracle |
