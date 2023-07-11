@@ -3,7 +3,7 @@
     "@zetamarkets/anchor": "0.26.0-versioned",
     "@solana/web3.js": "^1.68.0",
     "@solana/spl-token": "^0.1.6",
-    "@zetamarkets/sdk": "0.26.7",
+    "@zetamarkets/sdk": "1.4.2",
     "dotenv": "^10.0.0",
     "ts-node": "^7.0.1",
     "typescript": "^4.4.3"

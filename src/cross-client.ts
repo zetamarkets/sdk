@@ -585,7 +585,7 @@ export class CrossClient {
   }
 
   /**
-   * @param timerInterval   desired interval for subClient polling.
+   * @param timerInterval   desired interval for client polling.
    */
   private setPolling(timerInterval: number) {
     if (this._pollIntervalId !== undefined) {
@@ -660,7 +660,7 @@ export class CrossClient {
 
     // Check if the user has accounts set up
     let tx = new Transaction();
-    if (this._account === null) {
+    if (this._accountManager === null) {
       console.log(
         "User has no cross margin account manager. Creating account manager..."
       );
