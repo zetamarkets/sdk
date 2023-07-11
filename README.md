@@ -215,7 +215,7 @@ export interface CrossMarginAccount {
 }
 ```
 
-The details should be abstracted away into `client.getOrders(asset)` and `client.getPositions(asset)` in the SDK.
+The details are abstracted away into `client.getOrders(asset)` and `client.getPositions(asset)` in the SDK.
 
 ### Basic script setup to place a trade and view positions
 
@@ -243,7 +243,7 @@ console.log(Exchange.getOrderbook(asset));
 
 ### Placing an order.
 
-Placing an order on a new market (market index) will create an `OpenOrders` account. This is handled by the SDK.
+Placing an order on a new market will create an `OpenOrders` account. This is handled by the SDK.
 
 - The minimum price is $0.0001.
 - The minimum trade tick size is 0.001.
@@ -356,7 +356,7 @@ await client.cancelOrder(asset, order.orderId, order.side);
 await client.cancelAllOrders();
 ```
 
-See `src/client.ts` for full functionality.
+See `src/cross-client.ts` for full functionality.
 
 ### Check market mark price
 
