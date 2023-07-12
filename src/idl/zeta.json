@@ -379,7 +379,7 @@
         },
         {
           "name": "authority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         }
       ],
