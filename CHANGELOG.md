@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.4.4] 2023-07-13
+
+- Mark authority as mutable in CloseCrossMarginAccountManager. ([#249](https://github.com/zetamarkets/sdk/pull/249))
+
 ## [1.4.2] 2023-07-05
 
 - Add in per asset risk state for cross margin accounts. ([#247](https://github.com/zetamarkets/sdk/pull/247))
