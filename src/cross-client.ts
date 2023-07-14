@@ -647,6 +647,88 @@ export class CrossClient {
     return { addresses: marginAddresses, accounts: marginAccounts };
   }
 
+  public async cleanupMarginAccounts(): Promise<TransactionSignature[]> {
+    let accs = await this.findUserMarginAccounts();
+    let marginAddresses = accs.addresses;
+    let marginAccounts = accs.accounts;
+
+    if (this._account == null) {
+      throw Error("User has no cross margin account yet, nothing to cleanup.");
+    }
+
+    if (this._accountManager == null) {
+      throw Error(
+        "User has no cross margin account manager yet, nothing to cleanup."
+      );
+    }
+
+    const txs: Transaction[] = [];
+    for (var i = 0; i < marginAccounts.length; i++) {
+      let acc = marginAccounts[i];
+      let asset = assets.fromProgramAsset(acc.asset);
+      let market = Exchange.getPerpMarket(asset).address;
+      const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
+        market,
+        constants.DEX_PID[Exchange.network]
+      );
+
+      let ppl = acc.perpProductLedger;
+      if (
+        ppl.orderState.closingOrders.toNumber() != 0 ||
+        ppl.orderState.openingOrders[0].toNumber() != 0 ||
+        ppl.orderState.openingOrders[1].toNumber() != 0 ||
+        ppl.position.size.toNumber != 0 ||
+        ppl.position.costOfTrades.toNumber() != 0
+      ) {
+        throw Error("Margin accounts are not properly cleared.");
+      }
+
+      let tx = new Transaction();
+      if (acc.openOrdersNonce[constants.PERP_INDEX] != 0) {
+        tx.add(
+          instructions.settleDexFundsIx(
+            asset,
+            market,
+            vaultOwner,
+            utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
+          )
+        );
+        tx.add(
+          instructions.closeOpenOrdersV2Ix(
+            market,
+            this.publicKey,
+            marginAddresses[i],
+            utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
+          )
+        );
+      }
+      tx.add(
+        instructions.closeMarginAccountIx(
+          asset,
+          this.publicKey,
+          marginAddresses[i]
+        )
+      );
+      txs.push(tx);
+    }
+
+    // Needs to be in order, can't do this async
+    let sigs = [];
+    for (var t of txs) {
+      sigs.push(
+        await utils.processTransaction(
+          this._provider,
+          t,
+          undefined,
+          undefined,
+          undefined,
+          this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+        )
+      );
+    }
+    return sigs;
+  }
+
   public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {
     this.delegatedCheck();
     this.usdcAccountCheck();
@@ -689,43 +771,6 @@ export class CrossClient {
       )
     );
     txs.push(tx);
-
-    for (var i = 0; i < marginAccounts.length; i++) {
-      let acc = marginAccounts[i];
-      let asset = assets.fromProgramAsset(acc.asset);
-      let market = Exchange.getPerpMarket(asset).address;
-      const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
-        market,
-        constants.DEX_PID[Exchange.network]
-      );
-      tx = new Transaction();
-      if (acc.openOrdersNonce[constants.PERP_INDEX] != 0) {
-        tx.add(
-          instructions.settleDexFundsIx(
-            asset,
-            market,
-            vaultOwner,
-            utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
-          )
-        );
-        tx.add(
-          instructions.closeOpenOrdersV2Ix(
-            market,
-            this.publicKey,
-            marginAddresses[i],
-            utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
-          )
-        );
-      }
-      tx.add(
-        instructions.closeMarginAccountIx(
-          asset,
-          this.publicKey,
-          marginAddresses[i]
-        )
-      );
-      txs.push(tx);
-    }
 
     // Needs to be in order, can't do this async
     let sigs = [];

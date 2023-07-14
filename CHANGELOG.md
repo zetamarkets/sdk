@@ -5,9 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.4.4] 2023-07-13
+## [1.4.4] 2023-07-14
 
 - Mark authority as mutable in CloseCrossMarginAccountManager. ([#249](https://github.com/zetamarkets/sdk/pull/249))
+
+## [1.4.3] 2023-07-14
+
+- Separate sdk calls for migrating from MA to CMA and then closing OOAs and MAs. ([#248](https://github.com/zetamarkets/sdk/pull/247))
 
 ## [1.4.2] 2023-07-05
 
