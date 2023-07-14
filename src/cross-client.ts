@@ -1712,7 +1712,7 @@ export class CrossClient {
       openOrdersAccountToCancel = utils.createOpenOrdersAddress(
         Exchange.programId,
         Exchange.getPerpMarket(asset).address,
-        marginAccountToCancel,
+        account.authority,
         account.openOrdersNonce[constants.PERP_INDEX]
       );
     }
