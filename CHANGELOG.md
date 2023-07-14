@@ -8,6 +8,7 @@ Version changes are pinned to SDK releases.
 ## [1.4.4] 2023-07-14
 
 - Mark authority as mutable in CloseCrossMarginAccountManager. ([#249](https://github.com/zetamarkets/sdk/pull/249))
+- Bugfix force cancels open orders account for CMA -> MA. ([#249](https://github.com/zetamarkets/sdk/pull/249))
 
 ## [1.4.3] 2023-07-14
 
