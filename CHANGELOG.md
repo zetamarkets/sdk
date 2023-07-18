@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- Add header to event queue fetch. ([#250](https://github.com/zetamarkets/sdk/pull/250))
+
 ## [1.4.4] 2023-07-14
 
 - Mark authority as mutable in CloseCrossMarginAccountManager. ([#249](https://github.com/zetamarkets/sdk/pull/249))
