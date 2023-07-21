@@ -598,21 +598,27 @@ export class RiskCalculator {
     );
     let assetIndex = assets.assetToIndex(tradeAsset);
 
-    let size = marginAccount.productLedgers[assetIndex].position.size; // Signed
+    let position = marginAccount.productLedgers[assetIndex].position.size; // Signed
     let price = pnlExecutionPrice
       ? pnlExecutionPrice
       : Exchange.getMarkPrice(tradeAsset);
 
-    // Strictly a closing order - use maintenance margin incl orders
+    let maxClose = state.availableBalanceMaintenanceIncludingOrders / price;
+    let maxOpen = state.availableBalanceInitial / price;
+
     if (
-      size == 0 ||
-      (size > 0 && tradeSide == types.Side.BID) ||
-      (size < 0 && tradeSide == types.Side.ASK)
+      position == 0 ||
+      (position > 0 && tradeSide == types.Side.BID) ||
+      (position < 0 && tradeSide == types.Side.ASK)
     ) {
-      return state.availableBalanceMaintenanceIncludingOrders / price;
+      // Strictly an opening order - use initial margin
+      return maxOpen;
     } else {
-      // Either opening only, or close + open - use initial margin
-      return state.availableBalanceInitial / price;
+      // Either only close (uses maint margin incl orders),
+      // or close full size + open more (uses initial margin)
+      // Return the one that gives the biggest size
+      let closeOnlySize = Math.min(maxClose, position);
+      return Math.max(closeOnlySize, maxOpen);
     }
   }
 }
