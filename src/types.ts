@@ -213,6 +213,7 @@ export interface AssetRiskState {
   initialMargin: number;
   initialMarginSkipConcession: number;
   maintenanceMargin: number;
+  maintenanceMarginIncludingOrders: number;
   unrealizedPnl: number;
   unpaidFunding: number;
 }
@@ -221,6 +222,7 @@ export interface CrossMarginAccountState {
   balance: number;
   availableBalanceInitial: number;
   availableBalanceMaintenance: number;
+  availableBalanceMaintenanceIncludingOrders: number;
   availableBalanceWithdrawable: number;
   assetState: Map<Asset, AssetRiskState>;
   initialMarginTotal: number;

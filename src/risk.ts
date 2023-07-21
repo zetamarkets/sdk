@@ -394,7 +394,7 @@ export class RiskCalculator {
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount
-  ): number {
+  ): number | Map<Asset, number> {
     // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
     let assetList =
       accountType == types.ProgramAccountType.MarginAccount
@@ -402,6 +402,7 @@ export class RiskCalculator {
         : Exchange.assets;
 
     let margins = 0;
+    let marginMap: Map<Asset, number> = new Map();
     for (var asset of assetList) {
       const ledger =
         accountType == types.ProgramAccountType.MarginAccount
@@ -410,6 +411,8 @@ export class RiskCalculator {
       let size = ledger.position.size.toNumber();
       let bidOpenOrders = ledger.orderState.openingOrders[0].toNumber();
       let askOpenOrders = ledger.orderState.openingOrders[1].toNumber();
+
+      marginMap.set(asset, 0);
       if (bidOpenOrders == 0 && askOpenOrders == 0 && size == 0) {
         continue;
       }
@@ -423,7 +426,7 @@ export class RiskCalculator {
         shortLots += Math.abs(convertNativeLotSizeToDecimal(size));
       }
 
-      margins +=
+      let assetMargin =
         this.getPerpMarginRequirement(
           asset,
           // Positive for buys.
@@ -436,6 +439,9 @@ export class RiskCalculator {
           -shortLots,
           types.MarginType.MAINTENANCE
         );
+
+      margins += assetMargin;
+      marginMap.set(asset, assetMargin);
     }
 
     return margins;
@@ -475,6 +481,11 @@ export class RiskCalculator {
       marginAccount,
       accType
     ) as Map<Asset, number>;
+    let maintenanceMarginIncludingOrders =
+      this.calculateTotalMaintenanceMarginIncludingOrders(
+        marginAccount,
+        accType
+      ) as Map<Asset, number>;
 
     let upnlTotal = Array.from(unrealizedPnl.values()).reduce(
       (a, b) => a + b,
@@ -492,6 +503,9 @@ export class RiskCalculator {
       (a, b) => a + b,
       0
     );
+    let mmioTotal = Array.from(
+      maintenanceMarginIncludingOrders.values()
+    ).reduce((a, b) => a + b, 0);
 
     let availableBalanceInitial: number =
       balance + upnlTotal + unpaidFundingTotal - imTotal;
@@ -499,15 +513,19 @@ export class RiskCalculator {
       balance + upnlTotal + unpaidFundingTotal - imSkipConcessionTotal;
     let availableBalanceMaintenance: number =
       balance + upnlTotal + unpaidFundingTotal - mmTotal;
+    let availableBalanceMaintenanceIncludingOrders: number =
+      balance + upnlTotal + unpaidFundingTotal - mmioTotal;
     return {
       balance,
       availableBalanceInitial,
       availableBalanceMaintenance,
+      availableBalanceMaintenanceIncludingOrders,
       availableBalanceWithdrawable,
       assetState: collectRiskMaps(
         initialMargin,
         initialMarginSkipConcession,
         maintenanceMargin,
+        maintenanceMarginIncludingOrders,
         unrealizedPnl,
         unpaidFunding
       ),
@@ -564,5 +582,37 @@ export class RiskCalculator {
       availableBalanceMaintenance,
       availableBalanceWithdrawable,
     };
+  }
+
+  public getMaxTradeSize(
+    marginAccount: CrossMarginAccount,
+    tradeAsset: constants.Asset,
+    tradeSide: types.Side,
+    pnlExecutionPrice: number = undefined,
+    pnlAddTakerFees: boolean = false
+  ): number {
+    let state = this.getCrossMarginAccountState(
+      marginAccount,
+      pnlExecutionPrice,
+      pnlAddTakerFees
+    );
+    let assetIndex = assets.assetToIndex(tradeAsset);
+
+    let size = marginAccount.productLedgers[assetIndex].position.size; // Signed
+    let price = pnlExecutionPrice
+      ? pnlExecutionPrice
+      : Exchange.getMarkPrice(tradeAsset);
+
+    // Strictly a closing order - use maintenance margin incl orders
+    if (
+      size == 0 ||
+      (size > 0 && tradeSide == types.Side.BID) ||
+      (size < 0 && tradeSide == types.Side.ASK)
+    ) {
+      return state.availableBalanceMaintenanceIncludingOrders / price;
+    } else {
+      // Either opening only, or close + open - use initial margin
+      return state.availableBalanceInitial / price;
+    }
   }
 }

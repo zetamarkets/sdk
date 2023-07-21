@@ -13,6 +13,7 @@ export function collectRiskMaps(
   imMap: Map<Asset, Number>,
   imSCMap: Map<Asset, Number>,
   mmMap: Map<Asset, Number>,
+  mmioMap: Map<Asset, Number>,
   upnlMap: Map<Asset, Number>,
   unpaidFundingMap: Map<Asset, Number>
 ): Map<Asset, types.AssetRiskState> {
@@ -23,6 +24,7 @@ export function collectRiskMaps(
       initialMargin: imMap.get(a),
       initialMarginSkipConcession: imSCMap.get(a),
       maintenanceMargin: mmMap.get(a),
+      maintenanceMarginIncludingOrders: mmioMap.get(a),
       unrealizedPnl: upnlMap.get(a),
       unpaidFunding: unpaidFundingMap.get(a),
     });
