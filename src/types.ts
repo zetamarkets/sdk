@@ -64,9 +64,24 @@ export function toProgramOrderType(orderType: OrderType) {
   if (orderType == OrderType.POSTONLYSLIDE) return { postOnlySlide: {} };
 }
 
+export function fromProgramOrderType(orderType: any): OrderType {
+  if (objectEquals(orderType, { limit: {} })) return OrderType.LIMIT;
+  if (objectEquals(orderType, { postOnly: {} })) return OrderType.POSTONLY;
+  if (objectEquals(orderType, { fillOrKill: {} })) return OrderType.FILLORKILL;
+  if (objectEquals(orderType, { immediateOrCancel: {} }))
+    return OrderType.IMMEDIATEORCANCEL;
+  if (objectEquals(orderType, { postOnlySlide: {} }))
+    return OrderType.POSTONLYSLIDE;
+}
+
 export enum Side {
   BID,
   ASK,
+}
+
+export enum TriggerDirection {
+  INCREASING,
+  DECREASING,
 }
 
 export enum UserCallbackType {
@@ -90,6 +105,26 @@ export function fromProgramSide(side: any): Side {
     return Side.ASK;
   }
   throw Error("Invalid program side!");
+}
+
+export function toProgramTriggerDirection(triggerDirection: TriggerDirection) {
+  if (triggerDirection == TriggerDirection.INCREASING)
+    return { increasing: {} };
+  if (triggerDirection == TriggerDirection.DECREASING)
+    return { decreasing: {} };
+  throw Error("Invalid triggerDirection");
+}
+
+export function fromProgramTriggerDirection(
+  triggerDirection: any
+): TriggerDirection {
+  if (objectEquals(triggerDirection, { increasing: {} })) {
+    return TriggerDirection.INCREASING;
+  }
+  if (objectEquals(triggerDirection, { decreasing: {} })) {
+    return TriggerDirection.DECREASING;
+  }
+  throw Error("Invalid program triggerDirection!");
 }
 
 export enum Kind {
@@ -123,6 +158,19 @@ export interface Order {
   clientOrderId: BN;
   tifOffset: number;
   asset: Asset;
+}
+
+export interface TriggerOrder {
+  orderPrice: number;
+  triggerPrice: number;
+  size: number;
+  clientOrderId: number;
+  creationTs: number;
+  triggerDirection: TriggerDirection;
+  side: Side;
+  asset: Asset;
+  orderType: OrderType;
+  triggerOrderIndex: number;
 }
 
 export function orderEquals(
@@ -347,6 +395,27 @@ export interface OrderOptions {
   clientOrderId?: number;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
+}
+
+export interface TriggerOrderOptions {
+  triggerDirection: TriggerDirection;
+  orderType?: types.OrderType;
+  clientOrderId?: number;
+  tag?: string;
+  blockhash?: { blockhash: string; lastValidBlockHeight: number };
+}
+
+export function defaultTriggerOrderOptions(side: Side): TriggerOrderOptions {
+  return {
+    triggerDirection:
+      side == Side.BID
+        ? TriggerDirection.DECREASING
+        : TriggerDirection.INCREASING,
+    orderType: OrderType.FILLORKILL,
+    clientOrderId: 0,
+    tag: constants.DEFAULT_ORDER_TAG,
+    blockhash: undefined,
+  };
 }
 
 /**

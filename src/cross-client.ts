@@ -1,4 +1,5 @@
 import * as anchor from "@zetamarkets/anchor";
+import { BN } from "@zetamarkets/anchor";
 import * as utils from "./utils";
 import {
   assetToIndex,
@@ -174,12 +175,20 @@ export class CrossClient {
   private _openOrdersAccounts: PublicKey[];
 
   /**
-   * Returns a list of the user's current orders.
+   * Returns a list of the user's current orders, not including trigger orders
    */
   public get orders(): Map<Asset, types.Order[]> {
     return this._orders;
   }
   private _orders: Map<Asset, types.Order[]>;
+
+  /**
+   * Returns a list of the user's current trigger orders.
+   */
+  public get triggerOrders(): Map<Asset, types.TriggerOrder[]> {
+    return this._triggerOrders;
+  }
+  private _triggerOrders: Map<Asset, types.TriggerOrder[]>;
 
   /**
    * Returns a list of user current margin account positions.
@@ -1042,6 +1051,147 @@ export class CrossClient {
     return txId;
   }
 
+  public findAvailableTriggerOrderIndex(): number {
+    for (var i = 0; i < 128; i++) {
+      let mask: BN = new BN(1).shln(i); // 1 << i
+      if (this.account.triggerOrderIndexes.and(mask).isZero()) {
+        return i;
+      }
+    }
+    throw Error("No space for a new trigger order. Delete some and try again.");
+  }
+
+  public async placeTriggerOrder(
+    asset: Asset,
+    orderPrice: number,
+    triggerPrice: number,
+    size: number,
+    side: types.Side,
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(side)
+  ): Promise<TransactionSignature> {
+    let triggerOrderIndex = this.findAvailableTriggerOrderIndex();
+
+    let openOrdersPda = null;
+    let assetIndex = assets.assetToIndex(asset);
+    let tx = new Transaction();
+
+    if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
+      console.log(
+        `[${assetToName(
+          asset
+        )}] User doesn't have open orders account. Initialising for asset ${asset}.`
+      );
+
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV3Ix(
+        asset,
+        Exchange.getPerpMarket(asset).address,
+        this._provider.wallet.publicKey,
+        this._accountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[assetIndex];
+    }
+
+    tx.add(
+      instructions.placeTriggerOrderIx(
+        asset,
+        orderPrice,
+        triggerPrice,
+        options.triggerDirection,
+        triggerOrderIndex,
+        size,
+        side,
+        options.orderType != undefined
+          ? options.orderType
+          : types.OrderType.FILLORKILL,
+        options.clientOrderId != undefined ? options.clientOrderId : 0,
+        options.tag,
+        this.accountAddress,
+        this._provider.wallet.publicKey,
+        openOrdersPda,
+        this._whitelistTradingFeesAddress
+      )
+    );
+
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      options.blockhash
+    );
+    this._openOrdersAccounts[assetIndex] = openOrdersPda;
+    return txId;
+  }
+
+  public async cancelTriggerOrder(orderIndex: number) {
+    let triggerAccount = utils.getTriggerOrderInfo(
+      Exchange.programId,
+      this._accountAddress,
+      new Uint8Array([orderIndex])
+    )[0];
+    let tx = new Transaction().add(
+      instructions.cancelTriggerOrderIx(
+        orderIndex,
+        this._provider.wallet.publicKey,
+        triggerAccount,
+        this._accountAddress
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
+  public async editTriggerOrder(
+    orderIndex: number,
+    newOrderPrice: number,
+    newTriggerPrice: number,
+    newSize: number,
+    newSide: types.Side,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(
+      newSide
+    )
+  ) {
+    let triggerAccount = utils.getTriggerOrderInfo(
+      Exchange.programId,
+      this._accountAddress,
+      new Uint8Array([orderIndex])
+    )[0];
+    let tx = new Transaction().add(
+      instructions.editTriggerOrderIx(
+        newOrderPrice,
+        newTriggerPrice,
+        newOptions.triggerDirection,
+        newSize,
+        newSide,
+        newOptions.orderType != undefined
+          ? newOptions.orderType
+          : types.OrderType.FILLORKILL,
+        newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
+        this._provider.wallet.publicKey,
+        triggerAccount
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
   public async editDelegatedPubkey(
     delegatedPubkey: PublicKey
   ): Promise<TransactionSignature> {
@@ -1068,7 +1218,7 @@ export class CrossClient {
 
   public createCancelOrderNoErrorInstruction(
     asset: Asset,
-    orderId: anchor.BN,
+    orderId: BN,
     side: types.Side
   ): TransactionInstruction {
     return instructions.cancelOrderNoErrorIx(
@@ -1251,7 +1401,7 @@ export class CrossClient {
    */
   public async cancelOrder(
     asset: Asset,
-    orderId: anchor.BN,
+    orderId: BN,
     side: types.Side
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
@@ -1293,7 +1443,7 @@ export class CrossClient {
       this._provider.wallet.publicKey,
       this._accountAddress,
       this._openOrdersAccounts[assetToIndex(asset)],
-      new anchor.BN(clientOrderId)
+      new BN(clientOrderId)
     );
     tx.add(ix);
     return await utils.processTransaction(
@@ -1320,7 +1470,7 @@ export class CrossClient {
    */
   public async cancelAndPlaceOrder(
     asset: Asset,
-    orderId: anchor.BN,
+    orderId: BN,
     cancelSide: types.Side,
     newOrderPrice: number,
     newOrderSize: number,
@@ -1401,7 +1551,7 @@ export class CrossClient {
         this.provider.wallet.publicKey,
         this._accountAddress,
         this._openOrdersAccounts[assetIndex],
-        new anchor.BN(cancelClientOrderId)
+        new BN(cancelClientOrderId)
       )
     );
 
@@ -1468,7 +1618,7 @@ export class CrossClient {
         this._provider.wallet.publicKey,
         this._accountAddress,
         this._openOrdersAccounts[assetIndex],
-        new anchor.BN(cancelClientOrderId)
+        new BN(cancelClientOrderId)
       )
     );
 
@@ -1661,7 +1811,7 @@ export class CrossClient {
   public async forceCancelOrderByOrderId(
     asset: Asset,
     marginAccountToCancel: PublicKey,
-    orderId: anchor.BN,
+    orderId: BN,
     side: types.Side
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
@@ -1944,6 +2094,10 @@ export class CrossClient {
     return txIds;
   }
 
+  public getTriggerOrders(asset: Asset): types.TriggerOrder[] {
+    return this._triggerOrders.get(asset);
+  }
+
   public getOrders(asset: Asset): types.Order[] {
     return this._orders.get(asset);
   }
@@ -1998,6 +2152,77 @@ export class CrossClient {
     }
 
     this._orders = ordersByAsset;
+
+    let triggerOrderIndexes = [];
+
+    // Do this sequentially so the indexes remain in order
+    // Therefore sequential updateOrders() calls won't jumble the order of this._triggerOrders
+    for (var i = 0; i < 128; i++) {
+      let mask: BN = new BN(1).shln(i); // 1 << i
+      if (!this.account.triggerOrderIndexes.and(mask).isZero()) {
+        triggerOrderIndexes.push(i);
+      }
+    }
+
+    let triggerOrders = [];
+    let triggerOrdersByAsset: Map<Asset, types.TriggerOrder[]> = new Map();
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
+        triggerOrdersByAsset.set(asset, []);
+      })
+    );
+
+    let triggerOrderInfoAddresses = triggerOrderIndexes.map(
+      (index) =>
+        utils.getTriggerOrderInfo(
+          Exchange.programId,
+          this.accountAddress,
+          new Uint8Array([index])
+        )[0]
+    );
+
+    for (
+      let i = 0;
+      i < triggerOrderInfoAddresses.length;
+      i += constants.MAX_ACCOUNTS_TO_FETCH
+    ) {
+      let addressSlice = triggerOrderInfoAddresses.slice(
+        i,
+        i + constants.MAX_ACCOUNTS_TO_FETCH
+      );
+
+      let fetchedSlice =
+        await Exchange.program.account.triggerOrderInfo.fetchMultiple(
+          addressSlice
+        );
+
+      let fetchedSliceDecoded = fetchedSlice.map(
+        (order) => order as programTypes.TriggerOrderInfo
+      );
+
+      triggerOrders = triggerOrders.concat(fetchedSliceDecoded);
+    }
+
+    triggerOrders.forEach((rawOrder, i) => {
+      let order = {
+        orderPrice: rawOrder.orderPrice.toNumber(),
+        triggerPrice: rawOrder.triggerPrice.toNumber(),
+        size: rawOrder.size.toNumber(),
+        clientOrderId: rawOrder.clientOrderId.toNumber(),
+        creationTs: rawOrder.creationTs.toNumber(),
+        triggerDirection: types.fromProgramTriggerDirection(
+          rawOrder.triggerDirection
+        ),
+        side: types.fromProgramSide(rawOrder.side),
+        asset: assets.fromProgramAsset(rawOrder.asset),
+        orderType: types.fromProgramOrderType(rawOrder.orderType),
+        triggerOrderIndex: triggerOrderIndexes[i],
+      } as types.TriggerOrder;
+
+      triggerOrdersByAsset.get(order.asset).push(order);
+    });
+
+    this._triggerOrders = triggerOrdersByAsset;
   }
 
   private updatePositions() {

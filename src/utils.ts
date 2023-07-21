@@ -526,6 +526,21 @@ export function getSpreadAccount(
   );
 }
 
+export function getTriggerOrderInfo(
+  programId: PublicKey,
+  marginAccount: PublicKey,
+  triggerOrderIndex: Uint8Array
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("trigger-order-info")),
+      marginAccount.toBuffer(),
+      triggerOrderIndex,
+    ],
+    programId
+  );
+}
+
 export function getMarketUninitialized(
   programId: PublicKey,
   zetaGroup: PublicKey,
@@ -1592,6 +1607,30 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
       let txSig = await processTransaction(Exchange.provider, tx);
     })
   );
+}
+
+export async function executeTriggerOrder(
+  asset: Asset,
+  side: types.Side,
+  triggerOrderIndex: number,
+  triggerOrderInfo: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  whitelistTradingFeesAccount: PublicKey | undefined
+) {
+  let tx = new Transaction().add(
+    instructions.executeTriggerOrderIx(
+      asset,
+      side,
+      triggerOrderIndex,
+      triggerOrderInfo,
+      marginAccount,
+      openOrders,
+      whitelistTradingFeesAccount
+    )
+  );
+
+  await processTransaction(Exchange.provider, tx);
 }
 
 export function getProductLedger(marginAccount: MarginAccount, index: number) {

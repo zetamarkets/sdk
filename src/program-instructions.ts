@@ -524,6 +524,174 @@ export function placePerpOrderV3Ix(
   );
 }
 
+export function placeTriggerOrderIx(
+  asset: Asset,
+  orderPrice: number,
+  triggerPrice: number,
+  triggerDirection: types.TriggerDirection,
+  triggerOrderIndex: number,
+  size: number,
+  side: types.Side,
+  orderType: types.OrderType,
+  clientOrderId: number,
+  tag: String,
+  marginAccount: PublicKey,
+  authority: PublicKey,
+  openOrders: PublicKey,
+  whitelistTradingFeesAccount: PublicKey | undefined
+): TransactionInstruction {
+  let [triggerOrderInfo, _nonce] = utils.getTriggerOrderInfo(
+    Exchange.programId,
+    marginAccount,
+    Uint8Array.from([triggerOrderIndex])
+  );
+
+  let remainingAccounts =
+    whitelistTradingFeesAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistTradingFeesAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+  return Exchange.program.instruction.placeTriggerOrder(
+    triggerOrderIndex,
+    new anchor.BN(orderPrice),
+    new anchor.BN(triggerPrice),
+    types.toProgramTriggerDirection(triggerDirection),
+    new anchor.BN(size),
+    types.toProgramSide(side),
+    types.toProgramOrderType(orderType),
+    clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
+    new String(tag),
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        openOrders: openOrders,
+        authority: authority,
+        marginAccount: marginAccount,
+        pricing: Exchange.pricingAddress,
+        triggerOrderInfo: triggerOrderInfo,
+        systemProgram: SystemProgram.programId,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        market: Exchange.getPerpMarket(asset).serumMarket.address,
+      },
+      remainingAccounts,
+    }
+  );
+}
+export function executeTriggerOrderIx(
+  asset: Asset,
+  side: types.Side,
+  triggerOrderIndex: number,
+  triggerOrderInfo: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  whitelistTradingFeesAccount: PublicKey | undefined
+): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
+  let remainingAccounts =
+    whitelistTradingFeesAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistTradingFeesAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+
+  return Exchange.program.instruction.executeTriggerOrder(triggerOrderIndex, {
+    accounts: {
+      admin: Exchange.state.secondaryAdmin,
+      triggerOrderInfo: triggerOrderInfo,
+      placeOrderAccounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        marginAccount: marginAccount,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        tokenProgram: TOKEN_PROGRAM_ID,
+        serumAuthority: Exchange.serumAuthority,
+        openOrders: openOrders,
+        rent: SYSVAR_RENT_PUBKEY,
+        marketAccounts: {
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
+          // User params.
+          orderPayerTokenAccount:
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
+          coinWallet: marketData.baseVault,
+          pcWallet: marketData.quoteVault,
+        },
+        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+        oracleBackupFeed:
+          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+        oracleBackupProgram: constants.CHAINLINK_PID,
+        marketMint:
+          side == types.Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
+        mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
+      },
+    },
+    remainingAccounts,
+  });
+}
+export function cancelTriggerOrderIx(
+  triggerOrderIndex: number,
+  payer: PublicKey,
+  triggerOrderInfo: PublicKey,
+  marginAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.cancelTriggerOrder(triggerOrderIndex, {
+    accounts: {
+      state: Exchange.stateAddress,
+      payer: payer,
+      admin: Exchange.state.secondaryAdmin,
+      triggerOrderInfo: triggerOrderInfo,
+      marginAccount: marginAccount,
+    },
+  });
+}
+export function editTriggerOrderIx(
+  newOrderPrice: number,
+  newTriggerPrice: number,
+  newTriggerDirection: types.TriggerDirection,
+  newSize: number,
+  newSide: types.Side,
+  newOrderType: types.OrderType,
+  newClientOrderId: number,
+  owner: PublicKey,
+  triggerOrderInfo: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.editTriggerOrder(
+    new anchor.BN(newOrderPrice),
+    new anchor.BN(newTriggerPrice),
+    types.toProgramTriggerDirection(newTriggerDirection),
+    new anchor.BN(newSize),
+    types.toProgramSide(newSide),
+    types.toProgramOrderType(newOrderType),
+    newClientOrderId == 0 ? null : new anchor.BN(newClientOrderId),
+    {
+      accounts: {
+        owner: owner,
+        triggerOrderInfo: triggerOrderInfo,
+      },
+    }
+  );
+}
+
 export function cancelOrderIx(
   asset: Asset,
   userKey: PublicKey,
@@ -2060,6 +2228,7 @@ export interface StateParams {
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;
   nativeOpenInterestLimit: anchor.BN;
+  triggerOrderTimeoutSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {

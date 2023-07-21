@@ -36,6 +36,7 @@ export interface State {
   nativeOpenInterestLimit: anchor.BN;
   haltStates: Array<HaltStateV2>;
   haltStatesPadding: Array<HaltStateV2>;
+  triggerOrderTimeoutSeconds: number;
   padding: Array<number>;
 }
 
@@ -201,6 +202,7 @@ export interface CrossMarginAccount {
   lastFundingDeltasPadding: Array<AnchorDecimal>;
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
+  triggerOrderIndexes: anchor.BN;
   padding: Array<number>;
 }
 
@@ -232,6 +234,22 @@ export interface SpreadAccount {
   positionsPadding: Array<Position>;
   asset: any;
   padding: Array<number>;
+}
+
+export interface TriggerOrderInfo {
+  owner: PublicKey;
+  marginAccount: PublicKey;
+  openOrders: PublicKey;
+  whitelistTradingFeesAccount: PublicKey;
+  orderPrice: anchor.BN;
+  triggerPrice: anchor.BN;
+  size: anchor.BN;
+  clientOrderId: anchor.BN;
+  creationTs: anchor.BN;
+  triggerDirection: any; // enum TriggerDirection
+  side: any; // enum Side
+  asset: any; // enum Asset
+  orderType: any; // enum OrderType
 }
 
 export interface PerpSyncQueue {
