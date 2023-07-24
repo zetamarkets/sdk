@@ -444,7 +444,11 @@ export class RiskCalculator {
       marginMap.set(asset, assetMargin);
     }
 
-    return margins;
+    if (accountType == types.ProgramAccountType.MarginAccount) {
+      return margins;
+    } else {
+      return marginMap;
+    }
   }
 
   /**
@@ -598,13 +602,44 @@ export class RiskCalculator {
     );
     let assetIndex = assets.assetToIndex(tradeAsset);
 
-    let position = marginAccount.productLedgers[assetIndex].position.size; // Signed
+    let position = convertNativeLotSizeToDecimal(
+      marginAccount.productLedgers[assetIndex].position.size
+    );
+    let costOfTrades = convertNativeBNToDecimal(
+      marginAccount.productLedgers[assetIndex].position.costOfTrades
+    );
+    let enterPrice = costOfTrades / position;
     let price = pnlExecutionPrice
       ? pnlExecutionPrice
       : Exchange.getMarkPrice(tradeAsset);
+    let balance = state.balance;
 
-    let maxClose = state.availableBalanceMaintenanceIncludingOrders / price;
-    let maxOpen = state.availableBalanceInitial / price;
+    // Max Open using initial margin per lot
+    // Max Close using maintenance margin incl orders per lot
+    let init = Exchange.getMarginParams(tradeAsset).futureMarginInitial;
+    let maint = Exchange.getMarginParams(tradeAsset).futureMarginMaintenance;
+    let fee =
+      (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
+        100) *
+      price;
+    let maxOpen = state.availableBalanceInitial / (init * price);
+
+    // If you try to close the existing position
+    // Your balance would change to reflect your PnL
+    // And your maintenanceMarginIncludingOrders would decrease
+
+    // X is an unknown maxClose size
+    // Find X such that post execution (balance - marginReq) > 0
+    // (balance + balance_change) - (availMaint + margin_change) - fee > 0
+    // (balance + X*price - X*enterPrice) - (availMaint - X*price*maint) - X*fee > 0
+    // balance - availMaint > X(enterPrice + fee - price - price*maint)
+    // X < (balance - availMaint) / (price + price*maint - enterPrice - fee)
+
+    let maxClose =
+      (balance - state.availableBalanceMaintenanceIncludingOrders) /
+      (price + price * maint - enterPrice - fee);
+
+    // TODO should this return human readable lots (1) or program lots (1000)?
 
     if (
       position == 0 ||
