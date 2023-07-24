@@ -5,6 +5,9 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.5.0] 2023-07-25
+
+- Add fee to TradeEventV3. ([#253](https://github.com/zetamarkets/sdk/pull/253))
 - Add header to event queue fetch. ([#250](https://github.com/zetamarkets/sdk/pull/250))
 
 ## [1.4.4] 2023-07-14
