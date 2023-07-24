@@ -5,6 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.5.1] 2023-07-25
+
+- Add getMaxTradeSize() and getLiquidationPrice() to risk calcs. ([#252](https://github.com/zetamarkets/sdk/pull/252))
+
+## [1.5.0] 2023-07-24
+
 - Add header to event queue fetch. ([#250](https://github.com/zetamarkets/sdk/pull/250))
 
 ## [1.4.4] 2023-07-14
