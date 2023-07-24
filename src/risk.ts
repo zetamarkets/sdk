@@ -172,7 +172,7 @@ export class RiskCalculator {
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
-    executionPrice: number = undefined,
+    executionPrice: Map<Asset, number | undefined> = undefined,
     addTakerFees: boolean = false
   ): number | Map<Asset, number> {
     let pnl = 0;
@@ -219,15 +219,17 @@ export class RiskCalculator {
       }
 
       let subExchange = Exchange.getSubExchange(asset);
+      let price =
+        executionPrice && executionPrice.get(asset)
+          ? executionPrice.get(asset)
+          : subExchange.getMarkPrice();
       if (size > 0) {
         assetPnl +=
-          convertNativeLotSizeToDecimal(size) *
-            (executionPrice ? executionPrice : subExchange.getMarkPrice()) -
+          convertNativeLotSizeToDecimal(size) * price -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         assetPnl +=
-          convertNativeLotSizeToDecimal(size) *
-            (executionPrice ? executionPrice : subExchange.getMarkPrice()) +
+          convertNativeLotSizeToDecimal(size) * price +
           convertNativeBNToDecimal(position.costOfTrades);
       }
       if (addTakerFees) {
@@ -457,7 +459,7 @@ export class RiskCalculator {
    */
   public getCrossMarginAccountState(
     marginAccount: CrossMarginAccount,
-    pnlExecutionPrice: number = undefined,
+    pnlExecutionPrice: Map<Asset, number | undefined> = undefined,
     pnlAddTakerFees: boolean = false
   ): types.CrossMarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
@@ -536,6 +538,7 @@ export class RiskCalculator {
       initialMarginTotal: imTotal,
       initalMarginSkipConcessionTotal: imSkipConcessionTotal,
       maintenanceMarginTotal: mmTotal,
+      maintenanceMarginIncludingOrdersTotal: mmioTotal,
       unrealizedPnlTotal: upnlTotal,
       unpaidFundingTotal: unpaidFundingTotal,
     };
@@ -547,7 +550,7 @@ export class RiskCalculator {
    */
   public getMarginAccountState(
     marginAccount: MarginAccount,
-    pnlExecutionPrice: number = undefined,
+    pnlExecutionPrice: Map<Asset, number | undefined> = undefined,
     pnlAddTakerFees: boolean = false
   ): types.MarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
@@ -592,54 +595,92 @@ export class RiskCalculator {
     marginAccount: CrossMarginAccount,
     tradeAsset: constants.Asset,
     tradeSide: types.Side,
-    pnlExecutionPrice: number = undefined,
-    pnlAddTakerFees: boolean = false
+    tradePrice: number,
+    bufferPercent: number = 5,
+    executionPrices: Map<Asset, number | undefined> = undefined,
+    addTakerFees: boolean = false
   ): number {
-    let state = this.getCrossMarginAccountState(
+    let stateMarkPrice = this.getCrossMarginAccountState(
       marginAccount,
-      pnlExecutionPrice,
-      pnlAddTakerFees
+      undefined, // uPnL for margin calcs uses mark price
+      addTakerFees
     );
-    let assetIndex = assets.assetToIndex(tradeAsset);
+
+    let stateExecutionPrice = this.getCrossMarginAccountState(
+      marginAccount,
+      executionPrices, // Use actual price when we care about realising the uPnL
+      addTakerFees
+    );
+
+    let fee = addTakerFees
+      ? (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
+          100) *
+        tradePrice
+      : 0;
 
     let position = convertNativeLotSizeToDecimal(
-      marginAccount.productLedgers[assetIndex].position.size
+      marginAccount.productLedgers[assets.assetToIndex(tradeAsset)].position
+        .size
     );
-    let costOfTrades = convertNativeBNToDecimal(
-      marginAccount.productLedgers[assetIndex].position.costOfTrades
-    );
-    let enterPrice = costOfTrades / position;
-    let price = pnlExecutionPrice
-      ? pnlExecutionPrice
-      : Exchange.getMarkPrice(tradeAsset);
-    let balance = state.balance;
-
-    // Max Open using initial margin per lot
-    // Max Close using maintenance margin incl orders per lot
+    let positionAbs = Math.abs(position);
     let init = Exchange.getMarginParams(tradeAsset).futureMarginInitial;
     let maint = Exchange.getMarginParams(tradeAsset).futureMarginMaintenance;
-    let fee =
-      (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
-        100) *
-      price;
-    let maxOpen = state.availableBalanceInitial / (init * price);
+    let markPrice = Exchange.getMarkPrice(tradeAsset);
+    let extraUPNLPerLot =
+      tradeSide == types.Side.BID
+        ? markPrice - tradePrice
+        : tradePrice - markPrice;
 
-    // If you try to close the existing position
-    // Your balance would change to reflect your PnL
-    // And your maintenanceMarginIncludingOrders would decrease
+    // (currentBalance + currentUPNL + unpaid funding - currentIM) + extraUPNL - extraIM - fees > 0
+    // state.availableBalanceInitial + extraUPNL - extraIM - fees > 0
+    // Where X is the number of extra lots:
+    // state.availableBalanceInitial + X*extraUPNLPerLot - X*init*markPrice - X*fee > 0
+    // X < state.availableBalanceInitial / (init*markPrice + fee - extraUPNLPerLot)
+    let openSize =
+      stateMarkPrice.availableBalanceInitial /
+      (init * markPrice + fee - extraUPNLPerLot);
+    console.log("openSize", openSize);
+    console.log(
+      `${stateMarkPrice.availableBalanceInitial} / ${init} * ${markPrice} + ${fee} - ${extraUPNLPerLot}`
+    );
 
-    // X is an unknown maxClose size
-    // Find X such that post execution (balance - marginReq) > 0
-    // (balance + balance_change) - (availMaint + margin_change) - fee > 0
-    // (balance + X*price - X*enterPrice) - (availMaint - X*price*maint) - X*fee > 0
-    // balance - availMaint > X(enterPrice + fee - price - price*maint)
-    // X < (balance - availMaint) / (price + price*maint - enterPrice - fee)
+    // (currentBalance + currentUPNL + unpaid funding - currentMMIO) + extraMMIO - fees > 0
+    // stateExecutionPrice.availableBalanceMaintenanceIncludingOrders + extraMMIO - fees > 0
+    // Where X is the number of extra lots:
+    // stateExecutionPrice.availableBalanceMaintenanceIncludingOrders + X*maint*markPrice - X*fee > 0
+    // X < stateExecutionPrice.availableBalanceMaintenanceIncludingOrders / (fee - maint*markPrice)
+    let closeSize =
+      stateExecutionPrice.availableBalanceMaintenanceIncludingOrders /
+      (fee - maint * markPrice);
 
-    let maxClose =
-      (balance - state.availableBalanceMaintenanceIncludingOrders) /
-      (price + price * maint - enterPrice - fee);
+    // Equation falls apart if there is no positive X, means that you can close your position entirely
+    if (closeSize <= 0 || closeSize >= positionAbs) {
+      closeSize = positionAbs;
+    }
 
-    // TODO should this return human readable lots (1) or program lots (1000)?
+    console.log("closeSize", closeSize);
+    console.log(
+      `${stateExecutionPrice.availableBalanceMaintenanceIncludingOrders} / ${fee} - ${maint} * ${markPrice}`
+    );
+
+    // (currentBalance + currentUPNL + unpaid funding - currentIM) + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
+    // stateExecutionPrice.availableBalanceInitial + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
+    // Where X is the number of extra lots opened on the other side:
+    // stateExecutionPrice.availableBalanceInitial + position*init*markPrice - X*init*markPrice + X*extraUPNLPerLot - X*fee > 0
+    // X < (stateExecutionPrice.availableBalanceInitial + position*init*markPrice) / (init*markPrice + fee - extraUPNLPerLot)
+
+    let closeOpenSize = closeSize;
+    if (closeSize == positionAbs) {
+      closeOpenSize =
+        positionAbs +
+        (stateExecutionPrice.availableBalanceInitial +
+          positionAbs * init * markPrice) /
+          (init * markPrice + fee - extraUPNLPerLot);
+    }
+    console.log("closeOpenSize", closeOpenSize);
+    console.log(
+      `${stateExecutionPrice.availableBalanceInitial} + ${positionAbs} * ${init} * ${markPrice} / ${init} * ${markPrice} + ${fee} - ${extraUPNLPerLot}`
+    );
 
     if (
       position == 0 ||
@@ -647,13 +688,12 @@ export class RiskCalculator {
       (position < 0 && tradeSide == types.Side.ASK)
     ) {
       // Strictly an opening order - use initial margin
-      return maxOpen;
+      return ((100 - bufferPercent) / 100) * openSize;
     } else {
       // Either only close (uses maint margin incl orders),
       // or close full size + open more (uses initial margin)
       // Return the one that gives the biggest size
-      let closeOnlySize = Math.min(maxClose, position);
-      return Math.max(closeOnlySize, maxOpen);
+      return Math.max(((100 - bufferPercent) / 100) * closeOpenSize, closeSize);
     }
   }
 }

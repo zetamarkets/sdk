@@ -228,6 +228,7 @@ export interface CrossMarginAccountState {
   initialMarginTotal: number;
   initalMarginSkipConcessionTotal: number;
   maintenanceMarginTotal: number;
+  maintenanceMarginIncludingOrdersTotal: number;
   unrealizedPnlTotal: number;
   unpaidFundingTotal: number;
 }

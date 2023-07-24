@@ -686,9 +686,11 @@ export class Client {
     pnlExecutionPrice: number = undefined,
     pnlAddTakerFees: boolean = false
   ): types.MarginAccountState {
+    let pnlExecutionPrices = new Map();
+    pnlExecutionPrices.set(asset, pnlExecutionPrice);
     return Exchange.riskCalculator.getMarginAccountState(
       this.getSubClient(asset).marginAccount,
-      pnlExecutionPrice,
+      pnlExecutionPrices,
       pnlAddTakerFees
     );
   }
