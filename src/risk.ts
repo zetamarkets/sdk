@@ -9,7 +9,11 @@ import {
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
 import { assets, Decimal } from ".";
-import { calculateProductMargin, collectRiskMaps } from "./risk-utils";
+import {
+  calculateLiquidationPrice,
+  calculateProductMargin,
+  collectRiskMaps,
+} from "./risk-utils";
 
 export class RiskCalculator {
   private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
@@ -682,5 +686,20 @@ export class RiskCalculator {
       // Return the one that gives the biggest size
       return Math.max(((100 - bufferPercent) / 100) * closeOpenSize, closeSize);
     }
+  }
+
+  public getLiquidationPrice(
+    asset: Asset,
+    signedPosition: number,
+    marginAccount: CrossMarginAccount
+  ) {
+    let state = this.getCrossMarginAccountState(marginAccount);
+    return calculateLiquidationPrice(
+      state.balance,
+      state.maintenanceMarginTotal,
+      state.unrealizedPnlTotal,
+      Exchange.getMarkPrice(asset),
+      signedPosition
+    );
   }
 }
