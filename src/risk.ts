@@ -639,10 +639,6 @@ export class RiskCalculator {
     let openSize =
       stateMarkPrice.availableBalanceInitial /
       (init * markPrice + fee - extraUPNLPerLot);
-    console.log("openSize", openSize);
-    console.log(
-      `${stateMarkPrice.availableBalanceInitial} / ${init} * ${markPrice} + ${fee} - ${extraUPNLPerLot}`
-    );
 
     // (currentBalance + currentUPNL + unpaid funding - currentMMIO) + extraMMIO - fees > 0
     // stateExecutionPrice.availableBalanceMaintenanceIncludingOrders + extraMMIO - fees > 0
@@ -658,11 +654,6 @@ export class RiskCalculator {
       closeSize = positionAbs;
     }
 
-    console.log("closeSize", closeSize);
-    console.log(
-      `${stateExecutionPrice.availableBalanceMaintenanceIncludingOrders} / ${fee} - ${maint} * ${markPrice}`
-    );
-
     // (currentBalance + currentUPNL + unpaid funding - currentIM) + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
     // stateExecutionPrice.availableBalanceInitial + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
     // Where X is the number of extra lots opened on the other side:
@@ -677,10 +668,6 @@ export class RiskCalculator {
           positionAbs * init * markPrice) /
           (init * markPrice + fee - extraUPNLPerLot);
     }
-    console.log("closeOpenSize", closeOpenSize);
-    console.log(
-      `${stateExecutionPrice.availableBalanceInitial} + ${positionAbs} * ${init} * ${markPrice} / ${init} * ${markPrice} + ${fee} - ${extraUPNLPerLot}`
-    );
 
     if (
       position == 0 ||
