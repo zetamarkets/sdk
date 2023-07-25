@@ -8544,10 +8544,10 @@
             "name": "Uninitialized"
           },
           {
-            "name": "Increasing"
+            "name": "LessThanOrEqual"
           },
           {
-            "name": "Decreasing"
+            "name": "GreaterThanOrEqual"
           }
         ]
       }

@@ -80,8 +80,8 @@ export enum Side {
 }
 
 export enum TriggerDirection {
-  INCREASING,
-  DECREASING,
+  LESSTHANOREQUAL,
+  GREATERTHANOREQUAL,
 }
 
 export enum UserCallbackType {
@@ -108,21 +108,21 @@ export function fromProgramSide(side: any): Side {
 }
 
 export function toProgramTriggerDirection(triggerDirection: TriggerDirection) {
-  if (triggerDirection == TriggerDirection.INCREASING)
-    return { increasing: {} };
-  if (triggerDirection == TriggerDirection.DECREASING)
-    return { decreasing: {} };
+  if (triggerDirection == TriggerDirection.LESSTHANOREQUAL)
+    return { lessThanOrEqual: {} };
+  if (triggerDirection == TriggerDirection.GREATERTHANOREQUAL)
+    return { greaterThanOrEqual: {} };
   throw Error("Invalid triggerDirection");
 }
 
 export function fromProgramTriggerDirection(
   triggerDirection: any
 ): TriggerDirection {
-  if (objectEquals(triggerDirection, { increasing: {} })) {
-    return TriggerDirection.INCREASING;
+  if (objectEquals(triggerDirection, { lessThanOrEqual: {} })) {
+    return TriggerDirection.LESSTHANOREQUAL;
   }
-  if (objectEquals(triggerDirection, { decreasing: {} })) {
-    return TriggerDirection.DECREASING;
+  if (objectEquals(triggerDirection, { greaterThanOrEqual: {} })) {
+    return TriggerDirection.GREATERTHANOREQUAL;
   }
   throw Error("Invalid program triggerDirection!");
 }
@@ -409,8 +409,8 @@ export function defaultTriggerOrderOptions(side: Side): TriggerOrderOptions {
   return {
     triggerDirection:
       side == Side.BID
-        ? TriggerDirection.DECREASING
-        : TriggerDirection.INCREASING,
+        ? TriggerDirection.GREATERTHANOREQUAL
+        : TriggerDirection.LESSTHANOREQUAL,
     orderType: OrderType.FILLORKILL,
     clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,

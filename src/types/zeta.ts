@@ -8544,10 +8544,10 @@ export type Zeta = {
             "name": "Uninitialized"
           },
           {
-            "name": "Increasing"
+            "name": "LessThanOrEqual"
           },
           {
-            "name": "Decreasing"
+            "name": "GreaterThanOrEqual"
           }
         ]
       }
@@ -18414,10 +18414,10 @@ export const IDL: Zeta = {
             "name": "Uninitialized"
           },
           {
-            "name": "Increasing"
+            "name": "LessThanOrEqual"
           },
           {
-            "name": "Decreasing"
+            "name": "GreaterThanOrEqual"
           }
         ]
       }
