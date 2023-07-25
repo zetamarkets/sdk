@@ -9369,6 +9369,11 @@ export type Zeta = {
       "code": 6144,
       "name": "MarginAccountCannotLiquidateCrossMarginAccount",
       "msg": "MarginAccount cannot liquidate CrossMarginAccount"
+    },
+    {
+      "code": 6145,
+      "name": "InvalidDexAccOwner",
+      "msg": "Invalid owner for dex account"
     }
   ]
 };
@@ -18744,6 +18749,11 @@ export const IDL: Zeta = {
       "code": 6144,
       "name": "MarginAccountCannotLiquidateCrossMarginAccount",
       "msg": "MarginAccount cannot liquidate CrossMarginAccount"
+    },
+    {
+      "code": 6145,
+      "name": "InvalidDexAccOwner",
+      "msg": "Invalid owner for dex account"
     }
   ]
 };
