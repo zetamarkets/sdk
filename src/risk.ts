@@ -113,6 +113,15 @@ export class RiskCalculator {
     return sideMultiplier * openingSize;
   }
 
+  public calculateUnpaidFunding(
+    account: MarginAccount,
+    accountType: types.ProgramAccountType
+  ): number;
+  public calculateUnpaidFunding(
+    account: CrossMarginAccount,
+    accountType: types.ProgramAccountType
+  ): Map<Asset, number>;
+
   /**
    * Returns the unpaid funding for a given margin account.
    * @param account the user's spread (returns 0) or margin account.
@@ -121,7 +130,7 @@ export class RiskCalculator {
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount
-  ): number | Map<Asset, number> {
+  ): any {
     // Spread accounts cannot hold perps and therefore have no unpaid funding
     if (accountType == types.ProgramAccountType.SpreadAccount) {
       return 0;
@@ -168,6 +177,18 @@ export class RiskCalculator {
     }
   }
 
+  public calculateUnrealizedPnl(
+    account: MarginAccount,
+    accountType: types.ProgramAccountType,
+    executionPrice: Map<Asset, number | undefined>,
+    addTakerFees: boolean
+  ): number;
+  public calculateUnrealizedPnl(
+    account: CrossMarginAccount,
+    accountType: types.ProgramAccountType,
+    executionPrice: Map<Asset, number | undefined>,
+    addTakerFees: boolean
+  ): Map<Asset, number>;
   /**
    * Returns the unrealized pnl for a given margin or spread account.
    * @param account the user's spread or margin account.
@@ -178,7 +199,7 @@ export class RiskCalculator {
       .MarginAccount,
     executionPrice: Map<Asset, number | undefined> = undefined,
     addTakerFees: boolean = false
-  ): number | Map<Asset, number> {
+  ): any {
     let pnl = 0;
 
     let i_list = [];
@@ -254,6 +275,16 @@ export class RiskCalculator {
     }
   }
 
+  public calculateTotalInitialMargin(
+    account: MarginAccount,
+    accountType: types.ProgramAccountType,
+    skipConcession: boolean
+  ): number;
+  public calculateTotalInitialMargin(
+    account: CrossMarginAccount,
+    accountType: types.ProgramAccountType,
+    skipConcession: boolean
+  ): Map<Asset, number>;
   /**
    * Returns the total initial margin requirement for a given account.
    * This includes initial margin on positions which is used for
@@ -265,7 +296,7 @@ export class RiskCalculator {
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
     skipConcession: boolean = false
-  ): number | Map<Asset, number> {
+  ): any {
     // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
     let assetList =
       accountType == types.ProgramAccountType.MarginAccount
@@ -339,6 +370,14 @@ export class RiskCalculator {
     }
   }
 
+  public calculateTotalMaintenanceMargin(
+    account: MarginAccount,
+    accountType: types.ProgramAccountType
+  ): number;
+  public calculateTotalMaintenanceMargin(
+    account: CrossMarginAccount,
+    accountType: types.ProgramAccountType
+  ): Map<Asset, number>;
   /**
    * Returns the total maintenance margin requirement for a given account.
    * This only uses maintenance margin on positions and is used for
@@ -350,7 +389,7 @@ export class RiskCalculator {
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount
-  ): number | Map<Asset, number> {
+  ): any {
     // Margin account only has 1 asset, but for CrossMarginAccount we iterate through all assets
     let assetList =
       accountType == types.ProgramAccountType.MarginAccount
@@ -389,6 +428,14 @@ export class RiskCalculator {
     }
   }
 
+  public calculateTotalMaintenanceMarginIncludingOrders(
+    account: MarginAccount,
+    accountType: types.ProgramAccountType
+  ): number;
+  public calculateTotalMaintenanceMarginIncludingOrders(
+    account: CrossMarginAccount,
+    accountType: types.ProgramAccountType
+  ): Map<Asset, number>;
   /**
    * Returns the total maintenance margin requirement for a given account including orders.
    * This calculates maintenance margin across all positions and orders.
@@ -480,7 +527,8 @@ export class RiskCalculator {
     ) as Map<Asset, number>;
     let initialMargin = this.calculateTotalInitialMargin(
       marginAccount,
-      accType
+      accType,
+      false
     ) as Map<Asset, number>;
     let initialMarginSkipConcession = this.calculateTotalInitialMargin(
       marginAccount,
@@ -564,9 +612,14 @@ export class RiskCalculator {
       pnlExecutionPrice,
       pnlAddTakerFees
     ) as number;
-    let unpaidFunding = this.calculateUnpaidFunding(marginAccount) as number;
+    let unpaidFunding = this.calculateUnpaidFunding(
+      marginAccount,
+      types.ProgramAccountType.MarginAccount
+    ) as number;
     let initialMargin = this.calculateTotalInitialMargin(
-      marginAccount
+      marginAccount,
+      types.ProgramAccountType.MarginAccount,
+      false
     ) as number;
     let initialMarginSkipConcession = this.calculateTotalInitialMargin(
       marginAccount,
@@ -574,7 +627,8 @@ export class RiskCalculator {
       true
     ) as number;
     let maintenanceMargin = this.calculateTotalMaintenanceMargin(
-      marginAccount
+      marginAccount,
+      types.ProgramAccountType.MarginAccount
     ) as number;
     let availableBalanceInitial: number =
       balance + unrealizedPnl + unpaidFunding - initialMargin;
