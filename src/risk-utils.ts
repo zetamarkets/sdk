@@ -138,11 +138,14 @@ export function checkMarginAccountMarginRequirement(
 ) {
   let pnl = Exchange.riskCalculator.calculateUnrealizedPnl(
     marginAccount,
-    types.ProgramAccountType.MarginAccount
+    types.ProgramAccountType.MarginAccount,
+    undefined,
+    false
   );
   let totalMaintenanceMargin =
     Exchange.riskCalculator.calculateTotalMaintenanceMargin(
-      marginAccount
+      marginAccount,
+      types.ProgramAccountType.MarginAccount
     ) as number;
   let buffer = marginAccount.balance.toNumber() + pnl - totalMaintenanceMargin;
   return buffer > 0;
