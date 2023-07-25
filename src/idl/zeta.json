@@ -8430,6 +8430,11 @@
           "name": "sequenceNumber",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "fee",
+          "type": "u64",
+          "index": false
         }
       ]
     },
