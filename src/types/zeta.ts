@@ -9884,8 +9884,8 @@ export type Zeta = {
     },
     {
       "code": 6152,
-      "name": "InvalidTriggerOrderBit",
-      "msg": "Invalid trigger order index"
+      "name": "InvalidTriggerOrderBitRange",
+      "msg": "Invalid trigger order bit range"
     },
     {
       "code": 6153,
@@ -9901,6 +9901,11 @@ export type Zeta = {
       "code": 6155,
       "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
       "msg": "Trigger order needs either a trigger price + direction, or trigger time"
+    },
+    {
+      "code": 6156,
+      "name": "TriggerOrderBitOccupied",
+      "msg": "Given trigger order bit is occupied, pick another"
     }
   ]
 };
@@ -19791,8 +19796,8 @@ export const IDL: Zeta = {
     },
     {
       "code": 6152,
-      "name": "InvalidTriggerOrderBit",
-      "msg": "Invalid trigger order index"
+      "name": "InvalidTriggerOrderBitRange",
+      "msg": "Invalid trigger order bit range"
     },
     {
       "code": 6153,
@@ -19808,6 +19813,11 @@ export const IDL: Zeta = {
       "code": 6155,
       "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
       "msg": "Trigger order needs either a trigger price + direction, or trigger time"
+    },
+    {
+      "code": 6156,
+      "name": "TriggerOrderBitOccupied",
+      "msg": "Given trigger order bit is occupied, pick another"
     }
   ]
 };
