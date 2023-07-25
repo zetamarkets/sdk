@@ -3997,12 +3997,22 @@ export type Zeta = {
         },
         {
           "name": "triggerPrice",
-          "type": "u64"
+          "type": {
+            "option": "u64"
+          }
         },
         {
           "name": "triggerDirection",
           "type": {
-            "defined": "TriggerDirection"
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
           }
         },
         {
@@ -4249,12 +4259,22 @@ export type Zeta = {
         },
         {
           "name": "triggerPrice",
-          "type": "u64"
+          "type": {
+            "option": "u64"
+          }
         },
         {
           "name": "triggerDirection",
           "type": {
-            "defined": "TriggerDirection"
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
           }
         },
         {
@@ -7131,7 +7151,15 @@ export type Zeta = {
           },
           {
             "name": "triggerPrice",
-            "type": "u64"
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "triggerTs",
+            "type": {
+              "option": "u64"
+            }
           },
           {
             "name": "size",
@@ -7139,7 +7167,9 @@ export type Zeta = {
           },
           {
             "name": "clientOrderId",
-            "type": "u64"
+            "type": {
+              "option": "u64"
+            }
           },
           {
             "name": "creationTs",
@@ -7148,7 +7178,9 @@ export type Zeta = {
           {
             "name": "triggerDirection",
             "type": {
-              "defined": "TriggerDirection"
+              "option": {
+                "defined": "TriggerDirection"
+              }
             }
           },
           {
@@ -9864,6 +9896,11 @@ export type Zeta = {
       "code": 6154,
       "name": "OnlyOwnerCanEditTriggerOrder",
       "msg": "Only the owner can edit their own trigger order"
+    },
+    {
+      "code": 6155,
+      "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
+      "msg": "Trigger order needs either a trigger price + direction, or trigger time"
     }
   ]
 };
@@ -13867,12 +13904,22 @@ export const IDL: Zeta = {
         },
         {
           "name": "triggerPrice",
-          "type": "u64"
+          "type": {
+            "option": "u64"
+          }
         },
         {
           "name": "triggerDirection",
           "type": {
-            "defined": "TriggerDirection"
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
           }
         },
         {
@@ -14119,12 +14166,22 @@ export const IDL: Zeta = {
         },
         {
           "name": "triggerPrice",
-          "type": "u64"
+          "type": {
+            "option": "u64"
+          }
         },
         {
           "name": "triggerDirection",
           "type": {
-            "defined": "TriggerDirection"
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
           }
         },
         {
@@ -17001,7 +17058,15 @@ export const IDL: Zeta = {
           },
           {
             "name": "triggerPrice",
-            "type": "u64"
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "triggerTs",
+            "type": {
+              "option": "u64"
+            }
           },
           {
             "name": "size",
@@ -17009,7 +17074,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "clientOrderId",
-            "type": "u64"
+            "type": {
+              "option": "u64"
+            }
           },
           {
             "name": "creationTs",
@@ -17018,7 +17085,9 @@ export const IDL: Zeta = {
           {
             "name": "triggerDirection",
             "type": {
-              "defined": "TriggerDirection"
+              "option": {
+                "defined": "TriggerDirection"
+              }
             }
           },
           {
@@ -19734,6 +19803,11 @@ export const IDL: Zeta = {
       "code": 6154,
       "name": "OnlyOwnerCanEditTriggerOrder",
       "msg": "Only the owner can edit their own trigger order"
+    },
+    {
+      "code": 6155,
+      "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
+      "msg": "Trigger order needs either a trigger price + direction, or trigger time"
     }
   ]
 };

@@ -1100,6 +1100,7 @@ export class CrossClient {
         orderPrice,
         triggerPrice,
         options.triggerDirection,
+        0,
         triggerOrderBit,
         size,
         side,
@@ -1172,6 +1173,7 @@ export class CrossClient {
         newOrderPrice,
         newTriggerPrice,
         newOptions.triggerDirection,
+        0,
         newSize,
         newSide,
         newOptions.orderType != undefined
@@ -2204,13 +2206,20 @@ export class CrossClient {
     triggerOrders.forEach((rawOrder, i) => {
       let order = {
         orderPrice: rawOrder.orderPrice.toNumber(),
-        triggerPrice: rawOrder.triggerPrice.toNumber(),
+        triggerPrice: rawOrder.triggerPrice
+          ? rawOrder.triggerPrice.toNumber()
+          : null,
         size: rawOrder.size.toNumber(),
-        clientOrderId: rawOrder.clientOrderId.toNumber(),
+        clientOrderId: rawOrder.clientOrderId
+          ? rawOrder.clientOrderId.toNumber()
+          : null,
         creationTs: rawOrder.creationTs.toNumber(),
-        triggerDirection: types.fromProgramTriggerDirection(
-          rawOrder.triggerDirection
-        ),
+        triggerDirection: rawOrder.triggerDirection
+          ? types.fromProgramTriggerDirection(rawOrder.triggerDirection)
+          : null,
+        triggerTimestamp: rawOrder.triggerTimestamp
+          ? rawOrder.triggerTimestamp.toNumber()
+          : null,
         side: types.fromProgramSide(rawOrder.side),
         asset: assets.fromProgramAsset(rawOrder.asset),
         orderType: types.fromProgramOrderType(rawOrder.orderType),

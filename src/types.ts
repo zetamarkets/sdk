@@ -80,6 +80,7 @@ export enum Side {
 }
 
 export enum TriggerDirection {
+  UNINITIALIZED,
   LESSTHANOREQUAL,
   GREATERTHANOREQUAL,
 }
@@ -108,6 +109,8 @@ export function fromProgramSide(side: any): Side {
 }
 
 export function toProgramTriggerDirection(triggerDirection: TriggerDirection) {
+  if (triggerDirection == TriggerDirection.UNINITIALIZED)
+    return { uninitialized: {} };
   if (triggerDirection == TriggerDirection.LESSTHANOREQUAL)
     return { lessThanOrEqual: {} };
   if (triggerDirection == TriggerDirection.GREATERTHANOREQUAL)
@@ -118,6 +121,9 @@ export function toProgramTriggerDirection(triggerDirection: TriggerDirection) {
 export function fromProgramTriggerDirection(
   triggerDirection: any
 ): TriggerDirection {
+  if (objectEquals(triggerDirection, { uninitialized: {} })) {
+    return TriggerDirection.UNINITIALIZED;
+  }
   if (objectEquals(triggerDirection, { lessThanOrEqual: {} })) {
     return TriggerDirection.LESSTHANOREQUAL;
   }
@@ -162,11 +168,12 @@ export interface Order {
 
 export interface TriggerOrder {
   orderPrice: number;
-  triggerPrice: number;
+  triggerPrice: number | null;
   size: number;
   clientOrderId: number;
   creationTs: number;
-  triggerDirection: TriggerDirection;
+  triggerDirection: TriggerDirection | null;
+  triggerTimestamp: number | null;
   side: Side;
   asset: Asset;
   orderType: OrderType;

@@ -529,6 +529,7 @@ export function placeTriggerOrderIx(
   orderPrice: number,
   triggerPrice: number,
   triggerDirection: types.TriggerDirection,
+  triggerTimestamp: number,
   triggerOrderBit: number,
   size: number,
   side: types.Side,
@@ -559,8 +560,11 @@ export function placeTriggerOrderIx(
   return Exchange.program.instruction.placeTriggerOrder(
     triggerOrderBit,
     new anchor.BN(orderPrice),
-    new anchor.BN(triggerPrice),
-    types.toProgramTriggerDirection(triggerDirection),
+    triggerPrice == 0 ? null : new anchor.BN(triggerPrice),
+    triggerDirection == types.TriggerDirection.UNINITIALIZED
+      ? null
+      : types.toProgramTriggerDirection(triggerDirection),
+    triggerTimestamp == 0 ? null : new anchor.BN(triggerTimestamp),
     new anchor.BN(size),
     types.toProgramSide(side),
     types.toProgramOrderType(orderType),
@@ -668,6 +672,7 @@ export function editTriggerOrderIx(
   newOrderPrice: number,
   newTriggerPrice: number,
   newTriggerDirection: types.TriggerDirection,
+  newTriggerTimestamp: number,
   newSize: number,
   newSide: types.Side,
   newOrderType: types.OrderType,
@@ -677,8 +682,11 @@ export function editTriggerOrderIx(
 ): TransactionInstruction {
   return Exchange.program.instruction.editTriggerOrder(
     new anchor.BN(newOrderPrice),
-    new anchor.BN(newTriggerPrice),
-    types.toProgramTriggerDirection(newTriggerDirection),
+    newTriggerPrice == 0 ? null : new anchor.BN(newTriggerPrice),
+    newTriggerDirection == types.TriggerDirection.UNINITIALIZED
+      ? null
+      : types.toProgramTriggerDirection(newTriggerDirection),
+    newTriggerTimestamp == 0 ? null : new anchor.BN(newTriggerTimestamp),
     new anchor.BN(newSize),
     types.toProgramSide(newSide),
     types.toProgramOrderType(newOrderType),

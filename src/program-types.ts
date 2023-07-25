@@ -242,11 +242,12 @@ export interface TriggerOrder {
   openOrders: PublicKey;
   whitelistTradingFeesAccount: PublicKey;
   orderPrice: anchor.BN;
-  triggerPrice: anchor.BN;
+  triggerPrice: anchor.BN | null; // Option<u64>
+  triggerTs: anchor.BN | null; // Option<u64>
   size: anchor.BN;
-  clientOrderId: anchor.BN;
+  clientOrderId: anchor.BN | null; // Option<u64>
   creationTs: anchor.BN;
-  triggerDirection: any; // enum TriggerDirection
+  triggerDirection: any | null; // Option<TriggerDirection>
   side: any; // enum Side
   asset: any; // enum Asset
   orderType: any; // enum OrderType
