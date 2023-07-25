@@ -3966,7 +3966,7 @@
           "isSigner": false
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -3988,7 +3988,7 @@
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         },
         {
@@ -4050,7 +4050,7 @@
           "isSigner": false
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -4187,7 +4187,7 @@
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         }
       ]
@@ -4211,7 +4211,7 @@
           "isSigner": true
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -4223,7 +4223,7 @@
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         }
       ]
@@ -4237,7 +4237,7 @@
           "isSigner": true
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         }
@@ -6980,7 +6980,7 @@
             }
           },
           {
-            "name": "triggerOrderIndexes",
+            "name": "triggerOrderBits",
             "type": "u128"
           },
           {
@@ -7105,7 +7105,7 @@
       }
     },
     {
-      "name": "TriggerOrderInfo",
+      "name": "TriggerOrder",
       "type": {
         "kind": "struct",
         "fields": [
@@ -9852,13 +9852,18 @@
     },
     {
       "code": 6152,
-      "name": "InvalidTriggerOrderIndex",
+      "name": "InvalidTriggerOrderBit",
       "msg": "Invalid trigger order index"
     },
     {
       "code": 6153,
       "name": "InvalidSecondaryAdmin",
       "msg": "Invalid secondary admin"
+    },
+    {
+      "code": 6154,
+      "name": "OnlyOwnerCanEditTriggerOrder",
+      "msg": "Only the owner can edit their own trigger order"
     }
   ]
 }

@@ -3966,7 +3966,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -3988,7 +3988,7 @@ export type Zeta = {
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         },
         {
@@ -4050,7 +4050,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -4187,7 +4187,7 @@ export type Zeta = {
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         }
       ]
@@ -4211,7 +4211,7 @@ export type Zeta = {
           "isSigner": true
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -4223,7 +4223,7 @@ export type Zeta = {
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         }
       ]
@@ -4237,7 +4237,7 @@ export type Zeta = {
           "isSigner": true
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         }
@@ -6980,7 +6980,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "triggerOrderIndexes",
+            "name": "triggerOrderBits",
             "type": "u128"
           },
           {
@@ -7105,7 +7105,7 @@ export type Zeta = {
       }
     },
     {
-      "name": "triggerOrderInfo",
+      "name": "triggerOrder",
       "type": {
         "kind": "struct",
         "fields": [
@@ -9852,13 +9852,18 @@ export type Zeta = {
     },
     {
       "code": 6152,
-      "name": "InvalidTriggerOrderIndex",
+      "name": "InvalidTriggerOrderBit",
       "msg": "Invalid trigger order index"
     },
     {
       "code": 6153,
       "name": "InvalidSecondaryAdmin",
       "msg": "Invalid secondary admin"
+    },
+    {
+      "code": 6154,
+      "name": "OnlyOwnerCanEditTriggerOrder",
+      "msg": "Only the owner can edit their own trigger order"
     }
   ]
 };
@@ -13831,7 +13836,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -13853,7 +13858,7 @@ export const IDL: Zeta = {
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         },
         {
@@ -13915,7 +13920,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -14052,7 +14057,7 @@ export const IDL: Zeta = {
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         }
       ]
@@ -14076,7 +14081,7 @@ export const IDL: Zeta = {
           "isSigner": true
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         },
@@ -14088,7 +14093,7 @@ export const IDL: Zeta = {
       ],
       "args": [
         {
-          "name": "triggerOrderIndex",
+          "name": "triggerOrderBit",
           "type": "u8"
         }
       ]
@@ -14102,7 +14107,7 @@ export const IDL: Zeta = {
           "isSigner": true
         },
         {
-          "name": "triggerOrderInfo",
+          "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
         }
@@ -16845,7 +16850,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "triggerOrderIndexes",
+            "name": "triggerOrderBits",
             "type": "u128"
           },
           {
@@ -16970,7 +16975,7 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "triggerOrderInfo",
+      "name": "triggerOrder",
       "type": {
         "kind": "struct",
         "fields": [
@@ -19717,13 +19722,18 @@ export const IDL: Zeta = {
     },
     {
       "code": 6152,
-      "name": "InvalidTriggerOrderIndex",
+      "name": "InvalidTriggerOrderBit",
       "msg": "Invalid trigger order index"
     },
     {
       "code": 6153,
       "name": "InvalidSecondaryAdmin",
       "msg": "Invalid secondary admin"
+    },
+    {
+      "code": 6154,
+      "name": "OnlyOwnerCanEditTriggerOrder",
+      "msg": "Only the owner can edit their own trigger order"
     }
   ]
 };

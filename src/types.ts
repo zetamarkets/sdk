@@ -170,7 +170,7 @@ export interface TriggerOrder {
   side: Side;
   asset: Asset;
   orderType: OrderType;
-  triggerOrderIndex: number;
+  triggerOrderBit: number;
 }
 
 export function orderEquals(

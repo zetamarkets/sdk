@@ -202,7 +202,7 @@ export interface CrossMarginAccount {
   lastFundingDeltasPadding: Array<AnchorDecimal>;
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
-  triggerOrderIndexes: anchor.BN;
+  triggerOrderBits: anchor.BN;
   padding: Array<number>;
 }
 
@@ -236,7 +236,7 @@ export interface SpreadAccount {
   padding: Array<number>;
 }
 
-export interface TriggerOrderInfo {
+export interface TriggerOrder {
   owner: PublicKey;
   marginAccount: PublicKey;
   openOrders: PublicKey;

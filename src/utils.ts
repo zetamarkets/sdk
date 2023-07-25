@@ -526,16 +526,16 @@ export function getSpreadAccount(
   );
 }
 
-export function getTriggerOrderInfo(
+export function getTriggerOrder(
   programId: PublicKey,
   marginAccount: PublicKey,
-  triggerOrderIndex: Uint8Array
+  triggerOrderBit: Uint8Array
 ): [PublicKey, number] {
   return anchor.web3.PublicKey.findProgramAddressSync(
     [
-      Buffer.from(anchor.utils.bytes.utf8.encode("trigger-order-info")),
+      Buffer.from(anchor.utils.bytes.utf8.encode("trigger-order")),
       marginAccount.toBuffer(),
-      triggerOrderIndex,
+      triggerOrderBit,
     ],
     programId
   );
@@ -1612,8 +1612,8 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
 export async function executeTriggerOrder(
   asset: Asset,
   side: types.Side,
-  triggerOrderIndex: number,
-  triggerOrderInfo: PublicKey,
+  triggerOrderBit: number,
+  triggerOrder: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
@@ -1622,8 +1622,8 @@ export async function executeTriggerOrder(
     instructions.executeTriggerOrderIx(
       asset,
       side,
-      triggerOrderIndex,
-      triggerOrderInfo,
+      triggerOrderBit,
+      triggerOrder,
       marginAccount,
       openOrders,
       whitelistTradingFeesAccount

@@ -1051,10 +1051,10 @@ export class CrossClient {
     return txId;
   }
 
-  public findAvailableTriggerOrderIndex(): number {
+  public findAvailableTriggerOrderBit(): number {
     for (var i = 0; i < 128; i++) {
       let mask: BN = new BN(1).shln(i); // 1 << i
-      if (this.account.triggerOrderIndexes.and(mask).isZero()) {
+      if (this.account.triggerOrderBits.and(mask).isZero()) {
         return i;
       }
     }
@@ -1069,7 +1069,7 @@ export class CrossClient {
     side: types.Side,
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(side)
   ): Promise<TransactionSignature> {
-    let triggerOrderIndex = this.findAvailableTriggerOrderIndex();
+    let triggerOrderBit = this.findAvailableTriggerOrderBit();
 
     let openOrdersPda = null;
     let assetIndex = assets.assetToIndex(asset);
@@ -1100,7 +1100,7 @@ export class CrossClient {
         orderPrice,
         triggerPrice,
         options.triggerDirection,
-        triggerOrderIndex,
+        triggerOrderBit,
         size,
         side,
         options.orderType != undefined
@@ -1129,7 +1129,7 @@ export class CrossClient {
   }
 
   public async cancelTriggerOrder(orderIndex: number) {
-    let triggerAccount = utils.getTriggerOrderInfo(
+    let triggerAccount = utils.getTriggerOrder(
       Exchange.programId,
       this._accountAddress,
       new Uint8Array([orderIndex])
@@ -1162,7 +1162,7 @@ export class CrossClient {
       newSide
     )
   ) {
-    let triggerAccount = utils.getTriggerOrderInfo(
+    let triggerAccount = utils.getTriggerOrder(
       Exchange.programId,
       this._accountAddress,
       new Uint8Array([orderIndex])
@@ -2153,14 +2153,14 @@ export class CrossClient {
 
     this._orders = ordersByAsset;
 
-    let triggerOrderIndexes = [];
+    let triggerOrderBits = [];
 
     // Do this sequentially so the indexes remain in order
     // Therefore sequential updateOrders() calls won't jumble the order of this._triggerOrders
     for (var i = 0; i < 128; i++) {
       let mask: BN = new BN(1).shln(i); // 1 << i
-      if (!this.account.triggerOrderIndexes.and(mask).isZero()) {
-        triggerOrderIndexes.push(i);
+      if (!this.account.triggerOrderBits.and(mask).isZero()) {
+        triggerOrderBits.push(i);
       }
     }
 
@@ -2172,9 +2172,9 @@ export class CrossClient {
       })
     );
 
-    let triggerOrderInfoAddresses = triggerOrderIndexes.map(
+    let triggerOrderAddresses = triggerOrderBits.map(
       (index) =>
-        utils.getTriggerOrderInfo(
+        utils.getTriggerOrder(
           Exchange.programId,
           this.accountAddress,
           new Uint8Array([index])
@@ -2183,21 +2183,19 @@ export class CrossClient {
 
     for (
       let i = 0;
-      i < triggerOrderInfoAddresses.length;
+      i < triggerOrderAddresses.length;
       i += constants.MAX_ACCOUNTS_TO_FETCH
     ) {
-      let addressSlice = triggerOrderInfoAddresses.slice(
+      let addressSlice = triggerOrderAddresses.slice(
         i,
         i + constants.MAX_ACCOUNTS_TO_FETCH
       );
 
       let fetchedSlice =
-        await Exchange.program.account.triggerOrderInfo.fetchMultiple(
-          addressSlice
-        );
+        await Exchange.program.account.triggerOrder.fetchMultiple(addressSlice);
 
       let fetchedSliceDecoded = fetchedSlice.map(
-        (order) => order as programTypes.TriggerOrderInfo
+        (order) => order as programTypes.TriggerOrder
       );
 
       triggerOrders = triggerOrders.concat(fetchedSliceDecoded);
@@ -2216,7 +2214,7 @@ export class CrossClient {
         side: types.fromProgramSide(rawOrder.side),
         asset: assets.fromProgramAsset(rawOrder.asset),
         orderType: types.fromProgramOrderType(rawOrder.orderType),
-        triggerOrderIndex: triggerOrderIndexes[i],
+        triggerOrderBit: triggerOrderBits[i],
       } as types.TriggerOrder;
 
       triggerOrdersByAsset.get(order.asset).push(order);

@@ -529,7 +529,7 @@ export function placeTriggerOrderIx(
   orderPrice: number,
   triggerPrice: number,
   triggerDirection: types.TriggerDirection,
-  triggerOrderIndex: number,
+  triggerOrderBit: number,
   size: number,
   side: types.Side,
   orderType: types.OrderType,
@@ -540,10 +540,10 @@ export function placeTriggerOrderIx(
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
 ): TransactionInstruction {
-  let [triggerOrderInfo, _nonce] = utils.getTriggerOrderInfo(
+  let [triggerOrder, _nonce] = utils.getTriggerOrder(
     Exchange.programId,
     marginAccount,
-    Uint8Array.from([triggerOrderIndex])
+    Uint8Array.from([triggerOrderBit])
   );
 
   let remainingAccounts =
@@ -557,7 +557,7 @@ export function placeTriggerOrderIx(
         ]
       : [];
   return Exchange.program.instruction.placeTriggerOrder(
-    triggerOrderIndex,
+    triggerOrderBit,
     new anchor.BN(orderPrice),
     new anchor.BN(triggerPrice),
     types.toProgramTriggerDirection(triggerDirection),
@@ -574,7 +574,7 @@ export function placeTriggerOrderIx(
         authority: authority,
         marginAccount: marginAccount,
         pricing: Exchange.pricingAddress,
-        triggerOrderInfo: triggerOrderInfo,
+        triggerOrder: triggerOrder,
         systemProgram: SystemProgram.programId,
         dexProgram: constants.DEX_PID[Exchange.network],
         market: Exchange.getPerpMarket(asset).serumMarket.address,
@@ -586,8 +586,8 @@ export function placeTriggerOrderIx(
 export function executeTriggerOrderIx(
   asset: Asset,
   side: types.Side,
-  triggerOrderIndex: number,
-  triggerOrderInfo: PublicKey,
+  triggerOrderBit: number,
+  triggerOrder: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey,
   whitelistTradingFeesAccount: PublicKey | undefined
@@ -604,10 +604,10 @@ export function executeTriggerOrderIx(
         ]
       : [];
 
-  return Exchange.program.instruction.executeTriggerOrder(triggerOrderIndex, {
+  return Exchange.program.instruction.executeTriggerOrder(triggerOrderBit, {
     accounts: {
       admin: Exchange.state.secondaryAdmin,
-      triggerOrderInfo: triggerOrderInfo,
+      triggerOrder: triggerOrder,
       placeOrderAccounts: {
         state: Exchange.stateAddress,
         pricing: Exchange.pricingAddress,
@@ -649,17 +649,17 @@ export function executeTriggerOrderIx(
   });
 }
 export function cancelTriggerOrderIx(
-  triggerOrderIndex: number,
+  triggerOrderBit: number,
   payer: PublicKey,
-  triggerOrderInfo: PublicKey,
+  triggerOrder: PublicKey,
   marginAccount: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.cancelTriggerOrder(triggerOrderIndex, {
+  return Exchange.program.instruction.cancelTriggerOrder(triggerOrderBit, {
     accounts: {
       state: Exchange.stateAddress,
       payer: payer,
       admin: Exchange.state.secondaryAdmin,
-      triggerOrderInfo: triggerOrderInfo,
+      triggerOrder: triggerOrder,
       marginAccount: marginAccount,
     },
   });
@@ -673,7 +673,7 @@ export function editTriggerOrderIx(
   newOrderType: types.OrderType,
   newClientOrderId: number,
   owner: PublicKey,
-  triggerOrderInfo: PublicKey
+  triggerOrder: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.editTriggerOrder(
     new anchor.BN(newOrderPrice),
@@ -686,7 +686,7 @@ export function editTriggerOrderIx(
     {
       accounts: {
         owner: owner,
-        triggerOrderInfo: triggerOrderInfo,
+        triggerOrder: triggerOrder,
       },
     }
   );
