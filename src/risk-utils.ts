@@ -7,7 +7,7 @@ import {
   MarginAccount,
   ProductLedger,
 } from "./program-types";
-import { getProductLedger } from "./utils";
+import { getProductLedger, convertNativeBNToDecimal } from "./utils";
 
 export function collectRiskMaps(
   imMap: Map<Asset, Number>,
@@ -107,10 +107,19 @@ export function calculateFutureMargin(
   asset: Asset,
   spotPrice: number
 ): types.MarginRequirement {
-  let subExchange = Exchange.getSubExchange(asset);
-  let initial = spotPrice * subExchange.marginParams.futureMarginInitial;
+  let assetIndex = assets.assetToIndex(asset);
+  let initial =
+    spotPrice *
+    convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assetIndex].futureMarginInitial,
+      constants.MARGIN_PRECISION
+    );
   let maintenance =
-    spotPrice * subExchange.marginParams.futureMarginMaintenance;
+    spotPrice *
+    convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assetIndex].futureMarginMaintenance,
+      constants.MARGIN_PRECISION
+    );
   return {
     initialLong: initial,
     initialShort: initial,
