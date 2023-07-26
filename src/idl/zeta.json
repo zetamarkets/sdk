@@ -9374,6 +9374,11 @@
       "code": 6144,
       "name": "MarginAccountCannotLiquidateCrossMarginAccount",
       "msg": "MarginAccount cannot liquidate CrossMarginAccount"
+    },
+    {
+      "code": 6145,
+      "name": "InvalidDexAccOwner",
+      "msg": "Invalid owner for dex account"
     }
   ]
 }
