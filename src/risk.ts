@@ -655,7 +655,6 @@ export class RiskCalculator {
     tradeSide: types.Side,
     tradePrice: number,
     bufferPercent: number = 5,
-    executionPrices: Map<Asset, number | undefined> = undefined,
     addTakerFees: boolean = false
   ): number {
     let stateMarkPrice = this.getCrossMarginAccountState(
@@ -663,6 +662,9 @@ export class RiskCalculator {
       undefined, // uPnL for margin calcs uses mark price
       addTakerFees
     );
+
+    let executionPrices = new Map();
+    executionPrices.set(tradeAsset, tradePrice);
 
     let stateExecutionPrice = this.getCrossMarginAccountState(
       marginAccount,
