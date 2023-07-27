@@ -416,8 +416,8 @@ export function defaultTriggerOrderOptions(side: Side): TriggerOrderOptions {
   return {
     triggerDirection:
       side == Side.BID
-        ? TriggerDirection.GREATERTHANOREQUAL
-        : TriggerDirection.LESSTHANOREQUAL,
+        ? TriggerDirection.LESSTHANOREQUAL
+        : TriggerDirection.GREATERTHANOREQUAL,
     orderType: OrderType.FILLORKILL,
     clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,
