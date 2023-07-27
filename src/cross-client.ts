@@ -838,15 +838,8 @@ export class CrossClient {
     );
   }
 
-  public getAccountState(
-    pnlExecutionPrices: Map<Asset, number | undefined> = undefined,
-    pnlAddTakerFees: boolean = false
-  ): types.CrossMarginAccountState {
-    return Exchange.riskCalculator.getCrossMarginAccountState(
-      this._account,
-      pnlExecutionPrices,
-      pnlAddTakerFees
-    );
+  public getAccountState(): types.CrossMarginAccountState {
+    return Exchange.riskCalculator.getCrossMarginAccountState(this._account);
   }
 
   /**
