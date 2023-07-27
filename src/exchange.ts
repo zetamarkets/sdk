@@ -1089,6 +1089,26 @@ export class Exchange {
     }
   }
 
+  public async adminCancelTriggerOrder(
+    orderIndex: number,
+    crossMarginAccount: PublicKey
+  ) {
+    let triggerAccount = utils.getTriggerOrder(
+      this.programId,
+      crossMarginAccount,
+      new Uint8Array([orderIndex])
+    )[0];
+    let tx = new Transaction().add(
+      instructions.cancelTriggerOrderIx(
+        orderIndex,
+        this._provider.wallet.publicKey,
+        triggerAccount,
+        crossMarginAccount
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
   public updateMarginParams(asset: Asset) {
     this.getSubExchange(asset).updateMarginParams();
   }
