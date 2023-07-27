@@ -109,6 +109,12 @@ export function toProductKind(kind: Object): Kind {
   throw Error("Invalid product type");
 }
 
+export interface LiquidityCheckInfo {
+  validLiquidity: boolean;
+  avgPrice: number;
+  worstPrice: number;
+}
+
 export interface Order {
   marketIndex: number;
   market: PublicKey;

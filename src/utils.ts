@@ -1710,3 +1710,81 @@ export function median(arr: number[]): number | undefined {
   const mid = Math.floor(s.length / 2);
   return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
 }
+
+export const checkLiquidity = (
+  size: number,
+  asset: Asset,
+  orderbook?: types.DepthOrderbook
+): types.LiquidityCheckInfo => {
+  const side = size > 0 ? types.Side.BID : types.Side.ASK;
+  // We default to min lot size to still show a price
+  const absSize = !size ? constants.MIN_LOT_SIZE : Math.abs(size);
+  const orderbookSide =
+    side === types.Side.ASK ? orderbook.bids : orderbook.asks;
+
+  // Invalid order
+  if (!orderbookSide || !orderbookSide.length) {
+    return { validLiquidity: false, avgPrice: 0, worstPrice: 0 };
+  }
+
+  let validLiquidity = false;
+  // Size seen on the orderbook that satisfies the specified price
+  let seenSize = 0;
+  // The cumulative trade value for the seen size
+  let cumAmount = 0;
+  // The price of the worst orderbook level that will statisfy the request size entirely
+  let worstPrice = 0;
+  for (let i = 0; i < orderbookSide.length; i++) {
+    const orderbookLevel = orderbookSide[i];
+    const isWithinSlippge = checkWithinSlippageTolerance(
+      orderbookLevel.price,
+      side,
+      asset,
+      orderbook
+    );
+
+    if (!isWithinSlippge) {
+      // If not within slippage break early, not a valid market order
+      break;
+    }
+
+    // Size remaining to fill from orderbook
+    const sizeRemaining = absSize - seenSize;
+    // We can satify our size requirements without taking the entire level's size
+    const sizeToFill = Math.min(sizeRemaining, orderbookLevel.size);
+
+    seenSize += sizeToFill;
+    cumAmount += sizeToFill * orderbookLevel.price;
+    worstPrice = orderbookLevel.price;
+    validLiquidity = seenSize >= absSize;
+
+    // Size requirements satified
+    if (validLiquidity) break;
+  }
+  // Average price across all the seen levels
+  const avgPrice = cumAmount / seenSize || Exchange.getMarkPrice(asset);
+
+  return { validLiquidity, avgPrice, worstPrice };
+};
+
+const checkWithinSlippageTolerance = (
+  price: number,
+  side: types.Side,
+  asset: Asset,
+  orderbook: types.DepthOrderbook
+): boolean => {
+  const spotPrice = Exchange.getMarkPrice(asset);
+
+  const orderbookMidpoint =
+    !orderbook.asks.length || !orderbook.bids.length
+      ? undefined
+      : (orderbook.asks[0].price + orderbook.bids[0].price) / 2;
+  const markPrice = orderbookMidpoint || spotPrice;
+
+  if (side === types.Side.BID && price < markPrice) return true;
+  if (side === types.Side.ASK && price > markPrice) return true;
+
+  const maxSlippage = constants.PERP_MARKET_ORDER_SPOT_SLIPPAGE * markPrice;
+
+  return Math.abs(price - markPrice) <= Math.abs(maxSlippage);
+};
