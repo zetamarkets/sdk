@@ -218,24 +218,24 @@ export class RiskCalculator {
         continue;
       }
 
-      let subExchange = Exchange.getSubExchange(asset);
+      let price = executionPrice
+        ? executionPrice
+        : Exchange.getMarkPrice(asset);
       if (size > 0) {
         assetPnl +=
-          convertNativeLotSizeToDecimal(size) *
-            (executionPrice ? executionPrice : subExchange.getMarkPrice()) -
+          convertNativeLotSizeToDecimal(size) * price -
           convertNativeBNToDecimal(position.costOfTrades);
       } else {
         assetPnl +=
-          convertNativeLotSizeToDecimal(size) *
-            (executionPrice ? executionPrice : subExchange.getMarkPrice()) +
+          convertNativeLotSizeToDecimal(size) * price +
           convertNativeBNToDecimal(position.costOfTrades);
       }
       if (addTakerFees) {
         assetPnl -=
           convertNativeLotSizeToDecimal(Math.abs(size)) *
+          price *
           (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
-            100) *
-          subExchange.getMarkPrice();
+            100);
       }
       upnlMap.set(asset, assetPnl);
       pnl += assetPnl;
