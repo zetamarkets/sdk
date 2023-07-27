@@ -1714,7 +1714,7 @@ export function median(arr: number[]): number | undefined {
 export const checkLiquidity = (
   size: number,
   asset: Asset,
-  orderbook?: types.DepthOrderbook
+  orderbook: types.DepthOrderbook
 ): types.LiquidityCheckInfo => {
   const side = size > 0 ? types.Side.BID : types.Side.ASK;
   // We default to min lot size to still show a price
