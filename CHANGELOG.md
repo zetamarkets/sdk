@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.5.0] 2023-07-25
 
+- Clean up some risk calculations under the hood. ([#255](https://github.com/zetamarkets/sdk/pull/255))
 - Add fee to TradeEventV3. ([#253](https://github.com/zetamarkets/sdk/pull/253))
 - Add header to event queue fetch. ([#250](https://github.com/zetamarkets/sdk/pull/250))
 

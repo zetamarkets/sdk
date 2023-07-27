@@ -94,11 +94,6 @@ export class SubExchange {
   }
   private _perpSyncQueueAddress: PublicKey;
 
-  public get marginParams(): types.MarginParams {
-    return this._marginParams;
-  }
-  private _marginParams: types.MarginParams;
-
   public get halted(): boolean {
     return Exchange.state.haltStates[assetToIndex(this._asset)].halted;
   }
@@ -151,7 +146,6 @@ export class SubExchange {
     }
 
     this._perpSyncQueue = fetchedAccs[0] as PerpSyncQueue;
-    this.updateMarginParams();
 
     this._markets = await ZetaGroupMarkets.load(
       asset,
@@ -607,24 +601,6 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  public updateMarginParams() {
-    if (Exchange.pricing === undefined) {
-      return;
-    }
-    this._marginParams = {
-      futureMarginInitial: utils.convertNativeBNToDecimal(
-        Exchange.pricing.marginParameters[assetToIndex(this._asset)]
-          .futureMarginInitial,
-        constants.MARGIN_PRECISION
-      ),
-      futureMarginMaintenance: utils.convertNativeBNToDecimal(
-        Exchange.pricing.marginParameters[assetToIndex(this._asset)]
-          .futureMarginMaintenance,
-        constants.MARGIN_PRECISION
-      ),
-    };
   }
 
   /**
