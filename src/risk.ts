@@ -67,7 +67,7 @@ export class RiskCalculator {
     );
   }
 
-  public calculateMarginRequirement(
+  private calculateMarginRequirement(
     marginRequirement: types.MarginRequirement,
     size: number,
     marginType: types.MarginType
@@ -123,8 +123,9 @@ export class RiskCalculator {
   ): Map<Asset, number>;
 
   /**
-   * Returns the unpaid funding for a given margin account.
-   * @param account the user's spread (returns 0) or margin account.
+   * Returns the unpaid funding for a given margin or crossmargin account.
+   * @param account The MarginAccount or CrossMarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateUnpaidFunding(
     account: any,
@@ -177,28 +178,74 @@ export class RiskCalculator {
     }
   }
 
-  public calculateUnrealizedPnl(
+  public estimateRealizedPnl(
     account: MarginAccount,
     accountType: types.ProgramAccountType,
-    executionPrice: Map<Asset, number | undefined>,
-    addTakerFees: boolean
+    executionInfo: { asset: Asset; price: number; addTakerFees: boolean }
+  ): number;
+  public estimateRealizedPnl(
+    account: CrossMarginAccount,
+    accountType: types.ProgramAccountType,
+    executionInfo: { asset: Asset; price: number; addTakerFees: boolean }
+  ): Map<Asset, number>;
+  /**
+   * Calculates the estimated realized PnL of the account by passing in an execution price and using taker fees
+   * @param account The MarginAccount or CrossMarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   * @param executionInfo Information about how the PnL is hypothetically realised - execution price, asset and whether to add fees
+   */
+  public estimateRealizedPnl(
+    account: any,
+    accountType: types.ProgramAccountType = types.ProgramAccountType
+      .MarginAccount,
+    executionInfo: { asset: Asset; price: number; addTakerFees: boolean }
+  ): any {
+    return this.calculatePnl(account, accountType, executionInfo);
+  }
+
+  public calculateUnrealizedPnl(
+    account: MarginAccount,
+    accountType: types.ProgramAccountType
   ): number;
   public calculateUnrealizedPnl(
     account: CrossMarginAccount,
-    accountType: types.ProgramAccountType,
-    executionPrice: Map<Asset, number | undefined>,
-    addTakerFees: boolean
+    accountType: types.ProgramAccountType
   ): Map<Asset, number>;
+
   /**
-   * Returns the unrealized pnl for a given margin or spread account.
-   * @param account the user's spread or margin account.
+   * Calculates the unrealised PnL of the account, marking all positions to the markPrice
+   * @param account The MarginAccount or CrossMarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateUnrealizedPnl(
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
+      .MarginAccount
+  ): any {
+    return this.calculatePnl(account, accountType, undefined);
+  }
+
+  private calculatePnl(
+    account: MarginAccount,
+    accountType: types.ProgramAccountType,
+    executionInfo:
+      | { asset: Asset; price: number; addTakerFees: boolean }
+      | undefined
+  ): number;
+  private calculatePnl(
+    account: CrossMarginAccount,
+    accountType: types.ProgramAccountType,
+    executionInfo:
+      | { asset: Asset; price: number; addTakerFees: boolean }
+      | undefined
+  ): Map<Asset, number>;
+  private calculatePnl(
+    account: any,
+    accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
-    executionPrice: Map<Asset, number | undefined> = undefined,
-    addTakerFees: boolean = false
+    executionInfo:
+      | { asset: Asset; price: number; addTakerFees: boolean }
+      | undefined = undefined
   ): any {
     let pnl = 0;
 
@@ -245,8 +292,8 @@ export class RiskCalculator {
 
       let subExchange = Exchange.getSubExchange(asset);
       let price =
-        executionPrice && executionPrice.get(asset)
-          ? executionPrice.get(asset)
+        executionInfo && executionInfo.asset == asset
+          ? executionInfo.price
           : subExchange.getMarkPrice();
       if (size > 0) {
         assetPnl +=
@@ -257,7 +304,11 @@ export class RiskCalculator {
           convertNativeLotSizeToDecimal(size) * price +
           convertNativeBNToDecimal(position.costOfTrades);
       }
-      if (addTakerFees) {
+      if (
+        executionInfo &&
+        executionInfo.asset == asset &&
+        executionInfo.addTakerFees
+      ) {
         assetPnl -=
           convertNativeLotSizeToDecimal(Math.abs(size)) *
           (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
@@ -289,7 +340,8 @@ export class RiskCalculator {
    * Returns the total initial margin requirement for a given account.
    * This includes initial margin on positions which is used for
    * Place order, withdrawal and force cancels
-   * @param marginAccount   the user's MarginAccount.
+   * @param account the user's margin or crossmargin account.
+   * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateTotalInitialMargin(
     account: any,
@@ -382,8 +434,8 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account.
    * This only uses maintenance margin on positions and is used for
    * liquidations.
-   * @param asset           underlying asset type
-   * @param marginAccount   the user's MarginAccount.
+   * @param account the user's margin or crossmargin account.
+   * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateTotalMaintenanceMargin(
     account: any,
@@ -440,8 +492,8 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account including orders.
    * This calculates maintenance margin across all positions and orders.
    * This value is used to determine margin when sending a closing order only.
-   * @param asset           underlying asset type
-   * @param marginAccount   the user's MarginAccount.
+   * @param account the user's margin or crossmargin account.
+   * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateTotalMaintenanceMarginIncludingOrders(
     account: any,
@@ -506,20 +558,16 @@ export class RiskCalculator {
 
   /**
    * Returns the aggregate margin account state.
-   * @param crossMarginAccount   the user's CrossMarginAccount.
+   * @param marginAccount   the user's CrossMarginAccount.
    */
   public getCrossMarginAccountState(
-    marginAccount: CrossMarginAccount,
-    pnlExecutionPrice: Map<Asset, number | undefined> = undefined,
-    pnlAddTakerFees: boolean = false
+    marginAccount: CrossMarginAccount
   ): types.CrossMarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let accType = types.ProgramAccountType.CrossMarginAccount;
     let unrealizedPnl = this.calculateUnrealizedPnl(
       marginAccount,
-      accType,
-      pnlExecutionPrice,
-      pnlAddTakerFees
+      accType
     ) as Map<Asset, number>;
     let unpaidFunding = this.calculateUnpaidFunding(
       marginAccount,
@@ -601,16 +649,12 @@ export class RiskCalculator {
    * @param marginAccount   the user's MarginAccount.
    */
   public getMarginAccountState(
-    marginAccount: MarginAccount,
-    pnlExecutionPrice: Map<Asset, number | undefined> = undefined,
-    pnlAddTakerFees: boolean = false
+    marginAccount: MarginAccount
   ): types.MarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let unrealizedPnl = this.calculateUnrealizedPnl(
       marginAccount,
-      types.ProgramAccountType.MarginAccount,
-      pnlExecutionPrice,
-      pnlAddTakerFees
+      types.ProgramAccountType.MarginAccount
     ) as number;
     let unpaidFunding = this.calculateUnpaidFunding(
       marginAccount,
@@ -649,28 +693,47 @@ export class RiskCalculator {
     };
   }
 
+  /**
+   * Find the maximum size a user is allowed to trade, given the position they're currently in
+   * @param marginAccount The user's CrossMarginAccount itself
+   * @param tradeAsset The asset being traded
+   * @param tradeSide The side (bid/ask) being traded
+   * @param tradePrice The price the user wishes to execute at
+   * @param bufferPercent An added buffer on top of the final result, so that quick price movements don't immediately make you hit leverage limits
+   * @param addTakerFees Whether to account for taker fees or not in the estimations
+   * @returns
+   */
   public getMaxTradeSize(
     marginAccount: CrossMarginAccount,
     tradeAsset: constants.Asset,
     tradeSide: types.Side,
     tradePrice: number,
     bufferPercent: number = 5,
-    addTakerFees: boolean = false
+    addTakerFees: boolean = true
   ): number {
-    let stateMarkPrice = this.getCrossMarginAccountState(
-      marginAccount,
-      undefined, // uPnL for margin calcs uses mark price
-      addTakerFees
-    );
+    let state = this.getCrossMarginAccountState(marginAccount);
 
     let executionPrices = new Map();
     executionPrices.set(tradeAsset, tradePrice);
 
-    let stateExecutionPrice = this.getCrossMarginAccountState(
-      marginAccount,
-      executionPrices, // Use actual price when we care about realising the uPnL
-      addTakerFees
-    );
+    let estimatedPnl = Array.from(
+      this.estimateRealizedPnl(
+        marginAccount,
+        types.ProgramAccountType.CrossMarginAccount,
+        { asset: tradeAsset, price: tradePrice, addTakerFees: addTakerFees }
+      ).values()
+    ).reduce((a, b) => a + b, 0);
+    let realizedBalanceInit =
+      state.balance +
+      estimatedPnl +
+      state.unpaidFundingTotal -
+      state.initialMarginTotal;
+
+    let realizedBalanceMaintInclOrders =
+      state.balance +
+      estimatedPnl +
+      state.unpaidFundingTotal -
+      state.maintenanceMarginIncludingOrdersTotal;
 
     let fee = addTakerFees
       ? (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
@@ -683,8 +746,16 @@ export class RiskCalculator {
         .size
     );
     let positionAbs = Math.abs(position);
-    let init = Exchange.getMarginParams(tradeAsset).futureMarginInitial;
-    let maint = Exchange.getMarginParams(tradeAsset).futureMarginMaintenance;
+    let init = convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
+        .futureMarginInitial,
+      constants.MARGIN_PRECISION
+    );
+    let maint = convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
+        .futureMarginMaintenance,
+      constants.MARGIN_PRECISION
+    );
     let markPrice = Exchange.getMarkPrice(tradeAsset);
     let extraUPNLPerLot =
       tradeSide == types.Side.BID
@@ -697,17 +768,15 @@ export class RiskCalculator {
     // state.availableBalanceInitial + X*extraUPNLPerLot - X*init*markPrice - X*fee > 0
     // X < state.availableBalanceInitial / (init*markPrice + fee - extraUPNLPerLot)
     let openSize =
-      stateMarkPrice.availableBalanceInitial /
+      state.availableBalanceInitial /
       (init * markPrice + fee - extraUPNLPerLot);
 
     // (currentBalance + currentUPNL + unpaid funding - currentMMIO) + extraMMIO - fees > 0
-    // stateExecutionPrice.availableBalanceMaintenanceIncludingOrders + extraMMIO - fees > 0
+    // realizedBalanceMaintInclOrders + extraMMIO - fees > 0
     // Where X is the number of extra lots:
-    // stateExecutionPrice.availableBalanceMaintenanceIncludingOrders + X*maint*markPrice - X*fee > 0
-    // X < stateExecutionPrice.availableBalanceMaintenanceIncludingOrders / (fee - maint*markPrice)
-    let closeSize =
-      stateExecutionPrice.availableBalanceMaintenanceIncludingOrders /
-      (fee - maint * markPrice);
+    // realizedBalanceMaintInclOrders + X*maint*markPrice - X*fee > 0
+    // X < realizedBalanceMaintInclOrders / (fee - maint*markPrice)
+    let closeSize = realizedBalanceMaintInclOrders / (fee - maint * markPrice);
 
     // Equation falls apart if there is no positive X, means that you can close your position entirely
     if (closeSize <= 0 || closeSize >= positionAbs) {
@@ -715,17 +784,16 @@ export class RiskCalculator {
     }
 
     // (currentBalance + currentUPNL + unpaid funding - currentIM) + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
-    // stateExecutionPrice.availableBalanceInitial + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
+    // realizedBalanceInit + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
     // Where X is the number of extra lots opened on the other side:
-    // stateExecutionPrice.availableBalanceInitial + position*init*markPrice - X*init*markPrice + X*extraUPNLPerLot - X*fee > 0
-    // X < (stateExecutionPrice.availableBalanceInitial + position*init*markPrice) / (init*markPrice + fee - extraUPNLPerLot)
+    // realizedBalanceInit + position*init*markPrice - X*init*markPrice + X*extraUPNLPerLot - X*fee > 0
+    // X < (realizedBalanceInit + position*init*markPrice) / (init*markPrice + fee - extraUPNLPerLot)
 
     let closeOpenSize = closeSize;
     if (closeSize == positionAbs) {
       closeOpenSize =
         positionAbs +
-        (stateExecutionPrice.availableBalanceInitial +
-          positionAbs * init * markPrice) /
+        (realizedBalanceInit + positionAbs * init * markPrice) /
           (init * markPrice + fee - extraUPNLPerLot);
     }
 
