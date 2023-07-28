@@ -1101,7 +1101,7 @@ export class CrossClient {
       side,
       triggerPrice,
       triggerDirection,
-      0,
+      new anchor.BN(0),
       options
     );
   }
@@ -1202,7 +1202,27 @@ export class CrossClient {
     );
   }
 
-  public async editTriggerOrder(
+  public async editTimestampTriggerOrder(
+    orderIndex: number,
+    newOrderPrice: number,
+    newTriggerTime: anchor.BN,
+    newSize: number,
+    newSide: types.Side,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
+  ) {
+    await this.editTriggerOrder(
+      orderIndex,
+      newOrderPrice,
+      newSize,
+      newSide,
+      0,
+      types.TriggerDirection.UNINITIALIZED,
+      newTriggerTime,
+      newOptions
+    );
+  }
+
+  public async editPriceTriggerOrder(
     orderIndex: number,
     newOrderPrice: number,
     newTriggerPrice: number,
@@ -1212,6 +1232,30 @@ export class CrossClient {
     newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
       newSide
     )
+  ) {
+    await this.editTriggerOrder(
+      orderIndex,
+      newOrderPrice,
+      newSize,
+      newSide,
+      newTriggerPrice,
+      newDirection,
+      new anchor.BN(0),
+      newOptions
+    );
+  }
+
+  private async editTriggerOrder(
+    orderIndex: number,
+    newOrderPrice: number,
+    newSize: number,
+    newSide: types.Side,
+    newTriggerPrice: number,
+    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      newSide
+    ),
+    newTriggerTimestamp: anchor.BN,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     let triggerAccount = utils.getTriggerOrder(
       Exchange.programId,
@@ -1223,7 +1267,7 @@ export class CrossClient {
         newOrderPrice,
         newTriggerPrice,
         newDirection,
-        0,
+        newTriggerTimestamp,
         newSize,
         newSide,
         newOptions.orderType != undefined
@@ -2267,9 +2311,7 @@ export class CrossClient {
         triggerDirection: rawOrder.triggerDirection
           ? types.fromProgramTriggerDirection(rawOrder.triggerDirection)
           : null,
-        triggerTimestamp: rawOrder.triggerTimestamp
-          ? rawOrder.triggerTimestamp.toNumber()
-          : null,
+        triggerTimestamp: rawOrder.triggerTs ? rawOrder.triggerTs : null,
         side: types.fromProgramSide(rawOrder.side),
         asset: assets.fromProgramAsset(rawOrder.asset),
         orderType: types.fromProgramOrderType(rawOrder.orderType),

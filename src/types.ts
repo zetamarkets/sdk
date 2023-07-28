@@ -173,7 +173,7 @@ export interface TriggerOrder {
   clientOrderId: number;
   creationTs: number;
   triggerDirection: TriggerDirection | null;
-  triggerTimestamp: number | null;
+  triggerTimestamp: anchor.BN | null;
   side: Side;
   asset: Asset;
   orderType: OrderType;

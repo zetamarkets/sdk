@@ -672,7 +672,7 @@ export function editTriggerOrderIx(
   newOrderPrice: number,
   newTriggerPrice: number,
   newTriggerDirection: types.TriggerDirection,
-  newTriggerTimestamp: number,
+  newTriggerTimestamp: anchor.BN,
   newSize: number,
   newSide: types.Side,
   newOrderType: types.OrderType,
