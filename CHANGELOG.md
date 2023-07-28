@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.6.1] 2023-07-28
+
+- estimateRealizedPnl now returns the PnL for just the closed position ([#256](https://github.com/zetamarkets/sdk/pull/256))
+
 ## [1.6.0] 2023-07-25
 
 - Add getMaxTradeSize() and getLiquidationPrice() to risk calcs. ([#252](https://github.com/zetamarkets/sdk/pull/252))
