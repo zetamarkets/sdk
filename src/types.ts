@@ -405,19 +405,20 @@ export interface OrderOptions {
 }
 
 export interface TriggerOrderOptions {
-  triggerDirection: TriggerDirection;
   orderType?: types.OrderType;
   clientOrderId?: number;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
 }
 
-export function defaultTriggerOrderOptions(side: Side): TriggerOrderOptions {
+export function getDefaultTriggerDirection(side: Side): TriggerDirection {
+  return side == Side.BID
+    ? TriggerDirection.LESSTHANOREQUAL
+    : TriggerDirection.GREATERTHANOREQUAL;
+}
+
+export function defaultTriggerOrderOptions(): TriggerOrderOptions {
   return {
-    triggerDirection:
-      side == Side.BID
-        ? TriggerDirection.LESSTHANOREQUAL
-        : TriggerDirection.GREATERTHANOREQUAL,
     orderType: OrderType.FILLORKILL,
     clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,

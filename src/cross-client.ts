@@ -1061,13 +1061,62 @@ export class CrossClient {
     throw Error("No space for a new trigger order. Delete some and try again.");
   }
 
-  public async placeTriggerOrder(
+  // A trigger order that will fire at a certain unix timestamp
+  public async placeTimestampTriggerOrder(
+    asset: Asset,
+    orderPrice: number,
+    triggerTime: anchor.BN,
+    size: number,
+    side: types.Side,
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
+  ): Promise<TransactionSignature> {
+    return await this.placeTriggerOrder(
+      asset,
+      orderPrice,
+      size,
+      side,
+      0,
+      types.TriggerDirection.UNINITIALIZED,
+      triggerTime,
+      options
+    );
+  }
+
+  // A trigger order that will fire when markPrice passes triggerPrice in triggerDirection
+  public async placePriceTriggerOrder(
     asset: Asset,
     orderPrice: number,
     triggerPrice: number,
     size: number,
     side: types.Side,
-    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(side)
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
+    triggerDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      side
+    )
+  ): Promise<TransactionSignature> {
+    return await this.placeTriggerOrder(
+      asset,
+      orderPrice,
+      size,
+      side,
+      triggerPrice,
+      triggerDirection,
+      0,
+      options
+    );
+  }
+
+  private async placeTriggerOrder(
+    asset: Asset,
+    orderPrice: number,
+    size: number,
+    side: types.Side,
+    triggerPrice: number,
+    triggerDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      side
+    ),
+    triggerTimestamp: anchor.BN,
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ): Promise<TransactionSignature> {
     let triggerOrderBit = this.findAvailableTriggerOrderBit();
 
@@ -1099,8 +1148,8 @@ export class CrossClient {
         asset,
         orderPrice,
         triggerPrice,
-        options.triggerDirection,
-        0,
+        triggerDirection,
+        triggerTimestamp,
         triggerOrderBit,
         size,
         side,
@@ -1159,7 +1208,8 @@ export class CrossClient {
     newTriggerPrice: number,
     newSize: number,
     newSide: types.Side,
-    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
+    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
       newSide
     )
   ) {
@@ -1172,7 +1222,7 @@ export class CrossClient {
       instructions.editTriggerOrderIx(
         newOrderPrice,
         newTriggerPrice,
-        newOptions.triggerDirection,
+        newDirection,
         0,
         newSize,
         newSide,

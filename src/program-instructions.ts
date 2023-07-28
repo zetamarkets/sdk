@@ -529,7 +529,7 @@ export function placeTriggerOrderIx(
   orderPrice: number,
   triggerPrice: number,
   triggerDirection: types.TriggerDirection,
-  triggerTimestamp: number,
+  triggerTimestamp: anchor.BN,
   triggerOrderBit: number,
   size: number,
   side: types.Side,
@@ -564,7 +564,7 @@ export function placeTriggerOrderIx(
     triggerDirection == types.TriggerDirection.UNINITIALIZED
       ? null
       : types.toProgramTriggerDirection(triggerDirection),
-    triggerTimestamp == 0 ? null : new anchor.BN(triggerTimestamp),
+    triggerTimestamp == 0 ? null : triggerTimestamp,
     new anchor.BN(size),
     types.toProgramSide(side),
     types.toProgramOrderType(orderType),
