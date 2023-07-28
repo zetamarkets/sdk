@@ -178,16 +178,6 @@ export class RiskCalculator {
     }
   }
 
-  public estimateRealizedPnl(
-    account: MarginAccount,
-    accountType: types.ProgramAccountType,
-    executionInfo: { asset: Asset; price: number; addTakerFees: boolean }
-  ): number;
-  public estimateRealizedPnl(
-    account: CrossMarginAccount,
-    accountType: types.ProgramAccountType,
-    executionInfo: { asset: Asset; price: number; addTakerFees: boolean }
-  ): Map<Asset, number>;
   /**
    * Calculates the estimated realized PnL of the account by passing in an execution price and using taker fees
    * @param account The MarginAccount or CrossMarginAccount itself
@@ -199,8 +189,24 @@ export class RiskCalculator {
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
     executionInfo: { asset: Asset; price: number; addTakerFees: boolean }
-  ): any {
-    return this.calculatePnl(account, accountType, executionInfo);
+  ): number {
+    // Number for MarginAccount, Map for CrossMarginAccount
+    if (accountType == types.ProgramAccountType.CrossMarginAccount) {
+      let pnl = this.calculatePnl(
+        account as CrossMarginAccount,
+        accountType,
+        executionInfo
+      );
+      return Array.from(pnl.values()).reduce((a, b) => a + b, 0);
+    } else if (accountType == types.ProgramAccountType.MarginAccount) {
+      return this.calculatePnl(
+        account as MarginAccount,
+        accountType,
+        executionInfo
+      );
+    }
+
+    return 0;
   }
 
   public calculateUnrealizedPnl(
@@ -716,13 +722,11 @@ export class RiskCalculator {
     let executionPrices = new Map();
     executionPrices.set(tradeAsset, tradePrice);
 
-    let estimatedPnl = Array.from(
-      this.estimateRealizedPnl(
-        marginAccount,
-        types.ProgramAccountType.CrossMarginAccount,
-        { asset: tradeAsset, price: tradePrice, addTakerFees: addTakerFees }
-      ).values()
-    ).reduce((a, b) => a + b, 0);
+    let estimatedPnl = this.estimateRealizedPnl(
+      marginAccount,
+      types.ProgramAccountType.CrossMarginAccount,
+      { asset: tradeAsset, price: tradePrice, addTakerFees: addTakerFees }
+    );
     let realizedBalanceInit =
       state.balance +
       estimatedPnl +
