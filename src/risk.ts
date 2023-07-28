@@ -179,7 +179,7 @@ export class RiskCalculator {
   }
 
   /**
-   * Calculates the estimated realized PnL of the account by passing in an execution price and using taker fees
+   * Calculates the estimated realized PnL of the position by passing in an execution price and using taker fees
    * @param account The MarginAccount or CrossMarginAccount itself
    * @param accountType MarginAccount or CrossMarginAccount
    * @param executionInfo Information about how the PnL is hypothetically realised - execution price, asset and whether to add fees
@@ -197,7 +197,7 @@ export class RiskCalculator {
         accountType,
         executionInfo
       );
-      return Array.from(pnl.values()).reduce((a, b) => a + b, 0);
+      return pnl.get(executionInfo.asset);
     } else if (accountType == types.ProgramAccountType.MarginAccount) {
       return this.calculatePnl(
         account as MarginAccount,
@@ -722,11 +722,14 @@ export class RiskCalculator {
     let executionPrices = new Map();
     executionPrices.set(tradeAsset, tradePrice);
 
-    let estimatedPnl = this.estimateRealizedPnl(
-      marginAccount,
-      types.ProgramAccountType.CrossMarginAccount,
-      { asset: tradeAsset, price: tradePrice, addTakerFees: addTakerFees }
-    );
+    let estimatedPnl = Array.from(
+      this.calculatePnl(
+        marginAccount,
+        types.ProgramAccountType.CrossMarginAccount,
+        { asset: tradeAsset, price: tradePrice, addTakerFees: addTakerFees }
+      ).values()
+    ).reduce((a, b) => a + b, 0);
+
     let realizedBalanceInit =
       state.balance +
       estimatedPnl +
