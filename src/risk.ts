@@ -726,7 +726,7 @@ export class RiskCalculator {
       this.calculatePnl(
         marginAccount,
         types.ProgramAccountType.CrossMarginAccount,
-        { asset: tradeAsset, price: tradePrice, addTakerFees: addTakerFees }
+        { asset: tradeAsset, price: tradePrice, addTakerFees }
       ).values()
     ).reduce((a, b) => a + b, 0);
 
