@@ -399,6 +399,7 @@ export function fromProgramOrderCompleteType(
 export interface OrderOptions {
   tifOptions: TIFOptions;
   orderType?: types.OrderType;
+  reduceOnly?: boolean;
   clientOrderId?: number;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
@@ -406,6 +407,7 @@ export interface OrderOptions {
 
 export interface TriggerOrderOptions {
   orderType?: types.OrderType;
+  reduceOnly?: boolean;
   clientOrderId?: number;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
@@ -420,6 +422,7 @@ export function getDefaultTriggerDirection(side: Side): TriggerDirection {
 export function defaultTriggerOrderOptions(): TriggerOrderOptions {
   return {
     orderType: OrderType.FILLORKILL,
+    reduceOnly: false,
     clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,
@@ -443,6 +446,7 @@ export function defaultOrderOptions(): OrderOptions {
       expiryTs: undefined,
     },
     orderType: OrderType.LIMIT,
+    reduceOnly: false,
     clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,

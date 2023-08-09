@@ -251,6 +251,7 @@ export interface TriggerOrder {
   side: any; // enum Side
   asset: any; // enum Asset
   orderType: any; // enum OrderType
+  reduceOnly: boolean;
 }
 
 export interface PerpSyncQueue {

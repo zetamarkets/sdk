@@ -1019,7 +1019,7 @@ export class CrossClient {
 
     let tifOffsetToUse = utils.getTIFOffset(market, options.tifOptions);
 
-    let orderIx = instructions.placePerpOrderV3Ix(
+    let orderIx = instructions.placePerpOrderV4Ix(
       asset,
       price,
       size,
@@ -1027,6 +1027,7 @@ export class CrossClient {
       options.orderType != undefined
         ? options.orderType
         : types.OrderType.LIMIT,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
@@ -1156,6 +1157,7 @@ export class CrossClient {
         options.orderType != undefined
           ? options.orderType
           : types.OrderType.FILLORKILL,
+        options.reduceOnly != undefined ? options.reduceOnly : false,
         options.clientOrderId != undefined ? options.clientOrderId : 0,
         options.tag,
         this.accountAddress,
@@ -1273,6 +1275,7 @@ export class CrossClient {
         newOptions.orderType != undefined
           ? newOptions.orderType
           : types.OrderType.FILLORKILL,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         this._provider.wallet.publicKey,
         triggerAccount
@@ -1471,7 +1474,7 @@ export class CrossClient {
     let market = Exchange.getPerpMarket(asset);
     let tifOffset = utils.getTIFOffset(market, options.tifOptions);
 
-    return instructions.placePerpOrderV3Ix(
+    return instructions.placePerpOrderV4Ix(
       asset,
       price,
       size,
@@ -1479,6 +1482,7 @@ export class CrossClient {
       options.orderType != undefined
         ? options.orderType
         : types.OrderType.LIMIT,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffset,
@@ -1590,7 +1594,7 @@ export class CrossClient {
     let tifOffsetToUse = utils.getTIFOffset(market, options.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -1598,6 +1602,7 @@ export class CrossClient {
         options.orderType != undefined
           ? options.orderType
           : types.OrderType.LIMIT,
+        options.reduceOnly != undefined ? options.reduceOnly : false,
         options.clientOrderId != undefined ? options.clientOrderId : 0,
         options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
         tifOffsetToUse,
@@ -1654,7 +1659,7 @@ export class CrossClient {
     let tifOffsetToUse = utils.getTIFOffset(market, newOptions.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -1662,6 +1667,7 @@ export class CrossClient {
         newOptions.orderType != undefined
           ? newOptions.orderType
           : types.OrderType.LIMIT,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         newOptions.tag != undefined
           ? newOptions.tag
@@ -1721,7 +1727,7 @@ export class CrossClient {
     let tifOffsetToUse = utils.getTIFOffset(market, newOptions.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -1729,6 +1735,7 @@ export class CrossClient {
         newOptions.orderType != undefined
           ? newOptions.orderType
           : types.OrderType.LIMIT,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         newOptions.tag != undefined
           ? newOptions.tag
