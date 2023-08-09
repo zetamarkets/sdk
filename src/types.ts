@@ -177,6 +177,7 @@ export interface TriggerOrder {
   side: Side;
   asset: Asset;
   orderType: OrderType;
+  reduceOnly: boolean;
   triggerOrderBit: number;
 }
 

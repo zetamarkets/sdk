@@ -2322,6 +2322,7 @@ export class CrossClient {
         side: types.fromProgramSide(rawOrder.side),
         asset: assets.fromProgramAsset(rawOrder.asset),
         orderType: types.fromProgramOrderType(rawOrder.orderType),
+        reduceOnly: rawOrder.reduceOnly,
         triggerOrderBit: triggerOrderBits[i],
       } as types.TriggerOrder;
 
