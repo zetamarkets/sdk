@@ -5,9 +5,9 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.6.1] 2023-07-28
+## [1.6.1] 2023-08-09
 
-- estimateRealizedPnl now returns the PnL for just the closed position ([#256](https://github.com/zetamarkets/sdk/pull/256))
+- getMaxTradeSize() now simulates all positions and orders correctly. ([#256](https://github.com/zetamarkets/sdk/pull/256))
 
 ## [1.6.0] 2023-07-25
 
