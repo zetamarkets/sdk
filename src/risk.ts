@@ -787,7 +787,6 @@ export class RiskCalculator {
       constants.MARGIN_PRECISION
     );
     let markPrice = Exchange.getMarkPrice(tradeAsset);
-    let markPriceNative = convertDecimalToNativeInteger(markPrice);
 
     // If only closing the existing position -> Special case using MaintenanceMarginIncludingOrders
     // (currentBalance + currentUPNL + unpaid funding - currentMMIO) + extraMMIO - fees > 0
@@ -871,7 +870,7 @@ export class RiskCalculator {
           new anchor.BN(tradeSide == types.Side.BID ? sizeNative : -sizeNative)
         );
         editedAccount.balance = editedAccount.balance.sub(
-          new anchor.BN(convertDecimalToNativeInteger(fee * size))
+          new anchor.BN(convertDecimalToNativeInteger(fee * size, 1))
         );
 
         // If we're just adding to costOfTrades
@@ -880,7 +879,7 @@ export class RiskCalculator {
           (tradeSide == types.Side.ASK && currentSize < 0)
         ) {
           editedPosition.costOfTrades = editedPosition.costOfTrades.add(
-            new anchor.BN(size * convertDecimalToNativeInteger(tradePrice))
+            new anchor.BN(size * convertDecimalToNativeInteger(tradePrice, 1))
           );
 
           let openIndex = tradeSide == types.Side.BID ? 1 : 0;
@@ -900,7 +899,7 @@ export class RiskCalculator {
               convertNativeLotSizeToDecimal(Math.abs(currentSize))
           );
           let priceDiff = entryPrice.sub(
-            new anchor.BN(convertDecimalToNativeInteger(tradePrice))
+            new anchor.BN(convertDecimalToNativeInteger(tradePrice, 1))
           );
           editedAccount.balance = editedAccount.balance.add(
             new anchor.BN(tradeSide == types.Side.BID ? size : -size).mul(
@@ -932,7 +931,7 @@ export class RiskCalculator {
                 convertNativeLotSizeToDecimal(Math.abs(currentSize))
             );
             let priceDiff = entryPrice.sub(
-              new anchor.BN(convertDecimalToNativeInteger(tradePrice))
+              new anchor.BN(convertDecimalToNativeInteger(tradePrice, 1))
             );
             editedAccount.balance = editedAccount.balance.add(
               new anchor.BN(
@@ -946,7 +945,7 @@ export class RiskCalculator {
           editedPosition.costOfTrades = new anchor.BN(
             convertNativeLotSizeToDecimal(
               Math.abs(editedPosition.size.toNumber())
-            ) * convertDecimalToNativeInteger(tradePrice)
+            ) * convertDecimalToNativeInteger(tradePrice, 1)
           );
 
           let sameSide = tradeSide == types.Side.BID ? 0 : 1;
@@ -979,7 +978,7 @@ export class RiskCalculator {
           tradeSide == types.Side.BID ? pnlAdjustment : -pnlAdjustment
         );
         editedAccount.balance = editedAccount.balance.add(
-          new anchor.BN(convertDecimalToNativeInteger(pnlAdjustment))
+          new anchor.BN(convertDecimalToNativeInteger(pnlAdjustment, 1))
         );
 
         // If we're just adding an extra order on the same side as the existing position
