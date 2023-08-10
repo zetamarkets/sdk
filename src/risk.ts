@@ -892,8 +892,9 @@ export class RiskCalculator {
         }
         // If we're just reducing the current position
         else if (sizeNative < Math.abs(currentSize)) {
-          let entryPrice = editedPosition.costOfTrades.div(
-            new anchor.BN(convertNativeLotSizeToDecimal(Math.abs(currentSize)))
+          let entryPrice = new anchor.BN(
+            editedPosition.costOfTrades.toNumber() /
+              convertNativeLotSizeToDecimal(Math.abs(currentSize))
           );
           let priceDiff = entryPrice.sub(
             new anchor.BN(convertDecimalToNativeInteger(tradePrice))
@@ -906,8 +907,8 @@ export class RiskCalculator {
 
           editedPosition.costOfTrades = editedPosition.costOfTrades.sub(
             editedPosition.costOfTrades
-              .div(currentSizeBN.abs())
               .mul(new anchor.BN(sizeNative))
+              .div(currentSizeBN.abs())
           );
 
           let openIndex = tradeSide == types.Side.BID ? 0 : 1;
@@ -923,10 +924,9 @@ export class RiskCalculator {
         // If we're zeroing out the current position and opening a position on the other side
         else {
           if (Math.abs(currentSize) > 0) {
-            let entryPrice = editedPosition.costOfTrades.div(
-              new anchor.BN(
+            let entryPrice = new anchor.BN(
+              editedPosition.costOfTrades.toNumber() /
                 convertNativeLotSizeToDecimal(Math.abs(currentSize))
-              )
             );
             let priceDiff = entryPrice.sub(
               new anchor.BN(convertDecimalToNativeInteger(tradePrice))
