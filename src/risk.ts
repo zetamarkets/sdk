@@ -638,7 +638,10 @@ export class RiskCalculator {
     let availableBalanceInitial: number =
       balance + upnlTotal + unpaidFundingTotal - imTotal;
     let availableBalanceWithdrawable: number =
-      balance + upnlTotal + unpaidFundingTotal - imSkipConcessionTotal;
+      balance +
+      Math.min(0, upnlTotal) +
+      unpaidFundingTotal -
+      imSkipConcessionTotal;
     let availableBalanceMaintenance: number =
       balance + upnlTotal + unpaidFundingTotal - mmTotal;
     let availableBalanceMaintenanceIncludingOrders: number =
