@@ -1714,11 +1714,12 @@ export function median(arr: number[]): number | undefined {
 export const checkLiquidity = (
   size: number,
   asset: Asset,
+  side: types.Side,
   orderbook: types.DepthOrderbook
 ): types.LiquidityCheckInfo => {
-  const side = size > 0 ? types.Side.BID : types.Side.ASK;
   // We default to min lot size to still show a price
-  const absSize = !size ? constants.MIN_LOT_SIZE : Math.abs(size);
+  const fillSize = size || constants.MIN_LOT_SIZE;
+
   const orderbookSide =
     side === types.Side.ASK ? orderbook.bids : orderbook.asks;
 
@@ -1749,14 +1750,14 @@ export const checkLiquidity = (
     }
 
     // Size remaining to fill from orderbook
-    const sizeRemaining = absSize - seenSize;
+    const sizeRemaining = fillSize - seenSize;
     // We can satify our size requirements without taking the entire level's size
     const sizeToFill = Math.min(sizeRemaining, orderbookLevel.size);
 
     seenSize += sizeToFill;
     cumAmount += sizeToFill * orderbookLevel.price;
     worstPrice = orderbookLevel.price;
-    validLiquidity = seenSize >= absSize;
+    validLiquidity = seenSize >= fillSize;
 
     // Size requirements satified
     if (validLiquidity) break;
