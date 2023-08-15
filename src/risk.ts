@@ -844,11 +844,24 @@ export class RiskCalculator {
 
       // Couldn't find a suitable size
       if (iteration > maxIterations) {
-        return Math.max(closeSize, ((100 - bufferPercent) / 100) * size);
+        return Math.max(
+          closeSize,
+          Math.floor(
+            10 ** constants.POSITION_PRECISION *
+              ((100 - bufferPercent) / 100) *
+              size
+          ) /
+            10 ** constants.POSITION_PRECISION
+        );
       }
 
       if (size < 0.001) {
-        return Math.max(closeSize, 0);
+        return (
+          Math.floor(
+            10 ** constants.POSITION_PRECISION * Math.max(closeSize, 0)
+          ) /
+          10 ** constants.POSITION_PRECISION
+        );
       }
 
       editedAccount.productLedgers[assetIndex].position =
@@ -1020,7 +1033,15 @@ export class RiskCalculator {
         buffer > 0 &&
         newState.balance > 0
       ) {
-        return Math.max(closeSize, ((100 - bufferPercent) / 100) * size);
+        return Math.max(
+          closeSize,
+          Math.floor(
+            10 ** constants.POSITION_PRECISION *
+              ((100 - bufferPercent) / 100) *
+              size
+          ) /
+            10 ** constants.POSITION_PRECISION
+        );
       } else if (newState.availableBalanceInitial < 0) {
         sizeUpperBound = size;
         size = (sizeLowerBound + size) / 2;
