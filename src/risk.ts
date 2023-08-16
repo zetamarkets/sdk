@@ -856,13 +856,12 @@ export class RiskCalculator {
       }
 
       if (size < 0.001) {
-        return (
-          Math.floor(
-            10 ** constants.POSITION_PRECISION * Math.max(closeSize, 0)
-          ) /
-          10 ** constants.POSITION_PRECISION
-        );
+        return Math.max(closeSize, 0);
       }
+
+      size =
+        Math.floor(10 ** constants.POSITION_PRECISION * size) /
+        10 ** constants.POSITION_PRECISION;
 
       editedAccount.productLedgers[assetIndex].position =
         cloneDeep(currentPosition);
