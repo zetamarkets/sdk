@@ -5,6 +5,18 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.6.0] 2023-07-25
+
+- Add getMaxTradeSize() and getLiquidationPrice() to risk calcs. ([#252](https://github.com/zetamarkets/sdk/pull/252))
+- Reformat pnl into estimateRealizedPnl() and calculateUnrealizedPnl(), using function overloads ([#252](https://github.com/zetamarkets/sdk/pull/252))
+- Add checkLiquidity() util function to find the best price in the orderbook for a given size. ([#252](https://github.com/zetamarkets/sdk/pull/252))
+
+## [1.5.0] 2023-07-25
+
+- Clean up some risk calculations under the hood. ([#255](https://github.com/zetamarkets/sdk/pull/255))
+- Add fee to TradeEventV3. ([#253](https://github.com/zetamarkets/sdk/pull/253))
+- Add header to event queue fetch. ([#250](https://github.com/zetamarkets/sdk/pull/250))
+
 ## [1.4.4] 2023-07-14
 
 - Mark authority as mutable in CloseCrossMarginAccountManager. ([#249](https://github.com/zetamarkets/sdk/pull/249))

@@ -160,17 +160,25 @@ export function decodeRequestQueue(buffer: Buffer, history?: number) {
   return nodes;
 }
 
-export function decodeEventQueue(buffer: Buffer, history?: number): Event[] {
-  const { header, nodes } = decodeQueue(
+export function decodeEventQueue(
+  buffer: Buffer,
+  history?: number,
+  header?: boolean
+): Event[] | any {
+  const { header: h, nodes } = decodeQueue(
     EVENT_QUEUE_HEADER,
     EVENT,
     buffer,
     history
   );
-  if (!header.accountFlags.initialized || !header.accountFlags.eventQueue) {
+  if (!h.accountFlags.initialized || !h.accountFlags.eventQueue) {
     throw new Error("Invalid events queue");
   }
-  return nodes;
+  if (header) {
+    return h;
+  } else {
+    return nodes;
+  }
 }
 
 export const REQUEST_QUEUE_LAYOUT = {

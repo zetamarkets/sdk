@@ -9109,6 +9109,11 @@ export type Zeta = {
           "name": "sequenceNumber",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "fee",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -10051,61 +10056,66 @@ export type Zeta = {
     },
     {
       "code": 6145,
+      "name": "InvalidDexAccOwner",
+      "msg": "Invalid owner for dex account"
+    },
+    {
+      "code": 6146,
       "name": "TriggerOrderCannotBeRemoved",
       "msg": "Trigger order cannot be removed"
     },
     {
-      "code": 6146,
+      "code": 6147,
       "name": "TriggerOrderCannotBeExecuted",
       "msg": "Trigger order cannot be executed"
     },
     {
-      "code": 6147,
+      "code": 6148,
       "name": "TriggerOrderOnlySupportsCrossMarginAccounts",
       "msg": "Trigger order only supports CrossMarginAccounts"
     },
     {
-      "code": 6148,
+      "code": 6149,
       "name": "TooManyTriggerOrders",
       "msg": "Too many trigger orders, close some and retry"
     },
     {
-      "code": 6149,
+      "code": 6150,
       "name": "InvalidTriggerOrderRemainingAccounts",
       "msg": "Invalid trigger order remaining accounts"
     },
     {
-      "code": 6150,
+      "code": 6151,
       "name": "InvalidTriggerOrderWhitelistFeesAccount",
       "msg": "Invalid trigger order whitelist fees account"
     },
     {
-      "code": 6151,
+      "code": 6152,
       "name": "MissingTriggerOrderWhitelistFeesAccount",
       "msg": "Missing trigger order whitelist fees account"
     },
     {
-      "code": 6152,
+      "code": 6153,
       "name": "InvalidTriggerOrderBitRange",
       "msg": "Invalid trigger order bit range"
     },
     {
-      "code": 6153,
+      "code": 6154,
       "name": "InvalidSecondaryAdmin",
       "msg": "Invalid secondary admin"
     },
     {
-      "code": 6154,
+      "code": 6155,
       "name": "OnlyOwnerCanEditTriggerOrder",
       "msg": "Only the owner can edit their own trigger order"
     },
     {
-      "code": 6155,
+      "code": 6156,
       "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
       "msg": "Trigger order needs either a trigger price + direction, or trigger time"
     },
     {
-      "code": 6156,
+      "code": 6157,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
     }
@@ -19223,6 +19233,11 @@ export const IDL: Zeta = {
           "name": "sequenceNumber",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "fee",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -20165,61 +20180,66 @@ export const IDL: Zeta = {
     },
     {
       "code": 6145,
+      "name": "InvalidDexAccOwner",
+      "msg": "Invalid owner for dex account"
+    },
+    {
+      "code": 6146,
       "name": "TriggerOrderCannotBeRemoved",
       "msg": "Trigger order cannot be removed"
     },
     {
-      "code": 6146,
+      "code": 6147,
       "name": "TriggerOrderCannotBeExecuted",
       "msg": "Trigger order cannot be executed"
     },
     {
-      "code": 6147,
+      "code": 6148,
       "name": "TriggerOrderOnlySupportsCrossMarginAccounts",
       "msg": "Trigger order only supports CrossMarginAccounts"
     },
     {
-      "code": 6148,
+      "code": 6149,
       "name": "TooManyTriggerOrders",
       "msg": "Too many trigger orders, close some and retry"
     },
     {
-      "code": 6149,
+      "code": 6150,
       "name": "InvalidTriggerOrderRemainingAccounts",
       "msg": "Invalid trigger order remaining accounts"
     },
     {
-      "code": 6150,
+      "code": 6151,
       "name": "InvalidTriggerOrderWhitelistFeesAccount",
       "msg": "Invalid trigger order whitelist fees account"
     },
     {
-      "code": 6151,
+      "code": 6152,
       "name": "MissingTriggerOrderWhitelistFeesAccount",
       "msg": "Missing trigger order whitelist fees account"
     },
     {
-      "code": 6152,
+      "code": 6153,
       "name": "InvalidTriggerOrderBitRange",
       "msg": "Invalid trigger order bit range"
     },
     {
-      "code": 6153,
+      "code": 6154,
       "name": "InvalidSecondaryAdmin",
       "msg": "Invalid secondary admin"
     },
     {
-      "code": 6154,
+      "code": 6155,
       "name": "OnlyOwnerCanEditTriggerOrder",
       "msg": "Only the owner can edit their own trigger order"
     },
     {
-      "code": 6155,
+      "code": 6156,
       "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
       "msg": "Trigger order needs either a trigger price + direction, or trigger time"
     },
     {
-      "code": 6156,
+      "code": 6157,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
     }

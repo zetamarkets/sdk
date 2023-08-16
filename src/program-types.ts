@@ -376,6 +376,7 @@ export interface TradeEventV3 {
   user: PublicKey;
   isTaker: boolean;
   sequenceNumber: anchor.BN; // Unique id for the given market
+  fee: anchor.BN;
 }
 
 export interface PositionMovementEvent {

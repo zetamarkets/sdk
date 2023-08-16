@@ -273,6 +273,13 @@ export class Market {
     return decodeEventQueue(data);
   }
 
+  async loadEventQueueHeader(connection: Connection) {
+    const { data } = throwIfNull(
+      await connection.getAccountInfo(this._decoded.eventQueue)
+    );
+    return decodeEventQueue(data, undefined, true);
+  }
+
   private get _baseSplTokenMultiplier() {
     return new BN(10).pow(new BN(this._baseSplTokenDecimals));
   }

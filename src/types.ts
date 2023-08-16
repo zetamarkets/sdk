@@ -150,6 +150,12 @@ export function toProductKind(kind: Object): Kind {
   throw Error("Invalid product type");
 }
 
+export interface LiquidityCheckInfo {
+  validLiquidity: boolean;
+  avgPrice: number;
+  worstPrice: number;
+}
+
 export interface Order {
   marketIndex: number;
   market: PublicKey;
@@ -269,6 +275,7 @@ export interface AssetRiskState {
   initialMargin: number;
   initialMarginSkipConcession: number;
   maintenanceMargin: number;
+  maintenanceMarginIncludingOrders: number;
   unrealizedPnl: number;
   unpaidFunding: number;
 }
@@ -277,11 +284,13 @@ export interface CrossMarginAccountState {
   balance: number;
   availableBalanceInitial: number;
   availableBalanceMaintenance: number;
+  availableBalanceMaintenanceIncludingOrders: number;
   availableBalanceWithdrawable: number;
   assetState: Map<Asset, AssetRiskState>;
   initialMarginTotal: number;
   initalMarginSkipConcessionTotal: number;
   maintenanceMarginTotal: number;
+  maintenanceMarginIncludingOrdersTotal: number;
   unrealizedPnlTotal: number;
   unpaidFundingTotal: number;
 }

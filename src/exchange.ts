@@ -950,10 +950,6 @@ export class Exchange {
     await this.getSubExchange(asset).updatePricingParameters(args);
   }
 
-  public getMarginParams(asset: Asset) {
-    return this.getSubExchange(asset).marginParams;
-  }
-
   public async updateMarginParameters(
     asset: Asset,
     args: instructions.UpdateMarginParametersArgs
@@ -1107,10 +1103,6 @@ export class Exchange {
       )
     );
     return await utils.processTransaction(this._provider, tx);
-  }
-
-  public updateMarginParams(asset: Asset) {
-    this.getSubExchange(asset).updateMarginParams();
   }
 
   public async halt(asset: Asset) {
