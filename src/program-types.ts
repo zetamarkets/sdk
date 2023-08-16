@@ -240,7 +240,6 @@ export interface TriggerOrder {
   owner: PublicKey;
   marginAccount: PublicKey;
   openOrders: PublicKey;
-  whitelistTradingFeesAccount: PublicKey;
   orderPrice: anchor.BN;
   triggerPrice: anchor.BN | null; // Option<u64>
   triggerTs: anchor.BN | null; // Option<u64>

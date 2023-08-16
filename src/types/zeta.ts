@@ -7340,10 +7340,6 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "whitelistTradingFeesAccount",
-            "type": "publicKey"
-          },
-          {
             "name": "orderPrice",
             "type": "u64"
           },
@@ -10071,51 +10067,46 @@ export type Zeta = {
     },
     {
       "code": 6148,
-      "name": "TriggerOrderOnlySupportsCrossMarginAccounts",
-      "msg": "Trigger order only supports CrossMarginAccounts"
-    },
-    {
-      "code": 6149,
       "name": "TooManyTriggerOrders",
       "msg": "Too many trigger orders, close some and retry"
     },
     {
-      "code": 6150,
+      "code": 6149,
       "name": "InvalidTriggerOrderRemainingAccounts",
       "msg": "Invalid trigger order remaining accounts"
     },
     {
-      "code": 6151,
+      "code": 6150,
       "name": "InvalidTriggerOrderWhitelistFeesAccount",
       "msg": "Invalid trigger order whitelist fees account"
     },
     {
-      "code": 6152,
+      "code": 6151,
       "name": "MissingTriggerOrderWhitelistFeesAccount",
       "msg": "Missing trigger order whitelist fees account"
     },
     {
-      "code": 6153,
+      "code": 6152,
       "name": "InvalidTriggerOrderBitRange",
       "msg": "Invalid trigger order bit range"
     },
     {
-      "code": 6154,
+      "code": 6153,
       "name": "InvalidSecondaryAdmin",
       "msg": "Invalid secondary admin"
     },
     {
-      "code": 6155,
+      "code": 6154,
       "name": "OnlyOwnerCanEditTriggerOrder",
       "msg": "Only the owner can edit their own trigger order"
     },
     {
-      "code": 6156,
+      "code": 6155,
       "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
       "msg": "Trigger order needs either a trigger price + direction, or trigger time"
     },
     {
-      "code": 6157,
+      "code": 6156,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
     }
@@ -17464,10 +17455,6 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "whitelistTradingFeesAccount",
-            "type": "publicKey"
-          },
-          {
             "name": "orderPrice",
             "type": "u64"
           },
@@ -20195,51 +20182,46 @@ export const IDL: Zeta = {
     },
     {
       "code": 6148,
-      "name": "TriggerOrderOnlySupportsCrossMarginAccounts",
-      "msg": "Trigger order only supports CrossMarginAccounts"
-    },
-    {
-      "code": 6149,
       "name": "TooManyTriggerOrders",
       "msg": "Too many trigger orders, close some and retry"
     },
     {
-      "code": 6150,
+      "code": 6149,
       "name": "InvalidTriggerOrderRemainingAccounts",
       "msg": "Invalid trigger order remaining accounts"
     },
     {
-      "code": 6151,
+      "code": 6150,
       "name": "InvalidTriggerOrderWhitelistFeesAccount",
       "msg": "Invalid trigger order whitelist fees account"
     },
     {
-      "code": 6152,
+      "code": 6151,
       "name": "MissingTriggerOrderWhitelistFeesAccount",
       "msg": "Missing trigger order whitelist fees account"
     },
     {
-      "code": 6153,
+      "code": 6152,
       "name": "InvalidTriggerOrderBitRange",
       "msg": "Invalid trigger order bit range"
     },
     {
-      "code": 6154,
+      "code": 6153,
       "name": "InvalidSecondaryAdmin",
       "msg": "Invalid secondary admin"
     },
     {
-      "code": 6155,
+      "code": 6154,
       "name": "OnlyOwnerCanEditTriggerOrder",
       "msg": "Only the owner can edit their own trigger order"
     },
     {
-      "code": 6156,
+      "code": 6155,
       "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
       "msg": "Trigger order needs either a trigger price + direction, or trigger time"
     },
     {
-      "code": 6157,
+      "code": 6156,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
     }

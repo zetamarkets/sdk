@@ -1155,8 +1155,7 @@ export class CrossClient {
         options.tag,
         this.accountAddress,
         this._provider.wallet.publicKey,
-        openOrdersPda,
-        this._whitelistTradingFeesAddress
+        openOrdersPda
       )
     );
 

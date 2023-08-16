@@ -1615,8 +1615,7 @@ export async function executeTriggerOrder(
   triggerOrderBit: number,
   triggerOrder: PublicKey,
   marginAccount: PublicKey,
-  openOrders: PublicKey,
-  whitelistTradingFeesAccount: PublicKey | undefined
+  openOrders: PublicKey
 ) {
   let tx = new Transaction().add(
     instructions.executeTriggerOrderIx(
@@ -1625,8 +1624,7 @@ export async function executeTriggerOrder(
       triggerOrderBit,
       triggerOrder,
       marginAccount,
-      openOrders,
-      whitelistTradingFeesAccount
+      openOrders
     )
   );
 

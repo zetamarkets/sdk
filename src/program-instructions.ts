@@ -543,25 +543,13 @@ export function placeTriggerOrderIx(
   tag: String,
   marginAccount: PublicKey,
   authority: PublicKey,
-  openOrders: PublicKey,
-  whitelistTradingFeesAccount: PublicKey | undefined
+  openOrders: PublicKey
 ): TransactionInstruction {
   let [triggerOrder, _nonce] = utils.getTriggerOrder(
     Exchange.programId,
     marginAccount,
     Uint8Array.from([triggerOrderBit])
   );
-
-  let remainingAccounts =
-    whitelistTradingFeesAccount !== undefined
-      ? [
-          {
-            pubkey: whitelistTradingFeesAccount,
-            isSigner: false,
-            isWritable: false,
-          },
-        ]
-      : [];
   return Exchange.program.instruction.placeTriggerOrder(
     triggerOrderBit,
     new anchor.BN(orderPrice),
@@ -589,7 +577,6 @@ export function placeTriggerOrderIx(
         dexProgram: constants.DEX_PID[Exchange.network],
         market: Exchange.getPerpMarket(asset).serumMarket.address,
       },
-      remainingAccounts,
     }
   );
 }
@@ -599,20 +586,9 @@ export function executeTriggerOrderIx(
   triggerOrderBit: number,
   triggerOrder: PublicKey,
   marginAccount: PublicKey,
-  openOrders: PublicKey,
-  whitelistTradingFeesAccount: PublicKey | undefined
+  openOrders: PublicKey
 ): TransactionInstruction {
   let marketData = Exchange.getPerpMarket(asset);
-  let remainingAccounts =
-    whitelistTradingFeesAccount !== undefined
-      ? [
-          {
-            pubkey: whitelistTradingFeesAccount,
-            isSigner: false,
-            isWritable: false,
-          },
-        ]
-      : [];
 
   return Exchange.program.instruction.executeTriggerOrder(triggerOrderBit, {
     accounts: {
@@ -655,7 +631,6 @@ export function executeTriggerOrderIx(
         perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
       },
     },
-    remainingAccounts,
   });
 }
 export function cancelTriggerOrderIx(
