@@ -307,6 +307,23 @@ export class RiskCalculator {
           ? executionInfo.size
           : position.size.toNumber();
 
+      if (
+        executionInfo &&
+        executionInfo.size != undefined &&
+        executionInfo.asset == asset &&
+        (Math.abs(size) > Math.abs(position.size.toNumber()) ||
+          (size < 0 && position.size.toNumber() > 0) ||
+          (size > 0 && position.size.toNumber() < 0))
+      ) {
+        throw Error(
+          "executionInfo.size cannot be greater than existing position, and must be on the same side"
+        );
+      }
+
+      const costOfTrades =
+        convertNativeBNToDecimal(position.costOfTrades) *
+        (size / position.size.toNumber());
+
       if (size == 0) {
         upnlMap.set(asset, 0);
         continue;
@@ -318,13 +335,9 @@ export class RiskCalculator {
           ? executionInfo.price
           : subExchange.getMarkPrice();
       if (size > 0) {
-        assetPnl +=
-          convertNativeLotSizeToDecimal(size) * price -
-          convertNativeBNToDecimal(position.costOfTrades);
+        assetPnl += convertNativeLotSizeToDecimal(size) * price - costOfTrades;
       } else {
-        assetPnl +=
-          convertNativeLotSizeToDecimal(size) * price +
-          convertNativeBNToDecimal(position.costOfTrades);
+        assetPnl += convertNativeLotSizeToDecimal(size) * price + costOfTrades;
       }
       if (
         executionInfo &&
