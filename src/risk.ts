@@ -35,10 +35,19 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Get the internal margin requirements for a perp market
+   * @param asset underlying asset type.
+   * @returns MarginRequirement object with initial and maintenance margin requirements. Values are decimals, for 1 lot.
+   */
   public getPerpMarginRequirements(asset: Asset): types.MarginRequirement {
     return this._perpMarginRequirements.get(asset);
   }
 
+  /**
+   * Update the internal margin requirements for a perp market
+   * @param asset underlying asset type.
+   */
   public updateMarginRequirements(asset: Asset) {
     if (Exchange.pricing === undefined || Exchange.oracle === undefined) {
       throw Error("Pricing is not initialized");
@@ -57,7 +66,7 @@ export class RiskCalculator {
   /**
    * Returns the margin requirement for a given market and size.
    * @param asset          underlying asset type.
-   * @param size           signed integer of size for margin requirements (short orders should be negative)
+   * @param size           signed size for margin requirements (short orders should be negative), in lots.
    * @param marginType     type of margin calculation.
    */
   public getPerpMarginRequirement(
@@ -98,10 +107,11 @@ export class RiskCalculator {
 
   /**
    * Returns the size of an order that would be considered "opening", when applied to margin requirements.
-   * Total intended trade size = closing size + opening size
-   * @param size           signed integer of size for margin requirements (short orders should be negative)
-   * @param position       signed integer the user's current position for that product (0 if none).
-   * @param closingSize    unsigned integer of the user's current closing order quantity for that product (0 if none)
+   * Total intended trade size = closing size + opening size. All arguments must use the same precision.
+   * @param size           signed number of size for margin requirements (short orders should be negative)
+   * @param position       signed number the user's current position for that product (0 if none).
+   * @param closingSize    unsigned number of the user's current closing order quantity for that product (0 if none)
+   *
    */
   public calculateOpeningSize(
     size: number,
@@ -118,10 +128,20 @@ export class RiskCalculator {
     return sideMultiplier * openingSize;
   }
 
+  /**
+   * Returns the unpaid funding for a given margin or crossmargin account.
+   * @param account The MarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnpaidFunding(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Returns the unpaid funding for a given margin or crossmargin account.
+   * @param account The CrossMarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnpaidFunding(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -187,7 +207,7 @@ export class RiskCalculator {
    * Calculates the estimated realized PnL of the position by passing in an execution price and using taker fees
    * @param account The MarginAccount or CrossMarginAccount itself
    * @param accountType MarginAccount or CrossMarginAccount
-   * @param executionInfo Information about how the PnL is hypothetically realised - execution price, asset and whether to add fees
+   * @param executionInfo Information about how the PnL is hypothetically realised. asset (Asset), price (in decimal), size (in fixed POSITION_PRECISION, signed in the same direction as the existing position you're exiting), addTakerFees (bool)
    */
   public estimateRealizedPnl(
     account: any,
@@ -219,10 +239,20 @@ export class RiskCalculator {
     return 0;
   }
 
+  /**
+   * Calculates the unrealised PnL of the account, marking all positions to the markPrice
+   * @param account The MarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnrealizedPnl(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Calculates the unrealised PnL of the account, marking all positions to the markPrice
+   * @param account The CrossMarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnrealizedPnl(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -361,11 +391,27 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Returns the total initial margin requirement for a given account.
+   * This includes initial margin on positions which is used for
+   * Place order, withdrawal and force cancels
+   * @param account The MarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   * @param skipConcession Whether to skip margin concessions or not
+   */
   public calculateTotalInitialMargin(
     account: MarginAccount,
     accountType: types.ProgramAccountType,
     skipConcession: boolean
   ): number;
+  /**
+   * Returns the total initial margin requirement for a given account.
+   * This includes initial margin on positions which is used for
+   * Place order, withdrawal and force cancels
+   * @param account The CrossMarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   * @param skipConcession Whether to skip margin concessions or not
+   */
   public calculateTotalInitialMargin(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType,
@@ -375,8 +421,9 @@ export class RiskCalculator {
    * Returns the total initial margin requirement for a given account.
    * This includes initial margin on positions which is used for
    * Place order, withdrawal and force cancels
-   * @param account the user's margin or crossmargin account.
+   * @param account The MarginAccount or CrossMarginAccount itself.
    * @param accountType MarginAccount or CrossMarginAccount
+   * @param skipConcession Whether to skip margin concessions or not
    */
   public calculateTotalInitialMargin(
     account: any,
@@ -457,10 +504,24 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Returns the total maintenance margin requirement for a given account.
+   * This only uses maintenance margin on positions and is used for
+   * liquidations.
+   * @param account The MarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMargin(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Returns the total maintenance margin requirement for a given account.
+   * This only uses maintenance margin on positions and is used for
+   * liquidations.
+   * @param account The CrossMarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMargin(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -469,7 +530,7 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account.
    * This only uses maintenance margin on positions and is used for
    * liquidations.
-   * @param account the user's margin or crossmargin account.
+   * @param account The MarginAccount or CrossMarginAccount itself.
    * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateTotalMaintenanceMargin(
@@ -515,10 +576,24 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Returns the total maintenance margin requirement for a given account including orders.
+   * This calculates maintenance margin across all positions and orders.
+   * This value is used to determine margin when sending a closing order only.
+   * @param account The MarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMarginIncludingOrders(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Returns the total maintenance margin requirement for a given account including orders.
+   * This calculates maintenance margin across all positions and orders.
+   * This value is used to determine margin when sending a closing order only.
+   * @param account The CrossMarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMarginIncludingOrders(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -527,7 +602,7 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account including orders.
    * This calculates maintenance margin across all positions and orders.
    * This value is used to determine margin when sending a closing order only.
-   * @param account the user's margin or crossmargin account.
+   * @param account The MarginAccount or CrossMarginAccount itself.
    * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateTotalMaintenanceMarginIncludingOrders(
@@ -732,15 +807,18 @@ export class RiskCalculator {
   }
 
   /**
-   * Find the maximum size a user is allowed to trade, given the position they're currently in
+   * Find the maximum size a user is allowed to trade, given the position they're currently in.
+   * This function uses a binary search to approximate the largest size the user can trade.
+   * The arguments 'thresholdPercent', 'bufferPercent' and 'maxIterations' can be changed to get the right tradeoff between precision and speed.
    * @param marginAccount The user's CrossMarginAccount itself
    * @param tradeAsset The asset being traded
    * @param tradeSide The side (bid/ask) being traded
-   * @param tradePrice The price the user wishes to execute at
-   * @param thresholdPercent The ratio of availableBalanceInitial/balance at which we decide a size is good
+   * @param tradePrice The price the user wishes to execute at, in decimal USDC.
+   * @param isTaker Whether the full size is expected to trade or not. Only set this to true if the orderbook is deep enough as it may result in less conservative values.
+   * @param thresholdPercent The ratio of availableBalanceInitial/balance at which we decide a size is close enough to the maximum and can return
    * @param bufferPercent An added buffer on top of the final result, so that quick price movements don't immediately make you hit leverage limits
    * @param maxIterations The maximum amount of iterations for the binary search when finding a good size
-   * @returns
+   * @returns size in decimal, strictly >= 0
    */
   public getMaxTradeSize(
     marginAccount: CrossMarginAccount,
@@ -1066,6 +1144,13 @@ export class RiskCalculator {
     return 0;
   }
 
+  /**
+   * Find the price at which a given position will be subject to liquidation.
+   * @param asset The asset being traded
+   * @param signedPosition The signed size of the position, in decimal USDC
+   * @param marginAccount The CrossMarginAccount itself.
+   * @returns Liquidation price, in decimal USDC
+   */
   public getLiquidationPrice(
     asset: Asset,
     signedPosition: number,
