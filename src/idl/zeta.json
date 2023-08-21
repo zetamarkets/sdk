@@ -420,7 +420,7 @@
           "isSigner": false
         },
         {
-          "name": "authority",
+          "name": "signer",
           "isMut": true,
           "isSigner": true
         },
@@ -2362,7 +2362,7 @@
           "isSigner": false
         },
         {
-          "name": "authority",
+          "name": "signer",
           "isMut": true,
           "isSigner": true
         },

@@ -167,13 +167,13 @@ export function initializeMarginAccountIx(
 
 export function closeMarginAccountIx(
   asset: Asset,
-  userKey: PublicKey,
+  signer: PublicKey,
   marginAccount: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.closeMarginAccount({
     accounts: {
       marginAccount,
-      authority: userKey,
+      signer: signer,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
     },
   });
@@ -418,7 +418,7 @@ export function closeOpenOrdersV3Ix(
 
 export function closeOpenOrdersV2Ix(
   market: PublicKey,
-  userKey: PublicKey,
+  signer: PublicKey,
   marginAccount: PublicKey,
   openOrders: PublicKey
 ): TransactionInstruction {
@@ -433,7 +433,7 @@ export function closeOpenOrdersV2Ix(
       dexProgram: constants.DEX_PID[Exchange.network],
       openOrders,
       marginAccount: marginAccount,
-      authority: userKey,
+      signer: signer,
       market: market,
       serumAuthority: Exchange.serumAuthority,
       openOrdersMap,

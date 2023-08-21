@@ -12,12 +12,10 @@ import { exchange as Exchange } from "./exchange";
 import {
   CrossMarginAccount,
   CrossMarginAccountManager,
-  CrossMarginAccountInfo,
   ReferralAccount,
   ReferrerAccount,
   TradeEventV3,
   OrderCompleteEvent,
-  ProductLedger,
 } from "./program-types";
 import {
   PublicKey,
@@ -32,8 +30,6 @@ import {
 import * as types from "./types";
 import * as instructions from "./program-instructions";
 import { EventType } from "./events";
-import { Client } from "./client";
-import { SubExchange } from "./subexchange";
 import { assets, programTypes } from ".";
 
 export class CrossClient {
