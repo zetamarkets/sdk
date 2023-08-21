@@ -47,6 +47,7 @@ import { Decimal } from "./decimal";
 import { readBigInt64LE } from "./oracle-utils";
 import { assets } from ".";
 import { Network } from "./network";
+import cloneDeep from "lodash.clonedeep";
 
 export function getState(programId: PublicKey): [PublicKey, number] {
   return anchor.web3.PublicKey.findProgramAddressSync(
@@ -1789,3 +1790,9 @@ const checkWithinSlippageTolerance = (
 
   return Math.abs(price - markPrice) <= Math.abs(maxSlippage);
 };
+
+export function deepCloneCrossMarginAccount(
+  marginAccount: CrossMarginAccount
+): CrossMarginAccount {
+  return cloneDeep(marginAccount) as CrossMarginAccount;
+}

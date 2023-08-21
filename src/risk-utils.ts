@@ -324,11 +324,14 @@ export function addFakeTradeToAccount(
  * @param executionInfo A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
  * @returns
  */
-export function cloneAccountAndFakeTrade(
+export function fakeTrade(
   marginAccount: CrossMarginAccount,
+  clone: boolean,
   executionInfo?: types.ExecutionInfo
 ): CrossMarginAccount {
-  let account = cloneDeep(marginAccount) as CrossMarginAccount;
+  let account = clone
+    ? (cloneDeep(marginAccount) as CrossMarginAccount)
+    : marginAccount;
   addFakeTradeToAccount(
     account,
     executionInfo.isTaker,

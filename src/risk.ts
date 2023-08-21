@@ -15,7 +15,7 @@ import {
   addFakeTradeToAccount,
   calculateLiquidationPrice,
   calculateProductMargin,
-  cloneAccountAndFakeTrade,
+  fakeTrade,
   collectRiskMaps,
 } from "./risk-utils";
 
@@ -1021,15 +1021,17 @@ export class RiskCalculator {
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's equity after that order/trade occurs.
    * @param marginAccount The CrossMarginAccount itself
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal USDC representing the account equity
    */
   public getEquity(
     marginAccount: CrossMarginAccount,
-    executionInfo?: types.ExecutionInfo
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
   ): number {
     let account = marginAccount;
     if (executionInfo) {
-      account = cloneAccountAndFakeTrade(marginAccount, executionInfo);
+      account = fakeTrade(marginAccount, clone, executionInfo);
     }
     return this.getCrossMarginAccountState(account).equity;
   }
@@ -1038,13 +1040,16 @@ export class RiskCalculator {
    * Get an account's buying power, which is the position size you can get additional exposure to.
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's buying power after that order/trade occurs.
    * @param marginAccount The CrossMarginAccount itself
+   * @param asset The underlying for which we're estimating buying power
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal USDC representing the buying power
    */
   public getBuyingPower(
     marginAccount: CrossMarginAccount,
     asset: Asset,
-    executionInfo?: types.ExecutionInfo
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
   ): number {
     let account = marginAccount;
     let markPrice = Exchange.getMarkPrice(asset);
@@ -1055,7 +1060,7 @@ export class RiskCalculator {
     );
 
     if (executionInfo) {
-      account = cloneAccountAndFakeTrade(marginAccount, executionInfo);
+      account = fakeTrade(marginAccount, clone, executionInfo);
     }
     let state = this.getCrossMarginAccountState(account);
     let freeCollateral = state.availableBalanceInitial;
@@ -1068,15 +1073,17 @@ export class RiskCalculator {
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's margin usage after that order/trade occurs.
    * @param marginAccount The CrossMarginAccount itself
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal percentage representing margin usage.
    */
   public getMarginUsagePercent(
     marginAccount: CrossMarginAccount,
-    executionInfo?: types.ExecutionInfo
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
   ): number {
     let account = marginAccount;
     if (executionInfo) {
-      account = cloneAccountAndFakeTrade(marginAccount, executionInfo);
+      account = fakeTrade(marginAccount, clone, executionInfo);
     }
     let state = this.getCrossMarginAccountState(account);
     return 100 * (state.maintenanceMarginTotal / state.equity);
@@ -1087,15 +1094,17 @@ export class RiskCalculator {
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's free collateral after that order/trade occurs.
    * @param marginAccount The CrossMarginAccount itself
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal USDC representing the available collateral.
    */
   public getFreeCollateral(
     marginAccount: CrossMarginAccount,
-    executionInfo?: types.ExecutionInfo
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
   ): number {
     let account = marginAccount;
     if (executionInfo) {
-      account = cloneAccountAndFakeTrade(marginAccount, executionInfo);
+      account = fakeTrade(marginAccount, clone, executionInfo);
     }
     return this.getCrossMarginAccountState(account).availableBalanceInitial;
   }
@@ -1105,15 +1114,17 @@ export class RiskCalculator {
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's current leverage after that order/trade occurs.
    * @param marginAccount The CrossMarginAccount itself
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal value representing the current leverage.
    */
   public getLeverage(
     marginAccount: CrossMarginAccount,
-    executionInfo?: types.ExecutionInfo
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
   ) {
     let account = marginAccount;
     if (executionInfo) {
-      account = cloneAccountAndFakeTrade(marginAccount, executionInfo);
+      account = fakeTrade(marginAccount, clone, executionInfo);
     }
 
     // Sum up all the positions in the account
