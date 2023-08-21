@@ -320,14 +320,15 @@ export function addFakeTradeToAccount(
 
 /**
  * Simulate adding an extra position/order into an existing CrossMarginAccount, but deep copy the account first and return that deep copied account
- * @param marginAccount the (untouched) CrossMarginAccount itself
+ * @param marginAccount the CrossMarginAccount itself, untouched if clone = true
+ * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling this multiple times.
  * @param executionInfo A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
- * @returns
+ * @returns The edited CrossMarginAccount with an added trade/order
  */
 export function fakeTrade(
   marginAccount: CrossMarginAccount,
   clone: boolean,
-  executionInfo?: types.ExecutionInfo
+  executionInfo: types.ExecutionInfo
 ): CrossMarginAccount {
   let account = clone
     ? (cloneDeep(marginAccount) as CrossMarginAccount)

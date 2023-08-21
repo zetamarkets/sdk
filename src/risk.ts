@@ -1019,7 +1019,7 @@ export class RiskCalculator {
   /**
    * Get an account's equity, which is the balance including unrealized PnL and unpaid funding.
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's equity after that order/trade occurs.
-   * @param marginAccount The CrossMarginAccount itself
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal USDC representing the account equity
@@ -1039,7 +1039,7 @@ export class RiskCalculator {
   /**
    * Get an account's buying power, which is the position size you can get additional exposure to.
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's buying power after that order/trade occurs.
-   * @param marginAccount The CrossMarginAccount itself
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
    * @param asset The underlying for which we're estimating buying power
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
@@ -1071,7 +1071,7 @@ export class RiskCalculator {
   /**
    * Get an account's margin usage, which is a decimal percentage from 0 to 100 representing the percentage of equity used in maintenance margin.
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's margin usage after that order/trade occurs.
-   * @param marginAccount The CrossMarginAccount itself
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal percentage representing margin usage.
@@ -1092,7 +1092,7 @@ export class RiskCalculator {
   /**
    * Get an account's free collateral, which is the amount of available collateral the account has for trading. Equivalent to 'availableBalanceInitial'
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's free collateral after that order/trade occurs.
-   * @param marginAccount The CrossMarginAccount itself
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal USDC representing the available collateral.
@@ -1112,7 +1112,7 @@ export class RiskCalculator {
   /**
    * Get an account's current leverage
    * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's current leverage after that order/trade occurs.
-   * @param marginAccount The CrossMarginAccount itself
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @returns A decimal value representing the current leverage.
