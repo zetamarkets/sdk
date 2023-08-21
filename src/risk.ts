@@ -5,15 +5,20 @@ import { CrossMarginAccount, MarginAccount } from "./program-types";
 import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
+  convertDecimalToNativeInteger,
+  convertDecimalToNativeLotSize,
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
-import { assets, Decimal } from ".";
+import { assets, Decimal, programTypes } from ".";
 import {
   calculateLiquidationPrice,
   calculateProductMargin,
   collectRiskMaps,
 } from "./risk-utils";
+
+import * as anchor from "@zetamarkets/anchor";
+import cloneDeep from "lodash.clonedeep";
 
 export class RiskCalculator {
   private _marginRequirements: Map<Asset, Array<types.MarginRequirement>>;
@@ -30,10 +35,19 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Get the internal margin requirements for a perp market
+   * @param asset underlying asset type.
+   * @returns MarginRequirement object with initial and maintenance margin requirements. Values are decimals, for 1 lot.
+   */
   public getPerpMarginRequirements(asset: Asset): types.MarginRequirement {
     return this._perpMarginRequirements.get(asset);
   }
 
+  /**
+   * Update the internal margin requirements for a perp market
+   * @param asset underlying asset type.
+   */
   public updateMarginRequirements(asset: Asset) {
     if (Exchange.pricing === undefined || Exchange.oracle === undefined) {
       throw Error("Pricing is not initialized");
@@ -52,7 +66,7 @@ export class RiskCalculator {
   /**
    * Returns the margin requirement for a given market and size.
    * @param asset          underlying asset type.
-   * @param size           signed integer of size for margin requirements (short orders should be negative)
+   * @param size           signed size for margin requirements (short orders should be negative), in lots.
    * @param marginType     type of margin calculation.
    */
   public getPerpMarginRequirement(
@@ -93,10 +107,11 @@ export class RiskCalculator {
 
   /**
    * Returns the size of an order that would be considered "opening", when applied to margin requirements.
-   * Total intended trade size = closing size + opening size
-   * @param size           signed integer of size for margin requirements (short orders should be negative)
-   * @param position       signed integer the user's current position for that product (0 if none).
-   * @param closingSize    unsigned integer of the user's current closing order quantity for that product (0 if none)
+   * Total intended trade size = closing size + opening size. All arguments must use the same precision.
+   * @param size           signed number of size for margin requirements (short orders should be negative)
+   * @param position       signed number the user's current position for that product (0 if none).
+   * @param closingSize    unsigned number of the user's current closing order quantity for that product (0 if none)
+   *
    */
   public calculateOpeningSize(
     size: number,
@@ -113,10 +128,20 @@ export class RiskCalculator {
     return sideMultiplier * openingSize;
   }
 
+  /**
+   * Returns the unpaid funding for a given margin or crossmargin account.
+   * @param account The MarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnpaidFunding(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Returns the unpaid funding for a given margin or crossmargin account.
+   * @param account The CrossMarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnpaidFunding(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -179,16 +204,21 @@ export class RiskCalculator {
   }
 
   /**
-   * Calculates the estimated realized PnL of the account by passing in an execution price and using taker fees
+   * Calculates the estimated realized PnL of the position by passing in an execution price and using taker fees
    * @param account The MarginAccount or CrossMarginAccount itself
    * @param accountType MarginAccount or CrossMarginAccount
-   * @param executionInfo Information about how the PnL is hypothetically realised - execution price, asset and whether to add fees
+   * @param executionInfo Information about how the PnL is hypothetically realised. asset (Asset), price (in decimal), size (in fixed POSITION_PRECISION, signed in the same direction as the existing position you're exiting), addTakerFees (bool)
    */
   public estimateRealizedPnl(
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
-    executionInfo: { asset: Asset; price: number; addTakerFees: boolean }
+    executionInfo: {
+      asset: Asset;
+      price: number;
+      size: number;
+      addTakerFees: boolean;
+    }
   ): number {
     // Number for MarginAccount, Map for CrossMarginAccount
     if (accountType == types.ProgramAccountType.CrossMarginAccount) {
@@ -197,7 +227,7 @@ export class RiskCalculator {
         accountType,
         executionInfo
       );
-      return Array.from(pnl.values()).reduce((a, b) => a + b, 0);
+      return pnl.get(executionInfo.asset);
     } else if (accountType == types.ProgramAccountType.MarginAccount) {
       return this.calculatePnl(
         account as MarginAccount,
@@ -209,10 +239,20 @@ export class RiskCalculator {
     return 0;
   }
 
+  /**
+   * Calculates the unrealised PnL of the account, marking all positions to the markPrice
+   * @param account The MarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnrealizedPnl(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Calculates the unrealised PnL of the account, marking all positions to the markPrice
+   * @param account The CrossMarginAccount itself
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateUnrealizedPnl(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -235,14 +275,14 @@ export class RiskCalculator {
     account: MarginAccount,
     accountType: types.ProgramAccountType,
     executionInfo:
-      | { asset: Asset; price: number; addTakerFees: boolean }
+      | { asset: Asset; price: number; size: number; addTakerFees: boolean }
       | undefined
   ): number;
   private calculatePnl(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType,
     executionInfo:
-      | { asset: Asset; price: number; addTakerFees: boolean }
+      | { asset: Asset; price: number; size: number; addTakerFees: boolean }
       | undefined
   ): Map<Asset, number>;
   private calculatePnl(
@@ -250,7 +290,7 @@ export class RiskCalculator {
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
     executionInfo:
-      | { asset: Asset; price: number; addTakerFees: boolean }
+      | { asset: Asset; price: number; size: number; addTakerFees: boolean }
       | undefined = undefined
   ): any {
     let pnl = 0;
@@ -290,7 +330,30 @@ export class RiskCalculator {
         asset = fromProgramAsset(account.asset);
       }
 
-      const size = position.size.toNumber();
+      const size =
+        executionInfo &&
+        executionInfo.size != undefined &&
+        executionInfo.asset == asset
+          ? executionInfo.size
+          : position.size.toNumber();
+
+      if (
+        executionInfo &&
+        executionInfo.size != undefined &&
+        executionInfo.asset == asset &&
+        (Math.abs(size) > Math.abs(position.size.toNumber()) ||
+          (size < 0 && position.size.toNumber() > 0) ||
+          (size > 0 && position.size.toNumber() < 0))
+      ) {
+        throw Error(
+          "executionInfo.size cannot be greater than existing position, and must be on the same side"
+        );
+      }
+
+      const costOfTrades =
+        convertNativeBNToDecimal(position.costOfTrades) *
+        (size / position.size.toNumber());
+
       if (size == 0) {
         upnlMap.set(asset, 0);
         continue;
@@ -302,13 +365,9 @@ export class RiskCalculator {
           ? executionInfo.price
           : subExchange.getMarkPrice();
       if (size > 0) {
-        assetPnl +=
-          convertNativeLotSizeToDecimal(size) * price -
-          convertNativeBNToDecimal(position.costOfTrades);
+        assetPnl += convertNativeLotSizeToDecimal(size) * price - costOfTrades;
       } else {
-        assetPnl +=
-          convertNativeLotSizeToDecimal(size) * price +
-          convertNativeBNToDecimal(position.costOfTrades);
+        assetPnl += convertNativeLotSizeToDecimal(size) * price + costOfTrades;
       }
       if (
         executionInfo &&
@@ -332,11 +391,27 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Returns the total initial margin requirement for a given account.
+   * This includes initial margin on positions which is used for
+   * Place order, withdrawal and force cancels
+   * @param account The MarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   * @param skipConcession Whether to skip margin concessions or not
+   */
   public calculateTotalInitialMargin(
     account: MarginAccount,
     accountType: types.ProgramAccountType,
     skipConcession: boolean
   ): number;
+  /**
+   * Returns the total initial margin requirement for a given account.
+   * This includes initial margin on positions which is used for
+   * Place order, withdrawal and force cancels
+   * @param account The CrossMarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   * @param skipConcession Whether to skip margin concessions or not
+   */
   public calculateTotalInitialMargin(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType,
@@ -346,8 +421,9 @@ export class RiskCalculator {
    * Returns the total initial margin requirement for a given account.
    * This includes initial margin on positions which is used for
    * Place order, withdrawal and force cancels
-   * @param account the user's margin or crossmargin account.
+   * @param account The MarginAccount or CrossMarginAccount itself.
    * @param accountType MarginAccount or CrossMarginAccount
+   * @param skipConcession Whether to skip margin concessions or not
    */
   public calculateTotalInitialMargin(
     account: any,
@@ -428,10 +504,24 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Returns the total maintenance margin requirement for a given account.
+   * This only uses maintenance margin on positions and is used for
+   * liquidations.
+   * @param account The MarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMargin(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Returns the total maintenance margin requirement for a given account.
+   * This only uses maintenance margin on positions and is used for
+   * liquidations.
+   * @param account The CrossMarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMargin(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -440,7 +530,7 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account.
    * This only uses maintenance margin on positions and is used for
    * liquidations.
-   * @param account the user's margin or crossmargin account.
+   * @param account The MarginAccount or CrossMarginAccount itself.
    * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateTotalMaintenanceMargin(
@@ -486,10 +576,24 @@ export class RiskCalculator {
     }
   }
 
+  /**
+   * Returns the total maintenance margin requirement for a given account including orders.
+   * This calculates maintenance margin across all positions and orders.
+   * This value is used to determine margin when sending a closing order only.
+   * @param account The MarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMarginIncludingOrders(
     account: MarginAccount,
     accountType: types.ProgramAccountType
   ): number;
+  /**
+   * Returns the total maintenance margin requirement for a given account including orders.
+   * This calculates maintenance margin across all positions and orders.
+   * This value is used to determine margin when sending a closing order only.
+   * @param account The CrossMarginAccount itself.
+   * @param accountType MarginAccount or CrossMarginAccount
+   */
   public calculateTotalMaintenanceMarginIncludingOrders(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType
@@ -498,7 +602,7 @@ export class RiskCalculator {
    * Returns the total maintenance margin requirement for a given account including orders.
    * This calculates maintenance margin across all positions and orders.
    * This value is used to determine margin when sending a closing order only.
-   * @param account the user's margin or crossmargin account.
+   * @param account The MarginAccount or CrossMarginAccount itself.
    * @param accountType MarginAccount or CrossMarginAccount
    */
   public calculateTotalMaintenanceMarginIncludingOrders(
@@ -622,7 +726,10 @@ export class RiskCalculator {
     let availableBalanceInitial: number =
       balance + upnlTotal + unpaidFundingTotal - imTotal;
     let availableBalanceWithdrawable: number =
-      balance + upnlTotal + unpaidFundingTotal;
+      balance +
+      Math.min(0, upnlTotal) +
+      unpaidFundingTotal -
+      imSkipConcessionTotal;
     let availableBalanceMaintenance: number =
       balance + upnlTotal + unpaidFundingTotal - mmTotal;
     let availableBalanceMaintenanceIncludingOrders: number =
@@ -700,81 +807,79 @@ export class RiskCalculator {
   }
 
   /**
-   * Find the maximum size a user is allowed to trade, given the position they're currently in
+   * Find the maximum size a user is allowed to trade, given the position they're currently in.
+   * This function uses a binary search to approximate the largest size the user can trade.
+   * The arguments 'thresholdPercent', 'bufferPercent' and 'maxIterations' can be changed to get the right tradeoff between precision and speed.
    * @param marginAccount The user's CrossMarginAccount itself
    * @param tradeAsset The asset being traded
    * @param tradeSide The side (bid/ask) being traded
-   * @param tradePrice The price the user wishes to execute at
+   * @param tradePrice The price the user wishes to execute at, in decimal USDC.
+   * @param isTaker Whether the full size is expected to trade or not. Only set this to true if the orderbook is deep enough as it may result in less conservative values.
+   * @param thresholdPercent The ratio of availableBalanceInitial/balance at which we decide a size is close enough to the maximum and can return
    * @param bufferPercent An added buffer on top of the final result, so that quick price movements don't immediately make you hit leverage limits
-   * @param addTakerFees Whether to account for taker fees or not in the estimations
-   * @returns
+   * @param maxIterations The maximum amount of iterations for the binary search when finding a good size
+   * @returns size in decimal, strictly >= 0
    */
   public getMaxTradeSize(
     marginAccount: CrossMarginAccount,
     tradeAsset: constants.Asset,
     tradeSide: types.Side,
     tradePrice: number,
+    isTaker: boolean = true,
+    thresholdPercent: number = 1,
     bufferPercent: number = 5,
-    addTakerFees: boolean = true
+    maxIterations: number = 100
   ): number {
+    if (thresholdPercent <= 0) {
+      throw Error("thresholdPercent must be > 0");
+    }
     let state = this.getCrossMarginAccountState(marginAccount);
+    let assetIndex = assets.assetToIndex(tradeAsset);
 
-    let executionPrices = new Map();
-    executionPrices.set(tradeAsset, tradePrice);
-
-    let estimatedPnl = this.estimateRealizedPnl(
-      marginAccount,
-      types.ProgramAccountType.CrossMarginAccount,
-      { asset: tradeAsset, price: tradePrice, addTakerFees: addTakerFees }
-    );
-    let realizedBalanceInit =
-      state.balance +
-      estimatedPnl +
-      state.unpaidFundingTotal -
-      state.initialMarginTotal;
+    if (state.balance == 0) {
+      return 0;
+    }
 
     let realizedBalanceMaintInclOrders =
       state.balance +
-      estimatedPnl +
+      Array.from(
+        this.calculatePnl(
+          marginAccount,
+          types.ProgramAccountType.CrossMarginAccount,
+          {
+            asset: tradeAsset,
+            price: tradePrice,
+            size: undefined,
+            addTakerFees: isTaker,
+          }
+        ).values()
+      ).reduce((a, b) => a + b, 0) +
       state.unpaidFundingTotal -
       state.maintenanceMarginIncludingOrdersTotal;
 
-    let fee = addTakerFees
+    let fee = isTaker
       ? (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
           100) *
         tradePrice
       : 0;
 
+    let productLedger = marginAccount.productLedgers[assetIndex];
     let position = convertNativeLotSizeToDecimal(
-      marginAccount.productLedgers[assets.assetToIndex(tradeAsset)].position
-        .size
+      productLedger.position.size.toNumber()
     );
     let positionAbs = Math.abs(position);
-    let init = convertNativeBNToDecimal(
-      Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
-        .futureMarginInitial,
+
+    let maint = convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assetIndex].futureMarginMaintenance,
       constants.MARGIN_PRECISION
     );
-    let maint = convertNativeBNToDecimal(
-      Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
-        .futureMarginMaintenance,
+    let init = convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assetIndex].futureMarginInitial,
       constants.MARGIN_PRECISION
     );
     let markPrice = Exchange.getMarkPrice(tradeAsset);
-    let extraUPNLPerLot =
-      tradeSide == types.Side.BID
-        ? markPrice - tradePrice
-        : tradePrice - markPrice;
 
-    // (currentBalance + currentUPNL + unpaid funding - currentIM) + extraUPNL - extraIM - fees > 0
-    // state.availableBalanceInitial + extraUPNL - extraIM - fees > 0
-    // Where X is the number of extra lots:
-    // state.availableBalanceInitial + X*extraUPNLPerLot - X*init*markPrice - X*fee > 0
-    // X < state.availableBalanceInitial / (init*markPrice + fee - extraUPNLPerLot)
-    let openSize =
-      state.availableBalanceInitial /
-      (init * markPrice + fee - extraUPNLPerLot);
-
+    // If only closing the existing position -> Special case using MaintenanceMarginIncludingOrders
     // (currentBalance + currentUPNL + unpaid funding - currentMMIO) + extraMMIO - fees > 0
     // realizedBalanceMaintInclOrders + extraMMIO - fees > 0
     // Where X is the number of extra lots:
@@ -782,40 +887,270 @@ export class RiskCalculator {
     // X < realizedBalanceMaintInclOrders / (fee - maint*markPrice)
     let closeSize = realizedBalanceMaintInclOrders / (fee - maint * markPrice);
 
-    // Equation falls apart if there is no positive X, means that you can close your position entirely
-    if (closeSize <= 0 || closeSize >= positionAbs) {
-      closeSize = positionAbs;
-    }
-
-    // (currentBalance + currentUPNL + unpaid funding - currentIM) + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
-    // realizedBalanceInit + extraIMClose - extraIMOpen + extraUPNLOpen - fees > 0
-    // Where X is the number of extra lots opened on the other side:
-    // realizedBalanceInit + position*init*markPrice - X*init*markPrice + X*extraUPNLPerLot - X*fee > 0
-    // X < (realizedBalanceInit + position*init*markPrice) / (init*markPrice + fee - extraUPNLPerLot)
-
-    let closeOpenSize = closeSize;
-    if (closeSize == positionAbs) {
-      closeOpenSize =
-        positionAbs +
-        (realizedBalanceInit + positionAbs * init * markPrice) /
-          (init * markPrice + fee - extraUPNLPerLot);
-    }
-
+    // Cap the closing size to be how much we can send with MM requirements only
     if (
-      position == 0 ||
-      (position > 0 && tradeSide == types.Side.BID) ||
-      (position < 0 && tradeSide == types.Side.ASK)
+      closeSize <= 0 ||
+      closeSize >=
+        positionAbs -
+          convertNativeLotSizeToDecimal(
+            productLedger.orderState.closingOrders.toNumber()
+          )
     ) {
-      // Strictly an opening order - use initial margin
-      return ((100 - bufferPercent) / 100) * openSize;
-    } else {
-      // Either only close (uses maint margin incl orders),
-      // or close full size + open more (uses initial margin)
-      // Return the one that gives the biggest size
-      return Math.max(((100 - bufferPercent) / 100) * closeOpenSize, closeSize);
+      closeSize =
+        positionAbs -
+        convertNativeLotSizeToDecimal(
+          productLedger.orderState.closingOrders.toNumber()
+        );
     }
+    if (
+      position != 0 &&
+      ((position < 0 && tradeSide == types.Side.BID) ||
+        (position > 0 && tradeSide == types.Side.ASK))
+    ) {
+      closeSize = closeSize;
+    } else {
+      closeSize = 0;
+    }
+
+    // If we're not strictly closing an existing position, we need to estimate the max size
+    let editedAccount = cloneDeep(marginAccount) as CrossMarginAccount;
+    let currentPosition = cloneDeep(
+      editedAccount.productLedgers[assetIndex].position
+    ) as programTypes.Position;
+    let currentOrderState = cloneDeep(
+      editedAccount.productLedgers[assetIndex].orderState
+    ) as programTypes.OrderState;
+    let currentBalance = editedAccount.balance;
+
+    // Iterate until we find a good size using a binary search
+    let sizeLowerBound = 0;
+    let sizeUpperBound = Math.max(0, (state.balance / init) * markPrice);
+    if (sizeUpperBound == 0) {
+      return closeSize;
+    }
+    let size = sizeUpperBound / 2;
+    let iteration = 0;
+    while (true) {
+      iteration += 1;
+
+      // Couldn't find a suitable size
+      if (iteration > maxIterations) {
+        return Math.max(
+          closeSize,
+          Math.floor(
+            10 ** constants.POSITION_PRECISION *
+              ((100 - bufferPercent) / 100) *
+              size
+          ) /
+            10 ** constants.POSITION_PRECISION
+        );
+      }
+
+      if (size < 0.001) {
+        return Math.max(closeSize, 0);
+      }
+
+      size =
+        Math.floor(10 ** constants.POSITION_PRECISION * size) /
+        10 ** constants.POSITION_PRECISION;
+
+      editedAccount.productLedgers[assetIndex].position =
+        cloneDeep(currentPosition);
+      editedAccount.productLedgers[assetIndex].orderState =
+        cloneDeep(currentOrderState);
+      editedAccount.balance = currentBalance;
+
+      let editedPosition = editedAccount.productLedgers[assetIndex].position;
+      let editedOrderState =
+        editedAccount.productLedgers[assetIndex].orderState;
+
+      let sizeNative = convertDecimalToNativeLotSize(size);
+      let currentSizeBN = editedPosition.size;
+      let currentSize = currentSizeBN.toNumber();
+      // Fake the new position, moving both editedPosition and editedOrderState
+      if (isTaker) {
+        editedPosition.size = editedPosition.size.add(
+          new anchor.BN(tradeSide == types.Side.BID ? sizeNative : -sizeNative)
+        );
+        editedAccount.balance = editedAccount.balance.sub(
+          new anchor.BN(convertDecimalToNativeInteger(fee * size, 1))
+        );
+
+        // If we're just adding to costOfTrades
+        if (
+          (tradeSide == types.Side.BID && currentSize > 0) ||
+          (tradeSide == types.Side.ASK && currentSize < 0)
+        ) {
+          editedPosition.costOfTrades = editedPosition.costOfTrades.add(
+            new anchor.BN(size * convertDecimalToNativeInteger(tradePrice, 1))
+          );
+
+          let openIndex = tradeSide == types.Side.BID ? 1 : 0;
+          let diff = anchor.BN.min(
+            editedOrderState.openingOrders[openIndex],
+            new anchor.BN(sizeNative)
+          );
+          editedOrderState.closingOrders =
+            editedOrderState.closingOrders.add(diff);
+          editedOrderState.openingOrders[openIndex] =
+            editedOrderState.openingOrders[openIndex].sub(diff);
+        }
+        // If we're just reducing the current position
+        else if (sizeNative < Math.abs(currentSize)) {
+          let entryPrice = new anchor.BN(
+            editedPosition.costOfTrades.toNumber() /
+              convertNativeLotSizeToDecimal(Math.abs(currentSize))
+          );
+          let priceDiff = entryPrice.sub(
+            new anchor.BN(convertDecimalToNativeInteger(tradePrice, 1))
+          );
+          editedAccount.balance = editedAccount.balance.add(
+            new anchor.BN(tradeSide == types.Side.BID ? size : -size).mul(
+              priceDiff
+            )
+          );
+
+          editedPosition.costOfTrades = editedPosition.costOfTrades.sub(
+            editedPosition.costOfTrades
+              .mul(new anchor.BN(sizeNative))
+              .div(currentSizeBN.abs())
+          );
+
+          let openIndex = tradeSide == types.Side.BID ? 0 : 1;
+          let diff = anchor.BN.min(
+            editedOrderState.closingOrders,
+            new anchor.BN(sizeNative)
+          );
+          editedOrderState.closingOrders =
+            editedOrderState.closingOrders.sub(diff);
+          editedOrderState.openingOrders[openIndex] =
+            editedOrderState.openingOrders[openIndex].add(diff);
+        }
+        // If we're zeroing out the current position and opening a position on the other side
+        else {
+          if (Math.abs(currentSize) > 0) {
+            let entryPrice = new anchor.BN(
+              editedPosition.costOfTrades.toNumber() /
+                convertNativeLotSizeToDecimal(Math.abs(currentSize))
+            );
+            let priceDiff = entryPrice.sub(
+              new anchor.BN(convertDecimalToNativeInteger(tradePrice, 1))
+            );
+            editedAccount.balance = editedAccount.balance.add(
+              new anchor.BN(
+                tradeSide == types.Side.BID
+                  ? convertNativeLotSizeToDecimal(currentSizeBN.abs())
+                  : -convertNativeLotSizeToDecimal(currentSizeBN.abs())
+              ).mul(priceDiff)
+            );
+          }
+
+          editedPosition.costOfTrades = new anchor.BN(
+            convertNativeLotSizeToDecimal(
+              Math.abs(editedPosition.size.toNumber())
+            ) * convertDecimalToNativeInteger(tradePrice, 1)
+          );
+
+          let sameSide = tradeSide == types.Side.BID ? 0 : 1;
+          let otherSide = tradeSide == types.Side.BID ? 1 : 0;
+          editedOrderState.openingOrders[sameSide] =
+            editedOrderState.openingOrders[sameSide].add(
+              editedOrderState.closingOrders
+            );
+
+          editedOrderState.closingOrders = anchor.BN.max(
+            editedOrderState.openingOrders[otherSide].sub(
+              editedPosition.size.abs()
+            ),
+            new anchor.BN(0)
+          );
+
+          editedOrderState.openingOrders[otherSide] =
+            editedOrderState.openingOrders[otherSide].sub(
+              editedOrderState.closingOrders
+            );
+        }
+      }
+      // Fake the new order. editedPosition is untouched
+      else {
+        // Any non-filled trades have an extra PnL adjustment
+        // Only negative PnL is used
+        let pnlAdjustment = size * (markPrice - tradePrice);
+        pnlAdjustment = Math.min(
+          0,
+          tradeSide == types.Side.BID ? pnlAdjustment : -pnlAdjustment
+        );
+        editedAccount.balance = editedAccount.balance.add(
+          new anchor.BN(convertDecimalToNativeInteger(pnlAdjustment, 1))
+        );
+
+        // If we're just adding an extra order on the same side as the existing position
+        if (
+          (tradeSide == types.Side.BID && currentSize > 0) ||
+          (tradeSide == types.Side.ASK && currentSize < 0)
+        ) {
+          let i = tradeSide == types.Side.BID ? 0 : 1;
+          editedOrderState.openingOrders[i] = editedOrderState.openingOrders[
+            i
+          ].add(new anchor.BN(sizeNative));
+        }
+
+        // If we're adding to the opposite side then both openingOrders and closingOrders change
+        else {
+          let i = tradeSide == types.Side.BID ? 0 : 1;
+          let newOrderSize = editedOrderState.closingOrders
+            .add(editedOrderState.openingOrders[i])
+            .add(new anchor.BN(sizeNative));
+          editedOrderState.closingOrders = anchor.BN.min(
+            newOrderSize,
+            editedPosition.size.abs()
+          );
+          editedOrderState.openingOrders[i] = newOrderSize.sub(
+            editedOrderState.closingOrders
+          );
+        }
+      }
+
+      editedAccount.productLedgers[assetIndex].orderState = editedOrderState;
+      editedAccount.productLedgers[assetIndex].position = editedPosition;
+
+      // TODO if this is slow then do only the necessary calcs manually, there's a bunch of extra calcs in here
+      // that aren't needed in getMaxTradeSize()
+      let newState = this.getCrossMarginAccountState(editedAccount);
+      let buffer = newState.availableBalanceInitial / newState.balance;
+      if (
+        buffer < thresholdPercent / 100 &&
+        buffer > 0 &&
+        newState.balance > 0
+      ) {
+        return Math.max(
+          closeSize,
+          Math.floor(
+            10 ** constants.POSITION_PRECISION *
+              ((100 - bufferPercent) / 100) *
+              size
+          ) /
+            10 ** constants.POSITION_PRECISION
+        );
+      } else if (newState.availableBalanceInitial < 0) {
+        sizeUpperBound = size;
+        size = (sizeLowerBound + size) / 2;
+      } else {
+        sizeLowerBound = size;
+        size = (sizeUpperBound + size) / 2;
+      }
+    }
+
+    return 0;
   }
 
+  /**
+   * Find the price at which a given position will be subject to liquidation.
+   * @param asset The asset being traded
+   * @param signedPosition The signed size of the position, in decimal USDC
+   * @param marginAccount The CrossMarginAccount itself.
+   * @returns Liquidation price, in decimal USDC
+   */
   public getLiquidationPrice(
     asset: Asset,
     signedPosition: number,
