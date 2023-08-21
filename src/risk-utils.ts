@@ -1,7 +1,14 @@
 import { types, Exchange, constants, assets } from ".";
 import { Asset } from "./constants";
-import { MarginAccount } from "./program-types";
-import { convertNativeBNToDecimal } from "./utils";
+import { CrossMarginAccount, MarginAccount } from "./program-types";
+import {
+  convertDecimalToNativeInteger,
+  convertDecimalToNativeLotSize,
+  convertNativeBNToDecimal,
+  convertNativeLotSizeToDecimal,
+} from "./utils";
+import cloneDeep from "lodash.clonedeep";
+import * as anchor from "@zetamarkets/anchor";
 
 /**
  * Assemble a collected risk state Map<Asset, types.AssetRiskState>, describing important values on a per-asset basis.
@@ -134,4 +141,201 @@ export function checkMarginAccountMarginRequirement(
     ) as number;
   let buffer = marginAccount.balance.toNumber() + pnl - totalMaintenanceMargin;
   return buffer > 0;
+}
+
+/**
+ * Simulate adding an extra position/order into an existing CrossMarginAccount.
+ * This will change the account! Therefore do a deep clone first if you want a new account to simulate.
+ * @param marginAccount The CrossMarginAccount itself
+ * @param isTaker Whether or not the order crosses the orderbook in full and becomes a position
+ * @param asset The market on which we're trading
+ * @param side Bid or ask
+ * @param price The trade price, in decimal USDC
+ * @param size The trade size, in decimal USDC
+ */
+export function addFakeTradeToAccount(
+  marginAccount: CrossMarginAccount,
+  isTaker: boolean,
+  asset: constants.Asset,
+  side: types.Side,
+  price: number,
+  size: number
+) {
+  let assetIndex = assets.assetToIndex(asset);
+  let editedPosition = marginAccount.productLedgers[assetIndex].position;
+  let editedOrderState = marginAccount.productLedgers[assetIndex].orderState;
+  let markPrice = Exchange.getMarkPrice(asset);
+
+  let fee = isTaker
+    ? (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
+        100) *
+      price
+    : 0;
+
+  let sizeNative = convertDecimalToNativeLotSize(size);
+  let currentSizeBN = editedPosition.size;
+  let currentSize = currentSizeBN.toNumber();
+  // Fake the new position, moving both editedPosition and editedOrderState
+  if (isTaker) {
+    editedPosition.size = editedPosition.size.add(
+      new anchor.BN(side == types.Side.BID ? sizeNative : -sizeNative)
+    );
+    marginAccount.balance = marginAccount.balance.sub(
+      new anchor.BN(convertDecimalToNativeInteger(fee * size, 1))
+    );
+
+    // If we're just adding to costOfTrades
+    if (
+      (side == types.Side.BID && currentSize > 0) ||
+      (side == types.Side.ASK && currentSize < 0)
+    ) {
+      editedPosition.costOfTrades = editedPosition.costOfTrades.add(
+        new anchor.BN(size * convertDecimalToNativeInteger(price, 1))
+      );
+
+      let openIndex = side == types.Side.BID ? 1 : 0;
+      let diff = anchor.BN.min(
+        editedOrderState.openingOrders[openIndex],
+        new anchor.BN(sizeNative)
+      );
+      editedOrderState.closingOrders = editedOrderState.closingOrders.add(diff);
+      editedOrderState.openingOrders[openIndex] =
+        editedOrderState.openingOrders[openIndex].sub(diff);
+    }
+    // If we're just reducing the current position
+    else if (sizeNative < Math.abs(currentSize)) {
+      let entryPrice = new anchor.BN(
+        editedPosition.costOfTrades.toNumber() /
+          convertNativeLotSizeToDecimal(Math.abs(currentSize))
+      );
+      let priceDiff = entryPrice.sub(
+        new anchor.BN(convertDecimalToNativeInteger(price, 1))
+      );
+      marginAccount.balance = marginAccount.balance.add(
+        new anchor.BN(side == types.Side.BID ? size : -size).mul(priceDiff)
+      );
+
+      editedPosition.costOfTrades = editedPosition.costOfTrades.sub(
+        editedPosition.costOfTrades
+          .mul(new anchor.BN(sizeNative))
+          .div(currentSizeBN.abs())
+      );
+
+      let openIndex = side == types.Side.BID ? 0 : 1;
+      let diff = anchor.BN.min(
+        editedOrderState.closingOrders,
+        new anchor.BN(sizeNative)
+      );
+      editedOrderState.closingOrders = editedOrderState.closingOrders.sub(diff);
+      editedOrderState.openingOrders[openIndex] =
+        editedOrderState.openingOrders[openIndex].add(diff);
+    }
+    // If we're zeroing out the current position and opening a position on the other side
+    else {
+      if (Math.abs(currentSize) > 0) {
+        let entryPrice = new anchor.BN(
+          editedPosition.costOfTrades.toNumber() /
+            convertNativeLotSizeToDecimal(Math.abs(currentSize))
+        );
+        let priceDiff = entryPrice.sub(
+          new anchor.BN(convertDecimalToNativeInteger(price, 1))
+        );
+        marginAccount.balance = marginAccount.balance.add(
+          new anchor.BN(
+            side == types.Side.BID
+              ? convertNativeLotSizeToDecimal(currentSizeBN.abs())
+              : -convertNativeLotSizeToDecimal(currentSizeBN.abs())
+          ).mul(priceDiff)
+        );
+      }
+
+      editedPosition.costOfTrades = new anchor.BN(
+        convertNativeLotSizeToDecimal(
+          Math.abs(editedPosition.size.toNumber())
+        ) * convertDecimalToNativeInteger(price, 1)
+      );
+
+      let sameSide = side == types.Side.BID ? 0 : 1;
+      let otherSide = side == types.Side.BID ? 1 : 0;
+      editedOrderState.openingOrders[sameSide] = editedOrderState.openingOrders[
+        sameSide
+      ].add(editedOrderState.closingOrders);
+
+      editedOrderState.closingOrders = anchor.BN.max(
+        editedOrderState.openingOrders[otherSide].sub(
+          editedPosition.size.abs()
+        ),
+        new anchor.BN(0)
+      );
+
+      editedOrderState.openingOrders[otherSide] =
+        editedOrderState.openingOrders[otherSide].sub(
+          editedOrderState.closingOrders
+        );
+    }
+  }
+  // Fake the new order. editedPosition is untouched
+  else {
+    // Any non-filled trades have an extra PnL adjustment
+    // Only negative PnL is used
+    let pnlAdjustment = size * (markPrice - price);
+    pnlAdjustment = Math.min(
+      0,
+      side == types.Side.BID ? pnlAdjustment : -pnlAdjustment
+    );
+    marginAccount.balance = marginAccount.balance.add(
+      new anchor.BN(convertDecimalToNativeInteger(pnlAdjustment, 1))
+    );
+
+    // If we're just adding an extra order on the same side as the existing position
+    if (
+      (side == types.Side.BID && currentSize > 0) ||
+      (side == types.Side.ASK && currentSize < 0)
+    ) {
+      let i = side == types.Side.BID ? 0 : 1;
+      editedOrderState.openingOrders[i] = editedOrderState.openingOrders[i].add(
+        new anchor.BN(sizeNative)
+      );
+    }
+
+    // If we're adding to the opposite side then both openingOrders and closingOrders change
+    else {
+      let i = side == types.Side.BID ? 0 : 1;
+      let newOrderSize = editedOrderState.closingOrders
+        .add(editedOrderState.openingOrders[i])
+        .add(new anchor.BN(sizeNative));
+      editedOrderState.closingOrders = anchor.BN.min(
+        newOrderSize,
+        editedPosition.size.abs()
+      );
+      editedOrderState.openingOrders[i] = newOrderSize.sub(
+        editedOrderState.closingOrders
+      );
+    }
+  }
+
+  marginAccount.productLedgers[assetIndex].orderState = editedOrderState;
+  marginAccount.productLedgers[assetIndex].position = editedPosition;
+}
+
+/**
+ * Simulate adding an extra position/order into an existing CrossMarginAccount, but deep copy the account first and return that deep copied account
+ * @param marginAccount the (untouched) CrossMarginAccount itself
+ * @param executionInfo A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+ * @returns
+ */
+export function cloneAccountAndFakeTrade(
+  marginAccount: CrossMarginAccount,
+  executionInfo?: types.ExecutionInfo
+): CrossMarginAccount {
+  let account = cloneDeep(marginAccount) as CrossMarginAccount;
+  addFakeTradeToAccount(
+    account,
+    executionInfo.isTaker,
+    executionInfo.asset,
+    executionInfo.size > 0 ? types.Side.BID : types.Side.ASK,
+    executionInfo.price,
+    executionInfo.size
+  );
+  return account;
 }
