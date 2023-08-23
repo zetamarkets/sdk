@@ -151,7 +151,7 @@ export function checkMarginAccountMarginRequirement(
  * @param asset The market on which we're trading
  * @param side Bid or ask
  * @param price The trade price, in decimal USDC
- * @param size The trade size, in decimal USDC
+ * @param size The trade size, in decimal USDC (absolute value, so it must be > 0)
  */
 export function addFakeTradeToAccount(
   marginAccount: CrossMarginAccount,
@@ -339,7 +339,7 @@ export function fakeTrade(
     executionInfo.asset,
     executionInfo.size > 0 ? types.Side.BID : types.Side.ASK,
     executionInfo.price,
-    executionInfo.size
+    Math.abs(executionInfo.size)
   );
   return account;
 }
