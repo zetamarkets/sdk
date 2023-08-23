@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.7.0] 2023-08-21
+
+- Add post-trade calculations to risk.ts, allowing for accurate simulations of account metrics from a hypothetical order/trade. ([#257](https://github.com/zetamarkets/sdk/pull/257))
+
 ## [1.6.1] 2023-08-09
 
 - getMaxTradeSize() now simulates all positions and orders correctly. ([#256](https://github.com/zetamarkets/sdk/pull/256))

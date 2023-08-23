@@ -12,8 +12,10 @@ import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
 import { assets, Decimal, programTypes } from ".";
 import {
+  addFakeTradeToAccount,
   calculateLiquidationPrice,
   calculateProductMargin,
+  fakeTrade,
   collectRiskMaps,
 } from "./risk-utils";
 
@@ -66,7 +68,7 @@ export class RiskCalculator {
   /**
    * Returns the margin requirement for a given market and size.
    * @param asset          underlying asset type.
-   * @param size           signed size for margin requirements (short orders should be negative), in lots.
+   * @param size           signed size for margin requirements (short orders should be negative), in decimal USDC lots.
    * @param marginType     type of margin calculation.
    */
   public getPerpMarginRequirement(
@@ -213,12 +215,7 @@ export class RiskCalculator {
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
-    executionInfo: {
-      asset: Asset;
-      price: number;
-      size: number;
-      addTakerFees: boolean;
-    }
+    executionInfo: types.ExecutionInfo
   ): number {
     // Number for MarginAccount, Map for CrossMarginAccount
     if (accountType == types.ProgramAccountType.CrossMarginAccount) {
@@ -274,24 +271,18 @@ export class RiskCalculator {
   private calculatePnl(
     account: MarginAccount,
     accountType: types.ProgramAccountType,
-    executionInfo:
-      | { asset: Asset; price: number; size: number; addTakerFees: boolean }
-      | undefined
+    executionInfo: types.ExecutionInfo | undefined
   ): number;
   private calculatePnl(
     account: CrossMarginAccount,
     accountType: types.ProgramAccountType,
-    executionInfo:
-      | { asset: Asset; price: number; size: number; addTakerFees: boolean }
-      | undefined
+    executionInfo: types.ExecutionInfo | undefined
   ): Map<Asset, number>;
   private calculatePnl(
     account: any,
     accountType: types.ProgramAccountType = types.ProgramAccountType
       .MarginAccount,
-    executionInfo:
-      | { asset: Asset; price: number; size: number; addTakerFees: boolean }
-      | undefined = undefined
+    executionInfo: types.ExecutionInfo | undefined = undefined
   ): any {
     let pnl = 0;
 
@@ -372,7 +363,7 @@ export class RiskCalculator {
       if (
         executionInfo &&
         executionInfo.asset == asset &&
-        executionInfo.addTakerFees
+        executionInfo.isTaker
       ) {
         assetPnl -=
           convertNativeLotSizeToDecimal(Math.abs(size)) *
@@ -723,6 +714,7 @@ export class RiskCalculator {
       maintenanceMarginIncludingOrders.values()
     ).reduce((a, b) => a + b, 0);
 
+    let equity: number = balance + upnlTotal + unpaidFundingTotal;
     let availableBalanceInitial: number =
       balance + upnlTotal + unpaidFundingTotal - imTotal;
     let availableBalanceWithdrawable: number =
@@ -736,6 +728,7 @@ export class RiskCalculator {
       balance + upnlTotal + unpaidFundingTotal - mmioTotal;
     return {
       balance,
+      equity,
       availableBalanceInitial,
       availableBalanceMaintenance,
       availableBalanceMaintenanceIncludingOrders,
@@ -787,6 +780,7 @@ export class RiskCalculator {
       marginAccount,
       types.ProgramAccountType.MarginAccount
     ) as number;
+    let equity: number = balance + unrealizedPnl + unpaidFunding;
     let availableBalanceInitial: number =
       balance + unrealizedPnl + unpaidFunding - initialMargin;
     let availableBalanceWithdrawable: number =
@@ -795,6 +789,7 @@ export class RiskCalculator {
       balance + unrealizedPnl + unpaidFunding - maintenanceMargin;
     return {
       balance,
+      equity,
       initialMargin,
       initialMarginSkipConcession,
       maintenanceMargin,
@@ -850,7 +845,7 @@ export class RiskCalculator {
             asset: tradeAsset,
             price: tradePrice,
             size: undefined,
-            addTakerFees: isTaker,
+            isTaker: isTaker,
           }
         ).values()
       ).reduce((a, b) => a + b, 0) +
@@ -960,159 +955,14 @@ export class RiskCalculator {
         cloneDeep(currentOrderState);
       editedAccount.balance = currentBalance;
 
-      let editedPosition = editedAccount.productLedgers[assetIndex].position;
-      let editedOrderState =
-        editedAccount.productLedgers[assetIndex].orderState;
-
-      let sizeNative = convertDecimalToNativeLotSize(size);
-      let currentSizeBN = editedPosition.size;
-      let currentSize = currentSizeBN.toNumber();
-      // Fake the new position, moving both editedPosition and editedOrderState
-      if (isTaker) {
-        editedPosition.size = editedPosition.size.add(
-          new anchor.BN(tradeSide == types.Side.BID ? sizeNative : -sizeNative)
-        );
-        editedAccount.balance = editedAccount.balance.sub(
-          new anchor.BN(convertDecimalToNativeInteger(fee * size, 1))
-        );
-
-        // If we're just adding to costOfTrades
-        if (
-          (tradeSide == types.Side.BID && currentSize > 0) ||
-          (tradeSide == types.Side.ASK && currentSize < 0)
-        ) {
-          editedPosition.costOfTrades = editedPosition.costOfTrades.add(
-            new anchor.BN(size * convertDecimalToNativeInteger(tradePrice, 1))
-          );
-
-          let openIndex = tradeSide == types.Side.BID ? 1 : 0;
-          let diff = anchor.BN.min(
-            editedOrderState.openingOrders[openIndex],
-            new anchor.BN(sizeNative)
-          );
-          editedOrderState.closingOrders =
-            editedOrderState.closingOrders.add(diff);
-          editedOrderState.openingOrders[openIndex] =
-            editedOrderState.openingOrders[openIndex].sub(diff);
-        }
-        // If we're just reducing the current position
-        else if (sizeNative < Math.abs(currentSize)) {
-          let entryPrice = new anchor.BN(
-            editedPosition.costOfTrades.toNumber() /
-              convertNativeLotSizeToDecimal(Math.abs(currentSize))
-          );
-          let priceDiff = entryPrice.sub(
-            new anchor.BN(convertDecimalToNativeInteger(tradePrice, 1))
-          );
-          editedAccount.balance = editedAccount.balance.add(
-            new anchor.BN(tradeSide == types.Side.BID ? size : -size).mul(
-              priceDiff
-            )
-          );
-
-          editedPosition.costOfTrades = editedPosition.costOfTrades.sub(
-            editedPosition.costOfTrades
-              .mul(new anchor.BN(sizeNative))
-              .div(currentSizeBN.abs())
-          );
-
-          let openIndex = tradeSide == types.Side.BID ? 0 : 1;
-          let diff = anchor.BN.min(
-            editedOrderState.closingOrders,
-            new anchor.BN(sizeNative)
-          );
-          editedOrderState.closingOrders =
-            editedOrderState.closingOrders.sub(diff);
-          editedOrderState.openingOrders[openIndex] =
-            editedOrderState.openingOrders[openIndex].add(diff);
-        }
-        // If we're zeroing out the current position and opening a position on the other side
-        else {
-          if (Math.abs(currentSize) > 0) {
-            let entryPrice = new anchor.BN(
-              editedPosition.costOfTrades.toNumber() /
-                convertNativeLotSizeToDecimal(Math.abs(currentSize))
-            );
-            let priceDiff = entryPrice.sub(
-              new anchor.BN(convertDecimalToNativeInteger(tradePrice, 1))
-            );
-            editedAccount.balance = editedAccount.balance.add(
-              new anchor.BN(
-                tradeSide == types.Side.BID
-                  ? convertNativeLotSizeToDecimal(currentSizeBN.abs())
-                  : -convertNativeLotSizeToDecimal(currentSizeBN.abs())
-              ).mul(priceDiff)
-            );
-          }
-
-          editedPosition.costOfTrades = new anchor.BN(
-            convertNativeLotSizeToDecimal(
-              Math.abs(editedPosition.size.toNumber())
-            ) * convertDecimalToNativeInteger(tradePrice, 1)
-          );
-
-          let sameSide = tradeSide == types.Side.BID ? 0 : 1;
-          let otherSide = tradeSide == types.Side.BID ? 1 : 0;
-          editedOrderState.openingOrders[sameSide] =
-            editedOrderState.openingOrders[sameSide].add(
-              editedOrderState.closingOrders
-            );
-
-          editedOrderState.closingOrders = anchor.BN.max(
-            editedOrderState.openingOrders[otherSide].sub(
-              editedPosition.size.abs()
-            ),
-            new anchor.BN(0)
-          );
-
-          editedOrderState.openingOrders[otherSide] =
-            editedOrderState.openingOrders[otherSide].sub(
-              editedOrderState.closingOrders
-            );
-        }
-      }
-      // Fake the new order. editedPosition is untouched
-      else {
-        // Any non-filled trades have an extra PnL adjustment
-        // Only negative PnL is used
-        let pnlAdjustment = size * (markPrice - tradePrice);
-        pnlAdjustment = Math.min(
-          0,
-          tradeSide == types.Side.BID ? pnlAdjustment : -pnlAdjustment
-        );
-        editedAccount.balance = editedAccount.balance.add(
-          new anchor.BN(convertDecimalToNativeInteger(pnlAdjustment, 1))
-        );
-
-        // If we're just adding an extra order on the same side as the existing position
-        if (
-          (tradeSide == types.Side.BID && currentSize > 0) ||
-          (tradeSide == types.Side.ASK && currentSize < 0)
-        ) {
-          let i = tradeSide == types.Side.BID ? 0 : 1;
-          editedOrderState.openingOrders[i] = editedOrderState.openingOrders[
-            i
-          ].add(new anchor.BN(sizeNative));
-        }
-
-        // If we're adding to the opposite side then both openingOrders and closingOrders change
-        else {
-          let i = tradeSide == types.Side.BID ? 0 : 1;
-          let newOrderSize = editedOrderState.closingOrders
-            .add(editedOrderState.openingOrders[i])
-            .add(new anchor.BN(sizeNative));
-          editedOrderState.closingOrders = anchor.BN.min(
-            newOrderSize,
-            editedPosition.size.abs()
-          );
-          editedOrderState.openingOrders[i] = newOrderSize.sub(
-            editedOrderState.closingOrders
-          );
-        }
-      }
-
-      editedAccount.productLedgers[assetIndex].orderState = editedOrderState;
-      editedAccount.productLedgers[assetIndex].position = editedPosition;
+      addFakeTradeToAccount(
+        editedAccount,
+        isTaker,
+        tradeAsset,
+        tradeSide,
+        tradePrice,
+        size
+      );
 
       // TODO if this is slow then do only the necessary calcs manually, there's a bunch of extra calcs in here
       // that aren't needed in getMaxTradeSize()
@@ -1164,5 +1014,132 @@ export class RiskCalculator {
       Exchange.getMarkPrice(asset),
       signedPosition
     );
+  }
+
+  /**
+   * Get an account's equity, which is the balance including unrealized PnL and unpaid funding.
+   * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's equity after that order/trade occurs.
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
+   * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
+   * @returns A decimal USDC representing the account equity
+   */
+  public getEquity(
+    marginAccount: CrossMarginAccount,
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
+  ): number {
+    let account = marginAccount;
+    if (executionInfo) {
+      account = fakeTrade(marginAccount, clone, executionInfo);
+    }
+    return this.getCrossMarginAccountState(account).equity;
+  }
+
+  /**
+   * Get an account's buying power, which is the position size you can get additional exposure to.
+   * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's buying power after that order/trade occurs.
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
+   * @param asset The underlying for which we're estimating buying power
+   * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
+   * @returns A decimal USDC representing the buying power
+   */
+  public getBuyingPower(
+    marginAccount: CrossMarginAccount,
+    asset: Asset,
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
+  ): number {
+    let account = marginAccount;
+    let markPrice = Exchange.getMarkPrice(asset);
+    let initialMarginPerLot = this.getPerpMarginRequirement(
+      asset,
+      1,
+      types.MarginType.INITIAL
+    );
+
+    if (executionInfo) {
+      account = fakeTrade(marginAccount, clone, executionInfo);
+    }
+    let state = this.getCrossMarginAccountState(account);
+    let freeCollateral = state.availableBalanceInitial;
+
+    return freeCollateral * (markPrice / initialMarginPerLot);
+  }
+
+  /**
+   * Get an account's margin usage, which is a decimal percentage from 0 to 100 representing the percentage of equity used in maintenance margin.
+   * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's margin usage after that order/trade occurs.
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
+   * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
+   * @returns A decimal percentage representing margin usage.
+   */
+  public getMarginUsagePercent(
+    marginAccount: CrossMarginAccount,
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
+  ): number {
+    let account = marginAccount;
+    if (executionInfo) {
+      account = fakeTrade(marginAccount, clone, executionInfo);
+    }
+    let state = this.getCrossMarginAccountState(account);
+    return 100 * (state.maintenanceMarginTotal / state.equity);
+  }
+
+  /**
+   * Get an account's free collateral, which is the amount of available collateral the account has for trading. Equivalent to 'availableBalanceInitial'
+   * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's free collateral after that order/trade occurs.
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
+   * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
+   * @returns A decimal USDC representing the available collateral.
+   */
+  public getFreeCollateral(
+    marginAccount: CrossMarginAccount,
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
+  ): number {
+    let account = marginAccount;
+    if (executionInfo) {
+      account = fakeTrade(marginAccount, clone, executionInfo);
+    }
+    return this.getCrossMarginAccountState(account).availableBalanceInitial;
+  }
+
+  /**
+   * Get an account's current leverage
+   * You can optionally provide executionInfo to mimick a fake order/trade, which will return the account's current leverage after that order/trade occurs.
+   * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
+   * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+   * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
+   * @returns A decimal value representing the current leverage.
+   */
+  public getLeverage(
+    marginAccount: CrossMarginAccount,
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
+  ) {
+    let account = marginAccount;
+    if (executionInfo) {
+      account = fakeTrade(marginAccount, clone, executionInfo);
+    }
+
+    // Sum up all the positions in the account
+    let positionValue = 0;
+    for (var asset of Exchange.assets) {
+      positionValue +=
+        Math.abs(
+          convertNativeLotSizeToDecimal(
+            account.productLedgers[
+              assets.assetToIndex(asset)
+            ].position.size.toNumber()
+          )
+        ) * Exchange.getMarkPrice(asset);
+    }
+
+    return positionValue / this.getCrossMarginAccountState(account).equity;
   }
 }
