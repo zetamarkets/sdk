@@ -539,7 +539,6 @@ export function placeTriggerOrderIx(
   side: types.Side,
   orderType: types.OrderType,
   reduceOnly: boolean,
-  clientOrderId: number,
   tag: String,
   marginAccount: PublicKey,
   authority: PublicKey,
@@ -562,7 +561,6 @@ export function placeTriggerOrderIx(
     types.toProgramSide(side),
     types.toProgramOrderType(orderType),
     reduceOnly,
-    clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     new String(tag),
     toProgramAsset(asset),
     {
@@ -658,7 +656,6 @@ export function editTriggerOrderIx(
   newSide: types.Side,
   newOrderType: types.OrderType,
   newReduceOnly: boolean,
-  newClientOrderId: number,
   owner: PublicKey,
   triggerOrder: PublicKey
 ): TransactionInstruction {
@@ -673,7 +670,6 @@ export function editTriggerOrderIx(
     types.toProgramSide(newSide),
     types.toProgramOrderType(newOrderType),
     newReduceOnly,
-    newClientOrderId == 0 ? null : new anchor.BN(newClientOrderId),
     {
       accounts: {
         owner: owner,
@@ -2219,7 +2215,6 @@ export interface StateParams {
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;
   nativeOpenInterestLimit: anchor.BN;
-  triggerOrderTimeoutSeconds: number;
 }
 
 export interface UpdatePricingParametersArgs {

@@ -176,7 +176,6 @@ export interface TriggerOrder {
   orderPrice: number;
   triggerPrice: number | null;
   size: number;
-  clientOrderId: number;
   creationTs: number;
   triggerDirection: TriggerDirection | null;
   triggerTimestamp: anchor.BN | null;
@@ -418,7 +417,6 @@ export interface OrderOptions {
 export interface TriggerOrderOptions {
   orderType?: types.OrderType;
   reduceOnly?: boolean;
-  clientOrderId?: number;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
 }
@@ -433,7 +431,6 @@ export function defaultTriggerOrderOptions(): TriggerOrderOptions {
   return {
     orderType: OrderType.FILLORKILL,
     reduceOnly: false,
-    clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,
   };

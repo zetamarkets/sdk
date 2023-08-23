@@ -4226,12 +4226,6 @@ export type Zeta = {
           "type": "bool"
         },
         {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
           "name": "tag",
           "type": {
             "option": "string"
@@ -4490,12 +4484,6 @@ export type Zeta = {
         {
           "name": "reduceOnly",
           "type": "bool"
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
         }
       ]
     },
@@ -6723,15 +6711,11 @@ export type Zeta = {
             }
           },
           {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                334
+                338
               ]
             }
           }
@@ -7360,12 +7344,6 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "clientOrderId",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
             "name": "creationTs",
             "type": "u64"
           },
@@ -7394,6 +7372,10 @@ export type Zeta = {
             "type": {
               "defined": "OrderType"
             }
+          },
+          {
+            "name": "bit",
+            "type": "u8"
           },
           {
             "name": "reduceOnly",
@@ -8212,10 +8194,6 @@ export type Zeta = {
           {
             "name": "nativeOpenInterestLimit",
             "type": "u64"
-          },
-          {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
           }
         ]
       }
@@ -8328,10 +8306,6 @@ export type Zeta = {
           {
             "name": "nativeOpenInterestLimit",
             "type": "u64"
-          },
-          {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
           }
         ]
       }
@@ -14341,12 +14315,6 @@ export const IDL: Zeta = {
           "type": "bool"
         },
         {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
           "name": "tag",
           "type": {
             "option": "string"
@@ -14605,12 +14573,6 @@ export const IDL: Zeta = {
         {
           "name": "reduceOnly",
           "type": "bool"
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
         }
       ]
     },
@@ -16838,15 +16800,11 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                334
+                338
               ]
             }
           }
@@ -17475,12 +17433,6 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "clientOrderId",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
             "name": "creationTs",
             "type": "u64"
           },
@@ -17509,6 +17461,10 @@ export const IDL: Zeta = {
             "type": {
               "defined": "OrderType"
             }
+          },
+          {
+            "name": "bit",
+            "type": "u8"
           },
           {
             "name": "reduceOnly",
@@ -18327,10 +18283,6 @@ export const IDL: Zeta = {
           {
             "name": "nativeOpenInterestLimit",
             "type": "u64"
-          },
-          {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
           }
         ]
       }
@@ -18443,10 +18395,6 @@ export const IDL: Zeta = {
           {
             "name": "nativeOpenInterestLimit",
             "type": "u64"
-          },
-          {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
           }
         ]
       }

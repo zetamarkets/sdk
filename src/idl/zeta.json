@@ -4226,12 +4226,6 @@
           "type": "bool"
         },
         {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
           "name": "tag",
           "type": {
             "option": "string"
@@ -4490,12 +4484,6 @@
         {
           "name": "reduceOnly",
           "type": "bool"
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
         }
       ]
     },
@@ -6723,15 +6711,11 @@
             }
           },
           {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
-          },
-          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                334
+                338
               ]
             }
           }
@@ -7360,12 +7344,6 @@
             "type": "u64"
           },
           {
-            "name": "clientOrderId",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
             "name": "creationTs",
             "type": "u64"
           },
@@ -7394,6 +7372,10 @@
             "type": {
               "defined": "OrderType"
             }
+          },
+          {
+            "name": "bit",
+            "type": "u8"
           },
           {
             "name": "reduceOnly",
@@ -8212,10 +8194,6 @@
           {
             "name": "nativeOpenInterestLimit",
             "type": "u64"
-          },
-          {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
           }
         ]
       }
@@ -8328,10 +8306,6 @@
           {
             "name": "nativeOpenInterestLimit",
             "type": "u64"
-          },
-          {
-            "name": "triggerOrderTimeoutSeconds",
-            "type": "u32"
           }
         ]
       }

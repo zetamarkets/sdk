@@ -1151,7 +1151,6 @@ export class CrossClient {
           ? options.orderType
           : types.OrderType.FILLORKILL,
         options.reduceOnly != undefined ? options.reduceOnly : false,
-        options.clientOrderId != undefined ? options.clientOrderId : 0,
         options.tag,
         this.accountAddress,
         this._provider.wallet.publicKey,
@@ -1268,7 +1267,6 @@ export class CrossClient {
           ? newOptions.orderType
           : types.OrderType.FILLORKILL,
         newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
-        newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         this._provider.wallet.publicKey,
         triggerAccount
       )
@@ -2303,9 +2301,6 @@ export class CrossClient {
           ? rawOrder.triggerPrice.toNumber()
           : null,
         size: rawOrder.size.toNumber(),
-        clientOrderId: rawOrder.clientOrderId
-          ? rawOrder.clientOrderId.toNumber()
-          : null,
         creationTs: rawOrder.creationTs.toNumber(),
         triggerDirection: rawOrder.triggerDirection
           ? types.fromProgramTriggerDirection(rawOrder.triggerDirection)
@@ -2315,7 +2310,7 @@ export class CrossClient {
         asset: assets.fromProgramAsset(rawOrder.asset),
         orderType: types.fromProgramOrderType(rawOrder.orderType),
         reduceOnly: rawOrder.reduceOnly,
-        triggerOrderBit: triggerOrderBits[i],
+        triggerOrderBit: rawOrder.bit,
       } as types.TriggerOrder;
 
       triggerOrdersByAsset.get(order.asset).push(order);

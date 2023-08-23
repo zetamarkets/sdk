@@ -36,7 +36,6 @@ export interface State {
   nativeOpenInterestLimit: anchor.BN;
   haltStates: Array<HaltStateV2>;
   haltStatesPadding: Array<HaltStateV2>;
-  triggerOrderTimeoutSeconds: number;
   padding: Array<number>;
 }
 
@@ -244,12 +243,12 @@ export interface TriggerOrder {
   triggerPrice: anchor.BN | null; // Option<u64>
   triggerTs: anchor.BN | null; // Option<u64>
   size: anchor.BN;
-  clientOrderId: anchor.BN | null; // Option<u64>
   creationTs: anchor.BN;
   triggerDirection: any | null; // Option<TriggerDirection>
   side: any; // enum Side
   asset: any; // enum Asset
   orderType: any; // enum OrderType
+  bit: number;
   reduceOnly: boolean;
 }
 
