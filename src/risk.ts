@@ -1129,7 +1129,7 @@ export class RiskCalculator {
     marginAccount: CrossMarginAccount,
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true
-  ) {
+  ): number {
     if (marginAccount.balance.toNumber() == 0) return 0;
 
     let account = marginAccount;
