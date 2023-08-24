@@ -1029,6 +1029,8 @@ export class RiskCalculator {
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true
   ): number {
+    if (marginAccount.balance.toNumber() == 0) return 0;
+
     let account = marginAccount;
     if (executionInfo) {
       account = fakeTrade(marginAccount, clone, executionInfo);
@@ -1051,6 +1053,8 @@ export class RiskCalculator {
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true
   ): number {
+    if (marginAccount.balance.toNumber() == 0) return 0;
+
     let account = marginAccount;
     let markPrice = Exchange.getMarkPrice(asset);
     let initialMarginPerLot = this.getPerpMarginRequirement(
@@ -1081,6 +1085,8 @@ export class RiskCalculator {
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true
   ): number {
+    if (marginAccount.balance.toNumber() == 0) return 0;
+
     let account = marginAccount;
     if (executionInfo) {
       account = fakeTrade(marginAccount, clone, executionInfo);
@@ -1102,6 +1108,8 @@ export class RiskCalculator {
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true
   ): number {
+    if (marginAccount.balance.toNumber() == 0) return 0;
+
     let account = marginAccount;
     if (executionInfo) {
       account = fakeTrade(marginAccount, clone, executionInfo);
@@ -1122,6 +1130,8 @@ export class RiskCalculator {
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true
   ) {
+    if (marginAccount.balance.toNumber() == 0) return 0;
+
     let account = marginAccount;
     if (executionInfo) {
       account = fakeTrade(marginAccount, clone, executionInfo);
