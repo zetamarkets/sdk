@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.7.3] 2023-08-25
+
+- Small bugfix for sizeUpperBound in getMaxTradeSize(). ([#260](https://github.com/zetamarkets/sdk/pull/260))
+
 ## [1.7.1] 2023-08-23
 
 - Small bugfix for post-trade calcs. ([#258](https://github.com/zetamarkets/sdk/pull/258))

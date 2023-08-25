@@ -919,7 +919,7 @@ export class RiskCalculator {
 
     // Iterate until we find a good size using a binary search
     let sizeLowerBound = 0;
-    let sizeUpperBound = Math.max(0, (state.balance / init) * markPrice);
+    let sizeUpperBound = 2 * Math.max(0, state.balance / (init * markPrice));
     if (sizeUpperBound == 0) {
       return closeSize;
     }
