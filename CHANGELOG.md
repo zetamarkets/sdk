@@ -5,9 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.7.3] 2023-08-25
+## [1.7.3] 2023-08-28
 
 - Small bugfix for sizeUpperBound in getMaxTradeSize(). ([#260](https://github.com/zetamarkets/sdk/pull/260))
+
+## [1.7.2] 2023-08-24
+
+- New risk utils return 0 if balance is 0. ([#259](https://github.com/zetamarkets/sdk/pull/259))
 
 ## [1.7.1] 2023-08-23
 
