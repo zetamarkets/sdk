@@ -321,24 +321,38 @@ export class RiskCalculator {
         asset = fromProgramAsset(account.asset);
       }
 
-      const size =
+      let size =
         executionInfo &&
         executionInfo.size != undefined &&
         executionInfo.asset == asset
           ? executionInfo.size
           : position.size.toNumber();
 
+      // Clamp executionInfo.size such that
+      // 0 < executionInfo.size < position.size
       if (
         executionInfo &&
         executionInfo.size != undefined &&
-        executionInfo.asset == asset &&
-        (Math.abs(size) > Math.abs(position.size.toNumber()) ||
-          (size < 0 && position.size.toNumber() > 0) ||
-          (size > 0 && position.size.toNumber() < 0))
+        executionInfo.asset == asset
       ) {
-        throw Error(
-          "executionInfo.size cannot be greater than existing position, and must be on the same side"
-        );
+        let warn = false;
+        if (
+          (size < 0 && position.size.toNumber() > 0) ||
+          (size > 0 && position.size.toNumber() < 0)
+        ) {
+          warn = true;
+          size = 0;
+        } else if (Math.abs(size) > Math.abs(position.size.toNumber())) {
+          warn = true;
+          size = position.size.toNumber();
+        }
+        if (warn) {
+          console.warn(
+            `Warning: executionInfo.size should not be greater than existing position, and should be on the same side. existingPosition=${position.size.toNumber()}, executionInfo.size=${
+              executionInfo.size
+            }. Clamped executionInfo.size to ${size}`
+          );
+        }
       }
 
       const costOfTrades =

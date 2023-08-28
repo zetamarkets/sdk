@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.7.4] 2023-08-28
+
+- Clamp executionInfo.size in calculatePnl() instead of throwing and error. ([#261](https://github.com/zetamarkets/sdk/pull/261))
+
 ## [1.7.3] 2023-08-28
 
 - Small bugfix for sizeUpperBound in getMaxTradeSize(). ([#260](https://github.com/zetamarkets/sdk/pull/260))
