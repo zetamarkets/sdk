@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.8.0] 2023-08-29
+
+- New feature: Trigger Orders. ([#251](https://github.com/zetamarkets/sdk/pull/251))
+
 ## [1.7.4] 2023-08-28
 
 - Clamp executionInfo.size in calculatePnl() instead of throwing and error. ([#261](https://github.com/zetamarkets/sdk/pull/261))
