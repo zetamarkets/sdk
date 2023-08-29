@@ -3938,6 +3938,556 @@ export type Zeta = {
       ]
     },
     {
+      "name": "placePerpOrderV4",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "placeOrderAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rent",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketAccounts",
+              "accounts": [
+                {
+                  "name": "market",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "requestQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "eventQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "bids",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "asks",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "orderPayerTokenAccount",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinWallet",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcWallet",
+                  "isMut": true,
+                  "isSigner": false
+                }
+              ]
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupFeed",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketMint",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "mintAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpSyncQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "tifOffset",
+          "type": {
+            "option": "u16"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeTriggerOrder",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        },
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerOrder",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "placeOrderAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rent",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketAccounts",
+              "accounts": [
+                {
+                  "name": "market",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "requestQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "eventQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "bids",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "asks",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "orderPayerTokenAccount",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinWallet",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcWallet",
+                  "isMut": true,
+                  "isSigner": false
+                }
+              ]
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupFeed",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketMint",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "mintAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpSyncQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "cancelTriggerOrder",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
       "name": "cancelOrder",
       "accounts": [
         {
@@ -6632,11 +7182,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "triggerOrderBits",
+            "type": "u128"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2000
+                1984
               ]
             }
           }
@@ -6748,6 +7302,84 @@ export type Zeta = {
                 338
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "triggerOrder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "marginAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "openOrders",
+            "type": "publicKey"
+          },
+          {
+            "name": "orderPrice",
+            "type": "u64"
+          },
+          {
+            "name": "triggerPrice",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "triggerTs",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "size",
+            "type": "u64"
+          },
+          {
+            "name": "creationTs",
+            "type": "u64"
+          },
+          {
+            "name": "triggerDirection",
+            "type": {
+              "option": {
+                "defined": "TriggerDirection"
+              }
+            }
+          },
+          {
+            "name": "side",
+            "type": {
+              "defined": "Side"
+            }
+          },
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "orderType",
+            "type": {
+              "defined": "OrderType"
+            }
+          },
+          {
+            "name": "bit",
+            "type": "u8"
+          },
+          {
+            "name": "reduceOnly",
+            "type": "bool"
           }
         ]
       }
@@ -8108,6 +8740,23 @@ export type Zeta = {
       }
     },
     {
+      "name": "TriggerDirection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "LessThanOrEqual"
+          },
+          {
+            "name": "GreaterThanOrEqual"
+          }
+        ]
+      }
+    },
+    {
       "name": "Asset",
       "type": {
         "kind": "enum",
@@ -9379,6 +10028,61 @@ export type Zeta = {
       "code": 6145,
       "name": "InvalidDexAccOwner",
       "msg": "Invalid owner for dex account"
+    },
+    {
+      "code": 6146,
+      "name": "TriggerOrderCannotBeRemoved",
+      "msg": "Trigger order cannot be removed"
+    },
+    {
+      "code": 6147,
+      "name": "TriggerOrderCannotBeExecuted",
+      "msg": "Trigger order cannot be executed"
+    },
+    {
+      "code": 6148,
+      "name": "TooManyTriggerOrders",
+      "msg": "Too many trigger orders, close some and retry"
+    },
+    {
+      "code": 6149,
+      "name": "InvalidTriggerOrderRemainingAccounts",
+      "msg": "Invalid trigger order remaining accounts"
+    },
+    {
+      "code": 6150,
+      "name": "InvalidTriggerOrderWhitelistFeesAccount",
+      "msg": "Invalid trigger order whitelist fees account"
+    },
+    {
+      "code": 6151,
+      "name": "MissingTriggerOrderWhitelistFeesAccount",
+      "msg": "Missing trigger order whitelist fees account"
+    },
+    {
+      "code": 6152,
+      "name": "InvalidTriggerOrderBitRange",
+      "msg": "Invalid trigger order bit range"
+    },
+    {
+      "code": 6153,
+      "name": "InvalidSecondaryAdmin",
+      "msg": "Invalid secondary admin"
+    },
+    {
+      "code": 6154,
+      "name": "OnlyOwnerCanEditTriggerOrder",
+      "msg": "Only the owner can edit their own trigger order"
+    },
+    {
+      "code": 6155,
+      "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
+      "msg": "Trigger order needs either a trigger price + direction, or trigger time"
+    },
+    {
+      "code": 6156,
+      "name": "TriggerOrderBitOccupied",
+      "msg": "Given trigger order bit is occupied, pick another"
     }
   ]
 };
@@ -13323,6 +14027,556 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "placePerpOrderV4",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "placeOrderAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rent",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketAccounts",
+              "accounts": [
+                {
+                  "name": "market",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "requestQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "eventQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "bids",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "asks",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "orderPayerTokenAccount",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinWallet",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcWallet",
+                  "isMut": true,
+                  "isSigner": false
+                }
+              ]
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupFeed",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketMint",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "mintAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpSyncQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "tifOffset",
+          "type": {
+            "option": "u16"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeTriggerOrder",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        },
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerOrder",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "placeOrderAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rent",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketAccounts",
+              "accounts": [
+                {
+                  "name": "market",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "requestQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "eventQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "bids",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "asks",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "orderPayerTokenAccount",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinWallet",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcWallet",
+                  "isMut": true,
+                  "isSigner": false
+                }
+              ]
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupFeed",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketMint",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "mintAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpSyncQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "cancelTriggerOrder",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
       "name": "cancelOrder",
       "accounts": [
         {
@@ -16017,11 +17271,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "triggerOrderBits",
+            "type": "u128"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                2000
+                1984
               ]
             }
           }
@@ -16133,6 +17391,84 @@ export const IDL: Zeta = {
                 338
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "triggerOrder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "marginAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "openOrders",
+            "type": "publicKey"
+          },
+          {
+            "name": "orderPrice",
+            "type": "u64"
+          },
+          {
+            "name": "triggerPrice",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "triggerTs",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "size",
+            "type": "u64"
+          },
+          {
+            "name": "creationTs",
+            "type": "u64"
+          },
+          {
+            "name": "triggerDirection",
+            "type": {
+              "option": {
+                "defined": "TriggerDirection"
+              }
+            }
+          },
+          {
+            "name": "side",
+            "type": {
+              "defined": "Side"
+            }
+          },
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "orderType",
+            "type": {
+              "defined": "OrderType"
+            }
+          },
+          {
+            "name": "bit",
+            "type": "u8"
+          },
+          {
+            "name": "reduceOnly",
+            "type": "bool"
           }
         ]
       }
@@ -17493,6 +18829,23 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "TriggerDirection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "LessThanOrEqual"
+          },
+          {
+            "name": "GreaterThanOrEqual"
+          }
+        ]
+      }
+    },
+    {
       "name": "Asset",
       "type": {
         "kind": "enum",
@@ -18764,6 +20117,61 @@ export const IDL: Zeta = {
       "code": 6145,
       "name": "InvalidDexAccOwner",
       "msg": "Invalid owner for dex account"
+    },
+    {
+      "code": 6146,
+      "name": "TriggerOrderCannotBeRemoved",
+      "msg": "Trigger order cannot be removed"
+    },
+    {
+      "code": 6147,
+      "name": "TriggerOrderCannotBeExecuted",
+      "msg": "Trigger order cannot be executed"
+    },
+    {
+      "code": 6148,
+      "name": "TooManyTriggerOrders",
+      "msg": "Too many trigger orders, close some and retry"
+    },
+    {
+      "code": 6149,
+      "name": "InvalidTriggerOrderRemainingAccounts",
+      "msg": "Invalid trigger order remaining accounts"
+    },
+    {
+      "code": 6150,
+      "name": "InvalidTriggerOrderWhitelistFeesAccount",
+      "msg": "Invalid trigger order whitelist fees account"
+    },
+    {
+      "code": 6151,
+      "name": "MissingTriggerOrderWhitelistFeesAccount",
+      "msg": "Missing trigger order whitelist fees account"
+    },
+    {
+      "code": 6152,
+      "name": "InvalidTriggerOrderBitRange",
+      "msg": "Invalid trigger order bit range"
+    },
+    {
+      "code": 6153,
+      "name": "InvalidSecondaryAdmin",
+      "msg": "Invalid secondary admin"
+    },
+    {
+      "code": 6154,
+      "name": "OnlyOwnerCanEditTriggerOrder",
+      "msg": "Only the owner can edit their own trigger order"
+    },
+    {
+      "code": 6155,
+      "name": "TriggerOrderNeedsTimeOrPriceAndDirection",
+      "msg": "Trigger order needs either a trigger price + direction, or trigger time"
+    },
+    {
+      "code": 6156,
+      "name": "TriggerOrderBitOccupied",
+      "msg": "Given trigger order bit is occupied, pick another"
     }
   ]
 };

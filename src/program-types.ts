@@ -201,6 +201,7 @@ export interface CrossMarginAccount {
   lastFundingDeltasPadding: Array<AnchorDecimal>;
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
+  triggerOrderBits: anchor.BN;
   padding: Array<number>;
 }
 
@@ -232,6 +233,23 @@ export interface SpreadAccount {
   positionsPadding: Array<Position>;
   asset: any;
   padding: Array<number>;
+}
+
+export interface TriggerOrder {
+  owner: PublicKey;
+  marginAccount: PublicKey;
+  openOrders: PublicKey;
+  orderPrice: anchor.BN;
+  triggerPrice: anchor.BN | null; // Option<u64>
+  triggerTs: anchor.BN | null; // Option<u64>
+  size: anchor.BN;
+  creationTs: anchor.BN;
+  triggerDirection: any | null; // Option<TriggerDirection>
+  side: any; // enum Side
+  asset: any; // enum Asset
+  orderType: any; // enum OrderType
+  bit: number;
+  reduceOnly: boolean;
 }
 
 export interface PerpSyncQueue {

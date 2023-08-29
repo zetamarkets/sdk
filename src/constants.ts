@@ -99,6 +99,7 @@ export const CLEAN_MARKET_LIMIT = 9;
 export const CRANK_ACCOUNT_LIMIT = 12;
 export const CRANK_PERP_ACCOUNT_LIMIT = 10;
 export const MAX_MARKETS_TO_FETCH = 50;
+export const MAX_ACCOUNTS_TO_FETCH = 99;
 
 export const MIN_LOT_SIZE = 0.001;
 export const PERP_MARKET_ORDER_SPOT_SLIPPAGE = 0.02;

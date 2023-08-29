@@ -1,4 +1,5 @@
 import * as anchor from "@zetamarkets/anchor";
+import { BN } from "@zetamarkets/anchor";
 import * as utils from "./utils";
 import {
   assetToIndex,
@@ -174,12 +175,20 @@ export class CrossClient {
   private _openOrdersAccounts: PublicKey[];
 
   /**
-   * Returns a list of the user's current orders.
+   * Returns a list of the user's current orders, not including trigger orders
    */
   public get orders(): Map<Asset, types.Order[]> {
     return this._orders;
   }
   private _orders: Map<Asset, types.Order[]>;
+
+  /**
+   * Returns a list of the user's current trigger orders.
+   */
+  public get triggerOrders(): Map<Asset, types.TriggerOrder[]> {
+    return this._triggerOrders;
+  }
+  private _triggerOrders: Map<Asset, types.TriggerOrder[]>;
 
   /**
    * Returns a list of user current margin account positions.
@@ -1003,7 +1012,7 @@ export class CrossClient {
 
     let tifOffsetToUse = utils.getTIFOffset(market, options.tifOptions);
 
-    let orderIx = instructions.placePerpOrderV3Ix(
+    let orderIx = instructions.placePerpOrderV4Ix(
       asset,
       price,
       size,
@@ -1011,6 +1020,7 @@ export class CrossClient {
       options.orderType != undefined
         ? options.orderType
         : types.OrderType.LIMIT,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
@@ -1033,6 +1043,242 @@ export class CrossClient {
     );
     this._openOrdersAccounts[assetIndex] = openOrdersPda;
     return txId;
+  }
+
+  public findAvailableTriggerOrderBit(): number {
+    for (var i = 0; i < 128; i++) {
+      let mask: BN = new BN(1).shln(i); // 1 << i
+      if (this.account.triggerOrderBits.and(mask).isZero()) {
+        return i;
+      }
+    }
+    throw Error("No space for a new trigger order. Delete some and try again.");
+  }
+
+  // A trigger order that will fire at a certain unix timestamp
+  public async placeTimestampTriggerOrder(
+    asset: Asset,
+    orderPrice: number,
+    triggerTime: anchor.BN,
+    size: number,
+    side: types.Side,
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
+  ): Promise<TransactionSignature> {
+    return await this.placeTriggerOrder(
+      asset,
+      orderPrice,
+      size,
+      side,
+      0,
+      types.TriggerDirection.UNINITIALIZED,
+      triggerTime,
+      options
+    );
+  }
+
+  // A trigger order that will fire when markPrice passes triggerPrice in triggerDirection
+  public async placePriceTriggerOrder(
+    asset: Asset,
+    orderPrice: number,
+    triggerPrice: number,
+    size: number,
+    side: types.Side,
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
+    triggerDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      side
+    )
+  ): Promise<TransactionSignature> {
+    return await this.placeTriggerOrder(
+      asset,
+      orderPrice,
+      size,
+      side,
+      triggerPrice,
+      triggerDirection,
+      new anchor.BN(0),
+      options
+    );
+  }
+
+  private async placeTriggerOrder(
+    asset: Asset,
+    orderPrice: number,
+    size: number,
+    side: types.Side,
+    triggerPrice: number,
+    triggerDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      side
+    ),
+    triggerTimestamp: anchor.BN,
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
+  ): Promise<TransactionSignature> {
+    let triggerOrderBit = this.findAvailableTriggerOrderBit();
+
+    let openOrdersPda = null;
+    let assetIndex = assets.assetToIndex(asset);
+    let tx = new Transaction();
+
+    if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
+      console.log(
+        `[${assetToName(
+          asset
+        )}] User doesn't have open orders account. Initialising for asset ${asset}.`
+      );
+
+      let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV3Ix(
+        asset,
+        Exchange.getPerpMarket(asset).address,
+        this._provider.wallet.publicKey,
+        this._accountAddress
+      );
+      openOrdersPda = _openOrdersPda;
+      tx.add(initIx);
+    } else {
+      openOrdersPda = this._openOrdersAccounts[assetIndex];
+    }
+
+    tx.add(
+      instructions.placeTriggerOrderIx(
+        asset,
+        orderPrice,
+        triggerPrice,
+        triggerDirection,
+        triggerTimestamp,
+        triggerOrderBit,
+        size,
+        side,
+        options.orderType != undefined
+          ? options.orderType
+          : types.OrderType.FILLORKILL,
+        options.reduceOnly != undefined ? options.reduceOnly : false,
+        options.tag,
+        this.accountAddress,
+        this._provider.wallet.publicKey,
+        openOrdersPda
+      )
+    );
+
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      options.blockhash
+    );
+    this._openOrdersAccounts[assetIndex] = openOrdersPda;
+    return txId;
+  }
+
+  public async cancelTriggerOrder(orderIndex: number) {
+    let triggerAccount = utils.getTriggerOrder(
+      Exchange.programId,
+      this._accountAddress,
+      new Uint8Array([orderIndex])
+    )[0];
+    let tx = new Transaction().add(
+      instructions.cancelTriggerOrderIx(
+        orderIndex,
+        this._provider.wallet.publicKey,
+        triggerAccount,
+        this._accountAddress
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
+  public async editTimestampTriggerOrder(
+    orderIndex: number,
+    newOrderPrice: number,
+    newTriggerTime: anchor.BN,
+    newSize: number,
+    newSide: types.Side,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
+  ) {
+    await this.editTriggerOrder(
+      orderIndex,
+      newOrderPrice,
+      newSize,
+      newSide,
+      0,
+      types.TriggerDirection.UNINITIALIZED,
+      newTriggerTime,
+      newOptions
+    );
+  }
+
+  public async editPriceTriggerOrder(
+    orderIndex: number,
+    newOrderPrice: number,
+    newTriggerPrice: number,
+    newSize: number,
+    newSide: types.Side,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
+    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      newSide
+    )
+  ) {
+    await this.editTriggerOrder(
+      orderIndex,
+      newOrderPrice,
+      newSize,
+      newSide,
+      newTriggerPrice,
+      newDirection,
+      new anchor.BN(0),
+      newOptions
+    );
+  }
+
+  private async editTriggerOrder(
+    orderIndex: number,
+    newOrderPrice: number,
+    newSize: number,
+    newSide: types.Side,
+    newTriggerPrice: number,
+    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      newSide
+    ),
+    newTriggerTimestamp: anchor.BN,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
+  ) {
+    let triggerAccount = utils.getTriggerOrder(
+      Exchange.programId,
+      this._accountAddress,
+      new Uint8Array([orderIndex])
+    )[0];
+    let tx = new Transaction().add(
+      instructions.editTriggerOrderIx(
+        newOrderPrice,
+        newTriggerPrice,
+        newDirection,
+        newTriggerTimestamp,
+        newSize,
+        newSide,
+        newOptions.orderType != undefined
+          ? newOptions.orderType
+          : types.OrderType.FILLORKILL,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
+        this._provider.wallet.publicKey,
+        triggerAccount
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   public async editDelegatedPubkey(
@@ -1061,7 +1307,7 @@ export class CrossClient {
 
   public createCancelOrderNoErrorInstruction(
     asset: Asset,
-    orderId: anchor.BN,
+    orderId: BN,
     side: types.Side
   ): TransactionInstruction {
     return instructions.cancelOrderNoErrorIx(
@@ -1218,7 +1464,7 @@ export class CrossClient {
     let market = Exchange.getPerpMarket(asset);
     let tifOffset = utils.getTIFOffset(market, options.tifOptions);
 
-    return instructions.placePerpOrderV3Ix(
+    return instructions.placePerpOrderV4Ix(
       asset,
       price,
       size,
@@ -1226,6 +1472,7 @@ export class CrossClient {
       options.orderType != undefined
         ? options.orderType
         : types.OrderType.LIMIT,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffset,
@@ -1244,7 +1491,7 @@ export class CrossClient {
    */
   public async cancelOrder(
     asset: Asset,
-    orderId: anchor.BN,
+    orderId: BN,
     side: types.Side
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
@@ -1286,7 +1533,7 @@ export class CrossClient {
       this._provider.wallet.publicKey,
       this._accountAddress,
       this._openOrdersAccounts[assetToIndex(asset)],
-      new anchor.BN(clientOrderId)
+      new BN(clientOrderId)
     );
     tx.add(ix);
     return await utils.processTransaction(
@@ -1313,7 +1560,7 @@ export class CrossClient {
    */
   public async cancelAndPlaceOrder(
     asset: Asset,
-    orderId: anchor.BN,
+    orderId: BN,
     cancelSide: types.Side,
     newOrderPrice: number,
     newOrderSize: number,
@@ -1337,7 +1584,7 @@ export class CrossClient {
     let tifOffsetToUse = utils.getTIFOffset(market, options.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -1345,6 +1592,7 @@ export class CrossClient {
         options.orderType != undefined
           ? options.orderType
           : types.OrderType.LIMIT,
+        options.reduceOnly != undefined ? options.reduceOnly : false,
         options.clientOrderId != undefined ? options.clientOrderId : 0,
         options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
         tifOffsetToUse,
@@ -1394,14 +1642,14 @@ export class CrossClient {
         this.provider.wallet.publicKey,
         this._accountAddress,
         this._openOrdersAccounts[assetIndex],
-        new anchor.BN(cancelClientOrderId)
+        new BN(cancelClientOrderId)
       )
     );
 
     let tifOffsetToUse = utils.getTIFOffset(market, newOptions.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -1409,6 +1657,7 @@ export class CrossClient {
         newOptions.orderType != undefined
           ? newOptions.orderType
           : types.OrderType.LIMIT,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         newOptions.tag != undefined
           ? newOptions.tag
@@ -1461,14 +1710,14 @@ export class CrossClient {
         this._provider.wallet.publicKey,
         this._accountAddress,
         this._openOrdersAccounts[assetIndex],
-        new anchor.BN(cancelClientOrderId)
+        new BN(cancelClientOrderId)
       )
     );
 
     let tifOffsetToUse = utils.getTIFOffset(market, newOptions.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -1476,6 +1725,7 @@ export class CrossClient {
         newOptions.orderType != undefined
           ? newOptions.orderType
           : types.OrderType.LIMIT,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         newOptions.tag != undefined
           ? newOptions.tag
@@ -1654,7 +1904,7 @@ export class CrossClient {
   public async forceCancelOrderByOrderId(
     asset: Asset,
     marginAccountToCancel: PublicKey,
-    orderId: anchor.BN,
+    orderId: BN,
     side: types.Side
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
@@ -1937,6 +2187,10 @@ export class CrossClient {
     return txIds;
   }
 
+  public getTriggerOrders(asset: Asset): types.TriggerOrder[] {
+    return this._triggerOrders.get(asset);
+  }
+
   public getOrders(asset: Asset): types.Order[] {
     return this._orders.get(asset);
   }
@@ -1991,6 +2245,78 @@ export class CrossClient {
     }
 
     this._orders = ordersByAsset;
+
+    let triggerOrderBits = [];
+
+    // Do this sequentially so the indexes remain in order
+    // Therefore sequential updateOrders() calls won't jumble the order of this._triggerOrders
+    for (var i = 0; i < 128; i++) {
+      let mask: BN = new BN(1).shln(i); // 1 << i
+      if (!this.account.triggerOrderBits.and(mask).isZero()) {
+        triggerOrderBits.push(i);
+      }
+    }
+
+    let triggerOrders = [];
+    let triggerOrdersByAsset: Map<Asset, types.TriggerOrder[]> = new Map();
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
+        triggerOrdersByAsset.set(asset, []);
+      })
+    );
+
+    let triggerOrderAddresses = triggerOrderBits.map(
+      (index) =>
+        utils.getTriggerOrder(
+          Exchange.programId,
+          this.accountAddress,
+          new Uint8Array([index])
+        )[0]
+    );
+
+    for (
+      let i = 0;
+      i < triggerOrderAddresses.length;
+      i += constants.MAX_ACCOUNTS_TO_FETCH
+    ) {
+      let addressSlice = triggerOrderAddresses.slice(
+        i,
+        i + constants.MAX_ACCOUNTS_TO_FETCH
+      );
+
+      let fetchedSlice =
+        await Exchange.program.account.triggerOrder.fetchMultiple(addressSlice);
+
+      let fetchedSliceDecoded = fetchedSlice.map(
+        (order) => order as programTypes.TriggerOrder
+      );
+
+      triggerOrders = triggerOrders.concat(fetchedSliceDecoded);
+    }
+
+    triggerOrders.forEach((rawOrder, i) => {
+      let order = {
+        orderPrice: rawOrder.orderPrice.toNumber(),
+        triggerPrice: rawOrder.triggerPrice
+          ? rawOrder.triggerPrice.toNumber()
+          : null,
+        size: rawOrder.size.toNumber(),
+        creationTs: rawOrder.creationTs.toNumber(),
+        triggerDirection: rawOrder.triggerDirection
+          ? types.fromProgramTriggerDirection(rawOrder.triggerDirection)
+          : null,
+        triggerTimestamp: rawOrder.triggerTs ? rawOrder.triggerTs : null,
+        side: types.fromProgramSide(rawOrder.side),
+        asset: assets.fromProgramAsset(rawOrder.asset),
+        orderType: types.fromProgramOrderType(rawOrder.orderType),
+        reduceOnly: rawOrder.reduceOnly,
+        triggerOrderBit: rawOrder.bit,
+      } as types.TriggerOrder;
+
+      triggerOrdersByAsset.get(order.asset).push(order);
+    });
+
+    this._triggerOrders = triggerOrdersByAsset;
   }
 
   private updatePositions() {

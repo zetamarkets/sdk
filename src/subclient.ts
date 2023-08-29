@@ -565,7 +565,7 @@ export class SubClient {
       options.tifOptions
     );
 
-    let orderIx = instructions.placePerpOrderV3Ix(
+    let orderIx = instructions.placePerpOrderV4Ix(
       this.asset,
       price,
       size,
@@ -573,6 +573,7 @@ export class SubClient {
       options.orderType != undefined
         ? options.orderType
         : types.OrderType.LIMIT,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffsetToUse,
@@ -670,7 +671,7 @@ export class SubClient {
       options.tifOptions
     );
 
-    return instructions.placePerpOrderV3Ix(
+    return instructions.placePerpOrderV4Ix(
       this.asset,
       price,
       size,
@@ -678,6 +679,7 @@ export class SubClient {
       options.orderType != undefined
         ? options.orderType
         : types.OrderType.LIMIT,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
       options.clientOrderId != undefined ? options.clientOrderId : 0,
       options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
       tifOffset,
@@ -793,7 +795,7 @@ export class SubClient {
     );
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         this.asset,
         newOrderPrice,
         newOrderSize,
@@ -801,6 +803,7 @@ export class SubClient {
         options.orderType != undefined
           ? options.orderType
           : types.OrderType.LIMIT,
+        options.reduceOnly != undefined ? options.reduceOnly : false,
         options.clientOrderId != undefined ? options.clientOrderId : 0,
         options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
         tifOffsetToUse,
@@ -859,7 +862,7 @@ export class SubClient {
     );
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         this.asset,
         newOrderPrice,
         newOrderSize,
@@ -867,6 +870,7 @@ export class SubClient {
         newOptions.orderType != undefined
           ? newOptions.orderType
           : types.OrderType.LIMIT,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         newOptions.tag != undefined
           ? newOptions.tag
@@ -928,7 +932,7 @@ export class SubClient {
     );
 
     tx.add(
-      instructions.placePerpOrderV3Ix(
+      instructions.placePerpOrderV4Ix(
         this.asset,
         newOrderPrice,
         newOrderSize,
@@ -936,6 +940,7 @@ export class SubClient {
         newOptions.orderType != undefined
           ? newOptions.orderType
           : types.OrderType.LIMIT,
+        newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         newOptions.clientOrderId != undefined ? newOptions.clientOrderId : 0,
         newOptions.tag != undefined
           ? newOptions.tag

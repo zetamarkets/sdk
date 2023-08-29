@@ -441,12 +441,13 @@ export function closeOpenOrdersV2Ix(
   });
 }
 
-export function placePerpOrderV3Ix(
+export function placePerpOrderV4Ix(
   asset: Asset,
   price: number,
   size: number,
   side: types.Side,
   orderType: types.OrderType,
+  reduceOnly: boolean,
   clientOrderId: number,
   tag: String,
   tifOffset: number,
@@ -472,21 +473,129 @@ export function placePerpOrderV3Ix(
           },
         ]
       : [];
-  return Exchange.program.instruction.placePerpOrderV3(
+  return Exchange.program.instruction.placePerpOrderV4(
     new anchor.BN(price),
     new anchor.BN(size),
     types.toProgramSide(side),
     types.toProgramOrderType(orderType),
+    reduceOnly,
     clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
     new String(tag),
     tifOffset == 0 ? null : tifOffset,
     toProgramAsset(asset),
     {
       accounts: {
+        authority: authority,
+        placeOrderAccounts: {
+          state: Exchange.stateAddress,
+          pricing: Exchange.pricingAddress,
+          marginAccount: marginAccount,
+          dexProgram: constants.DEX_PID[Exchange.network],
+          tokenProgram: TOKEN_PROGRAM_ID,
+          serumAuthority: Exchange.serumAuthority,
+          openOrders: openOrders,
+          rent: SYSVAR_RENT_PUBKEY,
+          marketAccounts: {
+            market: marketData.serumMarket.address,
+            requestQueue: marketData.serumMarket.requestQueueAddress,
+            eventQueue: marketData.serumMarket.eventQueueAddress,
+            bids: marketData.serumMarket.bidsAddress,
+            asks: marketData.serumMarket.asksAddress,
+            coinVault: marketData.serumMarket.baseVaultAddress,
+            pcVault: marketData.serumMarket.quoteVaultAddress,
+            // User params.
+            orderPayerTokenAccount:
+              side == types.Side.BID
+                ? marketData.quoteVault
+                : marketData.baseVault,
+            coinWallet: marketData.baseVault,
+            pcWallet: marketData.quoteVault,
+          },
+          oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+          oracleBackupFeed:
+            Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+          oracleBackupProgram: constants.CHAINLINK_PID,
+          marketMint:
+            side == types.Side.BID
+              ? marketData.serumMarket.quoteMintAddress
+              : marketData.serumMarket.baseMintAddress,
+          mintAuthority: Exchange.mintAuthority,
+          perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
+        },
+      },
+      remainingAccounts,
+    }
+  );
+}
+
+export function placeTriggerOrderIx(
+  asset: Asset,
+  orderPrice: number,
+  triggerPrice: number,
+  triggerDirection: types.TriggerDirection,
+  triggerTimestamp: anchor.BN,
+  triggerOrderBit: number,
+  size: number,
+  side: types.Side,
+  orderType: types.OrderType,
+  reduceOnly: boolean,
+  tag: String,
+  marginAccount: PublicKey,
+  authority: PublicKey,
+  openOrders: PublicKey
+): TransactionInstruction {
+  let [triggerOrder, _nonce] = utils.getTriggerOrder(
+    Exchange.programId,
+    marginAccount,
+    Uint8Array.from([triggerOrderBit])
+  );
+  return Exchange.program.instruction.placeTriggerOrder(
+    triggerOrderBit,
+    new anchor.BN(orderPrice),
+    triggerPrice == 0 ? null : new anchor.BN(triggerPrice),
+    triggerDirection == types.TriggerDirection.UNINITIALIZED
+      ? null
+      : types.toProgramTriggerDirection(triggerDirection),
+    triggerTimestamp == 0 ? null : triggerTimestamp,
+    new anchor.BN(size),
+    types.toProgramSide(side),
+    types.toProgramOrderType(orderType),
+    reduceOnly,
+    new String(tag),
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        openOrders: openOrders,
+        authority: authority,
+        marginAccount: marginAccount,
+        pricing: Exchange.pricingAddress,
+        triggerOrder: triggerOrder,
+        systemProgram: SystemProgram.programId,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        market: Exchange.getPerpMarket(asset).serumMarket.address,
+      },
+    }
+  );
+}
+export function executeTriggerOrderIx(
+  asset: Asset,
+  side: types.Side,
+  triggerOrderBit: number,
+  triggerOrder: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey
+): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
+
+  return Exchange.program.instruction.executeTriggerOrder(triggerOrderBit, {
+    accounts: {
+      admin: Exchange.state.secondaryAdmin,
+      triggerOrder: triggerOrder,
+      placeOrderAccounts: {
         state: Exchange.stateAddress,
         pricing: Exchange.pricingAddress,
         marginAccount: marginAccount,
-        authority: authority,
         dexProgram: constants.DEX_PID[Exchange.network],
         tokenProgram: TOKEN_PROGRAM_ID,
         serumAuthority: Exchange.serumAuthority,
@@ -519,7 +628,53 @@ export function placePerpOrderV3Ix(
         mintAuthority: Exchange.mintAuthority,
         perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
       },
-      remainingAccounts,
+    },
+  });
+}
+export function cancelTriggerOrderIx(
+  triggerOrderBit: number,
+  payer: PublicKey,
+  triggerOrder: PublicKey,
+  marginAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.cancelTriggerOrder(triggerOrderBit, {
+    accounts: {
+      state: Exchange.stateAddress,
+      payer: payer,
+      admin: Exchange.state.secondaryAdmin,
+      triggerOrder: triggerOrder,
+      marginAccount: marginAccount,
+    },
+  });
+}
+export function editTriggerOrderIx(
+  newOrderPrice: number,
+  newTriggerPrice: number,
+  newTriggerDirection: types.TriggerDirection,
+  newTriggerTimestamp: anchor.BN,
+  newSize: number,
+  newSide: types.Side,
+  newOrderType: types.OrderType,
+  newReduceOnly: boolean,
+  owner: PublicKey,
+  triggerOrder: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.editTriggerOrder(
+    new anchor.BN(newOrderPrice),
+    newTriggerPrice == 0 ? null : new anchor.BN(newTriggerPrice),
+    newTriggerDirection == types.TriggerDirection.UNINITIALIZED
+      ? null
+      : types.toProgramTriggerDirection(newTriggerDirection),
+    newTriggerTimestamp == 0 ? null : new anchor.BN(newTriggerTimestamp),
+    new anchor.BN(newSize),
+    types.toProgramSide(newSide),
+    types.toProgramOrderType(newOrderType),
+    newReduceOnly,
+    {
+      accounts: {
+        owner: owner,
+        triggerOrder: triggerOrder,
+      },
     }
   );
 }

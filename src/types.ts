@@ -64,9 +64,25 @@ export function toProgramOrderType(orderType: OrderType) {
   if (orderType == OrderType.POSTONLYSLIDE) return { postOnlySlide: {} };
 }
 
+export function fromProgramOrderType(orderType: any): OrderType {
+  if (objectEquals(orderType, { limit: {} })) return OrderType.LIMIT;
+  if (objectEquals(orderType, { postOnly: {} })) return OrderType.POSTONLY;
+  if (objectEquals(orderType, { fillOrKill: {} })) return OrderType.FILLORKILL;
+  if (objectEquals(orderType, { immediateOrCancel: {} }))
+    return OrderType.IMMEDIATEORCANCEL;
+  if (objectEquals(orderType, { postOnlySlide: {} }))
+    return OrderType.POSTONLYSLIDE;
+}
+
 export enum Side {
   BID,
   ASK,
+}
+
+export enum TriggerDirection {
+  UNINITIALIZED,
+  LESSTHANOREQUAL,
+  GREATERTHANOREQUAL,
 }
 
 export enum UserCallbackType {
@@ -90,6 +106,31 @@ export function fromProgramSide(side: any): Side {
     return Side.ASK;
   }
   throw Error("Invalid program side!");
+}
+
+export function toProgramTriggerDirection(triggerDirection: TriggerDirection) {
+  if (triggerDirection == TriggerDirection.UNINITIALIZED)
+    return { uninitialized: {} };
+  if (triggerDirection == TriggerDirection.LESSTHANOREQUAL)
+    return { lessThanOrEqual: {} };
+  if (triggerDirection == TriggerDirection.GREATERTHANOREQUAL)
+    return { greaterThanOrEqual: {} };
+  throw Error("Invalid triggerDirection");
+}
+
+export function fromProgramTriggerDirection(
+  triggerDirection: any
+): TriggerDirection {
+  if (objectEquals(triggerDirection, { uninitialized: {} })) {
+    return TriggerDirection.UNINITIALIZED;
+  }
+  if (objectEquals(triggerDirection, { lessThanOrEqual: {} })) {
+    return TriggerDirection.LESSTHANOREQUAL;
+  }
+  if (objectEquals(triggerDirection, { greaterThanOrEqual: {} })) {
+    return TriggerDirection.GREATERTHANOREQUAL;
+  }
+  throw Error("Invalid program triggerDirection!");
 }
 
 export enum Kind {
@@ -129,6 +170,20 @@ export interface Order {
   clientOrderId: BN;
   tifOffset: number;
   asset: Asset;
+}
+
+export interface TriggerOrder {
+  orderPrice: number;
+  triggerPrice: number | null;
+  size: number;
+  creationTs: number;
+  triggerDirection: TriggerDirection | null;
+  triggerTimestamp: anchor.BN | null;
+  side: Side;
+  asset: Asset;
+  orderType: OrderType;
+  reduceOnly: boolean;
+  triggerOrderBit: number;
 }
 
 export function orderEquals(
@@ -355,9 +410,32 @@ export function fromProgramOrderCompleteType(
 export interface OrderOptions {
   tifOptions: TIFOptions;
   orderType?: types.OrderType;
+  reduceOnly?: boolean;
   clientOrderId?: number;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
+}
+
+export interface TriggerOrderOptions {
+  orderType?: types.OrderType;
+  reduceOnly?: boolean;
+  tag?: string;
+  blockhash?: { blockhash: string; lastValidBlockHeight: number };
+}
+
+export function getDefaultTriggerDirection(side: Side): TriggerDirection {
+  return side == Side.BID
+    ? TriggerDirection.LESSTHANOREQUAL
+    : TriggerDirection.GREATERTHANOREQUAL;
+}
+
+export function defaultTriggerOrderOptions(): TriggerOrderOptions {
+  return {
+    orderType: OrderType.FILLORKILL,
+    reduceOnly: false,
+    tag: constants.DEFAULT_ORDER_TAG,
+    blockhash: undefined,
+  };
 }
 
 /**
@@ -377,6 +455,7 @@ export function defaultOrderOptions(): OrderOptions {
       expiryTs: undefined,
     },
     orderType: OrderType.LIMIT,
+    reduceOnly: false,
     clientOrderId: 0,
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,
