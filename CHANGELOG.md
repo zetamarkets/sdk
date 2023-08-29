@@ -5,6 +5,30 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.7.4] 2023-08-28
+
+- Clamp executionInfo.size in calculatePnl() instead of throwing and error. ([#261](https://github.com/zetamarkets/sdk/pull/261))
+
+## [1.7.3] 2023-08-28
+
+- Small bugfix for sizeUpperBound in getMaxTradeSize(). ([#260](https://github.com/zetamarkets/sdk/pull/260))
+
+## [1.7.2] 2023-08-24
+
+- New risk utils return 0 if balance is 0. ([#259](https://github.com/zetamarkets/sdk/pull/259))
+
+## [1.7.1] 2023-08-23
+
+- Small bugfix for post-trade calcs. ([#258](https://github.com/zetamarkets/sdk/pull/258))
+
+## [1.7.0] 2023-08-21
+
+- Add post-trade calculations to risk.ts, allowing for accurate simulations of account metrics from a hypothetical order/trade. ([#257](https://github.com/zetamarkets/sdk/pull/257))
+
+## [1.6.1] 2023-08-09
+
+- getMaxTradeSize() now simulates all positions and orders correctly. ([#256](https://github.com/zetamarkets/sdk/pull/256))
+
 ## [1.6.0] 2023-07-25
 
 - Add getMaxTradeSize() and getLiquidationPrice() to risk calcs. ([#252](https://github.com/zetamarkets/sdk/pull/252))

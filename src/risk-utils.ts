@@ -1,14 +1,26 @@
-import { BN } from "@zetamarkets/anchor";
 import { types, Exchange, constants, assets } from ".";
 import { Asset } from "./constants";
+import { CrossMarginAccount, MarginAccount } from "./program-types";
 import {
-  Position,
-  SpreadAccount,
-  MarginAccount,
-  ProductLedger,
-} from "./program-types";
-import { getProductLedger, convertNativeBNToDecimal } from "./utils";
+  convertDecimalToNativeInteger,
+  convertDecimalToNativeLotSize,
+  convertNativeBNToDecimal,
+  convertNativeLotSizeToDecimal,
+} from "./utils";
+import cloneDeep from "lodash.clonedeep";
+import * as anchor from "@zetamarkets/anchor";
 
+/**
+ * Assemble a collected risk state Map<Asset, types.AssetRiskState>, describing important values on a per-asset basis.
+ * This is used getCrossMarginAccountState() and you probably don't need to be accessing it directly.
+ * @param imMap Initial margins map
+ * @param imSCMap Initial margins (skip concession) map
+ * @param mmMap Maintenance margins map
+ * @param mmioMap Maintenance margins (including orders) map
+ * @param upnlMap Unrealised PnL map
+ * @param unpaidFundingMap Unpaid funding map
+ * @returns map of AssetRiskStates for each asset
+ */
 export function collectRiskMaps(
   imMap: Map<Asset, Number>,
   imSCMap: Map<Asset, Number>,
@@ -34,11 +46,12 @@ export function collectRiskMaps(
 
 /**
  * Calculates the price at which a position will be liquidated.
- * @param accountBalance    margin account balance.
- * @param marginRequirement total margin requirement for margin account.
- * @param unrealizedPnl     unrealized pnl for margin account.
- * @param markPrice         mark price of product being calculated.
- * @param position          signed position size of user.
+ * @param accountBalance    margin account balance in decimal USDC
+ * @param marginRequirement total margin requirement for margin account, in decimal USDC
+ * @param unrealizedPnl     signed unrealized pnl for margin account, in decimal USDC
+ * @param markPrice         mark price of product being calculated, in decimal USDC
+ * @param position          signed position size of user, in decimal USDC
+ * @returns Liquidation price, in decimal USDC
  */
 export function calculateLiquidationPrice(
   accountBalance: number,
@@ -55,32 +68,10 @@ export function calculateLiquidationPrice(
 }
 
 /**
- * Calculates how much the strike is out of the money.
- * @param kind          product kind (expect CALL/PUT);
- * @param strike        strike of the product.
- * @param spotPrice     price of the spot.
- */
-export function calculateOtmAmount(
-  kind: types.Kind,
-  strike: number,
-  spotPrice: number
-): number {
-  switch (kind) {
-    case types.Kind.CALL: {
-      return Math.max(0, strike - spotPrice);
-    }
-    case types.Kind.PUT: {
-      return Math.max(0, spotPrice - strike);
-    }
-    default:
-      throw Error("Unsupported kind for OTM amount.");
-  }
-}
-
-/**
- * Calculates the margin requirement for given market index.
+ * Calculates the margin requirement for a given market.
  * @param asset         underlying asset (SOL, BTC, etc.)
- * @param spotPrice     price of the spot.
+ * @param spotPrice     price of the spot, in decimal USDC
+ * @returns Margin in decimal USDC
  */
 export function calculateProductMargin(
   asset: Asset,
@@ -101,11 +92,12 @@ export function calculateProductMargin(
 }
 
 /**
- * Calculates the margin requirement for a future.
+ * Calculates the margin requirement for a given market.
  * @param asset         underlying asset (SOL, BTC, etc.)
- * @param spotPrice     price of the spot.
+ * @param spotPrice     price of the spot, in decimal USDC
+ * @returns Margin in decimal USDC
  */
-export function calculateFutureMargin(
+export function calculatePerpMargin(
   asset: Asset,
   spotPrice: number
 ): types.MarginRequirement {
@@ -131,17 +123,10 @@ export function calculateFutureMargin(
 }
 
 /**
- * Calculates the margin requirement for a perp.
- * @param asset         underlying asset (SOL, BTC, etc.)
- * @param spotPrice     price of the spot.
+ * Checks whether a given account has enough maintenance margin. If not, it may be liquidated.
+ * @param marginAccount The MarginAccount itself.
+ * @returns Whether the account has enough maintenance margin.
  */
-export function calculatePerpMargin(
-  asset: Asset,
-  spotPrice: number
-): types.MarginRequirement {
-  return calculateFutureMargin(asset, spotPrice);
-}
-
 export function checkMarginAccountMarginRequirement(
   marginAccount: MarginAccount
 ) {
@@ -158,251 +143,203 @@ export function checkMarginAccountMarginRequirement(
   return buffer > 0;
 }
 
-export function handleExecutionCostOfTrades(
-  marginAccount: MarginAccount,
-  index: number,
-  size: number,
-  costOfTrades: number,
-  orderbook: boolean
-) {
-  if (size === 0) {
-    if (costOfTrades !== 0) {
-      throw Error("Cost of trades must be greater than zero.");
-    }
-    return;
-  }
-  let ledger = getProductLedger(marginAccount, index);
-  let [openSize, closeSize] = getExecutionOpenCloseSize(
-    ledger.position.size.toNumber(),
-    size
-  );
-  let sideIndex =
-    size > 0 ? constants.BID_ORDERS_INDEX : constants.ASK_ORDERS_INDEX;
-
-  if (orderbook) {
-    ledger.orderState.closingOrders = new BN(
-      ledger.orderState.closingOrders.toNumber() - closeSize
-    );
-    ledger.orderState.openingOrders[sideIndex] = new BN(
-      ledger.orderState.openingOrders[sideIndex].toNumber() - openSize
-    );
-  }
-
-  let [openCostOfTrades, closeCostOfTrades] = getOpenCloseCostOfTrades(
-    openSize,
-    closeSize,
-    costOfTrades
-  );
-  let signedOpenSize = size >= 0 ? openSize : -openSize;
-  resetClosingOrders(ledger);
-
-  closePosition(ledger.position, marginAccount, closeSize, closeCostOfTrades);
-
-  openPosition(ledger.position, signedOpenSize, openCostOfTrades);
-  rebalanceOrders(ledger);
-}
-
-function rebalanceOrders(ledger: ProductLedger) {
-  if (
-    ledger.orderState.closingOrders.toNumber() !== 0 ||
-    ledger.position.size.toNumber() === 0
-  ) {
-    return;
-  }
-
-  // If long, closing order size are asks
-  // If short, closing order size are bids
-  let index =
-    ledger.position.size.toNumber() > 0
-      ? constants.ASK_ORDERS_INDEX
-      : constants.BID_ORDERS_INDEX;
-  ledger.orderState.closingOrders = new BN(
-    Math.min(
-      Math.abs(ledger.position.size.toNumber()),
-      ledger.orderState.openingOrders[index].toNumber()
-    )
-  );
-  ledger.orderState.openingOrders[index] = new BN(
-    ledger.orderState.openingOrders[index].toNumber() -
-      ledger.orderState.closingOrders.toNumber()
-  );
-}
-
-/// Moves closing orders to the respective opening orders.
-/// To be called before executing or moving positions.
-/// `rebalance_orders` should be called after executing.
-function resetClosingOrders(ledger: ProductLedger) {
-  if (
-    ledger.orderState.closingOrders.toNumber() === 0 ||
-    ledger.position.size.toNumber() === 0
-  )
-    return;
-  // If long, closing order size are asks
-  // If short, closing order size are bids
-  let index =
-    ledger.position.size.toNumber() > 0
-      ? constants.ASK_ORDERS_INDEX
-      : constants.BID_ORDERS_INDEX;
-  ledger.orderState.openingOrders[index] = new BN(
-    ledger.orderState.openingOrders[index].toNumber() +
-      ledger.orderState.closingOrders.toNumber()
-  );
-  ledger.orderState.closingOrders = new BN(0);
-}
-
-function moveSize(position: Position, size: number) {
-  if (size === 0) return 0;
-  if (
-    (size > 0 && position.size.toNumber() < size) ||
-    (size < 0 && position.size.toNumber() > size)
-  ) {
-    throw Error("Invalid movement size.");
-  }
-  let costOfTrades;
-  if (size === position.size.toNumber()) {
-    costOfTrades = position.costOfTrades;
-    position.costOfTrades = new BN(0);
-    position.size = new BN(0);
-  } else {
-    costOfTrades = prorataCostOfTrades(position, Math.abs(size));
-    // larger (-ve) minus smaller (-ve) or larger (+ve) minus larger (+ve) -> 0
-    position.size = new BN(position.size.toNumber() - size);
-    position.costOfTrades = new BN(
-      position.costOfTrades.toNumber() - costOfTrades
-    );
-  }
-
-  return costOfTrades;
-}
-
-function getExecutionOpenCloseSize(
-  positionSize: number,
-  executionSize: number
-) {
-  // If is opening size
-  if (
-    (executionSize > 0 && positionSize >= 0) ||
-    (executionSize < 0 && positionSize <= 0)
-  ) {
-    return [Math.abs(executionSize), 0];
-  }
-  let executionSizeAbs = Math.abs(executionSize);
-  let closeSize = Math.min(executionSizeAbs, Math.abs(positionSize));
-  let openSize = executionSizeAbs - closeSize;
-
-  return [openSize, closeSize];
-}
-
-function getOpenCloseCostOfTrades(
-  openSize: number,
-  closeSize: number,
-  costOfTrades: number
-) {
-  let size = openSize + closeSize;
-  let closeCostOfTrades;
-  let openCostOfTrades;
-  if (openSize === 0) {
-    openCostOfTrades = 0;
-    closeCostOfTrades = costOfTrades;
-  } else {
-    closeCostOfTrades = (costOfTrades / size) * closeSize;
-    openCostOfTrades = costOfTrades - closeCostOfTrades;
-  }
-  return [openCostOfTrades, closeCostOfTrades];
-}
-
-function openPosition(position: Position, size: number, costOfTrades: number) {
-  if (size === 0 || costOfTrades === 0) return;
-
-  // Assert same side
-  if (
-    (size > 0 && position.size.toNumber() < 0) ||
-    (size < 0 && position.size.toNumber() > 0)
-  ) {
-    return;
-  }
-
-  position.size = new BN(position.size.toNumber() + size);
-  position.costOfTrades = new BN(
-    position.costOfTrades.toNumber() + costOfTrades
-  );
-}
-
-function closePosition(
-  position: Position,
-  account: SpreadAccount | MarginAccount,
-  size: number,
-  executionCostOfTrades: number
-) {
-  if (size === 0) return;
-  let positionSizeAbs = Math.abs(position.size.toNumber());
-  // Cannot close more than your position
-  if (size > positionSizeAbs) return;
-
-  let fullClose = size === positionSizeAbs;
-  let closedCostOfTrades = prorataCostOfTrades(position, size);
-  /*
-   * Cases:
-   * 1. Closing long position
-   * - Profitable if execution COT > closed COT (bought for more than purchase)
-   * - Loss if execution COT < closed COT (Sold for less than purchase)
-   * 2. Closing short position
-   * - Profitable if execution COT < closed COT (bought back for less than sold)
-   * - Loss if execution COT > closed COT (bought back for more than sold)
-   */
-  let [profitable, balanceDelta] =
-    closedCostOfTrades >= executionCostOfTrades
-      ? [
-          position.size.toNumber() < 0,
-          closedCostOfTrades - executionCostOfTrades,
-        ]
-      : [
-          position.size.toNumber() > 0,
-          executionCostOfTrades - closedCostOfTrades,
-        ];
-
-  if (profitable) {
-    account.balance = new BN(account.balance.toNumber() + balanceDelta);
-  } else {
-    account.balance = new BN(account.balance.toNumber() - balanceDelta);
-  }
-
-  if (position.size.toNumber() > 0) {
-    position.size = new BN(position.size.toNumber() - size);
-  } else {
-    position.size = new BN(position.size.toNumber() + size);
-  }
-
-  // Closed_cost_of_trades may have small rounding error.
-  if (fullClose) {
-    position.costOfTrades = new BN(0);
-  } else {
-    position.costOfTrades = new BN(
-      position.costOfTrades.toNumber() - closedCostOfTrades
-    );
-  }
-}
-
-function prorataCostOfTrades(position: Position, size: number) {
-  let sizeAbs = Math.abs(position.size.toNumber());
-  if (size === sizeAbs) {
-    return position.costOfTrades.toNumber();
-  } else {
-    return Math.floor(position.costOfTrades.toNumber() / sizeAbs) * size;
-  }
-}
-
-function calculateSignedCostOfTrades(price: number, size: number): number {
-  return Math.floor(
-    (price * size) / Math.pow(10, constants.POSITION_PRECISION)
-  );
-}
-
-export function calculateNormalizedCostOfTrades(
+/**
+ * Simulate adding an extra position/order into an existing CrossMarginAccount.
+ * This will change the account! Therefore do a deep clone first if you want a new account to simulate.
+ * @param marginAccount The CrossMarginAccount itself
+ * @param isTaker Whether or not the order crosses the orderbook in full and becomes a position
+ * @param asset The market on which we're trading
+ * @param side Bid or ask
+ * @param price The trade price, in decimal USDC
+ * @param size The trade size, in decimal USDC (absolute value, so it must be > 0)
+ */
+export function addFakeTradeToAccount(
+  marginAccount: CrossMarginAccount,
+  isTaker: boolean,
+  asset: constants.Asset,
+  side: types.Side,
   price: number,
   size: number
-): number {
-  return Math.floor(
-    Math.abs(price * size) / Math.pow(10, constants.POSITION_PRECISION)
+) {
+  let assetIndex = assets.assetToIndex(asset);
+  let editedPosition = marginAccount.productLedgers[assetIndex].position;
+  let editedOrderState = marginAccount.productLedgers[assetIndex].orderState;
+  let markPrice = Exchange.getMarkPrice(asset);
+
+  let fee = isTaker
+    ? (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
+        100) *
+      price
+    : 0;
+
+  let sizeNative = convertDecimalToNativeLotSize(size);
+  let currentSizeBN = editedPosition.size;
+  let currentSize = currentSizeBN.toNumber();
+  // Fake the new position, moving both editedPosition and editedOrderState
+  if (isTaker) {
+    editedPosition.size = editedPosition.size.add(
+      new anchor.BN(side == types.Side.BID ? sizeNative : -sizeNative)
+    );
+    marginAccount.balance = marginAccount.balance.sub(
+      new anchor.BN(convertDecimalToNativeInteger(fee * size, 1))
+    );
+
+    // If we're just adding to costOfTrades
+    if (
+      (side == types.Side.BID && currentSize > 0) ||
+      (side == types.Side.ASK && currentSize < 0)
+    ) {
+      editedPosition.costOfTrades = editedPosition.costOfTrades.add(
+        new anchor.BN(size * convertDecimalToNativeInteger(price, 1))
+      );
+
+      let openIndex = side == types.Side.BID ? 1 : 0;
+      let diff = anchor.BN.min(
+        editedOrderState.openingOrders[openIndex],
+        new anchor.BN(sizeNative)
+      );
+      editedOrderState.closingOrders = editedOrderState.closingOrders.add(diff);
+      editedOrderState.openingOrders[openIndex] =
+        editedOrderState.openingOrders[openIndex].sub(diff);
+    }
+    // If we're just reducing the current position
+    else if (sizeNative < Math.abs(currentSize)) {
+      let entryPrice = new anchor.BN(
+        editedPosition.costOfTrades.toNumber() /
+          convertNativeLotSizeToDecimal(Math.abs(currentSize))
+      );
+      let priceDiff = entryPrice.sub(
+        new anchor.BN(convertDecimalToNativeInteger(price, 1))
+      );
+      marginAccount.balance = marginAccount.balance.add(
+        new anchor.BN(side == types.Side.BID ? size : -size).mul(priceDiff)
+      );
+
+      editedPosition.costOfTrades = editedPosition.costOfTrades.sub(
+        editedPosition.costOfTrades
+          .mul(new anchor.BN(sizeNative))
+          .div(currentSizeBN.abs())
+      );
+
+      let openIndex = side == types.Side.BID ? 0 : 1;
+      let diff = anchor.BN.min(
+        editedOrderState.closingOrders,
+        new anchor.BN(sizeNative)
+      );
+      editedOrderState.closingOrders = editedOrderState.closingOrders.sub(diff);
+      editedOrderState.openingOrders[openIndex] =
+        editedOrderState.openingOrders[openIndex].add(diff);
+    }
+    // If we're zeroing out the current position and opening a position on the other side
+    else {
+      if (Math.abs(currentSize) > 0) {
+        let entryPrice = new anchor.BN(
+          editedPosition.costOfTrades.toNumber() /
+            convertNativeLotSizeToDecimal(Math.abs(currentSize))
+        );
+        let priceDiff = entryPrice.sub(
+          new anchor.BN(convertDecimalToNativeInteger(price, 1))
+        );
+        marginAccount.balance = marginAccount.balance.add(
+          new anchor.BN(
+            side == types.Side.BID
+              ? convertNativeLotSizeToDecimal(currentSizeBN.abs())
+              : -convertNativeLotSizeToDecimal(currentSizeBN.abs())
+          ).mul(priceDiff)
+        );
+      }
+
+      editedPosition.costOfTrades = new anchor.BN(
+        convertNativeLotSizeToDecimal(
+          Math.abs(editedPosition.size.toNumber())
+        ) * convertDecimalToNativeInteger(price, 1)
+      );
+
+      let sameSide = side == types.Side.BID ? 0 : 1;
+      let otherSide = side == types.Side.BID ? 1 : 0;
+      editedOrderState.openingOrders[sameSide] = editedOrderState.openingOrders[
+        sameSide
+      ].add(editedOrderState.closingOrders);
+
+      editedOrderState.closingOrders = anchor.BN.max(
+        editedOrderState.openingOrders[otherSide].sub(
+          editedPosition.size.abs()
+        ),
+        new anchor.BN(0)
+      );
+
+      editedOrderState.openingOrders[otherSide] =
+        editedOrderState.openingOrders[otherSide].sub(
+          editedOrderState.closingOrders
+        );
+    }
+  }
+  // Fake the new order. editedPosition is untouched
+  else {
+    // Any non-filled trades have an extra PnL adjustment
+    // Only negative PnL is used
+    let pnlAdjustment = size * (markPrice - price);
+    pnlAdjustment = Math.min(
+      0,
+      side == types.Side.BID ? pnlAdjustment : -pnlAdjustment
+    );
+    marginAccount.balance = marginAccount.balance.add(
+      new anchor.BN(convertDecimalToNativeInteger(pnlAdjustment, 1))
+    );
+
+    // If we're just adding an extra order on the same side as the existing position
+    if (
+      (side == types.Side.BID && currentSize > 0) ||
+      (side == types.Side.ASK && currentSize < 0)
+    ) {
+      let i = side == types.Side.BID ? 0 : 1;
+      editedOrderState.openingOrders[i] = editedOrderState.openingOrders[i].add(
+        new anchor.BN(sizeNative)
+      );
+    }
+
+    // If we're adding to the opposite side then both openingOrders and closingOrders change
+    else {
+      let i = side == types.Side.BID ? 0 : 1;
+      let newOrderSize = editedOrderState.closingOrders
+        .add(editedOrderState.openingOrders[i])
+        .add(new anchor.BN(sizeNative));
+      editedOrderState.closingOrders = anchor.BN.min(
+        newOrderSize,
+        editedPosition.size.abs()
+      );
+      editedOrderState.openingOrders[i] = newOrderSize.sub(
+        editedOrderState.closingOrders
+      );
+    }
+  }
+
+  marginAccount.productLedgers[assetIndex].orderState = editedOrderState;
+  marginAccount.productLedgers[assetIndex].position = editedPosition;
+}
+
+/**
+ * Simulate adding an extra position/order into an existing CrossMarginAccount, but deep copy the account first and return that deep copied account
+ * @param marginAccount the CrossMarginAccount itself, untouched if clone = true
+ * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling this multiple times.
+ * @param executionInfo A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
+ * @returns The edited CrossMarginAccount with an added trade/order
+ */
+export function fakeTrade(
+  marginAccount: CrossMarginAccount,
+  clone: boolean,
+  executionInfo: types.ExecutionInfo
+): CrossMarginAccount {
+  let account = clone
+    ? (cloneDeep(marginAccount) as CrossMarginAccount)
+    : marginAccount;
+  addFakeTradeToAccount(
+    account,
+    executionInfo.isTaker,
+    executionInfo.asset,
+    executionInfo.size > 0 ? types.Side.BID : types.Side.ASK,
+    executionInfo.price,
+    Math.abs(executionInfo.size)
   );
+  return account;
 }

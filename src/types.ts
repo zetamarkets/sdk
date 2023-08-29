@@ -260,6 +260,7 @@ export interface MarginRequirement {
 
 export interface MarginAccountState {
   balance: number;
+  equity: number;
   initialMargin: number;
   initialMarginSkipConcession: number;
   maintenanceMargin: number;
@@ -281,6 +282,7 @@ export interface AssetRiskState {
 
 export interface CrossMarginAccountState {
   balance: number;
+  equity: number;
   availableBalanceInitial: number;
   availableBalanceMaintenance: number;
   availableBalanceMaintenanceIncludingOrders: number;
@@ -482,4 +484,11 @@ export function defaultLoadExchangeConfig(
     throttleMs,
     loadFromStore,
   };
+}
+
+export interface ExecutionInfo {
+  asset: Asset;
+  price: number;
+  size: number;
+  isTaker: boolean;
 }
