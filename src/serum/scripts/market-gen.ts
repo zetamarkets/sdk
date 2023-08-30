@@ -63,9 +63,9 @@ function populateMarketStore(
   let subExchange = Exchange.getSubExchange(asset);
   let decodedSerumMarket: any;
   if (index == constants.PERP_INDEX) {
-    decodedSerumMarket = subExchange.markets.perpMarket.serumMarket.decoded;
+    decodedSerumMarket = subExchange.markets.market.serumMarket.decoded;
   } else {
-    decodedSerumMarket = subExchange.markets.markets[index].serumMarket.decoded;
+    throw Error("non-perps not supported");
   }
 
   for (const k in decodedSerumMarket) {

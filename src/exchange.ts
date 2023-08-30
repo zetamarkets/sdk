@@ -13,7 +13,7 @@ import * as utils from "./utils";
 import * as constants from "./constants";
 import * as assets from "./assets";
 import { PerpSyncQueue, ProductGreeks, State, Pricing } from "./program-types";
-import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
+import { Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
 import { Network } from "./network";
@@ -600,6 +600,7 @@ export class Exchange {
     const clockData = utils.getClockData(accFetches.at(-1));
     this.subscribeClock(clockData, callback);
     this.subscribePricing(callback);
+    this.subscribeState(callback);
 
     await Promise.all(
       this.assets.map(async (asset, i) => {
@@ -615,6 +616,7 @@ export class Exchange {
     );
 
     for (var se of this.getAllSubExchanges()) {
+      se.markets.market.subscribeOrderbook(callback);
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 
@@ -726,11 +728,6 @@ export class Exchange {
             this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
-            await Promise.all(
-              this.getAllSubExchanges().map(async (subExchange) => {
-                await subExchange.handlePolling(callback);
-              })
-            );
             if (this._useAutoPriorityFee == true) {
               await this.updateAutoFee();
             }
@@ -751,11 +748,6 @@ export class Exchange {
   public async updateExchangeState() {
     await this.updateState();
     await this.updateZetaPricing();
-    await Promise.all(
-      this.assets.map(async (asset) => {
-        this.getZetaGroupMarkets(asset).updateExpirySeries();
-      })
-    );
   }
 
   /**
@@ -789,6 +781,24 @@ export class Exchange {
     await this.updateState();
   }
 
+  private subscribeState(
+    callback?: (asset: Asset, type: EventType, data: any) => void
+  ) {
+    let eventEmitter = this._program.account.state.subscribe(
+      this._stateAddress,
+      this.provider.connection.commitment
+    );
+
+    eventEmitter.on("change", async (state: State) => {
+      this._state = state;
+      if (callback !== undefined) {
+        callback(null, EventType.EXCHANGE, null);
+      }
+    });
+
+    this._eventEmitters.push(eventEmitter);
+  }
+
   private subscribePricing(
     callback?: (asset: Asset, type: EventType, data: any) => void
   ) {
@@ -807,112 +817,12 @@ export class Exchange {
     this._eventEmitters.push(eventEmitter);
   }
 
-  public subscribeMarket(asset: Asset) {
-    this.getSubExchange(asset).markets.subscribeMarket(constants.PERP_INDEX);
-  }
-
-  public unsubscribeMarket(asset: Asset) {
-    this.getSubExchange(asset).markets.unsubscribeMarket(constants.PERP_INDEX);
-  }
-
-  public subscribePerp(asset: Asset) {
-    this.getSubExchange(asset).markets.subscribePerp();
-  }
-
-  public unsubscribePerp(asset: Asset) {
-    this.getSubExchange(asset).markets.unsubscribePerp();
-  }
-
-  public async updateOrderbook(asset: Asset) {
-    return await this.getPerpMarket(asset).updateOrderbook();
-  }
-
-  public async updateAllOrderbooks(live: boolean = true) {
-    // This assumes that every market has 1 asksAddress and 1 bidsAddress
-    let allLiveMarkets = [];
-    this.assets.forEach((asset) => {
-      allLiveMarkets = allLiveMarkets.concat([this.getPerpMarket(asset)]);
-    });
-
-    if (live) {
-      allLiveMarkets = allLiveMarkets.filter(
-        (m) => m.kind == types.Kind.PERP || m.expirySeries.isLive()
-      );
-    }
-
-    let liveMarketsSlices: Market[][] = [];
-    for (
-      let i = 0;
-      i < allLiveMarkets.length;
-      i += constants.MAX_MARKETS_TO_FETCH
-    ) {
-      liveMarketsSlices.push(
-        allLiveMarkets.slice(i, i + constants.MAX_MARKETS_TO_FETCH)
-      );
-    }
-
-    await Promise.all(
-      liveMarketsSlices.map(async (liveMarkets) => {
-        let liveMarketAskAddresses = liveMarkets.map(
-          (m) => m.serumMarket.asksAddress
-        );
-        let liveMarketBidAddresses = liveMarkets.map(
-          (m) => m.serumMarket.bidsAddress
-        );
-
-        let accountInfos = await this.connection.getMultipleAccountsInfo(
-          liveMarketAskAddresses.concat(liveMarketBidAddresses)
-        );
-        const half = Math.ceil(accountInfos.length / 2);
-        const asksAccountInfos = accountInfos.slice(0, half);
-        const bidsAccountInfos = accountInfos.slice(-half);
-
-        // A bit of a weird one but we want a map of liveMarkets -> accountInfos because
-        // we'll do the following orderbook updates async
-        let liveMarketsToAskAccountInfosMap: Map<
-          Market,
-          AccountInfo<Buffer>
-        > = new Map();
-        let liveMarketsToBidAccountInfosMap: Map<
-          Market,
-          AccountInfo<Buffer>
-        > = new Map();
-        liveMarkets.map((m, i) => {
-          liveMarketsToAskAccountInfosMap.set(m, asksAccountInfos[i]);
-          liveMarketsToBidAccountInfosMap.set(m, bidsAccountInfos[i]);
-        });
-
-        await Promise.all(
-          liveMarkets.map(async (market) => {
-            market.asks = Orderbook.decode(
-              market.serumMarket,
-              liveMarketsToAskAccountInfosMap.get(market).data
-            );
-            market.bids = Orderbook.decode(
-              market.serumMarket,
-              liveMarketsToBidAccountInfosMap.get(market).data
-            );
-            market.updateOrderbook(false);
-          })
-        );
-      })
-    );
-  }
-
   public getZetaGroupMarkets(asset: Asset): ZetaGroupMarkets {
     return this.getSubExchange(asset).markets;
   }
 
   public getPerpMarket(asset: Asset): Market {
-    return this.getSubExchange(asset).markets.perpMarket;
-  }
-
-  public getMarketsByExpiryIndex(asset: Asset, index: number): Market[] {
-    return this.getSubExchange(asset).markets.getMarketsByExpiryIndex(index);
-  }
-
-  public getExpirySeriesList(asset: Asset): ExpirySeries[] {
-    return this.getSubExchange(asset).markets.expirySeries;
+    return this.getSubExchange(asset).markets.market;
   }
 
   public getZetaGroupAddress(asset: Asset): PublicKey {
@@ -1035,10 +945,6 @@ export class Exchange {
     await this.updateZetaPricing();
   }
 
-  public async updateSubExchangeState(asset: Asset) {
-    await this.getSubExchange(asset).updateSubExchangeState();
-  }
-
   public async whitelistUserForDeposit(asset: Asset, user: PublicKey) {
     await this.getSubExchange(asset).whitelistUserForDeposit(user);
   }
@@ -1159,6 +1065,7 @@ export class Exchange {
     }
 
     await this._program.account.pricing.unsubscribe(this._pricingAddress);
+    await this._program.account.state.unsubscribe(this._stateAddress);
 
     for (var i = 0; i < this._programSubscriptionIds.length; i++) {
       await this.connection.removeProgramAccountChangeListener(

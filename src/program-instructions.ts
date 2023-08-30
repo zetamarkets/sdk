@@ -462,7 +462,7 @@ export function placePerpOrderV4Ix(
     );
   }
   let subExchange = Exchange.getSubExchange(asset);
-  let marketData = subExchange.markets.perpMarket;
+  let marketData = subExchange.markets.market;
   let remainingAccounts =
     whitelistTradingFeesAccount !== undefined
       ? [
@@ -1330,8 +1330,8 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
       oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[asset_index],
       oracleBackupProgram: constants.CHAINLINK_PID,
       perpMarket: marketData.address,
-      perpBids: subExchange.markets.perpMarket.serumMarket.bidsAddress,
-      perpAsks: subExchange.markets.perpMarket.serumMarket.asksAddress,
+      perpBids: subExchange.markets.market.serumMarket.bidsAddress,
+      perpAsks: subExchange.markets.market.serumMarket.asksAddress,
     },
   });
 }
@@ -2035,11 +2035,10 @@ export function transferExcessSpreadBalanceIx(
 
 export function settleDexFundsTxs(
   asset: Asset,
-  marketKey: PublicKey,
   vaultOwner: PublicKey,
   remainingAccounts: any[]
 ): Transaction[] {
-  let market = Exchange.getSubExchange(asset).markets.getMarket(marketKey);
+  let market = Exchange.getSubExchange(asset).markets.getMarket();
   let accounts = {
     state: Exchange.stateAddress,
     market: market.address,
@@ -2075,11 +2074,10 @@ export function settleDexFundsTxs(
 
 export function settleDexFundsIx(
   asset: Asset,
-  marketKey: PublicKey,
   vaultOwner: PublicKey,
   openOrders: PublicKey
 ): TransactionInstruction {
-  let market = Exchange.getSubExchange(asset).markets.getMarket(marketKey);
+  let market = Exchange.getSubExchange(asset).markets.getMarket();
   let accounts = {
     state: Exchange.stateAddress,
     market: market.address,
@@ -2106,11 +2104,8 @@ export function settleDexFundsIx(
   });
 }
 
-export function burnVaultTokenTx(
-  asset: Asset,
-  marketKey: PublicKey
-): Transaction {
-  let market = Exchange.getSubExchange(asset).markets.getMarket(marketKey);
+export function burnVaultTokenTx(asset: Asset): Transaction {
+  let market = Exchange.getSubExchange(asset).markets.getMarket();
   let tx = new Transaction();
   tx.add(
     Exchange.program.instruction.burnVaultTokens({

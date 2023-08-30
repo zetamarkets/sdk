@@ -1047,24 +1047,11 @@ export function getGreeksIndex(marketIndex: number): number {
   );
 }
 
-function printMarkets(markets: Market[], subExchange: SubExchange) {
-  for (var j = 0; j < markets.length; j++) {
-    let market = markets[j];
-
-    if (market.kind == types.Kind.PERP) {
-      let markPrice = subExchange.getMarkPrice();
-      console.log(
-        `[MARKET] INDEX: ${constants.PERP_INDEX} KIND: ${
-          market.kind
-        } MARK_PRICE ${markPrice.toFixed(6)}`
-      );
-      return;
-
-      // Non-perps not supported
-    } else {
-      continue;
-    }
-  }
+function printMarkets(subExchange: SubExchange) {
+  let markPrice = subExchange.getMarkPrice();
+  console.log(
+    `[MARKET] INDEX: ${constants.PERP_INDEX} MARK_PRICE ${markPrice.toFixed(6)}`
+  );
 }
 
 export function displayState() {
@@ -1072,7 +1059,7 @@ export function displayState() {
 
   for (var [asset, subExchange] of subExchanges) {
     // Products without expiries, ie perps
-    printMarkets([subExchange.markets.perpMarket], subExchange);
+    printMarkets(subExchange);
   }
 }
 
@@ -1189,10 +1176,7 @@ export async function crankMarket(
   }
   const openOrdersSet = new Set();
   // We pass in a couple of extra accounts for perps so the limit is lower
-  let limit =
-    market.kind == types.Kind.PERP
-      ? constants.CRANK_PERP_ACCOUNT_LIMIT
-      : constants.CRANK_ACCOUNT_LIMIT;
+  let limit = constants.CRANK_PERP_ACCOUNT_LIMIT;
 
   // Manually defined crankLimit will override
   if (crankLimit) {
@@ -1258,18 +1242,6 @@ export async function crankMarket(
 export async function pruneExpiredTIFOrders(asset: Asset) {
   let tx = new Transaction().add(instructions.pruneExpiredTIFOrdersIx(asset));
   return processTransaction(Exchange.provider, tx);
-}
-
-/**
- * Get the most recently expired index
- */
-export function getMostRecentExpiredIndex(asset: Asset) {
-  let subExchange = Exchange.getSubExchange(asset);
-  if (subExchange.markets.frontExpiryIndex - 1 < 0) {
-    return constants.ACTIVE_EXPIRIES - 1;
-  } else {
-    return subExchange.markets.frontExpiryIndex - 1;
-  }
 }
 
 export function getMutMarketAccounts(asset: Asset): Object[] {
@@ -1418,7 +1390,7 @@ export async function getAllOpenOrdersAccounts(
       return;
     }
 
-    let nonce = marginAccount.openOrdersNonce[market.marketIndex];
+    let nonce = marginAccount.openOrdersNonce[constants.PERP_INDEX];
     if (nonce != 0) {
       let [openOrders, _nonce] = getOpenOrders(
         Exchange.programId,
@@ -1454,7 +1426,7 @@ export async function settleAndBurnVaultTokens(
 ) {
   let openOrders = await getAllOpenOrdersAccounts(asset);
   let market = Exchange.getPerpMarket(asset);
-  console.log(`Burning tokens for market index ${market.marketIndex}`);
+  console.log(`Burning tokens`);
   let remainingAccounts = openOrders.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
   });
@@ -1466,7 +1438,6 @@ export async function settleAndBurnVaultTokens(
 
   let txs = instructions.settleDexFundsTxs(
     asset,
-    market.address,
     vaultOwner,
     remainingAccounts
   );
@@ -1480,7 +1451,7 @@ export async function settleAndBurnVaultTokens(
     );
   }
 
-  let burnTx = instructions.burnVaultTokenTx(asset, market.address);
+  let burnTx = instructions.burnVaultTokenTx(asset);
   await processTransaction(provider, burnTx);
 }
 
@@ -1489,8 +1460,8 @@ export async function burnVaultTokens(
   provider: anchor.AnchorProvider
 ) {
   let market = Exchange.getPerpMarket(asset);
-  console.log(`Burning tokens for market index ${market.marketIndex}`);
-  let burnTx = instructions.burnVaultTokenTx(asset, market.address);
+  console.log(`Burning tokens`);
+  let burnTx = instructions.burnVaultTokenTx(asset);
   await processTransaction(provider, burnTx);
 }
 
