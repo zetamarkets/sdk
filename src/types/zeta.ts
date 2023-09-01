@@ -1003,6 +1003,27 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "updateTriggerAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateReferralsAdmin",
       "accounts": [
         {
@@ -6711,11 +6732,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "triggerAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                306
               ]
             }
           }
@@ -11092,6 +11117,27 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "updateTriggerAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateReferralsAdmin",
       "accounts": [
         {
@@ -16800,11 +16846,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "triggerAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                306
               ]
             }
           }
