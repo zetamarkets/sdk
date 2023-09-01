@@ -280,7 +280,7 @@ export class CrossClient {
    * Returns a new instance of CrossClient, based off state in the Exchange singleton.
    * Requires the Exchange to be in a valid state to succeed.
    *
-   * @param throttle    Defaults to true.
+   * @param throttle    Defaults to false.
    *                    If set to false, margin account callbacks will also call
    *                    `updateState` instead of waiting for the poll.
    */
