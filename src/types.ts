@@ -432,7 +432,7 @@ export function getDefaultTriggerDirection(side: Side): TriggerDirection {
 export function defaultTriggerOrderOptions(): TriggerOrderOptions {
   return {
     orderType: OrderType.FILLORKILL,
-    reduceOnly: false,
+    reduceOnly: true,
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,
   };

@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.8.1] 2023-09-01
+
+- Default reduceOnly to true in trigger orders. ([#263](https://github.com/zetamarkets/sdk/pull/263))
+
 ## [1.8.0] 2023-08-29
 
 - New feature: Trigger Orders. ([#251](https://github.com/zetamarkets/sdk/pull/251))
