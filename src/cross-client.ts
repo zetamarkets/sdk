@@ -1171,6 +1171,105 @@ export class CrossClient {
     return txId;
   }
 
+  public async cancelAllTriggerOrdersAndPlaceOrder(
+    asset: Asset,
+    price: number,
+    size: number,
+    side: types.Side,
+    options: types.OrderOptions = types.defaultOrderOptions()
+  ) {
+    let triggerOrderIndexes = this.getTriggerOrders(asset).map(
+      (triggerOrder) => {
+        return triggerOrder.triggerOrderBit;
+      }
+    );
+
+    let txs = [];
+
+    for (
+      var i = 0;
+      i < triggerOrderIndexes.length;
+      i += constants.MAX_TRIGGER_CANCELS_PER_TX
+    ) {
+      let tx = new Transaction();
+      for (var j = 0; j < constants.MAX_TRIGGER_CANCELS_PER_TX; j++) {
+        // Don't want to overrun on the last one
+        if (i + j >= triggerOrderIndexes.length) {
+          break;
+        }
+        let triggerAccount = utils.getTriggerOrder(
+          Exchange.programId,
+          this._accountAddress,
+          new Uint8Array([triggerOrderIndexes[i + j]])
+        )[0];
+        tx.add(
+          instructions.cancelTriggerOrderIx(
+            triggerOrderIndexes[i + j],
+            this.publicKey,
+            triggerAccount,
+            this._accountAddress
+          )
+        );
+      }
+      txs.push(tx);
+    }
+
+    let placeIx = instructions.placePerpOrderV4Ix(
+      asset,
+      price,
+      size,
+      side,
+      options.orderType != undefined
+        ? options.orderType
+        : types.OrderType.LIMIT,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
+      options.clientOrderId != undefined ? options.clientOrderId : 0,
+      options.tag != undefined ? options.tag : constants.DEFAULT_ORDER_TAG,
+      utils.getTIFOffset(Exchange.getPerpMarket(asset), options.tifOptions),
+      this.accountAddress,
+      this._provider.wallet.publicKey,
+      this._openOrdersAccounts[assetToIndex(asset)],
+      this._whitelistTradingFeesAddress
+    );
+
+    // Edge case where user has 0 trigger orders
+    if (txs.length == 0) {
+      txs[0] = new Transaction().add(placeIx);
+    } else {
+      txs[txs.length - 1].add(placeIx);
+    }
+    // Send the first N-1 cancels async
+    // The last cancel contains a placeOrder after it, which should come after the cancels are all completed successfully
+    let txsWithoutLast = txs.slice(0, txs.length - 1);
+    let txIds: string[] = [];
+
+    await Promise.all(
+      txsWithoutLast.map(async (tx) => {
+        txIds.push(
+          await utils.processTransaction(
+            this.provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+          )
+        );
+      })
+    );
+    txIds.push(
+      await utils.processTransaction(
+        this.provider,
+        txs[txs.length - 1],
+        undefined,
+        undefined,
+        undefined,
+        this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+      )
+    );
+    return txIds;
+  }
+
   public async cancelTriggerOrder(orderIndex: number) {
     let triggerAccount = utils.getTriggerOrder(
       Exchange.programId,
