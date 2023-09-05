@@ -465,6 +465,7 @@ export function defaultOrderOptions(): OrderOptions {
 export interface LoadExchangeConfig {
   network: Network;
   connection: Connection;
+  orderbookConnection?: Connection;
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
@@ -480,6 +481,7 @@ export function defaultLoadExchangeConfig(
   return {
     network,
     connection,
+    orderbookConnection: undefined,
     opts,
     throttleMs,
     loadFromStore,

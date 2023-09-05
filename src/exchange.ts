@@ -93,6 +93,15 @@ export class Exchange {
   private _provider: anchor.AnchorProvider;
 
   /**
+   * Separate connection used for orderbook subscriptions.
+   * For example you might use a connection with Whirligig and low commitment for faster results
+   */
+  public get orderbookConnection(): Connection {
+    return this._orderbookConnection;
+  }
+  private _orderbookConnection: Connection;
+
+  /**
    * Public key used as the stable coin mint.
    */
   public get usdcMintAddress(): PublicKey {
@@ -330,6 +339,9 @@ export class Exchange {
       loadConfig.opts ||
         utils.commitmentConfig(loadConfig.connection.commitment)
     );
+    if (loadConfig.orderbookConnection) {
+      this._orderbookConnection = loadConfig.orderbookConnection;
+    }
     this._opts = loadConfig.opts;
     this._network = loadConfig.network;
     this._program = new anchor.Program(

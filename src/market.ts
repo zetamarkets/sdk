@@ -278,7 +278,10 @@ export class Market {
   public subscribeOrderbook(
     callback?: (asset: Asset, type: EventType, data: any) => void
   ) {
-    this._bidsSubscriptionId = Exchange.provider.connection.onAccountChange(
+    let connection = Exchange.orderbookConnection
+      ? Exchange.orderbookConnection
+      : Exchange.provider.connection;
+    this._bidsSubscriptionId = connection.onAccountChange(
       this.serumMarket.decoded.bids,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
         let decodedMarket = Orderbook.decode(
@@ -292,10 +295,10 @@ export class Market {
           callback(this.asset, EventType.ORDERBOOK, null);
         }
       },
-      Exchange.connection.commitment
+      connection.commitment
     );
 
-    this._asksSubscriptionId = Exchange.provider.connection.onAccountChange(
+    this._asksSubscriptionId = connection.onAccountChange(
       this.serumMarket.decoded.asks,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
         let decodedMarket = Orderbook.decode(
@@ -309,22 +312,21 @@ export class Market {
           callback(this.asset, EventType.ORDERBOOK, null);
         }
       },
-      Exchange.connection.commitment
+      connection.commitment
     );
   }
 
   public async unsubscribeOrderbook() {
+    let connection = Exchange.orderbookConnection
+      ? Exchange.orderbookConnection
+      : Exchange.provider.connection;
     if (this._bidsSubscriptionId !== undefined) {
-      await Exchange.provider.connection.removeAccountChangeListener(
-        this._bidsSubscriptionId
-      );
+      await connection.removeAccountChangeListener(this._bidsSubscriptionId);
       this._bidsSubscriptionId = undefined;
     }
 
     if (this._asksSubscriptionId !== undefined) {
-      await Exchange.provider.connection.removeAccountChangeListener(
-        this._asksSubscriptionId
-      );
+      await connection.removeAccountChangeListener(this._asksSubscriptionId);
       this._asksSubscriptionId = undefined;
     }
   }
