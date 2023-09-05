@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.8.1] 2023-09-05
+
+- New function to cancel all trigger orders + place order. ([#265](https://github.com/zetamarkets/sdk/pull/265))
+
 ## [1.8.1] 2023-09-01
 
 - Default reduceOnly to true in trigger orders. ([#263](https://github.com/zetamarkets/sdk/pull/263))
