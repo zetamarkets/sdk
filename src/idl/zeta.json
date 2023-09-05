@@ -1003,6 +1003,27 @@
       "args": []
     },
     {
+      "name": "updateTriggerAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateReferralsAdmin",
       "accounts": [
         {
@@ -6711,11 +6732,15 @@
             }
           },
           {
+            "name": "triggerAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                306
               ]
             }
           }

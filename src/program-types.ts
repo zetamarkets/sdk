@@ -36,6 +36,7 @@ export interface State {
   nativeOpenInterestLimit: anchor.BN;
   haltStates: Array<HaltStateV2>;
   haltStatesPadding: Array<HaltStateV2>;
+  triggerAdmin: PublicKey;
   padding: Array<number>;
 }
 

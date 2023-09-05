@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- Add trigger admin to state account. ([#264](https://github.com/zetamarkets/sdk/pull/264))
+
 ## [1.8.1] 2023-09-01
 
 - Default reduceOnly to true in trigger orders. ([#263](https://github.com/zetamarkets/sdk/pull/263))
