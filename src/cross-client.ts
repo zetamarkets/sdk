@@ -1171,6 +1171,45 @@ export class CrossClient {
     return txId;
   }
 
+  public async cancelAllTriggerOrders(asset: Asset | undefined) {
+    let orders = [];
+    if (asset == undefined) {
+      // All assets
+      orders = [...this._triggerOrders.values()].flat();
+    } else {
+      orders = this.getTriggerOrders(asset);
+    }
+
+    if (orders.length < 1) {
+      return;
+    }
+
+    let triggerOrderIndexes = orders.map((order) => {
+      return order.triggerOrderBit;
+    });
+
+    let txs = this.createCancelTriggerOrdersTxs(triggerOrderIndexes);
+
+    let txIds: string[] = [];
+
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(
+          await utils.processTransaction(
+            this.provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+          )
+        );
+      })
+    );
+
+    return txIds;
+  }
+
   public async cancelAllTriggerOrdersAndPlaceOrder(
     asset: Asset,
     price: number,
@@ -1184,35 +1223,7 @@ export class CrossClient {
       }
     );
 
-    let txs = [];
-
-    for (
-      var i = 0;
-      i < triggerOrderIndexes.length;
-      i += constants.MAX_TRIGGER_CANCELS_PER_TX
-    ) {
-      let tx = new Transaction();
-      for (var j = 0; j < constants.MAX_TRIGGER_CANCELS_PER_TX; j++) {
-        // Don't want to overrun on the last one
-        if (i + j >= triggerOrderIndexes.length) {
-          break;
-        }
-        let triggerAccount = utils.getTriggerOrder(
-          Exchange.programId,
-          this._accountAddress,
-          new Uint8Array([triggerOrderIndexes[i + j]])
-        )[0];
-        tx.add(
-          instructions.cancelTriggerOrderIx(
-            triggerOrderIndexes[i + j],
-            this.publicKey,
-            triggerAccount,
-            this._accountAddress
-          )
-        );
-      }
-      txs.push(tx);
-    }
+    let txs = this.createCancelTriggerOrdersTxs(triggerOrderIndexes);
 
     let placeIx = instructions.placePerpOrderV4Ix(
       asset,
@@ -1268,6 +1279,40 @@ export class CrossClient {
       )
     );
     return txIds;
+  }
+
+  private createCancelTriggerOrdersTxs(indexes: number[]) {
+    let txs = [];
+
+    for (
+      var i = 0;
+      i < indexes.length;
+      i += constants.MAX_TRIGGER_CANCELS_PER_TX
+    ) {
+      let tx = new Transaction();
+      for (var j = 0; j < constants.MAX_TRIGGER_CANCELS_PER_TX; j++) {
+        // Don't want to overrun on the last one
+        if (i + j >= triggerOrderIndexes.length) {
+          break;
+        }
+        let triggerAccount = utils.getTriggerOrder(
+          Exchange.programId,
+          this._accountAddress,
+          new Uint8Array([indexes[i + j]])
+        )[0];
+        tx.add(
+          instructions.cancelTriggerOrderIx(
+            indexes[i + j],
+            this.publicKey,
+            triggerAccount,
+            this._accountAddress
+          )
+        );
+      }
+      txs.push(tx);
+    }
+
+    return txs;
   }
 
   public async cancelTriggerOrder(orderIndex: number) {
