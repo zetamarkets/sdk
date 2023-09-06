@@ -477,13 +477,15 @@ export function defaultLoadExchangeConfig(
   connection: Connection,
   opts: ConfirmOptions = utils.defaultCommitment(),
   throttleMs = 0,
-  loadFromStore = false
+  loadFromStore = false,
+  orderbookConnection: Connection = undefined,
+  orderbookAssetSubscriptionOverride: Asset[] = undefined
 ): LoadExchangeConfig {
   return {
     network,
     connection,
-    orderbookConnection: undefined,
-    orderbookAssetSubscriptionOverride: undefined,
+    orderbookConnection,
+    orderbookAssetSubscriptionOverride,
     opts,
     throttleMs,
     loadFromStore,
