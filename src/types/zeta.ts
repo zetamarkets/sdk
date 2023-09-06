@@ -9188,6 +9188,18 @@ export type Zeta = {
           "name": "expiryTs",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
@@ -19335,6 +19347,18 @@ export const IDL: Zeta = {
         {
           "name": "expiryTs",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
           "index": false
         }
       ]

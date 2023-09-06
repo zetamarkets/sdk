@@ -334,6 +334,8 @@ export interface PlaceOrderEvent {
   oraclePrice: anchor.BN;
   orderId: anchor.BN;
   expiryTs: anchor.BN;
+  asset: any;
+  margin_account: PublicKey;
 }
 
 /**
