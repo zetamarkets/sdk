@@ -628,7 +628,14 @@ export class Exchange {
     );
 
     for (var se of this.getAllSubExchanges()) {
-      se.markets.market.subscribeOrderbook(callback);
+      // Only subscribe to the orderbook for assets provided in the override
+      // Useful for FE because we only want one asset at a time
+      if (
+        loadConfig.orderbookAssetSubscriptionOverride &&
+        loadConfig.orderbookAssetSubscriptionOverride.includes(se.asset)
+      ) {
+        se.markets.market.subscribeOrderbook(callback);
+      }
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 

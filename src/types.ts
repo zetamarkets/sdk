@@ -466,6 +466,7 @@ export interface LoadExchangeConfig {
   network: Network;
   connection: Connection;
   orderbookConnection?: Connection;
+  orderbookAssetSubscriptionOverride?: Asset[];
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
@@ -482,6 +483,7 @@ export function defaultLoadExchangeConfig(
     network,
     connection,
     orderbookConnection: undefined,
+    orderbookAssetSubscriptionOverride: undefined,
     opts,
     throttleMs,
     loadFromStore,
