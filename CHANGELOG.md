@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.8.2] 2023-09-06
+
+- Add asset and marginAccount to PlaceOrderEvent. ([#266](https://github.com/zetamarkets/sdk/pull/266))
+
 - Add trigger admin to state account. ([#264](https://github.com/zetamarkets/sdk/pull/264))
 
 ## [1.8.1] 2023-09-01
