@@ -316,7 +316,7 @@ export class Market {
     );
   }
 
-  public async unsubscribeOrderbook() {
+  public async unsubscribeOrderbook(wipeState: boolean = false) {
     let connection = Exchange.orderbookConnection
       ? Exchange.orderbookConnection
       : Exchange.provider.connection;
@@ -329,9 +329,24 @@ export class Market {
       await connection.removeAccountChangeListener(this._asksSubscriptionId);
       this._asksSubscriptionId = undefined;
     }
+
+    // Only after we're definitely no longer updating
+    if (wipeState) {
+      this._bids = undefined;
+      this._asks = undefined;
+      this._bidsSlot = 0;
+      this._asksSlot = 0;
+      this.updateOrderbook();
+    }
   }
 
   public updateOrderbook() {
+    // On a fresh subscription if there isn't data yet
+    if (this._bids == undefined || this._asks == undefined) {
+      this._orderbook = { bids: [], asks: [] };
+      return;
+    }
+
     [this._bids, this._asks].map((orderbookSide) => {
       const descending = orderbookSide.isBids ? true : false;
       const levels = []; // (price, size, tifOffset)
