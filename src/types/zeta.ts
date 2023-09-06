@@ -205,6 +205,32 @@ export type Zeta = {
       ]
     },
     {
+      "name": "migrateToNewCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "newCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "migrateToCrossMarginAccount",
       "accounts": [
         {
@@ -8925,6 +8951,9 @@ export type Zeta = {
           },
           {
             "name": "OpenOrders"
+          },
+          {
+            "name": "Liquidate"
           }
         ]
       }
@@ -10108,6 +10137,11 @@ export type Zeta = {
       "code": 6156,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
+    },
+    {
+      "code": 6157,
+      "name": "InvalidLiquidatorAuthority",
+      "msg": "Invalid liquidator authority"
     }
   ]
 };
@@ -10319,6 +10353,32 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "migrateToNewCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "newCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "migrateToCrossMarginAccount",
       "accounts": [
         {
@@ -19039,6 +19099,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "OpenOrders"
+          },
+          {
+            "name": "Liquidate"
           }
         ]
       }
@@ -20222,6 +20285,11 @@ export const IDL: Zeta = {
       "code": 6156,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
+    },
+    {
+      "code": 6157,
+      "name": "InvalidLiquidatorAuthority",
+      "msg": "Invalid liquidator authority"
     }
   ]
 };
