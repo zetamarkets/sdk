@@ -1292,7 +1292,7 @@ export class CrossClient {
       let tx = new Transaction();
       for (var j = 0; j < constants.MAX_TRIGGER_CANCELS_PER_TX; j++) {
         // Don't want to overrun on the last one
-        if (i + j >= triggerOrderIndexes.length) {
+        if (i + j >= indexes.length) {
           break;
         }
         let triggerAccount = utils.getTriggerOrder(
