@@ -400,6 +400,8 @@ export interface LiquidationEvent {
   liquidatee: PublicKey;
   liquidator: PublicKey;
   asset: Object;
+  liquidateeMarginAccount: PublicKey;
+  liquidatorMarginAccount: PublicKey;
 }
 
 export interface OrderCompleteEvent {
