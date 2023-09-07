@@ -630,9 +630,11 @@ export class Exchange {
     for (var se of this.getAllSubExchanges()) {
       // Only subscribe to the orderbook for assets provided in the override
       // Useful for FE because we only want one asset at a time
+      // If no override is provided, subscribe to all assets
       if (
-        loadConfig.orderbookAssetSubscriptionOverride &&
-        loadConfig.orderbookAssetSubscriptionOverride.includes(se.asset)
+        !loadConfig.orderbookAssetSubscriptionOverride ||
+        (loadConfig.orderbookAssetSubscriptionOverride &&
+          loadConfig.orderbookAssetSubscriptionOverride.includes(se.asset))
       ) {
         se.markets.market.subscribeOrderbook(callback);
       }
