@@ -205,6 +205,32 @@
       ]
     },
     {
+      "name": "migrateToNewCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "newCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "migrateToCrossMarginAccount",
       "accounts": [
         {
@@ -8925,6 +8951,9 @@
           },
           {
             "name": "OpenOrders"
+          },
+          {
+            "name": "Liquidate"
           }
         ]
       }
@@ -10120,6 +10149,11 @@
       "code": 6156,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
+    },
+    {
+      "code": 6157,
+      "name": "InvalidLiquidatorAuthority",
+      "msg": "Invalid liquidator authority"
     }
   ]
 }

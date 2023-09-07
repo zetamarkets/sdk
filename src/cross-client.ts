@@ -1907,8 +1907,6 @@ export class CrossClient {
     orderId: BN,
     side: types.Side
   ): Promise<TransactionSignature> {
-    this.delegatedCheck();
-
     let accountInfo = await Exchange.connection.getAccountInfo(
       marginAccountToCancel
     );
@@ -1970,8 +1968,6 @@ export class CrossClient {
     asset: Asset,
     marginAccountToCancel: PublicKey
   ): Promise<TransactionSignature> {
-    this.delegatedCheck();
-
     let accountInfo = await Exchange.connection.getAccountInfo(
       marginAccountToCancel
     );
@@ -2034,7 +2030,6 @@ export class CrossClient {
     liquidatedMarginAccount: PublicKey,
     size: number
   ): Promise<TransactionSignature> {
-    this.delegatedCheck();
     let tx = new Transaction();
     let ix = instructions.liquidateV2Ix(
       asset,
