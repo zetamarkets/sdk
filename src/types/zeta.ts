@@ -9262,6 +9262,16 @@ export type Zeta = {
             "defined": "Asset"
           },
           "index": false
+        },
+        {
+          "name": "liquidateeMarginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidatorMarginAccount",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
@@ -19421,6 +19431,16 @@ export const IDL: Zeta = {
           "type": {
             "defined": "Asset"
           },
+          "index": false
+        },
+        {
+          "name": "liquidateeMarginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidatorMarginAccount",
+          "type": "publicKey",
           "index": false
         }
       ]

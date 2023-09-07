@@ -9262,6 +9262,16 @@
             "defined": "Asset"
           },
           "index": false
+        },
+        {
+          "name": "liquidateeMarginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidatorMarginAccount",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
