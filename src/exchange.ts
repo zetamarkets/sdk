@@ -288,6 +288,9 @@ export class Exchange {
   }
   private _useAutoPriorityFee: boolean = false;
 
+  private _autoPriorityFeeOffset: number = 0;
+  private _autoPriorityFeeMultiplier: number = 1;
+
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
     return this._autoPriorityFeeUpperLimit;
@@ -302,6 +305,11 @@ export class Exchange {
 
   public toggleAutoPriorityFee() {
     this._useAutoPriorityFee = !this._useAutoPriorityFee;
+  }
+
+  public setAutoPriorityFeeScaling(offset: number = 0, multiplier: number = 1) {
+    this._autoPriorityFeeMultiplier = multiplier;
+    this._autoPriorityFeeOffset = offset;
   }
 
   public updatePriorityFee(microLamportsPerCU: number) {
@@ -667,7 +675,12 @@ export class Exchange {
         .map((obj) => obj.prioritizationFee); // Take a list of prioritizationFee values only
 
       let median = utils.median(fees);
-      this._priorityFee = Math.min(median, this._autoPriorityFeeUpperLimit);
+      let medianScaled =
+        this._autoPriorityFeeOffset + median * this._autoPriorityFeeMultiplier;
+      this._priorityFee = Math.min(
+        medianScaled,
+        this._autoPriorityFeeUpperLimit
+      );
       console.log(
         `AutoUpdate priority fee. New fee = ${this._priorityFee} microlamports per compute unit`
       );
