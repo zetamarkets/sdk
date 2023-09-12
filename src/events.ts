@@ -1,9 +1,5 @@
 export enum EventType {
   /**
-   * Refers to events that reflect a change in the exchange state.
-   */
-  EXCHANGE,
-  /**
    * Expiration event for a zeta group.
    */
   EXPIRY,
@@ -53,8 +49,6 @@ export interface OrderbookEvent {
 
 export function eventTypeToString(event: EventType) {
   switch (event) {
-    case EventType.EXCHANGE:
-      return "EXCHANGE";
     case EventType.EXPIRY:
       return "EXPIRY";
     case EventType.USER:
