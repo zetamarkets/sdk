@@ -7,6 +7,8 @@ Version changes are pinned to SDK releases.
 
 ## [1.9.2] 2023-09-12
 
+### Breaking
+
 - Add slot to callback functions. ([#270](https://github.com/zetamarkets/sdk/pull/270))
 
 ## [1.9.1] 2023-09-11
