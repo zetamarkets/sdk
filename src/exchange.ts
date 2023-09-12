@@ -8,6 +8,7 @@ import {
   AccountInfo,
   AccountMeta,
   Commitment,
+  Context,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -233,6 +234,11 @@ export class Exchange {
    * Websocket subscription id for clock.
    */
   private _clockSubscriptionId: number;
+
+  /**
+   * The subscription id for the pricing account.
+   */
+  private _pricingSubscriptionId: number = undefined;
 
   /**
    * @param interval   How often to poll zeta group and state in seconds.
@@ -538,7 +544,7 @@ export class Exchange {
   public async load(
     loadConfig: types.LoadExchangeConfig,
     wallet = new types.DummyWallet(),
-    callback?: (asset: Asset, event: EventType, data: any) => void
+    callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
   ) {
     if (this.isInitialized) {
       throw "Exchange already loaded";
@@ -691,16 +697,16 @@ export class Exchange {
 
   private async subscribeOracle(
     assets: Asset[],
-    callback?: (asset: Asset, type: EventType, data: any) => void
+    callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
     return this._oracle.subscribePriceFeeds(
       assets,
-      (asset: Asset, price: OraclePrice) => {
+      (asset: Asset, price: OraclePrice, slot: number) => {
         if (this.isInitialized) {
           this._riskCalculator.updateMarginRequirements(asset);
         }
         if (callback !== undefined) {
-          callback(asset, EventType.ORACLE, price);
+          callback(asset, EventType.ORACLE, slot, price);
         }
       }
     );
@@ -713,14 +719,14 @@ export class Exchange {
 
   private subscribeClock(
     clockData: types.ClockData,
-    callback?: (asset: Asset, type: EventType, data: any) => void
+    callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
     if (this._clockSubscriptionId !== undefined) {
       throw Error("Clock already subscribed to.");
     }
     this._clockSubscriptionId = this.provider.connection.onAccountChange(
       SYSVAR_CLOCK_PUBKEY,
-      async (accountInfo: AccountInfo<Buffer>, _context: any) => {
+      async (accountInfo: AccountInfo<Buffer>, context: any) => {
         this.setClockData(utils.getClockData(accountInfo));
 
         await Promise.all(
@@ -730,7 +736,7 @@ export class Exchange {
         );
 
         if (callback !== undefined) {
-          callback(null, EventType.CLOCK, null);
+          callback(null, EventType.CLOCK, context.slot, null);
         }
         try {
           if (
@@ -803,21 +809,21 @@ export class Exchange {
   }
 
   private subscribePricing(
-    callback?: (asset: Asset, type: EventType, data: any) => void
+    callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
-    let eventEmitter = this._program.account.pricing.subscribe(
+    this._pricingSubscriptionId = this.connection.onAccountChange(
       this._pricingAddress,
-      this.provider.connection.commitment
-    );
+      async (accountInfo: AccountInfo<Buffer>, context: Context) => {
+        this._pricing = this.program.coder.accounts.decode(
+          "Pricing",
+          accountInfo.data
+        );
 
-    eventEmitter.on("change", async (pricing: Pricing) => {
-      this._pricing = pricing;
-      if (callback !== undefined) {
-        callback(null, EventType.PRICING, null);
+        if (callback !== undefined) {
+          callback(null, EventType.PRICING, context.slot, null);
+        }
       }
-    });
-
-    this._eventEmitters.push(eventEmitter);
+    );
   }
 
   public subscribeMarket(asset: Asset) {
@@ -1171,7 +1177,12 @@ export class Exchange {
       this._clockSubscriptionId = undefined;
     }
 
-    await this._program.account.pricing.unsubscribe(this._pricingAddress);
+    if (this._pricingSubscriptionId !== undefined) {
+      await this._provider.connection.removeAccountChangeListener(
+        this._pricingSubscriptionId
+      );
+      this._pricingSubscriptionId = undefined;
+    }
 
     for (var i = 0; i < this._programSubscriptionIds.length; i++) {
       await this.connection.removeProgramAccountChangeListener(

@@ -137,7 +137,7 @@ export class SubExchange {
     fetchedAccs: any[],
     loadFromStore: boolean,
     throttleMs = 0,
-    callback?: (asset: Asset, event: EventType, data: any) => void
+    callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
   ) {
     console.info(`Loading ${assetToName(asset)} subExchange.`);
 
@@ -530,14 +530,15 @@ export class SubExchange {
   }
 
   public async handlePolling(
-    callback?: (asset: Asset, eventType: EventType, data: any) => void
+    callback?: (
+      asset: Asset,
+      eventType: EventType,
+      slot: number,
+      data: any
+    ) => void
   ) {
     if (!this._isInitialized) {
       return;
-    }
-    this._markets.updateExpirySeries();
-    if (callback !== undefined) {
-      callback(this.asset, EventType.EXCHANGE, null);
     }
 
     await this._markets.handlePolling(callback);

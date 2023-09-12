@@ -5,6 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.9.2] 2023-09-12
+
+### Breaking
+
+- Add slot to callback functions. ([#270](https://github.com/zetamarkets/sdk/pull/270))
+
 ## [1.9.1] 2023-09-11
 
 - Add auto prio fee offset and multiplier. ([#269](https://github.com/zetamarkets/sdk/pull/269))

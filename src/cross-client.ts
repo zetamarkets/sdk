@@ -29,6 +29,7 @@ import {
   Context,
   TransactionInstruction,
   ConfirmOptions,
+  SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
@@ -243,7 +244,12 @@ export class CrossClient {
   /**
    * User passed callback on load, stored for polling.
    */
-  private _callback: (asset: Asset, type: EventType, data: any) => void;
+  private _callback: (
+    asset: Asset,
+    type: EventType,
+    slot: number,
+    data: any
+  ) => void;
 
   private _updatingState: boolean = false;
 
@@ -288,7 +294,12 @@ export class CrossClient {
     connection: Connection,
     wallet: types.Wallet,
     opts: ConfirmOptions = utils.defaultCommitment(),
-    callback: (asset: Asset, type: EventType, data: any) => void = undefined,
+    callback: (
+      asset: Asset,
+      type: EventType,
+      slot: number,
+      data: any
+    ) => void = undefined,
     throttle: boolean = false,
     delegator: PublicKey = undefined,
     useVersionedTxs: boolean = false,
@@ -373,7 +384,7 @@ export class CrossClient {
         client._lastUpdateTimestamp = Exchange.clockTimestamp;
 
         if (callback !== undefined) {
-          callback(null, EventType.USER, {
+          callback(null, EventType.USER, context.slot, {
             UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
           });
         }
@@ -407,24 +418,30 @@ export class CrossClient {
     if (callback !== undefined) {
       client._tradeEventV3Listener = Exchange.program.addEventListener(
         "TradeEventV3",
-        (event: TradeEventV3, _slot) => {
+        (event: TradeEventV3, slot) => {
           if (
             client._accountAddress.toString() == event.marginAccount.toString()
           ) {
-            callback(fromProgramAsset(event.asset), EventType.TRADEV3, event);
+            callback(
+              fromProgramAsset(event.asset),
+              EventType.TRADEV3,
+              slot,
+              event
+            );
           }
         }
       );
 
       client._orderCompleteEventListener = Exchange.program.addEventListener(
         "OrderCompleteEvent",
-        (event: OrderCompleteEvent, _slot) => {
+        (event: OrderCompleteEvent, slot) => {
           if (
             client._accountAddress.toString() == event.marginAccount.toString()
           ) {
             callback(
               fromProgramAsset(event.asset),
               EventType.ORDERCOMPLETE,
+              slot,
               event
             );
           }
@@ -448,7 +465,7 @@ export class CrossClient {
           return;
         }
         let latestSlot = this._pendingUpdateSlot;
-        await this.updateState();
+        let fetchSlot = await this.updateState();
         // If there was a margin account websocket callback, we want to
         // trigger an `updateState` on the next timer tick.
         if (latestSlot == this._pendingUpdateSlot) {
@@ -456,7 +473,7 @@ export class CrossClient {
         }
         this._lastUpdateTimestamp = Exchange.clockTimestamp;
         if (this._callback !== undefined) {
-          this._callback(null, EventType.USER, {
+          this._callback(null, EventType.USER, fetchSlot, {
             UserCallbackType: types.UserCallbackType.POLLUPDATE,
           });
         }
@@ -490,7 +507,7 @@ export class CrossClient {
   /**
    * Polls the margin account for the latest state.
    */
-  public async updateState(fetch = true, force = false) {
+  public async updateState(fetch = true, force = false): Promise<number> {
     this.checkResetUpdatingState();
 
     if (this._updatingState && !force) {
@@ -499,12 +516,19 @@ export class CrossClient {
 
     this.toggleUpdateState(true);
 
+    let fetchSlot: number = 0;
     if (fetch) {
       try {
-        this._account =
-          (await Exchange.program.account.crossMarginAccount.fetch(
-            this._accountAddress
-          )) as unknown as CrossMarginAccount;
+        let [clockInfo, crossMarginAccountInfo] =
+          await Exchange.connection.getMultipleAccountsInfo([
+            SYSVAR_CLOCK_PUBKEY,
+            this._accountAddress,
+          ]);
+        fetchSlot = utils.getClockData(clockInfo).slot;
+        this._account = Exchange.program.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccount,
+          crossMarginAccountInfo.data
+        );
       } catch (e) {
         this.toggleUpdateState(false);
         return;
@@ -519,6 +543,7 @@ export class CrossClient {
     } catch (e) {}
 
     this.toggleUpdateState(false);
+    return fetchSlot;
   }
 
   public setUseVersionedTxs(useVersionedTxs: boolean) {

@@ -177,7 +177,12 @@ export class ZetaGroupMarkets {
   }
 
   public async handlePolling(
-    callback?: (asset: Asset, eventType: EventType, data: any) => void
+    callback?: (
+      asset: Asset,
+      eventType: EventType,
+      slot: number,
+      data: any
+    ) => void
   ) {
     if (
       Exchange.clockTimestamp >
@@ -185,29 +190,30 @@ export class ZetaGroupMarkets {
     ) {
       this._lastPollTimestamp = Exchange.clockTimestamp;
       let indexes = Array.from(this._subscribedMarketIndexes);
+      let slot = 0;
       await Promise.all(
         indexes.map(async (index) => {
           try {
-            await this._markets[index].updateOrderbook();
+            slot = await this._markets[index].updateOrderbook();
           } catch (e) {
             console.error(`Orderbook poll failed: ${e}`);
           }
           if (callback !== undefined) {
             let data: OrderbookEvent = { marketIndex: index };
-            callback(this.asset, EventType.ORDERBOOK, data);
+            callback(this.asset, EventType.ORDERBOOK, slot, data);
           }
         })
       );
 
       if (this._subscribedPerp) {
         try {
-          await this._perpMarket.updateOrderbook();
+          slot = await this._perpMarket.updateOrderbook();
         } catch (e) {
           console.error(`Orderbook poll failed: ${e}`);
         }
         if (callback !== undefined) {
           let data: OrderbookEvent = { marketIndex: constants.PERP_INDEX };
-          callback(this.asset, EventType.ORDERBOOK, data);
+          callback(this.asset, EventType.ORDERBOOK, slot, data);
         }
       }
     }
