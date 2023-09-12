@@ -5,9 +5,20 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.8.1] 2023-09-05
+## [1.9.2] 2023-09-13
 
 - New function to cancel all trigger orders + place order. ([#265](https://github.com/zetamarkets/sdk/pull/265))
+
+## [1.9.1] 2023-09-11
+
+- Add auto prio fee offset and multiplier. ([#269](https://github.com/zetamarkets/sdk/pull/269))
+
+## [1.9.0] 2023-09-07
+
+- Add margin account pubkeys to LiquidationEvent. ([#268](https://github.com/zetamarkets/sdk/pull/268))
+- Allow for delegator to liquidate and force cancel. ([#267](https://github.com/zetamarkets/sdk/pull/267))
+- Add asset and marginAccount to PlaceOrderEvent. ([#266](https://github.com/zetamarkets/sdk/pull/266))
+- Add trigger admin to state account. ([#264](https://github.com/zetamarkets/sdk/pull/264))
 
 ## [1.8.1] 2023-09-01
 
