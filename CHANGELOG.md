@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.0] 2023-09-13
+
+- Subscribe to orderbooks using websockets instead of polling them. ([#262](https://github.com/zetamarkets/sdk/pull/262))
+
 ## [1.9.2] 2023-09-12
 
 ### Breaking
