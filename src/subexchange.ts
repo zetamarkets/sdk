@@ -134,7 +134,7 @@ export class SubExchange {
     fetchedAccs: any[],
     loadFromStore: boolean,
     throttleMs = 0,
-    callback?: (asset: Asset, event: EventType, data: any) => void
+    callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
   ) {
     console.info(`Loading ${assetToName(asset)} subExchange.`);
 

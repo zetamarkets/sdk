@@ -1,7 +1,7 @@
 {
   "name": "@zetamarkets/sdk",
   "repository": "https://github.com/zetamarkets/sdk/",
-  "version": "1.8.0",
+  "version": "1.9.2",
   "description": "Zeta SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,8 +19,6 @@
     "@solana/web3.js": "1.68.0",
     "bs58": "^4.0.1",
     "lodash": "^4.17.21",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.4.2",
     "cross-fetch": "^3.1.6",
     "lodash.clonedeep": "^4.5.0"
   },
@@ -28,7 +26,9 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.12",
     "mocha": "^9.1.1",
-    "typedoc": "^0.22.10"
+    "typedoc": "^0.22.10",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.4.2"
   },
   "resolutions": {
     "@solana/buffer-layout": "4.0.0"

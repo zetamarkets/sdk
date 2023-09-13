@@ -11,7 +11,7 @@ export class Oracle {
   private _network: Network;
   private _data: Map<Asset, OraclePrice>;
   private _subscriptionIds: Map<Asset, number>;
-  private _callback: (asset: Asset, price: OraclePrice) => void;
+  private _callback: (asset: Asset, price: OraclePrice, slot: number) => void;
 
   public constructor(network: Network, connection: Connection) {
     this._network = network;
@@ -64,14 +64,14 @@ export class Oracle {
     this._data.set(asset, oracleData);
 
     if (triggerCallback) {
-      this._callback(asset, oracleData);
+      this._callback(asset, oracleData, Number(priceData.publishSlot));
     }
     return oracleData;
   }
 
   public async subscribePriceFeeds(
     assetList: Asset[],
-    callback: (asset: Asset, price: OraclePrice) => void
+    callback: (asset: Asset, price: OraclePrice, slot: number) => void
   ) {
     if (this._callback != undefined) {
       throw Error("Oracle price feeds already subscribed to!");
@@ -84,7 +84,7 @@ export class Oracle {
         let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
         let subscriptionId = this._connection.onAccountChange(
           priceAddress,
-          (accountInfo: AccountInfo<Buffer>, _context: Context) => {
+          (accountInfo: AccountInfo<Buffer>, context: Context) => {
             let priceData = parsePythData(accountInfo.data);
             let currPrice = this._data.get(asset);
             if (
@@ -100,7 +100,7 @@ export class Oracle {
               lastUpdatedSlot: priceData.publishSlot,
             };
             this._data.set(asset, oracleData);
-            this._callback(asset, oracleData);
+            this._callback(asset, oracleData, context.slot);
           },
           Exchange.provider.connection.commitment
         );

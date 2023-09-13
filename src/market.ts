@@ -276,7 +276,7 @@ export class Market {
   }
 
   public subscribeOrderbook(
-    callback?: (asset: Asset, type: EventType, data: any) => void
+    callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
     let connection = Exchange.orderbookConnection
       ? Exchange.orderbookConnection
@@ -292,7 +292,7 @@ export class Market {
         this._bidsSlot = context.slot;
         this.updateOrderbook();
         if (callback !== undefined) {
-          callback(this.asset, EventType.ORDERBOOK, null);
+          callback(this.asset, EventType.ORDERBOOK, context.slot, null);
         }
       },
       connection.commitment
@@ -309,7 +309,7 @@ export class Market {
         this._asksSlot = context.slot;
         this.updateOrderbook();
         if (callback !== undefined) {
-          callback(this.asset, EventType.ORDERBOOK, null);
+          callback(this.asset, EventType.ORDERBOOK, context.slot, null);
         }
       },
       connection.commitment

@@ -205,6 +205,32 @@ export type Zeta = {
       ]
     },
     {
+      "name": "migrateToNewCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "newCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "migrateToCrossMarginAccount",
       "accounts": [
         {
@@ -983,6 +1009,27 @@ export type Zeta = {
     },
     {
       "name": "updateSecondaryAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateTriggerAdmin",
       "accounts": [
         {
           "name": "state",
@@ -6711,11 +6758,15 @@ export type Zeta = {
             }
           },
           {
+            "name": "triggerAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                306
               ]
             }
           }
@@ -8900,6 +8951,9 @@ export type Zeta = {
           },
           {
             "name": "OpenOrders"
+          },
+          {
+            "name": "Liquidate"
           }
         ]
       }
@@ -9134,6 +9188,18 @@ export type Zeta = {
           "name": "expiryTs",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
@@ -9195,6 +9261,16 @@ export type Zeta = {
           "type": {
             "defined": "Asset"
           },
+          "index": false
+        },
+        {
+          "name": "liquidateeMarginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidatorMarginAccount",
+          "type": "publicKey",
           "index": false
         }
       ]
@@ -10083,6 +10159,11 @@ export type Zeta = {
       "code": 6156,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
+    },
+    {
+      "code": 6157,
+      "name": "InvalidLiquidatorAuthority",
+      "msg": "Invalid liquidator authority"
     }
   ]
 };
@@ -10294,6 +10375,32 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "migrateToNewCrossMarginAccount",
+      "accounts": [
+        {
+          "name": "newCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldCrossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "migrateToCrossMarginAccount",
       "accounts": [
         {
@@ -11072,6 +11179,27 @@ export const IDL: Zeta = {
     },
     {
       "name": "updateSecondaryAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateTriggerAdmin",
       "accounts": [
         {
           "name": "state",
@@ -16800,11 +16928,15 @@ export const IDL: Zeta = {
             }
           },
           {
+            "name": "triggerAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                306
               ]
             }
           }
@@ -18989,6 +19121,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "OpenOrders"
+          },
+          {
+            "name": "Liquidate"
           }
         ]
       }
@@ -19223,6 +19358,18 @@ export const IDL: Zeta = {
           "name": "expiryTs",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
@@ -19284,6 +19431,16 @@ export const IDL: Zeta = {
           "type": {
             "defined": "Asset"
           },
+          "index": false
+        },
+        {
+          "name": "liquidateeMarginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "liquidatorMarginAccount",
+          "type": "publicKey",
           "index": false
         }
       ]
@@ -20172,6 +20329,11 @@ export const IDL: Zeta = {
       "code": 6156,
       "name": "TriggerOrderBitOccupied",
       "msg": "Given trigger order bit is occupied, pick another"
+    },
+    {
+      "code": 6157,
+      "name": "InvalidLiquidatorAuthority",
+      "msg": "Invalid liquidator authority"
     }
   ]
 };

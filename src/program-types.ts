@@ -36,6 +36,7 @@ export interface State {
   nativeOpenInterestLimit: anchor.BN;
   haltStates: Array<HaltStateV2>;
   haltStatesPadding: Array<HaltStateV2>;
+  triggerAdmin: PublicKey;
   padding: Array<number>;
 }
 
@@ -333,6 +334,8 @@ export interface PlaceOrderEvent {
   oraclePrice: anchor.BN;
   orderId: anchor.BN;
   expiryTs: anchor.BN;
+  asset: any;
+  margin_account: PublicKey;
 }
 
 /**
@@ -397,6 +400,8 @@ export interface LiquidationEvent {
   liquidatee: PublicKey;
   liquidator: PublicKey;
   asset: Object;
+  liquidateeMarginAccount: PublicKey;
+  liquidatorMarginAccount: PublicKey;
 }
 
 export interface OrderCompleteEvent {
