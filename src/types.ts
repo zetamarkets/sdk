@@ -465,6 +465,8 @@ export function defaultOrderOptions(): OrderOptions {
 export interface LoadExchangeConfig {
   network: Network;
   connection: Connection;
+  orderbookConnection?: Connection;
+  orderbookAssetSubscriptionOverride?: Asset[];
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
@@ -475,11 +477,15 @@ export function defaultLoadExchangeConfig(
   connection: Connection,
   opts: ConfirmOptions = utils.defaultCommitment(),
   throttleMs = 0,
-  loadFromStore = false
+  loadFromStore = false,
+  orderbookConnection: Connection = undefined,
+  orderbookAssetSubscriptionOverride: Asset[] = undefined
 ): LoadExchangeConfig {
   return {
     network,
     connection,
+    orderbookConnection,
+    orderbookAssetSubscriptionOverride,
     opts,
     throttleMs,
     loadFromStore,

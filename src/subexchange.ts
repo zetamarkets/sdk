@@ -73,9 +73,6 @@ export class SubExchange {
   public get markets(): ZetaGroupMarkets {
     return this._markets;
   }
-  public get numMarkets(): number {
-    return this.getMarkets().length;
-  }
   private _markets: ZetaGroupMarkets;
 
   private _eventEmitters: any[] = [];
@@ -173,17 +170,7 @@ export class SubExchange {
       `Refreshing Serum markets for ${assetToName(this._asset)} SubExchange.`
     );
 
-    await Promise.all(
-      this._markets.markets
-        .map(async (m) => {
-          return m.serumMarket.updateDecoded(Exchange.connection);
-        })
-        .concat([
-          this._markets.perpMarket.serumMarket.updateDecoded(
-            Exchange.connection
-          ),
-        ])
-    );
+    await this._markets.market.serumMarket.updateDecoded(Exchange.connection);
 
     console.log(
       `${assetToName(this.asset)} SubExchange Serum markets refreshed`
@@ -194,7 +181,7 @@ export class SubExchange {
    * Checks only if the perp serum markets are stale and refreshes it if so
    */
   public async updatePerpSerumMarketIfNeeded(epochDelay: number) {
-    let m = this._markets.perpMarket;
+    let m = this._markets.market;
 
     if (
       m.serumMarket.epochLength.toNumber() == 0 ||
@@ -529,25 +516,6 @@ export class SubExchange {
     this._eventEmitters.push(eventEmitter);
   }
 
-  public async handlePolling(
-    callback?: (
-      asset: Asset,
-      eventType: EventType,
-      slot: number,
-      data: any
-    ) => void
-  ) {
-    if (!this._isInitialized) {
-      return;
-    }
-
-    await this._markets.handlePolling(callback);
-  }
-
-  public async updateSubExchangeState() {
-    this._markets.updateExpirySeries();
-  }
-
   /**
    * @param index   market index to get mark price.
    */
@@ -560,8 +528,8 @@ export class SubExchange {
   /**
    * Returns all perp & nonperk markets in a single list
    */
-  public getMarkets(): Market[] {
-    return this._markets.markets.concat(this._markets.perpMarket);
+  public getMarket(): Market {
+    return this._markets.market;
   }
 
   /**
@@ -658,11 +626,7 @@ export class SubExchange {
 
   public async cancelAllOrdersHalted() {
     this.assertHalted();
-    await Promise.all(
-      this.getMarkets().map(async (market) => {
-        await market.cancelAllOrdersHalted();
-      })
-    );
+    await this.getMarket().cancelAllOrdersHalted();
   }
 
   public async cleanZetaMarketHalted() {

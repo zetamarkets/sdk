@@ -722,7 +722,6 @@ export class CrossClient {
         tx.add(
           instructions.settleDexFundsIx(
             asset,
-            market,
             vaultOwner,
             utils.getOpenOrders(Exchange.programId, market, this.publicKey)[0]
           )
@@ -1827,7 +1826,6 @@ export class CrossClient {
     tx.add(
       instructions.settleDexFundsIx(
         asset,
-        market.address,
         vaultOwner,
         this._openOrdersAccounts[assetIndex]
       )
@@ -1878,7 +1876,6 @@ export class CrossClient {
       );
       let settleIx = instructions.settleDexFundsIx(
         asset,
-        market,
         vaultOwner,
         this._openOrdersAccounts[assetIndex]
       );
@@ -2230,7 +2227,6 @@ export class CrossClient {
     await Promise.all(
       Exchange.assets.map(async (asset) => {
         let market = Exchange.getPerpMarket(asset);
-        await market.updateOrderbook();
         orders.push(
           market.getOrdersForAccount(
             this._openOrdersAccounts[assetToIndex(asset)]

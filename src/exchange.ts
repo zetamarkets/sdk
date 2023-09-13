@@ -14,7 +14,7 @@ import * as utils from "./utils";
 import * as constants from "./constants";
 import * as assets from "./assets";
 import { PerpSyncQueue, ProductGreeks, State, Pricing } from "./program-types";
-import { ExpirySeries, Market, ZetaGroupMarkets } from "./market";
+import { Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
 import { Network } from "./network";
@@ -92,6 +92,15 @@ export class Exchange {
     return this._provider.connection;
   }
   private _provider: anchor.AnchorProvider;
+
+  /**
+   * Separate connection used for orderbook subscriptions.
+   * For example you might use a connection with Whirligig and low commitment for faster results
+   */
+  public get orderbookConnection(): Connection {
+    return this._orderbookConnection;
+  }
+  private _orderbookConnection: Connection;
 
   /**
    * Public key used as the stable coin mint.
@@ -241,6 +250,11 @@ export class Exchange {
   private _pricingSubscriptionId: number = undefined;
 
   /**
+   * The subscription id for the state account.
+   */
+  private _stateSubscriptionId: number = undefined;
+
+  /**
    * @param interval   How often to poll zeta group and state in seconds.
    */
   public get pollInterval(): number {
@@ -344,6 +358,9 @@ export class Exchange {
       loadConfig.opts ||
         utils.commitmentConfig(loadConfig.connection.commitment)
     );
+    if (loadConfig.orderbookConnection) {
+      this._orderbookConnection = loadConfig.orderbookConnection;
+    }
     this._opts = loadConfig.opts;
     this._network = loadConfig.network;
     this._program = new anchor.Program(
@@ -614,6 +631,7 @@ export class Exchange {
     const clockData = utils.getClockData(accFetches.at(-1));
     this.subscribeClock(clockData, callback);
     this.subscribePricing(callback);
+    this.subscribeState(callback);
 
     await Promise.all(
       this.assets.map(async (asset, i) => {
@@ -629,6 +647,16 @@ export class Exchange {
     );
 
     for (var se of this.getAllSubExchanges()) {
+      // Only subscribe to the orderbook for assets provided in the override
+      // Useful for FE because we only want one asset at a time
+      // If no override is provided, subscribe to all assets
+      if (
+        !loadConfig.orderbookAssetSubscriptionOverride ||
+        (loadConfig.orderbookAssetSubscriptionOverride &&
+          loadConfig.orderbookAssetSubscriptionOverride.includes(se.asset))
+      ) {
+        se.markets.market.subscribeOrderbook(callback);
+      }
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 
@@ -745,11 +773,6 @@ export class Exchange {
             this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
-            await Promise.all(
-              this.getAllSubExchanges().map(async (subExchange) => {
-                await subExchange.handlePolling(callback);
-              })
-            );
             if (this._useAutoPriorityFee == true) {
               await this.updateAutoFee();
             }
@@ -770,11 +793,6 @@ export class Exchange {
   public async updateExchangeState() {
     await this.updateState();
     await this.updateZetaPricing();
-    await Promise.all(
-      this.assets.map(async (asset) => {
-        this.getZetaGroupMarkets(asset).updateExpirySeries();
-      })
-    );
   }
 
   /**
@@ -808,6 +826,24 @@ export class Exchange {
     await this.updateState();
   }
 
+  private subscribeState(
+    callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
+  ) {
+    this._stateSubscriptionId = this.connection.onAccountChange(
+      this._stateAddress,
+      async (accountInfo: AccountInfo<Buffer>, context: Context) => {
+        this._state = this.program.coder.accounts.decode(
+          "State",
+          accountInfo.data
+        );
+
+        if (callback !== undefined) {
+          callback(null, EventType.EXCHANGE, context.slot, null);
+        }
+      }
+    );
+  }
+
   private subscribePricing(
     callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
@@ -826,112 +862,12 @@ export class Exchange {
     );
   }
 
-  public subscribeMarket(asset: Asset) {
-    this.getSubExchange(asset).markets.subscribeMarket(constants.PERP_INDEX);
-  }
-
-  public unsubscribeMarket(asset: Asset) {
-    this.getSubExchange(asset).markets.unsubscribeMarket(constants.PERP_INDEX);
-  }
-
-  public subscribePerp(asset: Asset) {
-    this.getSubExchange(asset).markets.subscribePerp();
-  }
-
-  public unsubscribePerp(asset: Asset) {
-    this.getSubExchange(asset).markets.unsubscribePerp();
-  }
-
-  public async updateOrderbook(asset: Asset) {
-    return await this.getPerpMarket(asset).updateOrderbook();
-  }
-
-  public async updateAllOrderbooks(live: boolean = true) {
-    // This assumes that every market has 1 asksAddress and 1 bidsAddress
-    let allLiveMarkets = [];
-    this.assets.forEach((asset) => {
-      allLiveMarkets = allLiveMarkets.concat([this.getPerpMarket(asset)]);
-    });
-
-    if (live) {
-      allLiveMarkets = allLiveMarkets.filter(
-        (m) => m.kind == types.Kind.PERP || m.expirySeries.isLive()
-      );
-    }
-
-    let liveMarketsSlices: Market[][] = [];
-    for (
-      let i = 0;
-      i < allLiveMarkets.length;
-      i += constants.MAX_MARKETS_TO_FETCH
-    ) {
-      liveMarketsSlices.push(
-        allLiveMarkets.slice(i, i + constants.MAX_MARKETS_TO_FETCH)
-      );
-    }
-
-    await Promise.all(
-      liveMarketsSlices.map(async (liveMarkets) => {
-        let liveMarketAskAddresses = liveMarkets.map(
-          (m) => m.serumMarket.asksAddress
-        );
-        let liveMarketBidAddresses = liveMarkets.map(
-          (m) => m.serumMarket.bidsAddress
-        );
-
-        let accountInfos = await this.connection.getMultipleAccountsInfo(
-          liveMarketAskAddresses.concat(liveMarketBidAddresses)
-        );
-        const half = Math.ceil(accountInfos.length / 2);
-        const asksAccountInfos = accountInfos.slice(0, half);
-        const bidsAccountInfos = accountInfos.slice(-half);
-
-        // A bit of a weird one but we want a map of liveMarkets -> accountInfos because
-        // we'll do the following orderbook updates async
-        let liveMarketsToAskAccountInfosMap: Map<
-          Market,
-          AccountInfo<Buffer>
-        > = new Map();
-        let liveMarketsToBidAccountInfosMap: Map<
-          Market,
-          AccountInfo<Buffer>
-        > = new Map();
-        liveMarkets.map((m, i) => {
-          liveMarketsToAskAccountInfosMap.set(m, asksAccountInfos[i]);
-          liveMarketsToBidAccountInfosMap.set(m, bidsAccountInfos[i]);
-        });
-
-        await Promise.all(
-          liveMarkets.map(async (market) => {
-            market.asks = Orderbook.decode(
-              market.serumMarket,
-              liveMarketsToAskAccountInfosMap.get(market).data
-            );
-            market.bids = Orderbook.decode(
-              market.serumMarket,
-              liveMarketsToBidAccountInfosMap.get(market).data
-            );
-            market.updateOrderbook(false);
-          })
-        );
-      })
-    );
-  }
-
   public getZetaGroupMarkets(asset: Asset): ZetaGroupMarkets {
     return this.getSubExchange(asset).markets;
   }
 
   public getPerpMarket(asset: Asset): Market {
-    return this.getSubExchange(asset).markets.perpMarket;
-  }
-
-  public getMarketsByExpiryIndex(asset: Asset, index: number): Market[] {
-    return this.getSubExchange(asset).markets.getMarketsByExpiryIndex(index);
-  }
-
-  public getExpirySeriesList(asset: Asset): ExpirySeries[] {
-    return this.getSubExchange(asset).markets.expirySeries;
+    return this.getSubExchange(asset).markets.market;
   }
 
   public getZetaGroupAddress(asset: Asset): PublicKey {
@@ -1052,10 +988,6 @@ export class Exchange {
     await utils.processTransaction(this.provider, tx);
 
     await this.updateZetaPricing();
-  }
-
-  public async updateSubExchangeState(asset: Asset) {
-    await this.getSubExchange(asset).updateSubExchangeState();
   }
 
   public async whitelistUserForDeposit(asset: Asset, user: PublicKey) {
@@ -1182,6 +1114,13 @@ export class Exchange {
         this._pricingSubscriptionId
       );
       this._pricingSubscriptionId = undefined;
+    }
+
+    if (this._stateSubscriptionId !== undefined) {
+      await this._provider.connection.removeAccountChangeListener(
+        this._stateSubscriptionId
+      );
+      this._stateSubscriptionId = undefined;
     }
 
     for (var i = 0; i < this._programSubscriptionIds.length; i++) {

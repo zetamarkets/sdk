@@ -81,14 +81,7 @@ export function calculateProductMargin(
   if (market.strike == null) {
     return null;
   }
-  let kind = market.kind;
-
-  switch (kind) {
-    case types.Kind.PERP:
-      return calculatePerpMargin(asset, spotPrice);
-    default:
-      throw Error("Non-perp not supported");
-  }
+  return calculatePerpMargin(asset, spotPrice);
 }
 
 /**
