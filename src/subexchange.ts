@@ -644,6 +644,9 @@ export class SubExchange {
     await Exchange.program.account.perpSyncQueue.unsubscribe(
       Exchange.pricing.perpSyncQueues[assetToIndex(this._asset)]
     );
+
+    await this.markets.market.unsubscribeOrderbook();
+
     for (var i = 0; i < this._eventEmitters.length; i++) {
       this._eventEmitters[i].removeListener("change");
     }
