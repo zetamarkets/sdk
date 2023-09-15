@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.2] 2023-09-15
+
+- Bugfix: Unsubscribe from orderbooks on Exchange.close(). ([#271](https://github.com/zetamarkets/sdk/pull/271))
+
 ## [1.10.1] 2023-09-15
 
 - New function to cancel all trigger orders + place order. ([#265](https://github.com/zetamarkets/sdk/pull/265))
