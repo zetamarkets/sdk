@@ -561,7 +561,7 @@ export class SubClient {
     }
 
     let tifOffsetToUse = utils.getTIFOffset(
-      this._subExchange.markets.getMarket(market),
+      this._subExchange.markets.getMarket(),
       options.tifOptions
     );
 
@@ -667,7 +667,7 @@ export class SubClient {
 
     let market = Exchange.getPerpMarket(this._asset).address;
     let tifOffset = utils.getTIFOffset(
-      this._subExchange.markets.getMarket(market),
+      this._subExchange.markets.getMarket(),
       options.tifOptions
     );
 
@@ -790,7 +790,7 @@ export class SubClient {
     );
 
     let tifOffsetToUse = utils.getTIFOffset(
-      this._subExchange.markets.getMarket(market),
+      this._subExchange.markets.getMarket(),
       options.tifOptions
     );
 
@@ -857,7 +857,7 @@ export class SubClient {
     );
 
     let tifOffsetToUse = utils.getTIFOffset(
-      this._subExchange.markets.getMarket(market),
+      this._subExchange.markets.getMarket(),
       newOptions.tifOptions
     );
 
@@ -927,7 +927,7 @@ export class SubClient {
     );
 
     let tifOffsetToUse = utils.getTIFOffset(
-      this._subExchange.markets.getMarket(market),
+      this._subExchange.markets.getMarket(),
       newOptions.tifOptions
     );
 
@@ -1017,7 +1017,6 @@ export class SubClient {
     tx.add(
       instructions.settleDexFundsIx(
         this.asset,
-        market,
         vaultOwner,
         this._openOrdersAccounts[marketIndex]
       )
@@ -1069,7 +1068,6 @@ export class SubClient {
       );
       let settleIx = instructions.settleDexFundsIx(
         this.asset,
-        market,
         vaultOwner,
         this._openOrdersAccounts[marketIndex]
       );
@@ -1388,7 +1386,6 @@ export class SubClient {
     }
 
     let market = Exchange.getPerpMarket(this._asset);
-    await market.updateOrderbook();
     let orders = market.getOrdersForAccount(
       this._openOrdersAccounts[constants.PERP_INDEX]
     );

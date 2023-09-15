@@ -564,7 +564,10 @@ export async function getMintDecimals(
   return decimals;
 }
 
-function throwIfNull<T>(value: T | null, message = "account not found"): T {
+export function throwIfNull<T>(
+  value: T | null,
+  message = "account not found"
+): T {
   if (value === null) {
     throw new Error(message);
   }

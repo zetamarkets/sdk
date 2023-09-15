@@ -17,14 +17,6 @@ export enum EventType {
    */
   CLOCK,
   /**
-   * A trade event for the user margin account.
-   */
-  TRADE,
-  /**
-   * A trade v2 event for the user margin account.
-   */
-  TRADEV2,
-  /**
    * A trade v3 event for the user margin account.
    */
   TRADEV3,
@@ -61,10 +53,6 @@ export function eventTypeToString(event: EventType) {
       return "USER";
     case EventType.CLOCK:
       return "CLOCK";
-    case EventType.TRADE:
-      return "TRADE";
-    case EventType.TRADEV2:
-      return "TRADEV2";
     case EventType.TRADEV3:
       return "TRADEV3";
     case EventType.ORDERCOMPLETE:
