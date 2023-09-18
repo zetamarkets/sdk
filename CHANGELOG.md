@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.3] 2023-09-18
+
+- New function updateOpenOrdersSync() in CrossClient. ([#272](https://github.com/zetamarkets/sdk/pull/272))
+
 ## [1.10.2] 2023-09-15
 
 - Bugfix: Unsubscribe from orderbooks on Exchange.close(). ([#271](https://github.com/zetamarkets/sdk/pull/271))

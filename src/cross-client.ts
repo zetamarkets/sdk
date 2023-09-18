@@ -2360,7 +2360,7 @@ export class CrossClient {
     return this._positions.get(asset);
   }
 
-  public async updateOrders() {
+  public updateOpenOrdersSync() {
     if (this._account == null) {
       console.log("User has no margin account, cannot update orders.");
       return;
@@ -2368,16 +2368,14 @@ export class CrossClient {
 
     let orders = [];
 
-    await Promise.all(
-      Exchange.assets.map(async (asset) => {
-        let market = Exchange.getPerpMarket(asset);
-        orders.push(
-          market.getOrdersForAccount(
-            this._openOrdersAccounts[assetToIndex(asset)]
-          )
-        );
-      })
-    );
+    Exchange.assets.forEach((asset) => {
+      let market = Exchange.getPerpMarket(asset);
+      orders.push(
+        market.getOrdersForAccount(
+          this._openOrdersAccounts[assetToIndex(asset)]
+        )
+      );
+    });
 
     let allOrders = [].concat(...orders);
     let allOrdersFiltered = allOrders.filter(function (order: types.Order) {
@@ -2395,16 +2393,20 @@ export class CrossClient {
       );
     });
     let ordersByAsset = new Map();
-    await Promise.all(
-      Exchange.assets.map(async (asset) => {
-        ordersByAsset.set(asset, []);
-      })
-    );
+
+    Exchange.assets.forEach((asset) => {
+      ordersByAsset.set(asset, []);
+    });
+
     for (var order of allOrdersFiltered) {
       ordersByAsset.get(order.asset).push(order);
     }
 
     this._orders = ordersByAsset;
+  }
+
+  public async updateOrders() {
+    this.updateOpenOrdersSync();
 
     let triggerOrderBits = [];
 
