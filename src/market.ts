@@ -226,7 +226,15 @@ export class Market {
     return this._asksSlot;
   }
   private _asksSlot: number;
+
+  public get bidsSubscriptionId(): number {
+    return this._bidsSubscriptionId;
+  }
   private _bidsSubscriptionId: number;
+
+  public get asksSubscriptionId(): number {
+    return this._asksSubscriptionId;
+  }
   private _asksSubscriptionId: number;
 
   /**

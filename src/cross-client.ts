@@ -199,6 +199,8 @@ export class CrossClient {
   }
   private _positions: Map<Asset, types.Position[]>;
 
+  private _openOrdersSums: Map<Asset, types.OpenOrdersSum>;
+
   /**
    * Index in CrossMarginAccountManager
    */
@@ -266,9 +268,15 @@ export class CrossClient {
 
     this._positions = new Map();
     this._orders = new Map();
+    this._openOrdersSums = new Map();
     for (var asset of Exchange.assets) {
       this._positions.set(asset, []);
       this._orders.set(asset, []);
+      this._openOrdersSums.set(asset, {
+        openingAsks: 0,
+        openingBids: 0,
+        closing: 0,
+      });
     }
 
     this._lastUpdateTimestamp = 0;
@@ -379,6 +387,55 @@ export class CrossClient {
           client._pendingUpdateSlot = context.slot;
           return;
         }
+
+        // If we have an open orders change, force fetch the orderbook if we're not subbed to it
+        await Promise.all(
+          Exchange.assets.map(async (asset) => {
+            let oldSums = client._openOrdersSums.get(asset);
+            let newSums =
+              client._account.productLedgers[assets.assetToIndex(asset)]
+                .orderState;
+
+            if (
+              oldSums.closing != newSums.closingOrders.toNumber() ||
+              oldSums.openingBids !=
+                newSums.openingOrders[constants.BID_ORDERS_INDEX].toNumber() ||
+              oldSums.openingAsks !=
+                newSums.openingOrders[constants.ASK_ORDERS_INDEX].toNumber()
+            ) {
+              console.log("Open orders change for", asset);
+              if (
+                Exchange.getPerpMarket(asset).bidsSubscriptionId == undefined ||
+                Exchange.getPerpMarket(asset).asksSubscriptionId == undefined
+              ) {
+                console.log("Fetching orderbook update for", asset);
+                let loadedOrderbooks = await Exchange.getPerpMarket(
+                  asset
+                ).serumMarket.loadBidsAndAsks(Exchange.provider.connection);
+                [
+                  Exchange.getPerpMarket(asset).bids,
+                  Exchange.getPerpMarket(asset).asks,
+                ] = [loadedOrderbooks.bids, loadedOrderbooks.asks];
+                if (callback !== undefined) {
+                  callback(
+                    null,
+                    EventType.ORDERBOOK,
+                    loadedOrderbooks.slot,
+                    null
+                  );
+                }
+              }
+            }
+
+            client._openOrdersSums.set(asset, {
+              closing: newSums.closingOrders.toNumber(),
+              openingBids:
+                newSums.openingOrders[constants.BID_ORDERS_INDEX].toNumber(),
+              openingAsks:
+                newSums.openingOrders[constants.ASK_ORDERS_INDEX].toNumber(),
+            });
+          })
+        );
 
         await client.updateState(false);
         client._lastUpdateTimestamp = Exchange.clockTimestamp;

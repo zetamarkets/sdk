@@ -498,3 +498,9 @@ export interface ExecutionInfo {
   size: number;
   isTaker: boolean;
 }
+
+export interface OpenOrdersSum {
+  openingBids: number;
+  openingAsks: number;
+  closing: number;
+}
