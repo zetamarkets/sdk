@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.4] 2023-09-19
+
+- Bugfix: Fix loading order to prevent a rarely occurring market undefined error. ([#274](https://github.com/zetamarkets/sdk/pull/274))
+
 ## [1.10.3] 2023-09-18
 
 - New function updateOpenOrdersSync() in CrossClient. ([#272](https://github.com/zetamarkets/sdk/pull/272))
