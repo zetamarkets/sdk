@@ -628,11 +628,6 @@ export class Exchange {
       );
     }
 
-    const clockData = utils.getClockData(accFetches.at(-1));
-    this.subscribeClock(clockData, callback);
-    this.subscribePricing(callback);
-    this.subscribeState(callback);
-
     await Promise.all(
       this.assets.map(async (asset, i) => {
         return this.getSubExchange(asset).load(
@@ -659,6 +654,11 @@ export class Exchange {
       }
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
+
+    const clockData = utils.getClockData(accFetches.at(-1));
+    this.subscribeClock(clockData, callback);
+    this.subscribePricing(callback);
+    this.subscribeState(callback);
 
     await this.updateExchangeState();
 
