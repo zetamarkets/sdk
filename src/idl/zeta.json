@@ -1043,8 +1043,8 @@
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
