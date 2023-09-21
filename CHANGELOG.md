@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.0] 2023-03-22
+
+- Client: Dynamically fetch open orders if there are changes to open orders sums. This generally improves account state robustness. ([#273](https://github.com/zetamarkets/sdk/pull/273))
+
 ## [1.10.4] 2023-09-19
 
 - Bugfix: Fix loading order to prevent a rarely occurring market undefined error. ([#274](https://github.com/zetamarkets/sdk/pull/274))

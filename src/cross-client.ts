@@ -1249,6 +1249,7 @@ export class CrossClient {
       options.blockhash
     );
     this._openOrdersAccounts[assetIndex] = openOrdersPda;
+    await this.updateOrders();
     return txId;
   }
 
@@ -1287,6 +1288,7 @@ export class CrossClient {
         );
       })
     );
+    await this.updateOrders();
 
     return txIds;
   }
@@ -1359,6 +1361,8 @@ export class CrossClient {
         this.useVersionedTxs ? utils.getZetaLutArr() : undefined
       )
     );
+    await this.updateOrders();
+
     return txIds;
   }
 
@@ -1410,7 +1414,7 @@ export class CrossClient {
         this._accountAddress
       )
     );
-    return await utils.processTransaction(
+    let txSig = await utils.processTransaction(
       this._provider,
       tx,
       undefined,
@@ -1418,6 +1422,8 @@ export class CrossClient {
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
+    await this.updateOrders();
+    return txSig;
   }
 
   public async editTimestampTriggerOrder(
@@ -1428,7 +1434,7 @@ export class CrossClient {
     newSide: types.Side,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
-    await this.editTriggerOrder(
+    return await this.editTriggerOrder(
       orderIndex,
       newOrderPrice,
       newSize,
@@ -1451,7 +1457,7 @@ export class CrossClient {
       newSide
     )
   ) {
-    await this.editTriggerOrder(
+    return await this.editTriggerOrder(
       orderIndex,
       newOrderPrice,
       newSize,
@@ -1496,7 +1502,8 @@ export class CrossClient {
         triggerAccount
       )
     );
-    return await utils.processTransaction(
+
+    let txSig = await utils.processTransaction(
       this._provider,
       tx,
       undefined,
@@ -1504,6 +1511,8 @@ export class CrossClient {
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
+    await this.updateOrders();
+    return txSig;
   }
 
   public async editDelegatedPubkey(
