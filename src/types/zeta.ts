@@ -1043,8 +1043,8 @@ export type Zeta = {
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -11213,8 +11213,8 @@ export const IDL: Zeta = {
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
