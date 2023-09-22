@@ -538,6 +538,9 @@ export class CrossClient {
         console.log(`CrossClient poll update failed. Error: ${e}`);
       }
     }
+
+    // Do this all the time because it's just local calcs
+    this.updateOpenOrdersSync();
   }
 
   private toggleUpdateState(toggleOn: boolean) {
