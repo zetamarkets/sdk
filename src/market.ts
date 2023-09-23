@@ -421,6 +421,17 @@ export class Market {
   }
 
   public getOrdersForAccount(openOrdersAddress: PublicKey): types.Order[] {
+    // After unsubscribing
+    if (this._bids == undefined || this._asks == undefined) {
+      if (this._bids == undefined) {
+        console.log(`[${this.asset}] this._bids == undefined`);
+      }
+      if (this._asks == undefined) {
+        console.log(`[${this.asset}] this._asks == undefined`);
+      }
+      return [];
+    }
+
     let orders = [...this._bids, ...this._asks].filter((order) =>
       order.openOrdersAddress.equals(openOrdersAddress)
     );
