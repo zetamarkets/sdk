@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.5] 2023-09-25
+
+- Bugfix: Handle empty accounts better to prevent undefined issues with trigger orders. ([#277](https://github.com/zetamarkets/sdk/pull/277))
+
 ## [1.10.4] 2023-09-19
 
 - Bugfix: Fix loading order to prevent a rarely occurring market undefined error. ([#274](https://github.com/zetamarkets/sdk/pull/274))
