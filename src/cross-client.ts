@@ -266,6 +266,7 @@ export class CrossClient {
 
     this._positions = new Map();
     this._orders = new Map();
+    this._triggerOrders = new Map();
     for (var asset of Exchange.assets) {
       this._positions.set(asset, []);
       this._orders.set(asset, []);
@@ -1070,6 +1071,10 @@ export class CrossClient {
   }
 
   public findAvailableTriggerOrderBit(): number {
+    // If we haven't loaded properly for whatever reason just use the last index to minimise the chance of collisions
+    if (!this.account || !this.account.triggerOrderBits) {
+      return 127;
+    }
     for (var i = 0; i < 128; i++) {
       let mask: BN = new BN(1).shln(i); // 1 << i
       if (this.account.triggerOrderBits.and(mask).isZero()) {
@@ -2407,6 +2412,9 @@ export class CrossClient {
 
   public async updateOrders() {
     this.updateOpenOrdersSync();
+    if (!this.account || !this.account.triggerOrderBits) {
+      return;
+    }
 
     let triggerOrderBits = [];
 
