@@ -195,9 +195,13 @@ export class SubExchange {
 
     await m.serumMarket.updateDecoded(Exchange.connection);
 
-    console.log(
-      `${assetToName(this.asset)} SubExchange perp Serum market refreshed`
-    );
+    // Can get spammy on non-mainnet if no one is placing orders
+    // because TIF epochs automatically roll over on new orders
+    if (Exchange.network == Network.MAINNET) {
+      console.log(
+        `${assetToName(this.asset)} SubExchange perp Serum market refreshed`
+      );
+    }
   }
 
   /**
