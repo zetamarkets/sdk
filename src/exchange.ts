@@ -641,6 +641,12 @@ export class Exchange {
       })
     );
 
+    await Promise.all(
+      this._assets.map(async (a) => {
+        await this.getPerpMarket(a).serumMarket.updateDecoded(this.connection);
+      })
+    );
+
     for (var se of this.getAllSubExchanges()) {
       // Only subscribe to the orderbook for assets provided in the override
       // Useful for FE because we only want one asset at a time
