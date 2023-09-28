@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.6] 2023-09-28
+
+- Client: New function getTriggerOrder(). ([#279](https://github.com/zetamarkets/sdk/pull/279))
+
 ## [1.10.5] 2023-09-25
 
 - Bugfix: Handle empty accounts better to prevent undefined issues with trigger orders. ([#277](https://github.com/zetamarkets/sdk/pull/277))

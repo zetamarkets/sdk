@@ -2353,6 +2353,20 @@ export class CrossClient {
     return txIds;
   }
 
+  public getTriggerOrder(triggerOrderBit: number): types.TriggerOrder {
+    let triggerOrders: types.TriggerOrder[] = [
+      ...this._triggerOrders.values(),
+    ].flat();
+
+    for (var triggerOrder of triggerOrders) {
+      if (triggerOrder.triggerOrderBit == triggerOrderBit) {
+        return triggerOrder;
+      }
+    }
+
+    throw new Error(`Cannot find trigger order with bit=${triggerOrderBit}`);
+  }
+
   public getTriggerOrders(asset: Asset): types.TriggerOrder[] {
     return this._triggerOrders.get(asset);
   }
