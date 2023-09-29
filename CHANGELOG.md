@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.7] 2023-09-28
+
+- Client: New function getTriggerOrder(). ([#279](https://github.com/zetamarkets/sdk/pull/279))
+
 ## [1.10.6] 2023-09-28
 
 - Reduce log spam relating to TIF epoch rollovers. ([#278](https://github.com/zetamarkets/sdk/pull/278))
