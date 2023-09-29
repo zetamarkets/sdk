@@ -11,11 +11,13 @@ import * as anchor from "@zetamarkets/anchor";
 import * as fs from "fs";
 import { DecodeType, returnDecodedType } from "./market-gen-utils";
 
-const mainnetUrl = "";
-const devnetUrl = "";
+const mainnetUrl =
+  "https://zeta.rpcpool.com/1f9a7927-518a-48fd-8c46-4d9109dbf27e";
+const devnetUrl =
+  "https://zeta.devnet.rpcpool.com/9b18e3ae-99eb-4e24-aff8-6e02836c87b3";
 
 const main = async () => {
-  let networks = [Network.DEVNET, Network.MAINNET];
+  let networks = [Network.DEVNET];
   let assetList = assets.allAssets();
   for (var network of networks) {
     let marketStore = {};
@@ -30,7 +32,7 @@ const main = async () => {
 
     await Exchange.load(LOAD_CONFIG);
     for (var asset of assetList) {
-      populateMarketStore(marketStore, network, asset, constants.PERP_INDEX);
+      populateMarketStore(marketStore, asset, constants.PERP_INDEX);
     }
     await Exchange.close();
 
@@ -41,25 +43,17 @@ const main = async () => {
 
 main().catch(console.error.bind(console));
 
-function populateMarketStore(
-  marketStore: Object,
-  network: Network,
-  asset: Asset,
-  index: number
-) {
-  if (!(network in marketStore)) {
-    marketStore[network] = {};
-  }
-  if (!(asset in marketStore[network])) {
-    marketStore[network][asset] = {};
+function populateMarketStore(marketStore: Object, asset: Asset, index: number) {
+  if (!(asset in marketStore)) {
+    marketStore[asset] = {};
   }
 
-  if (index in marketStore[network][asset]) {
+  if (index in marketStore[asset]) {
     return;
   }
 
-  marketStore[network][asset][index] = {};
-  let store = marketStore[network][asset][index];
+  marketStore[asset][index] = {};
+  let store = marketStore[asset][index];
   let subExchange = Exchange.getSubExchange(asset);
   if (index != constants.PERP_INDEX) {
     throw Error("non-perps not supported");

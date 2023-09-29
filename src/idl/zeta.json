@@ -6073,7 +6073,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -6082,7 +6082,7 @@
             "type": {
               "array": [
                 "u64",
-                20
+                19
               ]
             }
           },
@@ -6091,7 +6091,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -6100,7 +6100,7 @@
             "type": {
               "array": [
                 "u64",
-                20
+                19
               ]
             }
           },
@@ -6111,7 +6111,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                5
+                6
               ]
             }
           },
@@ -6122,7 +6122,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                20
+                19
               ]
             }
           },
@@ -6133,7 +6133,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                5
+                6
               ]
             }
           },
@@ -6144,7 +6144,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                20
+                19
               ]
             }
           },
@@ -6153,7 +6153,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -6162,7 +6162,7 @@
             "type": {
               "array": [
                 "u64",
-                20
+                19
               ]
             }
           },
@@ -6171,7 +6171,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6180,7 +6180,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6189,7 +6189,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6198,7 +6198,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6207,7 +6207,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6216,7 +6216,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6225,7 +6225,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6234,7 +6234,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6245,7 +6245,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                5
+                6
               ]
             }
           },
@@ -6256,7 +6256,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                20
+                19
               ]
             }
           },
@@ -6267,7 +6267,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                5
+                6
               ]
             }
           },
@@ -6278,7 +6278,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                20
+                19
               ]
             }
           },
@@ -6289,7 +6289,7 @@
                 {
                   "defined": "Product"
                 },
-                5
+                6
               ]
             }
           },
@@ -6300,7 +6300,7 @@
                 {
                   "defined": "Product"
                 },
-                20
+                19
               ]
             }
           },
@@ -6309,7 +6309,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6318,7 +6318,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6339,7 +6339,7 @@
             "type": {
               "array": [
                 "bool",
-                5
+                6
               ]
             }
           },
@@ -6348,7 +6348,7 @@
             "type": {
               "array": [
                 "bool",
-                20
+                19
               ]
             }
           },
@@ -6742,7 +6742,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                5
+                6
               ]
             }
           },
@@ -6753,7 +6753,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                20
+                19
               ]
             }
           },
@@ -7171,7 +7171,7 @@
             "type": {
               "array": [
                 "u8",
-                5
+                6
               ]
             }
           },
@@ -7180,7 +7180,7 @@
             "type": {
               "array": [
                 "u8",
-                20
+                19
               ]
             }
           },
@@ -7195,7 +7195,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                5
+                6
               ]
             }
           },
@@ -7206,7 +7206,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                20
+                19
               ]
             }
           },
@@ -7217,7 +7217,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                5
+                6
               ]
             }
           },
@@ -7228,7 +7228,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                20
+                19
               ]
             }
           },
@@ -8031,7 +8031,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -8826,6 +8826,9 @@
           },
           {
             "name": "ARB"
+          },
+          {
+            "name": "BNB"
           },
           {
             "name": "UNDEFINED"

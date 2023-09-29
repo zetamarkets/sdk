@@ -351,6 +351,13 @@ export class Exchange {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
+    // this._assets = [
+    //   constants.Asset.SOL,
+    //   constants.Asset.BTC,
+    //   constants.Asset.ETH,
+    //   constants.Asset.APT,
+    //   constants.Asset.ARB,
+    // ];
     this._assets = assets.allAssets();
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
@@ -369,7 +376,7 @@ export class Exchange {
       this._provider
     ) as anchor.Program<Zeta>;
 
-    for (var asset of assets.allAssets()) {
+    for (var asset of this._assets) {
       this.addSubExchange(asset, new SubExchange());
       this.getSubExchange(asset).initialize(asset);
     }
@@ -615,7 +622,7 @@ export class Exchange {
 
     const accFetches = (await Promise.all(allPromises)).slice(
       0,
-      assets.allAssets().length + 1
+      this.assets.length + 1
     );
 
     let perpSyncQueueAccs: PerpSyncQueue[] = [];
@@ -904,13 +911,6 @@ export class Exchange {
     return this._combinedSocializedLossAccountAddress;
   }
 
-  public async updatePricingParameters(
-    asset: Asset,
-    args: instructions.UpdatePricingParametersArgs
-  ) {
-    await this.getSubExchange(asset).updatePricingParameters(args);
-  }
-
   public async updateMarginParameters(
     asset: Asset,
     args: instructions.UpdateMarginParametersArgs
@@ -944,8 +944,11 @@ export class Exchange {
     await this.getSubExchange(asset).updatePerpSerumMarketIfNeeded(epochDelay);
   }
 
-  public async initializeZetaMarkets(asset: Asset) {
-    await this.getSubExchange(asset).initializeZetaMarkets();
+  public async initializeZetaMarkets(
+    asset: Asset,
+    zetaGroupAddress: PublicKey
+  ) {
+    await utils.initializeZetaMarkets(asset, zetaGroupAddress);
   }
 
   public async initializeZetaMarketsTIFEpochCycle(
