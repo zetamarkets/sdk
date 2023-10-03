@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.8] 2023-10-03
+
 - Client: Add new instruction to allow permissionless deposit to other user's margin accounts. ([#280](https://github.com/zetamarkets/sdk/pull/280))
 
 ## [1.10.7] 2023-09-28
