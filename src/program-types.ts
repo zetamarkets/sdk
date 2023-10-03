@@ -336,6 +336,7 @@ export interface PlaceOrderEvent {
   expiryTs: anchor.BN;
   asset: any;
   margin_account: PublicKey;
+  clientOrderId: anchor.BN;
 }
 
 /**

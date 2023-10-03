@@ -1819,6 +1819,62 @@ export type Zeta = {
       ]
     },
     {
+      "name": "depositPermissionless",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositTokenAcc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "depositInsuranceVault",
       "accounts": [
         {
@@ -9202,6 +9258,11 @@ export type Zeta = {
         {
           "name": "marginAccount",
           "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
           "index": false
         }
       ]
@@ -11992,6 +12053,62 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "depositPermissionless",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositTokenAcc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "depositInsuranceVault",
       "accounts": [
         {
@@ -19375,6 +19492,11 @@ export const IDL: Zeta = {
         {
           "name": "marginAccount",
           "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
           "index": false
         }
       ]
