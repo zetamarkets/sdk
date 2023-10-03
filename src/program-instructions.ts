@@ -238,6 +238,59 @@ export function depositV2Ix(
 }
 
 /**
+ * @param amount the native amount to deposit (6dp)
+ * @param user to deposit to
+ */
+export function depositPermissionlessIx(
+  amount: number,
+  userToDeposit: PublicKey,
+  payer: PublicKey,
+  whitelistDepositAccount: PublicKey | undefined
+): TransactionInstruction {
+  let remainingAccounts =
+    whitelistDepositAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistDepositAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+
+  // Default to 0 for now and CMA
+  let crossMarginAccount = utils.getCrossMarginAccount(
+    Exchange.programId,
+    userToDeposit,
+    Uint8Array.from([0])
+  )[0];
+
+  let depositTokenAcc = utils.getAssociatedTokenAddress(
+    constants.USDC_MINT_ADDRESS[Exchange.network],
+    payer
+  );
+
+  // TODO: Probably use mint to find decimal places in future.
+  return Exchange.program.instruction.depositPermissionless(
+    new anchor.BN(amount),
+    {
+      accounts: {
+        pricing: Exchange.pricingAddress,
+        crossMarginAccount,
+        vault: Exchange.combinedVaultAddress,
+        depositTokenAcc,
+        socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+        authority: userToDeposit,
+        payer,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        state: Exchange.stateAddress,
+      },
+      remainingAccounts,
+    }
+  );
+}
+
+/**
  * @param amount
  * @param insuranceDepositAccount
  * @param usdcAccount
