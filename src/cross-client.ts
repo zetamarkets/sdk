@@ -1020,7 +1020,7 @@ export class CrossClient {
       console.log(
         `[${assetToName(
           asset
-        )}] User doesn't have open orders account. Initialising for asset ${asset}}.`
+        )}] User doesn't have open orders account. Initialising for asset ${asset}.`
       );
 
       let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV3Ix(
