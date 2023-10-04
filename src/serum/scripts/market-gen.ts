@@ -11,13 +11,11 @@ import * as anchor from "@zetamarkets/anchor";
 import * as fs from "fs";
 import { DecodeType, returnDecodedType } from "./market-gen-utils";
 
-const mainnetUrl =
-  "https://zeta.rpcpool.com/1f9a7927-518a-48fd-8c46-4d9109dbf27e";
-const devnetUrl =
-  "https://zeta.devnet.rpcpool.com/9b18e3ae-99eb-4e24-aff8-6e02836c87b3";
+const mainnetUrl = "";
+const devnetUrl = "";
 
 const main = async () => {
-  let networks = [Network.DEVNET];
+  let networks = [Network.DEVNET, Network.MAINNET];
   let assetList = assets.allAssets();
   for (var network of networks) {
     let marketStore = {};
