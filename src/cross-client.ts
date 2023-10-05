@@ -1518,10 +1518,8 @@ export class CrossClient {
     );
   }
 
-  public async cancelAllMarketOrders(
-    skipEmpty: boolean = true
-  ): Promise<TransactionSignature[]> {
-    let ixs = [];
+  public async cancelAllMarketOrders(): Promise<TransactionSignature> {
+    let tx = new Transaction();
 
     for (var asset of Exchange.assets) {
       let assetIndex = assetToIndex(asset);
@@ -1529,11 +1527,7 @@ export class CrossClient {
         continue;
       }
 
-      if (skipEmpty && this.getOrders(asset).length == 0) {
-        continue;
-      }
-
-      ixs.push(
+      tx.add(
         instructions.cancelAllMarketOrdersIx(
           asset,
           this.provider.wallet.publicKey,
@@ -1542,20 +1536,14 @@ export class CrossClient {
         )
       );
     }
-
-    let txs = utils.splitIxsIntoTx(
-      ixs,
-      constants.MAX_CANCEL_ALL_MARKET_ORDER_PER_TX
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
-
-    let txIds: string[] = [];
-    await Promise.all(
-      txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
-      })
-    );
-
-    return txIds;
   }
 
   public createCancelAllMarketOrdersInstruction(
