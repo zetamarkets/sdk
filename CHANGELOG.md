@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.10.10] 2023-10-09
+
+- Utils: New function getTradeEventsFromTx() ([#285](https://github.com/zetamarkets/sdk/pull/285))
+
 ## [1.10.9] 2023-10-06
 
 - Client: Manually trigger USER callback on editTriggerOrder ([#284](https://github.com/zetamarkets/sdk/pull/284))
