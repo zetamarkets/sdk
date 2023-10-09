@@ -815,15 +815,15 @@ export function commitmentConfig(commitment: Commitment): ConfirmOptions {
 }
 
 export async function getTradeEventsFromTx(
-  connection: Connection,
-  txId: string
-) {
+  txId: string,
+  marginAccountFilter?: PublicKey
+): Promise<TradeEventV3[]> {
   const parser = new anchor.EventParser(
     Exchange.programId,
     Exchange.program.coder
   );
 
-  const tx = await connection.getTransaction(txId, {
+  const tx = await Exchange.connection.getTransaction(txId, {
     commitment: "confirmed",
     maxSupportedTransactionVersion: 0,
   });
@@ -837,19 +837,18 @@ export async function getTradeEventsFromTx(
 
   const events = parser.parseLogs(logs);
   const tradeEvents: TradeEventV3[] = [];
-  /**
-   * I wasn't really sure what to do regarding multiple trade events in a single tx so just
-   * left it like this.
-   */
 
   for (const event of events) {
-    // maybe want to move this string to a const, not sure where
-    if (event.name === "TradeEventV3") {
-      tradeEvents.push(event as unknown as TradeEventV3);
+    if (event.name.startsWith("TradeEvent")) {
+      if (
+        marginAccountFilter &&
+        event.data.marginAccount.toString() != marginAccountFilter.toString()
+      ) {
+        continue;
+      }
+      tradeEvents.push(event.data as TradeEventV3);
     }
   }
-
-  // if there's only going to be one event can just return the event.data.size.toNumber()
 
   return tradeEvents;
 }
