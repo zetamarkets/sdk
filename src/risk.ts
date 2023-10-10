@@ -1106,7 +1106,7 @@ export class RiskCalculator {
       account = fakeTrade(marginAccount, clone, executionInfo);
     }
     let state = this.getCrossMarginAccountState(account);
-    return 100 * (state.maintenanceMarginTotal / state.equity);
+    return 100 * (state.maintenanceMarginIncludingOrdersTotal / state.equity);
   }
 
   /**
@@ -1151,19 +1151,23 @@ export class RiskCalculator {
       account = fakeTrade(marginAccount, clone, executionInfo);
     }
 
-    // Sum up all the positions in the account
-    let positionValue = 0;
+    let state = this.getCrossMarginAccountState(account);
+
+    // Leverage = (value of positions + orders) / equity
+    let positionsAndOrdersValue = 0;
     for (var asset of Exchange.assets) {
-      positionValue +=
-        Math.abs(
-          convertNativeLotSizeToDecimal(
-            account.productLedgers[
-              assets.assetToIndex(asset)
-            ].position.size.toNumber()
-          )
-        ) * Exchange.getMarkPrice(asset);
+      let margin =
+        Exchange.pricing.marginParameters[assets.assetToIndex(asset)]
+          .futureMarginMaintenance /
+        10 ** constants.PLATFORM_PRECISION;
+
+      let value =
+        state.assetState.get(asset).maintenanceMarginIncludingOrders *
+        (100 / margin);
+
+      positionsAndOrdersValue += value;
     }
 
-    return positionValue / this.getCrossMarginAccountState(account).equity;
+    return positionsAndOrdersValue / state.equity;
   }
 }
