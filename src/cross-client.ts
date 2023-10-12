@@ -1444,7 +1444,7 @@ export class CrossClient {
         triggerAccount
       )
     );
-    return await utils.processTransaction(
+    let txSig = await utils.processTransaction(
       this._provider,
       tx,
       undefined,
@@ -1452,6 +1452,16 @@ export class CrossClient {
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
+
+    // Editing a trigger order doesn't prompt an account change because the bits stay the same.
+    // Therefore just manually fire this
+    if (this._callback !== undefined) {
+      this._callback(null, EventType.USER, Exchange.clockSlot, {
+        UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
+      });
+    }
+
+    return txSig;
   }
 
   public async editDelegatedPubkey(
