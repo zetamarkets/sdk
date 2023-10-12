@@ -340,6 +340,13 @@ export class Market {
     }
   }
 
+  public async forceFetchOrderbook() {
+    let orderbook = await this.serumMarket.loadBidsAndAsks(Exchange.connection);
+    this._bids = orderbook.bids;
+    this._asks = orderbook.asks;
+    this.updateOrderbook();
+  }
+
   public updateOrderbook() {
     // On a fresh subscription if there isn't data yet
     if (this._bids == undefined || this._asks == undefined) {

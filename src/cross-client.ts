@@ -456,6 +456,7 @@ export class CrossClient {
   }
 
   public async pollUpdate() {
+    this.updateOpenOrdersSync();
     if (
       Exchange.clockTimestamp >
         this._lastUpdateTimestamp + this._pollInterval ||
