@@ -351,13 +351,6 @@ export class Exchange {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
-    // this._assets = [
-    //   constants.Asset.SOL,
-    //   constants.Asset.BTC,
-    //   constants.Asset.ETH,
-    //   constants.Asset.APT,
-    //   constants.Asset.ARB,
-    // ];
     this._assets = assets.allAssets();
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
