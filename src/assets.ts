@@ -38,6 +38,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.ETH) return "ETH";
   if (asset == Asset.APT) return "APT";
   if (asset == Asset.ARB) return "ARB";
+  if (asset == Asset.BNB) return "BNB";
   if (asset == Asset.UNDEFINED) return "UNDEFINED";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   throw Error("Invalid asset");
@@ -49,6 +50,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "ETH") return Asset.ETH;
   if (name == "APT") return Asset.APT;
   if (name == "ARB") return Asset.ARB;
+  if (name == "BNB") return Asset.BNB;
   if (name == "UNDEFINED") return Asset.UNDEFINED;
   throw Error("Invalid asset");
 }
@@ -63,6 +65,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.ETH) return { eth: {} };
   if (asset == Asset.APT) return { apt: {} };
   if (asset == Asset.ARB) return { arb: {} };
+  if (asset == Asset.BNB) return { bnb: {} };
   throw Error("Invalid asset");
 }
 
@@ -81,6 +84,9 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { arb: {} })) {
     return Asset.ARB;
+  }
+  if (objectEquals(asset, { bnb: {} })) {
+    return Asset.BNB;
   }
   throw Error("Invalid asset");
 }
@@ -102,6 +108,9 @@ export function assetToIndex(asset: Asset): number {
     case Asset.ARB: {
       return 4;
     }
+    case Asset.BNB: {
+      return 5;
+    }
   }
   throw new Error("Invalid asset");
 }
@@ -122,6 +131,9 @@ export function indexToAsset(index: number): Asset {
     }
     case 4: {
       return Asset.ARB;
+    }
+    case 5: {
+      return Asset.BNB;
     }
   }
   throw new Error("Invalid index");

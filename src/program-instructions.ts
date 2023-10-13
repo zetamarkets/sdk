@@ -990,12 +990,12 @@ export async function initializeZetaMarketTxs(
   eventQueue: PublicKey,
   bids: PublicKey,
   asks: PublicKey,
-  marketIndexes: PublicKey
+  marketIndexes: PublicKey,
+  zetaGroupAddress: PublicKey
 ): Promise<[Transaction, Transaction]> {
-  let subExchange = Exchange.getSubExchange(asset);
   const [market, marketNonce] = utils.getMarketUninitialized(
     Exchange.programId,
-    subExchange.zetaGroupAddress,
+    zetaGroupAddress,
     seedIndex
   );
 
@@ -1399,20 +1399,6 @@ export function applyPerpFundingIx(
       pricing: Exchange.pricingAddress,
     },
     remainingAccounts, // margin accounts
-  });
-}
-
-export function updatePricingParametersIx(
-  asset: Asset,
-  args: UpdatePricingParametersArgs,
-  admin: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.updatePricingParameters(args, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      admin,
-    },
   });
 }
 
@@ -2263,19 +2249,6 @@ export interface StateParams {
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;
   nativeOpenInterestLimit: anchor.BN;
-}
-
-export interface UpdatePricingParametersArgs {
-  optionTradeNormalizer: anchor.BN;
-  futureTradeNormalizer: anchor.BN;
-  maxVolatilityRetreat: anchor.BN;
-  maxInterestRetreat: anchor.BN;
-  maxDelta: anchor.BN;
-  minDelta: anchor.BN;
-  minInterestRate: anchor.BN;
-  maxInterestRate: anchor.BN;
-  minVolatility: anchor.BN;
-  maxVolatility: anchor.BN;
 }
 
 export interface InitializeZetaGroupPricingArgs {
