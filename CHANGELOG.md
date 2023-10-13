@@ -5,9 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.10.10] 2023-10-09
+## [1.11.1] 2023-10-13
 
 - Utils: New function getTradeEventsFromTx() ([#285](https://github.com/zetamarkets/sdk/pull/285))
+
+## [1.11.0] 2023-10-13
+
+- General: New asset! (BNB) ([#283](https://github.com/zetamarkets/sdk/pull/283))
 
 ## [1.10.9] 2023-10-06
 
