@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.0] 2023-10-13
+
+- General: New asset! (BNB) ([#283](https://github.com/zetamarkets/sdk/pull/283))
+
 ## [1.10.9] 2023-10-06
 
 - Client: Manually trigger USER callback on editTriggerOrder ([#284](https://github.com/zetamarkets/sdk/pull/284))
