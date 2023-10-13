@@ -335,7 +335,7 @@ export interface PlaceOrderEvent {
   orderId: anchor.BN;
   expiryTs: anchor.BN;
   asset: any;
-  margin_account: PublicKey;
+  marginAccount: PublicKey;
   clientOrderId: anchor.BN;
 }
 
