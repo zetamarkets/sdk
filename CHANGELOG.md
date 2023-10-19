@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.1] 2023-10-19
+
+- Add price to TradeEventV3. ([#288](https://github.com/zetamarkets/sdk/pull/288))
+
 ## [1.11.0] 2023-10-13
 
 - General: New asset! (BNB) ([#283](https://github.com/zetamarkets/sdk/pull/283))
