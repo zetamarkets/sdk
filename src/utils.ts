@@ -814,6 +814,46 @@ export function commitmentConfig(commitment: Commitment): ConfirmOptions {
     commitment,
   };
 }
+
+export async function getTradeEventsFromTx(
+  txId: string,
+  marginAccountFilter?: PublicKey
+): Promise<TradeEventV3[]> {
+  const parser = new anchor.EventParser(
+    Exchange.programId,
+    Exchange.program.coder
+  );
+
+  const tx = await Exchange.connection.getTransaction(txId, {
+    commitment: "confirmed",
+    maxSupportedTransactionVersion: 0,
+  });
+
+  const logs = tx.meta.logMessages;
+
+  if (!logs) {
+    console.warn("No logs found");
+    return;
+  }
+
+  const events = parser.parseLogs(logs);
+  const tradeEvents: TradeEventV3[] = [];
+
+  for (const event of events) {
+    if (event.name.startsWith("TradeEvent")) {
+      if (
+        marginAccountFilter &&
+        event.data.marginAccount.toString() != marginAccountFilter.toString()
+      ) {
+        continue;
+      }
+      tradeEvents.push(event.data as TradeEventV3);
+    }
+  }
+
+  return tradeEvents;
+}
+
 export async function simulateTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction
