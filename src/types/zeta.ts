@@ -9197,6 +9197,11 @@ export type Zeta = {
           "name": "fee",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -19429,6 +19434,11 @@ export const IDL: Zeta = {
         },
         {
           "name": "fee",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "price",
           "type": "u64",
           "index": false
         }

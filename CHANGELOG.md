@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.2] 2023-10-24
+
+- Add price to TradeEventV3. ([#288](https://github.com/zetamarkets/sdk/pull/288))
+
 ## [1.11.1] 2023-10-13
 
 - Utils: New function getTradeEventsFromTx() ([#285](https://github.com/zetamarkets/sdk/pull/285))

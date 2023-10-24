@@ -9197,6 +9197,11 @@
           "name": "fee",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
         }
       ]
     },
