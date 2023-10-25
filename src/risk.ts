@@ -834,11 +834,26 @@ export class RiskCalculator {
     tradeAsset: constants.Asset,
     tradeSide: types.Side,
     tradePrice: number,
+    maxLeverage: number = -1,
     isTaker: boolean = true,
     thresholdPercent: number = 1,
     bufferPercent: number = 5,
     maxIterations: number = 100
   ): number {
+    // Cap max leverage to 0 < maxLeverage < maxAssetLeverage
+    if (maxLeverage <= 0) {
+      maxLeverage = -1;
+    }
+    if (maxLeverage != -1) {
+      let maxAssetLeverage =
+        100 /
+        convertNativeBNToDecimal(
+          Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
+            .futureMarginInitial
+        );
+      maxLeverage = Math.min(maxLeverage, maxAssetLeverage);
+    }
+
     if (thresholdPercent <= 0) {
       throw Error("thresholdPercent must be > 0");
     }
@@ -981,7 +996,12 @@ export class RiskCalculator {
       // TODO if this is slow then do only the necessary calcs manually, there's a bunch of extra calcs in here
       // that aren't needed in getMaxTradeSize()
       let newState = this.getCrossMarginAccountState(editedAccount);
-      let buffer = newState.availableBalanceInitial / newState.balance;
+      let buffer =
+        maxLeverage == -1
+          ? newState.availableBalanceInitial / newState.balance
+          : (maxLeverage - this.getLeverage(editedAccount, undefined, false)) /
+            maxLeverage;
+
       if (
         buffer < thresholdPercent / 100 &&
         buffer > 0 &&
@@ -996,7 +1016,10 @@ export class RiskCalculator {
           ) /
             10 ** constants.POSITION_PRECISION
         );
-      } else if (newState.availableBalanceInitial < 0) {
+      } else if (
+        (maxLeverage == -1 && newState.availableBalanceInitial < 0) ||
+        (maxLeverage != -1 && buffer < 0)
+      ) {
         sizeUpperBound = size;
         size = (sizeLowerBound + size) / 2;
       } else {
