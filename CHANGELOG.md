@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.3] 2023-10-25
+
+- Add max leverage option to getMaxTradeSize() ([#289](https://github.com/zetamarkets/sdk/pull/289))
+
 ## [1.11.2] 2023-10-24
 
 - Add price to TradeEventV3. ([#288](https://github.com/zetamarkets/sdk/pull/288))
