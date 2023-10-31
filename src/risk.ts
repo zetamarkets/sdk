@@ -841,7 +841,8 @@ export class RiskCalculator {
     maxIterations: number = 100
   ): number {
     // Cap max leverage to 0 < maxLeverage < maxAssetLeverage
-    if (maxLeverage <= 0) {
+    // Also don't cap leverage if not a taker trade, because leverage only counts positions
+    if (maxLeverage <= 0 || !isTaker) {
       maxLeverage = -1;
     }
     if (maxLeverage != -1) {
