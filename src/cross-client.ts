@@ -1396,10 +1396,8 @@ export class CrossClient {
     newTriggerPrice: number,
     newSize: number,
     newSide: types.Side,
-    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
-    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
-      newSide
-    )
+    newDirection: types.TriggerDirection,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     await this.editTriggerOrder(
       orderIndex,
@@ -1419,9 +1417,7 @@ export class CrossClient {
     newSize: number,
     newSide: types.Side,
     newTriggerPrice: number,
-    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
-      newSide
-    ),
+    newDirection: types.TriggerDirection,
     newTriggerTimestamp: anchor.BN,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
