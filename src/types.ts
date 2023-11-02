@@ -7,6 +7,7 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
+import { Connection as ConnectionZstd } from "zeta-solana-web3";
 import { allAssets } from "./assets";
 import { Asset } from "./constants";
 import { objectEquals } from "./utils";
@@ -465,7 +466,7 @@ export function defaultOrderOptions(): OrderOptions {
 export interface LoadExchangeConfig {
   network: Network;
   connection: Connection;
-  orderbookConnection?: Connection;
+  orderbookConnection?: Connection | ConnectionZstd;
   orderbookAssetSubscriptionOverride?: Asset[];
   opts: ConfirmOptions;
   throttleMs: number;

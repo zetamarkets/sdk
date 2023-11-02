@@ -6,10 +6,10 @@ import {
   Account,
   AccountInfo,
   Commitment,
-  Connection,
-  PublicKey,
+  PublicKey as PublicKeySolana,
   SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
+import { Connection, PublicKey } from "zeta-solana-web3";
 import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
 import { exchange as Exchange } from "../exchange";
@@ -518,7 +518,7 @@ export class Orderbook {
 
 export interface Order {
   orderId: BN;
-  openOrdersAddress: PublicKey;
+  openOrdersAddress: PublicKeySolana;
   openOrdersSlot: number;
   price: number;
   priceLots: BN;
