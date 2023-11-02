@@ -6,6 +6,10 @@ import {
   Context,
   PublicKey,
 } from "@solana/web3.js";
+import {
+  Connection as ConnectionZstd,
+  PublicKey as PublicKeyZstd,
+} from "zeta-solana-web3";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
 import {
@@ -90,17 +94,17 @@ export class ZetaGroupMarkets {
           commitment: opts.commitment,
           skipPreflight: opts.skipPreflight,
         },
-        constants.DEX_PID[Exchange.network]
+        constants.DEX_PID[Exchange.network] as PublicKeyZstd
       );
     } else {
       serumMarket = await SerumMarket.load(
         Exchange.connection,
-        marketAddr,
+        marketAddr as PublicKeyZstd,
         {
           commitment: opts.commitment,
           skipPreflight: opts.skipPreflight,
         },
-        constants.DEX_PID[Exchange.network]
+        constants.DEX_PID[Exchange.network] as PublicKeyZstd
       );
     }
 
@@ -122,7 +126,9 @@ export class ZetaGroupMarkets {
       serumMarket
     );
 
-    let book = await serumMarket.loadBidsAndAsks(Exchange.provider.connection);
+    let book = await serumMarket.loadBidsAndAsks(
+      Exchange.provider.connection as unknown as ConnectionZstd
+    );
     instance._market.bids = book.bids;
     instance._market.asks = book.asks;
     instance._market.updateOrderbook();

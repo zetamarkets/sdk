@@ -22,15 +22,16 @@ import {
 } from "./program-types";
 import {
   PublicKey,
-  Connection,
   Transaction,
   TransactionSignature,
   AccountInfo,
   Context,
+  Connection,
   TransactionInstruction,
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
+import { PublicKey as PublicKeyZstd } from "zeta-solana-web3";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
 import { EventType } from "./events";
@@ -523,8 +524,8 @@ export class CrossClient {
       try {
         let [clockInfo, crossMarginAccountInfo] =
           await Exchange.connection.getMultipleAccountsInfo([
-            SYSVAR_CLOCK_PUBKEY,
-            this._accountAddress,
+            SYSVAR_CLOCK_PUBKEY as PublicKeyZstd,
+            this._accountAddress as PublicKeyZstd,
           ]);
         fetchSlot = utils.getClockData(clockInfo).slot;
         this._account = Exchange.program.coder.accounts.decode(
@@ -2090,7 +2091,7 @@ export class CrossClient {
     side: types.Side
   ): Promise<TransactionSignature> {
     let accountInfo = await Exchange.connection.getAccountInfo(
-      marginAccountToCancel
+      marginAccountToCancel as PublicKeyZstd
     );
 
     let account: programTypes.MarginAccount | programTypes.CrossMarginAccount;
@@ -2151,7 +2152,7 @@ export class CrossClient {
     marginAccountToCancel: PublicKey
   ): Promise<TransactionSignature> {
     let accountInfo = await Exchange.connection.getAccountInfo(
-      marginAccountToCancel
+      marginAccountToCancel as PublicKeyZstd
     );
 
     let account: programTypes.MarginAccount | programTypes.CrossMarginAccount;
