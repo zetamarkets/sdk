@@ -715,10 +715,13 @@ export function editTriggerOrderIx(
   return Exchange.program.instruction.editTriggerOrder(
     new anchor.BN(newOrderPrice),
     newTriggerPrice == 0 ? null : new anchor.BN(newTriggerPrice),
-    newTriggerDirection == types.TriggerDirection.UNINITIALIZED
+    newTriggerDirection == types.TriggerDirection.UNINITIALIZED ||
+      newTriggerDirection == undefined
       ? null
       : types.toProgramTriggerDirection(newTriggerDirection),
-    newTriggerTimestamp == 0 ? null : new anchor.BN(newTriggerTimestamp),
+    newTriggerTimestamp == 0 || newTriggerTimestamp == undefined
+      ? null
+      : new anchor.BN(newTriggerTimestamp),
     new anchor.BN(newSize),
     types.toProgramSide(newSide),
     types.toProgramOrderType(newOrderType),

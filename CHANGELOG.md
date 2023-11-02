@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.5] 2023-11-02
+
+- Remove default trigger direction in editPriceTriggerOrder. ([#291](https://github.com/zetamarkets/sdk/pull/291))
+
 ## [1.11.4] 2023-11-02
 
 - Add max leverage option to getMaxTradeSize() ([#289](https://github.com/zetamarkets/sdk/pull/289))
