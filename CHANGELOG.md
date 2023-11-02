@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.3] 2023-11-02
+
+- Use fork of web3.js to enable zstd compression across the SDK. Reduces network usage significantly. ([#290](https://github.com/zetamarkets/sdk/pull/290))
+
 ## [1.11.2] 2023-10-24
 
 - Add price to TradeEventV3. ([#288](https://github.com/zetamarkets/sdk/pull/288))
