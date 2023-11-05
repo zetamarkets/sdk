@@ -384,7 +384,7 @@ Version changes are pinned to SDK releases.
 - general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
   - New client.placePerpOrder() function
   - New ApplyFundingEvent
-  - Exchange.getMarkets() now includes the perpMarket concantenated to the markets array
+  - Exchange.getMarkets() now includes the perpMarket concatenated to the markets array
     The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
 - client: Add create place order instruction function. (#[170](https://github.com/zetamarkets/sdk/pull/170))
 
@@ -587,7 +587,7 @@ Note: As the memory layout of Zeta accounts has not changed, merely refactored o
 ## [0.12.0] 2022-02-23
 
 - client: Add in functionality to close a margin account, close an open orders account and close multiple open orders accounts. ([#93](https://github.com/zetamarkets/sdk/pull/93))
-- general: Add in functionality to accomodate for extra order types (post-only & fill-or-kill). ([#93](https://github.com/zetamarkets/sdk/pull/93))
+- general: Add in functionality to accommodate for extra order types (post-only & fill-or-kill). ([#93](https://github.com/zetamarkets/sdk/pull/93))
 - general: Add in placeOrderV2 to allow order type to be specified. ([#93](https://github.com/zetamarkets/sdk/pull/93))
 
 ## [0.11.0] 2022-02-02
