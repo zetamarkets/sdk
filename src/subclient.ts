@@ -1396,13 +1396,15 @@ export class SubClient {
         order.orderId,
         order.side == types.Side.BID
       );
-      let serumMarket = Exchange.getPerpMarket(asset).serumMarket;
+      let market = Exchange.getPerpMarket(asset);
+      let serumMarket = market.serumMarket;
 
       return !utils.isOrderExpired(
         order.tifOffset,
         seqNum,
         serumMarket.epochStartTs.toNumber(),
-        serumMarket.startEpochSeqNum
+        serumMarket.startEpochSeqNum,
+        market.TIFBufferSeconds
       );
     });
   }

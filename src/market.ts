@@ -251,6 +251,14 @@ export class Market {
   }
   private _strike: number;
 
+  public set TIFBufferSeconds(buffer: number) {
+    this._TIFBufferSeconds = buffer;
+  }
+  public get TIFBufferSeconds(): number {
+    return this._TIFBufferSeconds;
+  }
+  private _TIFBufferSeconds: number;
+
   public constructor(
     asset: Asset,
     address: PublicKey,
@@ -269,6 +277,7 @@ export class Market {
     this._orderbook = { bids: [], asks: [] };
     this._bidsSlot = 0;
     this._asksSlot = 0;
+    this._TIFBufferSeconds = 0;
   }
 
   public updateStrike() {
@@ -372,7 +381,8 @@ export class Market {
             tifOffset.toNumber(),
             seqNum,
             this._serumMarket.epochStartTs.toNumber(),
-            this._serumMarket.startEpochSeqNum
+            this._serumMarket.startEpochSeqNum,
+            this._TIFBufferSeconds
           )
         ) {
           continue;

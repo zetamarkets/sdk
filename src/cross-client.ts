@@ -2410,13 +2410,15 @@ export class CrossClient {
         order.orderId,
         order.side == types.Side.BID
       );
-      let serumMarket = Exchange.getPerpMarket(order.asset).serumMarket;
+      let market = Exchange.getPerpMarket(order.asset);
+      let serumMarket = market.serumMarket;
 
       return !utils.isOrderExpired(
         order.tifOffset,
         seqNum,
         serumMarket.epochStartTs.toNumber(),
-        serumMarket.startEpochSeqNum
+        serumMarket.startEpochSeqNum,
+        market.TIFBufferSeconds
       );
     });
     let ordersByAsset = new Map();

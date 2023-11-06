@@ -471,6 +471,7 @@ export interface LoadExchangeConfig {
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
+  TIFBufferSeconds: number;
 }
 
 export function defaultLoadExchangeConfig(
@@ -480,7 +481,8 @@ export function defaultLoadExchangeConfig(
   throttleMs = 0,
   loadFromStore = false,
   orderbookConnection: Connection = undefined,
-  orderbookAssetSubscriptionOverride: Asset[] = undefined
+  orderbookAssetSubscriptionOverride: Asset[] = undefined,
+  TIFBufferSeconds: number = undefined
 ): LoadExchangeConfig {
   return {
     network,
@@ -490,6 +492,7 @@ export function defaultLoadExchangeConfig(
     opts,
     throttleMs,
     loadFromStore,
+    TIFBufferSeconds,
   };
 }
 
