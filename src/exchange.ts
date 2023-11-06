@@ -732,9 +732,8 @@ export class Exchange {
       let median = utils.median(fees);
       let medianScaled =
         this._autoPriorityFeeOffset + median * this._autoPriorityFeeMultiplier;
-      this._priorityFee = Math.min(
-        medianScaled,
-        this._autoPriorityFeeUpperLimit
+      this._priorityFee = Math.round(
+        Math.min(medianScaled, this._autoPriorityFeeUpperLimit)
       );
       console.log(
         `AutoUpdate priority fee. New fee = ${this._priorityFee} microlamports per compute unit`
