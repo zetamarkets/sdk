@@ -1716,13 +1716,17 @@ export function isOrderExpired(
   orderTIFOffset: number,
   orderSeqNum: anchor.BN,
   epochStartTs: number,
-  startEpochSeqNum: anchor.BN
+  startEpochSeqNum: anchor.BN,
+  TIFBufferSeconds: number
 ): boolean {
   if (orderTIFOffset == 0) {
     return false;
   }
 
-  if (epochStartTs + orderTIFOffset < Exchange.clockTimestamp) {
+  if (
+    epochStartTs + orderTIFOffset <
+    Exchange.clockTimestamp - TIFBufferSeconds
+  ) {
     return true;
   }
 

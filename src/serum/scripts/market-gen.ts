@@ -26,6 +26,7 @@ const main = async () => {
       opts: utils.defaultCommitment(),
       throttleMs: 0,
       loadFromStore: false,
+      TIFBufferSeconds: 0,
     };
 
     await Exchange.load(LOAD_CONFIG);

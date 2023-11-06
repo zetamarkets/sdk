@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.6] 2023-11-06
+
+- Add new TIF buffer option ([#293](https://github.com/zetamarkets/sdk/pull/293))
+
 ## [1.11.5] 2023-11-02
 
 - Remove default trigger direction in editPriceTriggerOrder. ([#291](https://github.com/zetamarkets/sdk/pull/291))

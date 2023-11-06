@@ -666,6 +666,11 @@ export class Exchange {
         (loadConfig.orderbookAssetSubscriptionOverride &&
           loadConfig.orderbookAssetSubscriptionOverride.includes(se.asset))
       ) {
+        // Optionally provide a buffer for when orders are not shown due to TIF
+        // Useful for slow internet connections on FE because it doesn't have to be exactly precise
+        if (loadConfig.TIFBufferSeconds) {
+          se.markets.market.TIFBufferSeconds = loadConfig.TIFBufferSeconds;
+        }
         se.markets.market.subscribeOrderbook(callback);
       }
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
