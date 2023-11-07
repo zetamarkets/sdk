@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.7] 2023-11-06
+
+- Round priority fees to the nearest integer ([#294](https://github.com/zetamarkets/sdk/pull/294))
+
 ## [1.11.6] 2023-11-06
 
 - Add new TIF buffer option ([#293](https://github.com/zetamarkets/sdk/pull/293))

@@ -898,7 +898,7 @@ export async function processTransaction(
   if (Exchange.priorityFee != 0) {
     tx.instructions.unshift(
       ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: Exchange.priorityFee,
+        microLamports: Math.round(Exchange.priorityFee),
       })
     );
   }
