@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## Unreleased
+## [1.11.8] 2023-11-09
 
 - Add a more precise estimate for liquidation price (under the assumption that other mark prices remain static). ([#296](https://github.com/zetamarkets/sdk/pull/296))
 

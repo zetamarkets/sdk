@@ -1105,7 +1105,7 @@ export class RiskCalculator {
     }
 
     const posSize = convertNativeLotSizeToDecimal(posSizeNative);
-    const C = convertNativeBNToDecimal(
+    const MMR = convertNativeBNToDecimal(
       Exchange.pricing.marginParameters[assets.assetToIndex(asset)]
         .futureMarginMaintenance,
       constants.MARGIN_PRECISION
@@ -1115,7 +1115,7 @@ export class RiskCalculator {
     const num = convertNativeIntegerToDecimal(
       cma.balance.toNumber() + nativeCotOffset + K
     );
-    const denom = Math.abs(posSize) * C - posSize;
+    const denom = Math.abs(posSize) * MMR - posSize;
     return Math.max(0, num / denom);
   }
 
