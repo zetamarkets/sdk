@@ -1066,8 +1066,8 @@ export class RiskCalculator {
     asset: Asset,
     cma: CrossMarginAccount
   ): number {
+    // K is the accumulated maintenance margin and unrealized pnl offsets from other assets
     let K = 0;
-
     for (var a of Exchange.assets) {
       if (a == asset) {
         continue;
@@ -1111,19 +1111,12 @@ export class RiskCalculator {
       constants.MARGIN_PRECISION
     );
 
-    if (posSize > 0) {
-      const num = convertNativeIntegerToDecimal(
-        cma.balance.toNumber() - nativeCot + K
-      );
-      const denom = posSize * C - posSize;
-      return Math.max(0, num / denom);
-    } else {
-      const num = convertNativeIntegerToDecimal(
-        cma.balance.toNumber() + nativeCot + K
-      );
-      const denom = Math.abs(posSize) * C - posSize;
-      return Math.max(0, num / denom);
-    }
+    const nativeCotOffset = posSize > 0 ? -nativeCot : nativeCot;
+    const num = convertNativeIntegerToDecimal(
+      cma.balance.toNumber() + nativeCotOffset + K
+    );
+    const denom = Math.abs(posSize) * C - posSize;
+    return Math.max(0, num / denom);
   }
 
   /**
