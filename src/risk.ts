@@ -7,6 +7,7 @@ import {
   convertNativeLotSizeToDecimal,
   convertDecimalToNativeInteger,
   convertDecimalToNativeLotSize,
+  convertNativeIntegerToDecimal,
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
@@ -1052,6 +1053,70 @@ export class RiskCalculator {
       Exchange.getMarkPrice(asset),
       signedPosition
     );
+  }
+
+  /**
+   * Find the price at which a given position will be subject to liquidation.
+   * (under the assumption that the prices of other assets stays static)
+   * @param asset The asset being traded
+   * @param marginAccount The CrossMarginAccount itself.
+   * @returns Liquidation price, in decimal USDC
+   */
+  public getEstimatedLiquidationPrice(
+    asset: Asset,
+    cma: CrossMarginAccount
+  ): number {
+    // K is the accumulated maintenance margin and unrealized pnl offsets from other assets
+    let K = 0;
+    for (var a of Exchange.assets) {
+      if (a == asset) {
+        continue;
+      }
+
+      const ledger = cma.productLedgers[assets.assetToIndex(a)];
+      const posSizeNative = ledger.position.size.toNumber();
+      if (posSizeNative == 0) {
+        continue;
+      }
+      const posSize = convertNativeLotSizeToDecimal(posSizeNative);
+      const assetMmNative = convertDecimalToNativeInteger(
+        this.getPerpMarginRequirement(a, posSize, types.MarginType.MAINTENANCE)
+      );
+      K -= assetMmNative;
+
+      let assetUpnl;
+      const nativePosDelta =
+        convertDecimalToNativeInteger(Exchange.getMarkPrice(a)) * posSize;
+      const nativeCot = ledger.position.costOfTrades.toNumber();
+      if (posSize > 0) {
+        assetUpnl = nativePosDelta - nativeCot;
+      } else {
+        assetUpnl = nativePosDelta + nativeCot;
+      }
+      K += assetUpnl;
+    }
+
+    const liqAssetPledger = cma.productLedgers[assets.assetToIndex(asset)];
+    const posSizeNative = liqAssetPledger.position.size.toNumber();
+    const nativeCot = liqAssetPledger.position.costOfTrades.toNumber();
+
+    if (posSizeNative == 0) {
+      return 0;
+    }
+
+    const posSize = convertNativeLotSizeToDecimal(posSizeNative);
+    const C = convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assets.assetToIndex(asset)]
+        .futureMarginMaintenance,
+      constants.MARGIN_PRECISION
+    );
+
+    const nativeCotOffset = posSize > 0 ? -nativeCot : nativeCot;
+    const num = convertNativeIntegerToDecimal(
+      cma.balance.toNumber() + nativeCotOffset + K
+    );
+    const denom = Math.abs(posSize) * C - posSize;
+    return Math.max(0, num / denom);
   }
 
   /**

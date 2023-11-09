@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- Add a more precise estimate for liquidation price (under the assumption that other mark prices remain static). ([#296](https://github.com/zetamarkets/sdk/pull/296))
+
 ## [1.11.7] 2023-11-06
 
 - Round priority fees to the nearest integer ([#294](https://github.com/zetamarkets/sdk/pull/294))
