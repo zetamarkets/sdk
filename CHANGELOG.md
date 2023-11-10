@@ -5,6 +5,9 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.8]
+
+- Make orderType mandatory for trigger orders. ([#298](https://github.com/zetamarkets/sdk/pull/298))
 - Add a more precise estimate for liquidation price (under the assumption that other mark prices remain static). ([#296](https://github.com/zetamarkets/sdk/pull/296))
 
 ## [1.11.7] 2023-11-06

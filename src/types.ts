@@ -418,7 +418,6 @@ export interface OrderOptions {
 }
 
 export interface TriggerOrderOptions {
-  orderType?: types.OrderType;
   reduceOnly?: boolean;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
@@ -432,7 +431,6 @@ export function getDefaultTriggerDirection(side: Side): TriggerDirection {
 
 export function defaultTriggerOrderOptions(): TriggerOrderOptions {
   return {
-    orderType: OrderType.FILLORKILL,
     reduceOnly: true,
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,
