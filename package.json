@@ -15,7 +15,7 @@
   "dependencies": {
     "@solana/buffer-layout": "4.0.0",
     "@solana/spl-token": "0.1.6",
-    "@solana/web3.js": "1.87.3",
+    "@solana/web3.js": "1.87.6",
     "@zetamarkets/anchor": "0.26.1-versioned",
     "bs58": "^4.0.1",
     "cross-fetch": "^3.1.6",
