@@ -7,6 +7,7 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
+import { Connection as ConnectionZstd } from "zeta-solana-web3";
 import { allAssets } from "./assets";
 import { Asset } from "./constants";
 import { objectEquals } from "./utils";
@@ -417,7 +418,6 @@ export interface OrderOptions {
 }
 
 export interface TriggerOrderOptions {
-  orderType?: types.OrderType;
   reduceOnly?: boolean;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
@@ -431,7 +431,6 @@ export function getDefaultTriggerDirection(side: Side): TriggerDirection {
 
 export function defaultTriggerOrderOptions(): TriggerOrderOptions {
   return {
-    orderType: OrderType.FILLORKILL,
     reduceOnly: true,
     tag: constants.DEFAULT_ORDER_TAG,
     blockhash: undefined,
@@ -465,11 +464,12 @@ export function defaultOrderOptions(): OrderOptions {
 export interface LoadExchangeConfig {
   network: Network;
   connection: Connection;
-  orderbookConnection?: Connection;
+  orderbookConnection?: Connection | ConnectionZstd;
   orderbookAssetSubscriptionOverride?: Asset[];
   opts: ConfirmOptions;
   throttleMs: number;
   loadFromStore: boolean;
+  TIFBufferSeconds: number;
 }
 
 export function defaultLoadExchangeConfig(
@@ -479,7 +479,8 @@ export function defaultLoadExchangeConfig(
   throttleMs = 0,
   loadFromStore = false,
   orderbookConnection: Connection = undefined,
-  orderbookAssetSubscriptionOverride: Asset[] = undefined
+  orderbookAssetSubscriptionOverride: Asset[] = undefined,
+  TIFBufferSeconds: number = undefined
 ): LoadExchangeConfig {
   return {
     network,
@@ -489,6 +490,7 @@ export function defaultLoadExchangeConfig(
     opts,
     throttleMs,
     loadFromStore,
+    TIFBufferSeconds,
   };
 }
 

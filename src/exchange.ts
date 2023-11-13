@@ -2,14 +2,18 @@ import * as anchor from "@zetamarkets/anchor";
 import {
   PublicKey,
   Transaction,
-  Connection,
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
   AccountInfo,
   AccountMeta,
   Commitment,
+  Connection,
   Context,
 } from "@solana/web3.js";
+import {
+  Connection as ConnectionZstd,
+  PublicKey as PublicKeyZstd,
+} from "zeta-solana-web3";
 import * as utils from "./utils";
 import * as constants from "./constants";
 import * as assets from "./assets";
@@ -88,8 +92,8 @@ export class Exchange {
   public get provider(): anchor.AnchorProvider {
     return this._provider;
   }
-  public get connection(): Connection {
-    return this._provider.connection;
+  public get connection(): ConnectionZstd {
+    return this._provider.connection as unknown as ConnectionZstd;
   }
   private _provider: anchor.AnchorProvider;
 
@@ -97,10 +101,10 @@ export class Exchange {
    * Separate connection used for orderbook subscriptions.
    * For example you might use a connection with Whirligig and low commitment for faster results
    */
-  public get orderbookConnection(): Connection {
+  public get orderbookConnection(): ConnectionZstd {
     return this._orderbookConnection;
   }
-  private _orderbookConnection: Connection;
+  private _orderbookConnection: ConnectionZstd;
 
   /**
    * Public key used as the stable coin mint.
@@ -359,7 +363,8 @@ export class Exchange {
         utils.commitmentConfig(loadConfig.connection.commitment)
     );
     if (loadConfig.orderbookConnection) {
-      this._orderbookConnection = loadConfig.orderbookConnection;
+      this._orderbookConnection =
+        loadConfig.orderbookConnection as unknown as ConnectionZstd;
     }
     this._opts = loadConfig.opts;
     this._network = loadConfig.network;
@@ -369,7 +374,7 @@ export class Exchange {
       this._provider
     ) as anchor.Program<Zeta>;
 
-    for (var asset of assets.allAssets()) {
+    for (var asset of this._assets) {
       this.addSubExchange(asset, new SubExchange());
       this.getSubExchange(asset).initialize(asset);
     }
@@ -594,7 +599,10 @@ export class Exchange {
 
     this._lastPollTimestamp = 0;
     await this.updateZetaPricing();
-    this._oracle = new Oracle(this.network, this.connection);
+    this._oracle = new Oracle(
+      this.network,
+      this.connection as unknown as Connection
+    );
 
     const subExchangeToFetchAddrs: PublicKey[] = this.assets
       .map((a) => {
@@ -615,7 +623,7 @@ export class Exchange {
 
     const accFetches = (await Promise.all(allPromises)).slice(
       0,
-      assets.allAssets().length + 1
+      this.assets.length + 1
     );
 
     let perpSyncQueueAccs: PerpSyncQueue[] = [];
@@ -641,6 +649,14 @@ export class Exchange {
       })
     );
 
+    await Promise.all(
+      this._assets.map(async (a) => {
+        await this.getPerpMarket(a).serumMarket.updateDecoded(
+          this.connection as unknown as ConnectionZstd
+        );
+      })
+    );
+
     for (var se of this.getAllSubExchanges()) {
       // Only subscribe to the orderbook for assets provided in the override
       // Useful for FE because we only want one asset at a time
@@ -650,6 +666,11 @@ export class Exchange {
         (loadConfig.orderbookAssetSubscriptionOverride &&
           loadConfig.orderbookAssetSubscriptionOverride.includes(se.asset))
       ) {
+        // Optionally provide a buffer for when orders are not shown due to TIF
+        // Useful for slow internet connections on FE because it doesn't have to be exactly precise
+        if (loadConfig.TIFBufferSeconds) {
+          se.markets.market.TIFBufferSeconds = loadConfig.TIFBufferSeconds;
+        }
         se.markets.market.subscribeOrderbook(callback);
       }
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
@@ -711,9 +732,8 @@ export class Exchange {
       let median = utils.median(fees);
       let medianScaled =
         this._autoPriorityFeeOffset + median * this._autoPriorityFeeMultiplier;
-      this._priorityFee = Math.min(
-        medianScaled,
-        this._autoPriorityFeeUpperLimit
+      this._priorityFee = Math.round(
+        Math.min(medianScaled, this._autoPriorityFeeUpperLimit)
       );
       console.log(
         `AutoUpdate priority fee. New fee = ${this._priorityFee} microlamports per compute unit`
@@ -752,8 +772,10 @@ export class Exchange {
     if (this._clockSubscriptionId !== undefined) {
       throw Error("Clock already subscribed to.");
     }
-    this._clockSubscriptionId = this.provider.connection.onAccountChange(
-      SYSVAR_CLOCK_PUBKEY,
+    this._clockSubscriptionId = (
+      this.provider.connection as unknown as ConnectionZstd
+    ).onAccountChange(
+      SYSVAR_CLOCK_PUBKEY as PublicKeyZstd,
       async (accountInfo: AccountInfo<Buffer>, context: any) => {
         this.setClockData(utils.getClockData(accountInfo));
 
@@ -781,7 +803,8 @@ export class Exchange {
           console.log(`SubExchange polling failed. Error: ${e}`);
         }
       },
-      this.provider.connection.commitment
+      this.provider.connection.commitment,
+      "base64+zstd"
     );
     this.setClockData(clockData);
   }
@@ -830,7 +853,7 @@ export class Exchange {
     callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
     this._stateSubscriptionId = this.connection.onAccountChange(
-      this._stateAddress,
+      this._stateAddress as PublicKeyZstd,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
         this._state = this.program.coder.accounts.decode(
           "State",
@@ -840,7 +863,9 @@ export class Exchange {
         if (callback !== undefined) {
           callback(null, EventType.EXCHANGE, context.slot, null);
         }
-      }
+      },
+      this.provider.connection.commitment,
+      "base64+zstd"
     );
   }
 
@@ -848,7 +873,7 @@ export class Exchange {
     callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
     this._pricingSubscriptionId = this.connection.onAccountChange(
-      this._pricingAddress,
+      this._pricingAddress as PublicKeyZstd,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
         this._pricing = this.program.coder.accounts.decode(
           "Pricing",
@@ -858,7 +883,9 @@ export class Exchange {
         if (callback !== undefined) {
           callback(null, EventType.PRICING, context.slot, null);
         }
-      }
+      },
+      this.provider.connection.commitment,
+      "base64+zstd"
     );
   }
 
@@ -898,13 +925,6 @@ export class Exchange {
     return this._combinedSocializedLossAccountAddress;
   }
 
-  public async updatePricingParameters(
-    asset: Asset,
-    args: instructions.UpdatePricingParametersArgs
-  ) {
-    await this.getSubExchange(asset).updatePricingParameters(args);
-  }
-
   public async updateMarginParameters(
     asset: Asset,
     args: instructions.UpdateMarginParametersArgs
@@ -938,8 +958,11 @@ export class Exchange {
     await this.getSubExchange(asset).updatePerpSerumMarketIfNeeded(epochDelay);
   }
 
-  public async initializeZetaMarkets(asset: Asset) {
-    await this.getSubExchange(asset).initializeZetaMarkets();
+  public async initializeZetaMarkets(
+    asset: Asset,
+    zetaGroupAddress: PublicKey
+  ) {
+    await utils.initializeZetaMarkets(asset, zetaGroupAddress);
   }
 
   public async initializeZetaMarketsTIFEpochCycle(

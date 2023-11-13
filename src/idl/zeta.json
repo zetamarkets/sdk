@@ -1043,8 +1043,8 @@
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -1792,6 +1792,62 @@
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositPermissionless",
+      "accounts": [
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositTokenAcc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
           "isMut": false,
           "isSigner": true
         },
@@ -6073,7 +6129,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -6082,7 +6138,7 @@
             "type": {
               "array": [
                 "u64",
-                20
+                19
               ]
             }
           },
@@ -6091,7 +6147,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -6100,7 +6156,7 @@
             "type": {
               "array": [
                 "u64",
-                20
+                19
               ]
             }
           },
@@ -6111,7 +6167,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                5
+                6
               ]
             }
           },
@@ -6122,7 +6178,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                20
+                19
               ]
             }
           },
@@ -6133,7 +6189,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                5
+                6
               ]
             }
           },
@@ -6144,7 +6200,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                20
+                19
               ]
             }
           },
@@ -6153,7 +6209,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -6162,7 +6218,7 @@
             "type": {
               "array": [
                 "u64",
-                20
+                19
               ]
             }
           },
@@ -6171,7 +6227,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6180,7 +6236,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6189,7 +6245,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6198,7 +6254,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6207,7 +6263,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6216,7 +6272,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6225,7 +6281,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6234,7 +6290,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6245,7 +6301,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                5
+                6
               ]
             }
           },
@@ -6256,7 +6312,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                20
+                19
               ]
             }
           },
@@ -6267,7 +6323,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                5
+                6
               ]
             }
           },
@@ -6278,7 +6334,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                20
+                19
               ]
             }
           },
@@ -6289,7 +6345,7 @@
                 {
                   "defined": "Product"
                 },
-                5
+                6
               ]
             }
           },
@@ -6300,7 +6356,7 @@
                 {
                   "defined": "Product"
                 },
-                20
+                19
               ]
             }
           },
@@ -6309,7 +6365,7 @@
             "type": {
               "array": [
                 "publicKey",
-                5
+                6
               ]
             }
           },
@@ -6318,7 +6374,7 @@
             "type": {
               "array": [
                 "publicKey",
-                20
+                19
               ]
             }
           },
@@ -6339,7 +6395,7 @@
             "type": {
               "array": [
                 "bool",
-                5
+                6
               ]
             }
           },
@@ -6348,7 +6404,7 @@
             "type": {
               "array": [
                 "bool",
-                20
+                19
               ]
             }
           },
@@ -6742,7 +6798,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                5
+                6
               ]
             }
           },
@@ -6753,7 +6809,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                20
+                19
               ]
             }
           },
@@ -7171,7 +7227,7 @@
             "type": {
               "array": [
                 "u8",
-                5
+                6
               ]
             }
           },
@@ -7180,7 +7236,7 @@
             "type": {
               "array": [
                 "u8",
-                20
+                19
               ]
             }
           },
@@ -7195,7 +7251,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                5
+                6
               ]
             }
           },
@@ -7206,7 +7262,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                20
+                19
               ]
             }
           },
@@ -7217,7 +7273,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                5
+                6
               ]
             }
           },
@@ -7228,7 +7284,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                20
+                19
               ]
             }
           },
@@ -8031,7 +8087,7 @@
             "type": {
               "array": [
                 "u64",
-                5
+                6
               ]
             }
           },
@@ -8828,6 +8884,9 @@
             "name": "ARB"
           },
           {
+            "name": "BNB"
+          },
+          {
             "name": "UNDEFINED"
           }
         ]
@@ -9138,6 +9197,11 @@
           "name": "fee",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -9199,6 +9263,11 @@
         {
           "name": "marginAccount",
           "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "clientOrderId",
+          "type": "u64",
           "index": false
         }
       ]

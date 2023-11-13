@@ -22,15 +22,16 @@ import {
 } from "./program-types";
 import {
   PublicKey,
-  Connection,
   Transaction,
   TransactionSignature,
   AccountInfo,
   Context,
+  Connection,
   TransactionInstruction,
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
+import { PublicKey as PublicKeyZstd } from "zeta-solana-web3";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
 import { EventType } from "./events";
@@ -266,6 +267,7 @@ export class CrossClient {
 
     this._positions = new Map();
     this._orders = new Map();
+    this._triggerOrders = new Map();
     for (var asset of Exchange.assets) {
       this._positions.set(asset, []);
       this._orders.set(asset, []);
@@ -455,6 +457,7 @@ export class CrossClient {
   }
 
   public async pollUpdate() {
+    this.updateOpenOrdersSync();
     if (
       Exchange.clockTimestamp >
         this._lastUpdateTimestamp + this._pollInterval ||
@@ -521,8 +524,8 @@ export class CrossClient {
       try {
         let [clockInfo, crossMarginAccountInfo] =
           await Exchange.connection.getMultipleAccountsInfo([
-            SYSVAR_CLOCK_PUBKEY,
-            this._accountAddress,
+            SYSVAR_CLOCK_PUBKEY as PublicKeyZstd,
+            this._accountAddress as PublicKeyZstd,
           ]);
         fetchSlot = utils.getClockData(clockInfo).slot;
         this._account = Exchange.program.coder.accounts.decode(
@@ -1019,7 +1022,7 @@ export class CrossClient {
       console.log(
         `[${assetToName(
           asset
-        )}] User doesn't have open orders account. Initialising for asset ${asset}}.`
+        )}] User doesn't have open orders account. Initialising for asset ${asset}.`
       );
 
       let [initIx, _openOrdersPda] = instructions.initializeOpenOrdersV3Ix(
@@ -1070,6 +1073,10 @@ export class CrossClient {
   }
 
   public findAvailableTriggerOrderBit(): number {
+    // If we haven't loaded properly for whatever reason just use the last index to minimise the chance of collisions
+    if (!this.account || !this.account.triggerOrderBits) {
+      return 127;
+    }
     for (var i = 0; i < 128; i++) {
       let mask: BN = new BN(1).shln(i); // 1 << i
       if (this.account.triggerOrderBits.and(mask).isZero()) {
@@ -1086,6 +1093,7 @@ export class CrossClient {
     triggerTime: anchor.BN,
     size: number,
     side: types.Side,
+    orderType: types.OrderType,
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ): Promise<TransactionSignature> {
     return await this.placeTriggerOrder(
@@ -1096,6 +1104,7 @@ export class CrossClient {
       0,
       types.TriggerDirection.UNINITIALIZED,
       triggerTime,
+      orderType,
       options
     );
   }
@@ -1107,6 +1116,7 @@ export class CrossClient {
     triggerPrice: number,
     size: number,
     side: types.Side,
+    orderType: types.OrderType,
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
     triggerDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
       side
@@ -1120,6 +1130,7 @@ export class CrossClient {
       triggerPrice,
       triggerDirection,
       new anchor.BN(0),
+      orderType,
       options
     );
   }
@@ -1134,6 +1145,7 @@ export class CrossClient {
       side
     ),
     triggerTimestamp: anchor.BN,
+    orderType: types.OrderType,
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ): Promise<TransactionSignature> {
     let triggerOrderBit = this.findAvailableTriggerOrderBit();
@@ -1171,9 +1183,7 @@ export class CrossClient {
         triggerOrderBit,
         size,
         side,
-        options.orderType != undefined
-          ? options.orderType
-          : types.OrderType.FILLORKILL,
+        orderType,
         options.reduceOnly != undefined ? options.reduceOnly : false,
         options.tag,
         this.accountAddress,
@@ -1369,6 +1379,7 @@ export class CrossClient {
     newTriggerTime: anchor.BN,
     newSize: number,
     newSide: types.Side,
+    newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     await this.editTriggerOrder(
@@ -1379,6 +1390,7 @@ export class CrossClient {
       0,
       types.TriggerDirection.UNINITIALIZED,
       newTriggerTime,
+      newOrderType,
       newOptions
     );
   }
@@ -1389,10 +1401,9 @@ export class CrossClient {
     newTriggerPrice: number,
     newSize: number,
     newSide: types.Side,
-    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
-    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
-      newSide
-    )
+    newDirection: types.TriggerDirection,
+    newOrderType: types.OrderType,
+    newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     await this.editTriggerOrder(
       orderIndex,
@@ -1402,6 +1413,7 @@ export class CrossClient {
       newTriggerPrice,
       newDirection,
       new anchor.BN(0),
+      newOrderType,
       newOptions
     );
   }
@@ -1412,10 +1424,9 @@ export class CrossClient {
     newSize: number,
     newSide: types.Side,
     newTriggerPrice: number,
-    newDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
-      newSide
-    ),
+    newDirection: types.TriggerDirection,
     newTriggerTimestamp: anchor.BN,
+    newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     let triggerAccount = utils.getTriggerOrder(
@@ -1431,15 +1442,13 @@ export class CrossClient {
         newTriggerTimestamp,
         newSize,
         newSide,
-        newOptions.orderType != undefined
-          ? newOptions.orderType
-          : types.OrderType.FILLORKILL,
+        newOrderType,
         newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         this._provider.wallet.publicKey,
         triggerAccount
       )
     );
-    return await utils.processTransaction(
+    let txSig = await utils.processTransaction(
       this._provider,
       tx,
       undefined,
@@ -1447,6 +1456,16 @@ export class CrossClient {
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
+
+    // Editing a trigger order doesn't prompt an account change because the bits stay the same.
+    // Therefore just manually fire this
+    if (this._callback !== undefined) {
+      this._callback(null, EventType.USER, Exchange.clockSlot, {
+        UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
+      });
+    }
+
+    return txSig;
   }
 
   public async editDelegatedPubkey(
@@ -2074,7 +2093,7 @@ export class CrossClient {
     side: types.Side
   ): Promise<TransactionSignature> {
     let accountInfo = await Exchange.connection.getAccountInfo(
-      marginAccountToCancel
+      marginAccountToCancel as PublicKeyZstd
     );
 
     let account: programTypes.MarginAccount | programTypes.CrossMarginAccount;
@@ -2135,7 +2154,7 @@ export class CrossClient {
     marginAccountToCancel: PublicKey
   ): Promise<TransactionSignature> {
     let accountInfo = await Exchange.connection.getAccountInfo(
-      marginAccountToCancel
+      marginAccountToCancel as PublicKeyZstd
     );
 
     let account: programTypes.MarginAccount | programTypes.CrossMarginAccount;
@@ -2348,6 +2367,20 @@ export class CrossClient {
     return txIds;
   }
 
+  public getTriggerOrder(triggerOrderBit: number): types.TriggerOrder {
+    let triggerOrders: types.TriggerOrder[] = [
+      ...this._triggerOrders.values(),
+    ].flat();
+
+    for (var triggerOrder of triggerOrders) {
+      if (triggerOrder.triggerOrderBit == triggerOrderBit) {
+        return triggerOrder;
+      }
+    }
+
+    throw new Error(`Cannot find trigger order with bit=${triggerOrderBit}`);
+  }
+
   public getTriggerOrders(asset: Asset): types.TriggerOrder[] {
     return this._triggerOrders.get(asset);
   }
@@ -2383,13 +2416,15 @@ export class CrossClient {
         order.orderId,
         order.side == types.Side.BID
       );
-      let serumMarket = Exchange.getPerpMarket(order.asset).serumMarket;
+      let market = Exchange.getPerpMarket(order.asset);
+      let serumMarket = market.serumMarket;
 
       return !utils.isOrderExpired(
         order.tifOffset,
         seqNum,
         serumMarket.epochStartTs.toNumber(),
-        serumMarket.startEpochSeqNum
+        serumMarket.startEpochSeqNum,
+        market.TIFBufferSeconds
       );
     });
     let ordersByAsset = new Map();
@@ -2407,6 +2442,9 @@ export class CrossClient {
 
   public async updateOrders() {
     this.updateOpenOrdersSync();
+    if (!this.account || !this.account.triggerOrderBits) {
+      return;
+    }
 
     let triggerOrderBits = [];
 

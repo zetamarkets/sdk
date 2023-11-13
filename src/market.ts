@@ -6,6 +6,10 @@ import {
   Context,
   PublicKey,
 } from "@solana/web3.js";
+import {
+  Connection as ConnectionZstd,
+  PublicKey as PublicKeyZstd,
+} from "zeta-solana-web3";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
 import {
@@ -90,17 +94,17 @@ export class ZetaGroupMarkets {
           commitment: opts.commitment,
           skipPreflight: opts.skipPreflight,
         },
-        constants.DEX_PID[Exchange.network]
+        constants.DEX_PID[Exchange.network] as PublicKeyZstd
       );
     } else {
       serumMarket = await SerumMarket.load(
         Exchange.connection,
-        marketAddr,
+        marketAddr as PublicKeyZstd,
         {
           commitment: opts.commitment,
           skipPreflight: opts.skipPreflight,
         },
-        constants.DEX_PID[Exchange.network]
+        constants.DEX_PID[Exchange.network] as PublicKeyZstd
       );
     }
 
@@ -122,7 +126,9 @@ export class ZetaGroupMarkets {
       serumMarket
     );
 
-    let book = await serumMarket.loadBidsAndAsks(Exchange.provider.connection);
+    let book = await serumMarket.loadBidsAndAsks(
+      Exchange.provider.connection as unknown as ConnectionZstd
+    );
     instance._market.bids = book.bids;
     instance._market.asks = book.asks;
     instance._market.updateOrderbook();
@@ -245,6 +251,14 @@ export class Market {
   }
   private _strike: number;
 
+  public set TIFBufferSeconds(buffer: number) {
+    this._TIFBufferSeconds = buffer;
+  }
+  public get TIFBufferSeconds(): number {
+    return this._TIFBufferSeconds;
+  }
+  private _TIFBufferSeconds: number;
+
   public constructor(
     asset: Asset,
     address: PublicKey,
@@ -263,6 +277,7 @@ export class Market {
     this._orderbook = { bids: [], asks: [] };
     this._bidsSlot = 0;
     this._asksSlot = 0;
+    this._TIFBufferSeconds = 0;
   }
 
   public updateStrike() {
@@ -340,6 +355,13 @@ export class Market {
     }
   }
 
+  public async forceFetchOrderbook() {
+    let orderbook = await this.serumMarket.loadBidsAndAsks(Exchange.connection);
+    this._bids = orderbook.bids;
+    this._asks = orderbook.asks;
+    this.updateOrderbook();
+  }
+
   public updateOrderbook() {
     // On a fresh subscription if there isn't data yet
     if (this._bids == undefined || this._asks == undefined) {
@@ -359,7 +381,8 @@ export class Market {
             tifOffset.toNumber(),
             seqNum,
             this._serumMarket.epochStartTs.toNumber(),
-            this._serumMarket.startEpochSeqNum
+            this._serumMarket.startEpochSeqNum,
+            this._TIFBufferSeconds
           )
         ) {
           continue;

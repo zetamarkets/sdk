@@ -5,6 +5,63 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.8]
+
+- Make orderType mandatory for trigger orders. ([#298](https://github.com/zetamarkets/sdk/pull/298))
+- Add a more precise estimate for liquidation price (under the assumption that other mark prices remain static). ([#296](https://github.com/zetamarkets/sdk/pull/296))
+
+## [1.11.7] 2023-11-06
+
+- Round priority fees to the nearest integer ([#294](https://github.com/zetamarkets/sdk/pull/294))
+
+## [1.11.6] 2023-11-06
+
+- Add new TIF buffer option ([#293](https://github.com/zetamarkets/sdk/pull/293))
+
+## [1.11.5] 2023-11-02
+
+- Remove default trigger direction in editPriceTriggerOrder. ([#291](https://github.com/zetamarkets/sdk/pull/291))
+
+## [1.11.4] 2023-11-02
+
+- Add max leverage option to getMaxTradeSize() ([#289](https://github.com/zetamarkets/sdk/pull/289))
+
+## [1.11.3] 2023-11-02
+
+- Use fork of web3.js to enable zstd compression across the SDK. Reduces network usage significantly. ([#290](https://github.com/zetamarkets/sdk/pull/290))
+
+## [1.11.2] 2023-10-24
+
+- Add price to TradeEventV3. ([#288](https://github.com/zetamarkets/sdk/pull/288))
+
+## [1.11.1] 2023-10-13
+
+- Utils: New function getTradeEventsFromTx() ([#285](https://github.com/zetamarkets/sdk/pull/285))
+
+## [1.11.0] 2023-10-13
+
+- General: New asset! (BNB) ([#283](https://github.com/zetamarkets/sdk/pull/283))
+
+## [1.10.9] 2023-10-06
+
+- Client: Manually trigger USER callback on editTriggerOrder ([#284](https://github.com/zetamarkets/sdk/pull/284))
+
+## [1.10.8] 2023-10-03
+
+- Client: Add new instruction to allow permissionless deposit to other user's margin accounts. ([#280](https://github.com/zetamarkets/sdk/pull/280))
+
+## [1.10.7] 2023-09-28
+
+- Client: New function getTriggerOrder(). ([#279](https://github.com/zetamarkets/sdk/pull/279))
+
+## [1.10.6] 2023-09-28
+
+- Reduce log spam relating to TIF epoch rollovers. ([#278](https://github.com/zetamarkets/sdk/pull/278))
+
+## [1.10.5] 2023-09-25
+
+- Bugfix: Handle empty accounts better to prevent undefined issues with trigger orders. ([#277](https://github.com/zetamarkets/sdk/pull/277))
+
 ## [1.10.4] 2023-09-19
 
 - Bugfix: Fix loading order to prevent a rarely occurring market undefined error. ([#274](https://github.com/zetamarkets/sdk/pull/274))
@@ -340,7 +397,7 @@ Version changes are pinned to SDK releases.
 - general: Add perpetual futures. (#[152](https://github.com/zetamarkets/sdk/pull/152)). Many changes, the main ones are:
   - New client.placePerpOrder() function
   - New ApplyFundingEvent
-  - Exchange.getMarkets() now includes the perpMarket concantenated to the markets array
+  - Exchange.getMarkets() now includes the perpMarket concatenated to the markets array
     The only breaking changes are additional accounts required for updatePricing, other than that everything can be ignored if perps aren't traded.
 - client: Add create place order instruction function. (#[170](https://github.com/zetamarkets/sdk/pull/170))
 
@@ -543,7 +600,7 @@ Note: As the memory layout of Zeta accounts has not changed, merely refactored o
 ## [0.12.0] 2022-02-23
 
 - client: Add in functionality to close a margin account, close an open orders account and close multiple open orders accounts. ([#93](https://github.com/zetamarkets/sdk/pull/93))
-- general: Add in functionality to accomodate for extra order types (post-only & fill-or-kill). ([#93](https://github.com/zetamarkets/sdk/pull/93))
+- general: Add in functionality to accommodate for extra order types (post-only & fill-or-kill). ([#93](https://github.com/zetamarkets/sdk/pull/93))
 - general: Add in placeOrderV2 to allow order type to be specified. ([#93](https://github.com/zetamarkets/sdk/pull/93))
 
 ## [0.11.0] 2022-02-02

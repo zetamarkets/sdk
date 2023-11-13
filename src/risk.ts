@@ -7,6 +7,7 @@ import {
   convertNativeLotSizeToDecimal,
   convertDecimalToNativeInteger,
   convertDecimalToNativeLotSize,
+  convertNativeIntegerToDecimal,
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
@@ -834,11 +835,27 @@ export class RiskCalculator {
     tradeAsset: constants.Asset,
     tradeSide: types.Side,
     tradePrice: number,
+    maxLeverage: number = -1,
     isTaker: boolean = true,
     thresholdPercent: number = 1,
     bufferPercent: number = 5,
     maxIterations: number = 100
   ): number {
+    // Cap max leverage to 0 < maxLeverage < maxAssetLeverage
+    // Also don't cap leverage if not a taker trade, because leverage only counts positions
+    if (maxLeverage <= 0 || !isTaker) {
+      maxLeverage = -1;
+    }
+    if (maxLeverage != -1) {
+      let maxAssetLeverage =
+        100 /
+        convertNativeBNToDecimal(
+          Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
+            .futureMarginInitial
+        );
+      maxLeverage = Math.min(maxLeverage, maxAssetLeverage);
+    }
+
     if (thresholdPercent <= 0) {
       throw Error("thresholdPercent must be > 0");
     }
@@ -981,7 +998,12 @@ export class RiskCalculator {
       // TODO if this is slow then do only the necessary calcs manually, there's a bunch of extra calcs in here
       // that aren't needed in getMaxTradeSize()
       let newState = this.getCrossMarginAccountState(editedAccount);
-      let buffer = newState.availableBalanceInitial / newState.balance;
+      let buffer =
+        maxLeverage == -1
+          ? newState.availableBalanceInitial / newState.balance
+          : (maxLeverage - this.getLeverage(editedAccount, undefined, false)) /
+            maxLeverage;
+
       if (
         buffer < thresholdPercent / 100 &&
         buffer > 0 &&
@@ -996,7 +1018,10 @@ export class RiskCalculator {
           ) /
             10 ** constants.POSITION_PRECISION
         );
-      } else if (newState.availableBalanceInitial < 0) {
+      } else if (
+        (maxLeverage == -1 && newState.availableBalanceInitial < 0) ||
+        (maxLeverage != -1 && buffer < 0)
+      ) {
         sizeUpperBound = size;
         size = (sizeLowerBound + size) / 2;
       } else {
@@ -1028,6 +1053,70 @@ export class RiskCalculator {
       Exchange.getMarkPrice(asset),
       signedPosition
     );
+  }
+
+  /**
+   * Find the price at which a given position will be subject to liquidation.
+   * (under the assumption that the prices of other assets stays static)
+   * @param asset The asset being traded
+   * @param marginAccount The CrossMarginAccount itself.
+   * @returns Liquidation price, in decimal USDC
+   */
+  public getEstimatedLiquidationPrice(
+    asset: Asset,
+    cma: CrossMarginAccount
+  ): number {
+    // K is the accumulated maintenance margin and unrealized pnl offsets from other assets
+    let K = 0;
+    for (var a of Exchange.assets) {
+      if (a == asset) {
+        continue;
+      }
+
+      const ledger = cma.productLedgers[assets.assetToIndex(a)];
+      const posSizeNative = ledger.position.size.toNumber();
+      if (posSizeNative == 0) {
+        continue;
+      }
+      const posSize = convertNativeLotSizeToDecimal(posSizeNative);
+      const assetMmNative = convertDecimalToNativeInteger(
+        this.getPerpMarginRequirement(a, posSize, types.MarginType.MAINTENANCE)
+      );
+      K -= assetMmNative;
+
+      let assetUpnl;
+      const nativePosDelta =
+        convertDecimalToNativeInteger(Exchange.getMarkPrice(a)) * posSize;
+      const nativeCot = ledger.position.costOfTrades.toNumber();
+      if (posSize > 0) {
+        assetUpnl = nativePosDelta - nativeCot;
+      } else {
+        assetUpnl = nativePosDelta + nativeCot;
+      }
+      K += assetUpnl;
+    }
+
+    const liqAssetPledger = cma.productLedgers[assets.assetToIndex(asset)];
+    const posSizeNative = liqAssetPledger.position.size.toNumber();
+    const nativeCot = liqAssetPledger.position.costOfTrades.toNumber();
+
+    if (posSizeNative == 0) {
+      return 0;
+    }
+
+    const posSize = convertNativeLotSizeToDecimal(posSizeNative);
+    const C = convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assets.assetToIndex(asset)]
+        .futureMarginMaintenance,
+      constants.MARGIN_PRECISION
+    );
+
+    const nativeCotOffset = posSize > 0 ? -nativeCot : nativeCot;
+    const num = convertNativeIntegerToDecimal(
+      cma.balance.toNumber() + nativeCotOffset + K
+    );
+    const denom = Math.abs(posSize) * C - posSize;
+    return Math.max(0, num / denom);
   }
 
   /**

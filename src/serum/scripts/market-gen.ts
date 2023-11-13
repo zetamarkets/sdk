@@ -26,11 +26,12 @@ const main = async () => {
       opts: utils.defaultCommitment(),
       throttleMs: 0,
       loadFromStore: false,
+      TIFBufferSeconds: 0,
     };
 
     await Exchange.load(LOAD_CONFIG);
     for (var asset of assetList) {
-      populateMarketStore(marketStore, network, asset, constants.PERP_INDEX);
+      populateMarketStore(marketStore, asset, constants.PERP_INDEX);
     }
     await Exchange.close();
 
@@ -41,25 +42,17 @@ const main = async () => {
 
 main().catch(console.error.bind(console));
 
-function populateMarketStore(
-  marketStore: Object,
-  network: Network,
-  asset: Asset,
-  index: number
-) {
-  if (!(network in marketStore)) {
-    marketStore[network] = {};
-  }
-  if (!(asset in marketStore[network])) {
-    marketStore[network][asset] = {};
+function populateMarketStore(marketStore: Object, asset: Asset, index: number) {
+  if (!(asset in marketStore)) {
+    marketStore[asset] = {};
   }
 
-  if (index in marketStore[network][asset]) {
+  if (index in marketStore[asset]) {
     return;
   }
 
-  marketStore[network][asset][index] = {};
-  let store = marketStore[network][asset][index];
+  marketStore[asset][index] = {};
+  let store = marketStore[asset][index];
   let subExchange = Exchange.getSubExchange(asset);
   if (index != constants.PERP_INDEX) {
     throw Error("non-perps not supported");

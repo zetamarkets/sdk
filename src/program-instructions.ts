@@ -238,6 +238,59 @@ export function depositV2Ix(
 }
 
 /**
+ * @param amount the native amount to deposit (6dp)
+ * @param user to deposit to
+ */
+export function depositPermissionlessIx(
+  amount: number,
+  userToDeposit: PublicKey,
+  payer: PublicKey,
+  whitelistDepositAccount: PublicKey | undefined
+): TransactionInstruction {
+  let remainingAccounts =
+    whitelistDepositAccount !== undefined
+      ? [
+          {
+            pubkey: whitelistDepositAccount,
+            isSigner: false,
+            isWritable: false,
+          },
+        ]
+      : [];
+
+  // Default to 0 for now and CMA
+  let crossMarginAccount = utils.getCrossMarginAccount(
+    Exchange.programId,
+    userToDeposit,
+    Uint8Array.from([0])
+  )[0];
+
+  let depositTokenAcc = utils.getAssociatedTokenAddress(
+    constants.USDC_MINT_ADDRESS[Exchange.network],
+    payer
+  );
+
+  // TODO: Probably use mint to find decimal places in future.
+  return Exchange.program.instruction.depositPermissionless(
+    new anchor.BN(amount),
+    {
+      accounts: {
+        pricing: Exchange.pricingAddress,
+        crossMarginAccount,
+        vault: Exchange.combinedVaultAddress,
+        depositTokenAcc,
+        socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
+        authority: userToDeposit,
+        payer,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        state: Exchange.stateAddress,
+      },
+      remainingAccounts,
+    }
+  );
+}
+
+/**
  * @param amount
  * @param insuranceDepositAccount
  * @param usdcAccount
@@ -662,10 +715,13 @@ export function editTriggerOrderIx(
   return Exchange.program.instruction.editTriggerOrder(
     new anchor.BN(newOrderPrice),
     newTriggerPrice == 0 ? null : new anchor.BN(newTriggerPrice),
-    newTriggerDirection == types.TriggerDirection.UNINITIALIZED
+    newTriggerDirection == types.TriggerDirection.UNINITIALIZED ||
+      newTriggerDirection == undefined
       ? null
       : types.toProgramTriggerDirection(newTriggerDirection),
-    newTriggerTimestamp == 0 ? null : new anchor.BN(newTriggerTimestamp),
+    newTriggerTimestamp == 0 || newTriggerTimestamp == undefined
+      ? null
+      : new anchor.BN(newTriggerTimestamp),
     new anchor.BN(newSize),
     types.toProgramSide(newSide),
     types.toProgramOrderType(newOrderType),
@@ -937,12 +993,12 @@ export async function initializeZetaMarketTxs(
   eventQueue: PublicKey,
   bids: PublicKey,
   asks: PublicKey,
-  marketIndexes: PublicKey
+  marketIndexes: PublicKey,
+  zetaGroupAddress: PublicKey
 ): Promise<[Transaction, Transaction]> {
-  let subExchange = Exchange.getSubExchange(asset);
   const [market, marketNonce] = utils.getMarketUninitialized(
     Exchange.programId,
-    subExchange.zetaGroupAddress,
+    zetaGroupAddress,
     seedIndex
   );
 
@@ -1346,20 +1402,6 @@ export function applyPerpFundingIx(
       pricing: Exchange.pricingAddress,
     },
     remainingAccounts, // margin accounts
-  });
-}
-
-export function updatePricingParametersIx(
-  asset: Asset,
-  args: UpdatePricingParametersArgs,
-  admin: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.updatePricingParameters(args, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      admin,
-    },
   });
 }
 
@@ -2210,19 +2252,6 @@ export interface StateParams {
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;
   nativeOpenInterestLimit: anchor.BN;
-}
-
-export interface UpdatePricingParametersArgs {
-  optionTradeNormalizer: anchor.BN;
-  futureTradeNormalizer: anchor.BN;
-  maxVolatilityRetreat: anchor.BN;
-  maxInterestRetreat: anchor.BN;
-  maxDelta: anchor.BN;
-  minDelta: anchor.BN;
-  minInterestRate: anchor.BN;
-  maxInterestRate: anchor.BN;
-  minVolatility: anchor.BN;
-  maxVolatility: anchor.BN;
 }
 
 export interface InitializeZetaGroupPricingArgs {

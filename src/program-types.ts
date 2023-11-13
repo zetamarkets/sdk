@@ -335,7 +335,8 @@ export interface PlaceOrderEvent {
   orderId: anchor.BN;
   expiryTs: anchor.BN;
   asset: any;
-  margin_account: PublicKey;
+  marginAccount: PublicKey;
+  clientOrderId: anchor.BN;
 }
 
 /**
@@ -378,6 +379,7 @@ export interface TradeEventV3 {
   isTaker: boolean;
   sequenceNumber: anchor.BN; // Unique id for the given market
   fee: anchor.BN;
+  price: anchor.BN;
 }
 
 export interface PositionMovementEvent {

@@ -195,25 +195,13 @@ export class SubExchange {
 
     await m.serumMarket.updateDecoded(Exchange.connection);
 
-    console.log(
-      `${assetToName(this.asset)} SubExchange perp Serum market refreshed`
-    );
-  }
-
-  /**
-   * Update the pricing parameters for a zeta group.
-   */
-  public async updatePricingParameters(
-    args: instructions.UpdatePricingParametersArgs
-  ) {
-    let tx = new Transaction().add(
-      instructions.updatePricingParametersIx(
-        this.asset,
-        args,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
+    // Can get spammy on non-mainnet if no one is placing orders
+    // because TIF epochs automatically roll over on new orders
+    if (Exchange.network == Network.MAINNET) {
+      console.log(
+        `${assetToName(this.asset)} SubExchange perp Serum market refreshed`
+      );
+    }
   }
 
   /**
@@ -275,152 +263,6 @@ export class SubExchange {
       )
     );
     await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
-   * Initializes the zeta markets for a zeta group.
-   */
-  public async initializeZetaMarkets() {
-    // Initialize market indexes.
-    let [marketIndexes, marketIndexesNonce] = utils.getMarketIndexes(
-      Exchange.programId,
-      this._zetaGroupAddress
-    );
-
-    console.log("Initializing market indexes.");
-
-    let tx = new Transaction().add(
-      instructions.initializeMarketIndexesIx(
-        this._asset,
-        marketIndexes,
-        marketIndexesNonce
-      )
-    );
-    try {
-      await utils.processTransaction(
-        Exchange.provider,
-        tx,
-        [],
-        utils.defaultCommitment(),
-        Exchange.useLedger
-      );
-    } catch (e) {
-      console.error(`Initialize market indexes failed: ${e}`);
-    }
-
-    let tx2 = new Transaction().add(
-      instructions.addPerpMarketIndexIx(this.asset, marketIndexes)
-    );
-
-    try {
-      await utils.processTransaction(
-        Exchange.provider,
-        tx2,
-        [],
-        utils.defaultCommitment(),
-        Exchange.useLedger
-      );
-      await utils.sleep(100);
-    } catch (e) {
-      console.error(`Add market indexes failed: ${e}`);
-      console.log(e);
-    }
-
-    let marketIndexesAccount =
-      (await Exchange.program.account.marketIndexes.fetch(
-        marketIndexes
-      )) as MarketIndexes;
-
-    if (!marketIndexesAccount.initialized) {
-      throw Error("Market indexes are not initialized!");
-    }
-    await this.initializeZetaMarket(marketIndexes, marketIndexesAccount);
-  }
-
-  private async initializeZetaMarket(
-    marketIndexes: PublicKey,
-    marketIndexesAccount: MarketIndexes
-  ) {
-    console.log(`Initializing zeta market`);
-
-    const homedir = os.homedir();
-    let dir = `${homedir}/keys/${assetToName(this.asset)}`;
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    let i = constants.PERP_INDEX;
-
-    const requestQueue = utils.getOrCreateKeypair(`${dir}/rq-${i}.json`);
-    const eventQueue = utils.getOrCreateKeypair(`${dir}/eq-${i}.json`);
-    const bids = utils.getOrCreateKeypair(`${dir}/bids-${i}.json`);
-    const asks = utils.getOrCreateKeypair(`${dir}/asks-${i}.json`);
-
-    let [tx, tx2] = await instructions.initializeZetaMarketTxs(
-      this.asset,
-      marketIndexesAccount.indexes[i],
-      requestQueue.publicKey,
-      eventQueue.publicKey,
-      bids.publicKey,
-      asks.publicKey,
-      marketIndexes
-    );
-
-    let marketInitialized = false;
-    let accountsInitialized = false;
-    if (Exchange.network != Network.LOCALNET) {
-      // Validate that the market hasn't already been initialized
-      // So no sol is wasted on unnecessary accounts.
-      const [market, _marketNonce] = utils.getMarketUninitialized(
-        Exchange.programId,
-        this._zetaGroupAddress,
-        marketIndexesAccount.indexes[i]
-      );
-
-      let info = await Exchange.provider.connection.getAccountInfo(market);
-      if (info !== null) {
-        marketInitialized = true;
-      }
-
-      info = await Exchange.provider.connection.getAccountInfo(bids.publicKey);
-      if (info !== null) {
-        accountsInitialized = true;
-      }
-    }
-
-    if (accountsInitialized) {
-      console.log(`Market ${i} serum accounts already initialized...`);
-    } else {
-      try {
-        await utils.processTransaction(
-          Exchange.provider,
-          tx,
-          [requestQueue, eventQueue, bids, asks],
-          utils.commitmentConfig(Exchange.connection.commitment),
-          Exchange.useLedger
-        );
-      } catch (e) {
-        console.error(
-          `Initialize zeta market serum accounts ${i} failed: ${e}`
-        );
-      }
-    }
-
-    if (marketInitialized) {
-      console.log(`Market ${i} already initialized. Skipping...`);
-    } else {
-      try {
-        await utils.processTransaction(
-          Exchange.provider,
-          tx2,
-          [],
-          utils.commitmentConfig(Exchange.connection.commitment),
-          Exchange.useLedger
-        );
-      } catch (e) {
-        console.error(`Initialize zeta market ${i} failed: ${e}`);
-      }
-    }
   }
 
   public async initializeZetaMarketsTIFEpochCycle(cycleLengthSecs: number) {
