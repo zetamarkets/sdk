@@ -262,7 +262,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -334,7 +334,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "payer",
@@ -10501,7 +10501,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "payer",
@@ -10573,7 +10573,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": false
+          "isSigner": true
         },
         {
           "name": "payer",
