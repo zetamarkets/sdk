@@ -1093,6 +1093,7 @@ export class CrossClient {
     triggerTime: anchor.BN,
     size: number,
     side: types.Side,
+    orderType: types.OrderType,
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ): Promise<TransactionSignature> {
     return await this.placeTriggerOrder(
@@ -1103,6 +1104,7 @@ export class CrossClient {
       0,
       types.TriggerDirection.UNINITIALIZED,
       triggerTime,
+      orderType,
       options
     );
   }
@@ -1114,6 +1116,7 @@ export class CrossClient {
     triggerPrice: number,
     size: number,
     side: types.Side,
+    orderType: types.OrderType,
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions(),
     triggerDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
       side
@@ -1127,6 +1130,7 @@ export class CrossClient {
       triggerPrice,
       triggerDirection,
       new anchor.BN(0),
+      orderType,
       options
     );
   }
@@ -1141,6 +1145,7 @@ export class CrossClient {
       side
     ),
     triggerTimestamp: anchor.BN,
+    orderType: types.OrderType,
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ): Promise<TransactionSignature> {
     let triggerOrderBit = this.findAvailableTriggerOrderBit();
@@ -1178,9 +1183,7 @@ export class CrossClient {
         triggerOrderBit,
         size,
         side,
-        options.orderType != undefined
-          ? options.orderType
-          : types.OrderType.FILLORKILL,
+        orderType,
         options.reduceOnly != undefined ? options.reduceOnly : false,
         options.tag,
         this.accountAddress,
@@ -1376,6 +1379,7 @@ export class CrossClient {
     newTriggerTime: anchor.BN,
     newSize: number,
     newSide: types.Side,
+    newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     await this.editTriggerOrder(
@@ -1386,6 +1390,7 @@ export class CrossClient {
       0,
       types.TriggerDirection.UNINITIALIZED,
       newTriggerTime,
+      newOrderType,
       newOptions
     );
   }
@@ -1397,6 +1402,7 @@ export class CrossClient {
     newSize: number,
     newSide: types.Side,
     newDirection: types.TriggerDirection,
+    newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     await this.editTriggerOrder(
@@ -1407,6 +1413,7 @@ export class CrossClient {
       newTriggerPrice,
       newDirection,
       new anchor.BN(0),
+      newOrderType,
       newOptions
     );
   }
@@ -1419,6 +1426,7 @@ export class CrossClient {
     newTriggerPrice: number,
     newDirection: types.TriggerDirection,
     newTriggerTimestamp: anchor.BN,
+    newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ) {
     let triggerAccount = utils.getTriggerOrder(
@@ -1434,9 +1442,7 @@ export class CrossClient {
         newTriggerTimestamp,
         newSize,
         newSide,
-        newOptions.orderType != undefined
-          ? newOptions.orderType
-          : types.OrderType.FILLORKILL,
+        newOrderType,
         newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         this._provider.wallet.publicKey,
         triggerAccount

@@ -7,13 +7,13 @@ import {
   convertNativeLotSizeToDecimal,
   convertDecimalToNativeInteger,
   convertDecimalToNativeLotSize,
+  convertNativeIntegerToDecimal,
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
 import { assets, Decimal, programTypes } from ".";
 import {
   addFakeTradeToAccount,
-  calculateLiquidationPrice,
   calculateProductMargin,
   fakeTrade,
   collectRiskMaps,
@@ -1034,24 +1034,73 @@ export class RiskCalculator {
 
   /**
    * Find the price at which a given position will be subject to liquidation.
+   * (under the assumption that the prices of other assets stays static)
    * @param asset The asset being traded
-   * @param signedPosition The signed size of the position, in decimal USDC
    * @param marginAccount The CrossMarginAccount itself.
    * @returns Liquidation price, in decimal USDC
    */
-  public getLiquidationPrice(
+  public getEstimatedLiquidationPrice(
     asset: Asset,
-    signedPosition: number,
-    marginAccount: CrossMarginAccount
-  ) {
-    let state = this.getCrossMarginAccountState(marginAccount);
-    return calculateLiquidationPrice(
-      state.balance,
-      state.maintenanceMarginTotal,
-      state.unrealizedPnlTotal,
-      Exchange.getMarkPrice(asset),
-      signedPosition
+    marginAccount: CrossMarginAccount,
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
+  ): number {
+    let account = marginAccount;
+    if (executionInfo) {
+      account = fakeTrade(marginAccount, clone, executionInfo);
+    }
+
+    // K is the accumulated maintenance margin and unrealized pnl offsets from other assets
+    let K = 0;
+    for (var a of Exchange.assets) {
+      if (a == asset) {
+        continue;
+      }
+
+      const ledger = account.productLedgers[assets.assetToIndex(a)];
+      const posSizeNative = ledger.position.size.toNumber();
+      if (posSizeNative == 0) {
+        continue;
+      }
+      const posSize = convertNativeLotSizeToDecimal(posSizeNative);
+      const assetMmNative = convertDecimalToNativeInteger(
+        this.getPerpMarginRequirement(a, posSize, types.MarginType.MAINTENANCE)
+      );
+      K -= assetMmNative;
+
+      let assetUpnl;
+      const nativePosDelta =
+        convertDecimalToNativeInteger(Exchange.getMarkPrice(a)) * posSize;
+      const nativeCot = ledger.position.costOfTrades.toNumber();
+      if (posSize > 0) {
+        assetUpnl = nativePosDelta - nativeCot;
+      } else {
+        assetUpnl = nativePosDelta + nativeCot;
+      }
+      K += assetUpnl;
+    }
+
+    const liqAssetPledger = account.productLedgers[assets.assetToIndex(asset)];
+    const posSizeNative = liqAssetPledger.position.size.toNumber();
+    const nativeCot = liqAssetPledger.position.costOfTrades.toNumber();
+
+    if (posSizeNative == 0) {
+      return 0;
+    }
+
+    const posSize = convertNativeLotSizeToDecimal(posSizeNative);
+    const C = convertNativeBNToDecimal(
+      Exchange.pricing.marginParameters[assets.assetToIndex(asset)]
+        .futureMarginMaintenance,
+      constants.MARGIN_PRECISION
     );
+
+    const nativeCotOffset = posSize > 0 ? -nativeCot : nativeCot;
+    const num = convertNativeIntegerToDecimal(
+      account.balance.toNumber() + nativeCotOffset + K
+    );
+    const denom = Math.abs(posSize) * C - posSize;
+    return Math.max(0, num / denom);
   }
 
   /**
