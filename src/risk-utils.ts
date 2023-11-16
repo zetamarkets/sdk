@@ -45,29 +45,6 @@ export function collectRiskMaps(
 }
 
 /**
- * Calculates the price at which a position will be liquidated.
- * @param accountBalance    margin account balance in decimal USDC
- * @param marginRequirement total margin requirement for margin account, in decimal USDC
- * @param unrealizedPnl     signed unrealized pnl for margin account, in decimal USDC
- * @param markPrice         mark price of product being calculated, in decimal USDC
- * @param position          signed position size of user, in decimal USDC
- * @returns Liquidation price, in decimal USDC
- */
-export function calculateLiquidationPrice(
-  accountBalance: number,
-  marginRequirement: number,
-  unrealizedPnl: number,
-  markPrice: number,
-  position: number
-): number {
-  if (position == 0) {
-    return 0;
-  }
-  let availableBalance = accountBalance - marginRequirement + unrealizedPnl;
-  return markPrice - availableBalance / position;
-}
-
-/**
  * Calculates the margin requirement for a given market.
  * @param asset         underlying asset (SOL, BTC, etc.)
  * @param spotPrice     price of the spot, in decimal USDC

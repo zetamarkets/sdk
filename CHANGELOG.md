@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.11.9]
+
+- Add fake trade functionality to getEstimatedLiquidationPrice. ([#299](https://github.com/zetamarkets/sdk/pull/299))
+- Remove old functions getLiquidationPrice and calculateLiquidationPrice. ([#299](https://github.com/zetamarkets/sdk/pull/299))
+
 ## [1.11.8]
 
 - Make orderType mandatory for trigger orders. ([#298](https://github.com/zetamarkets/sdk/pull/298))
