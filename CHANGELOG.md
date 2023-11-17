@@ -5,6 +5,17 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.12.0]
+
+### Breaking
+
+- Remove signer from initializeCrossMarginAccountManager and initializeCrossMarginAccount instructions. This is a breaking change, and older SDK versions will no longer work for account creation (baked into the deposit flow). ([#295](https://github.com/zetamarkets/sdk/pull/295))
+
+## [1.11.9]
+
+- Add fake trade functionality to getEstimatedLiquidationPrice. ([#299](https://github.com/zetamarkets/sdk/pull/299))
+- Remove old functions getLiquidationPrice and calculateLiquidationPrice. ([#299](https://github.com/zetamarkets/sdk/pull/299))
+
 ## [1.11.8]
 
 - Make orderType mandatory for trigger orders. ([#298](https://github.com/zetamarkets/sdk/pull/298))
