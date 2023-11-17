@@ -949,7 +949,13 @@ export class RiskCalculator {
 
     // Iterate until we find a good size using a binary search
     let sizeLowerBound = 0;
-    let sizeUpperBound = 2 * Math.max(0, state.balance / (init * tradePrice));
+    let sizeUpperBound =
+      2 *
+      Math.max(
+        0,
+        state.balance /
+          (init * 2 * Math.min(Exchange.getMarkPrice(tradeAsset), tradePrice))
+      );
     if (sizeUpperBound == 0) {
       return closeSize;
     }
@@ -1245,7 +1251,7 @@ export class RiskCalculator {
     let positionValue = 0;
     for (var asset of Exchange.assets) {
       let markPrice =
-        useExecutionInfoPrice && executionInfo
+        useExecutionInfoPrice && executionInfo && executionInfo.asset == asset
           ? executionInfo.price
           : Exchange.getMarkPrice(asset);
 
