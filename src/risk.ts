@@ -949,7 +949,7 @@ export class RiskCalculator {
 
     // Iterate until we find a good size using a binary search
     let sizeLowerBound = 0;
-    let sizeUpperBound = 2 * Math.max(0, state.balance / (init * markPrice));
+    let sizeUpperBound = 2 * Math.max(0, state.balance / (init * tradePrice));
     if (sizeUpperBound == 0) {
       return closeSize;
     }
@@ -998,10 +998,14 @@ export class RiskCalculator {
       // that aren't needed in getMaxTradeSize()
       let newState = this.getCrossMarginAccountState(editedAccount);
       let nonLeverageBuffer =
-        newState.availableBalanceInitial / newState.balance;
+        (newState.balance -
+          newState.unpaidFundingTotal -
+          newState.initialMarginTotal) /
+        (newState.balance - newState.unpaidFundingTotal);
+
       let buffer =
         maxLeverage == -1
-          ? newState.availableBalanceInitial / newState.balance
+          ? nonLeverageBuffer
           : Math.min(
               (maxLeverage -
                 this.getLeverage(editedAccount, undefined, false)) /
@@ -1234,14 +1238,14 @@ export class RiskCalculator {
       account = fakeTrade(marginAccount, clone, executionInfo);
     }
 
-    let markPrice =
-      useExecutionInfoPrice && executionInfo
-        ? executionInfo.price
-        : Exchange.getMarkPrice(asset);
-
     // Sum up all the positions in the account
     let positionValue = 0;
     for (var asset of Exchange.assets) {
+      let markPrice =
+        useExecutionInfoPrice && executionInfo
+          ? executionInfo.price
+          : Exchange.getMarkPrice(asset);
+
       positionValue +=
         Math.abs(
           convertNativeLotSizeToDecimal(
