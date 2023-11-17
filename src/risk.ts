@@ -14,7 +14,6 @@ import { Asset } from "./constants";
 import { assets, Decimal, programTypes } from ".";
 import {
   addFakeTradeToAccount,
-  calculateLiquidationPrice,
   calculateProductMargin,
   fakeTrade,
   collectRiskMaps,
@@ -1041,28 +1040,6 @@ export class RiskCalculator {
 
   /**
    * Find the price at which a given position will be subject to liquidation.
-   * @param asset The asset being traded
-   * @param signedPosition The signed size of the position, in decimal USDC
-   * @param marginAccount The CrossMarginAccount itself.
-   * @returns Liquidation price, in decimal USDC
-   */
-  public getLiquidationPrice(
-    asset: Asset,
-    signedPosition: number,
-    marginAccount: CrossMarginAccount
-  ) {
-    let state = this.getCrossMarginAccountState(marginAccount);
-    return calculateLiquidationPrice(
-      state.balance,
-      state.maintenanceMarginTotal,
-      state.unrealizedPnlTotal,
-      Exchange.getMarkPrice(asset),
-      signedPosition
-    );
-  }
-
-  /**
-   * Find the price at which a given position will be subject to liquidation.
    * (under the assumption that the prices of other assets stays static)
    * @param asset The asset being traded
    * @param marginAccount The CrossMarginAccount itself.
@@ -1070,8 +1047,15 @@ export class RiskCalculator {
    */
   public getEstimatedLiquidationPrice(
     asset: Asset,
-    cma: CrossMarginAccount
+    marginAccount: CrossMarginAccount,
+    executionInfo?: types.ExecutionInfo,
+    clone: boolean = true
   ): number {
+    let account = marginAccount;
+    if (executionInfo) {
+      account = fakeTrade(marginAccount, clone, executionInfo);
+    }
+
     // K is the accumulated maintenance margin and unrealized pnl offsets from other assets
     let K = 0;
     for (var a of Exchange.assets) {
@@ -1079,7 +1063,7 @@ export class RiskCalculator {
         continue;
       }
 
-      const ledger = cma.productLedgers[assets.assetToIndex(a)];
+      const ledger = account.productLedgers[assets.assetToIndex(a)];
       const posSizeNative = ledger.position.size.toNumber();
       if (posSizeNative == 0) {
         continue;
@@ -1102,7 +1086,7 @@ export class RiskCalculator {
       K += assetUpnl;
     }
 
-    const liqAssetPledger = cma.productLedgers[assets.assetToIndex(asset)];
+    const liqAssetPledger = account.productLedgers[assets.assetToIndex(asset)];
     const posSizeNative = liqAssetPledger.position.size.toNumber();
     const nativeCot = liqAssetPledger.position.costOfTrades.toNumber();
 
@@ -1119,7 +1103,7 @@ export class RiskCalculator {
 
     const nativeCotOffset = posSize > 0 ? -nativeCot : nativeCot;
     const num = convertNativeIntegerToDecimal(
-      cma.balance.toNumber() + nativeCotOffset + K
+      account.balance.toNumber() + nativeCotOffset + K
     );
     const denom = Math.abs(posSize) * C - posSize;
     return Math.max(0, num / denom);
@@ -1232,12 +1216,14 @@ export class RiskCalculator {
    * @param marginAccount The CrossMarginAccount itself, edited in-place if executionInfo is provided
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
+   * @param overrideEquity whether to override the equity part of the calc, using the unchanged equity
    * @returns A decimal value representing the current leverage.
    */
   public getLeverage(
     marginAccount: CrossMarginAccount,
     executionInfo?: types.ExecutionInfo,
-    clone: boolean = true
+    clone: boolean = true,
+    overrideEquity: boolean = false
   ): number {
     if (marginAccount.balance.toNumber() == 0) return 0;
 
@@ -1259,6 +1245,11 @@ export class RiskCalculator {
         ) * Exchange.getMarkPrice(asset);
     }
 
-    return positionValue / this.getCrossMarginAccountState(account).equity;
+    return (
+      positionValue /
+      (overrideEquity
+        ? this.getCrossMarginAccountState(marginAccount).equity
+        : this.getCrossMarginAccountState(account).equity)
+    );
   }
 }
