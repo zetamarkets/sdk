@@ -5,9 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.12.2]
+
+- Bugfix getMaxTradeSize with leverage option. ([#300](https://github.com/zetamarkets/sdk/pull/300))
+
 ## [1.12.1]
 
-- Add optional override equity param in leverage util([#301](https://github.com/zetamarkets/sdk/pull/301))
+- Add optional override equity param in leverage util. ([#301](https://github.com/zetamarkets/sdk/pull/301))
 
 ## [1.12.0]
 
