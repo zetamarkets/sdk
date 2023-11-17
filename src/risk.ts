@@ -1217,13 +1217,15 @@ export class RiskCalculator {
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @param overrideEquity whether to override the equity part of the calc, using the unchanged equity
+   * @param useExecutionInfoPrice whether to override the mark price with the executionInfo price
    * @returns A decimal value representing the current leverage.
    */
   public getLeverage(
     marginAccount: CrossMarginAccount,
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true,
-    overrideEquity: boolean = false
+    overrideEquity: boolean = false,
+    useExecutionInfoPrice: boolean = false
   ): number {
     if (marginAccount.balance.toNumber() == 0) return 0;
 
@@ -1231,6 +1233,11 @@ export class RiskCalculator {
     if (executionInfo) {
       account = fakeTrade(marginAccount, clone, executionInfo);
     }
+
+    let markPrice =
+      useExecutionInfoPrice && executionInfo
+        ? executionInfo.price
+        : Exchange.getMarkPrice(asset);
 
     // Sum up all the positions in the account
     let positionValue = 0;
@@ -1242,7 +1249,7 @@ export class RiskCalculator {
               assets.assetToIndex(asset)
             ].position.size.toNumber()
           )
-        ) * Exchange.getMarkPrice(asset);
+        ) * markPrice;
     }
 
     return (

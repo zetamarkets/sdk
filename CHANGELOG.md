@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.12.3]
+
+- New override in getLeverage() to use executionInfo price as markPrice. ([#302](https://github.com/zetamarkets/sdk/pull/302))
+
 ## [1.12.2]
 
 - Bugfix getMaxTradeSize with leverage option. ([#300](https://github.com/zetamarkets/sdk/pull/300))
