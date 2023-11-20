@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.13.0]
+## [1.13.1]
 
 - Add pyth asset. ([#305](https://github.com/zetamarkets/sdk/pull/305))
 

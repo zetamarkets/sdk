@@ -308,12 +308,12 @@ export const STATIC_AND_PERPS_LUT: {
     },
   }),
   mainnet: new AddressLookupTableAccount({
-    key: new PublicKey("CCKEj67kdDAjqwm5LdmTrXpH6zr2bWpAszAKc3fGM7dk"),
+    key: new PublicKey("pxSHSw1dQpf3fhffWxs9KEfbbKdHpcRYf9UYrh7u8R7"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 231149614,
+      lastExtendedSlot: 231176727,
       lastExtendedSlotStartIndex: 80,
-      authority: new PublicKey("BR47Yncz7AKKD4f6NuP83yxb31YjvYvZuHApjEvtP8tu"),
+      authority: new PublicKey("6h7Ce5MfeuUP4gqMfQkM9GanBrZDvBcuxK6RX8qLSWAP"),
       addresses: [
         new PublicKey("8eExPiLp47xbSDYkbuem4qnLUpbLTfZBeFuEJoh6EUr2"),
         new PublicKey("BbKFezrmKD83PeVh74958MzgFAue1pZptipSNLz5ccpk"),
