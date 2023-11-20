@@ -1038,7 +1038,8 @@ export class RiskCalculator {
         (maxLeverage == -1 &&
           newState.initialMarginTotal >
             equity + Math.min(newState.unrealizedPnlTotal, 0)) ||
-        (maxLeverage != -1 && buffer < 0)
+        (maxLeverage != -1 && buffer < 0) ||
+        buffer > 1
       ) {
         sizeUpperBound = size;
         size = (sizeLowerBound + size) / 2;
