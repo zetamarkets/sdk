@@ -181,6 +181,10 @@ export class SubExchange {
    * Checks only if the perp serum markets are stale and refreshes it if so
    */
   public async updatePerpSerumMarketIfNeeded(epochDelay: number) {
+    if (Exchange.isHalted(this._asset)) {
+      return;
+    }
+
     let m = this._markets.market;
 
     if (
