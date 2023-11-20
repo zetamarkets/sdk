@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- Add usdc account check and creation on withdraw. ([#303](https://github.com/zetamarkets/sdk/pull/303))
+
 ## [1.12.2]
 
 - Bugfix getMaxTradeSize with leverage option. ([#300](https://github.com/zetamarkets/sdk/pull/300))
