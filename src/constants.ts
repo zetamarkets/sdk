@@ -44,6 +44,7 @@ export const FLEX_MINTS = {
   mainnet: {
     [Asset.APT]: new PublicKey("8z8oShLky1PauW9hxv6AsjnricLqoK9MfmNZJDQNNNPr"),
     [Asset.ARB]: new PublicKey("Ebd7aUFu3rtsZruCzTnG4tjBoxaJdWT8S3t4yC8hVpbo"),
+    [Asset.PYTH]: new PublicKey("BjZmtqBVKY1oUSUjgq9PBQWJPyWbcWTXYbQ1oWxa9NYp"),
   },
 };
 
@@ -150,6 +151,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.APT]: new PublicKey("FNNvb1AFDnDVPkocEri8mWbJ1952HQZtFLuwPiUjSJQ"),
     [Asset.ARB]: new PublicKey("5HRrdmghsnU3i2u5StaKaydS7eq3vnKVKwXMzCNKsc4C"),
     [Asset.BNB]: new PublicKey("4CkQJBxhU8EZ2UjhigbtdaPbpTe6mqf811fipYBFbSYN"),
+    [Asset.PYTH]: new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
   },
 };
 
