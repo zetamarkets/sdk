@@ -954,7 +954,7 @@ export class RiskCalculator {
       Math.max(
         0,
         state.balance /
-          (init * 2 * Math.min(Exchange.getMarkPrice(tradeAsset), tradePrice))
+          (init * Math.min(Exchange.getMarkPrice(tradeAsset), tradePrice))
       );
     if (sizeUpperBound == 0) {
       return closeSize;
