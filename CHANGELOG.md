@@ -5,8 +5,14 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.13.0]
+
+- Add pyth asset. ([#305](https://github.com/zetamarkets/sdk/pull/305))
+
 ## [1.12.3]
 
+- Add skip to market refreshing if asset is halted. ([#304](https://github.com/zetamarkets/sdk/pull/304))
+- Add usdc account check and creation on withdraw. ([#303](https://github.com/zetamarkets/sdk/pull/303))
 - New override in getLeverage() to use executionInfo price as markPrice. ([#302](https://github.com/zetamarkets/sdk/pull/302))
 
 ## [1.12.2]

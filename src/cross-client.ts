@@ -31,6 +31,7 @@ import {
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
+import * as splToken from "@solana/spl-token";
 import { PublicKey as PublicKeyZstd } from "zeta-solana-web3";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
@@ -767,7 +768,7 @@ export class CrossClient {
 
   public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {
     this.delegatedCheck();
-    this.usdcAccountCheck();
+    await this.usdcAccountCheck();
 
     // Dynamically figure out the user's existing margin accounts
     let accs = await this.findUserMarginAccounts();
@@ -830,7 +831,7 @@ export class CrossClient {
    */
   public async deposit(amount: number): Promise<TransactionSignature> {
     this.delegatedCheck();
-    this.usdcAccountCheck();
+    await this.usdcAccountCheck();
     // Check if the user has accounts set up
     let tx = new Transaction();
     if (this._account === null) {
@@ -938,7 +939,23 @@ export class CrossClient {
    */
   public async withdraw(amount: number): Promise<TransactionSignature> {
     this.delegatedCheck();
+
     let tx = new Transaction();
+    try {
+      await this.usdcAccountCheck();
+    } catch (e) {
+      tx.add(
+        splToken.Token.createAssociatedTokenAccountInstruction(
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+          splToken.TOKEN_PROGRAM_ID,
+          constants.USDC_MINT_ADDRESS[Exchange.network],
+          this._usdcAccountAddress,
+          this.publicKey,
+          this.publicKey
+        )
+      );
+    }
+
     tx.add(
       instructions.withdrawV2Ix(
         amount,
