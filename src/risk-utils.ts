@@ -286,6 +286,8 @@ export function addFakeTradeToAccount(
 
   marginAccount.productLedgers[assetIndex].orderState = editedOrderState;
   marginAccount.productLedgers[assetIndex].position = editedPosition;
+  marginAccount.lastFundingDeltas[assetIndex] =
+    Exchange.pricing.fundingDeltas[assetIndex];
 }
 
 /**

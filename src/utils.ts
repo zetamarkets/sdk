@@ -1769,10 +1769,14 @@ export const checkLiquidity = (
   size: number,
   asset: Asset,
   side: types.Side,
-  orderbook: types.DepthOrderbook
+  slippage?: number,
+  orderbook?: types.DepthOrderbook
 ): types.LiquidityCheckInfo => {
   // We default to min lot size to still show a price
   const fillSize = size || constants.MIN_LOT_SIZE;
+
+  slippage ??= constants.PERP_MARKET_ORDER_SPOT_SLIPPAGE;
+  orderbook ??= Exchange.getOrderbook(asset);
 
   const orderbookSide =
     side === types.Side.ASK ? orderbook.bids : orderbook.asks;
@@ -1795,7 +1799,8 @@ export const checkLiquidity = (
       orderbookLevel.price,
       side,
       asset,
-      orderbook
+      orderbook,
+      slippage
     );
 
     if (!isWithinSlippge) {
@@ -1826,7 +1831,8 @@ const checkWithinSlippageTolerance = (
   price: number,
   side: types.Side,
   asset: Asset,
-  orderbook: types.DepthOrderbook
+  orderbook: types.DepthOrderbook,
+  slippage: number
 ): boolean => {
   const spotPrice = Exchange.getMarkPrice(asset);
 
@@ -1839,7 +1845,7 @@ const checkWithinSlippageTolerance = (
   if (side === types.Side.BID && price < markPrice) return true;
   if (side === types.Side.ASK && price > markPrice) return true;
 
-  const maxSlippage = constants.PERP_MARKET_ORDER_SPOT_SLIPPAGE * markPrice;
+  const maxSlippage = slippage * markPrice;
 
   return Math.abs(price - markPrice) <= Math.abs(maxSlippage);
 };
