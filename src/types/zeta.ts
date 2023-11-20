@@ -8887,6 +8887,9 @@ export type Zeta = {
             "name": "BNB"
           },
           {
+            "name": "PYTH"
+          },
+          {
             "name": "UNDEFINED"
           }
         ]
@@ -19124,6 +19127,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "BNB"
+          },
+          {
+            "name": "PYTH"
           },
           {
             "name": "UNDEFINED"
