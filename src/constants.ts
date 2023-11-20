@@ -72,6 +72,7 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["D19K6rrppbWAFa4jE1DJUStPnr7cSrqKk5TruGqfc5Ns"]: Asset.APT,
     ["CU6pPA2E2yQFqMzZKrFCmfjrSBEc6GxfmFrSqpqazygu"]: Asset.ARB,
     ["83vVPH4DaUxsi7otAK3yr8atUebbBxHQfHA6CLyzcDiW"]: Asset.BNB,
+    ["2JRRckcZK4pRCMpLXtG9TkDw4QxJNiwwjs8BG6b5piFy"]: Asset.PYTH,
   },
 };
 
