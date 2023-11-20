@@ -949,7 +949,13 @@ export class RiskCalculator {
 
     // Iterate until we find a good size using a binary search
     let sizeLowerBound = 0;
-    let sizeUpperBound = 2 * Math.max(0, state.balance / (init * markPrice));
+    let sizeUpperBound =
+      2 *
+      Math.max(
+        0,
+        state.balance /
+          (init * Math.min(Exchange.getMarkPrice(tradeAsset), tradePrice))
+      );
     if (sizeUpperBound == 0) {
       return closeSize;
     }
@@ -997,11 +1003,16 @@ export class RiskCalculator {
       // TODO if this is slow then do only the necessary calcs manually, there's a bunch of extra calcs in here
       // that aren't needed in getMaxTradeSize()
       let newState = this.getCrossMarginAccountState(editedAccount);
+      let equity = newState.balance - newState.unpaidFundingTotal;
       let nonLeverageBuffer =
-        newState.availableBalanceInitial / newState.balance;
+        (equity +
+          Math.min(newState.unrealizedPnlTotal, 0) -
+          newState.initialMarginTotal) /
+        equity;
+
       let buffer =
         maxLeverage == -1
-          ? newState.availableBalanceInitial / newState.balance
+          ? nonLeverageBuffer
           : Math.min(
               (maxLeverage -
                 this.getLeverage(editedAccount, undefined, false)) /
@@ -1024,8 +1035,11 @@ export class RiskCalculator {
             10 ** constants.POSITION_PRECISION
         );
       } else if (
-        (maxLeverage == -1 && newState.availableBalanceInitial < 0) ||
-        (maxLeverage != -1 && buffer < 0)
+        (maxLeverage == -1 &&
+          newState.initialMarginTotal >
+            equity + Math.min(newState.unrealizedPnlTotal, 0)) ||
+        (maxLeverage != -1 && buffer < 0) ||
+        buffer > 1
       ) {
         sizeUpperBound = size;
         size = (sizeLowerBound + size) / 2;
@@ -1217,13 +1231,15 @@ export class RiskCalculator {
    * @param executionInfo (Optional) A hypothetical trade. Object containing: asset (Asset), price (decimal USDC), size (signed decimal), isTaker (whether or not it trades for full size)
    * @param clone Whether to deep-copy the marginAccount as part of the function. You can speed up execution by providing your own already deep-copied marginAccount if calling multiple risk.ts functions.
    * @param overrideEquity whether to override the equity part of the calc, using the unchanged equity
+   * @param useExecutionInfoPrice whether to override the mark price with the executionInfo price
    * @returns A decimal value representing the current leverage.
    */
   public getLeverage(
     marginAccount: CrossMarginAccount,
     executionInfo?: types.ExecutionInfo,
     clone: boolean = true,
-    overrideEquity: boolean = false
+    overrideEquity: boolean = false,
+    useExecutionInfoPrice: boolean = false
   ): number {
     if (marginAccount.balance.toNumber() == 0) return 0;
 
@@ -1235,6 +1251,11 @@ export class RiskCalculator {
     // Sum up all the positions in the account
     let positionValue = 0;
     for (var asset of Exchange.assets) {
+      let markPrice =
+        useExecutionInfoPrice && executionInfo && executionInfo.asset == asset
+          ? executionInfo.price
+          : Exchange.getMarkPrice(asset);
+
       positionValue +=
         Math.abs(
           convertNativeLotSizeToDecimal(
@@ -1242,7 +1263,7 @@ export class RiskCalculator {
               assets.assetToIndex(asset)
             ].position.size.toNumber()
           )
-        ) * Exchange.getMarkPrice(asset);
+        ) * markPrice;
     }
 
     return (
