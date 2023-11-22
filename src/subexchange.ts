@@ -166,6 +166,10 @@ export class SubExchange {
    * Refreshes serum markets cache
    */
   public async updateSerumMarkets() {
+    if (!Exchange.isInitialized) {
+      return;
+    }
+
     console.info(
       `Refreshing Serum markets for ${assetToName(this._asset)} SubExchange.`
     );
