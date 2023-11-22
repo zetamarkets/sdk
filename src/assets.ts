@@ -42,7 +42,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.PYTH) return "PYTH";
   if (asset == Asset.UNDEFINED) return "UNDEFINED";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
-  throw Error("Invalid asset");
+  return undefined;
 }
 
 export function nameToAsset(name: string): Asset {
@@ -54,7 +54,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "BNB") return Asset.BNB;
   if (name == "PYTH") return Asset.PYTH;
   if (name == "UNDEFINED") return Asset.UNDEFINED;
-  throw Error("Invalid asset");
+  return undefined;
 }
 
 export function getAssetMint(asset: Asset): PublicKey {
@@ -69,7 +69,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.ARB) return { arb: {} };
   if (asset == Asset.BNB) return { bnb: {} };
   if (asset == Asset.PYTH) return { pyth: {} };
-  throw Error("Invalid asset");
+  return undefined;
 }
 
 export function fromProgramAsset(asset: any): Asset {
@@ -94,7 +94,7 @@ export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { pyth: {} })) {
     return Asset.PYTH;
   }
-  throw Error("Invalid asset");
+  return undefined;
 }
 
 export function assetToIndex(asset: Asset): number {
@@ -121,7 +121,7 @@ export function assetToIndex(asset: Asset): number {
       return 6;
     }
   }
-  throw new Error("Invalid asset");
+  return undefined;
 }
 
 export function indexToAsset(index: number): Asset {
@@ -148,5 +148,5 @@ export function indexToAsset(index: number): Asset {
       return Asset.PYTH;
     }
   }
-  throw new Error("Invalid index");
+  return undefined;
 }
