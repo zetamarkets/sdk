@@ -9,7 +9,7 @@ Version changes are pinned to SDK releases.
 
 - Fix anchor.BN truncation in risk calcs. ([#307](https://github.com/zetamarkets/sdk/pull/307))
 - Replace throw with an undefined return for invalid assets. ([#307](https://github.com/zetamarkets/sdk/pull/307))
-- Add check for Exchange.isInitialized when refreshing serum markets. ([#307](https://github.com/zetamarkets/sdk/pull/307))
+- Add check for Exchange.isInitialized when refreshing markets. ([#307](https://github.com/zetamarkets/sdk/pull/307))
 
 ## [1.13.2]
 
