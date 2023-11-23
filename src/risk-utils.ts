@@ -181,8 +181,11 @@ export function addFakeTradeToAccount(
       let priceDiff = entryPrice.sub(
         new anchor.BN(convertDecimalToNativeInteger(price, 1))
       );
+
+      let sizeMul = side == types.Side.BID ? size : -1 * size;
+
       marginAccount.balance = marginAccount.balance.add(
-        new anchor.BN(side == types.Side.BID ? size : -size).mul(priceDiff)
+        new anchor.BN(sizeMul * priceDiff.toNumber())
       );
 
       editedPosition.costOfTrades = editedPosition.costOfTrades.sub(
