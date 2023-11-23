@@ -5,6 +5,12 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.13.3]
+
+- Fix anchor.BN truncation in risk calcs. ([#307](https://github.com/zetamarkets/sdk/pull/307))
+- Replace throw with an undefined return for invalid assets. ([#307](https://github.com/zetamarkets/sdk/pull/307))
+- Add check for Exchange.isInitialized when refreshing markets. ([#307](https://github.com/zetamarkets/sdk/pull/307))
+
 ## [1.13.2]
 
 - Add pyth asset. ([#305](https://github.com/zetamarkets/sdk/pull/305))
