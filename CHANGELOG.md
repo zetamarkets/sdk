@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.13.4]
+
+- Filter nonzero open orders accounts before sending burn txs. ([#310](https://github.com/zetamarkets/sdk/pull/310))
+
 ## [1.13.3]
 
 - Add PYTH to devnet. ([#309](https://github.com/zetamarkets/sdk/pull/309))
