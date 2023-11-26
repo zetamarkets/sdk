@@ -49,6 +49,7 @@ import { assets } from ".";
 import { Network } from "./network";
 import cloneDeep from "lodash.clonedeep";
 import * as os from "os";
+import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
 
 export function getState(programId: PublicKey): [PublicKey, number] {
   return anchor.web3.PublicKey.findProgramAddressSync(
@@ -1466,9 +1467,38 @@ export async function settleAndBurnVaultTokens(
   provider: anchor.AnchorProvider
 ) {
   let openOrders = await getAllOpenOrdersAccounts(asset);
+
+  let openOrdersFiltered = [];
+  for (var i = 0; i < openOrders.length; i += constants.MAX_ACCOUNTS_TO_FETCH) {
+    let ooBatch = await Exchange.connection.getMultipleAccountsInfo(
+      openOrders.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH),
+      provider.connection.commitment
+    );
+
+    for (var j = 0; j < ooBatch.length; j++) {
+      const decoded = _OPEN_ORDERS_LAYOUT_V2.decode(ooBatch[j].data);
+      let openOrdersAccount = new OpenOrders(
+        openOrders[i + j],
+        decoded,
+        Exchange.programId
+      );
+
+      if (
+        openOrdersAccount.baseTokenFree.toNumber() != 0 ||
+        openOrdersAccount.baseTokenTotal.toNumber() != 0 ||
+        openOrdersAccount.quoteTokenFree.toNumber() != 0 ||
+        openOrdersAccount.quoteTokenTotal.toNumber() != 0
+      ) {
+        openOrdersFiltered.push(openOrders[i + j]);
+      }
+    }
+  }
+
   let market = Exchange.getPerpMarket(asset);
-  console.log(`Burning tokens`);
-  let remainingAccounts = openOrders.map((key) => {
+  console.log(
+    `Burning tokens for ${openOrdersFiltered.length} openOrders accounts`
+  );
+  let remainingAccounts = openOrdersFiltered.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
   });
 
