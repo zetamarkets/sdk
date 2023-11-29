@@ -1481,7 +1481,7 @@ export class CrossClient {
         UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
       });
     }
-
+    await this.updateState(true, false);
     return txSig;
   }
 
