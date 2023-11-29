@@ -8825,6 +8825,9 @@
           },
           {
             "name": "PostOnlySlide"
+          },
+          {
+            "name": "PostOnlyFront"
           }
         ]
       }

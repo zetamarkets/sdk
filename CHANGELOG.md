@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.14.0]
+
+- Add post only front order type.
+
 ## [1.13.3]
 
 - Add PYTH to devnet. ([#309](https://github.com/zetamarkets/sdk/pull/309))
