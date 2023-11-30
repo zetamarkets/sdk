@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.13.4]
+
+- Add open orders account to orderbook object. ([#308](https://github.com/zetamarkets/sdk/pull/308))
+
 ## [1.13.3]
 
 - Add PYTH to devnet. ([#309](https://github.com/zetamarkets/sdk/pull/309))
