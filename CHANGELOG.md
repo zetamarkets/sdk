@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.13.4]
 
+- Filter nonzero open orders accounts before sending burn txs. ([#310](https://github.com/zetamarkets/sdk/pull/310))
 - Add open orders account to orderbook object. ([#308](https://github.com/zetamarkets/sdk/pull/308))
 
 ## [1.13.3]
