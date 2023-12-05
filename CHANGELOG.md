@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.14.0]
+
+- New asset $TIA ([#313](https://github.com/zetamarkets/sdk/pull/313))
+
 ## [1.13.4]
 
 - Filter nonzero open orders accounts before sending burn txs. ([#310](https://github.com/zetamarkets/sdk/pull/310))
