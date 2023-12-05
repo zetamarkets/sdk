@@ -9,6 +9,7 @@ export enum Asset {
   ARB = "ARB",
   BNB = "BNB",
   PYTH = "PYTH",
+  TIA = "TIA",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -36,6 +37,7 @@ export const FLEX_MINTS = {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
     [Asset.ARB]: new PublicKey("w8h6r5ogLihfuWeCA1gs7boxNjzbwWeQbXMB3UATaC6"),
     [Asset.PYTH]: new PublicKey("5PK1Ty2ac1Un6zY11Em7qF4FAYBgUu5y8Pt8ZtbepGnF"),
+    [Asset.TIA]: new PublicKey("3U2JttPo1k5xsapjuvQJQnH3Kj8D5HegF3PKoPReJ4JU"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -46,6 +48,7 @@ export const FLEX_MINTS = {
     [Asset.APT]: new PublicKey("8z8oShLky1PauW9hxv6AsjnricLqoK9MfmNZJDQNNNPr"),
     [Asset.ARB]: new PublicKey("Ebd7aUFu3rtsZruCzTnG4tjBoxaJdWT8S3t4yC8hVpbo"),
     [Asset.PYTH]: new PublicKey("BjZmtqBVKY1oUSUjgq9PBQWJPyWbcWTXYbQ1oWxa9NYp"),
+    [Asset.TIA]: new PublicKey("DmBnRoEiwGCud2C8X6h67ZLVhq6GyTm2NDRXvRz6uWYE"),
   },
 };
 
@@ -74,6 +77,7 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["CU6pPA2E2yQFqMzZKrFCmfjrSBEc6GxfmFrSqpqazygu"]: Asset.ARB,
     ["83vVPH4DaUxsi7otAK3yr8atUebbBxHQfHA6CLyzcDiW"]: Asset.BNB,
     ["2JRRckcZK4pRCMpLXtG9TkDw4QxJNiwwjs8BG6b5piFy"]: Asset.PYTH,
+    ["3gbBUKLs2Xm4KKRemwFNxSWmNRMohXwKtV8Yj1PNBUeD"]: Asset.TIA,
   },
 };
 
@@ -137,6 +141,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ARB]: new PublicKey("APN6KouMoYPF3rR8KxSmWCWQwEW8PykMVpyTAPdLogk4"),
     [Asset.BNB]: new PublicKey("27xFcQmxoHoqpuMcZdwVMCwrrmZAFwN3QEuwtxskR1Lc"),
     [Asset.PYTH]: new PublicKey("5kkS7RmNdcECCMcgJ4gz4sCSFqnFozQeSNb3YhtZrhYx"),
+    [Asset.TIA]: new PublicKey("FwZ5ZzkcWseaCKcu5iVWT5Ru29FDReARyiA6BaSSB5RH"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -146,6 +151,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ARB]: new PublicKey("4mRGHzjGerQNWKXyQAmr9kWqb9saPPHKqo1xziXGQ5Dh"),
     [Asset.BNB]: new PublicKey("GwzBgrXb4PG59zjce24SF2b9JXbLEjJJTBkmytuEZj1b"),
     [Asset.PYTH]: new PublicKey("ELF78ZhSr8u4SCixA7YSpjdZHZoSNrAhcyysbavpC2kA"),
+    [Asset.TIA]: new PublicKey("4GiL1Y6u6JkPb7ckakzJgc414h6P7qoYnEKFcd1YtSB9"),
   },
   mainnet: {
     [Asset.SOL]: new PublicKey("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG"),
@@ -155,6 +161,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ARB]: new PublicKey("5HRrdmghsnU3i2u5StaKaydS7eq3vnKVKwXMzCNKsc4C"),
     [Asset.BNB]: new PublicKey("4CkQJBxhU8EZ2UjhigbtdaPbpTe6mqf811fipYBFbSYN"),
     [Asset.PYTH]: new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
+    [Asset.TIA]: new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
   },
 };
 
@@ -179,8 +186,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 7;
-export const UNUSED_PERP_MARKETS = 18;
+export const ACTIVE_PERP_MARKETS = 8;
+export const UNUSED_PERP_MARKETS = 17;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 30;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;

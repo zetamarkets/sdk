@@ -40,6 +40,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.ARB) return "ARB";
   if (asset == Asset.BNB) return "BNB";
   if (asset == Asset.PYTH) return "PYTH";
+  if (asset == Asset.TIA) return "TIA";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -52,6 +53,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "ARB") return Asset.ARB;
   if (name == "BNB") return Asset.BNB;
   if (name == "PYTH") return Asset.PYTH;
+  if (name == "TIA") return Asset.TIA;
   return Asset.UNDEFINED;
 }
 
@@ -67,6 +69,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.ARB) return { arb: {} };
   if (asset == Asset.BNB) return { bnb: {} };
   if (asset == Asset.PYTH) return { pyth: {} };
+  if (asset == Asset.TIA) return { tia: {} };
   return { undefined: {} };
 }
 
@@ -91,6 +94,9 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { pyth: {} })) {
     return Asset.PYTH;
+  }
+  if (objectEquals(asset, { tia: {} })) {
+    return Asset.TIA;
   }
   return Asset.UNDEFINED;
 }
@@ -118,6 +124,9 @@ export function assetToIndex(asset: Asset): number {
     case Asset.PYTH: {
       return 6;
     }
+    case Asset.TIA: {
+      return 7;
+    }
   }
   return 255; // Undefined is 255 onchain
 }
@@ -144,6 +153,9 @@ export function indexToAsset(index: number): Asset {
     }
     case 6: {
       return Asset.PYTH;
+    }
+    case 7: {
+      return Asset.TIA;
     }
   }
   return Asset.UNDEFINED;
