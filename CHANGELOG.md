@@ -9,6 +9,10 @@ Version changes are pinned to SDK releases.
 
 - Bugfix getMaxTradeSize being too conservative with positive uPnL ([#315](https://github.com/zetamarkets/sdk/pull/315))
 
+## [1.14.1]
+
+- TIA devnet constants. ([#314](https://github.com/zetamarkets/sdk/pull/314))
+
 ## [1.14.0]
 
 - New asset $TIA ([#313](https://github.com/zetamarkets/sdk/pull/313))
