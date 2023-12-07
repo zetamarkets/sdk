@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.15.0]
+
+- New asset $JTO.
+
 ## [1.14.1]
 
 - TIA devnet constants. ([#314](https://github.com/zetamarkets/sdk/pull/314))
