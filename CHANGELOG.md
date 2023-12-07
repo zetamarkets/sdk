@@ -5,9 +5,13 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.14.2]
+## [1.15.1]
 
 - Bugfix getMaxTradeSize being too conservative with positive uPnL ([#315](https://github.com/zetamarkets/sdk/pull/315))
+
+## [1.15.0]
+
+- New asset $JTO. ([#316](https://github.com/zetamarkets/sdk/pull/316))
 
 ## [1.14.1]
 

@@ -41,6 +41,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.BNB) return "BNB";
   if (asset == Asset.PYTH) return "PYTH";
   if (asset == Asset.TIA) return "TIA";
+  if (asset == Asset.JTO) return "JTO";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -54,6 +55,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "BNB") return Asset.BNB;
   if (name == "PYTH") return Asset.PYTH;
   if (name == "TIA") return Asset.TIA;
+  if (name == "JTO") return Asset.JTO;
   return Asset.UNDEFINED;
 }
 
@@ -70,6 +72,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.BNB) return { bnb: {} };
   if (asset == Asset.PYTH) return { pyth: {} };
   if (asset == Asset.TIA) return { tia: {} };
+  if (asset == Asset.JTO) return { jto: {} };
   return { undefined: {} };
 }
 
@@ -97,6 +100,9 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { tia: {} })) {
     return Asset.TIA;
+  }
+  if (objectEquals(asset, { jto: {} })) {
+    return Asset.JTO;
   }
   return Asset.UNDEFINED;
 }
@@ -127,6 +133,9 @@ export function assetToIndex(asset: Asset): number {
     case Asset.TIA: {
       return 7;
     }
+    case Asset.JTO: {
+      return 8;
+    }
   }
   return 255; // Undefined is 255 onchain
 }
@@ -156,6 +165,9 @@ export function indexToAsset(index: number): Asset {
     }
     case 7: {
       return Asset.TIA;
+    }
+    case 8: {
+      return Asset.JTO;
     }
   }
   return Asset.UNDEFINED;
