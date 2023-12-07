@@ -1003,7 +1003,7 @@ export class RiskCalculator {
       let newState = this.getCrossMarginAccountState(editedAccount);
       let equity =
         newState.balance +
-        newState.unrealizedPnlTotal -
+        newState.unrealizedPnlTotal +
         newState.unpaidFundingTotal;
       let nonLeverageBuffer = (equity - newState.initialMarginTotal) / equity;
 
