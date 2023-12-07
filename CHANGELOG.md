@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.15.0]
 
-- New asset $JTO.
+- New asset $JTO. ([#316](https://github.com/zetamarkets/sdk/pull/316))
 
 ## [1.14.1]
 
