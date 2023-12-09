@@ -6,7 +6,6 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
   convertDecimalToNativeInteger,
-  convertDecimalToNativeLotSize,
   convertNativeIntegerToDecimal,
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
@@ -19,7 +18,6 @@ import {
   collectRiskMaps,
 } from "./risk-utils";
 
-import * as anchor from "@zetamarkets/anchor";
 import cloneDeep from "lodash.clonedeep";
 
 export class RiskCalculator {
@@ -88,7 +86,7 @@ export class RiskCalculator {
     size: number,
     marginType: types.MarginType
   ) {
-    if (marginRequirement === null) {
+    if (marginRequirement === null || marginRequirement === undefined) {
       return null;
     }
 
