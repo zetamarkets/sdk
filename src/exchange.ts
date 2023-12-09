@@ -691,13 +691,14 @@ export class Exchange {
   }
 
   public getSubExchange(asset: Asset): SubExchange {
-    try {
-      return this._subExchanges.get(asset);
-    } catch (_e) {
-      throw Error(
+    const subExchange = this._subExchanges.get(asset);
+    if (subExchange === undefined) {
+      throw new Error(
         `Failed to get subExchange for asset=${asset}, have you called Exchange.load()?`
       );
     }
+
+    return subExchange;
   }
 
   public getAllSubExchanges(): SubExchange[] {
