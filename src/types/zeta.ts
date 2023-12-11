@@ -4530,6 +4530,22 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializeMinLotsAndTickSizes",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editTriggerOrder",
       "accounts": [
         {
@@ -4540,6 +4556,11 @@ export type Zeta = {
         {
           "name": "triggerOrder",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -6818,11 +6839,47 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "minLotSizes",
+            "type": {
+              "array": [
+                "u16",
+                9
+              ]
+            }
+          },
+          {
+            "name": "minLotSizesPadding",
+            "type": {
+              "array": [
+                "u16",
+                16
+              ]
+            }
+          },
+          {
+            "name": "tickSizes",
+            "type": {
+              "array": [
+                "u16",
+                9
+              ]
+            }
+          },
+          {
+            "name": "tickSizesPadding",
+            "type": {
+              "array": [
+                "u16",
+                16
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                306
+                206
               ]
             }
           }
@@ -10242,6 +10299,11 @@ export type Zeta = {
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IncorrectLotSize",
+      "msg": "Incorrect lot size"
     }
   ]
 };
@@ -14778,6 +14840,22 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializeMinLotsAndTickSizes",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editTriggerOrder",
       "accounts": [
         {
@@ -14788,6 +14866,11 @@ export const IDL: Zeta = {
         {
           "name": "triggerOrder",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -17066,11 +17149,47 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "minLotSizes",
+            "type": {
+              "array": [
+                "u16",
+                9
+              ]
+            }
+          },
+          {
+            "name": "minLotSizesPadding",
+            "type": {
+              "array": [
+                "u16",
+                16
+              ]
+            }
+          },
+          {
+            "name": "tickSizes",
+            "type": {
+              "array": [
+                "u16",
+                9
+              ]
+            }
+          },
+          {
+            "name": "tickSizesPadding",
+            "type": {
+              "array": [
+                "u16",
+                16
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                306
+                206
               ]
             }
           }
@@ -20490,6 +20609,11 @@ export const IDL: Zeta = {
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IncorrectLotSize",
+      "msg": "Incorrect lot size"
     }
   ]
 };

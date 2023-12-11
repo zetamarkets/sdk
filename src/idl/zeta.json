@@ -4530,6 +4530,22 @@
       ]
     },
     {
+      "name": "initializeMinLotsAndTickSizes",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editTriggerOrder",
       "accounts": [
         {
@@ -4540,6 +4556,11 @@
         {
           "name": "triggerOrder",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -6818,11 +6839,47 @@
             "type": "publicKey"
           },
           {
+            "name": "minLotSizes",
+            "type": {
+              "array": [
+                "u16",
+                9
+              ]
+            }
+          },
+          {
+            "name": "minLotSizesPadding",
+            "type": {
+              "array": [
+                "u16",
+                16
+              ]
+            }
+          },
+          {
+            "name": "tickSizes",
+            "type": {
+              "array": [
+                "u16",
+                9
+              ]
+            }
+          },
+          {
+            "name": "tickSizesPadding",
+            "type": {
+              "array": [
+                "u16",
+                16
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                306
+                206
               ]
             }
           }
@@ -10242,6 +10299,11 @@
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IncorrectLotSize",
+      "msg": "Incorrect lot size"
     }
   ]
 }

@@ -728,6 +728,7 @@ export function editTriggerOrderIx(
     newReduceOnly,
     {
       accounts: {
+        state: Exchange.stateAddress,
         owner: owner,
         triggerOrder: triggerOrder,
       },
