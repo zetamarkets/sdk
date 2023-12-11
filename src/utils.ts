@@ -660,11 +660,11 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
 
 /**
  * Converts a decimal number to native fixed point integer of precision 6.
- * roundingFactor argument will round the result to the nearest <roundingFactor>. Default is TICK_SIZE.
+ * roundingFactor argument will round the result to the nearest <roundingFactor>. Default is 100.
  */
 export function convertDecimalToNativeInteger(
   amount: number,
-  roundingFactor: number = constants.TICK_SIZE
+  roundingFactor: number = 100
 ): number {
   return (
     parseInt(
@@ -725,9 +725,17 @@ export function convertNativeLotSizeToDecimal(amount: number): number {
  * Converts a native lot size where 1 unit = 0.001 lots to human readable decimal
  * @param amount
  */
-export function convertDecimalToNativeLotSize(amount: number): number {
-  return parseInt(
-    (amount * Math.pow(10, constants.POSITION_PRECISION)).toFixed(0)
+export function convertDecimalToNativeLotSize(
+  amount: number,
+  roundingFactor: number = 1
+): number {
+  return (
+    parseInt(
+      (
+        (amount * Math.pow(10, constants.POSITION_PRECISION)) /
+        roundingFactor
+      ).toFixed(0)
+    ) * roundingFactor
   );
 }
 
