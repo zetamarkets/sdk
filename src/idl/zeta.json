@@ -4530,6 +4530,60 @@
       ]
     },
     {
+      "name": "updateMinLot",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "minLotSize",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "updateTickSize",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "tickSize",
+          "type": "u16"
+        }
+      ]
+    },
+    {
       "name": "initializeMinLotsAndTickSizes",
       "accounts": [
         {
