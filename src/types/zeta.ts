@@ -9890,8 +9890,8 @@ export type Zeta = {
     },
     {
       "code": 6087,
-      "name": "FillOrKillNotFullSize",
-      "msg": "Fill or kill order was not filled for full size"
+      "name": "FillOrKillOrIOCNotFullSize",
+      "msg": "Fill or kill order / IOC was not filled for full size"
     },
     {
       "code": 6088,
@@ -20138,8 +20138,8 @@ export const IDL: Zeta = {
     },
     {
       "code": 6087,
-      "name": "FillOrKillNotFullSize",
-      "msg": "Fill or kill order was not filled for full size"
+      "name": "FillOrKillOrIOCNotFullSize",
+      "msg": "Fill or kill order / IOC was not filled for full size"
     },
     {
       "code": 6088,
