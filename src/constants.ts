@@ -353,10 +353,10 @@ export const STATIC_AND_PERPS_LUT: {
     },
   }),
   mainnet: new AddressLookupTableAccount({
-    key: new PublicKey("CMSgNNtpAMYQVGEnjSEu4os8r1m41VboxEyQaiHRGiyB"),
+    key: new PublicKey("9rv3bBKxv21KtJZZdW2SF9YzQFu1ZhJeWQvjDc7Eczwi"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 234473327,
+      lastExtendedSlot: 234750716,
       lastExtendedSlotStartIndex: 120,
       authority: new PublicKey("BR47Yncz7AKKD4f6NuP83yxb31YjvYvZuHApjEvtP8tu"),
       addresses: [
@@ -383,7 +383,7 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
         new PublicKey("11111111111111111111111111111111"),
-        new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
+        new PublicKey("D8UUgr8a3aR3yUeHLu7v8FWK7E8Y5sSU7qrYBXUJXBQ5"),
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("JE6d41JRokZAMUEAznV8JP4h7i6Ain6CyJrQuweRipFU"),
         new PublicKey("EaNR74nCjrYyNDsuoWmq19pH76QSd1nuTzvJSr3RDQ6x"),
