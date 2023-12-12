@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.15.3]
+
+- Override asset loading for devnet ([#320](https://github.com/zetamarkets/sdk/pull/320))
+
 ## [1.15.2]
 
 - Bugfix getMaxTradeSize being too conservative with positive uPnL ([#315](https://github.com/zetamarkets/sdk/pull/315))

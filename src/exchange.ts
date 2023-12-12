@@ -355,7 +355,7 @@ export class Exchange {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
-    this._assets = assets.allAssets();
+    this._assets = assets.allAssets(loadConfig.network);
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
       wallet instanceof types.DummyWallet ? null : wallet,
