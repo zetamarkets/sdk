@@ -4552,7 +4552,7 @@ export type Zeta = {
         },
         {
           "name": "minLotSize",
-          "type": "u16"
+          "type": "u32"
         }
       ]
     },
@@ -4579,7 +4579,7 @@ export type Zeta = {
         },
         {
           "name": "tickSize",
-          "type": "u16"
+          "type": "u32"
         }
       ]
     },
@@ -6896,7 +6896,7 @@ export type Zeta = {
             "name": "minLotSizes",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 9
               ]
             }
@@ -6905,7 +6905,7 @@ export type Zeta = {
             "name": "minLotSizesPadding",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 16
               ]
             }
@@ -6914,7 +6914,7 @@ export type Zeta = {
             "name": "tickSizes",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 9
               ]
             }
@@ -6923,7 +6923,7 @@ export type Zeta = {
             "name": "tickSizesPadding",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 16
               ]
             }
@@ -6933,7 +6933,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                206
+                106
               ]
             }
           }
@@ -14916,7 +14916,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "minLotSize",
-          "type": "u16"
+          "type": "u32"
         }
       ]
     },
@@ -14943,7 +14943,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "tickSize",
-          "type": "u16"
+          "type": "u32"
         }
       ]
     },
@@ -17260,7 +17260,7 @@ export const IDL: Zeta = {
             "name": "minLotSizes",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 9
               ]
             }
@@ -17269,7 +17269,7 @@ export const IDL: Zeta = {
             "name": "minLotSizesPadding",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 16
               ]
             }
@@ -17278,7 +17278,7 @@ export const IDL: Zeta = {
             "name": "tickSizes",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 9
               ]
             }
@@ -17287,7 +17287,7 @@ export const IDL: Zeta = {
             "name": "tickSizesPadding",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 16
               ]
             }
@@ -17297,7 +17297,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                206
+                106
               ]
             }
           }

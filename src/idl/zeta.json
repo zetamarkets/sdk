@@ -4552,7 +4552,7 @@
         },
         {
           "name": "minLotSize",
-          "type": "u16"
+          "type": "u32"
         }
       ]
     },
@@ -4579,7 +4579,7 @@
         },
         {
           "name": "tickSize",
-          "type": "u16"
+          "type": "u32"
         }
       ]
     },
@@ -6896,7 +6896,7 @@
             "name": "minLotSizes",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 9
               ]
             }
@@ -6905,7 +6905,7 @@
             "name": "minLotSizesPadding",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 16
               ]
             }
@@ -6914,7 +6914,7 @@
             "name": "tickSizes",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 9
               ]
             }
@@ -6923,7 +6923,7 @@
             "name": "tickSizesPadding",
             "type": {
               "array": [
-                "u16",
+                "u32",
                 16
               ]
             }
@@ -6933,7 +6933,7 @@
             "type": {
               "array": [
                 "u8",
-                206
+                106
               ]
             }
           }

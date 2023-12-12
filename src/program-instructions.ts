@@ -2214,6 +2214,51 @@ export function editDelegatedPubkeyIx(
   });
 }
 
+export function updateMinLotIx(
+  asset: Asset,
+  newMinLotSize: number,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateMinLot(
+    toProgramAsset(asset),
+    newMinLotSize,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateTickSizeIx(
+  asset: Asset,
+  newTickSize: number,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateTickSize(
+    toProgramAsset(asset),
+    newTickSize,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function initializeMinLotsAndTickSizes(
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeMinLotsAndTickSizes({
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+    },
+  });
+}
+
 export interface ExpireSeriesOverrideArgs {
   settlementNonce: number;
   settlementPrice: anchor.BN;
