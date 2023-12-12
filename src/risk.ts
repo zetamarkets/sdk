@@ -953,7 +953,7 @@ export class RiskCalculator {
       2 *
       Math.max(
         0,
-        state.balance /
+        Math.max(state.balance, state.availableBalanceInitial) /
           (init * Math.min(Exchange.getMarkPrice(tradeAsset), tradePrice))
       );
     if (sizeUpperBound == 0) {
@@ -1000,15 +1000,12 @@ export class RiskCalculator {
         size
       );
 
-      // TODO if this is slow then do only the necessary calcs manually, there's a bunch of extra calcs in here
-      // that aren't needed in getMaxTradeSize()
       let newState = this.getCrossMarginAccountState(editedAccount);
-      let equity = newState.balance - newState.unpaidFundingTotal;
-      let nonLeverageBuffer =
-        (equity +
-          Math.min(newState.unrealizedPnlTotal, 0) -
-          newState.initialMarginTotal) /
-        equity;
+      let equity =
+        newState.balance +
+        newState.unrealizedPnlTotal +
+        newState.unpaidFundingTotal;
+      let nonLeverageBuffer = (equity - newState.initialMarginTotal) / equity;
 
       let buffer =
         maxLeverage == -1
@@ -1035,9 +1032,7 @@ export class RiskCalculator {
             10 ** constants.POSITION_PRECISION
         );
       } else if (
-        (maxLeverage == -1 &&
-          newState.initialMarginTotal >
-            equity + Math.min(newState.unrealizedPnlTotal, 0)) ||
+        (maxLeverage == -1 && newState.initialMarginTotal > equity) ||
         (maxLeverage != -1 && buffer < 0) ||
         buffer > 1
       ) {
