@@ -710,7 +710,8 @@ export function editTriggerOrderIx(
   newOrderType: types.OrderType,
   newReduceOnly: boolean,
   owner: PublicKey,
-  triggerOrder: PublicKey
+  triggerOrder: PublicKey,
+  crossMarginAccount: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.editTriggerOrder(
     new anchor.BN(newOrderPrice),
@@ -731,6 +732,7 @@ export function editTriggerOrderIx(
         state: Exchange.stateAddress,
         owner: owner,
         triggerOrder: triggerOrder,
+        marginAccount: crossMarginAccount,
       },
     }
   );
