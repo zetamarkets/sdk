@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.16.0]
 
-- Add in IDL changes for tif order traversal. ([][])
+- Add in IDL changes for tif order traversal. ([#321](https://github.com/zetamarkets/sdk/pull/321]))
 
 ## [1.15.3]
 
