@@ -699,7 +699,7 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
  */
 export function convertDecimalToNativeInteger(
   amount: number,
-  roundingFactor: number = 100
+  roundingFactor: number = constants.MIN_NATIVE_TICK_SIZE
 ): number {
   return (
     parseInt(
@@ -762,7 +762,7 @@ export function convertNativeLotSizeToDecimal(amount: number): number {
  */
 export function convertDecimalToNativeLotSize(
   amount: number,
-  roundingFactor: number = 1
+  roundingFactor: number = constants.MIN_NATIVE_MIN_LOT_SIZE
 ): number {
   return (
     parseInt(
