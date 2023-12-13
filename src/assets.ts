@@ -3,6 +3,7 @@ import { objectEquals } from "./utils";
 import { Asset } from "./constants";
 
 import * as constants from "./constants";
+import { Network } from "./network";
 
 export function isValidType(asset: Asset): boolean {
   try {
@@ -22,13 +23,28 @@ export function isValidStr(asset: string): boolean {
   return true;
 }
 
-export function allAssets(): Asset[] {
+export function allAssets(network: Network = Network.MAINNET): Asset[] {
   let allAssets: Asset[] = [];
   for (var a in Asset) {
     if (typeof Asset[a] === "string" && a != "UNDEFINED") {
       allAssets.push(nameToAsset(a));
     }
   }
+
+  // Keep devnet assets constant for ease of development and testing
+  if (network == Network.DEVNET) {
+    return [
+      constants.Asset.SOL,
+      constants.Asset.BTC,
+      constants.Asset.ETH,
+      constants.Asset.ARB,
+      constants.Asset.APT,
+      constants.Asset.PYTH,
+      constants.Asset.BNB,
+      constants.Asset.TIA,
+    ];
+  }
+
   return allAssets;
 }
 

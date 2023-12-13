@@ -10361,6 +10361,11 @@ export type Zeta = {
     },
     {
       "code": 6158,
+      "name": "IOCInvalidTakerFillSize",
+      "msg": "IOC size_to_use doesn't match taker fill size"
+    },
+    {
+      "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
     }
@@ -20730,6 +20735,11 @@ export const IDL: Zeta = {
     },
     {
       "code": 6158,
+      "name": "IOCInvalidTakerFillSize",
+      "msg": "IOC size_to_use doesn't match taker fill size"
+    },
+    {
+      "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
     }
