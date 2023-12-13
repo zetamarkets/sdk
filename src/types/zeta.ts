@@ -4611,6 +4611,67 @@ export type Zeta = {
           "name": "triggerOrder",
           "isMut": true,
           "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrderV2",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "state",
@@ -14975,6 +15036,67 @@ export const IDL: Zeta = {
     },
     {
       "name": "editTriggerOrder",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrderV2",
       "accounts": [
         {
           "name": "owner",

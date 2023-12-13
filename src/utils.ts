@@ -56,26 +56,7 @@ export function getNativeTickSize(asset: Asset): number {
 }
 
 export function getDecimalMinLotSize(asset: Asset): number {
-  switch (asset) {
-    case Asset.SOL:
-      return 0.1;
-    case Asset.BTC:
-      return 0.001;
-    case Asset.ETH:
-      return 0.01;
-    case Asset.APT:
-      return 0.1;
-    case Asset.ARB:
-      return 1;
-    case Asset.PYTH:
-      return 1;
-    case Asset.BNB:
-      return 0.01;
-    case Asset.TIA:
-      return 0.1;
-    case Asset.JTO:
-      return 0.1;
-  }
+  return getNativeMinLotSize(asset) / 10 ** constants.POSITION_PRECISION;
 }
 
 export function getNativeMinLotSize(asset: Asset): number {
@@ -776,7 +757,7 @@ export function convertNativeLotSizeToDecimal(amount: number): number {
 }
 
 /**
- * Converts a native lot size where 1 unit = 0.001 lots to human readable decimal
+ * Converts a human readable decimal to a native lot size where 1 unit = 0.001 lots
  * @param amount
  */
 export function convertDecimalToNativeLotSize(

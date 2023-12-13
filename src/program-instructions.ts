@@ -713,7 +713,7 @@ export function editTriggerOrderIx(
   triggerOrder: PublicKey,
   crossMarginAccount: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.editTriggerOrder(
+  return Exchange.program.instruction.editTriggerOrderV2(
     new anchor.BN(newOrderPrice),
     newTriggerPrice == 0 ? null : new anchor.BN(newTriggerPrice),
     newTriggerDirection == types.TriggerDirection.UNINITIALIZED ||
