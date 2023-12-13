@@ -9890,8 +9890,8 @@ export type Zeta = {
     },
     {
       "code": 6087,
-      "name": "FillOrKillOrIOCNotFullSize",
-      "msg": "Fill or kill order / IOC was not filled for full size"
+      "name": "FillOrKillNotFullSize",
+      "msg": "Fill or kill order was not filled for full size"
     },
     {
       "code": 6088,
@@ -10242,6 +10242,11 @@ export type Zeta = {
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IOCInvalidTakerFillSize",
+      "msg": "IOC size_to_use doesn't match taker fill size"
     }
   ]
 };
@@ -20138,8 +20143,8 @@ export const IDL: Zeta = {
     },
     {
       "code": 6087,
-      "name": "FillOrKillOrIOCNotFullSize",
-      "msg": "Fill or kill order / IOC was not filled for full size"
+      "name": "FillOrKillNotFullSize",
+      "msg": "Fill or kill order was not filled for full size"
     },
     {
       "code": 6088,
@@ -20490,6 +20495,11 @@ export const IDL: Zeta = {
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IOCInvalidTakerFillSize",
+      "msg": "IOC size_to_use doesn't match taker fill size"
     }
   ]
 };
