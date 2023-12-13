@@ -10242,6 +10242,11 @@
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IOCInvalidTakerFillSize",
+      "msg": "IOC size_to_use doesn't match taker fill size"
     }
   ]
 }
