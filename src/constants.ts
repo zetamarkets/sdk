@@ -125,56 +125,6 @@ export const CRANK_PERP_ACCOUNT_LIMIT = 10;
 export const MAX_MARKETS_TO_FETCH = 50;
 export const MAX_ACCOUNTS_TO_FETCH = 99;
 
-export function getDecimalMinLotSize(asset: Asset): number {
-  switch (asset) {
-    case Asset.SOL:
-      return 0.1;
-    case Asset.BTC:
-      return 0.001;
-    case Asset.ETH:
-      return 0.01;
-    case Asset.APT:
-      return 0.1;
-    case Asset.ARB:
-      return 1;
-    case Asset.PYTH:
-      return 1;
-    case Asset.BNB:
-      return 0.01;
-    case Asset.TIA:
-      return 0.1;
-    case Asset.JTO:
-      return 0.1;
-  }
-}
-
-export function getNativeMinLotSize(asset: Asset): number {
-  switch (asset) {
-    case Asset.SOL:
-      return 100;
-    case Asset.BTC:
-      return 1;
-    case Asset.ETH:
-      return 10;
-    case Asset.APT:
-      return 100;
-    case Asset.ARB:
-      return 1000;
-    case Asset.PYTH:
-      return 1000;
-    case Asset.BNB:
-      return 10;
-    case Asset.TIA:
-      return 100;
-    case Asset.JTO:
-      return 100;
-  }
-}
-
-export function getAssetPrecision(asset: Asset): number {
-  return Math.log10(getNativeMinLotSize(asset));
-}
-
 export const PERP_MARKET_ORDER_SPOT_SLIPPAGE = 0.02;
 
 // This is the most we can load per iteration without

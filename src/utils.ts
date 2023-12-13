@@ -51,6 +51,60 @@ import cloneDeep from "lodash.clonedeep";
 import * as os from "os";
 import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
 
+export function getNativeTickSize(asset: Asset): number {
+  return 100;
+}
+
+export function getDecimalMinLotSize(asset: Asset): number {
+  switch (asset) {
+    case Asset.SOL:
+      return 0.1;
+    case Asset.BTC:
+      return 0.001;
+    case Asset.ETH:
+      return 0.01;
+    case Asset.APT:
+      return 0.1;
+    case Asset.ARB:
+      return 1;
+    case Asset.PYTH:
+      return 1;
+    case Asset.BNB:
+      return 0.01;
+    case Asset.TIA:
+      return 0.1;
+    case Asset.JTO:
+      return 0.1;
+  }
+}
+
+export function getNativeMinLotSize(asset: Asset): number {
+  switch (asset) {
+    case Asset.SOL:
+      return 100;
+    case Asset.BTC:
+      return 1;
+    case Asset.ETH:
+      return 10;
+    case Asset.APT:
+      return 100;
+    case Asset.ARB:
+      return 1000;
+    case Asset.PYTH:
+      return 1000;
+    case Asset.BNB:
+      return 10;
+    case Asset.TIA:
+      return 100;
+    case Asset.JTO:
+      return 100;
+  }
+}
+
+export function getAssetPrecision(asset: Asset): number {
+  return Math.log10(getNativeMinLotSize(asset));
+}
+
 export function getState(programId: PublicKey): [PublicKey, number] {
   return anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from(anchor.utils.bytes.utf8.encode("state"))],
@@ -1811,7 +1865,7 @@ export const checkLiquidity = (
   orderbook?: types.DepthOrderbook
 ): types.LiquidityCheckInfo => {
   // We default to min lot size to still show a price
-  const fillSize = size || constants.getDecimalMinLotSize(asset);
+  const fillSize = size || getDecimalMinLotSize(asset);
 
   slippage ??= constants.PERP_MARKET_ORDER_SPOT_SLIPPAGE;
   orderbook ??= Exchange.getOrderbook(asset);
