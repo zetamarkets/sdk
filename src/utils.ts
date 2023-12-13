@@ -1811,7 +1811,7 @@ export const checkLiquidity = (
   orderbook?: types.DepthOrderbook
 ): types.LiquidityCheckInfo => {
   // We default to min lot size to still show a price
-  const fillSize = size || constants.MIN_LOT_SIZE;
+  const fillSize = size || constants.getDecimalMinLotSize(asset);
 
   slippage ??= constants.PERP_MARKET_ORDER_SPOT_SLIPPAGE;
   orderbook ??= Exchange.getOrderbook(asset);
