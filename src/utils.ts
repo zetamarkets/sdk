@@ -52,7 +52,7 @@ import * as os from "os";
 import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
 
 export function getNativeTickSize(asset: Asset): number {
-  return 100;
+  return Exchange.state.tickSizes[assets.assetToIndex(asset)];
 }
 
 export function getDecimalMinLotSize(asset: Asset): number {
