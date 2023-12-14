@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.16.1]
+
+- Remove leverage clamp in getMaxTradeSize([#322](https://github.com/zetamarkets/sdk/pull/322))
+
 ## [1.16.0]
 
 - Add in IDL changes for tif order traversal. ([#321](https://github.com/zetamarkets/sdk/pull/321]))
