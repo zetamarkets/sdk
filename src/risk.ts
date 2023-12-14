@@ -840,21 +840,6 @@ export class RiskCalculator {
     bufferPercent: number = 5,
     maxIterations: number = 100
   ): number {
-    // Cap max leverage to 0 < maxLeverage < maxAssetLeverage
-    // Also don't cap leverage if not a taker trade, because leverage only counts positions
-    if (maxLeverage <= 0 || !isTaker) {
-      maxLeverage = -1;
-    }
-    if (maxLeverage != -1) {
-      let maxAssetLeverage =
-        100 /
-        convertNativeBNToDecimal(
-          Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
-            .futureMarginInitial
-        );
-      maxLeverage = Math.min(maxLeverage, maxAssetLeverage);
-    }
-
     if (thresholdPercent <= 0) {
       throw Error("thresholdPercent must be > 0");
     }
