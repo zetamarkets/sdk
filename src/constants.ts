@@ -125,7 +125,8 @@ export const CRANK_PERP_ACCOUNT_LIMIT = 10;
 export const MAX_MARKETS_TO_FETCH = 50;
 export const MAX_ACCOUNTS_TO_FETCH = 99;
 
-export const MIN_LOT_SIZE = 0.001;
+export const MIN_NATIVE_MIN_LOT_SIZE = 1;
+export const MIN_NATIVE_TICK_SIZE = 100;
 export const PERP_MARKET_ORDER_SPOT_SLIPPAGE = 0.02;
 
 // This is the most we can load per iteration without
@@ -213,7 +214,6 @@ export const PLATFORM_PRECISION = 6;
 export const PRICING_PRECISION = 12;
 export const MARGIN_PRECISION = 8;
 export const POSITION_PRECISION = 3;
-export const TICK_SIZE = 100;
 
 export const DEFAULT_ORDER_TAG = "SDK";
 

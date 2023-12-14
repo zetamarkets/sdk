@@ -1462,7 +1462,8 @@ export class CrossClient {
         newOrderType,
         newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         this._provider.wallet.publicKey,
-        triggerAccount
+        triggerAccount,
+        this._accountAddress
       )
     );
     let txSig = await utils.processTransaction(
