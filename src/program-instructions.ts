@@ -710,9 +710,10 @@ export function editTriggerOrderIx(
   newOrderType: types.OrderType,
   newReduceOnly: boolean,
   owner: PublicKey,
-  triggerOrder: PublicKey
+  triggerOrder: PublicKey,
+  crossMarginAccount: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.editTriggerOrder(
+  return Exchange.program.instruction.editTriggerOrderV2(
     new anchor.BN(newOrderPrice),
     newTriggerPrice == 0 ? null : new anchor.BN(newTriggerPrice),
     newTriggerDirection == types.TriggerDirection.UNINITIALIZED ||
@@ -728,8 +729,10 @@ export function editTriggerOrderIx(
     newReduceOnly,
     {
       accounts: {
+        state: Exchange.stateAddress,
         owner: owner,
         triggerOrder: triggerOrder,
+        marginAccount: crossMarginAccount,
       },
     }
   );
@@ -2209,6 +2212,51 @@ export function editDelegatedPubkeyIx(
     accounts: {
       marginAccount: account,
       authority,
+    },
+  });
+}
+
+export function updateMinLotIx(
+  asset: Asset,
+  newMinLotSize: number,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateMinLot(
+    toProgramAsset(asset),
+    newMinLotSize,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateTickSizeIx(
+  asset: Asset,
+  newTickSize: number,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateTickSize(
+    toProgramAsset(asset),
+    newTickSize,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function initializeMinLotsAndTickSizes(
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeMinLotsAndTickSizes({
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
     },
   });
 }

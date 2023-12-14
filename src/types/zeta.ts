@@ -4530,6 +4530,76 @@ export type Zeta = {
       ]
     },
     {
+      "name": "updateMinLot",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "minLotSize",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "updateTickSize",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "tickSize",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "initializeMinLotsAndTickSizes",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editTriggerOrder",
       "accounts": [
         {
@@ -4540,6 +4610,77 @@ export type Zeta = {
         {
           "name": "triggerOrder",
           "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrderV2",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -6818,11 +6959,47 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "minLotSizes",
+            "type": {
+              "array": [
+                "u32",
+                9
+              ]
+            }
+          },
+          {
+            "name": "minLotSizesPadding",
+            "type": {
+              "array": [
+                "u32",
+                16
+              ]
+            }
+          },
+          {
+            "name": "tickSizes",
+            "type": {
+              "array": [
+                "u32",
+                9
+              ]
+            }
+          },
+          {
+            "name": "tickSizesPadding",
+            "type": {
+              "array": [
+                "u32",
+                16
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                306
+                106
               ]
             }
           }
@@ -10242,6 +10419,16 @@ export type Zeta = {
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IOCInvalidTakerFillSize",
+      "msg": "IOC size_to_use doesn't match taker fill size"
+    },
+    {
+      "code": 6159,
+      "name": "IncorrectLotSize",
+      "msg": "Incorrect lot size"
     }
   ]
 };
@@ -14778,6 +14965,76 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "updateMinLot",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "minLotSize",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "updateTickSize",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "tickSize",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "initializeMinLotsAndTickSizes",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editTriggerOrder",
       "accounts": [
         {
@@ -14788,6 +15045,77 @@ export const IDL: Zeta = {
         {
           "name": "triggerOrder",
           "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrderV2",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -17066,11 +17394,47 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "minLotSizes",
+            "type": {
+              "array": [
+                "u32",
+                9
+              ]
+            }
+          },
+          {
+            "name": "minLotSizesPadding",
+            "type": {
+              "array": [
+                "u32",
+                16
+              ]
+            }
+          },
+          {
+            "name": "tickSizes",
+            "type": {
+              "array": [
+                "u32",
+                9
+              ]
+            }
+          },
+          {
+            "name": "tickSizesPadding",
+            "type": {
+              "array": [
+                "u32",
+                16
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                306
+                106
               ]
             }
           }
@@ -20490,6 +20854,16 @@ export const IDL: Zeta = {
       "code": 6157,
       "name": "InvalidLiquidatorAuthority",
       "msg": "Invalid liquidator authority"
+    },
+    {
+      "code": 6158,
+      "name": "IOCInvalidTakerFillSize",
+      "msg": "IOC size_to_use doesn't match taker fill size"
+    },
+    {
+      "code": 6159,
+      "name": "IncorrectLotSize",
+      "msg": "Incorrect lot size"
     }
   ]
 };
