@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.15.4]
+
+- Remove leverage clamp in getMaxTradeSize([#322](https://github.com/zetamarkets/sdk/pull/322))
+
 ## [1.15.3]
 
 - Override asset loading for devnet ([#320](https://github.com/zetamarkets/sdk/pull/320))
