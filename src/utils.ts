@@ -1325,6 +1325,13 @@ export async function pruneExpiredTIFOrders(asset: Asset) {
   return processTransaction(Exchange.provider, tx);
 }
 
+export async function pruneExpiredTIFOrdersV2(asset: Asset, limit: number) {
+  let tx = new Transaction().add(
+    instructions.pruneExpiredTIFOrdersIxV2(asset, limit)
+  );
+  return processTransaction(Exchange.provider, tx);
+}
+
 export function getMutMarketAccounts(asset: Asset): Object[] {
   let market = Exchange.getPerpMarket(asset);
   return [

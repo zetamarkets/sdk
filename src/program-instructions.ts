@@ -802,6 +802,24 @@ export function cancelOrderNoErrorIx(
   );
 }
 
+export function pruneExpiredTIFOrdersIxV2(
+  asset: Asset,
+  limit: number
+): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
+  return Exchange.program.instruction.pruneExpiredTifOrdersV2(limit, {
+    accounts: {
+      dexProgram: constants.DEX_PID[Exchange.network],
+      state: Exchange.stateAddress,
+      serumAuthority: Exchange.serumAuthority,
+      market: marketData.address,
+      bids: marketData.serumMarket.bidsAddress,
+      asks: marketData.serumMarket.asksAddress,
+      eventQueue: marketData.serumMarket.eventQueueAddress,
+    },
+  });
+}
+
 export function pruneExpiredTIFOrdersIx(asset: Asset): TransactionInstruction {
   let marketData = Exchange.getPerpMarket(asset);
   return Exchange.program.instruction.pruneExpiredTifOrders({
