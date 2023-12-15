@@ -4679,7 +4679,7 @@
       "name": "cancelTriggerOrderV2",
       "accounts": [
         {
-          "name": "payer",
+          "name": "authority",
           "isMut": true,
           "isSigner": true
         },

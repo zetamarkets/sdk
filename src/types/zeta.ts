@@ -4679,7 +4679,7 @@ export type Zeta = {
       "name": "cancelTriggerOrderV2",
       "accounts": [
         {
-          "name": "payer",
+          "name": "authority",
           "isMut": true,
           "isSigner": true
         },
@@ -15368,7 +15368,7 @@ export const IDL: Zeta = {
       "name": "cancelTriggerOrderV2",
       "accounts": [
         {
-          "name": "payer",
+          "name": "authority",
           "isMut": true,
           "isSigner": true
         },

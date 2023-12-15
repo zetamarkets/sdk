@@ -740,13 +740,13 @@ export function executeTriggerOrderIx(
 }
 export function cancelTriggerOrderV2Ix(
   triggerOrderBit: number,
-  payer: PublicKey,
+  authority: PublicKey,
   triggerOrder: PublicKey,
   marginAccount: PublicKey
 ): TransactionInstruction {
   return Exchange.program.instruction.cancelTriggerOrderV2(triggerOrderBit, {
     accounts: {
-      payer: payer,
+      authority: authority,
       triggerOrder: triggerOrder,
       marginAccount: marginAccount,
     },
