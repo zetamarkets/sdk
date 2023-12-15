@@ -631,6 +631,60 @@ export function placeTriggerOrderIx(
     }
   );
 }
+export function executeTriggerOrderV2Ix(
+  asset: Asset,
+  side: types.Side,
+  triggerOrderBit: number,
+  triggerOrder: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  payer: PublicKey
+): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
+
+  return Exchange.program.instruction.executeTriggerOrderV2(triggerOrderBit, {
+    accounts: {
+      payer: payer,
+      triggerOrder: triggerOrder,
+      placeOrderAccounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        marginAccount: marginAccount,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        tokenProgram: TOKEN_PROGRAM_ID,
+        serumAuthority: Exchange.serumAuthority,
+        openOrders: openOrders,
+        rent: SYSVAR_RENT_PUBKEY,
+        marketAccounts: {
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
+          // User params.
+          orderPayerTokenAccount:
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
+          coinWallet: marketData.baseVault,
+          pcWallet: marketData.quoteVault,
+        },
+        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+        oracleBackupFeed:
+          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+        oracleBackupProgram: constants.CHAINLINK_PID,
+        marketMint:
+          side == types.Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
+        mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
+      },
+    },
+  });
+}
 export function executeTriggerOrderIx(
   asset: Asset,
   side: types.Side,
@@ -681,6 +735,20 @@ export function executeTriggerOrderIx(
         mintAuthority: Exchange.mintAuthority,
         perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
       },
+    },
+  });
+}
+export function cancelTriggerOrderV2Ix(
+  triggerOrderBit: number,
+  authority: PublicKey,
+  triggerOrder: PublicKey,
+  marginAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.cancelTriggerOrderV2(triggerOrderBit, {
+    accounts: {
+      authority: authority,
+      triggerOrder: triggerOrder,
+      marginAccount: marginAccount,
     },
   });
 }

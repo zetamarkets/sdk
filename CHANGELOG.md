@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.16.3]
+
+- New trigger order ixs ([#324](https://github.com/zetamarkets/sdk/pull/324))
+
 ## [1.16.2]
 
 - Prune orders v2. ([#323](https://github.com/zetamarkets/sdk/pull/323))
