@@ -74,7 +74,7 @@ export function calculatePerpMargin(
   let assetIndex = assets.assetToIndex(asset);
   let initial =
     spotPrice *
-    Math.min(
+    Math.max(
       convertNativeBNToDecimal(
         Exchange.pricing.marginParameters[assetIndex].futureMarginInitial,
         constants.MARGIN_PRECISION
