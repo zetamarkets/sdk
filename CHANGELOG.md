@@ -12,6 +12,8 @@ Version changes are pinned to SDK releases.
 ## [1.16.1]
 
 - Remove leverage clamp in getMaxTradeSize ([#322](https://github.com/zetamarkets/sdk/pull/322))
+- Prune orders v2. ([#323](https://github.com/zetamarkets/sdk/pull/323))
+
 
 ## [1.16.0]
 
