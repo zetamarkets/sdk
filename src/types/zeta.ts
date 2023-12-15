@@ -4343,6 +4343,157 @@ export type Zeta = {
       ]
     },
     {
+      "name": "executeTriggerOrderV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "placeOrderAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rent",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketAccounts",
+              "accounts": [
+                {
+                  "name": "market",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "requestQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "eventQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "bids",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "asks",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "orderPayerTokenAccount",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinWallet",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcWallet",
+                  "isMut": true,
+                  "isSigner": false
+                }
+              ]
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupFeed",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketMint",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "mintAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpSyncQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "executeTriggerOrder",
       "accounts": [
         {
@@ -4484,6 +4635,63 @@ export type Zeta = {
               "isSigner": false
             }
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "forceCancelTriggerOrder",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "cancelTriggerOrderV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -5212,6 +5420,52 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "pruneExpiredTifOrdersV2",
+      "accounts": [
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "limit",
+          "type": "u16"
+        }
+      ]
     },
     {
       "name": "forceCancelOrderByOrderIdV2",
@@ -14778,6 +15032,157 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "executeTriggerOrderV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "placeOrderAccounts",
+          "accounts": [
+            {
+              "name": "state",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "pricing",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marginAccount",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "serumAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "rent",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketAccounts",
+              "accounts": [
+                {
+                  "name": "market",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "requestQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "eventQueue",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "bids",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "asks",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "orderPayerTokenAccount",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcVault",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "coinWallet",
+                  "isMut": true,
+                  "isSigner": false
+                },
+                {
+                  "name": "pcWallet",
+                  "isMut": true,
+                  "isSigner": false
+                }
+              ]
+            },
+            {
+              "name": "oracle",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupFeed",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "oracleBackupProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "marketMint",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "mintAuthority",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "perpSyncQueue",
+              "isMut": true,
+              "isSigner": false
+            }
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "executeTriggerOrder",
       "accounts": [
         {
@@ -14919,6 +15324,63 @@ export const IDL: Zeta = {
               "isSigner": false
             }
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "forceCancelTriggerOrder",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "cancelTriggerOrderV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -15647,6 +16109,52 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "pruneExpiredTifOrdersV2",
+      "accounts": [
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "limit",
+          "type": "u16"
+        }
+      ]
     },
     {
       "name": "forceCancelOrderByOrderIdV2",

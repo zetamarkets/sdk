@@ -1697,16 +1697,18 @@ export async function executeTriggerOrder(
   triggerOrderBit: number,
   triggerOrder: PublicKey,
   marginAccount: PublicKey,
-  openOrders: PublicKey
+  openOrders: PublicKey,
+  payer: PublicKey
 ) {
   let tx = new Transaction().add(
-    instructions.executeTriggerOrderIx(
+    instructions.executeTriggerOrderV2Ix(
       asset,
       side,
       triggerOrderBit,
       triggerOrder,
       marginAccount,
-      openOrders
+      openOrders,
+      payer
     )
   );
 
