@@ -5,15 +5,17 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.16.2]
+## [1.16.3]
 
 - New trigger order ixs ([#324](https://github.com/zetamarkets/sdk/pull/324))
 
-## [1.16.1]
+## [1.16.2]
 
-- Remove leverage clamp in getMaxTradeSize ([#322](https://github.com/zetamarkets/sdk/pull/322))
 - Prune orders v2. ([#323](https://github.com/zetamarkets/sdk/pull/323))
 
+## [1.16.1]
+
+- Remove leverage clamp in getMaxTradeSize. ([#322](https://github.com/zetamarkets/sdk/pull/322))
 
 ## [1.16.0]
 
