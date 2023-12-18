@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.16.4]
+
+- Temporary override for margin reqs until backend deploys leverage drop ([#325](https://github.com/zetamarkets/sdk/pull/325))
+
 ## [1.16.3]
 
 - New trigger order ixs ([#324](https://github.com/zetamarkets/sdk/pull/324))
