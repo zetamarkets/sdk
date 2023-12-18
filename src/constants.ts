@@ -125,7 +125,8 @@ export const CRANK_PERP_ACCOUNT_LIMIT = 10;
 export const MAX_MARKETS_TO_FETCH = 50;
 export const MAX_ACCOUNTS_TO_FETCH = 99;
 
-export const MIN_LOT_SIZE = 0.001;
+export const MIN_NATIVE_MIN_LOT_SIZE = 1;
+export const MIN_NATIVE_TICK_SIZE = 100;
 export const PERP_MARKET_ORDER_SPOT_SLIPPAGE = 0.02;
 
 // This is the most we can load per iteration without
@@ -213,7 +214,6 @@ export const PLATFORM_PRECISION = 6;
 export const PRICING_PRECISION = 12;
 export const MARGIN_PRECISION = 8;
 export const POSITION_PRECISION = 3;
-export const TICK_SIZE = 100;
 
 export const DEFAULT_ORDER_TAG = "SDK";
 
@@ -225,7 +225,8 @@ export const ASK_ORDERS_INDEX = 1;
 
 export const MAX_TOTAL_SPREAD_ACCOUNT_CONTRACTS = 100_000_000;
 
-export const DEFAULT_MICRO_LAMPORTS_PER_CU_FEE = 1000;
+export const DEFAULT_MICRO_LAMPORTS_PER_CU_FEE = 1_000;
+export const PRIO_FEE_UPPER_LIMIT = 100_000;
 
 export const STATIC_AND_PERPS_LUT: {
   devnet: AddressLookupTableAccount;
@@ -354,10 +355,10 @@ export const STATIC_AND_PERPS_LUT: {
     },
   }),
   mainnet: new AddressLookupTableAccount({
-    key: new PublicKey("CMSgNNtpAMYQVGEnjSEu4os8r1m41VboxEyQaiHRGiyB"),
+    key: new PublicKey("9rv3bBKxv21KtJZZdW2SF9YzQFu1ZhJeWQvjDc7Eczwi"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 234473327,
+      lastExtendedSlot: 234750716,
       lastExtendedSlotStartIndex: 120,
       authority: new PublicKey("BR47Yncz7AKKD4f6NuP83yxb31YjvYvZuHApjEvtP8tu"),
       addresses: [
@@ -384,7 +385,7 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
         new PublicKey("11111111111111111111111111111111"),
-        new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
+        new PublicKey("D8UUgr8a3aR3yUeHLu7v8FWK7E8Y5sSU7qrYBXUJXBQ5"),
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("JE6d41JRokZAMUEAznV8JP4h7i6Ain6CyJrQuweRipFU"),
         new PublicKey("EaNR74nCjrYyNDsuoWmq19pH76QSd1nuTzvJSr3RDQ6x"),

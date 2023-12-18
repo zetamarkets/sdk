@@ -37,6 +37,10 @@ export interface State {
   haltStates: Array<HaltStateV2>;
   haltStatesPadding: Array<HaltStateV2>;
   triggerAdmin: PublicKey;
+  minLotSizes: Array<number>;
+  minLotSizesPadding: Array<number>;
+  tickSizes: Array<number>;
+  tickSizesPadding: Array<number>;
   padding: Array<number>;
 }
 
