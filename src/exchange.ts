@@ -735,7 +735,7 @@ export class Exchange {
         .map((obj) => obj.prioritizationFee); // Take a list of prioritizationFee values only
 
       let num = this._autoPriorityFeeUseMax
-        ? utils.max(fees)
+        ? Math.max(...fees)
         : utils.median(fees);
 
       let numScaled =

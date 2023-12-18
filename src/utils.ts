@@ -1843,17 +1843,6 @@ export function median(arr: number[]): number | undefined {
   return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
 }
 
-export function max(arr: number[]): number | undefined {
-  if (!arr.length) return undefined;
-  let max = arr[0];
-  for (var a of arr) {
-    if (a > max) {
-      max = a;
-    }
-  }
-  return max;
-}
-
 export const checkLiquidity = (
   size: number,
   asset: Asset,
