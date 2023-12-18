@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.16.5]
+
+- Better auto priority fees ([#326](https://github.com/zetamarkets/sdk/pull/326))
+
 ## [1.16.4]
 
 - Temporary override for margin reqs until backend deploys leverage drop ([#325](https://github.com/zetamarkets/sdk/pull/325))
