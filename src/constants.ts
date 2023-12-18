@@ -225,7 +225,8 @@ export const ASK_ORDERS_INDEX = 1;
 
 export const MAX_TOTAL_SPREAD_ACCOUNT_CONTRACTS = 100_000_000;
 
-export const DEFAULT_MICRO_LAMPORTS_PER_CU_FEE = 1000;
+export const DEFAULT_MICRO_LAMPORTS_PER_CU_FEE = 1_000;
+export const PRIO_FEE_UPPER_LIMIT = 100_000;
 
 export const STATIC_AND_PERPS_LUT: {
   devnet: AddressLookupTableAccount;
