@@ -820,12 +820,12 @@ export class RiskCalculator {
    * @param marginAccount The user's CrossMarginAccount itself
    * @param tradeAsset The asset being traded
    * @param tradeSide The side (bid/ask) being traded
-   * @param tradePrice The price the user wishes to execute at, in decimal USDC.
+   * @param tradePrice The price the user wishes to execute at, in decimal USDC. If tradePrice is <= 0, getMaxTradeSize returns undefined.
    * @param isTaker Whether the full size is expected to trade or not. Only set this to true if the orderbook is deep enough as it may result in less conservative values.
    * @param thresholdPercent The ratio of availableBalanceInitial/balance at which we decide a size is close enough to the maximum and can return
    * @param bufferPercent An added buffer on top of the final result, so that quick price movements don't immediately make you hit leverage limits
    * @param maxIterations The maximum amount of iterations for the binary search when finding a good size
-   * @returns size in decimal, strictly >= 0
+   * @returns size in decimal, strictly >= 0. If tradePrice is <= 0, this returns undefined.
    */
   public getMaxTradeSize(
     marginAccount: CrossMarginAccount,
@@ -838,6 +838,9 @@ export class RiskCalculator {
     bufferPercent: number = 5,
     maxIterations: number = 100
   ): number {
+    if (tradePrice <= 0) {
+      return undefined;
+    }
     // Don't cap leverage if not a taker trade, because leverage only counts positions
     if (maxLeverage <= 0 || !isTaker) {
       maxLeverage = -1;
