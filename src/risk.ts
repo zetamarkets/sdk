@@ -838,6 +838,9 @@ export class RiskCalculator {
     bufferPercent: number = 5,
     maxIterations: number = 100
   ): number {
+    if (tradePrice <= 0) {
+      return undefined;
+    }
     // Don't cap leverage if not a taker trade, because leverage only counts positions
     if (maxLeverage <= 0 || !isTaker) {
       maxLeverage = -1;
