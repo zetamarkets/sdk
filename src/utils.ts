@@ -848,11 +848,17 @@ export function defaultCommitment(): ConfirmOptions {
 }
 
 export function commitmentConfig(commitment: Commitment): ConfirmOptions {
-  return {
+  let opts = {
     skipPreflight: false,
     preflightCommitment: commitment,
     commitment,
   };
+
+  if (Exchange.maxRpcRetries != undefined) {
+    opts["maxRetries"] = Exchange.maxRpcRetries;
+  }
+
+  return opts;
 }
 
 export async function getTradeEventsFromTx(
