@@ -60,26 +60,8 @@ export function getDecimalMinLotSize(asset: Asset): number {
 }
 
 export function getNativeMinLotSize(asset: Asset): number {
-  switch (asset) {
-    case Asset.SOL:
-      return 100;
-    case Asset.BTC:
-      return 1;
-    case Asset.ETH:
-      return 10;
-    case Asset.APT:
-      return 100;
-    case Asset.ARB:
-      return 1000;
-    case Asset.PYTH:
-      return 1000;
-    case Asset.BNB:
-      return 10;
-    case Asset.TIA:
-      return 100;
-    case Asset.JTO:
-      return 100;
-  }
+  let assetIndex = assets.assetToIndex(asset);
+  return Exchange.state.minLotSizes[assetIndex];
 }
 
 export function getState(programId: PublicKey): [PublicKey, number] {
