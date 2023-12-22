@@ -848,11 +848,17 @@ export function defaultCommitment(): ConfirmOptions {
 }
 
 export function commitmentConfig(commitment: Commitment): ConfirmOptions {
-  return {
+  let opts = {
     skipPreflight: false,
     preflightCommitment: commitment,
     commitment,
   };
+
+  if (Exchange.maxRpcRetries != undefined) {
+    opts["maxRetries"] = Exchange.maxRpcRetries;
+  }
+
+  return opts;
 }
 
 export async function getTradeEventsFromTx(
@@ -1510,21 +1516,34 @@ export async function getAllOpenOrdersAccounts(
 
 export async function settleAndBurnVaultTokens(
   asset: Asset,
-  provider: anchor.AnchorProvider
+  provider: anchor.AnchorProvider,
+  accountLimit: number = 100
 ) {
-  let openOrders = await getAllOpenOrdersAccounts(asset);
+  let openOrdersRaw = await getAllOpenOrdersAccounts(asset);
+  // Randomly sort so that if we have an accountLimit we don't keep grabbing the same N accounts every time
+  let openOrdersRandSort = openOrdersRaw.sort(() => Math.random() - 0.5);
 
   let openOrdersFiltered = [];
-  for (var i = 0; i < openOrders.length; i += constants.MAX_ACCOUNTS_TO_FETCH) {
+  for (
+    var i = 0;
+    i < openOrdersRandSort.length;
+    i += constants.MAX_ACCOUNTS_TO_FETCH
+  ) {
+    if (openOrdersFiltered.length >= accountLimit) {
+      break;
+    }
     let ooBatch = await Exchange.connection.getMultipleAccountsInfo(
-      openOrders.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH),
+      openOrdersRandSort.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH),
       provider.connection.commitment
     );
 
     for (var j = 0; j < ooBatch.length; j++) {
+      if (openOrdersFiltered.length >= accountLimit) {
+        break;
+      }
       const decoded = _OPEN_ORDERS_LAYOUT_V2.decode(ooBatch[j].data);
       let openOrdersAccount = new OpenOrders(
-        openOrders[i + j],
+        openOrdersRandSort[i + j],
         decoded,
         Exchange.programId
       );
@@ -1535,7 +1554,7 @@ export async function settleAndBurnVaultTokens(
         openOrdersAccount.quoteTokenFree.toNumber() != 0 ||
         openOrdersAccount.quoteTokenTotal.toNumber() != 0
       ) {
-        openOrdersFiltered.push(openOrders[i + j]);
+        openOrdersFiltered.push(openOrdersRandSort[i + j]);
       }
     }
   }
@@ -1560,10 +1579,15 @@ export async function settleAndBurnVaultTokens(
   );
 
   for (var j = 0; j < txs.length; j += 5) {
+    console.log("Settle tx num =", j);
     let txSlice = txs.slice(j, j + 5);
     await Promise.all(
       txSlice.map(async (tx) => {
-        await processTransaction(provider, tx);
+        try {
+          await processTransaction(provider, tx);
+        } catch (e) {
+          console.log("Settle failed, continuing...");
+        }
       })
     );
   }

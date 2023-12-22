@@ -837,7 +837,7 @@ export class RiskCalculator {
     thresholdPercent: number = 1,
     bufferPercent: number = 5,
     maxIterations: number = 100
-  ): number {
+  ): number | undefined {
     if (tradePrice <= 0) {
       return undefined;
     }
