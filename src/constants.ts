@@ -11,6 +11,7 @@ export enum Asset {
   PYTH = "PYTH",
   TIA = "TIA",
   JTO = "JTO",
+  ONEMBONK = "ONEMBONK",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -40,6 +41,9 @@ export const FLEX_MINTS = {
     [Asset.PYTH]: new PublicKey("5PK1Ty2ac1Un6zY11Em7qF4FAYBgUu5y8Pt8ZtbepGnF"),
     [Asset.TIA]: new PublicKey("3U2JttPo1k5xsapjuvQJQnH3Kj8D5HegF3PKoPReJ4JU"),
     [Asset.JTO]: new PublicKey("5x1KCouXo8Hwtsypsd8K3AaXT1Zs7WNNdKEJafuatey6"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "LF8rzt8WSzMuH3E4pfryGvSWMc1jDponXdQHkzL2cGo"
+    ),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -53,6 +57,9 @@ export const FLEX_MINTS = {
     [Asset.PYTH]: new PublicKey("BjZmtqBVKY1oUSUjgq9PBQWJPyWbcWTXYbQ1oWxa9NYp"),
     [Asset.TIA]: new PublicKey("DmBnRoEiwGCud2C8X6h67ZLVhq6GyTm2NDRXvRz6uWYE"),
     [Asset.JTO]: new PublicKey("71jxAnng6EMHYZzXEBoRZUnnhd8iyoAoc1soUgPDMt9e"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "76x829V8cNWymEBNjUuE22bUcVnShNeRwnXnegviejyj"
+    ),
   },
 };
 
@@ -153,6 +160,9 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.PYTH]: new PublicKey("5kkS7RmNdcECCMcgJ4gz4sCSFqnFozQeSNb3YhtZrhYx"),
     [Asset.TIA]: new PublicKey("FwZ5ZzkcWseaCKcu5iVWT5Ru29FDReARyiA6BaSSB5RH"),
     [Asset.JTO]: new PublicKey("EZg2yWshcvHikVk6KDw6vEsbbPtKPfTx537Fz4hhSmsc"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "G6PKiDSNpyeFRM6iLyZWXTP4U8sKejdEHpDGEXJxTpdP"
+    ),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -174,6 +184,9 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.PYTH]: new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
     [Asset.TIA]: new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
     [Asset.JTO]: new PublicKey("D8UUgr8a3aR3yUeHLu7v8FWK7E8Y5sSU7qrYBXUJXBQ5"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "8ihFLu5FimgTQ1Unh4dVyEHUGodJ5gJQCrQf4KUVB9bN"
+    ),
   },
 };
 
