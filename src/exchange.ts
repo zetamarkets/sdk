@@ -342,6 +342,10 @@ export class Exchange {
     this._autoPriorityFeeUseMax = !this._autoPriorityFeeUseMax;
   }
 
+  public setAutoPriorityFeeUseMax(useMax: boolean) {
+    this._autoPriorityFeeUseMax = useMax;
+  }
+
   public updatePriorityFee(microLamportsPerCU: number) {
     this._priorityFee = microLamportsPerCU;
   }
