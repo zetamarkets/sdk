@@ -288,6 +288,8 @@ export class Exchange {
     this._ledgerWallet = wallet;
   }
 
+  public maxRpcRetries: number | undefined = undefined;
+
   // Handy map to grab zetagroup asset by pubkey without an RPC fetch
   // or having to manually filter all zetaGroups
   public zetaGroupPubkeyToAsset(key: PublicKey): Asset {

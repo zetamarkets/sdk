@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.16.8]
+
+- Robustness improvements around RPCs and cranking ([#330](https://github.com/zetamarkets/sdk/pull/330))
+- Add user to placeOrderEvent ([#328](https://github.com/zetamarkets/sdk/pull/328))
+
 ## [1.16.7]
 
 - Return undefined from getMaxTradeSize if price is 0 ([#327](https://github.com/zetamarkets/sdk/pull/327))

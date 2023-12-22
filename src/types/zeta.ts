@@ -9712,6 +9712,11 @@ export type Zeta = {
           "name": "clientOrderId",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
@@ -20403,6 +20408,11 @@ export const IDL: Zeta = {
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
           "index": false
         }
       ]
