@@ -9709,6 +9709,11 @@
           "name": "clientOrderId",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
