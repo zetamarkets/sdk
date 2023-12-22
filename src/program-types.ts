@@ -341,6 +341,7 @@ export interface PlaceOrderEvent {
   asset: any;
   marginAccount: PublicKey;
   clientOrderId: anchor.BN;
+  user: PublicKey;
 }
 
 /**

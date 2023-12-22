@@ -996,13 +996,13 @@ export type Zeta = {
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -1017,13 +1017,13 @@ export type Zeta = {
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -1059,13 +1059,13 @@ export type Zeta = {
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -9708,6 +9708,11 @@ export type Zeta = {
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
           "index": false
         }
       ]
@@ -11685,13 +11690,13 @@ export const IDL: Zeta = {
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -11706,13 +11711,13 @@ export const IDL: Zeta = {
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -11748,13 +11753,13 @@ export const IDL: Zeta = {
         },
         {
           "name": "admin",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
           "name": "newAdmin",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -20397,6 +20402,11 @@ export const IDL: Zeta = {
         {
           "name": "clientOrderId",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
           "index": false
         }
       ]
