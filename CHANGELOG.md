@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- Add instruction to update maker fee percentage. ([#334](https://github.com/zetamarkets/sdk/pull/334))
+
 ## [1.16.8]
 
 - Robustness improvements around RPCs and cranking ([#330](https://github.com/zetamarkets/sdk/pull/330))
