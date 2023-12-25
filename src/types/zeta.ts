@@ -6333,6 +6333,34 @@ export type Zeta = {
       ]
     },
     {
+      "name": "editMaType",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "maType",
+          "type": {
+            "defined": "MarginAccountType"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -9419,6 +9447,12 @@ export type Zeta = {
           },
           {
             "name": "MarketMaker"
+          },
+          {
+            "name": "T1"
+          },
+          {
+            "name": "MarketMakerT1"
           }
         ]
       }
@@ -17027,6 +17061,34 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "editMaType",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "maType",
+          "type": {
+            "defined": "MarginAccountType"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -20113,6 +20175,12 @@ export const IDL: Zeta = {
           },
           {
             "name": "MarketMaker"
+          },
+          {
+            "name": "T1"
+          },
+          {
+            "name": "MarketMakerT1"
           }
         ]
       }

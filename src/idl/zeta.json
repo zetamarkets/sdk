@@ -6333,6 +6333,34 @@
       ]
     },
     {
+      "name": "editMaType",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "maType",
+          "type": {
+            "defined": "MarginAccountType"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -9419,6 +9447,12 @@
           },
           {
             "name": "MarketMaker"
+          },
+          {
+            "name": "T1"
+          },
+          {
+            "name": "MarketMakerT1"
           }
         ]
       }
