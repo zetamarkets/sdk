@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.16.9]
+
+- New set utils in Exchange ([#328](https://github.com/zetamarkets/sdk/pull/332))
+
 ## [1.16.8]
 
 - Robustness improvements around RPCs and cranking ([#330](https://github.com/zetamarkets/sdk/pull/330))
