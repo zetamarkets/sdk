@@ -4,8 +4,8 @@ import {
   CrossClient,
   Exchange,
   programTypes,
+  assets,
 } from "@zetamarkets/sdk";
-import { asset } from "./liquidator";
 
 export async function findAccountsAtRisk(
   accounts: anchor.ProgramAccount[]
@@ -16,19 +16,20 @@ export async function findAccountsAtRisk(
       if (account.account == null) {
         return;
       }
-      let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
-        account.account as programTypes.MarginAccount
-      );
+      let marginAccountState =
+        Exchange.riskCalculator.getCrossMarginAccountState(
+          account.account as programTypes.CrossMarginAccount
+        );
       if (marginAccountState.availableBalanceInitial >= 0) {
         return;
       }
       console.log(
         `[ACCOUNT_AT_RISK] [ACCOUNT]: ${account.publicKey.toString()} [BALANCE]: ${
           marginAccountState.balance
-        } [INITIAL] ${marginAccountState.initialMargin} [MAINTENANCE]: ${
-          marginAccountState.maintenanceMargin
+        } [INITIAL] ${marginAccountState.initialMarginTotal} [MAINTENANCE]: ${
+          marginAccountState.maintenanceMarginTotal
         } [UNREALIZED PNL] ${
-          marginAccountState.unrealizedPnl
+          marginAccountState.unrealizedPnlTotal
         } [AVAILABLE BALANCE INITIAL] ${
           marginAccountState.availableBalanceInitial
         } [AVAILABLE BALANCE MAINTENANCE] ${
@@ -51,9 +52,10 @@ export async function findLiquidatableAccounts(
         return;
       }
 
-      let marginAccountState = Exchange.riskCalculator.getMarginAccountState(
-        account.account as programTypes.MarginAccount
-      );
+      let marginAccountState =
+        Exchange.riskCalculator.getCrossMarginAccountState(
+          account.account as programTypes.CrossMarginAccount
+        );
 
       // We assume the accounts passed in have had their open orders cancelled.
       // Therefore can just use availableBalanceLiquidation which assumes 0 open orders.
@@ -79,19 +81,24 @@ export async function cancelAllActiveOrders(
 ) {
   await Promise.all(
     accountsAtRisk.map(async (programAccount) => {
-      let marginAccount = programAccount.account as programTypes.MarginAccount;
+      let marginAccount =
+        programAccount.account as programTypes.CrossMarginAccount;
       // If they have any active orders, we can cancel.
-      let position = marginAccount.perpProductLedger.orderState;
-      if (
-        position.openingOrders[0].toNumber() != 0 ||
-        position.openingOrders[1].toNumber() != 0 ||
-        position.closingOrders.toNumber() != 0
-      ) {
-        console.log("[FORCE_CANCEL] " + programAccount.publicKey.toString());
-        try {
-          await client.forceCancelOrders(asset, programAccount.publicKey);
-        } catch (e) {
-          console.log(e);
+
+      for (var asset of Exchange.assets) {
+        let position =
+          marginAccount.productLedgers[assets.assetToIndex(asset)].orderState;
+        if (
+          position.openingOrders[0].toNumber() != 0 ||
+          position.openingOrders[1].toNumber() != 0 ||
+          position.closingOrders.toNumber() != 0
+        ) {
+          console.log("[FORCE_CANCEL] " + programAccount.publicKey.toString());
+          try {
+            await client.forceCancelOrders(asset, programAccount.publicKey);
+          } catch (e) {
+            console.log(e);
+          }
         }
       }
     })
@@ -105,47 +112,53 @@ export async function liquidateAccounts(
 ) {
   for (var i = 0; i < accounts.length; i++) {
     const liquidateeMarginAccount = accounts[i]
-      .account as programTypes.MarginAccount;
+      .account as programTypes.CrossMarginAccount;
     const liquidateeKey = accounts[i].publicKey;
 
-    const position =
-      liquidateeMarginAccount.perpProductLedger.position.size.toNumber();
+    // If an account is underwater then we can liquidate any position
+    for (var asset of Exchange.assets) {
+      const position =
+        liquidateeMarginAccount.productLedgers[
+          assets.assetToIndex(asset)
+        ].position.size.toNumber();
 
-    if (position == 0) {
-      continue;
-    }
+      if (position == 0) {
+        continue;
+      }
 
-    // Get latest state for your margin account.
-    await client.updateState();
-    let clientState = Exchange.riskCalculator.getCrossMarginAccountState(
-      client.account
-    );
+      // Get latest state for your margin account.
+      await client.updateState();
+      let clientState = Exchange.riskCalculator.getCrossMarginAccountState(
+        client.account
+      );
 
-    let marginConstrainedSize = calculateMaxLiquidationNativeSize(
-      clientState.availableBalanceInitial,
-      position > 0
-    );
+      let marginConstrainedSize = calculateMaxLiquidationNativeSize(
+        asset,
+        clientState.availableBalanceInitial,
+        position > 0
+      );
 
-    const size = Math.min(marginConstrainedSize, Math.abs(position));
-    const side = position > 0 ? "Bid" : "Ask";
+      const size = Math.min(marginConstrainedSize, Math.abs(position));
+      const side = position > 0 ? "Bid" : "Ask";
 
-    console.log(
-      "[LIQUIDATE] " +
-        liquidateeKey.toString() +
-        " [SIDE] " +
-        side +
-        " [AMOUNT] " +
-        size +
-        " [MAX CAPACITY WITH MARGIN] " +
-        marginConstrainedSize +
-        " [AVAILABLE SIZE] " +
-        Math.abs(position)
-    );
-    try {
-      let txId = await client.liquidate(asset, liquidateeKey, size);
-      console.log(`TX ID: ${txId}`);
-    } catch (e) {
-      console.log(e);
+      console.log(
+        "[LIQUIDATE] " +
+          liquidateeKey.toString() +
+          " [SIDE] " +
+          side +
+          " [AMOUNT] " +
+          size +
+          " [MAX CAPACITY WITH MARGIN] " +
+          marginConstrainedSize +
+          " [AVAILABLE SIZE] " +
+          Math.abs(position)
+      );
+      try {
+        let txId = await client.liquidate(asset, liquidateeKey, size);
+        console.log(`TX ID: ${txId}`);
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 }
@@ -157,14 +170,21 @@ export async function liquidateAccounts(
  * @returns native lot size given liquidator available balance.
  */
 export function calculateMaxLiquidationNativeSize(
+  asset: constants.Asset,
   availableMargin: number,
   long: boolean
 ): number {
   // Initial margin requirement per contract in decimals.
   // We use this so you are not at margin requirement limits after liquidation.
+
+  let marginRequirements =
+    Exchange.riskCalculator.getPerpMarginRequirements(asset);
+
   let initialMarginRequirement = long
-    ? Exchange.riskCalculator.getPerpMarginRequirements(asset).initialLong
-    : Exchange.riskCalculator.getPerpMarginRequirements(asset).initialShort;
+    ? marginRequirements.initialLong
+    : marginRequirements.initialShort;
+
+  console.log(asset, availableMargin, initialMarginRequirement);
 
   return parseInt(
     (
