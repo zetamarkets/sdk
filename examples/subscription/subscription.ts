@@ -48,12 +48,12 @@ async function main() {
     undefined
   );
 
-  subscription.subscribeProgramAccounts<programTypes.MarginAccount>(
-    constants.Asset.SOL,
-    types.ProgramAccountType.MarginAccount,
+  subscription.subscribeProgramAccounts<programTypes.CrossMarginAccount>(
+    types.ProgramAccountType.CrossMarginAccount,
     async (
-      data: subscription.AccountSubscriptionData<programTypes.MarginAccount>
+      data: subscription.AccountSubscriptionData<programTypes.CrossMarginAccount>
     ) => {
+      // Here you can filter for only accounts you care about (such as your own)
       console.log(data);
     }
   );
