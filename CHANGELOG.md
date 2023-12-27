@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.16.10]
+
+- Retry blockhash in utils.processTransaction() ([#335](https://github.com/zetamarkets/sdk/pull/335))
+
 ## [1.16.9]
 
 - New set utils in Exchange ([#328](https://github.com/zetamarkets/sdk/pull/332))
