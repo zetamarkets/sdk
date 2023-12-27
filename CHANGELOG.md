@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.17.0]
+
+- New asset ONEMBONK (BONK x 1 million) ([#333](https://github.com/zetamarkets/sdk/pull/333))
+
 ## [1.16.9]
 
 - New set utils in Exchange ([#328](https://github.com/zetamarkets/sdk/pull/332))
