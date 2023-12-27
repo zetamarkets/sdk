@@ -949,11 +949,30 @@ export async function processTransaction(
     );
   }
 
-  let recentBlockhash =
-    blockhash ??
-    (await provider.connection.getLatestBlockhash(
-      Exchange.blockhashCommitment
-    ));
+  let recentBlockhash;
+  let blockhashRetryAmount = 0;
+  while (blockhashRetryAmount < 3) {
+    try {
+      recentBlockhash =
+        blockhash ??
+        (await provider.connection.getLatestBlockhash(
+          Exchange.blockhashCommitment
+        ));
+    } catch (e) {
+      if (blockhashRetryAmount < 3) {
+        blockhashRetryAmount += 1;
+        console.warn(
+          `Failed to getLatestBlockhash. Retrying... (retryCount = ${blockhashRetryAmount})`
+        );
+        continue;
+      } else {
+        throw "getLatestBlockhash failed";
+      }
+    }
+
+    // Successful blockhash fetch
+    break;
+  }
 
   if (lutAccs) {
     if (useLedger) {
