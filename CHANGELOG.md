@@ -7,6 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.17.1]
 
+- Example cleanup. ([#336](https://github.com/zetamarkets/sdk/pull/336))
 - Fetch min lot sizes from state. ([#331](https://github.com/zetamarkets/sdk/pull/331))
 
 ## [1.17.0]
