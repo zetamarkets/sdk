@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.17.1]
+
+- Fetch min lot sizes from state. ([#331](https://github.com/zetamarkets/sdk/pull/331))
+
 ## [1.17.0]
 
 - New asset ONEMBONK (BONK x 1 million) ([#333](https://github.com/zetamarkets/sdk/pull/333))
