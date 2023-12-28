@@ -11,6 +11,7 @@ export enum Asset {
   PYTH = "PYTH",
   TIA = "TIA",
   JTO = "JTO",
+  ONEMBONK = "ONEMBONK",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -40,6 +41,9 @@ export const FLEX_MINTS = {
     [Asset.PYTH]: new PublicKey("5PK1Ty2ac1Un6zY11Em7qF4FAYBgUu5y8Pt8ZtbepGnF"),
     [Asset.TIA]: new PublicKey("3U2JttPo1k5xsapjuvQJQnH3Kj8D5HegF3PKoPReJ4JU"),
     [Asset.JTO]: new PublicKey("5x1KCouXo8Hwtsypsd8K3AaXT1Zs7WNNdKEJafuatey6"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "LF8rzt8WSzMuH3E4pfryGvSWMc1jDponXdQHkzL2cGo"
+    ),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -53,6 +57,9 @@ export const FLEX_MINTS = {
     [Asset.PYTH]: new PublicKey("BjZmtqBVKY1oUSUjgq9PBQWJPyWbcWTXYbQ1oWxa9NYp"),
     [Asset.TIA]: new PublicKey("DmBnRoEiwGCud2C8X6h67ZLVhq6GyTm2NDRXvRz6uWYE"),
     [Asset.JTO]: new PublicKey("71jxAnng6EMHYZzXEBoRZUnnhd8iyoAoc1soUgPDMt9e"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "76x829V8cNWymEBNjUuE22bUcVnShNeRwnXnegviejyj"
+    ),
   },
 };
 
@@ -153,6 +160,9 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.PYTH]: new PublicKey("5kkS7RmNdcECCMcgJ4gz4sCSFqnFozQeSNb3YhtZrhYx"),
     [Asset.TIA]: new PublicKey("FwZ5ZzkcWseaCKcu5iVWT5Ru29FDReARyiA6BaSSB5RH"),
     [Asset.JTO]: new PublicKey("EZg2yWshcvHikVk6KDw6vEsbbPtKPfTx537Fz4hhSmsc"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "G6PKiDSNpyeFRM6iLyZWXTP4U8sKejdEHpDGEXJxTpdP"
+    ),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -174,6 +184,9 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.PYTH]: new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
     [Asset.TIA]: new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
     [Asset.JTO]: new PublicKey("D8UUgr8a3aR3yUeHLu7v8FWK7E8Y5sSU7qrYBXUJXBQ5"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "8ihFLu5FimgTQ1Unh4dVyEHUGodJ5gJQCrQf4KUVB9bN"
+    ),
   },
 };
 
@@ -355,10 +368,10 @@ export const STATIC_AND_PERPS_LUT: {
     },
   }),
   mainnet: new AddressLookupTableAccount({
-    key: new PublicKey("9rv3bBKxv21KtJZZdW2SF9YzQFu1ZhJeWQvjDc7Eczwi"),
+    key: new PublicKey("7d6GkpUXXDBBXBwwwjSVWh1H3r7g68QQY8NUcfU1JAi9"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 234750716,
+      lastExtendedSlot: 238285984,
       lastExtendedSlotStartIndex: 120,
       authority: new PublicKey("BR47Yncz7AKKD4f6NuP83yxb31YjvYvZuHApjEvtP8tu"),
       addresses: [
@@ -386,6 +399,8 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("D8UUgr8a3aR3yUeHLu7v8FWK7E8Y5sSU7qrYBXUJXBQ5"),
+        new PublicKey("11111111111111111111111111111111"),
+        new PublicKey("8ihFLu5FimgTQ1Unh4dVyEHUGodJ5gJQCrQf4KUVB9bN"),
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("JE6d41JRokZAMUEAznV8JP4h7i6Ain6CyJrQuweRipFU"),
         new PublicKey("EaNR74nCjrYyNDsuoWmq19pH76QSd1nuTzvJSr3RDQ6x"),
@@ -486,6 +501,17 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("BaiBruf847DKccBnGtfNgMm6mjHeXoYs64ZoFK5uuV6Z"),
         new PublicKey("GZycSPLqxhZuQYmv5wWjdwK4v3T1WStBpGxYem691vMG"),
         new PublicKey("Avy1abPkJKJdadFVieTuF8oeN6ZFWsKNtKzU1a8tgn6Z"),
+        new PublicKey("Dy7j5mY3nxud8bow34MBUPhZqXutJRPjzEiXyNeiSMdD"),
+        new PublicKey("CgUMT14wR6WHX9mKMS5BWtd4tk39hRxbxtNRvp4BdMHf"),
+        new PublicKey("5Kdbu8k9hPU8fhAcszN2HYZdq5MHspV3y9ZKHA3t39ko"),
+        new PublicKey("4EVR1QadXD8SQeEnzkVv2BUfJaYoM7iPcGziiuAgWPhi"),
+        new PublicKey("CSh9paLCAfvE853RYQUtkCLqtBao87RX9FcxirK3pdX7"),
+        new PublicKey("gn46ys7QKtWqQAW2MsuSV475AcFGn7gdNnSCLgw71DL"),
+        new PublicKey("HTN3dEduTUp2VuFgo885BJ3KTp8WrPrZgEPiCVg2cVtD"),
+        new PublicKey("JDRP3wxczYJ265fGUKXc26ZuDaHgp12CnSbPupsRvQUT"),
+        new PublicKey("ETUAXwjeEEprVToJbMzB3vBJfLpEPxKzexdgmkMXuEk7"),
+        new PublicKey("J7yjhCLdftzL95kGetry8pyX4eXn4Tjjh7KoWo599Sry"),
+        new PublicKey("GdAX1L7jNsMmfN3kcCijk774aE2UtARV8frTozeUWT2E"),
       ],
     },
   }),
