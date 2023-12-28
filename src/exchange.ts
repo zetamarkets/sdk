@@ -288,6 +288,8 @@ export class Exchange {
     this._ledgerWallet = wallet;
   }
 
+  public maxRpcRetries: number | undefined = undefined;
+
   // Handy map to grab zetagroup asset by pubkey without an RPC fetch
   // or having to manually filter all zetaGroups
   public zetaGroupPubkeyToAsset(key: PublicKey): Asset {
@@ -327,6 +329,10 @@ export class Exchange {
   }
   private _blockhashCommitment: Commitment = "finalized";
 
+  public setUseAutoPriorityFee(useAutoPriorityFee: boolean) {
+    this._useAutoPriorityFee = useAutoPriorityFee;
+  }
+
   public toggleAutoPriorityFee() {
     this._useAutoPriorityFee = !this._useAutoPriorityFee;
   }
@@ -338,6 +344,10 @@ export class Exchange {
 
   public toggleAutoPriorityFeeUseMax() {
     this._autoPriorityFeeUseMax = !this._autoPriorityFeeUseMax;
+  }
+
+  public setAutoPriorityFeeUseMax(useMax: boolean) {
+    this._autoPriorityFeeUseMax = useMax;
   }
 
   public updatePriorityFee(microLamportsPerCU: number) {

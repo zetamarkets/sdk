@@ -36,13 +36,6 @@ export class Oracle {
     return Date.now() / 1000 - this.getPrice(asset).lastUpdatedTime;
   }
 
-  // Allows fetching of any pyth oracle price.
-  public async fetchPrice(oracleKey: PublicKey): Promise<number> {
-    let accountInfo = await this._connection.getAccountInfo(oracleKey);
-    let priceData = parsePythData(accountInfo.data);
-    return priceData.price;
-  }
-
   // Fetch and update an oracle price manually
   public async pollPrice(
     asset: Asset,
@@ -54,7 +47,7 @@ export class Oracle {
 
     let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
     let accountInfo = await this._connection.getAccountInfo(priceAddress);
-    let priceData = parsePythData(accountInfo.data);
+    let priceData = parsePythData(accountInfo.data, asset);
     let oracleData = {
       asset,
       price: priceData.price,
@@ -85,7 +78,7 @@ export class Oracle {
         let subscriptionId = this._connection.onAccountChange(
           priceAddress,
           (accountInfo: AccountInfo<Buffer>, context: Context) => {
-            let priceData = parsePythData(accountInfo.data);
+            let priceData = parsePythData(accountInfo.data, asset);
             let currPrice = this._data.get(asset);
             if (
               currPrice !== undefined &&
