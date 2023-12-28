@@ -61,7 +61,10 @@ export function getDecimalMinLotSize(asset: Asset): number {
 
 export function getNativeMinLotSize(asset: Asset): number {
   let assetIndex = assets.assetToIndex(asset);
-  return Exchange.state.minLotSizes[assetIndex];
+  if (Exchange.state != undefined) {
+    return Exchange.state.minLotSizes[assetIndex];
+  }
+  return 1000;
 }
 
 export function getState(programId: PublicKey): [PublicKey, number] {
