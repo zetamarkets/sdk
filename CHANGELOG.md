@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+## [1.17.2]
+
+- BONK constants ([#337](https://github.com/zetamarkets/sdk/pull/337))
+
 ## [1.17.1]
 
 - Example cleanup. ([#336](https://github.com/zetamarkets/sdk/pull/336))
