@@ -223,8 +223,12 @@ For examples sake, we want to see the orderbook for SOL perps
 
 ```ts
 const asset = constants.Asset.SOL;
-await Exchange.updateOrderbook(asset);
+
+// Orderbook updates automatically using websockets
 console.log(Exchange.getOrderbook(asset));
+
+// You can also forcefully poll the orderbook account for an update, although websockets should be sufficient
+Exchange.getPerpMarket(asset).forceFetchOrderbook();
 ```
 
 ```ts
@@ -557,25 +561,6 @@ This was to ensure that:
 You can change this via setting `Exchange.pollInterval`.
 
 This will poll `Pricing` and zeta `State` accounts.
-
-### Market orderbook polling
-
-Users can elect to poll markets at a certain frequency too. This has a default poll interval of `constants.DEFAULT_MARKET_POLL_INTERVAL`. (5 seconds).
-
-You can change this via `Exchange.getZetaGroupMarkets(asset).pollInterval`.
-
-Users have to subscribe to a market index for polling to be done on it. This is because each market requires 2 RPC requests, so polling all markets can easily hit rate limits if not on a dedicated provider.
-
-```ts
-// Subscribe to a market index.
-Exchange.subscribeMarket(asset, index);
-
-// Unsubscribe to a market index.
-Exchange.unsubscribeMarket(asset, index);
-
-// Manually poll a market index.
-await Exchange.updateOrderbook(asset, index);
-```
 
 ### Client polling and throttle
 

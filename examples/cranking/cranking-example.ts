@@ -79,20 +79,19 @@ async function main() {
       : 30000
   );
 
-  // Crank all markets.
+  /**
+   * Cranks the serum dex event queue for each zeta market. This will process trades that consist of maker fills.
+   * All other events are atomically processed at time of call such as taker fills and cancels.
+   * Functionality here will keep track of markets that are currently being cranked, markets that have empty event queues
+   * as well as allowing specification of whether only live markets are being cranked.
+   * This will flush event queues completely upon call.
+   * This function will poll all market event queues asynchronously so is quite expensive in terms of RPC requests per second.
+   * Use crankExchangeThrottle if you are running into rate limit issues.
+   */
   setInterval(
     async function () {
       assetList.map(async (asset) => {
-        await crankExchange(asset);
-        // Use this instead of `crankExchange` if you wish to throttle your cranking.
-        /*
-      await crankExchangeThrottled(
-        asset,
-        process.env.CRANK_EXCHANGE_THROTTLE_MS
-          ? parseInt(process.env.CRANK_EXCHANGE_THROTTLE_MS)
-          : 1000
-      );
-      */
+        await utils.crankMarket(asset);
       });
     },
     process.env.CRANK_EXCHANGE_INTERVAL
@@ -159,98 +158,6 @@ async function updatePricing() {
       }
     })
   );
-}
-
-/**
- * Cranks the serum dex event queue for each zeta market. This will process trades that consist of maker fills.
- * All other events are atomically processed at time of call such as taker fills and cancels.
- * Functionality here will keep track of markets that are currently being cranked, markets that have empty event queues
- * as well as allowing specification of whether only live markets are being cranked.
- * This will flush event queues completely upon call.
- * This function will poll all market event queues asynchronously so is quite expensive in terms of RPC requests per second.
- * Use crankExchangeThrottle if you are running into rate limit issues.
- */
-async function crankExchange(asset: constants.Asset) {
-  let market = Exchange.getPerpMarket(asset);
-  let eventQueue = await market.serumMarket.loadEventQueue(
-    Exchange.provider.connection
-  );
-
-  if (eventQueue.length > 0 && !crankingMarkets[market.marketIndex]) {
-    crankingMarkets[market.marketIndex] = true;
-    try {
-      while (eventQueue.length != 0) {
-        try {
-          await utils.crankMarket(asset);
-        } catch (e) {
-          console.error(
-            `Cranking failed on market ${market.marketIndex}, ${e}`
-          );
-        }
-
-        let currLength = eventQueue.length;
-
-        eventQueue = await market.serumMarket.loadEventQueue(
-          Exchange.provider.connection
-        );
-
-        let numCranked = currLength - eventQueue.length;
-        console.log(
-          `[${assets.assetToName(
-            asset
-          )}] Cranked ${numCranked} events for market ${market.marketIndex}`
-        );
-      }
-    } catch (e) {
-      console.error(`${e}`);
-    }
-    crankingMarkets[market.marketIndex] = false;
-  }
-}
-
-/**
- * Iteratively cranks each market event queue.
- * Allows an optional argument for `throttleMs` which is the duration it will sleep after each market crank.
- */
-async function crankExchangeThrottled(
-  asset: constants.Asset,
-  throttleMs: number
-) {
-  let market = Exchange.getPerpMarket(asset);
-  let eventQueue = await market.serumMarket.loadEventQueue(
-    Exchange.provider.connection
-  );
-  if (eventQueue.length > 0 && !crankingMarkets[market.marketIndex]) {
-    crankingMarkets[market.marketIndex] = true;
-    try {
-      while (eventQueue.length != 0) {
-        try {
-          await utils.crankMarket(asset);
-        } catch (e) {
-          console.error(
-            `Cranking failed on market ${market.marketIndex}, ${e}`
-          );
-        }
-
-        let currLength = eventQueue.length;
-
-        eventQueue = await market.serumMarket.loadEventQueue(
-          Exchange.provider.connection
-        );
-
-        let numCranked = currLength - eventQueue.length;
-        console.log(
-          `[${assets.assetToName(
-            asset
-          )}] Cranked ${numCranked} events for market ${market.marketIndex}`
-        );
-      }
-    } catch (e) {
-      console.error(`${e}`);
-    }
-    crankingMarkets[market.marketIndex] = false;
-    await sleep(throttleMs);
-  }
 }
 
 async function applyFunding() {
