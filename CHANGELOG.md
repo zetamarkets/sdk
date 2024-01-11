@@ -5,8 +5,6 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.18.0]
-
 - Add post only front order type.
 
 ## [1.17.2]
@@ -88,7 +86,6 @@ Version changes are pinned to SDK releases.
 
 - Filter nonzero open orders accounts before sending burn txs. ([#310](https://github.com/zetamarkets/sdk/pull/310))
 - Add open orders account to orderbook object. ([#308](https://github.com/zetamarkets/sdk/pull/308))
->>>>>>> origin/main
 
 ## [1.13.3]
 
