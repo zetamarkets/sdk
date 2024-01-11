@@ -6,7 +6,6 @@ import {
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
   convertDecimalToNativeInteger,
-  convertDecimalToNativeLotSize,
   convertNativeIntegerToDecimal,
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
@@ -19,7 +18,6 @@ import {
   collectRiskMaps,
 } from "./risk-utils";
 
-import * as anchor from "@zetamarkets/anchor";
 import cloneDeep from "lodash.clonedeep";
 
 export class RiskCalculator {
@@ -88,7 +86,7 @@ export class RiskCalculator {
     size: number,
     marginType: types.MarginType
   ) {
-    if (marginRequirement === null) {
+    if (marginRequirement === null || marginRequirement === undefined) {
       return null;
     }
 
@@ -822,12 +820,12 @@ export class RiskCalculator {
    * @param marginAccount The user's CrossMarginAccount itself
    * @param tradeAsset The asset being traded
    * @param tradeSide The side (bid/ask) being traded
-   * @param tradePrice The price the user wishes to execute at, in decimal USDC.
+   * @param tradePrice The price the user wishes to execute at, in decimal USDC. If tradePrice is <= 0, getMaxTradeSize returns undefined.
    * @param isTaker Whether the full size is expected to trade or not. Only set this to true if the orderbook is deep enough as it may result in less conservative values.
    * @param thresholdPercent The ratio of availableBalanceInitial/balance at which we decide a size is close enough to the maximum and can return
    * @param bufferPercent An added buffer on top of the final result, so that quick price movements don't immediately make you hit leverage limits
    * @param maxIterations The maximum amount of iterations for the binary search when finding a good size
-   * @returns size in decimal, strictly >= 0
+   * @returns size in decimal, strictly >= 0. If tradePrice is <= 0, this returns undefined.
    */
   public getMaxTradeSize(
     marginAccount: CrossMarginAccount,
@@ -839,22 +837,14 @@ export class RiskCalculator {
     thresholdPercent: number = 1,
     bufferPercent: number = 5,
     maxIterations: number = 100
-  ): number {
-    // Cap max leverage to 0 < maxLeverage < maxAssetLeverage
-    // Also don't cap leverage if not a taker trade, because leverage only counts positions
+  ): number | undefined {
+    if (tradePrice <= 0) {
+      return undefined;
+    }
+    // Don't cap leverage if not a taker trade, because leverage only counts positions
     if (maxLeverage <= 0 || !isTaker) {
       maxLeverage = -1;
     }
-    if (maxLeverage != -1) {
-      let maxAssetLeverage =
-        100 /
-        convertNativeBNToDecimal(
-          Exchange.pricing.marginParameters[assets.assetToIndex(tradeAsset)]
-            .futureMarginInitial
-        );
-      maxLeverage = Math.min(maxLeverage, maxAssetLeverage);
-    }
-
     if (thresholdPercent <= 0) {
       throw Error("thresholdPercent must be > 0");
     }
@@ -953,7 +943,7 @@ export class RiskCalculator {
       2 *
       Math.max(
         0,
-        state.balance /
+        Math.max(state.balance, state.availableBalanceInitial) /
           (init * Math.min(Exchange.getMarkPrice(tradeAsset), tradePrice))
       );
     if (sizeUpperBound == 0) {
@@ -1000,15 +990,12 @@ export class RiskCalculator {
         size
       );
 
-      // TODO if this is slow then do only the necessary calcs manually, there's a bunch of extra calcs in here
-      // that aren't needed in getMaxTradeSize()
       let newState = this.getCrossMarginAccountState(editedAccount);
-      let equity = newState.balance - newState.unpaidFundingTotal;
-      let nonLeverageBuffer =
-        (equity +
-          Math.min(newState.unrealizedPnlTotal, 0) -
-          newState.initialMarginTotal) /
-        equity;
+      let equity =
+        newState.balance +
+        newState.unrealizedPnlTotal +
+        newState.unpaidFundingTotal;
+      let nonLeverageBuffer = (equity - newState.initialMarginTotal) / equity;
 
       let buffer =
         maxLeverage == -1
@@ -1035,9 +1022,7 @@ export class RiskCalculator {
             10 ** constants.POSITION_PRECISION
         );
       } else if (
-        (maxLeverage == -1 &&
-          newState.initialMarginTotal >
-            equity + Math.min(newState.unrealizedPnlTotal, 0)) ||
+        (maxLeverage == -1 && newState.initialMarginTotal > equity) ||
         (maxLeverage != -1 && buffer < 0) ||
         buffer > 1
       ) {

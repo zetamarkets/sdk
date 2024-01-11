@@ -5,9 +5,90 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
-## [1.14.0]
+## [1.18.0]
 
 - Add post only front order type.
+
+## [1.17.2]
+
+- BONK constants ([#337](https://github.com/zetamarkets/sdk/pull/337))
+
+## [1.17.1]
+
+- Example cleanup. ([#336](https://github.com/zetamarkets/sdk/pull/336))
+- Fetch min lot sizes from state. ([#331](https://github.com/zetamarkets/sdk/pull/331))
+
+## [1.17.0]
+
+- New asset ONEMBONK (BONK x 1 million) ([#333](https://github.com/zetamarkets/sdk/pull/333))
+
+## [1.16.9]
+
+- New set utils in Exchange ([#328](https://github.com/zetamarkets/sdk/pull/332))
+
+## [1.16.8]
+
+- Robustness improvements around RPCs and cranking ([#330](https://github.com/zetamarkets/sdk/pull/330))
+- Add user to placeOrderEvent ([#328](https://github.com/zetamarkets/sdk/pull/328))
+
+## [1.16.7]
+
+- Return undefined from getMaxTradeSize if price is 0 ([#327](https://github.com/zetamarkets/sdk/pull/327))
+
+## [1.16.6]
+
+- Fix two sentry errors ([#317](https://github.com/zetamarkets/sdk/pull/317))
+
+## [1.16.5]
+
+- Better auto priority fees ([#326](https://github.com/zetamarkets/sdk/pull/326))
+
+## [1.16.4]
+
+- Temporary override for margin reqs until backend deploys leverage drop ([#325](https://github.com/zetamarkets/sdk/pull/325))
+
+## [1.16.3]
+
+- New trigger order ixs ([#324](https://github.com/zetamarkets/sdk/pull/324))
+
+## [1.16.2]
+
+- Prune orders v2. ([#323](https://github.com/zetamarkets/sdk/pull/323))
+
+## [1.16.1]
+
+- Remove leverage clamp in getMaxTradeSize. ([#322](https://github.com/zetamarkets/sdk/pull/322))
+
+## [1.16.0]
+
+- Add in IDL changes for tif order traversal. ([#321](https://github.com/zetamarkets/sdk/pull/321]))
+- Min lot size changes. ([#318](https://github.com/zetamarkets/sdk/pull/318))
+
+## [1.15.3]
+
+- Override asset loading for devnet ([#320](https://github.com/zetamarkets/sdk/pull/320))
+
+## [1.15.2]
+
+- Bugfix getMaxTradeSize being too conservative with positive uPnL ([#315](https://github.com/zetamarkets/sdk/pull/315))
+
+## [1.15.1]
+
+- New asset $JTO. ([#316](https://github.com/zetamarkets/sdk/pull/316))
+
+## [1.14.1]
+
+- TIA devnet constants. ([#314](https://github.com/zetamarkets/sdk/pull/314))
+
+## [1.14.0]
+
+- New asset $TIA ([#313](https://github.com/zetamarkets/sdk/pull/313))
+
+## [1.13.4]
+
+- Filter nonzero open orders accounts before sending burn txs. ([#310](https://github.com/zetamarkets/sdk/pull/310))
+- Add open orders account to orderbook object. ([#308](https://github.com/zetamarkets/sdk/pull/308))
+>>>>>>> origin/main
 
 ## [1.13.3]
 

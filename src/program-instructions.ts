@@ -631,6 +631,60 @@ export function placeTriggerOrderIx(
     }
   );
 }
+export function executeTriggerOrderV2Ix(
+  asset: Asset,
+  side: types.Side,
+  triggerOrderBit: number,
+  triggerOrder: PublicKey,
+  marginAccount: PublicKey,
+  openOrders: PublicKey,
+  payer: PublicKey
+): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
+
+  return Exchange.program.instruction.executeTriggerOrderV2(triggerOrderBit, {
+    accounts: {
+      payer: payer,
+      triggerOrder: triggerOrder,
+      placeOrderAccounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        marginAccount: marginAccount,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        tokenProgram: TOKEN_PROGRAM_ID,
+        serumAuthority: Exchange.serumAuthority,
+        openOrders: openOrders,
+        rent: SYSVAR_RENT_PUBKEY,
+        marketAccounts: {
+          market: marketData.serumMarket.address,
+          requestQueue: marketData.serumMarket.requestQueueAddress,
+          eventQueue: marketData.serumMarket.eventQueueAddress,
+          bids: marketData.serumMarket.bidsAddress,
+          asks: marketData.serumMarket.asksAddress,
+          coinVault: marketData.serumMarket.baseVaultAddress,
+          pcVault: marketData.serumMarket.quoteVaultAddress,
+          // User params.
+          orderPayerTokenAccount:
+            side == types.Side.BID
+              ? marketData.quoteVault
+              : marketData.baseVault,
+          coinWallet: marketData.baseVault,
+          pcWallet: marketData.quoteVault,
+        },
+        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+        oracleBackupFeed:
+          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+        oracleBackupProgram: constants.CHAINLINK_PID,
+        marketMint:
+          side == types.Side.BID
+            ? marketData.serumMarket.quoteMintAddress
+            : marketData.serumMarket.baseMintAddress,
+        mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
+      },
+    },
+  });
+}
 export function executeTriggerOrderIx(
   asset: Asset,
   side: types.Side,
@@ -684,6 +738,20 @@ export function executeTriggerOrderIx(
     },
   });
 }
+export function cancelTriggerOrderV2Ix(
+  triggerOrderBit: number,
+  authority: PublicKey,
+  triggerOrder: PublicKey,
+  marginAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.cancelTriggerOrderV2(triggerOrderBit, {
+    accounts: {
+      authority: authority,
+      triggerOrder: triggerOrder,
+      marginAccount: marginAccount,
+    },
+  });
+}
 export function cancelTriggerOrderIx(
   triggerOrderBit: number,
   payer: PublicKey,
@@ -710,9 +778,10 @@ export function editTriggerOrderIx(
   newOrderType: types.OrderType,
   newReduceOnly: boolean,
   owner: PublicKey,
-  triggerOrder: PublicKey
+  triggerOrder: PublicKey,
+  crossMarginAccount: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.editTriggerOrder(
+  return Exchange.program.instruction.editTriggerOrderV2(
     new anchor.BN(newOrderPrice),
     newTriggerPrice == 0 ? null : new anchor.BN(newTriggerPrice),
     newTriggerDirection == types.TriggerDirection.UNINITIALIZED ||
@@ -728,8 +797,10 @@ export function editTriggerOrderIx(
     newReduceOnly,
     {
       accounts: {
+        state: Exchange.stateAddress,
         owner: owner,
         triggerOrder: triggerOrder,
+        marginAccount: crossMarginAccount,
       },
     }
   );
@@ -797,6 +868,24 @@ export function cancelOrderNoErrorIx(
       },
     }
   );
+}
+
+export function pruneExpiredTIFOrdersIxV2(
+  asset: Asset,
+  limit: number
+): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
+  return Exchange.program.instruction.pruneExpiredTifOrdersV2(limit, {
+    accounts: {
+      dexProgram: constants.DEX_PID[Exchange.network],
+      state: Exchange.stateAddress,
+      serumAuthority: Exchange.serumAuthority,
+      market: marketData.address,
+      bids: marketData.serumMarket.bidsAddress,
+      asks: marketData.serumMarket.asksAddress,
+      eventQueue: marketData.serumMarket.eventQueueAddress,
+    },
+  });
 }
 
 export function pruneExpiredTIFOrdersIx(asset: Asset): TransactionInstruction {
@@ -2209,6 +2298,51 @@ export function editDelegatedPubkeyIx(
     accounts: {
       marginAccount: account,
       authority,
+    },
+  });
+}
+
+export function updateMinLotIx(
+  asset: Asset,
+  newMinLotSize: number,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateMinLot(
+    toProgramAsset(asset),
+    newMinLotSize,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateTickSizeIx(
+  asset: Asset,
+  newTickSize: number,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateTickSize(
+    toProgramAsset(asset),
+    newTickSize,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function initializeMinLotsAndTickSizes(
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeMinLotsAndTickSizes({
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
     },
   });
 }

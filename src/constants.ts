@@ -9,6 +9,9 @@ export enum Asset {
   ARB = "ARB",
   BNB = "BNB",
   PYTH = "PYTH",
+  TIA = "TIA",
+  JTO = "JTO",
+  ONEMBONK = "ONEMBONK",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -36,16 +39,27 @@ export const FLEX_MINTS = {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
     [Asset.ARB]: new PublicKey("w8h6r5ogLihfuWeCA1gs7boxNjzbwWeQbXMB3UATaC6"),
     [Asset.PYTH]: new PublicKey("5PK1Ty2ac1Un6zY11Em7qF4FAYBgUu5y8Pt8ZtbepGnF"),
+    [Asset.TIA]: new PublicKey("3U2JttPo1k5xsapjuvQJQnH3Kj8D5HegF3PKoPReJ4JU"),
+    [Asset.JTO]: new PublicKey("5x1KCouXo8Hwtsypsd8K3AaXT1Zs7WNNdKEJafuatey6"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "LF8rzt8WSzMuH3E4pfryGvSWMc1jDponXdQHkzL2cGo"
+    ),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
     [Asset.ARB]: new PublicKey("w8h6r5ogLihfuWeCA1gs7boxNjzbwWeQbXMB3UATaC6"),
     [Asset.PYTH]: new PublicKey("5PK1Ty2ac1Un6zY11Em7qF4FAYBgUu5y8Pt8ZtbepGnF"),
+    [Asset.TIA]: new PublicKey("3U2JttPo1k5xsapjuvQJQnH3Kj8D5HegF3PKoPReJ4JU"),
   },
   mainnet: {
     [Asset.APT]: new PublicKey("8z8oShLky1PauW9hxv6AsjnricLqoK9MfmNZJDQNNNPr"),
     [Asset.ARB]: new PublicKey("Ebd7aUFu3rtsZruCzTnG4tjBoxaJdWT8S3t4yC8hVpbo"),
     [Asset.PYTH]: new PublicKey("BjZmtqBVKY1oUSUjgq9PBQWJPyWbcWTXYbQ1oWxa9NYp"),
+    [Asset.TIA]: new PublicKey("DmBnRoEiwGCud2C8X6h67ZLVhq6GyTm2NDRXvRz6uWYE"),
+    [Asset.JTO]: new PublicKey("71jxAnng6EMHYZzXEBoRZUnnhd8iyoAoc1soUgPDMt9e"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "76x829V8cNWymEBNjUuE22bUcVnShNeRwnXnegviejyj"
+    ),
   },
 };
 
@@ -57,6 +71,8 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["5QyPHfnRttz4Tq7W7U5XEpKpvj7g3FTvMpE1BzL9w2Qi"]: Asset.APT,
     ["4fecsFCi8Tx4aFxvc8rAYT74RBmknQ3kqidZTejoqiw7"]: Asset.ARB,
     ["BAyFQXp7JBc26ZxMNBdzSjVDtEjQFXkcu7FYVniQFgyK"]: Asset.BNB,
+    ["HzEPLf1xmHdGjrbHG2WjfvEfU8AgcLudQyReVrWyZWB8"]: Asset.PYTH,
+    ["9diwAsKMFYaAey7enhAWcWbyLgZ5XRALaukUhbcGytgm"]: Asset.TIA,
   },
   devnet: {
     ["HRobFXQ2HQvSgCLq2CU9ZG3DR2BxRaAffw5SvdNnvk97"]: Asset.SOL,
@@ -65,6 +81,8 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["5QyPHfnRttz4Tq7W7U5XEpKpvj7g3FTvMpE1BzL9w2Qi"]: Asset.APT,
     ["4fecsFCi8Tx4aFxvc8rAYT74RBmknQ3kqidZTejoqiw7"]: Asset.ARB,
     ["BAyFQXp7JBc26ZxMNBdzSjVDtEjQFXkcu7FYVniQFgyK"]: Asset.BNB,
+    ["HzEPLf1xmHdGjrbHG2WjfvEfU8AgcLudQyReVrWyZWB8"]: Asset.PYTH,
+    ["9diwAsKMFYaAey7enhAWcWbyLgZ5XRALaukUhbcGytgm"]: Asset.TIA,
   },
   mainnet: {
     ["CoGhjFdyqzMFr5xVgznuBjULvoFbFtNN4bCdQzRArNK2"]: Asset.SOL,
@@ -74,6 +92,8 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["CU6pPA2E2yQFqMzZKrFCmfjrSBEc6GxfmFrSqpqazygu"]: Asset.ARB,
     ["83vVPH4DaUxsi7otAK3yr8atUebbBxHQfHA6CLyzcDiW"]: Asset.BNB,
     ["2JRRckcZK4pRCMpLXtG9TkDw4QxJNiwwjs8BG6b5piFy"]: Asset.PYTH,
+    ["3gbBUKLs2Xm4KKRemwFNxSWmNRMohXwKtV8Yj1PNBUeD"]: Asset.TIA,
+    ["Ddvq1YADoRuL4ATP4ThE9NWwsBSegb4XHd9C6jmUecQy"]: Asset.JTO,
   },
 };
 
@@ -112,7 +132,8 @@ export const CRANK_PERP_ACCOUNT_LIMIT = 10;
 export const MAX_MARKETS_TO_FETCH = 50;
 export const MAX_ACCOUNTS_TO_FETCH = 99;
 
-export const MIN_LOT_SIZE = 0.001;
+export const MIN_NATIVE_MIN_LOT_SIZE = 1;
+export const MIN_NATIVE_TICK_SIZE = 100;
 export const PERP_MARKET_ORDER_SPOT_SLIPPAGE = 0.02;
 
 // This is the most we can load per iteration without
@@ -137,6 +158,11 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ARB]: new PublicKey("APN6KouMoYPF3rR8KxSmWCWQwEW8PykMVpyTAPdLogk4"),
     [Asset.BNB]: new PublicKey("27xFcQmxoHoqpuMcZdwVMCwrrmZAFwN3QEuwtxskR1Lc"),
     [Asset.PYTH]: new PublicKey("5kkS7RmNdcECCMcgJ4gz4sCSFqnFozQeSNb3YhtZrhYx"),
+    [Asset.TIA]: new PublicKey("FwZ5ZzkcWseaCKcu5iVWT5Ru29FDReARyiA6BaSSB5RH"),
+    [Asset.JTO]: new PublicKey("EZg2yWshcvHikVk6KDw6vEsbbPtKPfTx537Fz4hhSmsc"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "G6PKiDSNpyeFRM6iLyZWXTP4U8sKejdEHpDGEXJxTpdP"
+    ),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -146,6 +172,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ARB]: new PublicKey("4mRGHzjGerQNWKXyQAmr9kWqb9saPPHKqo1xziXGQ5Dh"),
     [Asset.BNB]: new PublicKey("GwzBgrXb4PG59zjce24SF2b9JXbLEjJJTBkmytuEZj1b"),
     [Asset.PYTH]: new PublicKey("ELF78ZhSr8u4SCixA7YSpjdZHZoSNrAhcyysbavpC2kA"),
+    [Asset.TIA]: new PublicKey("4GiL1Y6u6JkPb7ckakzJgc414h6P7qoYnEKFcd1YtSB9"),
   },
   mainnet: {
     [Asset.SOL]: new PublicKey("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG"),
@@ -155,6 +182,11 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ARB]: new PublicKey("5HRrdmghsnU3i2u5StaKaydS7eq3vnKVKwXMzCNKsc4C"),
     [Asset.BNB]: new PublicKey("4CkQJBxhU8EZ2UjhigbtdaPbpTe6mqf811fipYBFbSYN"),
     [Asset.PYTH]: new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
+    [Asset.TIA]: new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
+    [Asset.JTO]: new PublicKey("D8UUgr8a3aR3yUeHLu7v8FWK7E8Y5sSU7qrYBXUJXBQ5"),
+    [Asset.ONEMBONK]: new PublicKey(
+      "8ihFLu5FimgTQ1Unh4dVyEHUGodJ5gJQCrQf4KUVB9bN"
+    ),
   },
 };
 
@@ -179,8 +211,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 7;
-export const UNUSED_PERP_MARKETS = 18;
+export const ACTIVE_PERP_MARKETS = 10;
+export const UNUSED_PERP_MARKETS = 15;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 30;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
@@ -195,7 +227,6 @@ export const PLATFORM_PRECISION = 6;
 export const PRICING_PRECISION = 12;
 export const MARGIN_PRECISION = 8;
 export const POSITION_PRECISION = 3;
-export const TICK_SIZE = 100;
 
 export const DEFAULT_ORDER_TAG = "SDK";
 
@@ -207,18 +238,19 @@ export const ASK_ORDERS_INDEX = 1;
 
 export const MAX_TOTAL_SPREAD_ACCOUNT_CONTRACTS = 100_000_000;
 
-export const DEFAULT_MICRO_LAMPORTS_PER_CU_FEE = 1000;
+export const DEFAULT_MICRO_LAMPORTS_PER_CU_FEE = 1_000;
+export const PRIO_FEE_UPPER_LIMIT = 100_000;
 
 export const STATIC_AND_PERPS_LUT: {
   devnet: AddressLookupTableAccount;
   mainnet: AddressLookupTableAccount;
 } = {
   devnet: new AddressLookupTableAccount({
-    key: new PublicKey("2ea7yKr6Z86SVrhmnujBHGuiWnxFPb6YjzM3SG2FNhW4"),
+    key: new PublicKey("67NY6DLH2b1LsooGkraZvtLrbteBQVAkLPXYhLSk5o1z"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 260317201,
-      lastExtendedSlotStartIndex: 80,
+      lastExtendedSlot: 263299395,
+      lastExtendedSlotStartIndex: 100,
       authority: new PublicKey("6qtNr6afnq8JjXQqxxgKfXQ2QKPrdVD232tivdrkhP39"),
       addresses: [
         new PublicKey("9VddCF6iEyZbjkCQ4g8VJpjEtuLsgmvRCc6LQwAvXigC"),
@@ -242,6 +274,8 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("ELF78ZhSr8u4SCixA7YSpjdZHZoSNrAhcyysbavpC2kA"),
         new PublicKey("AVQutgTg4Jd4o4A4P4aYLJF3gpq7xmsE6DZqw1Eq2NvS"),
+        new PublicKey("4GiL1Y6u6JkPb7ckakzJgc414h6P7qoYnEKFcd1YtSB9"),
+        new PublicKey("11111111111111111111111111111111"),
         new PublicKey("JB43m9cTZVb4LcEfBA1Bf49nz4cod2Xt5i2HRAAMQvdo"),
         new PublicKey("6YcgjoTUTeafyFC5C6vgFCVoM69qgpj966PhCojwiS4Z"),
         new PublicKey("qjoUa8fC1DjsnwVwUCJQcVDJVYUhAnrqz3B9FSxVPAm"),
@@ -319,16 +353,27 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("2DWDgtCYtVvV6fpN9WHhMztt4fWgNcdpn5hGVcXWxe6Z"),
         new PublicKey("7Ty1AkSCmHpMLFNjH7xW2s2DkcMWggg3MkyYfWmwcKa5"),
         new PublicKey("DS4ThY5eeu7orkMbueVW2zwQVG8FUhBGn1dm1WyxH75P"),
+        new PublicKey("9fV1YyxuhuxfiKQgTCtXVQPHAhSfVLNYccCwkDDnnurZ"),
+        new PublicKey("6xkyhooKT2wnciP7xjipque9SDwHwPPamwsprsoVXgg9"),
+        new PublicKey("FV8EEHjJvDUD8Kkp1DcomTatZBA81Z6C5AhmvyUwvEAh"),
+        new PublicKey("7qPuwhidbrkuVPEKSzKTCJdTgK5sfNLRGjfNkDqiLvPi"),
+        new PublicKey("3GxVoZpmiKLhDRa2cfVvDkbtVakm2f6sdW2TkDXMVsPt"),
+        new PublicKey("BBMdzR51QMSxJ2NwcQ5UK119To5SfmGHJFHYHN6s8ycv"),
+        new PublicKey("7q1cikNvmZZ4tDH7fnVLLf8vJC4ng6JVtjTcASXwN7fE"),
+        new PublicKey("2NQQtizg4kS97o2WH2dXLyN3C4Xt48Vr3t5nsRP1SQCh"),
+        new PublicKey("eGn33quwRDkdSm2234BgigDGPtE4uZ33X5cM3PqBcPQ"),
+        new PublicKey("CN5eiAYd5Qzo3WspfrzuNBBWAvxQfMXscquBt41SZ3ds"),
+        new PublicKey("E4rv8f3HyS1xgGVAYGA7UfeHmbzfcjE182HH56tCtoRS"),
       ],
     },
   }),
   mainnet: new AddressLookupTableAccount({
-    key: new PublicKey("pxSHSw1dQpf3fhffWxs9KEfbbKdHpcRYf9UYrh7u8R7"),
+    key: new PublicKey("7d6GkpUXXDBBXBwwwjSVWh1H3r7g68QQY8NUcfU1JAi9"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 231176727,
-      lastExtendedSlotStartIndex: 80,
-      authority: new PublicKey("6h7Ce5MfeuUP4gqMfQkM9GanBrZDvBcuxK6RX8qLSWAP"),
+      lastExtendedSlot: 238285984,
+      lastExtendedSlotStartIndex: 120,
+      authority: new PublicKey("BR47Yncz7AKKD4f6NuP83yxb31YjvYvZuHApjEvtP8tu"),
       addresses: [
         new PublicKey("8eExPiLp47xbSDYkbuem4qnLUpbLTfZBeFuEJoh6EUr2"),
         new PublicKey("BbKFezrmKD83PeVh74958MzgFAue1pZptipSNLz5ccpk"),
@@ -350,6 +395,12 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("4CkQJBxhU8EZ2UjhigbtdaPbpTe6mqf811fipYBFbSYN"),
         new PublicKey("F6rApkRBD31K6zZrwXt8aQrRKwzbZqCMH2vbMvBgftPX"),
         new PublicKey("nrYkQQQur7z8rYTST3G9GqATviK5SxTDkrqd21MW6Ue"),
+        new PublicKey("11111111111111111111111111111111"),
+        new PublicKey("funeUsHgi2QKkLdUPASRLuYkaK8JaazCEz3HikbkhVt"),
+        new PublicKey("11111111111111111111111111111111"),
+        new PublicKey("D8UUgr8a3aR3yUeHLu7v8FWK7E8Y5sSU7qrYBXUJXBQ5"),
+        new PublicKey("11111111111111111111111111111111"),
+        new PublicKey("8ihFLu5FimgTQ1Unh4dVyEHUGodJ5gJQCrQf4KUVB9bN"),
         new PublicKey("11111111111111111111111111111111"),
         new PublicKey("JE6d41JRokZAMUEAznV8JP4h7i6Ain6CyJrQuweRipFU"),
         new PublicKey("EaNR74nCjrYyNDsuoWmq19pH76QSd1nuTzvJSr3RDQ6x"),
@@ -428,6 +479,39 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("8UxG6sugH55rMybJkVXt3Pb3pJh9ZfRQbzajHEDDezsT"),
         new PublicKey("7Pnbf6WLGpsYjbjnQN4t8wMCzdDGsx9ZAyuLd4vZmN49"),
         new PublicKey("5Q245C352ChdBGWmNbiYmFneAUiMjhnbPwUqmdHWJ8U6"),
+        new PublicKey("EgN8rGcr2DRokxCebhkXuGBAQVkGeq7mGmzCGXsviT8r"),
+        new PublicKey("6xkyhooKT2wnciP7xjipque9SDwHwPPamwsprsoVXgg9"),
+        new PublicKey("FV8EEHjJvDUD8Kkp1DcomTatZBA81Z6C5AhmvyUwvEAh"),
+        new PublicKey("7qPuwhidbrkuVPEKSzKTCJdTgK5sfNLRGjfNkDqiLvPi"),
+        new PublicKey("3GxVoZpmiKLhDRa2cfVvDkbtVakm2f6sdW2TkDXMVsPt"),
+        new PublicKey("CXWkPH6BzU8dhNy3LQkaCH54jSxQATyp11wHuhsAzT9n"),
+        new PublicKey("2x1c7fXQdL5TDK9jbMvJ5VYM7wmPKUAQXrLAAFjvxSoc"),
+        new PublicKey("EJ2oxzqG3uKmD8FrbBRevQpZrvcQMRFA2fYauChcihaK"),
+        new PublicKey("BuDP4G7gjs4KdSQf1QenAygF8FksjH5Wu57maC9sezq7"),
+        new PublicKey("JB7F3kQvRYcQj8kogwGR78CMshg857E96ef4LQYDzSu1"),
+        new PublicKey("Bm6PXLobn7LBudgNdJKzUUNumAKAnEWuCoLVafsvPBda"),
+        new PublicKey("FPia9JqQZ6XBe3Kq9MA4bbFaqojiSNePLbVLQj7hKqqa"),
+        new PublicKey("9uYZdYf8aQd9YK6UrGUmz78pYpHscgHdD5f4cZojvmpH"),
+        new PublicKey("7HzkSBwxFTft413SFQoznSpd9zu8yWLoPc51QY9Y2Uwb"),
+        new PublicKey("9zGXeYAtgaMSafxCQxCTCWnK7W76wbPbjTYeMrCKx3wh"),
+        new PublicKey("FCZjBQniB2WJjQhk2DR4kYvsoy7fj9PCKqyU6j3uQ8rx"),
+        new PublicKey("2BXEjZqnRBhj3BrRbMERWnToEKErzxZmLPzLEmBHKdJT"),
+        new PublicKey("9g3YcLnENdQKYCxg88o1VUhSXJQVD3Kf7uMVB7d1SyuG"),
+        new PublicKey("3Vxn3hUebS9wYo5ejbhrXtxjDpp8iko4TW7sj3ub5wmv"),
+        new PublicKey("BaiBruf847DKccBnGtfNgMm6mjHeXoYs64ZoFK5uuV6Z"),
+        new PublicKey("GZycSPLqxhZuQYmv5wWjdwK4v3T1WStBpGxYem691vMG"),
+        new PublicKey("Avy1abPkJKJdadFVieTuF8oeN6ZFWsKNtKzU1a8tgn6Z"),
+        new PublicKey("Dy7j5mY3nxud8bow34MBUPhZqXutJRPjzEiXyNeiSMdD"),
+        new PublicKey("CgUMT14wR6WHX9mKMS5BWtd4tk39hRxbxtNRvp4BdMHf"),
+        new PublicKey("5Kdbu8k9hPU8fhAcszN2HYZdq5MHspV3y9ZKHA3t39ko"),
+        new PublicKey("4EVR1QadXD8SQeEnzkVv2BUfJaYoM7iPcGziiuAgWPhi"),
+        new PublicKey("CSh9paLCAfvE853RYQUtkCLqtBao87RX9FcxirK3pdX7"),
+        new PublicKey("gn46ys7QKtWqQAW2MsuSV475AcFGn7gdNnSCLgw71DL"),
+        new PublicKey("HTN3dEduTUp2VuFgo885BJ3KTp8WrPrZgEPiCVg2cVtD"),
+        new PublicKey("JDRP3wxczYJ265fGUKXc26ZuDaHgp12CnSbPupsRvQUT"),
+        new PublicKey("ETUAXwjeEEprVToJbMzB3vBJfLpEPxKzexdgmkMXuEk7"),
+        new PublicKey("J7yjhCLdftzL95kGetry8pyX4eXn4Tjjh7KoWo599Sry"),
+        new PublicKey("GdAX1L7jNsMmfN3kcCijk774aE2UtARV8frTozeUWT2E"),
       ],
     },
   }),

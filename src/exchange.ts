@@ -288,6 +288,8 @@ export class Exchange {
     this._ledgerWallet = wallet;
   }
 
+  public maxRpcRetries: number | undefined = undefined;
+
   // Handy map to grab zetagroup asset by pubkey without an RPC fetch
   // or having to manually filter all zetaGroups
   public zetaGroupPubkeyToAsset(key: PublicKey): Asset {
@@ -314,18 +316,22 @@ export class Exchange {
 
   private _autoPriorityFeeOffset: number = 0;
   private _autoPriorityFeeMultiplier: number = 1;
+  private _autoPriorityFeeUseMax: boolean = false;
 
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
     return this._autoPriorityFeeUpperLimit;
   }
-  private _autoPriorityFeeUpperLimit: number =
-    constants.DEFAULT_MICRO_LAMPORTS_PER_CU_FEE;
+  private _autoPriorityFeeUpperLimit: number = constants.PRIO_FEE_UPPER_LIMIT;
 
   public get blockhashCommitment(): Commitment {
     return this._blockhashCommitment;
   }
   private _blockhashCommitment: Commitment = "finalized";
+
+  public setUseAutoPriorityFee(useAutoPriorityFee: boolean) {
+    this._useAutoPriorityFee = useAutoPriorityFee;
+  }
 
   public toggleAutoPriorityFee() {
     this._useAutoPriorityFee = !this._useAutoPriorityFee;
@@ -334,6 +340,14 @@ export class Exchange {
   public setAutoPriorityFeeScaling(offset: number = 0, multiplier: number = 1) {
     this._autoPriorityFeeMultiplier = multiplier;
     this._autoPriorityFeeOffset = offset;
+  }
+
+  public toggleAutoPriorityFeeUseMax() {
+    this._autoPriorityFeeUseMax = !this._autoPriorityFeeUseMax;
+  }
+
+  public setAutoPriorityFeeUseMax(useMax: boolean) {
+    this._autoPriorityFeeUseMax = useMax;
   }
 
   public updatePriorityFee(microLamportsPerCU: number) {
@@ -355,7 +369,7 @@ export class Exchange {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
-    this._assets = assets.allAssets();
+    this._assets = assets.allAssets(loadConfig.network);
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
       wallet instanceof types.DummyWallet ? null : wallet,
@@ -691,20 +705,22 @@ export class Exchange {
   }
 
   public getSubExchange(asset: Asset): SubExchange {
-    try {
-      return this._subExchanges.get(asset);
-    } catch (_e) {
-      throw Error(
+    const subExchange = this._subExchanges.get(asset);
+    if (subExchange === undefined) {
+      throw new Error(
         `Failed to get subExchange for asset=${asset}, have you called Exchange.load()?`
       );
     }
+
+    return subExchange;
   }
 
   public getAllSubExchanges(): SubExchange[] {
     return [...this._subExchanges.values()];
   }
 
-  private async updateAutoFee() {
+  // Public so you can call it as often as you want. By default gets called in the clock interval
+  public async updateAutoFee() {
     let accountList = [];
 
     // Query the most written-to accounts
@@ -729,11 +745,14 @@ export class Exchange {
         .slice(0, 20) // Grab the latest 20
         .map((obj) => obj.prioritizationFee); // Take a list of prioritizationFee values only
 
-      let median = utils.median(fees);
-      let medianScaled =
-        this._autoPriorityFeeOffset + median * this._autoPriorityFeeMultiplier;
+      let num = this._autoPriorityFeeUseMax
+        ? Math.max(...fees)
+        : utils.median(fees);
+
+      let numScaled =
+        this._autoPriorityFeeOffset + num * this._autoPriorityFeeMultiplier;
       this._priorityFee = Math.round(
-        Math.min(medianScaled, this._autoPriorityFeeUpperLimit)
+        Math.min(numScaled, this._autoPriorityFeeUpperLimit)
       );
       console.log(
         `AutoUpdate priority fee. New fee = ${this._priorityFee} microlamports per compute unit`

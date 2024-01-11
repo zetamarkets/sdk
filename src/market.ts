@@ -371,10 +371,13 @@ export class Market {
 
     [this._bids, this._asks].map((orderbookSide) => {
       const descending = orderbookSide.isBids ? true : false;
-      const levels = []; // (price, size, tifOffset)
-      for (const { key, quantity, tifOffset } of orderbookSide.slab.items(
-        descending
-      )) {
+      const levels = []; // (price, size, tifOffset, owners)
+      for (const {
+        key,
+        quantity,
+        tifOffset,
+        owner,
+      } of orderbookSide.slab.items(descending)) {
         let seqNum = getSeqNumFromSerumOrderKey(key, orderbookSide.isBids);
         if (
           isOrderExpired(
@@ -391,18 +394,24 @@ export class Market {
         const price = getPriceFromSerumOrderKey(key);
         if (levels.length > 0 && levels[levels.length - 1][0].eq(price)) {
           levels[levels.length - 1][1].iadd(quantity);
+          levels[levels.length - 1][2].add(owner.toString());
         } else {
-          levels.push([price, new anchor.BN(quantity.toNumber())]);
+          levels.push([
+            price,
+            new anchor.BN(quantity.toNumber()),
+            new Set<string>([owner.toString()]),
+          ]);
         }
       }
 
       this._orderbook[orderbookSide.isBids ? "bids" : "asks"] = levels.map(
-        ([priceLots, sizeLots]) => {
+        ([priceLots, sizeLots, owners]) => {
           return {
             price: this._serumMarket.priceLotsToNumber(priceLots),
             size: convertNativeLotSizeToDecimal(
               this._serumMarket.baseSizeLotsToNumber(sizeLots)
             ),
+            owners: owners,
           };
         }
       );

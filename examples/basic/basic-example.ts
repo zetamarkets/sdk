@@ -92,7 +92,6 @@ async function main() {
   utils.displayState();
 
   // Show current orderbook for a market.
-  await Exchange.updateOrderbook(tradingAsset);
   console.log(`${tradingAsset} Market orderbook:`);
   console.log(Exchange.getOrderbook(tradingAsset));
 
@@ -105,8 +104,10 @@ async function main() {
     { tifOptions: {}, orderType: types.OrderType.LIMIT } // Extra optional parameters
   );
 
+  // Allow orderbook to update (it uses a websocket subscription)
+  await utils.sleep(1000);
+
   // See our order in the orderbook.
-  await Exchange.updateOrderbook(tradingAsset);
   console.log(`${tradingAsset} Market orderbook after our order:`);
   console.log(Exchange.getOrderbook(tradingAsset));
 

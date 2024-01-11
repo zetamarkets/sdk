@@ -233,6 +233,7 @@ export function positionEquals(a: Position, b: Position): boolean {
 export interface Level {
   price: number;
   size: number;
+  owners: Set<string>;
 }
 
 export interface DepthOrderbook {

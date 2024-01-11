@@ -1,6 +1,8 @@
 // Taken from @pythnetwork/client
 // Trimmed down to not require all the dependencies.
 import { Buffer } from "buffer";
+import { Asset } from "./constants";
+import { assetMultiplier } from "./assets";
 
 // https://github.com/nodejs/node/blob/v14.17.0/lib/internal/errors.js#L758
 const ERR_BUFFER_OUT_OF_BOUNDS = () =>
@@ -101,7 +103,9 @@ function parsePythPriceInfo(data: Buffer, exponent: number): Price {
 }
 
 // Pass in pyth oracle account.
-export function parsePythData(data: Buffer): Price {
+export function parsePythData(data: Buffer, asset: Asset): Price {
   const exponent = data.readInt32LE(20);
-  return parsePythPriceInfo(data.slice(208, 240), exponent);
+  let price = parsePythPriceInfo(data.slice(208, 240), exponent);
+  price.price = price.price * assetMultiplier(asset);
+  return price;
 }

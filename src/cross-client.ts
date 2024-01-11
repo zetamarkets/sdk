@@ -1352,7 +1352,7 @@ export class CrossClient {
           new Uint8Array([indexes[i + j]])
         )[0];
         tx.add(
-          instructions.cancelTriggerOrderIx(
+          instructions.cancelTriggerOrderV2Ix(
             indexes[i + j],
             this.publicKey,
             triggerAccount,
@@ -1373,7 +1373,7 @@ export class CrossClient {
       new Uint8Array([orderIndex])
     )[0];
     let tx = new Transaction().add(
-      instructions.cancelTriggerOrderIx(
+      instructions.cancelTriggerOrderV2Ix(
         orderIndex,
         this._provider.wallet.publicKey,
         triggerAccount,
@@ -1462,7 +1462,8 @@ export class CrossClient {
         newOrderType,
         newOptions.reduceOnly != undefined ? newOptions.reduceOnly : false,
         this._provider.wallet.publicKey,
-        triggerAccount
+        triggerAccount,
+        this._accountAddress
       )
     );
     let txSig = await utils.processTransaction(

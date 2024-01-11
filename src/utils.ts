@@ -49,6 +49,23 @@ import { assets } from ".";
 import { Network } from "./network";
 import cloneDeep from "lodash.clonedeep";
 import * as os from "os";
+import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
+
+export function getNativeTickSize(asset: Asset): number {
+  return Exchange.state.tickSizes[assets.assetToIndex(asset)];
+}
+
+export function getDecimalMinLotSize(asset: Asset): number {
+  return getNativeMinLotSize(asset) / 10 ** constants.POSITION_PRECISION;
+}
+
+export function getNativeMinLotSize(asset: Asset): number {
+  let assetIndex = assets.assetToIndex(asset);
+  if (Exchange.state != undefined) {
+    return Exchange.state.minLotSizes[assetIndex];
+  }
+  return 1000;
+}
 
 export function getState(programId: PublicKey): [PublicKey, number] {
   return anchor.web3.PublicKey.findProgramAddressSync(
@@ -659,11 +676,11 @@ export function sortMarketKeys(keys: PublicKey[]): PublicKey[] {
 
 /**
  * Converts a decimal number to native fixed point integer of precision 6.
- * roundingFactor argument will round the result to the nearest <roundingFactor>. Default is TICK_SIZE.
+ * roundingFactor argument will round the result to the nearest <roundingFactor>. Default is 100.
  */
 export function convertDecimalToNativeInteger(
   amount: number,
-  roundingFactor: number = constants.TICK_SIZE
+  roundingFactor: number = constants.MIN_NATIVE_TICK_SIZE
 ): number {
   return (
     parseInt(
@@ -721,12 +738,20 @@ export function convertNativeLotSizeToDecimal(amount: number): number {
 }
 
 /**
- * Converts a native lot size where 1 unit = 0.001 lots to human readable decimal
+ * Converts a human readable decimal to a native lot size where 1 unit = 0.001 lots
  * @param amount
  */
-export function convertDecimalToNativeLotSize(amount: number): number {
-  return parseInt(
-    (amount * Math.pow(10, constants.POSITION_PRECISION)).toFixed(0)
+export function convertDecimalToNativeLotSize(
+  amount: number,
+  roundingFactor: number = constants.MIN_NATIVE_MIN_LOT_SIZE
+): number {
+  return (
+    parseInt(
+      (
+        (amount * Math.pow(10, constants.POSITION_PRECISION)) /
+        roundingFactor
+      ).toFixed(0)
+    ) * roundingFactor
   );
 }
 
@@ -808,11 +833,17 @@ export function defaultCommitment(): ConfirmOptions {
 }
 
 export function commitmentConfig(commitment: Commitment): ConfirmOptions {
-  return {
+  let opts = {
     skipPreflight: false,
     preflightCommitment: commitment,
     commitment,
   };
+
+  if (Exchange.maxRpcRetries != undefined) {
+    opts["maxRetries"] = Exchange.maxRpcRetries;
+  }
+
+  return opts;
 }
 
 export async function getTradeEventsFromTx(
@@ -1285,6 +1316,13 @@ export async function pruneExpiredTIFOrders(asset: Asset) {
   return processTransaction(Exchange.provider, tx);
 }
 
+export async function pruneExpiredTIFOrdersV2(asset: Asset, limit: number) {
+  let tx = new Transaction().add(
+    instructions.pruneExpiredTIFOrdersIxV2(asset, limit)
+  );
+  return processTransaction(Exchange.provider, tx);
+}
+
 export function getMutMarketAccounts(asset: Asset): Object[] {
   let market = Exchange.getPerpMarket(asset);
   return [
@@ -1463,12 +1501,54 @@ export async function getAllOpenOrdersAccounts(
 
 export async function settleAndBurnVaultTokens(
   asset: Asset,
-  provider: anchor.AnchorProvider
+  provider: anchor.AnchorProvider,
+  accountLimit: number = 100
 ) {
-  let openOrders = await getAllOpenOrdersAccounts(asset);
+  let openOrdersRaw = await getAllOpenOrdersAccounts(asset);
+  // Randomly sort so that if we have an accountLimit we don't keep grabbing the same N accounts every time
+  let openOrdersRandSort = openOrdersRaw.sort(() => Math.random() - 0.5);
+
+  let openOrdersFiltered = [];
+  for (
+    var i = 0;
+    i < openOrdersRandSort.length;
+    i += constants.MAX_ACCOUNTS_TO_FETCH
+  ) {
+    if (openOrdersFiltered.length >= accountLimit) {
+      break;
+    }
+    let ooBatch = await Exchange.connection.getMultipleAccountsInfo(
+      openOrdersRandSort.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH),
+      provider.connection.commitment
+    );
+
+    for (var j = 0; j < ooBatch.length; j++) {
+      if (openOrdersFiltered.length >= accountLimit) {
+        break;
+      }
+      const decoded = _OPEN_ORDERS_LAYOUT_V2.decode(ooBatch[j].data);
+      let openOrdersAccount = new OpenOrders(
+        openOrdersRandSort[i + j],
+        decoded,
+        Exchange.programId
+      );
+
+      if (
+        openOrdersAccount.baseTokenFree.toNumber() != 0 ||
+        openOrdersAccount.baseTokenTotal.toNumber() != 0 ||
+        openOrdersAccount.quoteTokenFree.toNumber() != 0 ||
+        openOrdersAccount.quoteTokenTotal.toNumber() != 0
+      ) {
+        openOrdersFiltered.push(openOrdersRandSort[i + j]);
+      }
+    }
+  }
+
   let market = Exchange.getPerpMarket(asset);
-  console.log(`Burning tokens`);
-  let remainingAccounts = openOrders.map((key) => {
+  console.log(
+    `Burning tokens for ${openOrdersFiltered.length} openOrders accounts`
+  );
+  let remainingAccounts = openOrdersFiltered.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
   });
 
@@ -1484,10 +1564,15 @@ export async function settleAndBurnVaultTokens(
   );
 
   for (var j = 0; j < txs.length; j += 5) {
+    console.log("Settle tx num =", j);
     let txSlice = txs.slice(j, j + 5);
     await Promise.all(
       txSlice.map(async (tx) => {
-        await processTransaction(provider, tx);
+        try {
+          await processTransaction(provider, tx);
+        } catch (e) {
+          console.log("Settle failed, continuing...");
+        }
       })
     );
   }
@@ -1628,16 +1713,18 @@ export async function executeTriggerOrder(
   triggerOrderBit: number,
   triggerOrder: PublicKey,
   marginAccount: PublicKey,
-  openOrders: PublicKey
+  openOrders: PublicKey,
+  payer: PublicKey
 ) {
   let tx = new Transaction().add(
-    instructions.executeTriggerOrderIx(
+    instructions.executeTriggerOrderV2Ix(
       asset,
       side,
       triggerOrderBit,
       triggerOrder,
       marginAccount,
-      openOrders
+      openOrders,
+      payer
     )
   );
 
@@ -1773,7 +1860,7 @@ export const checkLiquidity = (
   orderbook?: types.DepthOrderbook
 ): types.LiquidityCheckInfo => {
   // We default to min lot size to still show a price
-  const fillSize = size || constants.MIN_LOT_SIZE;
+  const fillSize = size || getDecimalMinLotSize(asset);
 
   slippage ??= constants.PERP_MARKET_ORDER_SPOT_SLIPPAGE;
   orderbook ??= Exchange.getOrderbook(asset);

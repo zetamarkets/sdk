@@ -3,6 +3,7 @@ import { objectEquals } from "./utils";
 import { Asset } from "./constants";
 
 import * as constants from "./constants";
+import { Network } from "./network";
 
 export function isValidType(asset: Asset): boolean {
   try {
@@ -22,13 +23,28 @@ export function isValidStr(asset: string): boolean {
   return true;
 }
 
-export function allAssets(): Asset[] {
+export function allAssets(network: Network = Network.MAINNET): Asset[] {
   let allAssets: Asset[] = [];
   for (var a in Asset) {
     if (typeof Asset[a] === "string" && a != "UNDEFINED") {
       allAssets.push(nameToAsset(a));
     }
   }
+
+  // Keep devnet assets constant for ease of development and testing
+  if (network == Network.DEVNET) {
+    return [
+      constants.Asset.SOL,
+      constants.Asset.BTC,
+      constants.Asset.ETH,
+      constants.Asset.ARB,
+      constants.Asset.APT,
+      constants.Asset.PYTH,
+      constants.Asset.BNB,
+      constants.Asset.TIA,
+    ];
+  }
+
   return allAssets;
 }
 
@@ -40,6 +56,9 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.ARB) return "ARB";
   if (asset == Asset.BNB) return "BNB";
   if (asset == Asset.PYTH) return "PYTH";
+  if (asset == Asset.TIA) return "TIA";
+  if (asset == Asset.JTO) return "JTO";
+  if (asset == Asset.ONEMBONK) return "ONEMBONK";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -52,6 +71,9 @@ export function nameToAsset(name: string): Asset {
   if (name == "ARB") return Asset.ARB;
   if (name == "BNB") return Asset.BNB;
   if (name == "PYTH") return Asset.PYTH;
+  if (name == "TIA") return Asset.TIA;
+  if (name == "JTO") return Asset.JTO;
+  if (name == "ONEMBONK") return Asset.ONEMBONK;
   return Asset.UNDEFINED;
 }
 
@@ -67,6 +89,9 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.ARB) return { arb: {} };
   if (asset == Asset.BNB) return { bnb: {} };
   if (asset == Asset.PYTH) return { pyth: {} };
+  if (asset == Asset.TIA) return { tia: {} };
+  if (asset == Asset.JTO) return { jto: {} };
+  if (asset == Asset.ONEMBONK) return { onembonk: {} };
   return { undefined: {} };
 }
 
@@ -92,6 +117,16 @@ export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { pyth: {} })) {
     return Asset.PYTH;
   }
+  if (objectEquals(asset, { tia: {} })) {
+    return Asset.TIA;
+  }
+  if (objectEquals(asset, { jto: {} })) {
+    return Asset.JTO;
+  }
+  if (objectEquals(asset, { onembonk: {} })) {
+    return Asset.ONEMBONK;
+  }
+
   return Asset.UNDEFINED;
 }
 
@@ -117,6 +152,15 @@ export function assetToIndex(asset: Asset): number {
     }
     case Asset.PYTH: {
       return 6;
+    }
+    case Asset.TIA: {
+      return 7;
+    }
+    case Asset.JTO: {
+      return 8;
+    }
+    case Asset.ONEMBONK: {
+      return 9;
     }
   }
   return 255; // Undefined is 255 onchain
@@ -145,6 +189,24 @@ export function indexToAsset(index: number): Asset {
     case 6: {
       return Asset.PYTH;
     }
+    case 7: {
+      return Asset.TIA;
+    }
+    case 8: {
+      return Asset.JTO;
+    }
+    case 9: {
+      return Asset.ONEMBONK;
+    }
   }
   return Asset.UNDEFINED;
+}
+
+export function assetMultiplier(asset: Asset): number {
+  switch (asset) {
+    case Asset.ONEMBONK: {
+      return 1_000_000;
+    }
+  }
+  return 1;
 }
