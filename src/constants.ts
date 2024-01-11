@@ -12,6 +12,7 @@ export enum Asset {
   TIA = "TIA",
   JTO = "JTO",
   ONEMBONK = "ONEMBONK",
+  SEI = "SEI",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -44,6 +45,7 @@ export const FLEX_MINTS = {
     [Asset.ONEMBONK]: new PublicKey(
       "LF8rzt8WSzMuH3E4pfryGvSWMc1jDponXdQHkzL2cGo"
     ),
+    [Asset.SEI]: new PublicKey("Dju5Nvuet6GyBk7dBwWSG9cg2JDhtxKXHsBTs7HFbPk3"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -60,6 +62,7 @@ export const FLEX_MINTS = {
     [Asset.ONEMBONK]: new PublicKey(
       "76x829V8cNWymEBNjUuE22bUcVnShNeRwnXnegviejyj"
     ),
+    [Asset.SEI]: new PublicKey("CTw2xSSAfrv9hJGVpB2R2q5xYrdX79i3hXeCiQiAKf2f"),
   },
 };
 
@@ -163,6 +166,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ONEMBONK]: new PublicKey(
       "G6PKiDSNpyeFRM6iLyZWXTP4U8sKejdEHpDGEXJxTpdP"
     ),
+    [Asset.SEI]: new PublicKey("EhC74qLWnp3i5y3EiPibQHdAkNU4F9kvcDuWgcQuLj6G"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -187,6 +191,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ONEMBONK]: new PublicKey(
       "8ihFLu5FimgTQ1Unh4dVyEHUGodJ5gJQCrQf4KUVB9bN"
     ),
+    [Asset.SEI]: new PublicKey("6cUuAyAX3eXoiWkjFF77RQBEUF15AAMQ7d1hm4EPd3tv"),
   },
 };
 
