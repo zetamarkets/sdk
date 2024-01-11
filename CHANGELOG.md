@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## Unreleased
 
+- Add post only front order type.
+
 ## [1.17.2]
 
 - BONK constants ([#337](https://github.com/zetamarkets/sdk/pull/337))

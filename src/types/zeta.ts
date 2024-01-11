@@ -9256,6 +9256,9 @@ export type Zeta = {
           },
           {
             "name": "PostOnlySlide"
+          },
+          {
+            "name": "PostOnlyFront"
           }
         ]
       }
@@ -19953,6 +19956,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "PostOnlySlide"
+          },
+          {
+            "name": "PostOnlyFront"
           }
         ]
       }
