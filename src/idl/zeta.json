@@ -9256,6 +9256,9 @@
           },
           {
             "name": "PostOnlySlide"
+          },
+          {
+            "name": "PostOnlyFront"
           }
         ]
       }
