@@ -16,6 +16,7 @@ import {
   calculateProductMargin,
   fakeTrade,
   collectRiskMaps,
+  addFakeCancelToAccount,
 } from "./risk-utils";
 
 import cloneDeep from "lodash.clonedeep";
@@ -834,6 +835,7 @@ export class RiskCalculator {
     tradePrice: number,
     maxLeverage: number = -1,
     isTaker: boolean = true,
+    fakeCancel: types.Order = undefined,
     thresholdPercent: number = 1,
     bufferPercent: number = 5,
     maxIterations: number = 100
@@ -929,6 +931,11 @@ export class RiskCalculator {
 
     // If we're not strictly closing an existing position, we need to estimate the max size
     let editedAccount = cloneDeep(marginAccount) as CrossMarginAccount;
+
+    if (fakeCancel) {
+      addFakeCancelToAccount(editedAccount, fakeCancel);
+    }
+
     let currentPosition = cloneDeep(
       editedAccount.productLedgers[assetIndex].position
     ) as programTypes.Position;

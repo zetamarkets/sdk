@@ -319,3 +319,35 @@ export function fakeTrade(
   );
   return account;
 }
+
+export function addFakeCancelToAccount(
+  marginAccount: CrossMarginAccount,
+  order: types.Order
+) {
+  const assetIndex = assets.assetToIndex(order.asset);
+  const bidAskIndex = order.side == types.Side.BID ? 0 : 1;
+
+  const nativeOrderSize = convertDecimalToNativeLotSize(order.size);
+
+  const cancelOpening = Math.min(
+    marginAccount.productLedgers[assetIndex].orderState.openingOrders[
+      bidAskIndex
+    ].toNumber(),
+    nativeOrderSize
+  );
+  const cancelClosing = nativeOrderSize - cancelOpening;
+
+  marginAccount.productLedgers[assetIndex].orderState.openingOrders[
+    bidAskIndex
+  ] = new anchor.BN(
+    marginAccount.productLedgers[assetIndex].orderState.openingOrders[
+      bidAskIndex
+    ].toNumber() - cancelOpening
+  );
+
+  marginAccount.productLedgers[assetIndex].orderState.closingOrders =
+    new anchor.BN(
+      marginAccount.productLedgers[assetIndex].orderState.closingOrders -
+        cancelClosing
+    );
+}
