@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 - Add post only front order type.
 
-## [1.18.0]
+## [1.18.2]
 
 - Add sei. ([#339](https://github.com/zetamarkets/sdk/pull/339))
 - Post only front order type. ([#312](https://github.com/zetamarkets/sdk/pull/312))
