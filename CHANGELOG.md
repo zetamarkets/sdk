@@ -3,9 +3,9 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## Unreleased
+## [1.18.3]
 
-- Add post only front order type.
+- Add fake cancel optionality for get max trade size. ([#338](https://github.com/zetamarkets/sdk/pull/338))
 
 ## [1.18.2]
 
