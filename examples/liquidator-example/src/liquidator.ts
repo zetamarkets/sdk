@@ -24,9 +24,6 @@ import { airdropUsdc } from "./utils";
 let client: CrossClient;
 let scanning: boolean = false;
 
-// Underlying to run on. Can technically run on multiple at a time but will require some code modifications.
-export const asset = constants.Asset.BTC;
-
 // Function that will do a few things sequentially.
 // 1. Get all margin accounts for the program.
 // 2. Cancel all active orders for accounts at risk. (This is required to liquidate an account)
@@ -39,24 +36,11 @@ export async function scanMarginAccounts() {
   console.log(`Scanning margin accounts...`);
   scanning = true;
   let marginAccounts: anchor.ProgramAccount[] =
-    await Exchange.program.account.marginAccount.all();
-
-  let marginAccountsAsset = marginAccounts.filter((account) => {
-    return (
-      assets.fromProgramAsset(
-        (account.account as programTypes.MarginAccount).asset
-      ) == asset
-    );
-  });
+    await Exchange.program.account.crossMarginAccount.all();
 
   console.log(`${marginAccounts.length} margin accounts.`);
-  console.log(
-    `${marginAccountsAsset.length} ${assets.assetToName(
-      asset
-    )} margin accounts.`
-  );
 
-  let accountsAtRisk = await findAccountsAtRisk(marginAccountsAsset);
+  let accountsAtRisk = await findAccountsAtRisk(marginAccounts);
   if (accountsAtRisk.length == 0) {
     console.log("No accounts at risk.");
     scanning = false;

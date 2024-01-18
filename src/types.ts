@@ -54,6 +54,7 @@ export enum OrderType {
   FILLORKILL,
   IMMEDIATEORCANCEL,
   POSTONLYSLIDE,
+  POSTONLYFRONT,
 }
 
 export function toProgramOrderType(orderType: OrderType) {
@@ -63,6 +64,7 @@ export function toProgramOrderType(orderType: OrderType) {
   if (orderType == OrderType.IMMEDIATEORCANCEL)
     return { immediateOrCancel: {} };
   if (orderType == OrderType.POSTONLYSLIDE) return { postOnlySlide: {} };
+  if (orderType == OrderType.POSTONLYFRONT) return { postOnlyFront: {} };
 }
 
 export function fromProgramOrderType(orderType: any): OrderType {
@@ -73,6 +75,8 @@ export function fromProgramOrderType(orderType: any): OrderType {
     return OrderType.IMMEDIATEORCANCEL;
   if (objectEquals(orderType, { postOnlySlide: {} }))
     return OrderType.POSTONLYSLIDE;
+  if (objectEquals(orderType, { postOnlyFront: {} }))
+    return OrderType.POSTONLYFRONT;
 }
 
 export enum Side {

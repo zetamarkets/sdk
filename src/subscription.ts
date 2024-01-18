@@ -12,7 +12,6 @@ export interface AccountSubscriptionData<T> {
 }
 
 export function subscribeProgramAccounts<T>(
-  asset: Asset,
   accountType: types.ProgramAccountType,
   callback?: (data: AccountSubscriptionData<T>) => void
 ) {
@@ -22,10 +21,11 @@ export function subscribeProgramAccounts<T>(
   const subscriptionId = Exchange.connection.onProgramAccountChange(
     Exchange.programId,
     async (keyedAccountInfo: KeyedAccountInfo, context: Context) => {
-      let acc = Exchange.program.account.marginAccount.coder.accounts.decode(
-        accountType,
-        keyedAccountInfo.accountInfo.data
-      );
+      let acc =
+        Exchange.program.account.crossMarginAccount.coder.accounts.decode(
+          accountType,
+          keyedAccountInfo.accountInfo.data
+        );
       callback({ key: keyedAccountInfo.accountId, account: acc as T, context });
     },
     "confirmed",

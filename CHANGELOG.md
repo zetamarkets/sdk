@@ -3,7 +3,31 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## Unreleased
+## [1.18.3]
+
+- Add fake cancel optionality for get max trade size. ([#338](https://github.com/zetamarkets/sdk/pull/338))
+
+## [1.18.2]
+
+- Add sei. ([#339](https://github.com/zetamarkets/sdk/pull/339))
+- Post only front order type. ([#312](https://github.com/zetamarkets/sdk/pull/312))
+
+## [1.17.2]
+
+- BONK constants. ([#337](https://github.com/zetamarkets/sdk/pull/337))
+
+## [1.17.1]
+
+- Example cleanup. ([#336](https://github.com/zetamarkets/sdk/pull/336))
+- Fetch min lot sizes from state. ([#331](https://github.com/zetamarkets/sdk/pull/331))
+
+## [1.17.0]
+
+- New asset ONEMBONK (BONK x 1 million) ([#333](https://github.com/zetamarkets/sdk/pull/333))
+
+## [1.16.9]
+
+- New set utils in Exchange ([#328](https://github.com/zetamarkets/sdk/pull/332))
 
 - Add instruction to update maker fee percentage. ([#334](https://github.com/zetamarkets/sdk/pull/334))
 
