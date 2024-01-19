@@ -1029,7 +1029,8 @@ export class CrossClient {
     price: number,
     size: number,
     side: types.Side,
-    options: types.OrderOptions = types.defaultOrderOptions()
+    options: types.OrderOptions = types.defaultOrderOptions(),
+    preIxs: TransactionInstruction[] = []
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
     let assetIndex = assetToIndex(asset);
@@ -1052,6 +1053,10 @@ export class CrossClient {
       tx.add(initIx);
     } else {
       openOrdersPda = this._openOrdersAccounts[assetIndex];
+    }
+
+    if (preIxs.length > 0) {
+      tx.add(...preIxs);
     }
 
     let tifOffsetToUse = utils.getTIFOffset(market, options.tifOptions);
@@ -1220,6 +1225,51 @@ export class CrossClient {
     );
     this._openOrdersAccounts[assetIndex] = openOrdersPda;
     return txId;
+  }
+
+  /*
+   * Note: When using this you must pass in the trigger order bit yourself, you can do this by calling
+   * CrossClient.findAvailableTriggerOrderBit(),
+   * If you need to create more than one instruction atomically
+   * put in consecutvie nubmers for triggerOrderBit
+   */
+  public createPlaceTriggerOrderIx(
+    asset: Asset,
+    orderPrice: number,
+    size: number,
+    side: types.Side,
+    triggerPrice: number,
+    triggerDirection: types.TriggerDirection = types.getDefaultTriggerDirection(
+      side
+    ),
+    triggerTimestamp: anchor.BN,
+    orderType: types.OrderType,
+    triggerOrderBit: number,
+    options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
+  ): TransactionInstruction {
+    let assetIndex = assets.assetToIndex(asset);
+
+    if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
+      throw Error("User has no open orders account.");
+    }
+    let openOrdersPda = this._openOrdersAccounts[assetIndex];
+
+    return instructions.placeTriggerOrderIx(
+      asset,
+      orderPrice,
+      triggerPrice,
+      triggerDirection,
+      triggerTimestamp,
+      triggerOrderBit,
+      size,
+      side,
+      orderType,
+      options.reduceOnly != undefined ? options.reduceOnly : false,
+      options.tag,
+      this.accountAddress,
+      this._provider.wallet.publicKey,
+      openOrdersPda
+    );
   }
 
   public async cancelAllTriggerOrders(asset: Asset | undefined) {
