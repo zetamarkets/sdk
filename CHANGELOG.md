@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.18.4]
 
-- Add preixs to cross client place order and create place trigger order ix. ([]())
+- Add preixs to cross client place order and create place trigger order ix. ([#341](https://github.com/zetamarkets/sdk/pull/341))
 
 ## [1.18.3]
 
