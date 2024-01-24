@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## Unreleased
+
+- Add instruction to update maker fee percentage. ([#334](https://github.com/zetamarkets/sdk/pull/334))
+
 ## [1.18.5]
 
 - Bugfix - Use execution price for uPnL trading fee calc. ([#342](https://github.com/zetamarkets/sdk/pull/342))

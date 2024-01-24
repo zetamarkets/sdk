@@ -1071,6 +1071,27 @@
       "args": []
     },
     {
+      "name": "updateMakerTradeFeePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newNativeMakerTradeFeePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "updateZetaState",
       "accounts": [
         {
@@ -6333,6 +6354,34 @@
       ]
     },
     {
+      "name": "editMaType",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "maType",
+          "type": {
+            "defined": "MarginAccountType"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -7249,11 +7298,15 @@
             }
           },
           {
+            "name": "nativeMakerTradeFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                106
+                98
               ]
             }
           }
@@ -9428,6 +9481,9 @@
           },
           {
             "name": "MarketMaker"
+          },
+          {
+            "name": "MarketMakerT1"
           }
         ]
       }
