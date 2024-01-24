@@ -9483,9 +9483,6 @@ export type Zeta = {
             "name": "MarketMaker"
           },
           {
-            "name": "T1"
-          },
-          {
             "name": "MarketMakerT1"
           }
         ]
@@ -20243,9 +20240,6 @@ export const IDL: Zeta = {
           },
           {
             "name": "MarketMaker"
-          },
-          {
-            "name": "T1"
           },
           {
             "name": "MarketMakerT1"
