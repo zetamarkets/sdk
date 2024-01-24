@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.18.5]
+
+- Bugfix - Use execution price for uPnL trading fee calc. ([#342](https://github.com/zetamarkets/sdk/pull/342))
+
 ## [1.18.4]
 
 - Add preixs to cross client place order and create place trigger order ix. ([#341](https://github.com/zetamarkets/sdk/pull/341))
