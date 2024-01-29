@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.19.1]
+
+- Add optional startIndex to findAvailableTriggerOrderBit(). ([#345](https://github.com/zetamarkets/sdk/pull/345))
+
 ## [1.19.0]
 
 - Add instruction to update maker fee percentage. ([#334](https://github.com/zetamarkets/sdk/pull/334))
