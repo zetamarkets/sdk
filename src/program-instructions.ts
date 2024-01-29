@@ -2302,6 +2302,38 @@ export function editDelegatedPubkeyIx(
   });
 }
 
+export function updateMakerTradeFeePercentageIx(
+  newNativeMakerTradeFeePercetange: anchor.BN,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.updateMakerTradeFeePercentage(
+    newNativeMakerTradeFeePercetange,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function editMaType(
+  maType: types.MarginAccountType,
+  marginAccount: PublicKey,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.editMaType(
+    types.toProgramMarginAccountType(maType),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+        marginAccount,
+      },
+    }
+  );
+}
+
 export function updateMinLotIx(
   asset: Asset,
   newMinLotSize: number,

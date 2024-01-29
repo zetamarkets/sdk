@@ -382,7 +382,7 @@ export class RiskCalculator {
           convertNativeLotSizeToDecimal(Math.abs(size)) *
           (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
             100) *
-          subExchange.getMarkPrice();
+          price;
       }
       upnlMap.set(asset, assetPnl);
       pnl += assetPnl;

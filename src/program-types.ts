@@ -41,6 +41,7 @@ export interface State {
   minLotSizesPadding: Array<number>;
   tickSizes: Array<number>;
   tickSizesPadding: Array<number>;
+  nativeMakerTradeFeePercentage: anchor.BN;
   padding: Array<number>;
 }
 

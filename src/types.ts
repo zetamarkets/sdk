@@ -371,6 +371,7 @@ export type MarketIdentifier = number | PublicKey;
 export enum MarginAccountType {
   NORMAL = 0,
   MARKET_MAKER = 1,
+  MARKET_MAKER_T1 = 2,
 }
 
 export function fromProgramMarginAccountType(
@@ -382,13 +383,33 @@ export function fromProgramMarginAccountType(
   if (objectEquals(accountType, { marketMaker: {} })) {
     return MarginAccountType.MARKET_MAKER;
   }
+  if (objectEquals(accountType, { marketMakert1: {} })) {
+    return MarginAccountType.MARKET_MAKER_T1;
+  }
+  throw Error("Invalid margin account type");
+}
+
+export function toProgramMarginAccountType(
+  accountType: MarginAccountType
+): any {
+  if (accountType == MarginAccountType.NORMAL) {
+    return { normal: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER) {
+    return { marketMaker: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T1) {
+    return { marketMakerT1: {} };
+  }
   throw Error("Invalid margin account type");
 }
 
 export function isMarketMaker(account: CrossMarginAccount | MarginAccount) {
   return (
     fromProgramMarginAccountType(account.accountType) ==
-    MarginAccountType.MARKET_MAKER
+      MarginAccountType.MARKET_MAKER ||
+    fromProgramMarginAccountType(account.accountType) ==
+      MarginAccountType.MARKET_MAKER_T1
   );
 }
 

@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.19.0]
+
+- Add instruction to update maker fee percentage. ([#334](https://github.com/zetamarkets/sdk/pull/334))
+- Add instruction to update margin account type. ([#334](https://github.com/zetamarkets/sdk/pull/334))
+
+## [1.18.5]
+
+- Bugfix - Use execution price for uPnL trading fee calc. ([#342](https://github.com/zetamarkets/sdk/pull/342))
+
 ## [1.18.4]
 
 - Add preixs to cross client place order and create place trigger order ix. ([#341](https://github.com/zetamarkets/sdk/pull/341))
