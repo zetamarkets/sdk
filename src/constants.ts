@@ -13,6 +13,7 @@ export enum Asset {
   JTO = "JTO",
   ONEMBONK = "ONEMBONK",
   SEI = "SEI",
+  JUP = "JUP",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -46,6 +47,7 @@ export const FLEX_MINTS = {
       "LF8rzt8WSzMuH3E4pfryGvSWMc1jDponXdQHkzL2cGo"
     ),
     [Asset.SEI]: new PublicKey("Dju5Nvuet6GyBk7dBwWSG9cg2JDhtxKXHsBTs7HFbPk3"),
+    [Asset.JUP]: new PublicKey("rYFexooTE27wUDaJsjpy8UdyKqUHxroPvfB2Hgmajjt"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -63,6 +65,7 @@ export const FLEX_MINTS = {
       "76x829V8cNWymEBNjUuE22bUcVnShNeRwnXnegviejyj"
     ),
     [Asset.SEI]: new PublicKey("CTw2xSSAfrv9hJGVpB2R2q5xYrdX79i3hXeCiQiAKf2f"),
+    [Asset.JUP]: new PublicKey("7uP5h7kxRaSbd2dz5e6gZp8yhqazyMvaXVoNZ4HsgZ2n"),
   },
 };
 
@@ -167,6 +170,7 @@ export const PYTH_PRICE_FEEDS = {
       "G6PKiDSNpyeFRM6iLyZWXTP4U8sKejdEHpDGEXJxTpdP"
     ),
     [Asset.SEI]: new PublicKey("EhC74qLWnp3i5y3EiPibQHdAkNU4F9kvcDuWgcQuLj6G"),
+    [Asset.JUP]: new PublicKey("8uMQw668EowuxXcX6oYohLepTCoZmk9WEnj224qevLqj"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -192,6 +196,7 @@ export const PYTH_PRICE_FEEDS = {
       "8ihFLu5FimgTQ1Unh4dVyEHUGodJ5gJQCrQf4KUVB9bN"
     ),
     [Asset.SEI]: new PublicKey("6cUuAyAX3eXoiWkjFF77RQBEUF15AAMQ7d1hm4EPd3tv"),
+    [Asset.JUP]: new PublicKey("g6eRCbboSwK4tSWngn773RCMexr1APQr4uA9bGZBYfo"),
   },
 };
 
@@ -216,8 +221,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 11;
-export const UNUSED_PERP_MARKETS = 14;
+export const ACTIVE_PERP_MARKETS = 12;
+export const UNUSED_PERP_MARKETS = 13;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 30;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;

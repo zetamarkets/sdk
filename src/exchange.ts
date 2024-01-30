@@ -370,6 +370,7 @@ export class Exchange {
       throw "Exchange already setup";
     }
     this._assets = assets.allAssets(loadConfig.network);
+    this._assets.pop();
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
       wallet instanceof types.DummyWallet ? null : wallet,
