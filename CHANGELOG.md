@@ -7,6 +7,10 @@ Version changes are pinned to SDK releases.
 
 - Improve tx confirmations by polling. ([#347](https://github.com/zetamarkets/sdk/pull/347))
 
+## [1.20.0]
+
+- Add JUP asset. ([346](https://github.com/zetamarkets/sdk/pull/346))
+
 ## [1.19.1]
 
 - Add optional startIndex to findAvailableTriggerOrderBit(). ([#345](https://github.com/zetamarkets/sdk/pull/345))
