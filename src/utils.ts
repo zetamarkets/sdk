@@ -983,30 +983,42 @@ export async function processTransaction(
     rawTx = tx.serialize();
   }
 
+  let txOpts = opts || commitmentConfig(provider.connection.commitment);
   try {
     // Integration tests don't like the split send + confirm :(
     if (Exchange.network == Network.LOCALNET) {
       return await anchor.sendAndConfirmRawTransaction(
         provider.connection,
         rawTx,
-        opts || commitmentConfig(provider.connection.commitment)
+        txOpts
       );
     }
 
-    let txSig = await provider.connection.sendRawTransaction(
-      rawTx,
-      opts || commitmentConfig(provider.connection.commitment)
-    );
-    let result = await provider.connection.confirmTransaction({
-      blockhash: recentBlockhash.blockhash,
-      lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
-      signature: txSig,
+    let txSig = bs58.encode(tx.signatures[0].signature).toString();
+
+    await provider.connection.sendRawTransaction(rawTx, {
+      skipPreflight: true,
     });
-    if (result.value.err != null) {
-      let parsedErr = parseError(result.value.err);
-      throw parsedErr;
+
+    let now = Date.now() / 1000;
+    // Poll the tx confirmation for N seconds
+    // Polling is more reliable than websockets using confirmTransaction()
+    while (Date.now() / 1000 - now < Exchange._txConfirmationPollSeconds) {
+      let status = await provider.connection.getSignatureStatus(txSig);
+      console.log(status);
+      if (status.value != null) {
+        if (status.value.err != null) {
+          let parsedErr = parseError(
+            parseInt(status.value.err["InstructionError"][1]["Custom"])
+          );
+          throw parsedErr;
+        }
+        if (status.value.confirmationStatus == txOpts.commitment.toString()) {
+          return txSig;
+        }
+      }
     }
-    return txSig;
+    throw "Transaction was not confirmed";
   } catch (err) {
     let parsedErr = parseError(err);
     throw parsedErr;
@@ -1021,6 +1033,9 @@ export function parseError(err: any) {
   }
 
   const programError = anchor.ProgramError.parse(err, errors.idlErrors);
+  if (typeof err == typeof 0 && errors.idlErrors.has(err)) {
+    return errors.idlErrors.get(err);
+  }
   if (programError) {
     return programError;
   }
