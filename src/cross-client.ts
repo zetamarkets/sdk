@@ -1094,12 +1094,17 @@ export class CrossClient {
     return txId;
   }
 
-  public findAvailableTriggerOrderBit(): number {
+  /**
+   * Find the next available bit to store a trigger order (0 to 127)
+   * @param startIndex optional, the index from which to start looking (0 to 127)
+   * @returns the first available bit (0 to 127)
+   */
+  public findAvailableTriggerOrderBit(startIndex: number = 0): number {
     // If we haven't loaded properly for whatever reason just use the last index to minimise the chance of collisions
     if (!this.account || !this.account.triggerOrderBits) {
       return 127;
     }
-    for (var i = 0; i < 128; i++) {
+    for (var i = startIndex; i < 128; i++) {
       let mask: BN = new BN(1).shln(i); // 1 << i
       if (this.account.triggerOrderBits.and(mask).isZero()) {
         return i;

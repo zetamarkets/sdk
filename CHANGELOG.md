@@ -7,6 +7,10 @@ Version changes are pinned to SDK releases.
 
 - Add JUP asset. ([346](https://github.com/zetamarkets/sdk/pull/346))
 
+## [1.19.1]
+
+- Add optional startIndex to findAvailableTriggerOrderBit(). ([#345](https://github.com/zetamarkets/sdk/pull/345))
+
 ## [1.19.0]
 
 - Add instruction to update maker fee percentage. ([#334](https://github.com/zetamarkets/sdk/pull/334))
