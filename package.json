@@ -1,7 +1,7 @@
 {
   "name": "@zetamarkets/sdk",
   "repository": "https://github.com/zetamarkets/sdk/",
-  "version": "1.19.1",
+  "version": "1.20.0",
   "description": "Zeta SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

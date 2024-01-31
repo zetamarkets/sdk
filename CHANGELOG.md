@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.20.0]
+
+- Add JUP asset. ([346](https://github.com/zetamarkets/sdk/pull/346))
+
 ## [1.19.1]
 
 - Add optional startIndex to findAvailableTriggerOrderBit(). ([#345](https://github.com/zetamarkets/sdk/pull/345))
