@@ -994,9 +994,7 @@ export async function processTransaction(
       );
     }
 
-    let txSig = bs58.encode(tx.signatures[0].signature).toString();
-
-    await provider.connection.sendRawTransaction(rawTx, {
+    let txSig = await provider.connection.sendRawTransaction(rawTx, {
       skipPreflight: true,
     });
 
@@ -1005,7 +1003,6 @@ export async function processTransaction(
     // Polling is more reliable than websockets using confirmTransaction()
     while (Date.now() / 1000 - now < Exchange._txConfirmationPollSeconds) {
       let status = await provider.connection.getSignatureStatus(txSig);
-      console.log(status);
       if (status.value != null) {
         if (status.value.err != null) {
           let parsedErr = parseError(
@@ -1017,6 +1014,7 @@ export async function processTransaction(
           return txSig;
         }
       }
+      await sleep(500); // Don't spam the RPC
     }
     throw "Transaction was not confirmed";
   } catch (err) {
