@@ -318,6 +318,8 @@ export class Exchange {
   private _autoPriorityFeeMultiplier: number = 1;
   private _autoPriorityFeeUseMax: boolean = false;
 
+  public _txConfirmationPollSeconds = 20;
+
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
     return this._autoPriorityFeeUpperLimit;
