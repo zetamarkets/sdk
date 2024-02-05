@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.20.1]
+
+- Improve tx confirmations by polling. ([#347](https://github.com/zetamarkets/sdk/pull/347))
+
 ## [1.20.0]
 
 - Add JUP asset. ([346](https://github.com/zetamarkets/sdk/pull/346))
