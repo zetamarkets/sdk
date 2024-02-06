@@ -6,6 +6,7 @@ Version changes are pinned to SDK releases.
 ## [1.20.2]
 
 - Relax throwing if no open orders account is detected in some client functions. ([#349](https://github.com/zetamarkets/sdk/pull/349))
+- Edit the marketMakerT1 enum type - bugfix. ([#348](https://github.com/zetamarkets/sdk/pull/34))
 
 ## [1.20.1]
 
