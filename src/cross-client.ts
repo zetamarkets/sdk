@@ -1253,11 +1253,17 @@ export class CrossClient {
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ): TransactionInstruction {
     let assetIndex = assets.assetToIndex(asset);
-
+    let openOrdersAccount = this._openOrdersAccounts[assetIndex];
     if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
-      throw Error("User has no open orders account.");
+      // This account won't be created unless explicitly done so before this instruction
+      // Purposely don't throw because there are some frontend cases which do more complicated tx building
+      openOrdersAccount = utils.getCrossOpenOrders(
+        Exchange.programId,
+        Exchange.getPerpMarket(asset).address,
+        this._accountAddress
+      )[0];
+      console.warn(`No open orders account for ${assetToName(asset)}`);
     }
-    let openOrdersPda = this._openOrdersAccounts[assetIndex];
 
     return instructions.placeTriggerOrderIx(
       asset,
@@ -1273,7 +1279,7 @@ export class CrossClient {
       options.tag,
       this.accountAddress,
       this._provider.wallet.publicKey,
-      openOrdersPda
+      openOrdersAccount
     );
   }
 
@@ -1716,9 +1722,16 @@ export class CrossClient {
     options: types.OrderOptions = types.defaultOrderOptions()
   ): TransactionInstruction {
     let assetIndex = assetToIndex(asset);
+    let openOrdersAccount = this._openOrdersAccounts[assetIndex];
     if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
-      console.log(`No open orders account for ${assetToName(asset)}`);
-      throw Error("User does not have an open orders account.");
+      // This account won't be created unless explicitly done so before this instruction
+      // Purposely don't throw because there are some frontend cases which do more complicated tx building
+      openOrdersAccount = utils.getCrossOpenOrders(
+        Exchange.programId,
+        Exchange.getPerpMarket(asset).address,
+        this._accountAddress
+      )[0];
+      console.warn(`No open orders account for ${assetToName(asset)}`);
     }
 
     let market = Exchange.getPerpMarket(asset);
@@ -1738,7 +1751,7 @@ export class CrossClient {
       tifOffset,
       this.accountAddress,
       this._provider.wallet.publicKey,
-      this._openOrdersAccounts[assetIndex],
+      openOrdersAccount,
       this._whitelistTradingFeesAddress
     );
   }
