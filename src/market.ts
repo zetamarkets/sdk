@@ -73,7 +73,6 @@ export class ZetaGroupMarkets {
   public static async load(
     asset: Asset,
     opts: ConfirmOptions,
-    throttleMs: number,
     loadFromStore: boolean
   ): Promise<ZetaGroupMarkets> {
     let instance = new ZetaGroupMarkets(asset);

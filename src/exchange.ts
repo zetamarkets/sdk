@@ -371,7 +371,11 @@ export class Exchange {
     if (this.isSetup) {
       throw "Exchange already setup";
     }
-    this._assets = assets.allAssets(loadConfig.network);
+    if (loadConfig.loadAssets) {
+      this._assets = loadConfig.loadAssets;
+    } else {
+      this._assets = assets.allAssets();
+    }
     this._provider = new anchor.AnchorProvider(
       loadConfig.connection,
       wallet instanceof types.DummyWallet ? null : wallet,
@@ -637,10 +641,19 @@ export class Exchange {
       this.subscribeOracle(this.assets, callback),
     ]);
 
-    const accFetches = (await Promise.all(allPromises)).slice(
-      0,
-      this.assets.length + 1
-    );
+    // If throttleMs is passed, do each promise slowly with a delay, else load everything at once
+    let accFetches = [];
+    if (loadConfig.throttleMs > 0) {
+      for (var prom of allPromises) {
+        await utils.sleep(loadConfig.throttleMs);
+        accFetches.push(await Promise.resolve(prom));
+      }
+    } else {
+      accFetches = (await Promise.all(allPromises)).slice(
+        0,
+        this.assets.length + 1
+      );
+    }
 
     let perpSyncQueueAccs: PerpSyncQueue[] = [];
     for (let i = 0; i < accFetches.length - 1; i++) {
@@ -652,26 +665,48 @@ export class Exchange {
       );
     }
 
-    await Promise.all(
-      this.assets.map(async (asset, i) => {
-        return this.getSubExchange(asset).load(
+    // If throttleMs is passed, load sequentially with some delay, else load as fast as possible
+    if (loadConfig.throttleMs > 0) {
+      this.assets.forEach(async (asset, i) => {
+        await utils.sleep(loadConfig.throttleMs);
+        this.getSubExchange(asset).load(
           asset,
           this.opts,
           [perpSyncQueueAccs[i]],
           loadConfig.loadFromStore,
-          loadConfig.throttleMs,
           callback
         );
-      })
-    );
+      });
+    } else {
+      await Promise.all(
+        this.assets.map(async (asset, i) => {
+          return this.getSubExchange(asset).load(
+            asset,
+            this.opts,
+            [perpSyncQueueAccs[i]],
+            loadConfig.loadFromStore,
+            callback
+          );
+        })
+      );
+    }
 
-    await Promise.all(
-      this._assets.map(async (a) => {
-        await this.getPerpMarket(a).serumMarket.updateDecoded(
+    if (loadConfig.throttleMs > 0) {
+      for (var asset of this.assets) {
+        await utils.sleep(loadConfig.throttleMs);
+        await this.getPerpMarket(asset).serumMarket.updateDecoded(
           this.connection as unknown as ConnectionZstd
         );
-      })
-    );
+      }
+    } else {
+      await Promise.all(
+        this._assets.map(async (a) => {
+          await this.getPerpMarket(a).serumMarket.updateDecoded(
+            this.connection as unknown as ConnectionZstd
+          );
+        })
+      );
+    }
 
     for (var se of this.getAllSubExchanges()) {
       // Only subscribe to the orderbook for assets provided in the override
