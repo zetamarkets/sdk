@@ -383,7 +383,7 @@ export function fromProgramMarginAccountType(
   if (objectEquals(accountType, { marketMaker: {} })) {
     return MarginAccountType.MARKET_MAKER;
   }
-  if (objectEquals(accountType, { marketMakert1: {} })) {
+  if (objectEquals(accountType, { marketMakerT1: {} })) {
     return MarginAccountType.MARKET_MAKER_T1;
   }
   throw Error("Invalid margin account type");

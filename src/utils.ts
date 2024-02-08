@@ -983,30 +983,40 @@ export async function processTransaction(
     rawTx = tx.serialize();
   }
 
+  let txOpts = opts || commitmentConfig(provider.connection.commitment);
   try {
     // Integration tests don't like the split send + confirm :(
     if (Exchange.network == Network.LOCALNET) {
       return await anchor.sendAndConfirmRawTransaction(
         provider.connection,
         rawTx,
-        opts || commitmentConfig(provider.connection.commitment)
+        txOpts
       );
     }
 
-    let txSig = await provider.connection.sendRawTransaction(
-      rawTx,
-      opts || commitmentConfig(provider.connection.commitment)
-    );
-    let result = await provider.connection.confirmTransaction({
-      blockhash: recentBlockhash.blockhash,
-      lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
-      signature: txSig,
+    let txSig = await provider.connection.sendRawTransaction(rawTx, {
+      skipPreflight: true,
     });
-    if (result.value.err != null) {
-      let parsedErr = parseError(result.value.err);
-      throw parsedErr;
+
+    let now = Date.now() / 1000;
+    // Poll the tx confirmation for N seconds
+    // Polling is more reliable than websockets using confirmTransaction()
+    while (Date.now() / 1000 - now < Exchange._txConfirmationPollSeconds) {
+      let status = await provider.connection.getSignatureStatus(txSig);
+      if (status.value != null) {
+        if (status.value.err != null) {
+          let parsedErr = parseError(
+            parseInt(status.value.err["InstructionError"][1]["Custom"])
+          );
+          throw parsedErr;
+        }
+        if (status.value.confirmationStatus == txOpts.commitment.toString()) {
+          return txSig;
+        }
+      }
+      await sleep(400); // Don't spam the RPC
     }
-    return txSig;
+    throw "Transaction was not confirmed";
   } catch (err) {
     let parsedErr = parseError(err);
     throw parsedErr;
@@ -1021,6 +1031,9 @@ export function parseError(err: any) {
   }
 
   const programError = anchor.ProgramError.parse(err, errors.idlErrors);
+  if (typeof err == typeof 0 && errors.idlErrors.has(err)) {
+    return errors.idlErrors.get(err);
+  }
   if (programError) {
     return programError;
   }
@@ -1457,14 +1470,32 @@ export async function getAllProgramAccountAddresses(
 }
 
 export async function getAllOpenOrdersAccounts(
-  asset: Asset
+  asset: Asset,
+  accountLimit?: number
 ): Promise<PublicKey[]> {
   let allOpenOrders: PublicKey[] = [];
   let market = Exchange.getPerpMarket(asset);
 
-  let marginAccounts = await Exchange.program.account.marginAccount.all();
-  marginAccounts.forEach((acc) => {
-    let marginAccount = acc.account as MarginAccount;
+  let maPubkeys = await getAllProgramAccountAddresses(
+    types.ProgramAccountType.MarginAccount
+  );
+
+  // Randomly grab the first N only to avoid overloading the app
+  maPubkeys.sort(() => Math.random() - 0.5);
+  if (accountLimit) {
+    maPubkeys = maPubkeys.slice(0, accountLimit);
+  }
+  console.log(`${maPubkeys.length} marginAccounts pubkeys`);
+  let marginAccounts = [];
+  for (let i = 0; i < maPubkeys.length; i += constants.MAX_ACCOUNTS_TO_FETCH) {
+    marginAccounts = marginAccounts.concat(
+      await Exchange.program.account.marginAccount.fetchMultiple(
+        maPubkeys.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH)
+      )
+    );
+  }
+
+  marginAccounts.forEach((marginAccount) => {
     if (assets.fromProgramAsset(marginAccount.asset) != asset) {
       return;
     }
@@ -1480,17 +1511,31 @@ export async function getAllOpenOrdersAccounts(
     }
   });
 
-  let crossMarginAccounts =
-    await Exchange.program.account.crossMarginAccount.all();
-  crossMarginAccounts.forEach((acc) => {
-    let crossMarginAccount = acc.account as CrossMarginAccount;
+  let cmaPubkeys = await getAllProgramAccountAddresses(
+    types.ProgramAccountType.CrossMarginAccount
+  );
+  // Randomly grab the first N only to avoid overloading the app
+  cmaPubkeys.sort(() => Math.random() - 0.5);
+  if (accountLimit) {
+    cmaPubkeys = cmaPubkeys.slice(0, accountLimit);
+  }
+  console.log(`${cmaPubkeys.length} crossMarginAccounts`);
+  let crossMarginAccounts = [];
+  for (let i = 0; i < cmaPubkeys.length; i += constants.MAX_ACCOUNTS_TO_FETCH) {
+    crossMarginAccounts = crossMarginAccounts.concat(
+      await Exchange.program.account.crossMarginAccount.fetchMultiple(
+        cmaPubkeys.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH)
+      )
+    );
+  }
 
+  crossMarginAccounts.forEach((crossMarginAccount, i) => {
     let nonce = crossMarginAccount.openOrdersNonces[assets.assetToIndex(asset)];
     if (nonce != 0) {
       let [openOrders, _nonce] = getCrossOpenOrders(
         Exchange.programId,
         market.address,
-        acc.publicKey
+        cmaPubkeys[i]
       );
       allOpenOrders.push(openOrders);
     }
@@ -1504,31 +1549,23 @@ export async function settleAndBurnVaultTokens(
   provider: anchor.AnchorProvider,
   accountLimit: number = 100
 ) {
-  let openOrdersRaw = await getAllOpenOrdersAccounts(asset);
-  // Randomly sort so that if we have an accountLimit we don't keep grabbing the same N accounts every time
-  let openOrdersRandSort = openOrdersRaw.sort(() => Math.random() - 0.5);
+  let openOrdersRaw = await getAllOpenOrdersAccounts(asset, accountLimit);
 
   let openOrdersFiltered = [];
   for (
     var i = 0;
-    i < openOrdersRandSort.length;
+    i < openOrdersRaw.length;
     i += constants.MAX_ACCOUNTS_TO_FETCH
   ) {
-    if (openOrdersFiltered.length >= accountLimit) {
-      break;
-    }
     let ooBatch = await Exchange.connection.getMultipleAccountsInfo(
-      openOrdersRandSort.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH),
+      openOrdersRaw.slice(i, i + constants.MAX_ACCOUNTS_TO_FETCH),
       provider.connection.commitment
     );
 
     for (var j = 0; j < ooBatch.length; j++) {
-      if (openOrdersFiltered.length >= accountLimit) {
-        break;
-      }
       const decoded = _OPEN_ORDERS_LAYOUT_V2.decode(ooBatch[j].data);
       let openOrdersAccount = new OpenOrders(
-        openOrdersRandSort[i + j],
+        openOrdersRaw[i + j],
         decoded,
         Exchange.programId
       );
@@ -1539,7 +1576,7 @@ export async function settleAndBurnVaultTokens(
         openOrdersAccount.quoteTokenFree.toNumber() != 0 ||
         openOrdersAccount.quoteTokenTotal.toNumber() != 0
       ) {
-        openOrdersFiltered.push(openOrdersRandSort[i + j]);
+        openOrdersFiltered.push(openOrdersRaw[i + j]);
       }
     }
   }
@@ -1567,11 +1604,11 @@ export async function settleAndBurnVaultTokens(
     console.log("Settle tx num =", j);
     let txSlice = txs.slice(j, j + 5);
     await Promise.all(
-      txSlice.map(async (tx) => {
+      txSlice.map(async (tx, i) => {
         try {
           await processTransaction(provider, tx);
         } catch (e) {
-          console.log("Settle failed, continuing...");
+          console.log(`Settle failed on tx ${j + i}, continuing...`);
         }
       })
     );

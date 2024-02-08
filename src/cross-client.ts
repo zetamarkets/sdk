@@ -1094,12 +1094,17 @@ export class CrossClient {
     return txId;
   }
 
-  public findAvailableTriggerOrderBit(): number {
+  /**
+   * Find the next available bit to store a trigger order (0 to 127)
+   * @param startIndex optional, the index from which to start looking (0 to 127)
+   * @returns the first available bit (0 to 127)
+   */
+  public findAvailableTriggerOrderBit(startIndex: number = 0): number {
     // If we haven't loaded properly for whatever reason just use the last index to minimise the chance of collisions
     if (!this.account || !this.account.triggerOrderBits) {
       return 127;
     }
-    for (var i = 0; i < 128; i++) {
+    for (var i = startIndex; i < 128; i++) {
       let mask: BN = new BN(1).shln(i); // 1 << i
       if (this.account.triggerOrderBits.and(mask).isZero()) {
         return i;
@@ -1248,11 +1253,17 @@ export class CrossClient {
     options: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
   ): TransactionInstruction {
     let assetIndex = assets.assetToIndex(asset);
-
+    let openOrdersAccount = this._openOrdersAccounts[assetIndex];
     if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
-      throw Error("User has no open orders account.");
+      // This account won't be created unless explicitly done so before this instruction
+      // Purposely don't throw because there are some frontend cases which do more complicated tx building
+      openOrdersAccount = utils.getCrossOpenOrders(
+        Exchange.programId,
+        Exchange.getPerpMarket(asset).address,
+        this._accountAddress
+      )[0];
+      console.warn(`No open orders account for ${assetToName(asset)}`);
     }
-    let openOrdersPda = this._openOrdersAccounts[assetIndex];
 
     return instructions.placeTriggerOrderIx(
       asset,
@@ -1268,7 +1279,7 @@ export class CrossClient {
       options.tag,
       this.accountAddress,
       this._provider.wallet.publicKey,
-      openOrdersPda
+      openOrdersAccount
     );
   }
 
@@ -1711,9 +1722,16 @@ export class CrossClient {
     options: types.OrderOptions = types.defaultOrderOptions()
   ): TransactionInstruction {
     let assetIndex = assetToIndex(asset);
+    let openOrdersAccount = this._openOrdersAccounts[assetIndex];
     if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
-      console.log(`No open orders account for ${assetToName(asset)}`);
-      throw Error("User does not have an open orders account.");
+      // This account won't be created unless explicitly done so before this instruction
+      // Purposely don't throw because there are some frontend cases which do more complicated tx building
+      openOrdersAccount = utils.getCrossOpenOrders(
+        Exchange.programId,
+        Exchange.getPerpMarket(asset).address,
+        this._accountAddress
+      )[0];
+      console.warn(`No open orders account for ${assetToName(asset)}`);
     }
 
     let market = Exchange.getPerpMarket(asset);
@@ -1733,7 +1751,7 @@ export class CrossClient {
       tifOffset,
       this.accountAddress,
       this._provider.wallet.publicKey,
-      this._openOrdersAccounts[assetIndex],
+      openOrdersAccount,
       this._whitelistTradingFeesAddress
     );
   }

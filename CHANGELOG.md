@@ -3,9 +3,30 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [1.19.1]
+## [1.21.0]
 
 - Add PNL to TradeEventV3 and PositionSize to ApplyFundingEvent. ([#344](https://github.com/zetamarkets/sdk/pull/344))
+
+## [1.20.3]
+
+- Refactor settleAndBurnVaultTokens to allow an accountLimit. ([#350](https://github.com/zetamarkets/sdk/pull/350))
+
+## [1.20.2]
+
+- Relax throwing if no open orders account is detected in some client functions. ([#349](https://github.com/zetamarkets/sdk/pull/349))
+- Edit the marketMakerT1 enum type - bugfix. ([#348](https://github.com/zetamarkets/sdk/pull/34))
+
+## [1.20.1]
+
+- Improve tx confirmations by polling. ([#347](https://github.com/zetamarkets/sdk/pull/347))
+
+## [1.20.0]
+
+- Add JUP asset. ([346](https://github.com/zetamarkets/sdk/pull/346))
+
+## [1.19.1]
+
+- Add optional startIndex to findAvailableTriggerOrderBit(). ([#345](https://github.com/zetamarkets/sdk/pull/345))
 
 ## [1.19.0]
 
