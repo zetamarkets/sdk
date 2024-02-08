@@ -685,59 +685,30 @@ export function executeTriggerOrderV2Ix(
     },
   });
 }
-export function executeTriggerOrderIx(
-  asset: Asset,
-  side: types.Side,
-  triggerOrderBit: number,
-  triggerOrder: PublicKey,
-  marginAccount: PublicKey,
-  openOrders: PublicKey
-): TransactionInstruction {
-  let marketData = Exchange.getPerpMarket(asset);
 
-  return Exchange.program.instruction.executeTriggerOrder(triggerOrderBit, {
+export function takeTriggerOrderIx(
+  asset: Asset,
+  triggerOrder: PublicKey,
+  triggerOrderBit: number,
+  orderMarginAccount: PublicKey,
+  takerMarginAccount: PublicKey,
+  taker: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.takeTriggerOrder(triggerOrderBit, {
     accounts: {
-      admin: Exchange.state.secondaryAdmin,
       triggerOrder: triggerOrder,
-      placeOrderAccounts: {
-        state: Exchange.stateAddress,
-        pricing: Exchange.pricingAddress,
-        marginAccount: marginAccount,
-        dexProgram: constants.DEX_PID[Exchange.network],
-        tokenProgram: TOKEN_PROGRAM_ID,
-        serumAuthority: Exchange.serumAuthority,
-        openOrders: openOrders,
-        rent: SYSVAR_RENT_PUBKEY,
-        marketAccounts: {
-          market: marketData.serumMarket.address,
-          requestQueue: marketData.serumMarket.requestQueueAddress,
-          eventQueue: marketData.serumMarket.eventQueueAddress,
-          bids: marketData.serumMarket.bidsAddress,
-          asks: marketData.serumMarket.asksAddress,
-          coinVault: marketData.serumMarket.baseVaultAddress,
-          pcVault: marketData.serumMarket.quoteVaultAddress,
-          // User params.
-          orderPayerTokenAccount:
-            side == types.Side.BID
-              ? marketData.quoteVault
-              : marketData.baseVault,
-          coinWallet: marketData.baseVault,
-          pcWallet: marketData.quoteVault,
-        },
-        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-        oracleBackupFeed:
-          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
-        oracleBackupProgram: constants.CHAINLINK_PID,
-        marketMint:
-          side == types.Side.BID
-            ? marketData.serumMarket.quoteMintAddress
-            : marketData.serumMarket.baseMintAddress,
-        mintAuthority: Exchange.mintAuthority,
-        perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
-      },
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
+      oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+      oracleBackupProgram: constants.CHAINLINK_PID,
+      taker,
+      takerMarginAccount,
+      orderMarginAccount,
     },
   });
 }
+
 export function cancelTriggerOrderV2Ix(
   triggerOrderBit: number,
   authority: PublicKey,
@@ -752,22 +723,23 @@ export function cancelTriggerOrderV2Ix(
     },
   });
 }
-export function cancelTriggerOrderIx(
+
+export function forceCancelTriggerOrderIx(
   triggerOrderBit: number,
-  payer: PublicKey,
+  authority: PublicKey,
   triggerOrder: PublicKey,
   marginAccount: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.cancelTriggerOrder(triggerOrderBit, {
+  return Exchange.program.instruction.forceCancelTriggerOrder(triggerOrderBit, {
     accounts: {
       state: Exchange.stateAddress,
-      payer: payer,
-      admin: Exchange.state.secondaryAdmin,
+      admin: authority,
       triggerOrder: triggerOrder,
       marginAccount: marginAccount,
     },
   });
 }
+
 export function editTriggerOrderIx(
   newOrderPrice: number,
   newTriggerPrice: number,
@@ -2303,11 +2275,26 @@ export function editDelegatedPubkeyIx(
 }
 
 export function updateMakerTradeFeePercentageIx(
-  newNativeMakerTradeFeePercetange: anchor.BN,
+  newNativeMakerTradeFeePercentage: anchor.BN,
   admin: PublicKey
 ) {
   return Exchange.program.instruction.updateMakerTradeFeePercentage(
-    newNativeMakerTradeFeePercetange,
+    newNativeMakerTradeFeePercentage,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateTakeTriggerOrderFeePercentageIx(
+  newTakeTriggerOrderFeePercentage: anchor.BN,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.updateTakeTriggerOrderFeePercentage(
+    newTakeTriggerOrderFeePercentage,
     {
       accounts: {
         state: Exchange.stateAddress,
