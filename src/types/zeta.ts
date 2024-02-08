@@ -9392,6 +9392,9 @@ export type Zeta = {
             "name": "JUP"
           },
           {
+            "name": "DYM"
+          },
+          {
             "name": "UNDEFINED"
           }
         ]
@@ -20152,6 +20155,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "JUP"
+          },
+          {
+            "name": "DYM"
           },
           {
             "name": "UNDEFINED"
