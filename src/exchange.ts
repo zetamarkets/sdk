@@ -644,10 +644,14 @@ export class Exchange {
     // If throttleMs is passed, do each promise slowly with a delay, else load everything at once
     let accFetches = [];
     if (loadConfig.throttleMs > 0) {
+      console.log(
+        `Fetching ${allPromises.length} core accounts with ${loadConfig.throttleMs}ms sleep inbetween each fetch...`
+      );
       for (var prom of allPromises) {
         await utils.sleep(loadConfig.throttleMs);
         accFetches.push(await Promise.resolve(prom));
       }
+      accFetches = accFetches.slice(0, this.assets.length + 1);
     } else {
       accFetches = (await Promise.all(allPromises)).slice(
         0,
@@ -667,16 +671,16 @@ export class Exchange {
 
     // If throttleMs is passed, load sequentially with some delay, else load as fast as possible
     if (loadConfig.throttleMs > 0) {
-      this.assets.forEach(async (asset, i) => {
+      for (var asset of this.assets) {
         await utils.sleep(loadConfig.throttleMs);
-        this.getSubExchange(asset).load(
+        await this.getSubExchange(asset).load(
           asset,
           this.opts,
-          [perpSyncQueueAccs[i]],
+          [perpSyncQueueAccs[this.assets.indexOf(asset)]],
           loadConfig.loadFromStore,
           callback
         );
-      });
+      }
     } else {
       await Promise.all(
         this.assets.map(async (asset, i) => {
@@ -692,6 +696,9 @@ export class Exchange {
     }
 
     if (loadConfig.throttleMs > 0) {
+      console.log(
+        `Updating ${this.assets.length} markets with ${loadConfig.throttleMs}ms sleep inbetween each update...`
+      );
       for (var asset of this.assets) {
         await utils.sleep(loadConfig.throttleMs);
         await this.getPerpMarket(asset).serumMarket.updateDecoded(
@@ -735,6 +742,11 @@ export class Exchange {
     await this.updateExchangeState();
 
     this._isInitialized = true;
+
+    // An extra log because the throttleMs path is slower and logs more along the way
+    if (loadConfig.throttleMs > 0) {
+      console.log("Exchange load complete");
+    }
   }
 
   private addSubExchange(asset: Asset, subExchange: SubExchange) {
