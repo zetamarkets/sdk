@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [Unreleased]
+
+- Deprecate v1 trigger instructions.
+- Add new take trigger order instruction.
+
 ## [1.20.3]
 
 - Refactor settleAndBurnVaultTokens to allow an accountLimit. ([#350](https://github.com/zetamarkets/sdk/pull/350))
