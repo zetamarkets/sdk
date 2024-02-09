@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.20.4]
+
+- More load options - assets and throttleMs. ([#351](https://github.com/zetamarkets/sdk/pull/351))
+
 ## [1.20.3]
 
 - Refactor settleAndBurnVaultTokens to allow an accountLimit. ([#350](https://github.com/zetamarkets/sdk/pull/350))
