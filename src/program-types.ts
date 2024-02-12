@@ -386,6 +386,7 @@ export interface TradeEventV3 {
   sequenceNumber: anchor.BN; // Unique id for the given market
   fee: anchor.BN;
   price: anchor.BN;
+  pnl: anchor.BN;
 }
 
 export interface PositionMovementEvent {
@@ -432,4 +433,5 @@ export interface ApplyFundingEvent {
   remainingBalance: anchor.BN;
   fundingRate: anchor.BN;
   oraclePrice: anchor.BN;
+  positionSize: anchor.BN;
 }

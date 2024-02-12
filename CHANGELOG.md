@@ -3,9 +3,13 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [1.20.4]
+## [1.20.5]
 
 - More load options - assets and throttleMs. ([#351](https://github.com/zetamarkets/sdk/pull/351))
+
+## [1.20.4]
+
+- Add PNL to TradeEventV3 and PositionSize to ApplyFundingEvent. ([#344](https://github.com/zetamarkets/sdk/pull/344))
 
 ## [1.20.3]
 
