@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.21.2]
+
+- Small bugfix for DYM in indexToAsset(). ([#354](https://github.com/zetamarkets/sdk/pull/354))
+
+## [1.21.1]
+
+- Skipped
+
 ## [1.21.0]
 
 - New asset $DYM. ([#352](https://github.com/zetamarkets/sdk/pull/352))
