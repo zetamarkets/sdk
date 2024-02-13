@@ -9713,6 +9713,11 @@
           "name": "price",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "pnl",
+          "type": "i64",
+          "index": false
         }
       ]
     },
@@ -9954,6 +9959,11 @@
         {
           "name": "oraclePrice",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "positionSize",
+          "type": "i64",
           "index": false
         }
       ]

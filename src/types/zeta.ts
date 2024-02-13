@@ -9713,6 +9713,11 @@ export type Zeta = {
           "name": "price",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "pnl",
+          "type": "i64",
+          "index": false
         }
       ]
     },
@@ -9954,6 +9959,11 @@ export type Zeta = {
         {
           "name": "oraclePrice",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "positionSize",
+          "type": "i64",
           "index": false
         }
       ]
@@ -20478,6 +20488,11 @@ export const IDL: Zeta = {
           "name": "price",
           "type": "u64",
           "index": false
+        },
+        {
+          "name": "pnl",
+          "type": "i64",
+          "index": false
         }
       ]
     },
@@ -20719,6 +20734,11 @@ export const IDL: Zeta = {
         {
           "name": "oraclePrice",
           "type": "u64",
+          "index": false
+        },
+        {
+          "name": "positionSize",
+          "type": "i64",
           "index": false
         }
       ]
