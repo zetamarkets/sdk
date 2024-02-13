@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.21.1]
 
-- Small bugfix for DYM in indexToAsset(). ([])
+- Small bugfix for DYM in indexToAsset(). ([#354](https://github.com/zetamarkets/sdk/pull/354))
 
 ## [1.21.0]
 
