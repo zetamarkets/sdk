@@ -230,6 +230,9 @@ export function indexToAsset(index: number): Asset {
     case 11: {
       return Asset.JUP;
     }
+    case 12: {
+      return Asset.DYM;
+    }
   }
   return Asset.UNDEFINED;
 }
