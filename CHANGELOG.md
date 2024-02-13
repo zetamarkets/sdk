@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.21.3]
+
+- Bugfix devnet loading assets in Exchange.load(). ([#355](https://github.com/zetamarkets/sdk/pull/354))
+
 ## [1.21.2]
 
 - Small bugfix for DYM in indexToAsset(). ([#354](https://github.com/zetamarkets/sdk/pull/354))
