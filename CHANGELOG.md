@@ -6,6 +6,7 @@ Version changes are pinned to SDK releases.
 ## [1.21.0]
 
 - New asset $DYM. ([#352](https://github.com/zetamarkets/sdk/pull/352))
+- More load options - assets and throttleMs. ([#351](https://github.com/zetamarkets/sdk/pull/351))
 
 ## [1.20.4]
 

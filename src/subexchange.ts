@@ -126,14 +126,13 @@ export class SubExchange {
 
   /**
    * Loads a fresh instance of the subExchange object using on chain state.
-   * @param throttle    Whether to sleep on market loading for rate limit reasons.
+   * @param throttleMs    Whether to sleep on market loading for rate limit reasons.
    */
   public async load(
     asset: Asset,
     opts: ConfirmOptions,
     fetchedAccs: any[],
     loadFromStore: boolean,
-    throttleMs = 0,
     callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
   ) {
     console.info(`Loading ${assetToName(asset)} subExchange.`);
@@ -144,12 +143,7 @@ export class SubExchange {
 
     this._perpSyncQueue = fetchedAccs[0] as PerpSyncQueue;
 
-    this._markets = await ZetaGroupMarkets.load(
-      asset,
-      opts,
-      throttleMs,
-      loadFromStore
-    );
+    this._markets = await ZetaGroupMarkets.load(asset, opts, loadFromStore);
 
     Exchange.riskCalculator.updateMarginRequirements(asset);
 

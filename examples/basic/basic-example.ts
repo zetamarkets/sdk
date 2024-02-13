@@ -51,13 +51,16 @@ async function main() {
   // Airdropping SOL.
   await connection.requestAirdrop(wallet.publicKey, 100_000_000);
 
-  const loadExchangeConfig = types.defaultLoadExchangeConfig(
+  let loadExchangeConfig = types.defaultLoadExchangeConfig(
     Network.DEVNET,
     connection,
     utils.defaultCommitment(),
     0,
     true
   );
+
+  // Optionally add a throttle for startup load to prevent rate-limiting on free-tier RPCs
+  // loadExchangeConfig.throttleMs = 1000;
 
   await fetch(`${SERVER_URL}/faucet/USDC`, {
     method: "post",
