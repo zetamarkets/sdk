@@ -8,6 +8,11 @@ Version changes are pinned to SDK releases.
 - Deprecate v1 trigger instructions.
 - Add new take trigger order instruction.
 
+## [1.20.4]
+
+- Add PNL to TradeEventV3 and PositionSize to ApplyFundingEvent. ([#344](https://github.com/zetamarkets/sdk/pull/344))
+>>>>>>> origin/main
+
 ## [1.20.3]
 
 - Refactor settleAndBurnVaultTokens to allow an accountLimit. ([#350](https://github.com/zetamarkets/sdk/pull/350))
