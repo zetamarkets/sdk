@@ -252,6 +252,32 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "adminOverrideReferrerPubkey",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newReferrer",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
@@ -6369,7 +6395,7 @@ export type Zeta = {
           "isSigner": true
         },
         {
-          "name": "referrerTagAccount",
+          "name": "referrerIdAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -7968,7 +7994,7 @@ export type Zeta = {
       }
     },
     {
-      "name": "referrerTagAccount",
+      "name": "referrerIdAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -10876,6 +10902,32 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "adminOverrideReferrerPubkey",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newReferrer",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
@@ -16993,7 +17045,7 @@ export const IDL: Zeta = {
           "isSigner": true
         },
         {
-          "name": "referrerTagAccount",
+          "name": "referrerIdAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -18592,7 +18644,7 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "referrerTagAccount",
+      "name": "referrerIdAccount",
       "type": {
         "kind": "struct",
         "fields": [
