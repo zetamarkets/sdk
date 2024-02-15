@@ -1686,28 +1686,6 @@ export function objectEquals(a: any, b: any): boolean {
   return JSON.stringify(a) == JSON.stringify(b);
 }
 
-export async function fetchReferrerAliasAccount(
-  referrer: PublicKey = undefined,
-  alias: string = undefined
-): Promise<ReferrerAlias> {
-  if (!referrer && !alias) {
-    return null;
-  }
-
-  let referrerAliases = await Exchange.program.account.referrerAlias.all();
-  for (var i = 0; i < referrerAliases.length; i++) {
-    let acc = referrerAliases[i].account as ReferrerAlias;
-    if (
-      (referrer && acc.referrer.equals(referrer)) ||
-      (alias && convertBufferToTrimmedString(acc.alias) == alias)
-    ) {
-      return acc;
-    }
-  }
-
-  return null;
-}
-
 export function convertBufferToTrimmedString(buffer: number[]): string {
   let bufferString = Buffer.from(buffer).toString().trim();
   let splitIndex = bufferString.length;

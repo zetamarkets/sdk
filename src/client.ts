@@ -20,7 +20,6 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import * as constants from "./constants";
-import { referUserIx } from "./program-instructions";
 import { EventType } from "./events";
 import * as types from "./types";
 import { Asset } from "./constants";
@@ -308,74 +307,6 @@ export class Client {
   public getAllSubClients(): SubClient[] {
     return [...this._subClients.values()];
     // This is referring itself by another referrer.
-  }
-
-  public async setReferralData() {
-    this.delegatedCheck();
-    try {
-      let [referrerAccount] = utils.getReferrerAccountAddress(
-        Exchange.programId,
-        this.publicKey
-      );
-
-      this._referrerAccount =
-        (await Exchange.program.account.referrerAccount.fetch(
-          referrerAccount
-        )) as unknown as ReferrerAccount;
-      console.log(`User is a referrer. ${this.publicKey}.`);
-
-      let referrerAlias = await utils.fetchReferrerAliasAccount(this.publicKey);
-      if (referrerAlias !== null) {
-        let existingAlias = Buffer.from(referrerAlias.alias).toString().trim();
-        this._referrerAlias = existingAlias;
-      }
-    } catch (e) {}
-
-    try {
-      let [referralAccountAddress, _nonce] = utils.getReferralAccountAddress(
-        Exchange.programId,
-        this.publicKey
-      );
-
-      this._referralAccountAddress = referralAccountAddress;
-      this._referralAccount =
-        (await Exchange.program.account.referralAccount.fetch(
-          referralAccountAddress
-        )) as unknown as ReferralAccount;
-      console.log(
-        `User has been referred by ${this._referralAccount.referrer.toString()}.`
-      );
-    } catch (e) {}
-  }
-
-  public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    let [referrerAccount] = utils.getReferrerAccountAddress(
-      Exchange.programId,
-      referrer
-    );
-
-    try {
-      await Exchange.program.account.referrerAccount.fetch(referrerAccount);
-    } catch (e) {
-      throw Error(`Invalid referrer. ${referrer.toString()}`);
-    }
-    let tx = new Transaction().add(
-      referUserIx(this.provider.wallet.publicKey, referrer)
-    );
-    let txId = await utils.processTransaction(this.provider, tx);
-
-    [this._referralAccountAddress] = utils.getReferralAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-
-    this._referralAccount =
-      (await Exchange.program.account.referralAccount.fetch(
-        this._referralAccountAddress
-      )) as unknown as ReferralAccount;
-
-    return txId;
   }
 
   /**
@@ -1065,83 +996,6 @@ export class Client {
       addresses.push(this.getSubClient(asset).marginAccountAddress);
     }
     return addresses;
-  }
-
-  public async initializeReferrerAccount() {
-    this.delegatedCheck();
-    let tx = new Transaction().add(
-      await instructions.initializeReferrerAccountIx(this.publicKey)
-    );
-    await utils.processTransaction(this._provider, tx);
-  }
-
-  public async initializeReferrerAlias(
-    alias: string
-  ): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    if (alias.length > 15) {
-      throw new Error("Alias cannot be over 15 chars!");
-    }
-
-    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-
-    try {
-      await Exchange.program.account.referrerAccount.fetch(
-        referrerAccountAddress
-      );
-    } catch (e) {
-      throw Error(`User is not a referrer, cannot create alias.`);
-    }
-
-    let referrerAlias = await utils.fetchReferrerAliasAccount(this.publicKey);
-    if (referrerAlias !== null) {
-      let existingAlias = Buffer.from(referrerAlias.alias).toString().trim();
-      throw Error(`Referrer already has alias. ${existingAlias}`);
-    }
-
-    let tx = new Transaction().add(
-      await instructions.initializeReferrerAliasIx(this.publicKey, alias)
-    );
-
-    let txid = await utils.processTransaction(this.provider, tx);
-    this._referrerAlias = alias;
-
-    return txid;
-  }
-
-  public async claimReferrerRewards(): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-    let tx = new Transaction().add(
-      await instructions.claimReferralsRewardsIx(
-        referrerAccountAddress,
-        this._usdcAccountAddress,
-        this.provider.wallet.publicKey
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
-  public async claimReferralRewards(): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    let [referralAccountAddress] = utils.getReferralAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-    let tx = new Transaction().add(
-      await instructions.claimReferralsRewardsIx(
-        referralAccountAddress,
-        this._usdcAccountAddress,
-        this.provider.wallet.publicKey
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
   }
 
   public getProductLedger(asset: Asset, marketIndex: number): ProductLedger {
