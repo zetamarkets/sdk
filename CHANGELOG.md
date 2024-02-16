@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.21.4]
+
+- Improve cancelAllMarketOrders for big transactions. ([#356](https://github.com/zetamarkets/sdk/pull/356))
+- Add txSig to return args of edit trigger order functions. ([#356](https://github.com/zetamarkets/sdk/pull/356))
+
 ## [1.21.3]
 
 - Bugfix devnet loading assets in Exchange.load(). ([#355](https://github.com/zetamarkets/sdk/pull/354))
