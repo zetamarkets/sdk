@@ -1837,6 +1837,20 @@ export function initializeWhitelistTradingFeesAccountIx(
   );
 }
 
+export function adminOverrideReferrerPubkeyIx(
+  admin: PublicKey,
+  userCrossMarginAccountManager: PublicKey,
+  newReferrer: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.adminOverrideReferrerPubkey(newReferrer, {
+    accounts: {
+      crossMarginAccountManager: userCrossMarginAccountManager,
+      state: Exchange.stateAddress,
+      admin: admin,
+    },
+  });
+}
+
 export function settlePositionsHaltedTxs(
   asset: Asset,
   marginAccounts: AccountMeta[],
@@ -1998,6 +2012,20 @@ export function initializeReferrerAccountsIx(
       referrerIdAccount,
       referrerPubkeyAccount,
       systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function closeReferrerAccountsIx(
+  user: PublicKey,
+  referrerIdAccount: PublicKey,
+  referrerPubkeyAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.closeReferrerAccounts({
+    accounts: {
+      authority: user,
+      referrerIdAccount,
+      referrerPubkeyAccount,
     },
   });
 }

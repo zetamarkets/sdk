@@ -6418,6 +6418,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "closeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editMaType",
       "accounts": [
         {
@@ -7999,10 +8020,6 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
             "name": "referrerId",
             "type": {
               "array": [
@@ -8024,8 +8041,13 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
+            "name": "referrerId",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
           }
         ]
       }
@@ -10644,6 +10666,11 @@ export type Zeta = {
       "code": 6160,
       "name": "InvalidReferrerIDLength",
       "msg": "Invalid referrer ID length"
+    },
+    {
+      "code": 6161,
+      "name": "InvalidReferrerIDOwner",
+      "msg": "Invalid referrer ID owner"
     }
   ]
 };
@@ -17068,6 +17095,27 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "closeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editMaType",
       "accounts": [
         {
@@ -18649,10 +18697,6 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
             "name": "referrerId",
             "type": {
               "array": [
@@ -18674,8 +18718,13 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
+            "name": "referrerId",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
           }
         ]
       }
@@ -21294,6 +21343,11 @@ export const IDL: Zeta = {
       "code": 6160,
       "name": "InvalidReferrerIDLength",
       "msg": "Invalid referrer ID length"
+    },
+    {
+      "code": 6161,
+      "name": "InvalidReferrerIDOwner",
+      "msg": "Invalid referrer ID owner"
     }
   ]
 };

@@ -6418,6 +6418,27 @@
       ]
     },
     {
+      "name": "closeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editMaType",
       "accounts": [
         {
@@ -7999,10 +8020,6 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
             "name": "referrerId",
             "type": {
               "array": [
@@ -8024,8 +8041,13 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
+            "name": "referrerId",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
           }
         ]
       }
@@ -10644,6 +10666,11 @@
       "code": 6160,
       "name": "InvalidReferrerIDLength",
       "msg": "Invalid referrer ID length"
+    },
+    {
+      "code": 6161,
+      "name": "InvalidReferrerIDOwner",
+      "msg": "Invalid referrer ID owner"
     }
   ]
 }

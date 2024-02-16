@@ -1147,6 +1147,24 @@ export class Exchange {
     return await utils.processTransaction(this._provider, tx);
   }
 
+  public async adminOverrideReferrerPubkey(
+    user: PublicKey,
+    newReferrer: PublicKey
+  ) {
+    let accountManagerAddress = utils.getCrossMarginAccountManager(
+      this.programId,
+      user
+    )[0];
+    let tx = new Transaction().add(
+      instructions.adminOverrideReferrerPubkeyIx(
+        this._provider.wallet.publicKey,
+        accountManagerAddress,
+        newReferrer
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
   public async halt(asset: Asset) {
     await this.getSubExchange(asset).halt();
   }

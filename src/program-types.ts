@@ -190,6 +190,8 @@ export interface CrossMarginAccountManager {
   nonce: number;
   authority: PublicKey;
   accounts: Array<CrossMarginAccountInfo>;
+  referrer: PublicKey;
+  padding: Array<number>;
 }
 
 export interface CrossMarginAccount {
@@ -239,6 +241,15 @@ export interface SpreadAccount {
   positionsPadding: Array<Position>;
   asset: any;
   padding: Array<number>;
+}
+
+export interface ReferrerIdAccount {
+  referrerId: Array<number>;
+  referrerPubkey: PublicKey;
+}
+
+export interface ReferrerPubkeyAccount {
+  referrerPubkey: PublicKey;
 }
 
 export interface TriggerOrder {

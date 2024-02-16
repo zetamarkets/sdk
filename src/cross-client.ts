@@ -491,15 +491,20 @@ export class CrossClient {
     let fetchSlot: number = 0;
     if (fetch) {
       try {
-        let [clockInfo, crossMarginAccountInfo] =
+        let [clockInfo, crossMarginAccountInfo, crossMarginAccountManagerInfo] =
           await Exchange.connection.getMultipleAccountsInfo([
             SYSVAR_CLOCK_PUBKEY as PublicKeyZstd,
             this._accountAddress as PublicKeyZstd,
+            this._accountManagerAddress as PublicKeyZstd,
           ]);
         fetchSlot = utils.getClockData(clockInfo).slot;
         this._account = Exchange.program.coder.accounts.decode(
           types.ProgramAccountType.CrossMarginAccount,
           crossMarginAccountInfo.data
+        );
+        this._accountManager = Exchange.program.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccountManager,
+          crossMarginAccountManagerInfo.data
         );
       } catch (e) {
         this.toggleUpdateState(false);
@@ -688,7 +693,9 @@ export class CrossClient {
     );
   }
 
-  public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {
+  public async migrateToCrossMarginAccount(
+    referrer?: PublicKey
+  ): Promise<TransactionSignature[]> {
     this.delegatedCheck();
     await this.usdcAccountCheck();
 
@@ -708,7 +715,8 @@ export class CrossClient {
       tx.add(
         instructions.initializeCrossMarginAccountManagerIx(
           this._accountManagerAddress,
-          this._provider.wallet.publicKey
+          this._provider.wallet.publicKey,
+          referrer
         )
       );
     }
@@ -750,8 +758,12 @@ export class CrossClient {
 
   /**
    * @param amount  the native amount to deposit (6 decimals fixed point)
+   * @param referrer the referrer pubkey to set in initializeCrossMarginAccountManager (only used when creating a new account)
    */
-  public async deposit(amount: number): Promise<TransactionSignature> {
+  public async deposit(
+    amount: number,
+    referrer?: PublicKey
+  ): Promise<TransactionSignature> {
     this.delegatedCheck();
     await this.usdcAccountCheck();
     // Check if the user has accounts set up
@@ -763,7 +775,8 @@ export class CrossClient {
       tx.add(
         instructions.initializeCrossMarginAccountManagerIx(
           this._accountManagerAddress,
-          this._provider.wallet.publicKey
+          this._provider.wallet.publicKey,
+          referrer
         )
       );
     }
@@ -930,6 +943,41 @@ export class CrossClient {
     );
     this._account = null;
     return txId;
+  }
+
+  public async closeReferrerAccounts(): Promise<TransactionSignature> {
+    this.delegatedCheck();
+
+    // Fetch all required accounts because we don't store them in the client
+    let referrerPubkeyAccountAddress = utils.getReferrerPubkeyAccount(
+      Exchange.programId,
+      this.publicKey
+    )[0];
+    let referrerPubkeyAccount =
+      await Exchange.program.account.referrerPubkeyAccount.fetch(
+        referrerPubkeyAccountAddress
+      );
+    let id = Buffer.from(referrerPubkeyAccount.referrerId).toString();
+    let referrerIdAccountAddress = utils.getReferrerIdAccount(
+      Exchange.programId,
+      id
+    )[0];
+
+    let tx = new Transaction().add(
+      instructions.closeReferrerAccountsIx(
+        this.publicKey,
+        referrerIdAccountAddress,
+        referrerPubkeyAccountAddress
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
