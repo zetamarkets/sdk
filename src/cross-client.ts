@@ -14,8 +14,6 @@ import {
   CrossMarginAccount,
   CrossMarginAccountManager,
   CrossMarginAccountInfo,
-  ReferralAccount,
-  ReferrerAccount,
   TradeEventV3,
   OrderCompleteEvent,
   ProductLedger,
@@ -51,31 +49,6 @@ export class CrossClient {
     return this._provider.connection;
   }
   private _provider: anchor.AnchorProvider;
-
-  /**
-   * Stores the user referral account data.
-   */
-  public get referralAccount(): ReferralAccount | null {
-    return this._referralAccount;
-  }
-  private _referralAccount: ReferralAccount | null;
-  private _referralAccountAddress: PublicKey;
-
-  /**
-   * Stores the user referrer account data.
-   */
-  public get referrerAccount(): ReferrerAccount | null {
-    return this._referrerAccount;
-  }
-  private _referrerAccount: ReferrerAccount | null;
-
-  /**
-   * Stores the user referrer account alias.
-   */
-  public get referrerAlias(): string | null {
-    return this._referrerAlias;
-  }
-  private _referrerAlias: string | null;
 
   /**
    * Client margin account address.
@@ -280,9 +253,6 @@ export class CrossClient {
     this._accountManager = null;
 
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
-    this._referralAccount = null;
-    this._referrerAccount = null;
-    this._referrerAlias = null;
   }
 
   /**
@@ -415,8 +385,6 @@ export class CrossClient {
     }
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
-    client._referralAccountAddress = undefined;
-    client._referrerAlias = undefined;
 
     if (callback !== undefined) {
       client._tradeEventV3Listener = Exchange.program.addEventListener(
@@ -696,6 +664,28 @@ export class CrossClient {
       );
     }
     return sigs;
+  }
+
+  public async initializeReferrerAccount(
+    id: string
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction().add(
+      instructions.initializeReferrerAccountsIx(
+        id,
+        this.publicKey,
+        utils.getReferrerIdAccount(Exchange.programId, id)[0],
+        utils.getReferrerPubkeyAccount(Exchange.programId, this.publicKey)[0]
+      )
+    );
+
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {

@@ -5,8 +5,6 @@ import {
   SpreadAccount,
   MarginAccount,
   PositionMovementEvent,
-  ReferralAccount,
-  ReferrerAccount,
   TradeEventV3,
   OrderCompleteEvent,
   ProductLedger,
@@ -38,31 +36,6 @@ export class Client {
     return this._provider.connection;
   }
   private _provider: anchor.AnchorProvider;
-
-  /**
-   * Stores the user referral account data.
-   */
-  public get referralAccount(): ReferralAccount | null {
-    return this._referralAccount;
-  }
-  private _referralAccount: ReferralAccount | null;
-  private _referralAccountAddress: PublicKey;
-
-  /**
-   * Stores the user referrer account data.
-   */
-  public get referrerAccount(): ReferrerAccount | null {
-    return this._referrerAccount;
-  }
-  private _referrerAccount: ReferrerAccount | null;
-
-  /**
-   * Stores the user referrer account alias.
-   */
-  public get referrerAlias(): string | null {
-    return this._referrerAlias;
-  }
-  private _referrerAlias: string | null;
 
   /**
    * Client margin account address.
@@ -140,9 +113,6 @@ export class Client {
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
     this._subClients = new Map();
     this._marginAccountToAsset = new Map();
-    this._referralAccount = null;
-    this._referrerAccount = null;
-    this._referrerAlias = null;
   }
   private _subClients: Map<Asset, SubClient>;
 
@@ -248,8 +218,6 @@ export class Client {
     });
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
-    client._referralAccountAddress = undefined;
-    client._referrerAlias = undefined;
 
     if (callback !== undefined) {
       client._tradeEventV3Listener = Exchange.program.addEventListener(
@@ -306,7 +274,6 @@ export class Client {
 
   public getAllSubClients(): SubClient[] {
     return [...this._subClients.values()];
-    // This is referring itself by another referrer.
   }
 
   /**

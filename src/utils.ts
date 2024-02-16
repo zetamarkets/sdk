@@ -35,7 +35,6 @@ import { SubExchange } from "./subexchange";
 import { Market } from "./market";
 import {
   MarginAccount,
-  ReferrerAlias,
   TradeEventV3,
   OpenOrdersMap,
   CrossOpenOrdersMap,
@@ -482,6 +481,32 @@ export function getQuoteMint(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("quote-mint")),
       market.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getReferrerIdAccount(
+  programId: PublicKey,
+  id: string
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("referrer-id-account")),
+      Buffer.from(id),
+    ],
+    programId
+  );
+}
+
+export function getReferrerPubkeyAccount(
+  programId: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("referrer-pubkey-account")),
+      userKey.toBuffer(),
     ],
     programId
   );

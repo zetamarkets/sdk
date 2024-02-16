@@ -92,17 +92,21 @@ export function migrateToCrossMarginAccountIx(
 
 export function initializeCrossMarginAccountManagerIx(
   crossMarginAccountManager: PublicKey,
-  user: PublicKey
+  user: PublicKey,
+  referrer?: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeCrossMarginAccountManager({
-    accounts: {
-      crossMarginAccountManager,
-      authority: user,
-      payer: user,
-      zetaProgram: Exchange.programId,
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return Exchange.program.instruction.initializeCrossMarginAccountManager(
+    referrer ? referrer : null,
+    {
+      accounts: {
+        crossMarginAccountManager,
+        authority: user,
+        payer: user,
+        zetaProgram: Exchange.programId,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function closeCrossMarginAccountManagerIx(
@@ -1980,6 +1984,22 @@ export function updateAdminIx(
     return Exchange.program.instruction.updateSecondaryAdmin(accounts);
   }
   return Exchange.program.instruction.updateAdmin(accounts);
+}
+
+export function initializeReferrerAccountsIx(
+  id: string,
+  user: PublicKey,
+  referrerIdAccount: PublicKey,
+  referrerPubkeyAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeReferrerAccounts(id, {
+    accounts: {
+      authority: user,
+      referrerIdAccount,
+      referrerPubkeyAccount,
+      systemProgram: SystemProgram.programId,
+    },
+  });
 }
 
 export function updateReferralsAdminIx(
