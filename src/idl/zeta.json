@@ -1092,6 +1092,27 @@
       ]
     },
     {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "updateZetaState",
       "accounts": [
         {
@@ -7302,11 +7323,15 @@
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                98
+                90
               ]
             }
           }

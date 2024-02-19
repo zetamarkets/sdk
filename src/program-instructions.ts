@@ -2317,6 +2317,21 @@ export function updateMakerTradeFeePercentageIx(
   );
 }
 
+export function updateMakerRebatePercentageIx(
+  newNativeMakerRebatePercetange: anchor.BN,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.updateMakerRebatePercentage(
+    newNativeMakerRebatePercetange,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
 export function editMaType(
   maType: types.MarginAccountType,
   marginAccount: PublicKey,

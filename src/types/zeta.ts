@@ -1092,6 +1092,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "updateZetaState",
       "accounts": [
         {
@@ -7302,11 +7323,15 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                98
+                90
               ]
             }
           }
@@ -11867,6 +11892,27 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "updateZetaState",
       "accounts": [
         {
@@ -18077,11 +18123,15 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                98
+                90
               ]
             }
           }
