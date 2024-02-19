@@ -208,6 +208,7 @@ export interface CrossMarginAccount {
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
+  feeMultiplier: anchor.BN;
   padding: Array<number>;
 }
 

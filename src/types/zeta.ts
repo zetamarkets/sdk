@@ -1050,6 +1050,27 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "updateFeeTierAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateReferralsAdmin",
       "accounts": [
         {
@@ -6382,6 +6403,32 @@ export type Zeta = {
       ]
     },
     {
+      "name": "setFeeTier",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "feeMultiplier",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -7302,11 +7349,15 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "feeTierAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                98
+                90
               ]
             }
           }
@@ -7777,11 +7828,15 @@ export type Zeta = {
             "type": "u128"
           },
           {
+            "name": "feeMultiplier",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1976
               ]
             }
           }
@@ -10769,6 +10824,11 @@ export type Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
+    },
+    {
+      "code": 6160,
+      "name": "InvalidFeeTierAdmin",
+      "msg": "Invalid fee tier admin"
     }
   ]
 };
@@ -11825,6 +11885,27 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "updateFeeTierAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateReferralsAdmin",
       "accounts": [
         {
@@ -17157,6 +17238,32 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "setFeeTier",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "feeMultiplier",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -18077,11 +18184,15 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "feeTierAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                98
+                90
               ]
             }
           }
@@ -18552,11 +18663,15 @@ export const IDL: Zeta = {
             "type": "u128"
           },
           {
+            "name": "feeMultiplier",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1976
               ]
             }
           }
@@ -21544,6 +21659,11 @@ export const IDL: Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
+    },
+    {
+      "code": 6160,
+      "name": "InvalidFeeTierAdmin",
+      "msg": "Invalid fee tier admin"
     }
   ]
 };
