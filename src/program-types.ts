@@ -388,6 +388,7 @@ export interface TradeEventV3 {
   fee: anchor.BN;
   price: anchor.BN;
   pnl: anchor.BN;
+  rebate: anchor.BN;
 }
 
 export interface PositionMovementEvent {

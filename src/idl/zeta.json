@@ -7802,11 +7802,15 @@
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1968
               ]
             }
           }
@@ -7911,11 +7915,15 @@
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                322
               ]
             }
           }
@@ -9742,6 +9750,11 @@
         {
           "name": "pnl",
           "type": "i64",
+          "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
           "index": false
         }
       ]

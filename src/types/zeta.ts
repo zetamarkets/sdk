@@ -7802,11 +7802,15 @@ export type Zeta = {
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1968
               ]
             }
           }
@@ -7911,11 +7915,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                322
               ]
             }
           }
@@ -9742,6 +9750,11 @@ export type Zeta = {
         {
           "name": "pnl",
           "type": "i64",
+          "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
           "index": false
         }
       ]
@@ -18602,11 +18615,15 @@ export const IDL: Zeta = {
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1968
               ]
             }
           }
@@ -18711,11 +18728,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                322
               ]
             }
           }
@@ -20542,6 +20563,11 @@ export const IDL: Zeta = {
         {
           "name": "pnl",
           "type": "i64",
+          "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
           "index": false
         }
       ]
