@@ -758,11 +758,11 @@ export class CrossClient {
 
   /**
    * @param amount  the native amount to deposit (6 decimals fixed point)
-   * @param referrer the referrer pubkey to set in initializeCrossMarginAccountManager (only used when creating a new account)
+   * @param referrerId the referrer's ID to use in initializeCrossMarginAccountManager (only used when creating a new account)
    */
   public async deposit(
     amount: number,
-    referrer?: PublicKey
+    referrerId?: string
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
     await this.usdcAccountCheck();
@@ -772,11 +772,35 @@ export class CrossClient {
       console.log(
         "User has no cross margin account manager. Creating account manager..."
       );
+
+      let referrerAddress = undefined;
+
+      if (referrerId) {
+        let failures = 0;
+        while (referrerAddress == undefined) {
+          try {
+            referrerAddress = (
+              await Exchange.program.account.referrerIdAccount.fetch(
+                utils
+                  .getReferrerIdAccount(Exchange.programId, referrerId)[0]
+                  .toString()
+              )
+            ).referrerPubkey;
+          } catch (e) {
+            failures += 1;
+            if (failures > 3) {
+              throw `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`;
+            } else {
+              console.log(`Failed fetching ReferrerIdAccount, retrying...`);
+            }
+          }
+        }
+      }
       tx.add(
         instructions.initializeCrossMarginAccountManagerIx(
           this._accountManagerAddress,
           this._provider.wallet.publicKey,
-          referrer
+          referrerAddress
         )
       );
     }
