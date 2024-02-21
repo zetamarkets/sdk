@@ -2302,21 +2302,6 @@ export function editDelegatedPubkeyIx(
   });
 }
 
-export function updateMakerTradeFeePercentageIx(
-  newNativeMakerTradeFeePercetange: anchor.BN,
-  admin: PublicKey
-) {
-  return Exchange.program.instruction.updateMakerTradeFeePercentage(
-    newNativeMakerTradeFeePercetange,
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        admin,
-      },
-    }
-  );
-}
-
 export function editMaType(
   maType: types.MarginAccountType,
   marginAccount: PublicKey,
@@ -2405,15 +2390,11 @@ export interface StateParams {
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
-  nativeD1TradeFeePercentage: anchor.BN;
-  nativeD1UnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
   marginConcessionPercentage: number;
-  nativeOptionTradeFeePercentage: anchor.BN;
-  nativeOptionUnderlyingFeePercentage: anchor.BN;
   maxPerpDeltaAgeSeconds: number;
   nativeWithdrawLimit: anchor.BN;
   withdrawLimitEpochSeconds: number;

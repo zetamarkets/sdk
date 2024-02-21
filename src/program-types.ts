@@ -15,16 +15,16 @@ export interface State {
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
-  nativeD1TradeFeePercentage: anchor.BN;
-  nativeD1UnderlyingFeePercentage: anchor.BN;
+  deprecatedNativeD1TradeFeePercentage: anchor.BN;
+  deprecatedNativeD1UnderlyingFeePercentage: anchor.BN;
   nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
   marginConcessionPercentage: number;
   treasuryWalletNonce: number;
-  nativeOptionTradeFeePercentage: anchor.BN;
-  nativeOptionUnderlyingFeePercentage: anchor.BN;
+  deprecatedNativeOptionTradeFeePercentage: anchor.BN;
+  deprecatedNativeOptionUnderlyingFeePercentage: anchor.BN;
   referralsAdmin: PublicKey;
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
@@ -41,7 +41,7 @@ export interface State {
   minLotSizesPadding: Array<number>;
   tickSizes: Array<number>;
   tickSizesPadding: Array<number>;
-  nativeMakerTradeFeePercentage: anchor.BN;
+  deprecatedNativeMakerTradeFeePercentage: anchor.BN;
   padding: Array<number>;
 }
 
@@ -208,7 +208,6 @@ export interface CrossMarginAccount {
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
-  feeMultiplier: anchor.BN;
   padding: Array<number>;
 }
 

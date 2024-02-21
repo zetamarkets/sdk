@@ -1092,27 +1092,6 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateMakerTradeFeePercentage",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "newNativeMakerTradeFeePercentage",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "updateZetaState",
       "accounts": [
         {
@@ -6403,32 +6382,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "setFeeTier",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "crossMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "feeMultiplier",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -7203,11 +7156,11 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
+            "name": "deprecatedNativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeD1UnderlyingFeePercentage",
+            "name": "deprecatedNativeD1UnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -7235,11 +7188,11 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "nativeOptionTradeFeePercentage",
+            "name": "deprecatedNativeOptionTradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeOptionUnderlyingFeePercentage",
+            "name": "deprecatedNativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -7345,7 +7298,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "nativeMakerTradeFeePercentage",
+            "name": "deprecatedNativeMakerTradeFeePercentage",
             "type": "u64"
           },
           {
@@ -7826,10 +7779,6 @@ export type Zeta = {
           {
             "name": "triggerOrderBits",
             "type": "u128"
-          },
-          {
-            "name": "feeMultiplier",
-            "type": "u64"
           },
           {
             "name": "padding",
@@ -8790,22 +8739,6 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
             "name": "nativeWhitelistUnderlyingFeePercentage",
             "type": "u64"
           },
@@ -8900,22 +8833,6 @@ export type Zeta = {
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
-          },
-          {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
           },
           {
             "name": "nativeWhitelistUnderlyingFeePercentage",
@@ -9545,6 +9462,27 @@ export type Zeta = {
           },
           {
             "name": "MarketMakerT1"
+          },
+          {
+            "name": "NormalT1"
+          },
+          {
+            "name": "NormalT2"
+          },
+          {
+            "name": "NormalT3"
+          },
+          {
+            "name": "NormalT4"
+          },
+          {
+            "name": "NormalT5"
+          },
+          {
+            "name": "NormalT6"
+          },
+          {
+            "name": "NormalT7"
           }
         ]
       }
@@ -11927,27 +11865,6 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateMakerTradeFeePercentage",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "newNativeMakerTradeFeePercentage",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "updateZetaState",
       "accounts": [
         {
@@ -17238,32 +17155,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "setFeeTier",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "crossMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "feeMultiplier",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "initializeReferrerAccount",
       "accounts": [
         {
@@ -18038,11 +17929,11 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
+            "name": "deprecatedNativeD1TradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeD1UnderlyingFeePercentage",
+            "name": "deprecatedNativeD1UnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -18070,11 +17961,11 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "nativeOptionTradeFeePercentage",
+            "name": "deprecatedNativeOptionTradeFeePercentage",
             "type": "u64"
           },
           {
-            "name": "nativeOptionUnderlyingFeePercentage",
+            "name": "deprecatedNativeOptionUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -18180,7 +18071,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "nativeMakerTradeFeePercentage",
+            "name": "deprecatedNativeMakerTradeFeePercentage",
             "type": "u64"
           },
           {
@@ -18661,10 +18552,6 @@ export const IDL: Zeta = {
           {
             "name": "triggerOrderBits",
             "type": "u128"
-          },
-          {
-            "name": "feeMultiplier",
-            "type": "u64"
           },
           {
             "name": "padding",
@@ -19625,22 +19512,6 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
             "name": "nativeWhitelistUnderlyingFeePercentage",
             "type": "u64"
           },
@@ -19735,22 +19606,6 @@ export const IDL: Zeta = {
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
-          },
-          {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
           },
           {
             "name": "nativeWhitelistUnderlyingFeePercentage",
@@ -20380,6 +20235,27 @@ export const IDL: Zeta = {
           },
           {
             "name": "MarketMakerT1"
+          },
+          {
+            "name": "NormalT1"
+          },
+          {
+            "name": "NormalT2"
+          },
+          {
+            "name": "NormalT3"
+          },
+          {
+            "name": "NormalT4"
+          },
+          {
+            "name": "NormalT5"
+          },
+          {
+            "name": "NormalT6"
+          },
+          {
+            "name": "NormalT7"
           }
         ]
       }

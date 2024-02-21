@@ -1,4 +1,5 @@
 import { PublicKey, AddressLookupTableAccount } from "@solana/web3.js";
+import { types } from ".";
 
 // Ordered in underlying sequence number.
 export enum Asset {
@@ -119,6 +120,35 @@ export const DEX_PID: {
 export const CHAINLINK_PID: PublicKey = new PublicKey(
   "HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny"
 );
+
+// These are constants onchain
+// We duplicate them here for convenient access for frontend and risk utils
+export const FEE_TIER_MAP_BPS = {
+  taker: {
+    [types.MarginAccountType.MARKET_MAKER]: 0,
+    [types.MarginAccountType.MARKET_MAKER_T1]: 10,
+    [types.MarginAccountType.NORMAL]: 10,
+    [types.MarginAccountType.NORMAL_T1]: 9,
+    [types.MarginAccountType.NORMAL_T2]: 8,
+    [types.MarginAccountType.NORMAL_T3]: 7,
+    [types.MarginAccountType.NORMAL_T4]: 6,
+    [types.MarginAccountType.NORMAL_T5]: 5,
+    [types.MarginAccountType.NORMAL_T6]: 4,
+    [types.MarginAccountType.NORMAL_T7]: 3,
+  },
+  maker: {
+    [types.MarginAccountType.MARKET_MAKER]: 0,
+    [types.MarginAccountType.MARKET_MAKER_T1]: 0,
+    [types.MarginAccountType.NORMAL]: 2,
+    [types.MarginAccountType.NORMAL_T1]: 1.8,
+    [types.MarginAccountType.NORMAL_T2]: 1.6,
+    [types.MarginAccountType.NORMAL_T3]: 1.4,
+    [types.MarginAccountType.NORMAL_T4]: 1.2,
+    [types.MarginAccountType.NORMAL_T5]: 1,
+    [types.MarginAccountType.NORMAL_T6]: 0.8,
+    [types.MarginAccountType.NORMAL_T7]: 0.6,
+  },
+};
 
 export const MAX_SETTLE_AND_CLOSE_PER_TX = 4;
 export const MAX_CANCELS_PER_TX = 3;

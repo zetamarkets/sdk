@@ -372,6 +372,13 @@ export enum MarginAccountType {
   NORMAL = 0,
   MARKET_MAKER = 1,
   MARKET_MAKER_T1 = 2,
+  NORMAL_T1 = 3,
+  NORMAL_T2 = 4,
+  NORMAL_T3 = 5,
+  NORMAL_T4 = 6,
+  NORMAL_T5 = 7,
+  NORMAL_T6 = 8,
+  NORMAL_T7 = 9,
 }
 
 export function fromProgramMarginAccountType(
@@ -385,6 +392,27 @@ export function fromProgramMarginAccountType(
   }
   if (objectEquals(accountType, { marketMakerT1: {} })) {
     return MarginAccountType.MARKET_MAKER_T1;
+  }
+  if (objectEquals(accountType, { normalT1: {} })) {
+    return MarginAccountType.NORMAL_T1;
+  }
+  if (objectEquals(accountType, { normalT2: {} })) {
+    return MarginAccountType.NORMAL_T2;
+  }
+  if (objectEquals(accountType, { normalT3: {} })) {
+    return MarginAccountType.NORMAL_T3;
+  }
+  if (objectEquals(accountType, { normalT4: {} })) {
+    return MarginAccountType.NORMAL_T4;
+  }
+  if (objectEquals(accountType, { normalT5: {} })) {
+    return MarginAccountType.NORMAL_T5;
+  }
+  if (objectEquals(accountType, { normalT6: {} })) {
+    return MarginAccountType.NORMAL_T6;
+  }
+  if (objectEquals(accountType, { normalT7: {} })) {
+    return MarginAccountType.NORMAL_T7;
   }
   throw Error("Invalid margin account type");
 }
@@ -400,6 +428,27 @@ export function toProgramMarginAccountType(
   }
   if (accountType == MarginAccountType.MARKET_MAKER_T1) {
     return { marketMakerT1: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T1) {
+    return { normalT1: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T2) {
+    return { normalT2: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T3) {
+    return { normalT3: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T4) {
+    return { normalT4: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T5) {
+    return { normalT5: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T6) {
+    return { normalT6: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T7) {
+    return { normalT7: {} };
   }
   throw Error("Invalid margin account type");
 }
