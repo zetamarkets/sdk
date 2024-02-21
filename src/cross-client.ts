@@ -1429,8 +1429,8 @@ export class CrossClient {
     newSide: types.Side,
     newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
-  ) {
-    await this.editTriggerOrder(
+  ): Promise<TransactionSignature> {
+    return await this.editTriggerOrder(
       orderIndex,
       newOrderPrice,
       newSize,
@@ -1452,8 +1452,8 @@ export class CrossClient {
     newDirection: types.TriggerDirection,
     newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
-  ) {
-    await this.editTriggerOrder(
+  ): Promise<TransactionSignature> {
+    return await this.editTriggerOrder(
       orderIndex,
       newOrderPrice,
       newSize,
@@ -1476,7 +1476,7 @@ export class CrossClient {
     newTriggerTimestamp: anchor.BN,
     newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
-  ) {
+  ): Promise<TransactionSignature> {
     let triggerAccount = utils.getTriggerOrder(
       Exchange.programId,
       this._accountAddress,
@@ -1581,16 +1581,19 @@ export class CrossClient {
     );
   }
 
-  public async cancelAllMarketOrders(): Promise<TransactionSignature> {
-    let tx = new Transaction();
+  public async cancelAllMarketOrders(): Promise<TransactionSignature[]> {
+    let ixs = [];
 
     for (var asset of Exchange.assets) {
       let assetIndex = assetToIndex(asset);
-      if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
+      if (
+        this.getOrders(asset).length < 1 ||
+        this._openOrdersAccounts[assetIndex].equals(PublicKey.default)
+      ) {
         continue;
       }
 
-      tx.add(
+      ixs.push(
         instructions.cancelAllMarketOrdersIx(
           asset,
           this.provider.wallet.publicKey,
@@ -1599,14 +1602,21 @@ export class CrossClient {
         )
       );
     }
-    return await utils.processTransaction(
-      this._provider,
-      tx,
-      undefined,
-      undefined,
-      undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      this.useVersionedTxs
+        ? constants.MAX_PRUNE_CANCELS_PER_TX_LUT
+        : constants.MAX_PRUNE_CANCELS_PER_TX
     );
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._provider, tx));
+      })
+    );
+
+    return txIds;
   }
 
   public createCancelAllMarketOrdersInstruction(
