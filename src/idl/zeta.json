@@ -7164,7 +7164,7 @@
             "type": "u64"
           },
           {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "name": "deprecatedNativeWhitelistUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -7310,7 +7310,7 @@
             "type": {
               "array": [
                 "u8",
-                90
+                66
               ]
             }
           }
@@ -8739,10 +8739,6 @@
             "type": "u32"
           },
           {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -8833,10 +8829,6 @@
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
           },
           {
             "name": "nativeDepositLimit",
@@ -10762,6 +10754,11 @@
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
+    },
+    {
+      "code": 6160,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
     }
   ]
 }

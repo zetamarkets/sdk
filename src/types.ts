@@ -9,7 +9,7 @@ import {
 } from "@solana/web3.js";
 import { Connection as ConnectionZstd } from "zeta-solana-web3";
 import { allAssets } from "./assets";
-import { Asset } from "./constants";
+import { Asset, MarginAccountType } from "./constants";
 import { objectEquals } from "./utils";
 import { CrossMarginAccount, MarginAccount } from "./program-types";
 import { Network, types, utils } from ".";
@@ -367,19 +367,6 @@ export function toProgramTreasuryMovementType(
 }
 
 export type MarketIdentifier = number | PublicKey;
-
-export enum MarginAccountType {
-  NORMAL = 0,
-  MARKET_MAKER = 1,
-  MARKET_MAKER_T1 = 2,
-  NORMAL_T1 = 3,
-  NORMAL_T2 = 4,
-  NORMAL_T3 = 5,
-  NORMAL_T4 = 6,
-  NORMAL_T5 = 7,
-  NORMAL_T6 = 8,
-  NORMAL_T7 = 9,
-}
 
 export function fromProgramMarginAccountType(
   accountType: any

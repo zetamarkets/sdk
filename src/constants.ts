@@ -1,5 +1,4 @@
 import { PublicKey, AddressLookupTableAccount } from "@solana/web3.js";
-import { types } from ".";
 
 // Ordered in underlying sequence number.
 export enum Asset {
@@ -17,6 +16,19 @@ export enum Asset {
   JUP = "JUP",
   DYM = "DYM",
   UNDEFINED = "UNDEFINED",
+}
+
+export enum MarginAccountType {
+  NORMAL = 0,
+  MARKET_MAKER = 1,
+  MARKET_MAKER_T1 = 2,
+  NORMAL_T1 = 3,
+  NORMAL_T2 = 4,
+  NORMAL_T3 = 5,
+  NORMAL_T4 = 6,
+  NORMAL_T5 = 7,
+  NORMAL_T6 = 8,
+  NORMAL_T7 = 9,
 }
 
 export const ZETA_PID: {
@@ -125,28 +137,28 @@ export const CHAINLINK_PID: PublicKey = new PublicKey(
 // We duplicate them here for convenient access for frontend and risk utils
 export const FEE_TIER_MAP_BPS = {
   taker: {
-    [types.MarginAccountType.MARKET_MAKER]: 0,
-    [types.MarginAccountType.MARKET_MAKER_T1]: 10,
-    [types.MarginAccountType.NORMAL]: 10,
-    [types.MarginAccountType.NORMAL_T1]: 9,
-    [types.MarginAccountType.NORMAL_T2]: 8,
-    [types.MarginAccountType.NORMAL_T3]: 7,
-    [types.MarginAccountType.NORMAL_T4]: 6,
-    [types.MarginAccountType.NORMAL_T5]: 5,
-    [types.MarginAccountType.NORMAL_T6]: 4,
-    [types.MarginAccountType.NORMAL_T7]: 3,
+    [MarginAccountType.MARKET_MAKER]: 0,
+    [MarginAccountType.MARKET_MAKER_T1]: 10,
+    [MarginAccountType.NORMAL]: 10,
+    [MarginAccountType.NORMAL_T1]: 9,
+    [MarginAccountType.NORMAL_T2]: 8,
+    [MarginAccountType.NORMAL_T3]: 7,
+    [MarginAccountType.NORMAL_T4]: 6,
+    [MarginAccountType.NORMAL_T5]: 5,
+    [MarginAccountType.NORMAL_T6]: 4,
+    [MarginAccountType.NORMAL_T7]: 3,
   },
   maker: {
-    [types.MarginAccountType.MARKET_MAKER]: 0,
-    [types.MarginAccountType.MARKET_MAKER_T1]: 0,
-    [types.MarginAccountType.NORMAL]: 2,
-    [types.MarginAccountType.NORMAL_T1]: 1.8,
-    [types.MarginAccountType.NORMAL_T2]: 1.6,
-    [types.MarginAccountType.NORMAL_T3]: 1.4,
-    [types.MarginAccountType.NORMAL_T4]: 1.2,
-    [types.MarginAccountType.NORMAL_T5]: 1,
-    [types.MarginAccountType.NORMAL_T6]: 0.8,
-    [types.MarginAccountType.NORMAL_T7]: 0.6,
+    [MarginAccountType.MARKET_MAKER]: 0,
+    [MarginAccountType.MARKET_MAKER_T1]: 0,
+    [MarginAccountType.NORMAL]: 2,
+    [MarginAccountType.NORMAL_T1]: 1.8,
+    [MarginAccountType.NORMAL_T2]: 1.6,
+    [MarginAccountType.NORMAL_T3]: 1.4,
+    [MarginAccountType.NORMAL_T4]: 1.2,
+    [MarginAccountType.NORMAL_T5]: 1,
+    [MarginAccountType.NORMAL_T6]: 0.8,
+    [MarginAccountType.NORMAL_T7]: 0.6,
   },
 };
 

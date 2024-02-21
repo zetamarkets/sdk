@@ -17,7 +17,7 @@ export interface State {
   insuranceVaultLiquidationPercentage: number;
   deprecatedNativeD1TradeFeePercentage: anchor.BN;
   deprecatedNativeD1UnderlyingFeePercentage: anchor.BN;
-  nativeWhitelistUnderlyingFeePercentage: anchor.BN;
+  deprecatedNativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
@@ -42,6 +42,7 @@ export interface State {
   tickSizes: Array<number>;
   tickSizesPadding: Array<number>;
   deprecatedNativeMakerTradeFeePercentage: anchor.BN;
+  maTypeAdmin: PublicKey;
   padding: Array<number>;
 }
 

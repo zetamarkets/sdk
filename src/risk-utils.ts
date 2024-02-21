@@ -139,7 +139,7 @@ export function addFakeTradeToAccount(
 
   let fee =
     (constants.FEE_TIER_MAP_BPS[isTaker ? "taker" : "maker"][
-      marginAccount.accountType as types.MarginAccountType
+      marginAccount.accountType as constants.MarginAccountType
     ] /
       10000) *
     price;

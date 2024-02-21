@@ -7164,7 +7164,7 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "name": "deprecatedNativeWhitelistUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -7310,7 +7310,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                90
+                66
               ]
             }
           }
@@ -8739,10 +8739,6 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -8833,10 +8829,6 @@ export type Zeta = {
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
           },
           {
             "name": "nativeDepositLimit",
@@ -10762,6 +10754,11 @@ export type Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
+    },
+    {
+      "code": 6160,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
     }
   ]
 };
@@ -17932,7 +17929,7 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
+            "name": "deprecatedNativeWhitelistUnderlyingFeePercentage",
             "type": "u64"
           },
           {
@@ -18078,7 +18075,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                90
+                66
               ]
             }
           }
@@ -19507,10 +19504,6 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -19601,10 +19594,6 @@ export const IDL: Zeta = {
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
           },
           {
             "name": "nativeDepositLimit",
@@ -21530,6 +21519,11 @@ export const IDL: Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
+    },
+    {
+      "code": 6160,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
     }
   ]
 };

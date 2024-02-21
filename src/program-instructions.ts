@@ -2303,7 +2303,7 @@ export function editDelegatedPubkeyIx(
 }
 
 export function editMaType(
-  maType: types.MarginAccountType,
+  maType: constants.MarginAccountType,
   marginAccount: PublicKey,
   admin: PublicKey
 ) {
@@ -2390,7 +2390,6 @@ export interface StateParams {
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
-  nativeWhitelistUnderlyingFeePercentage: anchor.BN;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;

@@ -378,7 +378,7 @@ export class RiskCalculator {
           convertNativeLotSizeToDecimal(Math.abs(size)) *
           (constants.FEE_TIER_MAP_BPS[
             executionInfo.isTaker ? "taker" : "maker"
-          ][account.accountType as types.MarginAccountType] /
+          ][account.accountType as constants.MarginAccountType] /
             10000) *
           price;
       }
@@ -874,7 +874,7 @@ export class RiskCalculator {
 
     let fee =
       (constants.FEE_TIER_MAP_BPS[isTaker ? "taker" : "maker"][
-        marginAccount.accountType as types.MarginAccountType
+        marginAccount.accountType as constants.MarginAccountType
       ] /
         10000) *
       tradePrice;
