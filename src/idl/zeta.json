@@ -1050,7 +1050,7 @@
       "args": []
     },
     {
-      "name": "updateFeeTierAdmin",
+      "name": "updateMaTypeAdmin",
       "accounts": [
         {
           "name": "state",
@@ -7302,7 +7302,7 @@
             "type": "u64"
           },
           {
-            "name": "feeTierAdmin",
+            "name": "maTypeAdmin",
             "type": "publicKey"
           },
           {
@@ -7785,7 +7785,7 @@
             "type": {
               "array": [
                 "u8",
-                1976
+                1984
               ]
             }
           }
@@ -10762,11 +10762,6 @@
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
-    },
-    {
-      "code": 6160,
-      "name": "InvalidFeeTierAdmin",
-      "msg": "Invalid fee tier admin"
     }
   ]
 }

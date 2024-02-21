@@ -1050,7 +1050,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateFeeTierAdmin",
+      "name": "updateMaTypeAdmin",
       "accounts": [
         {
           "name": "state",
@@ -7302,7 +7302,7 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "feeTierAdmin",
+            "name": "maTypeAdmin",
             "type": "publicKey"
           },
           {
@@ -7785,7 +7785,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                1976
+                1984
               ]
             }
           }
@@ -10762,11 +10762,6 @@ export type Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
-    },
-    {
-      "code": 6160,
-      "name": "InvalidFeeTierAdmin",
-      "msg": "Invalid fee tier admin"
     }
   ]
 };
@@ -11823,7 +11818,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateFeeTierAdmin",
+      "name": "updateMaTypeAdmin",
       "accounts": [
         {
           "name": "state",
@@ -18075,7 +18070,7 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "feeTierAdmin",
+            "name": "maTypeAdmin",
             "type": "publicKey"
           },
           {
@@ -18558,7 +18553,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                1976
+                1984
               ]
             }
           }
@@ -21535,11 +21530,6 @@ export const IDL: Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
-    },
-    {
-      "code": 6160,
-      "name": "InvalidFeeTierAdmin",
-      "msg": "Invalid fee tier admin"
     }
   ]
 };
