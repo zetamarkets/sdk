@@ -496,6 +496,7 @@ export interface LoadExchangeConfig {
   throttleMs: number;
   loadFromStore: boolean;
   TIFBufferSeconds: number;
+  loadAssets?: Asset[];
 }
 
 export function defaultLoadExchangeConfig(
@@ -506,7 +507,8 @@ export function defaultLoadExchangeConfig(
   loadFromStore = false,
   orderbookConnection: Connection = undefined,
   orderbookAssetSubscriptionOverride: Asset[] = undefined,
-  TIFBufferSeconds: number = undefined
+  TIFBufferSeconds: number = undefined,
+  loadAssets: Asset[] = undefined
 ): LoadExchangeConfig {
   return {
     network,
@@ -517,6 +519,7 @@ export function defaultLoadExchangeConfig(
     throttleMs,
     loadFromStore,
     TIFBufferSeconds,
+    loadAssets,
   };
 }
 

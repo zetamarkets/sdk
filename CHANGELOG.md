@@ -8,6 +8,29 @@ Version changes are pinned to SDK releases.
 - Deprecate v1 trigger instructions.
 - Add new take trigger order instruction.
 
+## [1.21.4]
+
+- Improve cancelAllMarketOrders for big transactions. ([#356](https://github.com/zetamarkets/sdk/pull/356))
+- Add txSig to return args of edit trigger order functions. ([#356](https://github.com/zetamarkets/sdk/pull/356))
+
+## [1.21.3]
+
+- Bugfix devnet loading assets in Exchange.load(). ([#355](https://github.com/zetamarkets/sdk/pull/354))
+
+## [1.21.2]
+
+- Small bugfix for DYM in indexToAsset(). ([#354](https://github.com/zetamarkets/sdk/pull/354))
+
+## [1.21.1]
+
+- Skipped
+
+## [1.21.0]
+
+- New asset $DYM. ([#352](https://github.com/zetamarkets/sdk/pull/352))
+- More load options - assets and throttleMs. ([#351](https://github.com/zetamarkets/sdk/pull/351))
+>>>>>>> origin/main
+
 ## [1.20.4]
 
 - Add PNL to TradeEventV3 and PositionSize to ApplyFundingEvent. ([#344](https://github.com/zetamarkets/sdk/pull/344))
