@@ -15,16 +15,13 @@ export interface State {
   pricingFrequencySeconds: number;
   liquidatorLiquidationPercentage: number;
   insuranceVaultLiquidationPercentage: number;
-  deprecatedNativeD1TradeFeePercentage: anchor.BN;
-  deprecatedNativeD1UnderlyingFeePercentage: anchor.BN;
-  deprecatedNativeWhitelistUnderlyingFeePercentage: anchor.BN;
+  deprecatedFeeValues: Array<anchor.BN>;
   nativeDepositLimit: anchor.BN;
   expirationThresholdSeconds: number;
   positionMovementFeeBps: number;
   marginConcessionPercentage: number;
   treasuryWalletNonce: number;
-  deprecatedNativeOptionTradeFeePercentage: anchor.BN;
-  deprecatedNativeOptionUnderlyingFeePercentage: anchor.BN;
+  deprecatedOptionFeeValues: Array<anchor.BN>;
   referralsAdmin: PublicKey;
   referralsRewardsWalletNonce: number;
   maxPerpDeltaAge: number;
@@ -41,7 +38,7 @@ export interface State {
   minLotSizesPadding: Array<number>;
   tickSizes: Array<number>;
   tickSizesPadding: Array<number>;
-  deprecatedNativeMakerTradeFeePercentage: anchor.BN;
+  deprecatedMakerFeeValue: anchor.BN;
   maTypeAdmin: PublicKey;
   padding: Array<number>;
 }

@@ -7156,16 +7156,13 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "deprecatedNativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "deprecatedNativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "deprecatedNativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
           },
           {
             "name": "nativeDepositLimit",
@@ -7188,12 +7185,13 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "deprecatedNativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "deprecatedNativeOptionUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedOptionFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                2
+              ]
+            }
           },
           {
             "name": "referralsAdmin",
@@ -7298,7 +7296,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "deprecatedNativeMakerTradeFeePercentage",
+            "name": "deprecatedMakerFeeValue",
             "type": "u64"
           },
           {
@@ -17921,16 +17919,13 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "deprecatedNativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "deprecatedNativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "deprecatedNativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
           },
           {
             "name": "nativeDepositLimit",
@@ -17953,12 +17948,13 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "deprecatedNativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "deprecatedNativeOptionUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedOptionFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                2
+              ]
+            }
           },
           {
             "name": "referralsAdmin",
@@ -18063,7 +18059,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "deprecatedNativeMakerTradeFeePercentage",
+            "name": "deprecatedMakerFeeValue",
             "type": "u64"
           },
           {
