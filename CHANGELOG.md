@@ -29,7 +29,6 @@ Version changes are pinned to SDK releases.
 
 - New asset $DYM. ([#352](https://github.com/zetamarkets/sdk/pull/352))
 - More load options - assets and throttleMs. ([#351](https://github.com/zetamarkets/sdk/pull/351))
->>>>>>> origin/main
 
 ## [1.20.4]
 
