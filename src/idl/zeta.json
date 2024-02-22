@@ -4569,6 +4569,16 @@
           "isSigner": false
         },
         {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "taker",
           "isMut": true,
           "isSigner": true
@@ -10851,8 +10861,5 @@
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
     }
-  ],
-  "metadata": {
-    "address": "BG3oRikW8d16YjUEmX3ZxHm9SiJzrGtMhsSR8aCw1Cd7"
-  }
+  ]
 }

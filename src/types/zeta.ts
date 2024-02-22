@@ -4569,6 +4569,16 @@ export type Zeta = {
           "isSigner": false
         },
         {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "taker",
           "isMut": true,
           "isSigner": true
@@ -15421,6 +15431,16 @@ export const IDL: Zeta = {
         },
         {
           "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
           "isMut": false,
           "isSigner": false
         },

@@ -694,6 +694,7 @@ export function takeTriggerOrderIx(
   takerMarginAccount: PublicKey,
   taker: PublicKey
 ): TransactionInstruction {
+  let marketData = Exchange.getPerpMarket(asset);
   return Exchange.program.instruction.takeTriggerOrder(triggerOrderBit, {
     accounts: {
       triggerOrder: triggerOrder,
@@ -702,6 +703,8 @@ export function takeTriggerOrderIx(
       oracle: Exchange.pricing.oracles[assetToIndex(asset)],
       oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
       oracleBackupProgram: constants.CHAINLINK_PID,
+      bids: marketData.serumMarket.bidsAddress,
+      asks: marketData.serumMarket.asksAddress,
       taker,
       takerMarginAccount,
       orderMarginAccount,
