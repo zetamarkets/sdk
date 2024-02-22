@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [Unreleased]
+
+## [1.22.0]
+
+- Deprecate v1 trigger instructions.
+- Add new take trigger order instruction.
+
 ## [1.21.4]
 
 - Improve cancelAllMarketOrders for big transactions. ([#356](https://github.com/zetamarkets/sdk/pull/356))

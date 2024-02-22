@@ -1473,6 +1473,37 @@ export class CrossClient {
     );
   }
 
+  public async takeTriggerOrder(
+    orderIndex: number,
+    asset: Asset,
+    orderMarginAccount: PublicKey
+  ) {
+    let triggerAccount = utils.getTriggerOrder(
+      Exchange.programId,
+      orderMarginAccount,
+      new Uint8Array([orderIndex])
+    )[0];
+
+    let tx = new Transaction().add(
+      instructions.takeTriggerOrderIx(
+        asset,
+        triggerAccount,
+        orderIndex,
+        orderMarginAccount,
+        this._accountAddress,
+        this.provider.wallet.publicKey
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
   public async editPriceTriggerOrder(
     orderIndex: number,
     newOrderPrice: number,
