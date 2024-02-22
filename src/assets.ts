@@ -62,6 +62,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.SEI) return "SEI";
   if (asset == Asset.JUP) return "JUP";
   if (asset == Asset.DYM) return "DYM";
+  if (asset == Asset.STRK) return "STRK";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -80,6 +81,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "SEI") return Asset.SEI;
   if (name == "JUP") return Asset.JUP;
   if (name == "DYM") return Asset.DYM;
+  if (name == "STRK") return Asset.STRK;
   return Asset.UNDEFINED;
 }
 
@@ -101,6 +103,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.SEI) return { sei: {} };
   if (asset == Asset.JUP) return { jup: {} };
   if (asset == Asset.DYM) return { dym: {} };
+  if (asset == Asset.STRK) return { strk: {} };
   return { undefined: {} };
 }
 
@@ -143,6 +146,9 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { dym: {} })) {
     return Asset.DYM;
+  }
+  if (objectEquals(asset, { strk: {} })) {
+    return Asset.STRK;
   }
   return Asset.UNDEFINED;
 }
@@ -188,6 +194,9 @@ export function assetToIndex(asset: Asset): number {
     case Asset.DYM: {
       return 12;
     }
+    case Asset.STRK: {
+      return 13;
+    }
   }
   return 255; // Undefined is 255 onchain
 }
@@ -232,6 +241,9 @@ export function indexToAsset(index: number): Asset {
     }
     case 12: {
       return Asset.DYM;
+    }
+    case 13: {
+      return Asset.STRK;
     }
   }
   return Asset.UNDEFINED;
