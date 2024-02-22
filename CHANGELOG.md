@@ -33,7 +33,6 @@ Version changes are pinned to SDK releases.
 ## [1.20.4]
 
 - Add PNL to TradeEventV3 and PositionSize to ApplyFundingEvent. ([#344](https://github.com/zetamarkets/sdk/pull/344))
->>>>>>> origin/main
 
 ## [1.20.3]
 
