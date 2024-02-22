@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.22.1]
+
+- New asset $STRK. ([#361](https://github.com/zetamarkets/sdk/pull/361))
+
 ## [1.22.0]
 
 - Deprecate v1 trigger instructions.
