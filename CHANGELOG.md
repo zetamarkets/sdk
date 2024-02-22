@@ -5,6 +5,8 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.22.0]
+
 - Deprecate v1 trigger instructions.
 - Add new take trigger order instruction.
 
