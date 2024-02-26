@@ -5,6 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.22.2]
+
+- New function closeAllPositions(). ([#362](https://github.com/zetamarkets/sdk/pull/362))
+- New option to specify retry amount for txs. Use CrossClient.setTxRetryAmount(). ([#362](https://github.com/zetamarkets/sdk/pull/362))
+
 ## [1.22.1]
 
 - New asset $STRK. ([#361](https://github.com/zetamarkets/sdk/pull/361))
