@@ -42,6 +42,7 @@ export interface State {
   tickSizes: Array<number>;
   tickSizesPadding: Array<number>;
   nativeMakerTradeFeePercentage: anchor.BN;
+  nativeTakeTriggerOrderFeePercentage: anchor.BN;
   padding: Array<number>;
 }
 

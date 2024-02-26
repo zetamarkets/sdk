@@ -1137,7 +1137,7 @@ export class Exchange {
       new Uint8Array([orderIndex])
     )[0];
     let tx = new Transaction().add(
-      instructions.cancelTriggerOrderIx(
+      instructions.forceCancelTriggerOrderIx(
         orderIndex,
         this._provider.wallet.publicKey,
         triggerAccount,

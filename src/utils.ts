@@ -34,6 +34,7 @@ import { exchange as Exchange } from "./exchange";
 import { SubExchange } from "./subexchange";
 import { Market } from "./market";
 import {
+  TriggerOrder,
   MarginAccount,
   TradeEventV3,
   OpenOrdersMap,
@@ -2136,4 +2137,29 @@ async function initializeZetaMarket(
       console.error(`Initialize zeta market ${i} failed: ${e}`);
     }
   }
+}
+
+export function calculateTakeTriggerOrderExecutionPrice(
+  triggerOrder: TriggerOrder
+) {
+  if (triggerOrder.triggerPrice == null) {
+    throw new Error("Trigger order needs a trigger price.");
+  }
+  let fee =
+    Exchange.state.nativeTakeTriggerOrderFeePercentage.toNumber() / 100_000_000;
+  let tradePriceFee = fee * triggerOrder.triggerPrice.toNumber();
+  let side = types.fromProgramSide(triggerOrder.side);
+  let executionPrice = null;
+  if (side == types.Side.BID) {
+    executionPrice = Math.min(
+      triggerOrder.orderPrice.toNumber(),
+      triggerOrder.triggerPrice.toNumber() + tradePriceFee
+    );
+  } else {
+    executionPrice = Math.max(
+      triggerOrder.orderPrice.toNumber(),
+      triggerOrder.triggerPrice.toNumber() - tradePriceFee
+    );
+  }
+  return executionPrice;
 }

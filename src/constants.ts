@@ -15,6 +15,7 @@ export enum Asset {
   SEI = "SEI",
   JUP = "JUP",
   DYM = "DYM",
+  STRK = "STRK",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -50,6 +51,7 @@ export const FLEX_MINTS = {
     [Asset.SEI]: new PublicKey("Dju5Nvuet6GyBk7dBwWSG9cg2JDhtxKXHsBTs7HFbPk3"),
     [Asset.JUP]: new PublicKey("rYFexooTE27wUDaJsjpy8UdyKqUHxroPvfB2Hgmajjt"),
     [Asset.DYM]: new PublicKey("EgsE6WkPfaNT9iEDyrUmNb4C4jCaJ6BPC9wZsp6CdRFj"),
+    [Asset.STRK]: new PublicKey("7dEBs64vVgs8Ws3DkK7cwxSMe9RzQ21pnYawXgFaxisp"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -69,6 +71,7 @@ export const FLEX_MINTS = {
     [Asset.SEI]: new PublicKey("CTw2xSSAfrv9hJGVpB2R2q5xYrdX79i3hXeCiQiAKf2f"),
     [Asset.JUP]: new PublicKey("7uP5h7kxRaSbd2dz5e6gZp8yhqazyMvaXVoNZ4HsgZ2n"),
     [Asset.DYM]: new PublicKey("FxxBzHfSZc794sRw6aLs7KuaG9iBy1hSLLFV8LLQYAiL"),
+    [Asset.STRK]: new PublicKey("C42HXAXQiV6EqxzTvmwff6FgCPNw7r2MgvJ9uv8UNdce"),
   },
 };
 
@@ -177,6 +180,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.SEI]: new PublicKey("EhC74qLWnp3i5y3EiPibQHdAkNU4F9kvcDuWgcQuLj6G"),
     [Asset.JUP]: new PublicKey("8uMQw668EowuxXcX6oYohLepTCoZmk9WEnj224qevLqj"),
     [Asset.DYM]: new PublicKey("9XFg7LwjRp2UjqkdiEdeA9wSNovgc5v9iW231UMfeSDz"),
+    [Asset.STRK]: new PublicKey("8BgZQeymUJHAv1kWcFBr5YtytvU27yju8bvHYJWszAY9"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -204,6 +208,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.SEI]: new PublicKey("6cUuAyAX3eXoiWkjFF77RQBEUF15AAMQ7d1hm4EPd3tv"),
     [Asset.JUP]: new PublicKey("g6eRCbboSwK4tSWngn773RCMexr1APQr4uA9bGZBYfo"),
     [Asset.DYM]: new PublicKey("CSRRrhXa6DYu1W5jf89A7unCATdug2Z33tYyV2NXZZxa"),
+    [Asset.STRK]: new PublicKey("899ZkaKUTFZprwCAY3xnSAdWs3Ma6oDW3YqX8zpis1No"),
   },
 };
 
@@ -228,8 +233,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 13;
-export const UNUSED_PERP_MARKETS = 12;
+export const ACTIVE_PERP_MARKETS = 14;
+export const UNUSED_PERP_MARKETS = 11;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 30;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
@@ -388,8 +393,8 @@ export const STATIC_AND_PERPS_LUT: {
     key: new PublicKey("GYCrZc3MkTtLYiYGvcVMZUeqGZwP6S9bVGAbXASGeNtD"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 247856040,
-      lastExtendedSlotStartIndex: 160,
+      lastExtendedSlot: 249727678,
+      lastExtendedSlotStartIndex: 176,
       authority: new PublicKey("EwXPBSBUPqYDNA3dUVZ3nonFuaw3wGGJqEUTJbknDirH"),
       addresses: [
         new PublicKey("8eExPiLp47xbSDYkbuem4qnLUpbLTfZBeFuEJoh6EUr2"),
@@ -568,6 +573,19 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("HWStMu8eEqcKyf7jaLVuKEjVjwRhsZ47uC28QmuMxAzs"),
         new PublicKey("7cwSf9v33vH7HDcbD9fLTa7Dwr6e91f8C3aUMHuNkvHg"),
         new PublicKey("MPT1KEM3kE5XQZCYrMrvQqEVUJwdnkgbAhrrwvYeYa1"),
+        new PublicKey("899ZkaKUTFZprwCAY3xnSAdWs3Ma6oDW3YqX8zpis1No"),
+        new PublicKey("11111111111111111111111111111111"),
+        new PublicKey("8W6mHYDt7Sd6VXWy7Sh82RX68PB2hrFy7KuwkraMbVH2"),
+        new PublicKey("2SgUVRAWs1yuUjiYW8JCHb4g7R2gBHdEk5x9KJgn9zNy"),
+        new PublicKey("CS4jRF49KnrFfDoSnC6LbRiz7oK5xJCYcSavdp7erJJd"),
+        new PublicKey("AY6wqJ3ZjBYXmXKrpa7mZ7NcrqUF4w1KsH2zPGgMszyG"),
+        new PublicKey("33ET7TdFt1kVuY2eVjU4rCnCzyKgfiZY9TbPSHb4zCHn"),
+        new PublicKey("CdES4frNaF9AvE1Hyso6wbW3jaB1jR7HpZiSNSP4bC7m"),
+        new PublicKey("4qdMQ6iLN8Mm4Sa8geNkF1E2PmYN4zB9mGdeW4kxMGBY"),
+        new PublicKey("6wmWjNJPNCw3p3psBZM3DURJaxENVk4woYvJsCdcMb7R"),
+        new PublicKey("HpTGysQZFppoLQcRrfFu47teEajxharPP7f19XJuKU16"),
+        new PublicKey("ygRrmycNpMzEsqLYRpDMS9J1SHaFMG4Rm3tjkyVGVnc"),
+        new PublicKey("EV1UdC9dSz7a66hqYW5TkVe6JihSAyfEwVLwYzy1cGXz"),
       ],
     },
   }),
