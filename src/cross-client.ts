@@ -1321,23 +1321,18 @@ export class CrossClient {
 
   /**
    * Close all positions using market orders
-   * @param orderPrices Manual override for what price to send, decimal format. If not provided, the price will be markPrice + 5% slippage
+   * @param orderPrices Manual override for what price to send, decimal format
    */
-  public async closeAllPositions(orderPrices?: Map<Asset, number>) {
+  public async closeAllPositions(orderPrices: Map<Asset, number>) {
     let ixs = [];
 
     for (var position of [...this._positions.values()].flat()) {
       let side = position.size < 0 ? types.Side.BID : types.Side.ASK;
 
-      // 5% slippage unless a specific price is given
-      let price: number;
-      if (orderPrices && orderPrices.has(position.asset)) {
-        price = orderPrices.get(position.asset);
-      } else {
-        price =
-          Exchange.getMarkPrice(position.asset) *
-          (side == types.Side.BID ? 1.05 : 0.95);
+      if (!orderPrices.has(position.asset)) {
+        throw `orderPrices does not have a value for ${position.asset}`;
       }
+      let price = orderPrices.get(position.asset);
 
       ixs.push(
         this.createPlacePerpOrderInstruction(
