@@ -90,12 +90,12 @@ export function migrateToCrossMarginAccountIx(
   });
 }
 
-export function initializeCrossMarginAccountManagerIx(
+export function initializeCrossMarginAccountManagerV2Ix(
   crossMarginAccountManager: PublicKey,
   user: PublicKey,
   referrer?: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeCrossMarginAccountManager(
+  return Exchange.program.instruction.initializeCrossMarginAccountManagerV2(
     referrer ? referrer : null,
     {
       accounts: {

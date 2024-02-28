@@ -712,7 +712,7 @@ export class CrossClient {
         "User has no cross margin account manager. Creating account manager..."
       );
       tx.add(
-        instructions.initializeCrossMarginAccountManagerIx(
+        instructions.initializeCrossMarginAccountManagerV2Ix(
           this._accountManagerAddress,
           this._provider.wallet.publicKey,
           referrer
@@ -796,7 +796,7 @@ export class CrossClient {
         }
       }
       tx.add(
-        instructions.initializeCrossMarginAccountManagerIx(
+        instructions.initializeCrossMarginAccountManagerV2Ix(
           this._accountManagerAddress,
           this._provider.wallet.publicKey,
           referrerAddress

@@ -306,6 +306,37 @@ export type Zeta = {
           "isSigner": false
         }
       ],
+      "args": []
+    },
+    {
+      "name": "initializeCrossMarginAccountManagerV2",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
       "args": [
         {
           "name": "referrer",
@@ -11050,6 +11081,37 @@ export const IDL: Zeta = {
     },
     {
       "name": "initializeCrossMarginAccountManager",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeCrossMarginAccountManagerV2",
       "accounts": [
         {
           "name": "crossMarginAccountManager",
