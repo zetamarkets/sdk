@@ -34,7 +34,6 @@ import { PublicKey as PublicKeyZstd } from "zeta-solana-web3";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
 import { EventType } from "./events";
-import { Client } from "./client";
 import { SubExchange } from "./subexchange";
 import { assets, programTypes } from ".";
 

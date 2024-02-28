@@ -1,8 +1,6 @@
 // Singleton
 import { exchange as Exchange } from "./exchange";
 import { SubExchange } from "./subexchange";
-import { SubClient } from "./subclient";
-import { Client } from "./client";
 import { CrossClient } from "./cross-client";
 import { InsuranceClient } from "./insurance-client";
 import { Network } from "./network";
@@ -33,8 +31,6 @@ export {
   Exchange,
   constants,
   types,
-  SubClient,
-  Client,
   CrossClient,
   Decimal,
   instructions,
