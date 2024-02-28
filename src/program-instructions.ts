@@ -1207,7 +1207,7 @@ export function initializeUnderlyingIx(
 
   return Exchange.program.instruction.initializeUnderlying(flexUnderlying, {
     accounts: {
-      admin: Exchange.state.secondaryAdmin,
+      admin: Exchange.state.admin,
       zetaProgram: Exchange.programId,
       state: Exchange.stateAddress,
       systemProgram: SystemProgram.programId,
@@ -1606,7 +1606,7 @@ export function updateZetaPricingPubkeysIx(
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
-      admin: Exchange.state.secondaryAdmin,
+      admin: Exchange.state.admin,
     },
   });
 }
@@ -1714,7 +1714,7 @@ export function initializeMarketIndexesIx(
       accounts: {
         state: Exchange.stateAddress,
         marketIndexes: marketIndexes,
-        admin: Exchange.state.secondaryAdmin,
+        admin: Exchange.state.admin,
         systemProgram: SystemProgram.programId,
         pricing: Exchange.pricingAddress,
       },
