@@ -5,6 +5,14 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.23.0]
+
+- Add functionality for referral accounts. ([#357](https://github.com/zetamarkets/sdk/pull/357))
+
+### Breaking
+
+- Remove old client.ts and subclient.ts. ([#357](https://github.com/zetamarkets/sdk/pull/357))
+
 ## [1.22.1]
 
 - New asset $STRK. ([#361](https://github.com/zetamarkets/sdk/pull/361))
