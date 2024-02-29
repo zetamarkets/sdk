@@ -1137,11 +1137,29 @@ export class Exchange {
       new Uint8Array([orderIndex])
     )[0];
     let tx = new Transaction().add(
-      instructions.cancelTriggerOrderIx(
+      instructions.forceCancelTriggerOrderIx(
         orderIndex,
         this._provider.wallet.publicKey,
         triggerAccount,
         crossMarginAccount
+      )
+    );
+    return await utils.processTransaction(this._provider, tx);
+  }
+
+  public async adminOverrideReferrerPubkey(
+    user: PublicKey,
+    newReferrer: PublicKey
+  ) {
+    let accountManagerAddress = utils.getCrossMarginAccountManager(
+      this.programId,
+      user
+    )[0];
+    let tx = new Transaction().add(
+      instructions.adminOverrideReferrerPubkeyIx(
+        this._provider.wallet.publicKey,
+        accountManagerAddress,
+        newReferrer
       )
     );
     return await utils.processTransaction(this._provider, tx);

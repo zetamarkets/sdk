@@ -14,8 +14,6 @@ import {
   CrossMarginAccount,
   CrossMarginAccountManager,
   CrossMarginAccountInfo,
-  ReferralAccount,
-  ReferrerAccount,
   TradeEventV3,
   OrderCompleteEvent,
   ProductLedger,
@@ -36,7 +34,6 @@ import { PublicKey as PublicKeyZstd } from "zeta-solana-web3";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
 import { EventType } from "./events";
-import { Client } from "./client";
 import { SubExchange } from "./subexchange";
 import { assets, programTypes } from ".";
 
@@ -51,31 +48,6 @@ export class CrossClient {
     return this._provider.connection;
   }
   private _provider: anchor.AnchorProvider;
-
-  /**
-   * Stores the user referral account data.
-   */
-  public get referralAccount(): ReferralAccount | null {
-    return this._referralAccount;
-  }
-  private _referralAccount: ReferralAccount | null;
-  private _referralAccountAddress: PublicKey;
-
-  /**
-   * Stores the user referrer account data.
-   */
-  public get referrerAccount(): ReferrerAccount | null {
-    return this._referrerAccount;
-  }
-  private _referrerAccount: ReferrerAccount | null;
-
-  /**
-   * Stores the user referrer account alias.
-   */
-  public get referrerAlias(): string | null {
-    return this._referrerAlias;
-  }
-  private _referrerAlias: string | null;
 
   /**
    * Client margin account address.
@@ -280,9 +252,6 @@ export class CrossClient {
     this._accountManager = null;
 
     this._provider = new anchor.AnchorProvider(connection, wallet, opts);
-    this._referralAccount = null;
-    this._referrerAccount = null;
-    this._referrerAlias = null;
   }
 
   /**
@@ -415,8 +384,6 @@ export class CrossClient {
     }
 
     client.setPolling(constants.DEFAULT_CLIENT_TIMER_INTERVAL);
-    client._referralAccountAddress = undefined;
-    client._referrerAlias = undefined;
 
     if (callback !== undefined) {
       client._tradeEventV3Listener = Exchange.program.addEventListener(
@@ -523,15 +490,20 @@ export class CrossClient {
     let fetchSlot: number = 0;
     if (fetch) {
       try {
-        let [clockInfo, crossMarginAccountInfo] =
+        let [clockInfo, crossMarginAccountInfo, crossMarginAccountManagerInfo] =
           await Exchange.connection.getMultipleAccountsInfo([
             SYSVAR_CLOCK_PUBKEY as PublicKeyZstd,
             this._accountAddress as PublicKeyZstd,
+            this._accountManagerAddress as PublicKeyZstd,
           ]);
         fetchSlot = utils.getClockData(clockInfo).slot;
         this._account = Exchange.program.coder.accounts.decode(
           types.ProgramAccountType.CrossMarginAccount,
           crossMarginAccountInfo.data
+        );
+        this._accountManager = Exchange.program.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccountManager,
+          crossMarginAccountManagerInfo.data
         );
       } catch (e) {
         this.toggleUpdateState(false);
@@ -552,74 +524,6 @@ export class CrossClient {
 
   public setUseVersionedTxs(useVersionedTxs: boolean) {
     this._useVersionedTxs = useVersionedTxs;
-  }
-
-  public async setReferralData() {
-    this.delegatedCheck();
-    try {
-      let [referrerAccount] = utils.getReferrerAccountAddress(
-        Exchange.programId,
-        this.publicKey
-      );
-
-      this._referrerAccount =
-        (await Exchange.program.account.referrerAccount.fetch(
-          referrerAccount
-        )) as unknown as ReferrerAccount;
-      console.log(`User is a referrer. ${this.publicKey}.`);
-
-      let referrerAlias = await utils.fetchReferrerAliasAccount(this.publicKey);
-      if (referrerAlias !== null) {
-        let existingAlias = Buffer.from(referrerAlias.alias).toString().trim();
-        this._referrerAlias = existingAlias;
-      }
-    } catch (e) {}
-
-    try {
-      let [referralAccountAddress, _nonce] = utils.getReferralAccountAddress(
-        Exchange.programId,
-        this.publicKey
-      );
-
-      this._referralAccountAddress = referralAccountAddress;
-      this._referralAccount =
-        (await Exchange.program.account.referralAccount.fetch(
-          referralAccountAddress
-        )) as unknown as ReferralAccount;
-      console.log(
-        `User has been referred by ${this._referralAccount.referrer.toString()}.`
-      );
-    } catch (e) {}
-  }
-
-  public async referUser(referrer: PublicKey): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    let [referrerAccount] = utils.getReferrerAccountAddress(
-      Exchange.programId,
-      referrer
-    );
-
-    try {
-      await Exchange.program.account.referrerAccount.fetch(referrerAccount);
-    } catch (e) {
-      throw Error(`Invalid referrer. ${referrer.toString()}`);
-    }
-    let tx = new Transaction().add(
-      instructions.referUserIx(this.provider.wallet.publicKey, referrer)
-    );
-    let txId = await utils.processTransaction(this.provider, tx);
-
-    [this._referralAccountAddress] = utils.getReferralAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-
-    this._referralAccount =
-      (await Exchange.program.account.referralAccount.fetch(
-        this._referralAccountAddress
-      )) as unknown as ReferralAccount;
-
-    return txId;
   }
 
   /**
@@ -766,7 +670,31 @@ export class CrossClient {
     return sigs;
   }
 
-  public async migrateToCrossMarginAccount(): Promise<TransactionSignature[]> {
+  public async initializeReferrerAccount(
+    id: string
+  ): Promise<TransactionSignature> {
+    let tx = new Transaction().add(
+      instructions.initializeReferrerAccountsIx(
+        id,
+        this.publicKey,
+        utils.getReferrerIdAccount(Exchange.programId, id)[0],
+        utils.getReferrerPubkeyAccount(Exchange.programId, this.publicKey)[0]
+      )
+    );
+
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
+  public async migrateToCrossMarginAccount(
+    referrer?: PublicKey
+  ): Promise<TransactionSignature[]> {
     this.delegatedCheck();
     await this.usdcAccountCheck();
 
@@ -784,9 +712,10 @@ export class CrossClient {
         "User has no cross margin account manager. Creating account manager..."
       );
       tx.add(
-        instructions.initializeCrossMarginAccountManagerIx(
+        instructions.initializeCrossMarginAccountManagerV2Ix(
           this._accountManagerAddress,
-          this._provider.wallet.publicKey
+          this._provider.wallet.publicKey,
+          referrer
         )
       );
     }
@@ -828,8 +757,12 @@ export class CrossClient {
 
   /**
    * @param amount  the native amount to deposit (6 decimals fixed point)
+   * @param referrerId the referrer's ID to use in initializeCrossMarginAccountManager (only used when creating a new account)
    */
-  public async deposit(amount: number): Promise<TransactionSignature> {
+  public async deposit(
+    amount: number,
+    referrerId?: string
+  ): Promise<TransactionSignature> {
     this.delegatedCheck();
     await this.usdcAccountCheck();
     // Check if the user has accounts set up
@@ -838,10 +771,35 @@ export class CrossClient {
       console.log(
         "User has no cross margin account manager. Creating account manager..."
       );
+
+      let referrerAddress = undefined;
+
+      if (referrerId) {
+        let failures = 0;
+        while (referrerAddress == undefined) {
+          try {
+            referrerAddress = (
+              await Exchange.program.account.referrerIdAccount.fetch(
+                utils
+                  .getReferrerIdAccount(Exchange.programId, referrerId)[0]
+                  .toString()
+              )
+            ).referrerPubkey;
+          } catch (e) {
+            failures += 1;
+            if (failures > 3) {
+              throw `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`;
+            } else {
+              console.log(`Failed fetching ReferrerIdAccount, retrying...`);
+            }
+          }
+        }
+      }
       tx.add(
-        instructions.initializeCrossMarginAccountManagerIx(
+        instructions.initializeCrossMarginAccountManagerV2Ix(
           this._accountManagerAddress,
-          this._provider.wallet.publicKey
+          this._provider.wallet.publicKey,
+          referrerAddress
         )
       );
     }
@@ -1008,6 +966,41 @@ export class CrossClient {
     );
     this._account = null;
     return txId;
+  }
+
+  public async closeReferrerAccounts(): Promise<TransactionSignature> {
+    this.delegatedCheck();
+
+    // Fetch all required accounts because we don't store them in the client
+    let referrerPubkeyAccountAddress = utils.getReferrerPubkeyAccount(
+      Exchange.programId,
+      this.publicKey
+    )[0];
+    let referrerPubkeyAccount =
+      await Exchange.program.account.referrerPubkeyAccount.fetch(
+        referrerPubkeyAccountAddress
+      );
+    let id = Buffer.from(referrerPubkeyAccount.referrerId).toString();
+    let referrerIdAccountAddress = utils.getReferrerIdAccount(
+      Exchange.programId,
+      id
+    )[0];
+
+    let tx = new Transaction().add(
+      instructions.closeReferrerAccountsIx(
+        this.publicKey,
+        referrerIdAccountAddress,
+        referrerPubkeyAccountAddress
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   /**
@@ -1459,8 +1452,8 @@ export class CrossClient {
     newSide: types.Side,
     newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
-  ) {
-    await this.editTriggerOrder(
+  ): Promise<TransactionSignature> {
+    return await this.editTriggerOrder(
       orderIndex,
       newOrderPrice,
       newSize,
@@ -1473,6 +1466,37 @@ export class CrossClient {
     );
   }
 
+  public async takeTriggerOrder(
+    orderIndex: number,
+    asset: Asset,
+    orderMarginAccount: PublicKey
+  ) {
+    let triggerAccount = utils.getTriggerOrder(
+      Exchange.programId,
+      orderMarginAccount,
+      new Uint8Array([orderIndex])
+    )[0];
+
+    let tx = new Transaction().add(
+      instructions.takeTriggerOrderIx(
+        asset,
+        triggerAccount,
+        orderIndex,
+        orderMarginAccount,
+        this._accountAddress,
+        this.provider.wallet.publicKey
+      )
+    );
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
   public async editPriceTriggerOrder(
     orderIndex: number,
     newOrderPrice: number,
@@ -1482,8 +1506,8 @@ export class CrossClient {
     newDirection: types.TriggerDirection,
     newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
-  ) {
-    await this.editTriggerOrder(
+  ): Promise<TransactionSignature> {
+    return await this.editTriggerOrder(
       orderIndex,
       newOrderPrice,
       newSize,
@@ -1506,7 +1530,7 @@ export class CrossClient {
     newTriggerTimestamp: anchor.BN,
     newOrderType: types.OrderType,
     newOptions: types.TriggerOrderOptions = types.defaultTriggerOrderOptions()
-  ) {
+  ): Promise<TransactionSignature> {
     let triggerAccount = utils.getTriggerOrder(
       Exchange.programId,
       this._accountAddress,
@@ -1611,16 +1635,19 @@ export class CrossClient {
     );
   }
 
-  public async cancelAllMarketOrders(): Promise<TransactionSignature> {
-    let tx = new Transaction();
+  public async cancelAllMarketOrders(): Promise<TransactionSignature[]> {
+    let ixs = [];
 
     for (var asset of Exchange.assets) {
       let assetIndex = assetToIndex(asset);
-      if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
+      if (
+        this.getOrders(asset).length < 1 ||
+        this._openOrdersAccounts[assetIndex].equals(PublicKey.default)
+      ) {
         continue;
       }
 
-      tx.add(
+      ixs.push(
         instructions.cancelAllMarketOrdersIx(
           asset,
           this.provider.wallet.publicKey,
@@ -1629,14 +1656,21 @@ export class CrossClient {
         )
       );
     }
-    return await utils.processTransaction(
-      this._provider,
-      tx,
-      undefined,
-      undefined,
-      undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      this.useVersionedTxs
+        ? constants.MAX_PRUNE_CANCELS_PER_TX_LUT
+        : constants.MAX_PRUNE_CANCELS_PER_TX
     );
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(await utils.processTransaction(this._provider, tx));
+      })
+    );
+
+    return txIds;
   }
 
   public createCancelAllMarketOrdersInstruction(
@@ -2653,59 +2687,6 @@ export class CrossClient {
     });
   }
 
-  public async initializeReferrerAlias(
-    alias: string
-  ): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    if (alias.length > 15) {
-      throw new Error("Alias cannot be over 15 chars!");
-    }
-
-    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-
-    try {
-      await Exchange.program.account.referrerAccount.fetch(
-        referrerAccountAddress
-      );
-    } catch (e) {
-      throw Error(`User is not a referrer, cannot create alias.`);
-    }
-
-    let referrerAlias = await utils.fetchReferrerAliasAccount(this.publicKey);
-    if (referrerAlias !== null) {
-      let existingAlias = Buffer.from(referrerAlias.alias).toString().trim();
-      throw Error(`Referrer already has alias. ${existingAlias}`);
-    }
-
-    let tx = new Transaction().add(
-      await instructions.initializeReferrerAliasIx(this.publicKey, alias)
-    );
-
-    let txid = await utils.processTransaction(this.provider, tx);
-    this._referrerAlias = alias;
-
-    return txid;
-  }
-
-  public async claimReferralRewards(): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    let [referralAccountAddress] = utils.getReferralAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-    let tx = new Transaction().add(
-      await instructions.claimReferralsRewardsIx(
-        referralAccountAddress,
-        this._usdcAccountAddress,
-        this.provider.wallet.publicKey
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
-  }
-
   /**
    * Getter functions for raw user margin account state.
    */
@@ -2755,30 +2736,6 @@ export class CrossClient {
     let orderState = this.getProductLedger(asset).orderState;
     let size = orderState.closingOrders.toNumber();
     return decimal ? utils.convertNativeLotSizeToDecimal(size) : size;
-  }
-
-  public async initializeReferrerAccount() {
-    this.delegatedCheck();
-    let tx = new Transaction().add(
-      await instructions.initializeReferrerAccountIx(this.publicKey)
-    );
-    await utils.processTransaction(this._provider, tx);
-  }
-
-  public async claimReferrerRewards(): Promise<TransactionSignature> {
-    this.delegatedCheck();
-    let [referrerAccountAddress] = utils.getReferrerAccountAddress(
-      Exchange.programId,
-      this.publicKey
-    );
-    let tx = new Transaction().add(
-      await instructions.claimReferralsRewardsIx(
-        referrerAccountAddress,
-        this._usdcAccountAddress,
-        this.provider.wallet.publicKey
-      )
-    );
-    return await utils.processTransaction(this._provider, tx);
   }
 
   /**

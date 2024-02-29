@@ -34,8 +34,8 @@ import { exchange as Exchange } from "./exchange";
 import { SubExchange } from "./subexchange";
 import { Market } from "./market";
 import {
+  TriggerOrder,
   MarginAccount,
-  ReferrerAlias,
   TradeEventV3,
   OpenOrdersMap,
   CrossOpenOrdersMap,
@@ -482,6 +482,32 @@ export function getQuoteMint(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("quote-mint")),
       market.toBuffer(),
+    ],
+    programId
+  );
+}
+
+export function getReferrerIdAccount(
+  programId: PublicKey,
+  id: string
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("referrer-id-account")),
+      Buffer.from(id),
+    ],
+    programId
+  );
+}
+
+export function getReferrerPubkeyAccount(
+  programId: PublicKey,
+  userKey: PublicKey
+): [PublicKey, number] {
+  return anchor.web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode("referrer-pubkey-account")),
+      userKey.toBuffer(),
     ],
     programId
   );
@@ -1686,28 +1712,6 @@ export function objectEquals(a: any, b: any): boolean {
   return JSON.stringify(a) == JSON.stringify(b);
 }
 
-export async function fetchReferrerAliasAccount(
-  referrer: PublicKey = undefined,
-  alias: string = undefined
-): Promise<ReferrerAlias> {
-  if (!referrer && !alias) {
-    return null;
-  }
-
-  let referrerAliases = await Exchange.program.account.referrerAlias.all();
-  for (var i = 0; i < referrerAliases.length; i++) {
-    let acc = referrerAliases[i].account as ReferrerAlias;
-    if (
-      (referrer && acc.referrer.equals(referrer)) ||
-      (alias && convertBufferToTrimmedString(acc.alias) == alias)
-    ) {
-      return acc;
-    }
-  }
-
-  return null;
-}
-
 export function convertBufferToTrimmedString(buffer: number[]): string {
   let bufferString = Buffer.from(buffer).toString().trim();
   let splitIndex = bufferString.length;
@@ -2133,4 +2137,29 @@ async function initializeZetaMarket(
       console.error(`Initialize zeta market ${i} failed: ${e}`);
     }
   }
+}
+
+export function calculateTakeTriggerOrderExecutionPrice(
+  triggerOrder: TriggerOrder
+) {
+  if (triggerOrder.triggerPrice == null) {
+    throw new Error("Trigger order needs a trigger price.");
+  }
+  let fee =
+    Exchange.state.nativeTakeTriggerOrderFeePercentage.toNumber() / 100_000_000;
+  let tradePriceFee = fee * triggerOrder.triggerPrice.toNumber();
+  let side = types.fromProgramSide(triggerOrder.side);
+  let executionPrice = null;
+  if (side == types.Side.BID) {
+    executionPrice = Math.min(
+      triggerOrder.orderPrice.toNumber(),
+      triggerOrder.triggerPrice.toNumber() + tradePriceFee
+    );
+  } else {
+    executionPrice = Math.max(
+      triggerOrder.orderPrice.toNumber(),
+      triggerOrder.triggerPrice.toNumber() - tradePriceFee
+    );
+  }
+  return executionPrice;
 }
