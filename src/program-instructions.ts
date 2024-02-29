@@ -90,19 +90,23 @@ export function migrateToCrossMarginAccountIx(
   });
 }
 
-export function initializeCrossMarginAccountManagerIx(
+export function initializeCrossMarginAccountManagerV2Ix(
   crossMarginAccountManager: PublicKey,
-  user: PublicKey
+  user: PublicKey,
+  referrer?: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeCrossMarginAccountManager({
-    accounts: {
-      crossMarginAccountManager,
-      authority: user,
-      payer: user,
-      zetaProgram: Exchange.programId,
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return Exchange.program.instruction.initializeCrossMarginAccountManagerV2(
+    referrer ? referrer : null,
+    {
+      accounts: {
+        crossMarginAccountManager,
+        authority: user,
+        payer: user,
+        zetaProgram: Exchange.programId,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function closeCrossMarginAccountManagerIx(
@@ -685,59 +689,33 @@ export function executeTriggerOrderV2Ix(
     },
   });
 }
-export function executeTriggerOrderIx(
+
+export function takeTriggerOrderIx(
   asset: Asset,
-  side: types.Side,
-  triggerOrderBit: number,
   triggerOrder: PublicKey,
-  marginAccount: PublicKey,
-  openOrders: PublicKey
+  triggerOrderBit: number,
+  orderMarginAccount: PublicKey,
+  takerMarginAccount: PublicKey,
+  taker: PublicKey
 ): TransactionInstruction {
   let marketData = Exchange.getPerpMarket(asset);
-
-  return Exchange.program.instruction.executeTriggerOrder(triggerOrderBit, {
+  return Exchange.program.instruction.takeTriggerOrder(triggerOrderBit, {
     accounts: {
-      admin: Exchange.state.secondaryAdmin,
       triggerOrder: triggerOrder,
-      placeOrderAccounts: {
-        state: Exchange.stateAddress,
-        pricing: Exchange.pricingAddress,
-        marginAccount: marginAccount,
-        dexProgram: constants.DEX_PID[Exchange.network],
-        tokenProgram: TOKEN_PROGRAM_ID,
-        serumAuthority: Exchange.serumAuthority,
-        openOrders: openOrders,
-        rent: SYSVAR_RENT_PUBKEY,
-        marketAccounts: {
-          market: marketData.serumMarket.address,
-          requestQueue: marketData.serumMarket.requestQueueAddress,
-          eventQueue: marketData.serumMarket.eventQueueAddress,
-          bids: marketData.serumMarket.bidsAddress,
-          asks: marketData.serumMarket.asksAddress,
-          coinVault: marketData.serumMarket.baseVaultAddress,
-          pcVault: marketData.serumMarket.quoteVaultAddress,
-          // User params.
-          orderPayerTokenAccount:
-            side == types.Side.BID
-              ? marketData.quoteVault
-              : marketData.baseVault,
-          coinWallet: marketData.baseVault,
-          pcWallet: marketData.quoteVault,
-        },
-        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-        oracleBackupFeed:
-          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
-        oracleBackupProgram: constants.CHAINLINK_PID,
-        marketMint:
-          side == types.Side.BID
-            ? marketData.serumMarket.quoteMintAddress
-            : marketData.serumMarket.baseMintAddress,
-        mintAuthority: Exchange.mintAuthority,
-        perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
-      },
+      state: Exchange.stateAddress,
+      pricing: Exchange.pricingAddress,
+      oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+      oracleBackupProgram: constants.CHAINLINK_PID,
+      bids: marketData.serumMarket.bidsAddress,
+      asks: marketData.serumMarket.asksAddress,
+      taker,
+      takerMarginAccount,
+      orderMarginAccount,
     },
   });
 }
+
 export function cancelTriggerOrderV2Ix(
   triggerOrderBit: number,
   authority: PublicKey,
@@ -752,22 +730,23 @@ export function cancelTriggerOrderV2Ix(
     },
   });
 }
-export function cancelTriggerOrderIx(
+
+export function forceCancelTriggerOrderIx(
   triggerOrderBit: number,
-  payer: PublicKey,
+  authority: PublicKey,
   triggerOrder: PublicKey,
   marginAccount: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.cancelTriggerOrder(triggerOrderBit, {
+  return Exchange.program.instruction.forceCancelTriggerOrder(triggerOrderBit, {
     accounts: {
       state: Exchange.stateAddress,
-      payer: payer,
-      admin: Exchange.state.secondaryAdmin,
+      admin: authority,
       triggerOrder: triggerOrder,
       marginAccount: marginAccount,
     },
   });
 }
+
 export function editTriggerOrderIx(
   newOrderPrice: number,
   newTriggerPrice: number,
@@ -1833,92 +1812,16 @@ export function initializeWhitelistTradingFeesAccountIx(
   );
 }
 
-export function referUserIx(
-  user: PublicKey,
-  referrer: PublicKey
+export function adminOverrideReferrerPubkeyIx(
+  admin: PublicKey,
+  userCrossMarginAccountManager: PublicKey,
+  newReferrer: PublicKey
 ): TransactionInstruction {
-  let [referrerAccount, _referrerAccountNonce] =
-    utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
-
-  let [referralAccount, _referralAccountNonce] =
-    utils.getReferralAccountAddress(Exchange.program.programId, user);
-
-  return Exchange.program.instruction.referUser({
+  return Exchange.program.instruction.adminOverrideReferrerPubkey(newReferrer, {
     accounts: {
-      user,
-      referrerAccount,
-      referralAccount,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
-export function initializeReferrerAccountIx(
-  referrer: PublicKey
-): TransactionInstruction {
-  let [referrerAccount, _referrerAccountNonce] =
-    utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
-
-  return Exchange.program.instruction.initializeReferrerAccount({
-    accounts: {
-      referrer,
-      referrerAccount,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
-export function initializeReferrerAliasIx(
-  referrer: PublicKey,
-  alias: string
-): TransactionInstruction {
-  let [referrerAccount] = utils.getReferrerAccountAddress(
-    Exchange.program.programId,
-    referrer
-  );
-
-  let [referrerAlias] = utils.getReferrerAliasAddress(
-    Exchange.program.programId,
-    alias
-  );
-
-  return Exchange.program.instruction.initializeReferrerAlias(alias, {
-    accounts: {
-      referrer,
-      referrerAlias,
-      referrerAccount,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
-export function setReferralsRewardsIx(
-  args: SetReferralsRewardsArgs[],
-  referralsAdmin: PublicKey,
-  remainingAccounts: AccountMeta[]
-): TransactionInstruction {
-  return Exchange.program.instruction.setReferralsRewards(args, {
-    accounts: {
+      crossMarginAccountManager: userCrossMarginAccountManager,
       state: Exchange.stateAddress,
-      referralsAdmin,
-    },
-    remainingAccounts,
-  });
-}
-
-export function claimReferralsRewardsIx(
-  userReferralsAccount: PublicKey,
-  userTokenAccount: PublicKey,
-  user: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.claimReferralsRewards({
-    accounts: {
-      state: Exchange.stateAddress,
-      referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
-      userReferralsAccount,
-      userTokenAccount,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      user,
+      admin: admin,
     },
   });
 }
@@ -2070,6 +1973,36 @@ export function updateAdminIx(
     return Exchange.program.instruction.updateSecondaryAdmin(accounts);
   }
   return Exchange.program.instruction.updateAdmin(accounts);
+}
+
+export function initializeReferrerAccountsIx(
+  id: string,
+  user: PublicKey,
+  referrerIdAccount: PublicKey,
+  referrerPubkeyAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeReferrerAccounts(id, {
+    accounts: {
+      authority: user,
+      referrerIdAccount,
+      referrerPubkeyAccount,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function closeReferrerAccountsIx(
+  user: PublicKey,
+  referrerIdAccount: PublicKey,
+  referrerPubkeyAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.closeReferrerAccounts({
+    accounts: {
+      authority: user,
+      referrerIdAccount,
+      referrerPubkeyAccount,
+    },
+  });
 }
 
 export function updateReferralsAdminIx(
@@ -2300,6 +2233,36 @@ export function editDelegatedPubkeyIx(
       authority,
     },
   });
+}
+
+export function updateMakerTradeFeePercentageIx(
+  newNativeMakerTradeFeePercentage: anchor.BN,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.updateMakerTradeFeePercentage(
+    newNativeMakerTradeFeePercentage,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateTakeTriggerOrderFeePercentageIx(
+  newTakeTriggerOrderFeePercentage: anchor.BN,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.updateTakeTriggerOrderFeePercentage(
+    newTakeTriggerOrderFeePercentage,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
 }
 
 export function editMaType(

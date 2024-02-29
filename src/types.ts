@@ -315,6 +315,7 @@ export interface MarginParams {
 }
 
 export enum ProgramAccountType {
+  CrossMarginAccountManager = "CrossMarginAccountManager",
   CrossMarginAccount = "CrossMarginAccount",
   MarginAccount = "MarginAccount",
   SpreadAccount = "SpreadAccount",

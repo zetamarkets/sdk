@@ -40,6 +40,8 @@ export interface State {
   tickSizesPadding: Array<number>;
   deprecatedMakerFeeValue: anchor.BN;
   maTypeAdmin: PublicKey;
+  nativeMakerTradeFeePercentage: anchor.BN;
+  nativeTakeTriggerOrderFeePercentage: anchor.BN;
   padding: Array<number>;
 }
 
@@ -188,6 +190,8 @@ export interface CrossMarginAccountManager {
   nonce: number;
   authority: PublicKey;
   accounts: Array<CrossMarginAccountInfo>;
+  referrer: PublicKey;
+  padding: Array<number>;
 }
 
 export interface CrossMarginAccount {
@@ -237,6 +241,15 @@ export interface SpreadAccount {
   positionsPadding: Array<Position>;
   asset: any;
   padding: Array<number>;
+}
+
+export interface ReferrerIdAccount {
+  referrerId: Array<number>;
+  referrerPubkey: PublicKey;
+}
+
+export interface ReferrerPubkeyAccount {
+  referrerPubkey: PublicKey;
 }
 
 export interface TriggerOrder {
@@ -306,29 +319,6 @@ export interface SocializedLossAccount {
 export interface WhitelistTradingFeesAccount {
   nonce: number;
   userKey: PublicKey;
-}
-
-export interface ReferralAccount {
-  nonce: number;
-  referrer: PublicKey;
-  user: PublicKey;
-  timestamp: anchor.BN;
-  pendingRewards: anchor.BN;
-  claimedRewards: anchor.BN;
-}
-
-export interface ReferrerAccount {
-  nonce: number;
-  hasAlias: boolean;
-  referrer: PublicKey;
-  pendingRewards: anchor.BN;
-  claimedRewards: anchor.BN;
-}
-
-export interface ReferrerAlias {
-  nonce: number;
-  alias: Array<number>;
-  referrer: PublicKey;
 }
 
 // TODO move these events to event.ts.

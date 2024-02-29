@@ -252,6 +252,32 @@
       "args": []
     },
     {
+      "name": "adminOverrideReferrerPubkey",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newReferrer",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
@@ -281,6 +307,44 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "initializeCrossMarginAccountManagerV2",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "referrer",
+          "type": {
+            "option": "publicKey"
+          }
+        }
+      ]
     },
     {
       "name": "initializeCrossMarginAccount",
@@ -1090,6 +1154,48 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "updateMakerTradeFeePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newNativeMakerTradeFeePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateTakeTriggerOrderFeePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newTakeTriggerOrderFeePercentage",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "updateZetaState",
@@ -4515,6 +4621,72 @@
       ]
     },
     {
+      "name": "takeTriggerOrder",
+      "accounts": [
+        {
+          "name": "triggerOrder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "taker",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "takerMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "orderMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "executeTriggerOrder",
       "accounts": [
         {
@@ -6354,6 +6526,58 @@
       ]
     },
     {
+      "name": "initializeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "referrerId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "closeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editMaType",
       "accounts": [
         {
@@ -6380,145 +6604,6 @@
           }
         }
       ]
-    },
-    {
-      "name": "initializeReferrerAccount",
-      "accounts": [
-        {
-          "name": "referrer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "referUser",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializeReferrerAlias",
-      "accounts": [
-        {
-          "name": "referrer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAlias",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "alias",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "setReferralsRewards",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralsAdmin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "vec": {
-              "defined": "SetReferralsRewardsArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "claimReferralsRewards",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralsRewardsWallet",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userReferralsAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "editDelegatedPubkey",
@@ -6573,7 +6658,7 @@
             "type": {
               "array": [
                 "u64",
-                13
+                14
               ]
             }
           },
@@ -6582,7 +6667,7 @@
             "type": {
               "array": [
                 "u64",
-                12
+                11
               ]
             }
           },
@@ -6591,7 +6676,7 @@
             "type": {
               "array": [
                 "u64",
-                13
+                14
               ]
             }
           },
@@ -6600,7 +6685,7 @@
             "type": {
               "array": [
                 "u64",
-                12
+                11
               ]
             }
           },
@@ -6611,7 +6696,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                13
+                14
               ]
             }
           },
@@ -6622,7 +6707,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                12
+                11
               ]
             }
           },
@@ -6633,7 +6718,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                13
+                14
               ]
             }
           },
@@ -6644,7 +6729,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                12
+                11
               ]
             }
           },
@@ -6653,7 +6738,7 @@
             "type": {
               "array": [
                 "u64",
-                13
+                14
               ]
             }
           },
@@ -6662,7 +6747,7 @@
             "type": {
               "array": [
                 "u64",
-                12
+                11
               ]
             }
           },
@@ -6671,7 +6756,7 @@
             "type": {
               "array": [
                 "publicKey",
-                13
+                14
               ]
             }
           },
@@ -6680,7 +6765,7 @@
             "type": {
               "array": [
                 "publicKey",
-                12
+                11
               ]
             }
           },
@@ -6689,7 +6774,7 @@
             "type": {
               "array": [
                 "publicKey",
-                13
+                14
               ]
             }
           },
@@ -6698,7 +6783,7 @@
             "type": {
               "array": [
                 "publicKey",
-                12
+                11
               ]
             }
           },
@@ -6707,7 +6792,7 @@
             "type": {
               "array": [
                 "publicKey",
-                13
+                14
               ]
             }
           },
@@ -6716,7 +6801,7 @@
             "type": {
               "array": [
                 "publicKey",
-                12
+                11
               ]
             }
           },
@@ -6725,7 +6810,7 @@
             "type": {
               "array": [
                 "publicKey",
-                13
+                14
               ]
             }
           },
@@ -6734,7 +6819,7 @@
             "type": {
               "array": [
                 "publicKey",
-                12
+                11
               ]
             }
           },
@@ -6745,7 +6830,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                13
+                14
               ]
             }
           },
@@ -6756,7 +6841,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                12
+                11
               ]
             }
           },
@@ -6767,7 +6852,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                13
+                14
               ]
             }
           },
@@ -6778,7 +6863,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                12
+                11
               ]
             }
           },
@@ -6789,7 +6874,7 @@
                 {
                   "defined": "Product"
                 },
-                13
+                14
               ]
             }
           },
@@ -6800,7 +6885,7 @@
                 {
                   "defined": "Product"
                 },
-                12
+                11
               ]
             }
           },
@@ -6809,7 +6894,7 @@
             "type": {
               "array": [
                 "publicKey",
-                13
+                14
               ]
             }
           },
@@ -6818,7 +6903,7 @@
             "type": {
               "array": [
                 "publicKey",
-                12
+                11
               ]
             }
           },
@@ -6839,7 +6924,7 @@
             "type": {
               "array": [
                 "bool",
-                13
+                14
               ]
             }
           },
@@ -6848,7 +6933,7 @@
             "type": {
               "array": [
                 "bool",
-                12
+                11
               ]
             }
           },
@@ -7240,7 +7325,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                13
+                14
               ]
             }
           },
@@ -7251,7 +7336,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                12
+                11
               ]
             }
           },
@@ -7264,7 +7349,7 @@
             "type": {
               "array": [
                 "u32",
-                13
+                14
               ]
             }
           },
@@ -7273,7 +7358,7 @@
             "type": {
               "array": [
                 "u32",
-                12
+                11
               ]
             }
           },
@@ -7282,7 +7367,7 @@
             "type": {
               "array": [
                 "u32",
-                13
+                14
               ]
             }
           },
@@ -7291,7 +7376,7 @@
             "type": {
               "array": [
                 "u32",
-                12
+                11
               ]
             }
           },
@@ -7300,15 +7385,15 @@
             "type": "u64"
           },
           {
-            "name": "maTypeAdmin",
-            "type": "publicKey"
+            "name": "nativeTakeTriggerOrderFeePercentage",
+            "type": "u64"
           },
           {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                66
+                90
               ]
             }
           }
@@ -7666,7 +7751,20 @@
                 {
                   "defined": "CrossMarginAccountInfo"
                 },
-                25
+                20
+              ]
+            }
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                23
               ]
             }
           }
@@ -7713,7 +7811,7 @@
             "type": {
               "array": [
                 "u8",
-                13
+                14
               ]
             }
           },
@@ -7722,7 +7820,7 @@
             "type": {
               "array": [
                 "u8",
-                12
+                11
               ]
             }
           },
@@ -7737,7 +7835,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                13
+                14
               ]
             }
           },
@@ -7748,7 +7846,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                12
+                11
               ]
             }
           },
@@ -7759,7 +7857,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                13
+                14
               ]
             }
           },
@@ -7770,7 +7868,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                12
+                11
               ]
             }
           },
@@ -8058,86 +8156,39 @@
       }
     },
     {
-      "name": "ReferrerAccount",
+      "name": "ReferrerIdAccount",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "hasAlias",
-            "type": "bool"
-          },
-          {
-            "name": "referrer",
-            "type": "publicKey"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "claimedRewards",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ReferralAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "referrer",
-            "type": "publicKey"
-          },
-          {
-            "name": "user",
-            "type": "publicKey"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "claimedRewards",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ReferrerAlias",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "alias",
+            "name": "referrerId",
             "type": {
               "array": [
                 "u8",
-                15
+                6
               ]
             }
           },
           {
-            "name": "referrer",
+            "name": "referrerPubkey",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReferrerPubkeyAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referrerId",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
           }
         ]
       }
@@ -8573,7 +8624,7 @@
             "type": {
               "array": [
                 "u64",
-                13
+                14
               ]
             }
           },
@@ -8617,26 +8668,6 @@
           {
             "name": "interestRate",
             "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "SetReferralsRewardsArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "referralsAccountKey",
-            "type": "publicKey"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "overwrite",
-            "type": "bool"
           }
         ]
       }
@@ -9355,6 +9386,9 @@
           },
           {
             "name": "DYM"
+          },
+          {
+            "name": "STRK"
           },
           {
             "name": "UNDEFINED"
@@ -10755,8 +10789,13 @@
     },
     {
       "code": 6160,
-      "name": "InvalidMATypeAdminSigner",
-      "msg": "Invalid margin account type admin signer"
+      "name": "InvalidReferrerIDLength",
+      "msg": "Invalid referrer ID length"
+    },
+    {
+      "code": 6161,
+      "name": "InvalidReferrerIDOwner",
+      "msg": "Invalid referrer ID owner"
     }
   ]
 }
