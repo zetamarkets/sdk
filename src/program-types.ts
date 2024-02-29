@@ -39,9 +39,8 @@ export interface State {
   tickSizes: Array<number>;
   tickSizesPadding: Array<number>;
   deprecatedMakerFeeValue: anchor.BN;
-  maTypeAdmin: PublicKey;
-  nativeMakerTradeFeePercentage: anchor.BN;
   nativeTakeTriggerOrderFeePercentage: anchor.BN;
+  maTypeAdmin: PublicKey;
   padding: Array<number>;
 }
 

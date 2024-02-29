@@ -1156,27 +1156,6 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateMakerTradeFeePercentage",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "newNativeMakerTradeFeePercentage",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "updateTakeTriggerOrderFeePercentage",
       "accounts": [
         {
@@ -7389,11 +7368,15 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "maTypeAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                90
+                58
               ]
             }
           }
@@ -9488,6 +9471,21 @@ export type Zeta = {
             "name": "MarketMakerT1"
           },
           {
+            "name": "MarketMakerT2"
+          },
+          {
+            "name": "MarketMakerT3"
+          },
+          {
+            "name": "MarketMakerT4"
+          },
+          {
+            "name": "MarketMakerT5"
+          },
+          {
+            "name": "MarketMakerT0"
+          },
+          {
             "name": "NormalT1"
           },
           {
@@ -9501,12 +9499,6 @@ export type Zeta = {
           },
           {
             "name": "NormalT5"
-          },
-          {
-            "name": "NormalT6"
-          },
-          {
-            "name": "NormalT7"
           }
         ]
       }
@@ -10789,11 +10781,16 @@ export type Zeta = {
     },
     {
       "code": 6160,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
+    },
+    {
+      "code": 6161,
       "name": "InvalidReferrerIDLength",
       "msg": "Invalid referrer ID length"
     },
     {
-      "code": 6161,
+      "code": 6162,
       "name": "InvalidReferrerIDOwner",
       "msg": "Invalid referrer ID owner"
     }
@@ -11958,27 +11955,6 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateMakerTradeFeePercentage",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "newNativeMakerTradeFeePercentage",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "updateTakeTriggerOrderFeePercentage",
       "accounts": [
         {
@@ -18191,11 +18167,15 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "maTypeAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                90
+                58
               ]
             }
           }
@@ -20290,6 +20270,21 @@ export const IDL: Zeta = {
             "name": "MarketMakerT1"
           },
           {
+            "name": "MarketMakerT2"
+          },
+          {
+            "name": "MarketMakerT3"
+          },
+          {
+            "name": "MarketMakerT4"
+          },
+          {
+            "name": "MarketMakerT5"
+          },
+          {
+            "name": "MarketMakerT0"
+          },
+          {
             "name": "NormalT1"
           },
           {
@@ -20303,12 +20298,6 @@ export const IDL: Zeta = {
           },
           {
             "name": "NormalT5"
-          },
-          {
-            "name": "NormalT6"
-          },
-          {
-            "name": "NormalT7"
           }
         ]
       }
@@ -21591,11 +21580,16 @@ export const IDL: Zeta = {
     },
     {
       "code": 6160,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
+    },
+    {
+      "code": 6161,
       "name": "InvalidReferrerIDLength",
       "msg": "Invalid referrer ID length"
     },
     {
-      "code": 6161,
+      "code": 6162,
       "name": "InvalidReferrerIDOwner",
       "msg": "Invalid referrer ID owner"
     }

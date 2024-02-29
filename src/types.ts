@@ -378,8 +378,23 @@ export function fromProgramMarginAccountType(
   if (objectEquals(accountType, { marketMaker: {} })) {
     return MarginAccountType.MARKET_MAKER;
   }
+  if (objectEquals(accountType, { marketMakerT0: {} })) {
+    return MarginAccountType.MARKET_MAKER_T0;
+  }
   if (objectEquals(accountType, { marketMakerT1: {} })) {
     return MarginAccountType.MARKET_MAKER_T1;
+  }
+  if (objectEquals(accountType, { marketMakerT2: {} })) {
+    return MarginAccountType.MARKET_MAKER_T2;
+  }
+  if (objectEquals(accountType, { marketMakerT3: {} })) {
+    return MarginAccountType.MARKET_MAKER_T3;
+  }
+  if (objectEquals(accountType, { marketMakerT4: {} })) {
+    return MarginAccountType.MARKET_MAKER_T4;
+  }
+  if (objectEquals(accountType, { marketMakerT5: {} })) {
+    return MarginAccountType.MARKET_MAKER_T5;
   }
   if (objectEquals(accountType, { normalT1: {} })) {
     return MarginAccountType.NORMAL_T1;
@@ -396,12 +411,6 @@ export function fromProgramMarginAccountType(
   if (objectEquals(accountType, { normalT5: {} })) {
     return MarginAccountType.NORMAL_T5;
   }
-  if (objectEquals(accountType, { normalT6: {} })) {
-    return MarginAccountType.NORMAL_T6;
-  }
-  if (objectEquals(accountType, { normalT7: {} })) {
-    return MarginAccountType.NORMAL_T7;
-  }
   throw Error("Invalid margin account type");
 }
 
@@ -414,8 +423,23 @@ export function toProgramMarginAccountType(
   if (accountType == MarginAccountType.MARKET_MAKER) {
     return { marketMaker: {} };
   }
+  if (accountType == MarginAccountType.MARKET_MAKER_T0) {
+    return { marketMakerT0: {} };
+  }
   if (accountType == MarginAccountType.MARKET_MAKER_T1) {
     return { marketMakerT1: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T2) {
+    return { marketMakerT2: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T3) {
+    return { marketMakerT3: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T4) {
+    return { marketMakerT4: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T5) {
+    return { marketMakerT5: {} };
   }
   if (accountType == MarginAccountType.NORMAL_T1) {
     return { normalT1: {} };
@@ -431,12 +455,6 @@ export function toProgramMarginAccountType(
   }
   if (accountType == MarginAccountType.NORMAL_T5) {
     return { normalT5: {} };
-  }
-  if (accountType == MarginAccountType.NORMAL_T6) {
-    return { normalT6: {} };
-  }
-  if (accountType == MarginAccountType.NORMAL_T7) {
-    return { normalT7: {} };
   }
   throw Error("Invalid margin account type");
 }

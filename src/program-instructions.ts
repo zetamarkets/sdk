@@ -2235,21 +2235,6 @@ export function editDelegatedPubkeyIx(
   });
 }
 
-export function updateMakerTradeFeePercentageIx(
-  newNativeMakerTradeFeePercentage: anchor.BN,
-  admin: PublicKey
-) {
-  return Exchange.program.instruction.updateMakerTradeFeePercentage(
-    newNativeMakerTradeFeePercentage,
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        admin,
-      },
-    }
-  );
-}
-
 export function updateTakeTriggerOrderFeePercentageIx(
   newTakeTriggerOrderFeePercentage: anchor.BN,
   admin: PublicKey
