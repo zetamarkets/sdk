@@ -1177,6 +1177,27 @@
       ]
     },
     {
+      "name": "updateTakeTriggerOrderFeePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newTakeTriggerOrderFeePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "updateZetaState",
       "accounts": [
         {
@@ -7366,6 +7387,10 @@
             "type": "u64"
           },
           {
+            "name": "nativeTakeTriggerOrderFeePercentage",
+            "type": "u64"
+          },
+          {
             "name": "nativeMakerRebatePercentage",
             "type": "u64"
           },
@@ -7374,7 +7399,7 @@
             "type": {
               "array": [
                 "u8",
-                90
+                82
               ]
             }
           }
