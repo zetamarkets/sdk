@@ -1822,20 +1822,6 @@ export function initializeWhitelistTradingFeesAccountIx(
   );
 }
 
-export function adminOverrideReferrerPubkeyIx(
-  admin: PublicKey,
-  userCrossMarginAccountManager: PublicKey,
-  newReferrer: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.adminOverrideReferrerPubkey(newReferrer, {
-    accounts: {
-      crossMarginAccountManager: userCrossMarginAccountManager,
-      state: Exchange.stateAddress,
-      admin: admin,
-    },
-  });
-}
-
 export function settlePositionsHaltedTxs(
   asset: Asset,
   marginAccounts: AccountMeta[],
@@ -2269,6 +2255,21 @@ export function updateTakeTriggerOrderFeePercentageIx(
 ) {
   return Exchange.program.instruction.updateTakeTriggerOrderFeePercentage(
     newTakeTriggerOrderFeePercentage,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateMakerRebatePercentageIx(
+  newNativeMakerRebatePercetange: anchor.BN,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.updateMakerRebatePercentage(
+    newNativeMakerRebatePercetange,
     {
       accounts: {
         state: Exchange.stateAddress,

@@ -252,32 +252,6 @@
       "args": []
     },
     {
-      "name": "adminOverrideReferrerPubkey",
-      "accounts": [
-        {
-          "name": "crossMarginAccountManager",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "newReferrer",
-          "type": "publicKey"
-        }
-      ]
-    },
-    {
       "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
@@ -1151,6 +1125,27 @@
       "args": [
         {
           "name": "newNativeMakerTradeFeePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
           "type": "u64"
         }
       ]
@@ -7370,11 +7365,15 @@
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                90
+                82
               ]
             }
           }
@@ -7858,11 +7857,15 @@
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1976
               ]
             }
           }
@@ -7967,11 +7970,15 @@
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                330
               ]
             }
           }
@@ -9734,6 +9741,11 @@
         {
           "name": "pnl",
           "type": "i64",
+          "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
           "index": false
         }
       ]

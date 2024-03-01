@@ -5,9 +5,17 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [1.23.1]
+## [1.23.3]
 
 - Add extra referral utils. ([#363](https://github.com/zetamarkets/sdk/pull/363))
+
+## [1.23.2]
+
+- Real-time maker rebate. ([#359](https://github.com/zetamarkets/sdk/pull/359))
+
+## [1.23.1]
+
+- Skipped
 
 ## [1.23.0]
 
