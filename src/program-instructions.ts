@@ -15,6 +15,16 @@ import { Asset } from "./constants";
 import * as constants from "./constants";
 import { assetToIndex, toProgramAsset } from "./assets";
 import { Market } from "./market";
+import {
+  RegExpMatcher,
+  englishDataset,
+  englishRecommendedTransformers,
+} from "obscenity";
+
+const profanityMatcher = new RegExpMatcher({
+  ...englishDataset.build(),
+  ...englishRecommendedTransformers,
+});
 
 export function initializeCombinedInsuranceVaultIx(): TransactionInstruction {
   let [insuranceVault, insuranceVaultNonce] =
@@ -1981,6 +1991,9 @@ export function initializeReferrerAccountsIx(
   referrerIdAccount: PublicKey,
   referrerPubkeyAccount: PublicKey
 ): TransactionInstruction {
+  if (profanityMatcher.hasMatch(id)) {
+    throw "ID has profanity, be nice!";
+  }
   return Exchange.program.instruction.initializeReferrerAccounts(id, {
     accounts: {
       authority: user,

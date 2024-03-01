@@ -1724,6 +1724,19 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
   return bufferString.substring(0, splitIndex);
 }
 
+export async function fetchReferralId(user: PublicKey) {
+  const accKey = getReferrerPubkeyAccount(Exchange.programId, user)[0];
+  const accBuffer =
+    await Exchange.program.account.referrerPubkeyAccount.fetchNullable(
+      accKey.toString()
+    );
+
+  if (accBuffer == null) {
+    return null;
+  }
+  return Buffer.from(accBuffer.referrerId).toString();
+}
+
 export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
   let remainingAccounts = keys.map((key) => {
     return { pubkey: key, isSigner: false, isWritable: true };
