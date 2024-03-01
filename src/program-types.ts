@@ -43,6 +43,7 @@ export interface State {
   tickSizesPadding: Array<number>;
   nativeMakerTradeFeePercentage: anchor.BN;
   nativeTakeTriggerOrderFeePercentage: anchor.BN;
+  nativeMakerRebatePercentage: anchor.BN;
   padding: Array<number>;
 }
 
@@ -211,6 +212,7 @@ export interface CrossMarginAccount {
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
+  rebateRebalanceAmount: anchor.BN;
   padding: Array<number>;
 }
 
@@ -229,6 +231,7 @@ export interface MarginAccount {
   accountType: any;
   lastFundingDelta: AnchorDecimal;
   delegatedPubkey: PublicKey;
+  rebateRebalanceAmount: anchor.BN;
   padding: Array<number>;
 }
 
@@ -376,6 +379,7 @@ export interface TradeEventV3 {
   fee: anchor.BN;
   price: anchor.BN;
   pnl: anchor.BN;
+  rebate: anchor.BN;
 }
 
 export interface PositionMovementEvent {
