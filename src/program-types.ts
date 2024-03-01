@@ -212,6 +212,7 @@ export interface CrossMarginAccount {
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
+  rebateRebalanceAmount: anchor.BN;
   padding: Array<number>;
 }
 
@@ -230,6 +231,7 @@ export interface MarginAccount {
   accountType: any;
   lastFundingDelta: AnchorDecimal;
   delegatedPubkey: PublicKey;
+  rebateRebalanceAmount: anchor.BN;
   padding: Array<number>;
 }
 
