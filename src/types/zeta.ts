@@ -10808,6 +10808,11 @@ export type Zeta = {
       "code": 6161,
       "name": "InvalidReferrerIDOwner",
       "msg": "Invalid referrer ID owner"
+    },
+    {
+      "code": 6162,
+      "name": "CannotReferSelf",
+      "msg": "User cannot refer themselves"
     }
   ]
 };
@@ -21622,6 +21627,11 @@ export const IDL: Zeta = {
       "code": 6161,
       "name": "InvalidReferrerIDOwner",
       "msg": "Invalid referrer ID owner"
+    },
+    {
+      "code": 6162,
+      "name": "CannotReferSelf",
+      "msg": "User cannot refer themselves"
     }
   ]
 };
