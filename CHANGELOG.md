@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.23.1]
+
+- Add extra referral utils. ([#362](https://github.com/zetamarkets/sdk/pull/362))
+
 ## [1.23.0]
 
 - Add functionality for referral accounts. ([#357](https://github.com/zetamarkets/sdk/pull/357))
