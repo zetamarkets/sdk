@@ -7,7 +7,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.23.1]
 
-- Add extra referral utils. ([#362](https://github.com/zetamarkets/sdk/pull/362))
+- Add extra referral utils. ([#363](https://github.com/zetamarkets/sdk/pull/363))
 
 ## [1.23.0]
 
