@@ -252,32 +252,6 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "adminOverrideReferrerPubkey",
-      "accounts": [
-        {
-          "name": "crossMarginAccountManager",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "newReferrer",
-          "type": "publicKey"
-        }
-      ]
-    },
-    {
       "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
@@ -7860,11 +7834,15 @@ export type Zeta = {
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1976
               ]
             }
           }
@@ -7969,11 +7947,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                330
               ]
             }
           }
@@ -9726,6 +9708,11 @@ export type Zeta = {
         {
           "name": "pnl",
           "type": "i64",
+          "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
           "index": false
         }
       ]
@@ -11051,32 +11038,6 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "adminOverrideReferrerPubkey",
-      "accounts": [
-        {
-          "name": "crossMarginAccountManager",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "newReferrer",
-          "type": "publicKey"
-        }
-      ]
-    },
-    {
       "name": "initializeCrossMarginAccountManager",
       "accounts": [
         {
@@ -18659,11 +18620,15 @@ export const IDL: Zeta = {
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1976
               ]
             }
           }
@@ -18768,11 +18733,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                330
               ]
             }
           }
@@ -20525,6 +20494,11 @@ export const IDL: Zeta = {
         {
           "name": "pnl",
           "type": "i64",
+          "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
           "index": false
         }
       ]
