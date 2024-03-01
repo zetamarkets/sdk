@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.23.1]
+
+- Real-time maker rebate. ([#359](https://github.com/zetamarkets/sdk/pull/359))
+
 ## [1.23.0]
 
 - Add functionality for referral accounts. ([#357](https://github.com/zetamarkets/sdk/pull/357))
