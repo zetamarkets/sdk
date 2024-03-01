@@ -1812,20 +1812,6 @@ export function initializeWhitelistTradingFeesAccountIx(
   );
 }
 
-export function adminOverrideReferrerPubkeyIx(
-  admin: PublicKey,
-  userCrossMarginAccountManager: PublicKey,
-  newReferrer: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.adminOverrideReferrerPubkey(newReferrer, {
-    accounts: {
-      crossMarginAccountManager: userCrossMarginAccountManager,
-      state: Exchange.stateAddress,
-      admin: admin,
-    },
-  });
-}
-
 export function settlePositionsHaltedTxs(
   asset: Asset,
   marginAccounts: AccountMeta[],
