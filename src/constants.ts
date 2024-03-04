@@ -130,6 +130,7 @@ export const MAX_PRUNE_CANCELS_PER_TX = 3;
 export const MAX_PRUNE_CANCELS_PER_TX_LUT = 5;
 export const MAX_GREEK_UPDATES_PER_TX = 20;
 export const MAX_TRIGGER_CANCELS_PER_TX = 10;
+export const MAX_CLOSE_OOA_PER_TX = 5;
 export const MAX_SETTLEMENT_ACCOUNTS = 20;
 export const MAX_FUNDING_ACCOUNTS = 20;
 export const MAX_REBALANCE_ACCOUNTS = 18;

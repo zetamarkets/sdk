@@ -428,7 +428,7 @@ export class CrossClient {
     this.updateOpenOrdersSync();
     if (
       Exchange.clockTimestamp >
-        this._lastUpdateTimestamp + this._pollInterval ||
+      this._lastUpdateTimestamp + this._pollInterval ||
       this._pendingUpdate
     ) {
       try {
@@ -469,7 +469,7 @@ export class CrossClient {
     if (
       this._updatingState &&
       Date.now() / 1000 - this._updatingStateTimestamp >
-        constants.UPDATING_STATE_LIMIT_SECONDS
+      constants.UPDATING_STATE_LIMIT_SECONDS
     ) {
       this.toggleUpdateState(false);
     }
@@ -516,7 +516,7 @@ export class CrossClient {
         this.updatePositions();
         await this.updateOrders();
       }
-    } catch (e) {}
+    } catch (e) { }
 
     this.toggleUpdateState(false);
     return fetchSlot;
@@ -2088,16 +2088,11 @@ export class CrossClient {
     return txId;
   }
 
-  /**
-   * Closes a user open orders account for a given market.
-   */
-  public async closeOpenOrdersAccount(
-    asset: Asset
-  ): Promise<TransactionSignature> {
+  public createCloseOpenOrdersAccountIx(asset: Asset) {
     this.delegatedCheck();
     let assetIndex = assetToIndex(asset);
     if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
-      throw Error("User has no open orders account for this market!");
+      throw Error(`User has no open orders account for ${asset} market!`);
     }
     let market = Exchange.getPerpMarket(asset);
     const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
@@ -2122,6 +2117,19 @@ export class CrossClient {
         this._openOrdersAccounts[assetIndex]
       )
     );
+
+    return tx;
+  }
+
+  /**
+   * Closes a user open orders account for a given market.
+   */
+  public async closeOpenOrdersAccount(
+    asset: Asset
+  ): Promise<TransactionSignature> {
+
+    let tx = this.createCloseOpenOrdersAccountIx(asset);
+
     let txId = await utils.processTransaction(
       this._provider,
       tx,
@@ -2130,8 +2138,49 @@ export class CrossClient {
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
+    let assetIndex = assetToIndex(asset);
     this._openOrdersAccounts[assetIndex] = PublicKey.default;
     return txId;
+  }
+
+  /**
+   * Closes a user open orders account for a given assets.
+   */
+  public async closeOpenOrdersAccounts(
+    assets: Asset[]
+  ): Promise<TransactionSignature[]> {
+
+
+    const txs: Transaction[] = [];
+    for (
+      var i = 0;
+      i < assets.length;
+      i += constants.MAX_CLOSE_OOA_PER_TX
+    ) {
+      let tx = new Transaction();
+      for (var j = 0; j < constants.MAX_CLOSE_OOA_PER_TX; j++) {
+        // Don't want to overrun on the last one
+        if (i + j >= assets.length) {
+          break;
+        }
+        tx.add(this.createCloseOpenOrdersAccountIx(assets[i + j]));
+
+      }
+      txs.push(tx);
+    }
+
+    return Promise.all(
+      txs.map(async (tx) => 
+        utils.processTransaction(
+          this.provider,
+          tx,
+          undefined,
+          undefined,
+          undefined,
+          this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+        )
+      )
+    );
   }
 
   /**
