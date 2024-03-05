@@ -43,6 +43,7 @@ export interface State {
   tickSizesPadding: Array<number>;
   nativeMakerTradeFeePercentage: anchor.BN;
   nativeTakeTriggerOrderFeePercentage: anchor.BN;
+  nativeMakerRebatePercentage: anchor.BN;
   padding: Array<number>;
 }
 
@@ -191,6 +192,8 @@ export interface CrossMarginAccountManager {
   nonce: number;
   authority: PublicKey;
   accounts: Array<CrossMarginAccountInfo>;
+  referrer: PublicKey;
+  padding: Array<number>;
 }
 
 export interface CrossMarginAccount {
@@ -209,6 +212,7 @@ export interface CrossMarginAccount {
   productLedgers: Array<ProductLedger>;
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
+  rebateRebalanceAmount: anchor.BN;
   padding: Array<number>;
 }
 
@@ -227,6 +231,7 @@ export interface MarginAccount {
   accountType: any;
   lastFundingDelta: AnchorDecimal;
   delegatedPubkey: PublicKey;
+  rebateRebalanceAmount: anchor.BN;
   padding: Array<number>;
 }
 
@@ -240,6 +245,15 @@ export interface SpreadAccount {
   positionsPadding: Array<Position>;
   asset: any;
   padding: Array<number>;
+}
+
+export interface ReferrerIdAccount {
+  referrerId: Array<number>;
+  referrerPubkey: PublicKey;
+}
+
+export interface ReferrerPubkeyAccount {
+  referrerPubkey: PublicKey;
 }
 
 export interface TriggerOrder {
@@ -311,29 +325,6 @@ export interface WhitelistTradingFeesAccount {
   userKey: PublicKey;
 }
 
-export interface ReferralAccount {
-  nonce: number;
-  referrer: PublicKey;
-  user: PublicKey;
-  timestamp: anchor.BN;
-  pendingRewards: anchor.BN;
-  claimedRewards: anchor.BN;
-}
-
-export interface ReferrerAccount {
-  nonce: number;
-  hasAlias: boolean;
-  referrer: PublicKey;
-  pendingRewards: anchor.BN;
-  claimedRewards: anchor.BN;
-}
-
-export interface ReferrerAlias {
-  nonce: number;
-  alias: Array<number>;
-  referrer: PublicKey;
-}
-
 // TODO move these events to event.ts.
 export interface PlaceOrderEvent {
   fee: anchor.BN;
@@ -388,6 +379,7 @@ export interface TradeEventV3 {
   fee: anchor.BN;
   price: anchor.BN;
   pnl: anchor.BN;
+  rebate: anchor.BN;
 }
 
 export interface PositionMovementEvent {

@@ -283,6 +283,44 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "initializeCrossMarginAccountManagerV2",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "referrer",
+          "type": {
+            "option": "publicKey"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeCrossMarginAccount",
       "accounts": [
         {
@@ -1087,6 +1125,27 @@ export type Zeta = {
       "args": [
         {
           "name": "newNativeMakerTradeFeePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
           "type": "u64"
         }
       ]
@@ -6441,6 +6500,58 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "referrerId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "closeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editMaType",
       "accounts": [
         {
@@ -6467,145 +6578,6 @@ export type Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "initializeReferrerAccount",
-      "accounts": [
-        {
-          "name": "referrer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "referUser",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializeReferrerAlias",
-      "accounts": [
-        {
-          "name": "referrer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAlias",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "alias",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "setReferralsRewards",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralsAdmin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "vec": {
-              "defined": "SetReferralsRewardsArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "claimReferralsRewards",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralsRewardsWallet",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userReferralsAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "editDelegatedPubkey",
@@ -7393,11 +7365,15 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                90
+                82
               ]
             }
           }
@@ -7755,7 +7731,20 @@ export type Zeta = {
                 {
                   "defined": "CrossMarginAccountInfo"
                 },
-                25
+                20
+              ]
+            }
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                23
               ]
             }
           }
@@ -7868,11 +7857,15 @@ export type Zeta = {
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1976
               ]
             }
           }
@@ -7977,11 +7970,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                330
               ]
             }
           }
@@ -8147,86 +8144,39 @@ export type Zeta = {
       }
     },
     {
-      "name": "referrerAccount",
+      "name": "referrerIdAccount",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "hasAlias",
-            "type": "bool"
-          },
-          {
-            "name": "referrer",
-            "type": "publicKey"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "claimedRewards",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "referralAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "referrer",
-            "type": "publicKey"
-          },
-          {
-            "name": "user",
-            "type": "publicKey"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "claimedRewards",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "referrerAlias",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "alias",
+            "name": "referrerId",
             "type": {
               "array": [
                 "u8",
-                15
+                6
               ]
             }
           },
           {
-            "name": "referrer",
+            "name": "referrerPubkey",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referrerPubkeyAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referrerId",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
           }
         ]
       }
@@ -8706,26 +8656,6 @@ export type Zeta = {
           {
             "name": "interestRate",
             "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "SetReferralsRewardsArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "referralsAccountKey",
-            "type": "publicKey"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "overwrite",
-            "type": "bool"
           }
         ]
       }
@@ -9812,6 +9742,11 @@ export type Zeta = {
           "name": "pnl",
           "type": "i64",
           "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -10863,6 +10798,21 @@ export type Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
+    },
+    {
+      "code": 6160,
+      "name": "InvalidReferrerIDLength",
+      "msg": "Invalid referrer ID length"
+    },
+    {
+      "code": 6161,
+      "name": "InvalidReferrerIDOwner",
+      "msg": "Invalid referrer ID owner"
+    },
+    {
+      "code": 6162,
+      "name": "CannotReferSelf",
+      "msg": "User cannot refer themselves"
     }
   ]
 };
@@ -11152,6 +11102,44 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "initializeCrossMarginAccountManagerV2",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "zetaProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "referrer",
+          "type": {
+            "option": "publicKey"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeCrossMarginAccount",
       "accounts": [
         {
@@ -11956,6 +11944,27 @@ export const IDL: Zeta = {
       "args": [
         {
           "name": "newNativeMakerTradeFeePercentage",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
           "type": "u64"
         }
       ]
@@ -17310,6 +17319,58 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "referrerId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "closeReferrerAccounts",
+      "accounts": [
+        {
+          "name": "referrerIdAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPubkeyAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "editMaType",
       "accounts": [
         {
@@ -17336,145 +17397,6 @@ export const IDL: Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "initializeReferrerAccount",
-      "accounts": [
-        {
-          "name": "referrer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "referUser",
-      "accounts": [
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializeReferrerAlias",
-      "accounts": [
-        {
-          "name": "referrer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "referrerAlias",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "referrerAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "alias",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "setReferralsRewards",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralsAdmin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "vec": {
-              "defined": "SetReferralsRewardsArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "claimReferralsRewards",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "referralsRewardsWallet",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userReferralsAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
     },
     {
       "name": "editDelegatedPubkey",
@@ -18262,11 +18184,15 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                90
+                82
               ]
             }
           }
@@ -18624,7 +18550,20 @@ export const IDL: Zeta = {
                 {
                   "defined": "CrossMarginAccountInfo"
                 },
-                25
+                20
+              ]
+            }
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                23
               ]
             }
           }
@@ -18737,11 +18676,15 @@ export const IDL: Zeta = {
             "type": "u128"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1984
+                1976
               ]
             }
           }
@@ -18846,11 +18789,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "rebateRebalanceAmount",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                338
+                330
               ]
             }
           }
@@ -19016,86 +18963,39 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "referrerAccount",
+      "name": "referrerIdAccount",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "hasAlias",
-            "type": "bool"
-          },
-          {
-            "name": "referrer",
-            "type": "publicKey"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "claimedRewards",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "referralAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "referrer",
-            "type": "publicKey"
-          },
-          {
-            "name": "user",
-            "type": "publicKey"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "claimedRewards",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "referrerAlias",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "alias",
+            "name": "referrerId",
             "type": {
               "array": [
                 "u8",
-                15
+                6
               ]
             }
           },
           {
-            "name": "referrer",
+            "name": "referrerPubkey",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "referrerPubkeyAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referrerId",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
           }
         ]
       }
@@ -19575,26 +19475,6 @@ export const IDL: Zeta = {
           {
             "name": "interestRate",
             "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "SetReferralsRewardsArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "referralsAccountKey",
-            "type": "publicKey"
-          },
-          {
-            "name": "pendingRewards",
-            "type": "u64"
-          },
-          {
-            "name": "overwrite",
-            "type": "bool"
           }
         ]
       }
@@ -20681,6 +20561,11 @@ export const IDL: Zeta = {
           "name": "pnl",
           "type": "i64",
           "index": false
+        },
+        {
+          "name": "rebate",
+          "type": "u64",
+          "index": false
         }
       ]
     },
@@ -21732,6 +21617,21 @@ export const IDL: Zeta = {
       "code": 6159,
       "name": "IncorrectLotSize",
       "msg": "Incorrect lot size"
+    },
+    {
+      "code": 6160,
+      "name": "InvalidReferrerIDLength",
+      "msg": "Invalid referrer ID length"
+    },
+    {
+      "code": 6161,
+      "name": "InvalidReferrerIDOwner",
+      "msg": "Invalid referrer ID owner"
+    },
+    {
+      "code": 6162,
+      "name": "CannotReferSelf",
+      "msg": "User cannot refer themselves"
     }
   ]
 };

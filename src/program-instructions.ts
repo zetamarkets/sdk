@@ -90,19 +90,23 @@ export function migrateToCrossMarginAccountIx(
   });
 }
 
-export function initializeCrossMarginAccountManagerIx(
+export function initializeCrossMarginAccountManagerV2Ix(
   crossMarginAccountManager: PublicKey,
-  user: PublicKey
+  user: PublicKey,
+  referrer?: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.initializeCrossMarginAccountManager({
-    accounts: {
-      crossMarginAccountManager,
-      authority: user,
-      payer: user,
-      zetaProgram: Exchange.programId,
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return Exchange.program.instruction.initializeCrossMarginAccountManagerV2(
+    referrer ? referrer : null,
+    {
+      accounts: {
+        crossMarginAccountManager,
+        authority: user,
+        payer: user,
+        zetaProgram: Exchange.programId,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }
 
 export function closeCrossMarginAccountManagerIx(
@@ -1203,7 +1207,7 @@ export function initializeUnderlyingIx(
 
   return Exchange.program.instruction.initializeUnderlying(flexUnderlying, {
     accounts: {
-      admin: Exchange.state.secondaryAdmin,
+      admin: Exchange.state.admin,
       zetaProgram: Exchange.programId,
       state: Exchange.stateAddress,
       systemProgram: SystemProgram.programId,
@@ -1602,7 +1606,7 @@ export function updateZetaPricingPubkeysIx(
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
-      admin: Exchange.state.secondaryAdmin,
+      admin: Exchange.state.admin,
     },
   });
 }
@@ -1710,7 +1714,7 @@ export function initializeMarketIndexesIx(
       accounts: {
         state: Exchange.stateAddress,
         marketIndexes: marketIndexes,
-        admin: Exchange.state.secondaryAdmin,
+        admin: Exchange.state.admin,
         systemProgram: SystemProgram.programId,
         pricing: Exchange.pricingAddress,
       },
@@ -1806,96 +1810,6 @@ export function initializeWhitelistTradingFeesAccountIx(
       },
     }
   );
-}
-
-export function referUserIx(
-  user: PublicKey,
-  referrer: PublicKey
-): TransactionInstruction {
-  let [referrerAccount, _referrerAccountNonce] =
-    utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
-
-  let [referralAccount, _referralAccountNonce] =
-    utils.getReferralAccountAddress(Exchange.program.programId, user);
-
-  return Exchange.program.instruction.referUser({
-    accounts: {
-      user,
-      referrerAccount,
-      referralAccount,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
-export function initializeReferrerAccountIx(
-  referrer: PublicKey
-): TransactionInstruction {
-  let [referrerAccount, _referrerAccountNonce] =
-    utils.getReferrerAccountAddress(Exchange.program.programId, referrer);
-
-  return Exchange.program.instruction.initializeReferrerAccount({
-    accounts: {
-      referrer,
-      referrerAccount,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
-export function initializeReferrerAliasIx(
-  referrer: PublicKey,
-  alias: string
-): TransactionInstruction {
-  let [referrerAccount] = utils.getReferrerAccountAddress(
-    Exchange.program.programId,
-    referrer
-  );
-
-  let [referrerAlias] = utils.getReferrerAliasAddress(
-    Exchange.program.programId,
-    alias
-  );
-
-  return Exchange.program.instruction.initializeReferrerAlias(alias, {
-    accounts: {
-      referrer,
-      referrerAlias,
-      referrerAccount,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
-export function setReferralsRewardsIx(
-  args: SetReferralsRewardsArgs[],
-  referralsAdmin: PublicKey,
-  remainingAccounts: AccountMeta[]
-): TransactionInstruction {
-  return Exchange.program.instruction.setReferralsRewards(args, {
-    accounts: {
-      state: Exchange.stateAddress,
-      referralsAdmin,
-    },
-    remainingAccounts,
-  });
-}
-
-export function claimReferralsRewardsIx(
-  userReferralsAccount: PublicKey,
-  userTokenAccount: PublicKey,
-  user: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.claimReferralsRewards({
-    accounts: {
-      state: Exchange.stateAddress,
-      referralsRewardsWallet: Exchange.referralsRewardsWalletAddress,
-      userReferralsAccount,
-      userTokenAccount,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      user,
-    },
-  });
 }
 
 export function settlePositionsHaltedTxs(
@@ -2045,6 +1959,36 @@ export function updateAdminIx(
     return Exchange.program.instruction.updateSecondaryAdmin(accounts);
   }
   return Exchange.program.instruction.updateAdmin(accounts);
+}
+
+export function initializeReferrerAccountsIx(
+  id: string,
+  user: PublicKey,
+  referrerIdAccount: PublicKey,
+  referrerPubkeyAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.initializeReferrerAccounts(id, {
+    accounts: {
+      authority: user,
+      referrerIdAccount,
+      referrerPubkeyAccount,
+      systemProgram: SystemProgram.programId,
+    },
+  });
+}
+
+export function closeReferrerAccountsIx(
+  user: PublicKey,
+  referrerIdAccount: PublicKey,
+  referrerPubkeyAccount: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.closeReferrerAccounts({
+    accounts: {
+      authority: user,
+      referrerIdAccount,
+      referrerPubkeyAccount,
+    },
+  });
 }
 
 export function updateReferralsAdminIx(
@@ -2298,6 +2242,21 @@ export function updateTakeTriggerOrderFeePercentageIx(
 ) {
   return Exchange.program.instruction.updateTakeTriggerOrderFeePercentage(
     newTakeTriggerOrderFeePercentage,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+      },
+    }
+  );
+}
+
+export function updateMakerRebatePercentageIx(
+  newNativeMakerRebatePercetange: anchor.BN,
+  admin: PublicKey
+) {
+  return Exchange.program.instruction.updateMakerRebatePercentage(
+    newNativeMakerRebatePercetange,
     {
       accounts: {
         state: Exchange.stateAddress,

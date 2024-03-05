@@ -5,10 +5,26 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [1.22.2]
+## [1.23.3]
 
 - New function closeAllPositions(). ([#362](https://github.com/zetamarkets/sdk/pull/362))
 - New option to specify retry amount for txs. Use CrossClient.setTxRetryAmount(). ([#362](https://github.com/zetamarkets/sdk/pull/362))
+
+## [1.23.2]
+
+- Real-time maker rebate. ([#359](https://github.com/zetamarkets/sdk/pull/359))
+
+## [1.23.1]
+
+- Skipped
+
+## [1.23.0]
+
+- Add functionality for referral accounts. ([#357](https://github.com/zetamarkets/sdk/pull/357))
+
+### Breaking
+
+- Remove old client.ts and subclient.ts. ([#357](https://github.com/zetamarkets/sdk/pull/357))
 
 ## [1.22.1]
 
