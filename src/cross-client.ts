@@ -74,6 +74,11 @@ export class CrossClient {
   }
   private _useVersionedTxs: boolean = false;
 
+  public get txRetryAmount(): number {
+    return this._txRetryAmount;
+  }
+  private _txRetryAmount: number = undefined;
+
   /**
    * Client usdc account address.
    */
@@ -275,6 +280,7 @@ export class CrossClient {
     throttle: boolean = false,
     delegator: PublicKey = undefined,
     useVersionedTxs: boolean = false,
+    txRetryAmount: number = undefined,
     subaccountIndex: number = 0
   ): Promise<CrossClient> {
     let client = new CrossClient(connection, wallet, opts);
@@ -286,6 +292,7 @@ export class CrossClient {
 
     client._subaccountIndex = subaccountIndex;
     client._useVersionedTxs = useVersionedTxs;
+    client._txRetryAmount = txRetryAmount;
     client._usdcAccountAddress = utils.getAssociatedTokenAddress(
       Exchange.usdcMintAddress,
       owner
@@ -526,6 +533,10 @@ export class CrossClient {
     this._useVersionedTxs = useVersionedTxs;
   }
 
+  public setTxRetryAmount(txRetryAmount: number) {
+    this._txRetryAmount = txRetryAmount;
+  }
+
   /**
    * @param timerInterval   desired interval for client polling.
    */
@@ -663,7 +674,9 @@ export class CrossClient {
           undefined,
           undefined,
           undefined,
-          this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+          this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+          undefined,
+          this._txRetryAmount
         )
       );
     }
@@ -748,7 +761,9 @@ export class CrossClient {
           undefined,
           undefined,
           undefined,
-          this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+          this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+          undefined,
+          this._txRetryAmount
         )
       );
     }
@@ -829,7 +844,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -859,7 +876,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
     this._account = null;
     return txId;
@@ -886,7 +905,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
     this._accountManager = null;
     return txId;
@@ -965,7 +986,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -1018,7 +1041,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
     this._account = null;
     return txId;
@@ -1202,7 +1227,8 @@ export class CrossClient {
       undefined,
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
-      options.blockhash
+      options.blockhash,
+      this._txRetryAmount
     );
     this._openOrdersAccounts[assetIndex] = openOrdersPda;
     return txId;
@@ -1340,7 +1366,8 @@ export class CrossClient {
       undefined,
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
-      options.blockhash
+      options.blockhash,
+      this._txRetryAmount
     );
     this._openOrdersAccounts[assetIndex] = openOrdersPda;
     return txId;
@@ -1397,6 +1424,59 @@ export class CrossClient {
     );
   }
 
+  /**
+   * Close all positions using market orders
+   * @param orderPrices Manual override for what price to send, decimal format
+   */
+  public async closeAllPositions(orderPrices: Map<Asset, number>) {
+    let ixs = [];
+
+    for (var position of [...this._positions.values()].flat()) {
+      let side = position.size < 0 ? types.Side.BID : types.Side.ASK;
+
+      if (!orderPrices.has(position.asset)) {
+        throw `orderPrices does not have a value for ${position.asset}`;
+      }
+      let price = orderPrices.get(position.asset);
+
+      ixs.push(
+        this.createPlacePerpOrderInstruction(
+          position.asset,
+          utils.convertDecimalToNativeInteger(price),
+          utils.convertDecimalToNativeLotSize(Math.abs(position.size)),
+          side,
+          { orderType: types.OrderType.FILLORKILL, tifOptions: {} } // We want to error if the trade didn't work for full size
+        )
+      );
+    }
+
+    let txs = utils.splitIxsIntoTx(
+      ixs,
+      this.useVersionedTxs
+        ? constants.MAX_ORDERS_PER_TX_LUT
+        : constants.MAX_ORDERS_PER_TX
+    );
+    let txIds: string[] = [];
+    await Promise.all(
+      txs.map(async (tx) => {
+        txIds.push(
+          await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
+          )
+        );
+      })
+    );
+
+    return txIds;
+  }
+
   public async cancelAllTriggerOrders(asset: Asset | undefined) {
     let orders = [];
     if (asset == undefined) {
@@ -1427,7 +1507,9 @@ export class CrossClient {
             undefined,
             undefined,
             undefined,
-            this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
           )
         );
       })
@@ -1489,7 +1571,9 @@ export class CrossClient {
             undefined,
             undefined,
             undefined,
-            this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
           )
         );
       })
@@ -1501,7 +1585,9 @@ export class CrossClient {
         undefined,
         undefined,
         undefined,
-        this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+        this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+        undefined,
+        this._txRetryAmount
       )
     );
     return txIds;
@@ -1561,7 +1647,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -1614,7 +1702,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -1678,7 +1768,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
 
     // Editing a trigger order doesn't prompt an account change because the bits stay the same.
@@ -1712,7 +1804,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -1752,7 +1846,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -1787,7 +1883,18 @@ export class CrossClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
+        txIds.push(
+          await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
+          )
+        );
       })
     );
 
@@ -1831,7 +1938,18 @@ export class CrossClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
+        txIds.push(
+          await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
+          )
+        );
       })
     );
     return txIds;
@@ -1863,7 +1981,18 @@ export class CrossClient {
     let txIds: string[] = [];
     await Promise.all(
       txs.map(async (tx) => {
-        txIds.push(await utils.processTransaction(this._provider, tx));
+        txIds.push(
+          await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
+          )
+        );
       })
     );
     return txIds;
@@ -1938,7 +2067,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -1970,7 +2101,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -2038,7 +2171,8 @@ export class CrossClient {
       undefined,
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
-      options.blockhash
+      options.blockhash,
+      this._txRetryAmount
     );
   }
 
@@ -2105,7 +2239,8 @@ export class CrossClient {
       undefined,
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
-      newOptions.blockhash
+      newOptions.blockhash,
+      this._txRetryAmount
     );
   }
 
@@ -2173,7 +2308,8 @@ export class CrossClient {
       undefined,
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
-      newOptions.blockhash
+      newOptions.blockhash,
+      this._txRetryAmount
     );
   }
 
@@ -2203,7 +2339,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
     this._openOrdersAccounts[assetIndex] = openOrdersPda;
     return txId;
@@ -2249,7 +2387,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
     this._openOrdersAccounts[assetIndex] = PublicKey.default;
     return txId;
@@ -2308,7 +2448,9 @@ export class CrossClient {
         undefined,
         undefined,
         undefined,
-        this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+        this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+        undefined,
+        this._txRetryAmount
       );
       txIds.push(txId);
     }
@@ -2381,7 +2523,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -2441,7 +2585,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -2472,7 +2618,9 @@ export class CrossClient {
       undefined,
       undefined,
       undefined,
-      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
     );
   }
 
@@ -2555,7 +2703,9 @@ export class CrossClient {
             undefined,
             undefined,
             undefined,
-            this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
           )
         );
       })
@@ -2600,7 +2750,9 @@ export class CrossClient {
             undefined,
             undefined,
             undefined,
-            this.useVersionedTxs ? utils.getZetaLutArr() : undefined
+            this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+            undefined,
+            this._txRetryAmount
           )
         );
       })
