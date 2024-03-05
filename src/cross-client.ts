@@ -995,14 +995,16 @@ export class CrossClient {
       );
     }
 
-    tx.add(
-      instructions.withdrawV2Ix(
-        this._account.balance.toNumber(),
-        this._accountAddress,
-        this._usdcAccountAddress,
-        this._provider.wallet.publicKey
-      )
-    );
+    if (this._account.balance > 0) {
+      tx.add(
+        instructions.withdrawV2Ix(
+          this._account.balance.toNumber(),
+          this._accountAddress,
+          this._usdcAccountAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
     tx.add(
       instructions.closeCrossMarginAccountIx(
         this._provider.wallet.publicKey,
@@ -1051,14 +1053,16 @@ export class CrossClient {
       );
     }
 
-    tx.add(
-      instructions.withdrawV2Ix(
-        this._account.balance.toNumber(),
-        this._accountAddress,
-        this._usdcAccountAddress,
-        this._provider.wallet.publicKey
-      )
-    );
+    if (this._account.balance > 0) {
+      tx.add(
+        instructions.withdrawV2Ix(
+          this._account.balance.toNumber(),
+          this._accountAddress,
+          this._usdcAccountAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
     tx.add(
       instructions.closeCrossMarginAccountIx(
         this._provider.wallet.publicKey,
