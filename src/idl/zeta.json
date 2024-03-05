@@ -7740,11 +7740,19 @@
             "type": "publicKey"
           },
           {
+            "name": "nativeReferreeRebatePercent",
+            "type": "u32"
+          },
+          {
+            "name": "referreeRebateEndTime",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                11
               ]
             }
           }
@@ -7861,11 +7869,19 @@
             "type": "u64"
           },
           {
+            "name": "nativeReferreeRebatePercent",
+            "type": "u32"
+          },
+          {
+            "name": "referreeRebateEndTime",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1976
+                1964
               ]
             }
           }
@@ -7974,11 +7990,19 @@
             "type": "u64"
           },
           {
+            "name": "nativeReferreeRebatePercent",
+            "type": "u32"
+          },
+          {
+            "name": "referreeRebateEndTime",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                330
+                318
               ]
             }
           }
