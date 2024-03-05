@@ -2404,18 +2404,13 @@ export class CrossClient {
   ): Promise<TransactionSignature[]> {
     this.delegatedCheck();
     let combinedIxs: TransactionInstruction[] = [];
-    let markets = [];
     for (var asset of assets) {
-      markets.push(Exchange.getPerpMarket(asset));
-    }
-    for (var i = 0; i < assets.length; i++) {
       let assetIndex = assetToIndex(asset);
-      let market = markets[i];
       if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
         throw Error("User has no open orders account for this market!");
       }
       const [vaultOwner, _vaultSignerNonce] = utils.getSerumVaultOwnerAndNonce(
-        market,
+        Exchange.getPerpMarket(asset).address,
         constants.DEX_PID[Exchange.network]
       );
       let settleIx = instructions.settleDexFundsIx(
@@ -2424,7 +2419,7 @@ export class CrossClient {
         this._openOrdersAccounts[assetIndex]
       );
       let closeIx = instructions.closeOpenOrdersV3Ix(
-        market,
+        asset,
         this._provider.wallet.publicKey,
         this.accountAddress,
         this._openOrdersAccounts[assetIndex]
