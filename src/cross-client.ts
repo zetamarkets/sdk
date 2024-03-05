@@ -888,6 +888,43 @@ export class CrossClient {
       undefined,
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
+    this._accountManager = null;
+    return txId;
+  }
+
+  /**
+   * Closes the CrossMarginAccount and CrossMarginAccountManager in one transaction
+   */
+  public async closeAccountAndManager(): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    if (this._account === null) {
+      throw Error("User has no account to close");
+    }
+    if (this._accountManager === null) {
+      throw Error("User has no account manager to close");
+    }
+    let tx = new Transaction().add(
+      instructions.closeCrossMarginAccountIx(
+        this._provider.wallet.publicKey,
+        this._accountAddress,
+        this._accountManagerAddress
+      )
+    );
+    tx.add(
+      instructions.closeCrossMarginAccountManagerIx(
+        this._provider.wallet.publicKey,
+        this._accountManagerAddress
+      )
+    );
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+    this._accountManager = null;
     this._account = null;
     return txId;
   }
@@ -940,7 +977,23 @@ export class CrossClient {
     if (this._account === null) {
       throw Error("User has no margin account to withdraw or close.");
     }
+
     let tx = new Transaction();
+    try {
+      await this.usdcAccountCheck();
+    } catch (e) {
+      tx.add(
+        splToken.Token.createAssociatedTokenAccountInstruction(
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+          splToken.TOKEN_PROGRAM_ID,
+          constants.USDC_MINT_ADDRESS[Exchange.network],
+          this._usdcAccountAddress,
+          this.publicKey,
+          this.publicKey
+        )
+      );
+    }
+
     tx.add(
       instructions.withdrawV2Ix(
         this._account.balance.toNumber(),
