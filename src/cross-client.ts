@@ -971,6 +971,7 @@ export class CrossClient {
 
   /**
    * Withdraws the entirety of the CrossClient's margin account and then closes it.
+   * Useful for only closing one subaccount.
    */
   public async withdrawAndCloseAccount(): Promise<TransactionSignature> {
     this.delegatedCheck();
@@ -1018,6 +1019,69 @@ export class CrossClient {
       this._useVersionedTxs ? utils.getZetaLutArr() : undefined
     );
     this._account = null;
+    return txId;
+  }
+
+  /**
+   * Withdraws the entirety of the CrossClient's margin account and then closes it.
+   * Useful for closing the main account and everything
+   */
+  public async withdrawAndCloseAccountAndCloseManager(): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    if (this._account === null) {
+      throw Error("User has no margin account to withdraw or close.");
+    }
+    if (this._accountManager === null) {
+      throw Error("User has no account manager to close");
+    }
+
+    let tx = new Transaction();
+    try {
+      await this.usdcAccountCheck();
+    } catch (e) {
+      tx.add(
+        splToken.Token.createAssociatedTokenAccountInstruction(
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+          splToken.TOKEN_PROGRAM_ID,
+          constants.USDC_MINT_ADDRESS[Exchange.network],
+          this._usdcAccountAddress,
+          this.publicKey,
+          this.publicKey
+        )
+      );
+    }
+
+    tx.add(
+      instructions.withdrawV2Ix(
+        this._account.balance.toNumber(),
+        this._accountAddress,
+        this._usdcAccountAddress,
+        this._provider.wallet.publicKey
+      )
+    );
+    tx.add(
+      instructions.closeCrossMarginAccountIx(
+        this._provider.wallet.publicKey,
+        this._accountAddress,
+        this._accountManagerAddress
+      )
+    );
+    tx.add(
+      instructions.closeCrossMarginAccountManagerIx(
+        this._provider.wallet.publicKey,
+        this._accountManagerAddress
+      )
+    );
+    let txId: TransactionSignature = await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+    this._account = null;
+    this._accountManager = null;
     return txId;
   }
 
