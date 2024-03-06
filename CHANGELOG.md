@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.23.5]
+
+- Add support for fee tiers. ([#358](https://github.com/zetamarkets/sdk/pull/358))
+
 ## [1.23.4]
 
 - Add close account utils: closeAccountAndManager and withdrawAndCloseAccountAndCloseManager. ([#366](https://github.com/zetamarkets/sdk/pull/366))
