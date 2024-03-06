@@ -28,11 +28,19 @@ export enum MarginAccountType {
   MARKET_MAKER_T3 = 5,
   MARKET_MAKER_T4 = 6,
   MARKET_MAKER_T5 = 7,
+  MARKET_MAKER_T6 = 8,
+  MARKET_MAKER_T7 = 9,
+  MARKET_MAKER_T8 = 10,
+  MARKET_MAKER_T9 = 11,
   NORMAL_T1 = 12,
   NORMAL_T2 = 13,
   NORMAL_T3 = 14,
   NORMAL_T4 = 15,
   NORMAL_T5 = 16,
+  NORMAL_T6 = 17,
+  NORMAL_T7 = 18,
+  NORMAL_T8 = 19,
+  NORMAL_T9 = 20,
 }
 
 export const ZETA_PID: {

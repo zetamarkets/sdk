@@ -396,6 +396,18 @@ export function fromProgramMarginAccountType(
   if (objectEquals(accountType, { marketMakerT5: {} })) {
     return MarginAccountType.MARKET_MAKER_T5;
   }
+  if (objectEquals(accountType, { marketMakerT6: {} })) {
+    return MarginAccountType.MARKET_MAKER_T6;
+  }
+  if (objectEquals(accountType, { marketMakerT7: {} })) {
+    return MarginAccountType.MARKET_MAKER_T7;
+  }
+  if (objectEquals(accountType, { marketMakerT8: {} })) {
+    return MarginAccountType.MARKET_MAKER_T8;
+  }
+  if (objectEquals(accountType, { marketMakerT9: {} })) {
+    return MarginAccountType.MARKET_MAKER_T9;
+  }
   if (objectEquals(accountType, { normalT1: {} })) {
     return MarginAccountType.NORMAL_T1;
   }
@@ -410,6 +422,18 @@ export function fromProgramMarginAccountType(
   }
   if (objectEquals(accountType, { normalT5: {} })) {
     return MarginAccountType.NORMAL_T5;
+  }
+  if (objectEquals(accountType, { normalT6: {} })) {
+    return MarginAccountType.NORMAL_T6;
+  }
+  if (objectEquals(accountType, { normalT7: {} })) {
+    return MarginAccountType.NORMAL_T7;
+  }
+  if (objectEquals(accountType, { normalT8: {} })) {
+    return MarginAccountType.NORMAL_T8;
+  }
+  if (objectEquals(accountType, { normalT9: {} })) {
+    return MarginAccountType.NORMAL_T9;
   }
   throw Error("Invalid margin account type");
 }
@@ -441,6 +465,18 @@ export function toProgramMarginAccountType(
   if (accountType == MarginAccountType.MARKET_MAKER_T5) {
     return { marketMakerT5: {} };
   }
+  if (accountType == MarginAccountType.MARKET_MAKER_T6) {
+    return { marketMakerT6: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T7) {
+    return { marketMakerT7: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T8) {
+    return { marketMakerT8: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T9) {
+    return { marketMakerT9: {} };
+  }
   if (accountType == MarginAccountType.NORMAL_T1) {
     return { normalT1: {} };
   }
@@ -455,6 +491,18 @@ export function toProgramMarginAccountType(
   }
   if (accountType == MarginAccountType.NORMAL_T5) {
     return { normalT5: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T6) {
+    return { normalT6: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T7) {
+    return { normalT7: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T8) {
+    return { normalT8: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T9) {
+    return { normalT9: {} };
   }
   throw Error("Invalid margin account type");
 }
@@ -475,7 +523,15 @@ export function isMarketMaker(account: CrossMarginAccount | MarginAccount) {
       fromProgramMarginAccountType(account.accountType) ==
         MarginAccountType.MARKET_MAKER_T4 ||
       fromProgramMarginAccountType(account.accountType) ==
-        MarginAccountType.MARKET_MAKER_T5
+        MarginAccountType.MARKET_MAKER_T5 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T6 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T7 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T8 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T9
     );
   } catch (e) {
     return false;
