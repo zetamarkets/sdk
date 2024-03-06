@@ -7742,11 +7742,11 @@
             "type": "publicKey"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
@@ -7871,11 +7871,11 @@
             "type": "u64"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
@@ -7992,11 +7992,11 @@
             "type": "u64"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {

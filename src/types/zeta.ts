@@ -7742,11 +7742,11 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
@@ -7871,11 +7871,11 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
@@ -7992,11 +7992,11 @@ export type Zeta = {
             "type": "u64"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
@@ -18606,11 +18606,11 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
@@ -18735,11 +18735,11 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
@@ -18856,11 +18856,11 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
-            "name": "nativeReferreeRebatePercent",
+            "name": "nativeRefereeRebatePercent",
             "type": "u32"
           },
           {
-            "name": "referreeRebateEndTime",
+            "name": "refereeRebateEndTime",
             "type": "u64"
           },
           {
