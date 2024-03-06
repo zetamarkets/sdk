@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.23.4]
+
+- Add close account utils: closeAccountAndManager and withdrawAndCloseAccountAndCloseManager. ([#366](https://github.com/zetamarkets/sdk/pull/366))
+
 ## [1.23.3]
 
 - New function closeAllPositions(). ([#362](https://github.com/zetamarkets/sdk/pull/362))
