@@ -1088,7 +1088,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateReferralsAdmin",
+      "name": "updateMaTypeAdmin",
       "accounts": [
         {
           "name": "state",
@@ -1097,7 +1097,7 @@ export type Zeta = {
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -1109,7 +1109,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateMakerTradeFeePercentage",
+      "name": "updateReferralsAdmin",
       "accounts": [
         {
           "name": "state",
@@ -1120,14 +1120,14 @@ export type Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "newNativeMakerTradeFeePercentage",
-          "type": "u64"
-        }
-      ]
+      "args": []
     },
     {
       "name": "updateMakerRebatePercentage",
@@ -7215,16 +7215,13 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
           },
           {
             "name": "nativeDepositLimit",
@@ -7247,12 +7244,13 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedOptionFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                2
+              ]
+            }
           },
           {
             "name": "referralsAdmin",
@@ -7357,7 +7355,7 @@ export type Zeta = {
             }
           },
           {
-            "name": "nativeMakerTradeFeePercentage",
+            "name": "deprecatedMakerFeeValue",
             "type": "u64"
           },
           {
@@ -7369,11 +7367,15 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "maTypeAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                82
+                50
               ]
             }
           }
@@ -8780,26 +8782,6 @@ export type Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -8890,26 +8872,6 @@ export type Zeta = {
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
-          },
-          {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
           },
           {
             "name": "nativeDepositLimit",
@@ -9538,6 +9500,60 @@ export type Zeta = {
           },
           {
             "name": "MarketMakerT1"
+          },
+          {
+            "name": "MarketMakerT0"
+          },
+          {
+            "name": "MarketMakerT2"
+          },
+          {
+            "name": "MarketMakerT3"
+          },
+          {
+            "name": "MarketMakerT4"
+          },
+          {
+            "name": "MarketMakerT5"
+          },
+          {
+            "name": "MarketMakerT6"
+          },
+          {
+            "name": "MarketMakerT7"
+          },
+          {
+            "name": "MarketMakerT8"
+          },
+          {
+            "name": "MarketMakerT9"
+          },
+          {
+            "name": "NormalT1"
+          },
+          {
+            "name": "NormalT2"
+          },
+          {
+            "name": "NormalT3"
+          },
+          {
+            "name": "NormalT4"
+          },
+          {
+            "name": "NormalT5"
+          },
+          {
+            "name": "NormalT6"
+          },
+          {
+            "name": "NormalT7"
+          },
+          {
+            "name": "NormalT8"
+          },
+          {
+            "name": "NormalT9"
           }
         ]
       }
@@ -10837,6 +10853,11 @@ export type Zeta = {
       "code": 6162,
       "name": "CannotReferSelf",
       "msg": "User cannot refer themselves"
+    },
+    {
+      "code": 6163,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
     }
   ]
 };
@@ -11931,7 +11952,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateReferralsAdmin",
+      "name": "updateMaTypeAdmin",
       "accounts": [
         {
           "name": "state",
@@ -11940,7 +11961,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -11952,7 +11973,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateMakerTradeFeePercentage",
+      "name": "updateReferralsAdmin",
       "accounts": [
         {
           "name": "state",
@@ -11963,14 +11984,14 @@ export const IDL: Zeta = {
           "name": "admin",
           "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "newNativeMakerTradeFeePercentage",
-          "type": "u64"
-        }
-      ]
+      "args": []
     },
     {
       "name": "updateMakerRebatePercentage",
@@ -18058,16 +18079,13 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                3
+              ]
+            }
           },
           {
             "name": "nativeDepositLimit",
@@ -18090,12 +18108,13 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
+            "name": "deprecatedOptionFeeValues",
+            "type": {
+              "array": [
+                "u64",
+                2
+              ]
+            }
           },
           {
             "name": "referralsAdmin",
@@ -18200,7 +18219,7 @@ export const IDL: Zeta = {
             }
           },
           {
-            "name": "nativeMakerTradeFeePercentage",
+            "name": "deprecatedMakerFeeValue",
             "type": "u64"
           },
           {
@@ -18212,11 +18231,15 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "maTypeAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                82
+                50
               ]
             }
           }
@@ -19623,26 +19646,6 @@ export const IDL: Zeta = {
             "type": "u32"
           },
           {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
             "name": "nativeDepositLimit",
             "type": "u64"
           },
@@ -19733,26 +19736,6 @@ export const IDL: Zeta = {
           {
             "name": "insuranceVaultLiquidationPercentage",
             "type": "u32"
-          },
-          {
-            "name": "nativeD1TradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeD1UnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionTradeFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeOptionUnderlyingFeePercentage",
-            "type": "u64"
-          },
-          {
-            "name": "nativeWhitelistUnderlyingFeePercentage",
-            "type": "u64"
           },
           {
             "name": "nativeDepositLimit",
@@ -20381,6 +20364,60 @@ export const IDL: Zeta = {
           },
           {
             "name": "MarketMakerT1"
+          },
+          {
+            "name": "MarketMakerT0"
+          },
+          {
+            "name": "MarketMakerT2"
+          },
+          {
+            "name": "MarketMakerT3"
+          },
+          {
+            "name": "MarketMakerT4"
+          },
+          {
+            "name": "MarketMakerT5"
+          },
+          {
+            "name": "MarketMakerT6"
+          },
+          {
+            "name": "MarketMakerT7"
+          },
+          {
+            "name": "MarketMakerT8"
+          },
+          {
+            "name": "MarketMakerT9"
+          },
+          {
+            "name": "NormalT1"
+          },
+          {
+            "name": "NormalT2"
+          },
+          {
+            "name": "NormalT3"
+          },
+          {
+            "name": "NormalT4"
+          },
+          {
+            "name": "NormalT5"
+          },
+          {
+            "name": "NormalT6"
+          },
+          {
+            "name": "NormalT7"
+          },
+          {
+            "name": "NormalT8"
+          },
+          {
+            "name": "NormalT9"
           }
         ]
       }
@@ -21680,6 +21717,11 @@ export const IDL: Zeta = {
       "code": 6162,
       "name": "CannotReferSelf",
       "msg": "User cannot refer themselves"
+    },
+    {
+      "code": 6163,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
     }
   ]
 };
