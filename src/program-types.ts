@@ -191,6 +191,8 @@ export interface CrossMarginAccountManager {
   authority: PublicKey;
   accounts: Array<CrossMarginAccountInfo>;
   referrer: PublicKey;
+  nativeRefereeRebatePercent: number;
+  refereeRebateEndTime: anchor.BN;
   padding: Array<number>;
 }
 
@@ -211,6 +213,8 @@ export interface CrossMarginAccount {
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
   rebateRebalanceAmount: anchor.BN;
+  nativeRefereeRebatePercent: number;
+  refereeRebateEndTime: anchor.BN;
   padding: Array<number>;
 }
 
@@ -230,6 +234,8 @@ export interface MarginAccount {
   lastFundingDelta: AnchorDecimal;
   delegatedPubkey: PublicKey;
   rebateRebalanceAmount: anchor.BN;
+  nativeRefereeRebatePercent: number;
+  refereeRebateEndTime: anchor.BN;
   padding: Array<number>;
 }
 
