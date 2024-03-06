@@ -373,15 +373,13 @@ export class RiskCalculator {
       } else {
         assetPnl += convertNativeLotSizeToDecimal(size) * price + costOfTrades;
       }
-      if (
-        executionInfo &&
-        executionInfo.asset == asset &&
-        executionInfo.isTaker
-      ) {
+      if (executionInfo && executionInfo.asset == asset) {
         assetPnl -=
           convertNativeLotSizeToDecimal(Math.abs(size)) *
-          (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
-            100) *
+          (constants.FEE_TIER_MAP_BPS[
+            executionInfo.isTaker ? "taker" : "maker"
+          ][account.accountType as constants.MarginAccountType] /
+            10000) *
           price;
       }
       upnlMap.set(asset, assetPnl);
@@ -874,11 +872,12 @@ export class RiskCalculator {
       state.unpaidFundingTotal -
       state.maintenanceMarginIncludingOrdersTotal;
 
-    let fee = isTaker
-      ? (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
-          100) *
-        tradePrice
-      : 0;
+    let fee =
+      (constants.FEE_TIER_MAP_BPS[isTaker ? "taker" : "maker"][
+        marginAccount.accountType as constants.MarginAccountType
+      ] /
+        10000) *
+      tradePrice;
 
     let productLedger = marginAccount.productLedgers[assetIndex];
     let position = convertNativeLotSizeToDecimal(

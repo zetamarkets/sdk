@@ -19,6 +19,30 @@ export enum Asset {
   UNDEFINED = "UNDEFINED",
 }
 
+export enum MarginAccountType {
+  NORMAL = 0,
+  MARKET_MAKER = 1,
+  MARKET_MAKER_T1 = 2,
+  MARKET_MAKER_T0 = 3,
+  MARKET_MAKER_T2 = 4,
+  MARKET_MAKER_T3 = 5,
+  MARKET_MAKER_T4 = 6,
+  MARKET_MAKER_T5 = 7,
+  MARKET_MAKER_T6 = 8,
+  MARKET_MAKER_T7 = 9,
+  MARKET_MAKER_T8 = 10,
+  MARKET_MAKER_T9 = 11,
+  NORMAL_T1 = 12,
+  NORMAL_T2 = 13,
+  NORMAL_T3 = 14,
+  NORMAL_T4 = 15,
+  NORMAL_T5 = 16,
+  NORMAL_T6 = 17,
+  NORMAL_T7 = 18,
+  NORMAL_T8 = 19,
+  NORMAL_T9 = 20,
+}
+
 export const ZETA_PID: {
   localnet: PublicKey;
   devnet: PublicKey;
@@ -122,6 +146,41 @@ export const DEX_PID: {
 export const CHAINLINK_PID: PublicKey = new PublicKey(
   "HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny"
 );
+
+// These are constants onchain
+// We duplicate them here for convenient access for frontend and risk utils
+export const FEE_TIER_MAP_BPS = {
+  taker: {
+    [MarginAccountType.MARKET_MAKER]: 0,
+    [MarginAccountType.MARKET_MAKER_T0]: 10,
+    [MarginAccountType.MARKET_MAKER_T1]: 9,
+    [MarginAccountType.MARKET_MAKER_T2]: 8,
+    [MarginAccountType.MARKET_MAKER_T3]: 7,
+    [MarginAccountType.MARKET_MAKER_T4]: 6,
+    [MarginAccountType.MARKET_MAKER_T5]: 5,
+    [MarginAccountType.NORMAL]: 10,
+    [MarginAccountType.NORMAL_T1]: 9,
+    [MarginAccountType.NORMAL_T2]: 8,
+    [MarginAccountType.NORMAL_T3]: 7,
+    [MarginAccountType.NORMAL_T4]: 6,
+    [MarginAccountType.NORMAL_T5]: 5,
+  },
+  maker: {
+    [MarginAccountType.MARKET_MAKER]: 0,
+    [MarginAccountType.MARKET_MAKER_T0]: 0,
+    [MarginAccountType.MARKET_MAKER_T1]: 0,
+    [MarginAccountType.MARKET_MAKER_T2]: 0,
+    [MarginAccountType.MARKET_MAKER_T3]: 0,
+    [MarginAccountType.MARKET_MAKER_T4]: 0,
+    [MarginAccountType.MARKET_MAKER_T5]: 0,
+    [MarginAccountType.NORMAL]: 2,
+    [MarginAccountType.NORMAL_T1]: 1.8,
+    [MarginAccountType.NORMAL_T2]: 1.6,
+    [MarginAccountType.NORMAL_T3]: 1.4,
+    [MarginAccountType.NORMAL_T4]: 1.2,
+    [MarginAccountType.NORMAL_T5]: 1,
+  },
+};
 
 export const MAX_SETTLE_AND_CLOSE_PER_TX = 4;
 export const MAX_CANCELS_PER_TX = 3;

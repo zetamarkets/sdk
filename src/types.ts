@@ -9,7 +9,7 @@ import {
 } from "@solana/web3.js";
 import { Connection as ConnectionZstd } from "zeta-solana-web3";
 import { allAssets } from "./assets";
-import { Asset } from "./constants";
+import { Asset, MarginAccountType } from "./constants";
 import { objectEquals } from "./utils";
 import { CrossMarginAccount, MarginAccount } from "./program-types";
 import { Network, types, utils } from ".";
@@ -369,12 +369,6 @@ export function toProgramTreasuryMovementType(
 
 export type MarketIdentifier = number | PublicKey;
 
-export enum MarginAccountType {
-  NORMAL = 0,
-  MARKET_MAKER = 1,
-  MARKET_MAKER_T1 = 2,
-}
-
 export function fromProgramMarginAccountType(
   accountType: any
 ): MarginAccountType {
@@ -384,8 +378,62 @@ export function fromProgramMarginAccountType(
   if (objectEquals(accountType, { marketMaker: {} })) {
     return MarginAccountType.MARKET_MAKER;
   }
+  if (objectEquals(accountType, { marketMakerT0: {} })) {
+    return MarginAccountType.MARKET_MAKER_T0;
+  }
   if (objectEquals(accountType, { marketMakerT1: {} })) {
     return MarginAccountType.MARKET_MAKER_T1;
+  }
+  if (objectEquals(accountType, { marketMakerT2: {} })) {
+    return MarginAccountType.MARKET_MAKER_T2;
+  }
+  if (objectEquals(accountType, { marketMakerT3: {} })) {
+    return MarginAccountType.MARKET_MAKER_T3;
+  }
+  if (objectEquals(accountType, { marketMakerT4: {} })) {
+    return MarginAccountType.MARKET_MAKER_T4;
+  }
+  if (objectEquals(accountType, { marketMakerT5: {} })) {
+    return MarginAccountType.MARKET_MAKER_T5;
+  }
+  if (objectEquals(accountType, { marketMakerT6: {} })) {
+    return MarginAccountType.MARKET_MAKER_T6;
+  }
+  if (objectEquals(accountType, { marketMakerT7: {} })) {
+    return MarginAccountType.MARKET_MAKER_T7;
+  }
+  if (objectEquals(accountType, { marketMakerT8: {} })) {
+    return MarginAccountType.MARKET_MAKER_T8;
+  }
+  if (objectEquals(accountType, { marketMakerT9: {} })) {
+    return MarginAccountType.MARKET_MAKER_T9;
+  }
+  if (objectEquals(accountType, { normalT1: {} })) {
+    return MarginAccountType.NORMAL_T1;
+  }
+  if (objectEquals(accountType, { normalT2: {} })) {
+    return MarginAccountType.NORMAL_T2;
+  }
+  if (objectEquals(accountType, { normalT3: {} })) {
+    return MarginAccountType.NORMAL_T3;
+  }
+  if (objectEquals(accountType, { normalT4: {} })) {
+    return MarginAccountType.NORMAL_T4;
+  }
+  if (objectEquals(accountType, { normalT5: {} })) {
+    return MarginAccountType.NORMAL_T5;
+  }
+  if (objectEquals(accountType, { normalT6: {} })) {
+    return MarginAccountType.NORMAL_T6;
+  }
+  if (objectEquals(accountType, { normalT7: {} })) {
+    return MarginAccountType.NORMAL_T7;
+  }
+  if (objectEquals(accountType, { normalT8: {} })) {
+    return MarginAccountType.NORMAL_T8;
+  }
+  if (objectEquals(accountType, { normalT9: {} })) {
+    return MarginAccountType.NORMAL_T9;
   }
   throw Error("Invalid margin account type");
 }
@@ -399,19 +447,95 @@ export function toProgramMarginAccountType(
   if (accountType == MarginAccountType.MARKET_MAKER) {
     return { marketMaker: {} };
   }
+  if (accountType == MarginAccountType.MARKET_MAKER_T0) {
+    return { marketMakerT0: {} };
+  }
   if (accountType == MarginAccountType.MARKET_MAKER_T1) {
     return { marketMakerT1: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T2) {
+    return { marketMakerT2: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T3) {
+    return { marketMakerT3: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T4) {
+    return { marketMakerT4: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T5) {
+    return { marketMakerT5: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T6) {
+    return { marketMakerT6: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T7) {
+    return { marketMakerT7: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T8) {
+    return { marketMakerT8: {} };
+  }
+  if (accountType == MarginAccountType.MARKET_MAKER_T9) {
+    return { marketMakerT9: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T1) {
+    return { normalT1: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T2) {
+    return { normalT2: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T3) {
+    return { normalT3: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T4) {
+    return { normalT4: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T5) {
+    return { normalT5: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T6) {
+    return { normalT6: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T7) {
+    return { normalT7: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T8) {
+    return { normalT8: {} };
+  }
+  if (accountType == MarginAccountType.NORMAL_T9) {
+    return { normalT9: {} };
   }
   throw Error("Invalid margin account type");
 }
 
 export function isMarketMaker(account: CrossMarginAccount | MarginAccount) {
-  return (
-    fromProgramMarginAccountType(account.accountType) ==
-      MarginAccountType.MARKET_MAKER ||
-    fromProgramMarginAccountType(account.accountType) ==
-      MarginAccountType.MARKET_MAKER_T1
-  );
+  try {
+    return (
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T0 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T1 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T2 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T3 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T4 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T5 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T6 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T7 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T8 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T9
+    );
+  } catch (e) {
+    return false;
+  }
 }
 
 export enum OrderCompleteType {
