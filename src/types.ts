@@ -460,12 +460,26 @@ export function toProgramMarginAccountType(
 }
 
 export function isMarketMaker(account: CrossMarginAccount | MarginAccount) {
-  return (
-    fromProgramMarginAccountType(account.accountType) ==
-      MarginAccountType.MARKET_MAKER ||
-    fromProgramMarginAccountType(account.accountType) ==
-      MarginAccountType.MARKET_MAKER_T1
-  );
+  try {
+    return (
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T0 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T1 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T2 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T3 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T4 ||
+      fromProgramMarginAccountType(account.accountType) ==
+        MarginAccountType.MARKET_MAKER_T5
+    );
+  } catch (e) {
+    return false;
+  }
 }
 
 export enum OrderCompleteType {

@@ -1118,7 +1118,7 @@ export type Zeta = {
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -1128,6 +1128,27 @@ export type Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "updateTakeTriggerOrderFeePercentage",
@@ -7342,6 +7363,10 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "maTypeAdmin",
             "type": "publicKey"
           },
@@ -7350,7 +7375,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                58
+                50
               ]
             }
           }
@@ -9453,6 +9478,9 @@ export type Zeta = {
             "name": "MarketMakerT1"
           },
           {
+            "name": "MarketMakerT0"
+          },
+          {
             "name": "MarketMakerT2"
           },
           {
@@ -9465,7 +9493,16 @@ export type Zeta = {
             "name": "MarketMakerT5"
           },
           {
-            "name": "MarketMakerT0"
+            "name": "MarketMakerT6"
+          },
+          {
+            "name": "MarketMakerT7"
+          },
+          {
+            "name": "MarketMakerT8"
+          },
+          {
+            "name": "MarketMakerT9"
           },
           {
             "name": "NormalT1"
@@ -9481,6 +9518,18 @@ export type Zeta = {
           },
           {
             "name": "NormalT5"
+          },
+          {
+            "name": "NormalT6"
+          },
+          {
+            "name": "NormalT7"
+          },
+          {
+            "name": "NormalT8"
+          },
+          {
+            "name": "NormalT9"
           }
         ]
       }
@@ -10768,18 +10817,18 @@ export type Zeta = {
     },
     {
       "code": 6160,
-      "name": "InvalidMATypeAdminSigner",
-      "msg": "Invalid margin account type admin signer"
-    },
-    {
-      "code": 6161,
       "name": "InvalidReferrerIDLength",
       "msg": "Invalid referrer ID length"
     },
     {
-      "code": 6162,
+      "code": 6161,
       "name": "InvalidReferrerIDOwner",
       "msg": "Invalid referrer ID owner"
+    },
+    {
+      "code": 6162,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
     }
   ]
 };
@@ -11904,7 +11953,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -11914,6 +11963,27 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "updateMakerRebatePercentage",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nativeMakerRebatePercentage",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "updateTakeTriggerOrderFeePercentage",
@@ -18128,6 +18198,10 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "nativeMakerRebatePercentage",
+            "type": "u64"
+          },
+          {
             "name": "maTypeAdmin",
             "type": "publicKey"
           },
@@ -18136,7 +18210,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                58
+                50
               ]
             }
           }
@@ -20239,6 +20313,9 @@ export const IDL: Zeta = {
             "name": "MarketMakerT1"
           },
           {
+            "name": "MarketMakerT0"
+          },
+          {
             "name": "MarketMakerT2"
           },
           {
@@ -20251,7 +20328,16 @@ export const IDL: Zeta = {
             "name": "MarketMakerT5"
           },
           {
-            "name": "MarketMakerT0"
+            "name": "MarketMakerT6"
+          },
+          {
+            "name": "MarketMakerT7"
+          },
+          {
+            "name": "MarketMakerT8"
+          },
+          {
+            "name": "MarketMakerT9"
           },
           {
             "name": "NormalT1"
@@ -20267,6 +20353,18 @@ export const IDL: Zeta = {
           },
           {
             "name": "NormalT5"
+          },
+          {
+            "name": "NormalT6"
+          },
+          {
+            "name": "NormalT7"
+          },
+          {
+            "name": "NormalT8"
+          },
+          {
+            "name": "NormalT9"
           }
         ]
       }
@@ -21554,18 +21652,18 @@ export const IDL: Zeta = {
     },
     {
       "code": 6160,
-      "name": "InvalidMATypeAdminSigner",
-      "msg": "Invalid margin account type admin signer"
-    },
-    {
-      "code": 6161,
       "name": "InvalidReferrerIDLength",
       "msg": "Invalid referrer ID length"
     },
     {
-      "code": 6162,
+      "code": 6161,
       "name": "InvalidReferrerIDOwner",
       "msg": "Invalid referrer ID owner"
+    },
+    {
+      "code": 6162,
+      "name": "InvalidMATypeAdminSigner",
+      "msg": "Invalid margin account type admin signer"
     }
   ]
 };
