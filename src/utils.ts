@@ -1045,7 +1045,7 @@ export async function processTransaction(
         }
         await sleep(400); // Don't spam the RPC
       }
-      throw "Transaction was not confirmed";
+      throw `Transaction ${txSig} was not confirmed`;
     } catch (err) {
       let parsedErr = parseError(err);
       failures += 1;
