@@ -10827,6 +10827,11 @@ export type Zeta = {
     },
     {
       "code": 6162,
+      "name": "CannotReferSelf",
+      "msg": "User cannot refer themselves"
+    },
+    {
+      "code": 6163,
       "name": "InvalidMATypeAdminSigner",
       "msg": "Invalid margin account type admin signer"
     }
@@ -21662,6 +21667,11 @@ export const IDL: Zeta = {
     },
     {
       "code": 6162,
+      "name": "CannotReferSelf",
+      "msg": "User cannot refer themselves"
+    },
+    {
+      "code": 6163,
       "name": "InvalidMATypeAdminSigner",
       "msg": "Invalid margin account type admin signer"
     }
