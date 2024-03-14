@@ -5,6 +5,10 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
+## [1.23.6]
+
+- Extra util getFeeBps() ([#368](https://github.com/zetamarkets/sdk/pull/368))
+
 ## [1.23.5]
 
 - Add support for fee tiers. ([#358](https://github.com/zetamarkets/sdk/pull/358))
