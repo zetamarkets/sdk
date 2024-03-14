@@ -2172,3 +2172,18 @@ export function calculateTakeTriggerOrderExecutionPrice(
   }
   return executionPrice;
 }
+
+export function getFeeBps(
+  isTaker: boolean,
+  accountType: constants.MarginAccountType
+): number {
+  let feeMap = isTaker
+    ? constants.FEE_TIER_MAP_BPS["taker"]
+    : constants.FEE_TIER_MAP_BPS["maker"];
+
+  let fee = feeMap[accountType];
+  if (fee == undefined) {
+    return feeMap[constants.MarginAccountType.NORMAL];
+  }
+  return fee;
+}
