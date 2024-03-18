@@ -5,9 +5,26 @@ Version changes are pinned to SDK releases.
 
 ## [Unreleased]
 
-## [1.23.3]
+## [1.23.7]
 
 - Add extra referral utils. ([#363](https://github.com/zetamarkets/sdk/pull/363))
+
+## [1.23.6]
+
+- Extra util getFeeBps() ([#368](https://github.com/zetamarkets/sdk/pull/368))
+
+## [1.23.5]
+
+- Add support for fee tiers. ([#358](https://github.com/zetamarkets/sdk/pull/358))
+
+## [1.23.4]
+
+- Add close account utils: closeAccountAndManager and withdrawAndCloseAccountAndCloseManager. ([#366](https://github.com/zetamarkets/sdk/pull/366))
+
+## [1.23.3]
+
+- New function closeAllPositions(). ([#362](https://github.com/zetamarkets/sdk/pull/362))
+- New option to specify retry amount for txs. Use CrossClient.setTxRetryAmount(). ([#362](https://github.com/zetamarkets/sdk/pull/362))
 
 ## [1.23.2]
 

@@ -137,11 +137,12 @@ export function addFakeTradeToAccount(
   let editedOrderState = marginAccount.productLedgers[assetIndex].orderState;
   let markPrice = Exchange.getMarkPrice(asset);
 
-  let fee = isTaker
-    ? (convertNativeBNToDecimal(Exchange.state.nativeD1TradeFeePercentage) /
-        100) *
-      price
-    : 0;
+  let fee =
+    (constants.FEE_TIER_MAP_BPS[isTaker ? "taker" : "maker"][
+      marginAccount.accountType as constants.MarginAccountType
+    ] /
+      10000) *
+    price;
 
   let sizeNative = convertDecimalToNativeLotSize(size);
   let currentSizeBN = editedPosition.size;

@@ -948,104 +948,113 @@ export async function processTransaction(
   opts?: ConfirmOptions,
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
-  blockhash?: { blockhash: string; lastValidBlockHeight: number }
+  blockhash?: { blockhash: string; lastValidBlockHeight: number },
+  retries?: number
 ): Promise<TransactionSignature> {
-  let rawTx: Buffer | Uint8Array;
+  let failures = 0;
+  while (true) {
+    let rawTx: Buffer | Uint8Array;
 
-  if (Exchange.priorityFee != 0) {
-    tx.instructions.unshift(
-      ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: Math.round(Exchange.priorityFee),
-      })
-    );
-  }
-
-  let recentBlockhash =
-    blockhash ??
-    (await provider.connection.getLatestBlockhash(
-      Exchange.blockhashCommitment
-    ));
-
-  if (lutAccs) {
-    if (useLedger) {
-      throw Error("Ledger does not support versioned transactions");
-    }
-
-    let v0Tx: VersionedTransaction = new VersionedTransaction(
-      new TransactionMessage({
-        payerKey: provider.wallet.publicKey,
-        recentBlockhash: recentBlockhash.blockhash,
-        instructions: tx.instructions,
-      }).compileToV0Message(lutAccs)
-    );
-    v0Tx.sign(
-      (signers ?? [])
-        .filter((s) => s !== undefined)
-        .map((kp) => {
-          return kp;
+    if (Exchange.priorityFee != 0) {
+      tx.instructions.unshift(
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: Math.round(Exchange.priorityFee),
         })
-    );
-    v0Tx = (await provider.wallet.signTransaction(
-      v0Tx
-    )) as VersionedTransaction;
-    rawTx = v0Tx.serialize();
-  } else {
-    tx.recentBlockhash = recentBlockhash.blockhash;
-    tx.feePayer = useLedger
-      ? Exchange.ledgerWallet.publicKey
-      : provider.wallet.publicKey;
-
-    (signers ?? [])
-      .filter((s) => s !== undefined)
-      .forEach((kp) => {
-        tx.partialSign(kp);
-      });
-
-    if (useLedger) {
-      tx = await Exchange.ledgerWallet.signTransaction(tx);
-    } else {
-      tx = (await provider.wallet.signTransaction(tx)) as Transaction;
-    }
-    rawTx = tx.serialize();
-  }
-
-  let txOpts = opts || commitmentConfig(provider.connection.commitment);
-  try {
-    // Integration tests don't like the split send + confirm :(
-    if (Exchange.network == Network.LOCALNET) {
-      return await anchor.sendAndConfirmRawTransaction(
-        provider.connection,
-        rawTx,
-        txOpts
       );
     }
 
-    let txSig = await provider.connection.sendRawTransaction(rawTx, {
-      skipPreflight: true,
-    });
+    let recentBlockhash =
+      blockhash ??
+      (await provider.connection.getLatestBlockhash(
+        Exchange.blockhashCommitment
+      ));
 
-    let now = Date.now() / 1000;
-    // Poll the tx confirmation for N seconds
-    // Polling is more reliable than websockets using confirmTransaction()
-    while (Date.now() / 1000 - now < Exchange._txConfirmationPollSeconds) {
-      let status = await provider.connection.getSignatureStatus(txSig);
-      if (status.value != null) {
-        if (status.value.err != null) {
-          let parsedErr = parseError(
-            parseInt(status.value.err["InstructionError"][1]["Custom"])
-          );
-          throw parsedErr;
-        }
-        if (status.value.confirmationStatus == txOpts.commitment.toString()) {
-          return txSig;
-        }
+    if (lutAccs) {
+      if (useLedger) {
+        throw Error("Ledger does not support versioned transactions");
       }
-      await sleep(400); // Don't spam the RPC
+
+      let v0Tx: VersionedTransaction = new VersionedTransaction(
+        new TransactionMessage({
+          payerKey: provider.wallet.publicKey,
+          recentBlockhash: recentBlockhash.blockhash,
+          instructions: tx.instructions,
+        }).compileToV0Message(lutAccs)
+      );
+      v0Tx.sign(
+        (signers ?? [])
+          .filter((s) => s !== undefined)
+          .map((kp) => {
+            return kp;
+          })
+      );
+      v0Tx = (await provider.wallet.signTransaction(
+        v0Tx
+      )) as VersionedTransaction;
+      rawTx = v0Tx.serialize();
+    } else {
+      tx.recentBlockhash = recentBlockhash.blockhash;
+      tx.feePayer = useLedger
+        ? Exchange.ledgerWallet.publicKey
+        : provider.wallet.publicKey;
+
+      (signers ?? [])
+        .filter((s) => s !== undefined)
+        .forEach((kp) => {
+          tx.partialSign(kp);
+        });
+
+      if (useLedger) {
+        tx = await Exchange.ledgerWallet.signTransaction(tx);
+      } else {
+        tx = (await provider.wallet.signTransaction(tx)) as Transaction;
+      }
+      rawTx = tx.serialize();
     }
-    throw "Transaction was not confirmed";
-  } catch (err) {
-    let parsedErr = parseError(err);
-    throw parsedErr;
+
+    let txOpts = opts || commitmentConfig(provider.connection.commitment);
+    try {
+      // Integration tests don't like the split send + confirm :(
+      if (Exchange.network == Network.LOCALNET) {
+        return await anchor.sendAndConfirmRawTransaction(
+          provider.connection,
+          rawTx,
+          txOpts
+        );
+      }
+
+      let txSig = await provider.connection.sendRawTransaction(rawTx, {
+        skipPreflight: true,
+      });
+
+      let now = Date.now() / 1000;
+      // Poll the tx confirmation for N seconds
+      // Polling is more reliable than websockets using confirmTransaction()
+      while (Date.now() / 1000 - now < Exchange._txConfirmationPollSeconds) {
+        let status = await provider.connection.getSignatureStatus(txSig);
+        if (status.value != null) {
+          if (status.value.err != null) {
+            let parsedErr = parseError(
+              parseInt(status.value.err["InstructionError"][1]["Custom"])
+            );
+            throw parsedErr;
+          }
+          if (status.value.confirmationStatus == txOpts.commitment.toString()) {
+            return txSig;
+          }
+        }
+        await sleep(400); // Don't spam the RPC
+      }
+      throw `Transaction ${txSig} was not confirmed`;
+    } catch (err) {
+      let parsedErr = parseError(err);
+      failures += 1;
+      if (!retries || failures > retries) {
+        throw parsedErr;
+      }
+      console.log(`Transaction failed to send. Retrying...`);
+      console.log(`failCount=${failures}. error=${parsedErr}`);
+    }
   }
 }
 
@@ -2175,4 +2184,19 @@ export function calculateTakeTriggerOrderExecutionPrice(
     );
   }
   return executionPrice;
+}
+
+export function getFeeBps(
+  isTaker: boolean,
+  accountType: constants.MarginAccountType
+): number {
+  let feeMap = isTaker
+    ? constants.FEE_TIER_MAP_BPS["taker"]
+    : constants.FEE_TIER_MAP_BPS["maker"];
+
+  let fee = feeMap[accountType];
+  if (fee == undefined) {
+    return feeMap[constants.MarginAccountType.NORMAL];
+  }
+  return fee;
 }
