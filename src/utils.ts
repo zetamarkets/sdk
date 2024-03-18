@@ -1013,6 +1013,7 @@ export async function processTransaction(
     }
 
     let txOpts = opts || commitmentConfig(provider.connection.commitment);
+    let txSig;
     try {
       // Integration tests don't like the split send + confirm :(
       if (Exchange.network == Network.LOCALNET) {
@@ -1023,7 +1024,7 @@ export async function processTransaction(
         );
       }
 
-      let txSig = await provider.connection.sendRawTransaction(rawTx, {
+      txSig = await provider.connection.sendRawTransaction(rawTx, {
         skipPreflight: true,
       });
 
@@ -1037,6 +1038,7 @@ export async function processTransaction(
             let parsedErr = parseError(
               parseInt(status.value.err["InstructionError"][1]["Custom"])
             );
+            console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
             throw parsedErr;
           }
           if (status.value.confirmationStatus == txOpts.commitment.toString()) {
@@ -1050,6 +1052,7 @@ export async function processTransaction(
       let parsedErr = parseError(err);
       failures += 1;
       if (!retries || failures > retries) {
+        console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
         throw parsedErr;
       }
       console.log(`Transaction failed to send. Retrying...`);
