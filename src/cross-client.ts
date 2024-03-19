@@ -798,7 +798,6 @@ export class CrossClient {
     referrerId?: string
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
-    await this.usdcAccountCheck();
     // Check if the user has accounts set up
     let tx = new Transaction();
     if (this._accountManager === null) {
