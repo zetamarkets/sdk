@@ -192,6 +192,11 @@ export class CrossClient {
   private _accountSubscriptionId: number = undefined;
 
   /**
+   * The subscription id for the margin account manager subscription.
+   */
+  private _accountManagerSubscriptionId: number = undefined;
+
+  /**
    * Last update timestamp.
    */
   private _lastUpdateTimestamp: number;
@@ -369,6 +374,23 @@ export class CrossClient {
         }
 
         client.updateOpenOrdersAddresses();
+      },
+      connection.commitment
+    );
+
+    client._accountManagerSubscriptionId = connection.onAccountChange(
+      client._accountManagerAddress,
+      async (accountInfo: AccountInfo<Buffer>, context: Context) => {
+        client._accountManager = Exchange.program.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccountManager,
+          accountInfo.data
+        );
+
+        if (callback !== undefined) {
+          callback(null, EventType.USER, context.slot, {
+            UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
+          });
+        }
       },
       connection.commitment
     );
@@ -3116,6 +3138,12 @@ export class CrossClient {
         this._accountSubscriptionId
       );
       this._accountSubscriptionId = undefined;
+    }
+    if (this._accountManagerSubscriptionId !== undefined) {
+      await this._provider.connection.removeAccountChangeListener(
+        this._accountManagerSubscriptionId
+      );
+      this._accountManagerSubscriptionId = undefined;
     }
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);

@@ -1028,24 +1028,29 @@ export async function processTransaction(
         skipPreflight: true,
       });
 
-      let now = Date.now() / 1000;
+      let currentBlockHeight = 0;
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
-      while (Date.now() / 1000 - now < Exchange._txConfirmationPollSeconds) {
+      while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
         let status = await provider.connection.getSignatureStatus(txSig);
+        currentBlockHeight = await provider.connection.getBlockHeight(
+          provider.connection.commitment
+        );
+        console.log(
+          `[DEBUG] Confirming tx... currentBlockHeight=${currentBlockHeight} lastValidBlockHeight=${recentBlockhash.lastValidBlockHeight}`
+        );
         if (status.value != null) {
           if (status.value.err != null) {
             let parsedErr = parseError(
               parseInt(status.value.err["InstructionError"][1]["Custom"])
             );
-            console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
             throw parsedErr;
           }
           if (status.value.confirmationStatus == txOpts.commitment.toString()) {
             return txSig;
           }
         }
-        await sleep(400); // Don't spam the RPC
+        await sleep(1500); // Don't spam the RPC
       }
       throw `Transaction ${txSig} was not confirmed`;
     } catch (err) {
