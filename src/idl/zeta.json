@@ -4332,6 +4332,166 @@
       ]
     },
     {
+      "name": "placeMultiOrders",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "requestQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupFeed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "oracleBackupProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketBaseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketQuoteMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpSyncQueue",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "bidOrders",
+          "type": {
+            "vec": {
+              "defined": "OrderArgs"
+            }
+          }
+        },
+        {
+          "name": "askOrders",
+          "type": {
+            "vec": {
+              "defined": "OrderArgs"
+            }
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        }
+      ]
+    },
+    {
       "name": "placeTriggerOrder",
       "accounts": [
         {
@@ -8583,6 +8743,34 @@
       }
     },
     {
+      "name": "OrderArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u64"
+          },
+          {
+            "name": "clientOrderId",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "tifOffset",
+            "type": {
+              "option": "u16"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
@@ -10012,6 +10200,54 @@
           "index": false
         }
       ]
+    },
+    {
+      "name": "PlaceMultiOrdersEvent",
+      "fields": [
+        {
+          "name": "oraclePrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "orderIds",
+          "type": {
+            "vec": "u128"
+          },
+          "index": false
+        },
+        {
+          "name": "expiryTss",
+          "type": {
+            "vec": "u64"
+          },
+          "index": false
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          },
+          "index": false
+        },
+        {
+          "name": "marginAccount",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "clientOrderIds",
+          "type": {
+            "vec": "u64"
+          },
+          "index": false
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [
@@ -10834,6 +11070,11 @@
       "code": 6163,
       "name": "InvalidMATypeAdminSigner",
       "msg": "Invalid margin account type admin signer"
+    },
+    {
+      "code": 6164,
+      "name": "PostOnlyForMulti",
+      "msg": "Post only order types only for multi orders"
     }
   ]
 }
