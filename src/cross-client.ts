@@ -2075,23 +2075,25 @@ export class CrossClient {
 
     for (var i = 0; i < bids.length; i++) {
       let o = bids[i];
+      let clientOrderId = o.clientOrderId != undefined ? o.clientOrderId : 0;
+      let offset = tifOffset == 0 ? null : tifOffset;
       bidOrders.push({
         price: new anchor.BN(o.price),
         size: new anchor.BN(o.size),
-        clientOrderId:
-          o.clientOrderId == 0 ? null : new anchor.BN(o.clientOrderId),
-        tifOffset: tifOffset,
+        clientOrderId: new anchor.BN(clientOrderId),
+        tifOffset: offset,
       });
     }
 
     for (var i = 0; i < asks.length; i++) {
       let o = asks[i];
+      let clientOrderId = o.clientOrderId != undefined ? o.clientOrderId : 0;
+      let offset = tifOffset == 0 ? null : tifOffset;
       askOrders.push({
         price: new anchor.BN(o.price),
         size: new anchor.BN(o.size),
-        clientOrderId:
-          o.clientOrderId == 0 ? null : new anchor.BN(o.clientOrderId),
-        tifOffset: tifOffset,
+        clientOrderId: new anchor.BN(clientOrderId),
+        tifOffset: offset,
       });
     }
 

@@ -662,5 +662,5 @@ export interface ExecutionInfo {
 export interface PlaceMultiOrderArg {
   price: number;
   size: number;
-  clientOrderId: anchor.BN | null;
+  clientOrderId?: number;
 }
