@@ -2080,7 +2080,7 @@ export class CrossClient {
       bidOrders.push({
         price: new anchor.BN(o.price),
         size: new anchor.BN(o.size),
-        clientOrderId: new anchor.BN(clientOrderId),
+        clientOrderId: clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
         tifOffset: offset,
       });
     }
@@ -2092,7 +2092,7 @@ export class CrossClient {
       askOrders.push({
         price: new anchor.BN(o.price),
         size: new anchor.BN(o.size),
-        clientOrderId: new anchor.BN(clientOrderId),
+        clientOrderId: clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
         tifOffset: offset,
       });
     }
