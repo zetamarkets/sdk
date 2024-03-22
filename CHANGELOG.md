@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [Unreleased]
+## [1.24.0]
+
+- Add placeMultiOrders to program-instructions.
 
 ## [1.23.6]
 
