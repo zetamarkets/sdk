@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.24.0]
 
-- Add placeMultiOrders to program-instructions.
+- Add placeMultiOrders to program-instructions. ([#369](https://github.com/zetamarkets/sdk/pull/369))
 
 ## [1.23.6]
 
