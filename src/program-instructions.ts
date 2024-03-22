@@ -1978,7 +1978,7 @@ export function initializeReferrerAccountsIx(
   referrerPubkeyAccount: PublicKey
 ): TransactionInstruction {
   if (profanityMatcher.hasMatch(id)) {
-    throw "ID has profanity, be nice!";
+    throw Error("ID has profanity, be nice!");
   }
   return Exchange.program.instruction.initializeReferrerAccounts(id, {
     accounts: {

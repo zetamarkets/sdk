@@ -97,7 +97,7 @@ export class SubExchange {
 
   public async initialize(asset: Asset) {
     if (this.isSetup) {
-      throw "SubExchange already initialized.";
+      throw Error("SubExchange already initialized.");
     }
 
     this._asset = asset;
@@ -138,7 +138,7 @@ export class SubExchange {
     console.info(`Loading ${assetToName(asset)} subExchange.`);
 
     if (this.isInitialized) {
-      throw "SubExchange already loaded.";
+      throw Error("SubExchange already loaded.");
     }
 
     this._perpSyncQueue = fetchedAccs[0] as PerpSyncQueue;
@@ -337,7 +337,7 @@ export class SubExchange {
 
   public assertInitialized() {
     if (!this.isInitialized) {
-      throw "SubExchange uninitialized";
+      throw Error("SubExchange uninitialized");
     }
   }
 
@@ -422,7 +422,7 @@ export class SubExchange {
 
   public assertHalted() {
     if (!Exchange.state.haltStates[assetToIndex(this.asset)].halted) {
-      throw "Not halted.";
+      throw Error("Not halted.");
     }
   }
 

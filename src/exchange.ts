@@ -367,7 +367,7 @@ export class Exchange {
     wallet = new types.DummyWallet()
   ) {
     if (this.isSetup) {
-      throw "Exchange already setup";
+      throw Error("Exchange already setup");
     }
     if (loadConfig.loadAssets) {
       this._assets = loadConfig.loadAssets;
@@ -587,7 +587,7 @@ export class Exchange {
     callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
   ) {
     if (this.isInitialized) {
-      throw "Exchange already loaded";
+      throw Error("Exchange already loaded");
     }
 
     if (loadConfig.network == Network.LOCALNET && loadConfig.loadFromStore) {

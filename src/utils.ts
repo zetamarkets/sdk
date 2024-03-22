@@ -941,6 +941,21 @@ export async function simulateTransaction(
   return { events, raw: logs };
 }
 
+function txConfirmationCheck(expectedLevel: string, currentLevel: string) {
+  const levels = ["processed", "confirmed", "finalized"];
+
+  if (levels.indexOf(expectedLevel) == -1) {
+    throw Error(
+      "Please use commitment level 'processed', 'confirmed' or 'finalized'"
+    );
+  }
+
+  if (levels.indexOf(currentLevel) >= levels.indexOf(expectedLevel)) {
+    return true;
+  }
+  return false;
+}
+
 export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -1036,23 +1051,26 @@ export async function processTransaction(
         currentBlockHeight = await provider.connection.getBlockHeight(
           provider.connection.commitment
         );
-        console.log(
-          `[DEBUG] Confirming tx... currentBlockHeight=${currentBlockHeight} lastValidBlockHeight=${recentBlockhash.lastValidBlockHeight}`
-        );
         if (status.value != null) {
           if (status.value.err != null) {
-            let parsedErr = parseError(
-              parseInt(status.value.err["InstructionError"][1]["Custom"])
+            // Gets caught and parsed in the later catch
+            let err = parseInt(
+              status.value.err["InstructionError"][1]["Custom"]
             );
-            throw parsedErr;
+            throw err;
           }
-          if (status.value.confirmationStatus == txOpts.commitment.toString()) {
+          if (
+            txConfirmationCheck(
+              txOpts.commitment.toString(),
+              status.value.confirmationStatus.toString()
+            )
+          ) {
             return txSig;
           }
         }
         await sleep(1500); // Don't spam the RPC
       }
-      throw `Transaction ${txSig} was not confirmed`;
+      throw Error(`Transaction ${txSig} was not confirmed`);
     } catch (err) {
       let parsedErr = parseError(err);
       failures += 1;
@@ -1075,7 +1093,12 @@ export function parseError(err: any) {
 
   const programError = anchor.ProgramError.parse(err, errors.idlErrors);
   if (typeof err == typeof 0 && errors.idlErrors.has(err)) {
-    return errors.idlErrors.get(err);
+    return new errors.NativeAnchorError(
+      parseInt(err),
+      errors.idlErrors.get(err),
+      [],
+      []
+    );
   }
   if (programError) {
     return programError;

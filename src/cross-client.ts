@@ -843,7 +843,9 @@ export class CrossClient {
           } catch (e) {
             failures += 1;
             if (failures > 3) {
-              throw `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`;
+              throw Error(
+                `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`
+              );
             } else {
               console.log(`Failed fetching ReferrerIdAccount, retrying...`);
             }
@@ -912,7 +914,9 @@ export class CrossClient {
           } catch (e) {
             failures += 1;
             if (failures > 3) {
-              throw `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`;
+              throw Error(
+                `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`
+              );
             } else {
               console.log(`Failed fetching ReferrerIdAccount, retrying...`);
             }
@@ -1551,7 +1555,7 @@ export class CrossClient {
       let side = position.size < 0 ? types.Side.BID : types.Side.ASK;
 
       if (!orderPrices.has(position.asset)) {
-        throw `orderPrices does not have a value for ${position.asset}`;
+        throw Error(`orderPrices does not have a value for ${position.asset}`);
       }
       let price = orderPrices.get(position.asset);
 
