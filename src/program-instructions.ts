@@ -596,7 +596,6 @@ export function placeMultiOrdersIx(
 ): TransactionInstruction {
   let subExchange = Exchange.getSubExchange(asset);
   let marketData = subExchange.markets.market;
-
   return Exchange.program.instruction.placeMultiOrders(
     toProgramAsset(asset),
     bidOrders,

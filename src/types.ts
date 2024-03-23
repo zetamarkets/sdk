@@ -654,3 +654,13 @@ export interface ExecutionInfo {
   size: number;
   isTaker: boolean;
 }
+
+/**
+ * Price and side should be in native integer format i.e. the raw number (not the decimal).
+ * 6 d.p for price and 3 d.p for size
+ */
+export interface PlaceMultiOrderArg {
+  price: number;
+  size: number;
+  clientOrderId?: number;
+}
