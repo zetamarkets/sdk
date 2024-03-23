@@ -662,5 +662,6 @@ export interface ExecutionInfo {
 export interface PlaceMultiOrderArg {
   price: number;
   size: number;
+  tifOptions: TIFOptions;
   clientOrderId?: number;
 }
