@@ -453,6 +453,38 @@ export function initializeOpenOrdersV3Ix(
   ];
 }
 
+export function closeOpenOrdersV4Ix(
+  asset: Asset,
+  userKey: PublicKey,
+  crossMarginAccount: PublicKey,
+  openOrders: PublicKey
+): TransactionInstruction {
+  const [openOrdersMap, openOrdersMapNonce] = utils.getCrossOpenOrdersMap(
+    Exchange.programId,
+    openOrders
+  );
+  let market = Exchange.getPerpMarket(asset);
+
+  return Exchange.program.instruction.closeOpenOrdersV4(
+    openOrdersMapNonce,
+    toProgramAsset(asset),
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        openOrders,
+        crossMarginAccount: crossMarginAccount,
+        authority: userKey,
+        market: market.address,
+        serumAuthority: Exchange.serumAuthority,
+        openOrdersMap,
+        eventQueue: market.serumMarket.eventQueueAddress,
+      },
+    }
+  );
+}
+
 export function closeOpenOrdersV3Ix(
   asset: Asset,
   userKey: PublicKey,

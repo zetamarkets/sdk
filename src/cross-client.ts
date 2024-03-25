@@ -2572,7 +2572,7 @@ export class CrossClient {
     );
 
     tx.add(
-      instructions.closeOpenOrdersV3Ix(
+      instructions.closeOpenOrdersV4Ix(
         asset,
         this._provider.wallet.publicKey,
         this.accountAddress,

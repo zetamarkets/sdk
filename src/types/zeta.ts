@@ -2656,6 +2656,73 @@ export type Zeta = {
       ]
     },
     {
+      "name": "closeOpenOrdersV4",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersMap",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeWhitelistDepositAccount",
       "accounts": [
         {
@@ -11075,6 +11142,16 @@ export type Zeta = {
       "code": 6164,
       "name": "PostOnlyForMulti",
       "msg": "Post only order types only for multi orders"
+    },
+    {
+      "code": 6165,
+      "name": "ErrTickWide",
+      "msg": "ErrTickWide"
+    },
+    {
+      "code": 6166,
+      "name": "OORemainingEvents",
+      "msg": "Open orders has remaining events"
     }
   ]
 };
@@ -13737,6 +13814,73 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "closeOpenOrdersV4",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrdersMap",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeWhitelistDepositAccount",
       "accounts": [
         {
@@ -22156,6 +22300,16 @@ export const IDL: Zeta = {
       "code": 6164,
       "name": "PostOnlyForMulti",
       "msg": "Post only order types only for multi orders"
+    },
+    {
+      "code": 6165,
+      "name": "ErrTickWide",
+      "msg": "ErrTickWide"
+    },
+    {
+      "code": 6166,
+      "name": "OORemainingEvents",
+      "msg": "Open orders has remaining events"
     }
   ]
 };

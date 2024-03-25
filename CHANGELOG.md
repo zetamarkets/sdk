@@ -10,6 +10,7 @@ Version changes are pinned to SDK releases.
 - Improve error handling for RPC errors ([#363](https://github.com/zetamarkets/sdk/pull/363))
 - Improve tx confirmation to use blockheight and add new Exchange.skipRpcConfirmation option ([#363](https://github.com/zetamarkets/sdk/pull/363))
 - Fix risk utils to use getFeeBps() ([#363](https://github.com/zetamarkets/sdk/pull/363))
+- Update to closeOpenOrdersV4. ([#372](https://github.com/zetamarkets/sdk/pull/372))
 
 ## [1.24.1]
 
