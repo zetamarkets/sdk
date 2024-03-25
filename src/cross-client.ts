@@ -192,6 +192,11 @@ export class CrossClient {
   private _accountSubscriptionId: number = undefined;
 
   /**
+   * The subscription id for the margin account manager subscription.
+   */
+  private _accountManagerSubscriptionId: number = undefined;
+
+  /**
    * Last update timestamp.
    */
   private _lastUpdateTimestamp: number;
@@ -369,6 +374,23 @@ export class CrossClient {
         }
 
         client.updateOpenOrdersAddresses();
+      },
+      connection.commitment
+    );
+
+    client._accountManagerSubscriptionId = connection.onAccountChange(
+      client._accountManagerAddress,
+      async (accountInfo: AccountInfo<Buffer>, context: Context) => {
+        client._accountManager = Exchange.program.coder.accounts.decode(
+          types.ProgramAccountType.CrossMarginAccountManager,
+          accountInfo.data
+        );
+
+        if (callback !== undefined) {
+          callback(null, EventType.USER, context.slot, {
+            UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
+          });
+        }
       },
       connection.commitment
     );
@@ -686,7 +708,31 @@ export class CrossClient {
   public async initializeReferrerAccount(
     id: string
   ): Promise<TransactionSignature> {
-    let tx = new Transaction().add(
+    let tx = new Transaction();
+
+    if (this._accountManager === null) {
+      console.log(
+        "User has no cross margin account manager. Creating account manager..."
+      );
+      tx.add(
+        instructions.initializeCrossMarginAccountManagerV2Ix(
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
+    if (this._account === null) {
+      console.log("User has no cross margin account. Creating account...");
+      tx.add(
+        instructions.initializeCrossMarginAccountIx(
+          this._accountAddress,
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
+
+    tx.add(
       instructions.initializeReferrerAccountsIx(
         id,
         this.publicKey,
@@ -770,19 +816,13 @@ export class CrossClient {
     return sigs;
   }
 
-  /**
-   * @param amount  the native amount to deposit (6 decimals fixed point)
-   * @param referrerId the referrer's ID to use in initializeCrossMarginAccountManager (only used when creating a new account)
-   */
-  public async deposit(
-    amount: number,
+  public async initializeAccounts(
     referrerId?: string
   ): Promise<TransactionSignature> {
     this.delegatedCheck();
-    await this.usdcAccountCheck();
     // Check if the user has accounts set up
     let tx = new Transaction();
-    if (this._account === null) {
+    if (this._accountManager === null) {
       console.log(
         "User has no cross margin account manager. Creating account manager..."
       );
@@ -803,7 +843,9 @@ export class CrossClient {
           } catch (e) {
             failures += 1;
             if (failures > 3) {
-              throw `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`;
+              throw Error(
+                `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`
+              );
             } else {
               console.log(`Failed fetching ReferrerIdAccount, retrying...`);
             }
@@ -818,6 +860,84 @@ export class CrossClient {
         )
       );
     }
+    if (this._account === null) {
+      console.log("User has no cross margin account. Creating account...");
+      tx.add(
+        instructions.initializeCrossMarginAccountIx(
+          this._accountAddress,
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
+
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
+  }
+
+  /**
+   * @param amount  the native amount to deposit (6 decimals fixed point)
+   * @param referrerId the referrer's ID to use in initializeCrossMarginAccountManager (only used when creating a new account)
+   */
+  public async deposit(
+    amount: number,
+    referrerId?: string
+  ): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    await this.usdcAccountCheck();
+    // Check if the user has accounts set up
+    let tx = new Transaction();
+    if (this._accountManager === null) {
+      console.log(
+        "User has no cross margin account manager. Creating account manager..."
+      );
+
+      let referrerAddress = undefined;
+
+      if (referrerId) {
+        let failures = 0;
+        while (referrerAddress == undefined) {
+          try {
+            referrerAddress = (
+              await Exchange.program.account.referrerIdAccount.fetch(
+                utils
+                  .getReferrerIdAccount(Exchange.programId, referrerId)[0]
+                  .toString()
+              )
+            ).referrerPubkey;
+          } catch (e) {
+            failures += 1;
+            if (failures > 3) {
+              throw Error(
+                `Error fetching referrer pubkey for ID=${referrerId}, please double-check it. Error: ${e}`
+              );
+            } else {
+              console.log(`Failed fetching ReferrerIdAccount, retrying...`);
+            }
+          }
+        }
+      }
+      tx.add(
+        instructions.initializeCrossMarginAccountManagerV2Ix(
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey,
+          referrerAddress
+        )
+      );
+    } else {
+      if (referrerId) {
+        console.warn(
+          "Provided referrer ID when an account manager already exists. A referrer ID can only be placed on a brand new account."
+        );
+      }
+    }
+
     if (this._account === null) {
       console.log("User has no cross margin account. Creating account...");
       tx.add(
@@ -1029,6 +1149,11 @@ export class CrossClient {
       );
     }
     tx.add(
+      instructions.rebalanceInsuranceVaultIx([
+        { pubkey: this.accountAddress, isSigner: false, isWritable: true },
+      ])
+    );
+    tx.add(
       instructions.closeCrossMarginAccountIx(
         this._provider.wallet.publicKey,
         this._accountAddress,
@@ -1088,6 +1213,11 @@ export class CrossClient {
         )
       );
     }
+    tx.add(
+      instructions.rebalanceInsuranceVaultIx([
+        { pubkey: this.accountAddress, isSigner: false, isWritable: true },
+      ])
+    );
     tx.add(
       instructions.closeCrossMarginAccountIx(
         this._provider.wallet.publicKey,
@@ -1435,7 +1565,7 @@ export class CrossClient {
       let side = position.size < 0 ? types.Side.BID : types.Side.ASK;
 
       if (!orderPrices.has(position.asset)) {
-        throw `orderPrices does not have a value for ${position.asset}`;
+        throw Error(`orderPrices does not have a value for ${position.asset}`);
       }
       let price = orderPrices.get(position.asset);
 
@@ -3090,6 +3220,12 @@ export class CrossClient {
         this._accountSubscriptionId
       );
       this._accountSubscriptionId = undefined;
+    }
+    if (this._accountManagerSubscriptionId !== undefined) {
+      await this._provider.connection.removeAccountChangeListener(
+        this._accountManagerSubscriptionId
+      );
+      this._accountManagerSubscriptionId = undefined;
     }
     if (this._pollIntervalId !== undefined) {
       clearInterval(this._pollIntervalId);

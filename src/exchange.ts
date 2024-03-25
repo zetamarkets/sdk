@@ -289,6 +289,7 @@ export class Exchange {
   }
 
   public maxRpcRetries: number | undefined = undefined;
+  public skipRpcConfirmation: boolean | undefined = undefined;
 
   // Handy map to grab zetagroup asset by pubkey without an RPC fetch
   // or having to manually filter all zetaGroups
@@ -317,8 +318,6 @@ export class Exchange {
   private _autoPriorityFeeOffset: number = 0;
   private _autoPriorityFeeMultiplier: number = 1;
   private _autoPriorityFeeUseMax: boolean = false;
-
-  public _txConfirmationPollSeconds = 20;
 
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
@@ -369,7 +368,7 @@ export class Exchange {
     wallet = new types.DummyWallet()
   ) {
     if (this.isSetup) {
-      throw "Exchange already setup";
+      throw Error("Exchange already setup");
     }
     if (loadConfig.loadAssets) {
       this._assets = loadConfig.loadAssets;
@@ -589,7 +588,7 @@ export class Exchange {
     callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
   ) {
     if (this.isInitialized) {
-      throw "Exchange already loaded";
+      throw Error("Exchange already loaded");
     }
 
     if (loadConfig.network == Network.LOCALNET && loadConfig.loadFromStore) {
@@ -1118,7 +1117,17 @@ export class Exchange {
     try {
       await Promise.all(
         txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(this._provider, tx);
+          let txSig = await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            this.skipRpcConfirmation
+          );
           console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
         })
       );

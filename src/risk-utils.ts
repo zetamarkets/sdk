@@ -6,6 +6,7 @@ import {
   convertDecimalToNativeLotSize,
   convertNativeBNToDecimal,
   convertNativeLotSizeToDecimal,
+  getFeeBps,
 } from "./utils";
 import cloneDeep from "lodash.clonedeep";
 import * as anchor from "@zetamarkets/anchor";
@@ -137,12 +138,7 @@ export function addFakeTradeToAccount(
   let editedOrderState = marginAccount.productLedgers[assetIndex].orderState;
   let markPrice = Exchange.getMarkPrice(asset);
 
-  let fee =
-    (constants.FEE_TIER_MAP_BPS[isTaker ? "taker" : "maker"][
-      marginAccount.accountType as constants.MarginAccountType
-    ] /
-      10000) *
-    price;
+  let fee = (getFeeBps(isTaker, marginAccount.accountType) / 10000) * price;
 
   let sizeNative = convertDecimalToNativeLotSize(size);
   let currentSizeBN = editedPosition.size;
