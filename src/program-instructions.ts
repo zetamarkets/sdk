@@ -595,6 +595,56 @@ export function placePerpOrderV4Ix(
   );
 }
 
+export function placeMultiOrdersIx(
+  asset: Asset,
+  bidOrders: OrderArgs[],
+  askOrders: OrderArgs[],
+  orderType: types.OrderType,
+  marginAccount: PublicKey,
+  authority: PublicKey,
+  openOrders: PublicKey
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = subExchange.markets.market;
+  return Exchange.program.instruction.placeMultiOrders(
+    toProgramAsset(asset),
+    bidOrders,
+    askOrders,
+    types.toProgramOrderType(orderType),
+    {
+      accounts: {
+        authority,
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        marginAccount,
+        dexProgram: constants.DEX_PID[Exchange.network],
+        tokenProgram: TOKEN_PROGRAM_ID,
+        serumAuthority: Exchange.serumAuthority,
+        openOrders,
+        rent: SYSVAR_RENT_PUBKEY,
+        market: marketData.serumMarket.address,
+        requestQueue: marketData.serumMarket.requestQueueAddress,
+        eventQueue: marketData.serumMarket.eventQueueAddress,
+        bids: marketData.serumMarket.bidsAddress,
+        asks: marketData.serumMarket.asksAddress,
+        marketBaseVault: marketData.serumMarket.baseVaultAddress,
+        marketQuoteVault: marketData.serumMarket.quoteVaultAddress,
+        // User params.
+        zetaBaseVault: marketData.baseVault,
+        zetaQuoteVault: marketData.quoteVault,
+        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+        oracleBackupFeed:
+          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+        oracleBackupProgram: constants.CHAINLINK_PID,
+        marketBaseMint: marketData.serumMarket.baseMintAddress,
+        marketQuoteMint: marketData.serumMarket.quoteMintAddress,
+        mintAuthority: Exchange.mintAuthority,
+        perpSyncQueue: Exchange.pricing.perpSyncQueues[assetToIndex(asset)],
+      },
+    }
+  );
+}
+
 export function placeTriggerOrderIx(
   asset: Asset,
   orderPrice: number,
@@ -2417,4 +2467,11 @@ export interface UpdateZetaPricingPubkeysArgs {
   market: PublicKey;
   perpSyncQueue: PublicKey;
   zetaGroupKey: PublicKey;
+}
+
+export interface OrderArgs {
+  price: anchor.BN;
+  size: anchor.BN;
+  clientOrderId: anchor.BN | null;
+  tifOffset: number | null;
 }

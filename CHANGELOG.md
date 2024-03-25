@@ -3,7 +3,13 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [Unreleased]
+## [1.24.1]
+
+- Add `createPlaceMultiOrderInstruction` to cross-client. ([#370](https://github.com/zetamarkets/sdk/pull/370))
+
+## [1.24.0]
+
+- Add placeMultiOrders to program-instructions. ([#369](https://github.com/zetamarkets/sdk/pull/369))
 
 ## [1.23.7]
 

@@ -2170,6 +2170,74 @@ export class CrossClient {
     );
   }
 
+  public createPlaceMultiOrderInstruction(
+    asset: Asset,
+    bids: types.PlaceMultiOrderArg[],
+    asks: types.PlaceMultiOrderArg[],
+    orderType: types.OrderType,
+    tifOptions: types.TIFOptions
+  ): TransactionInstruction {
+    if (
+      orderType != types.OrderType.POSTONLY &&
+      orderType != types.OrderType.POSTONLYSLIDE &&
+      orderType != types.OrderType.POSTONLYFRONT
+    ) {
+      throw new Error("Invalid order type.");
+    }
+
+    let assetIndex = assetToIndex(asset);
+    let openOrdersAccount = this._openOrdersAccounts[assetIndex];
+    if (this._openOrdersAccounts[assetIndex].equals(PublicKey.default)) {
+      // This account won't be created unless explicitly done so before this instruction
+      // Purposely don't throw because there are some frontend cases which do more complicated tx building
+      openOrdersAccount = utils.getCrossOpenOrders(
+        Exchange.programId,
+        Exchange.getPerpMarket(asset).address,
+        this._accountAddress
+      )[0];
+      console.warn(`No open orders account for ${assetToName(asset)}`);
+    }
+
+    let market = Exchange.getPerpMarket(asset);
+    let tifOffset = utils.getTIFOffset(market, tifOptions);
+    let bidOrders: instructions.OrderArgs[] = [];
+    let askOrders: instructions.OrderArgs[] = [];
+
+    for (var i = 0; i < bids.length; i++) {
+      let o = bids[i];
+      let clientOrderId = o.clientOrderId != undefined ? o.clientOrderId : 0;
+      let offset = tifOffset == 0 ? null : tifOffset;
+      bidOrders.push({
+        price: new anchor.BN(o.price),
+        size: new anchor.BN(o.size),
+        clientOrderId: clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
+        tifOffset: offset,
+      });
+    }
+
+    for (var i = 0; i < asks.length; i++) {
+      let o = asks[i];
+      let clientOrderId = o.clientOrderId != undefined ? o.clientOrderId : 0;
+      let offset = tifOffset == 0 ? null : tifOffset;
+      askOrders.push({
+        price: new anchor.BN(o.price),
+        size: new anchor.BN(o.size),
+        clientOrderId: clientOrderId == 0 ? null : new anchor.BN(clientOrderId),
+        tifOffset: offset,
+      });
+    }
+
+    return instructions.placeMultiOrdersIx(
+      asset,
+      bidOrders,
+      askOrders,
+      orderType,
+      this.accountAddress,
+      this._provider.wallet.publicKey,
+      openOrdersAccount
+    );
+  }
+
   /**
    * Cancels a user order by orderId
    * @param asset     the asset of the order to be cancelled.
