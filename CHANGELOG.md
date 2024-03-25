@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.24.2]
+
+- Update to closeOpenOrdersV4. ([#370](https://github.com/zetamarkets/sdk/pull/370))
+
 ## [1.24.1]
 
 - Add `createPlaceMultiOrderInstruction` to cross-client. ([#370](https://github.com/zetamarkets/sdk/pull/370))
