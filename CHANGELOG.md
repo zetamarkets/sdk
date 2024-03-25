@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.25.0]
+
+- Subscribe to CMA manager ([#363](https://github.com/zetamarkets/sdk/pull/363))
+- Add new util instructions for account creation and referrals in cross-client.ts ([#363](https://github.com/zetamarkets/sdk/pull/363))
+- Improve error handling for RPC errors ([#363](https://github.com/zetamarkets/sdk/pull/363))
+- Improve tx confirmation to use blockheight and add new Exchange.skipRpcConfirmation option ([#363](https://github.com/zetamarkets/sdk/pull/363))
+- Fix risk utils to use getFeeBps() ([#363](https://github.com/zetamarkets/sdk/pull/363))
+
 ## [1.24.1]
 
 - Add `createPlaceMultiOrderInstruction` to cross-client. ([#370](https://github.com/zetamarkets/sdk/pull/370))
@@ -10,10 +18,6 @@ Version changes are pinned to SDK releases.
 ## [1.24.0]
 
 - Add placeMultiOrders to program-instructions. ([#369](https://github.com/zetamarkets/sdk/pull/369))
-
-## [1.23.7]
-
-- Add extra referral utils. ([#363](https://github.com/zetamarkets/sdk/pull/363))
 
 ## [1.23.6]
 
