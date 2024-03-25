@@ -1149,6 +1149,11 @@ export class CrossClient {
       );
     }
     tx.add(
+      instructions.rebalanceInsuranceVaultIx([
+        { pubkey: this.accountAddress, isSigner: false, isWritable: true },
+      ])
+    );
+    tx.add(
       instructions.closeCrossMarginAccountIx(
         this._provider.wallet.publicKey,
         this._accountAddress,
@@ -1208,6 +1213,11 @@ export class CrossClient {
         )
       );
     }
+    tx.add(
+      instructions.rebalanceInsuranceVaultIx([
+        { pubkey: this.accountAddress, isSigner: false, isWritable: true },
+      ])
+    );
     tx.add(
       instructions.closeCrossMarginAccountIx(
         this._provider.wallet.publicKey,

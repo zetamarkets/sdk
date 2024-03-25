@@ -964,7 +964,8 @@ export async function processTransaction(
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
-  retries?: number
+  retries?: number,
+  skipConfirmation?: boolean
 ): Promise<TransactionSignature> {
   let failures = 0;
   while (true) {
@@ -1043,34 +1044,38 @@ export async function processTransaction(
         skipPreflight: true,
       });
 
-      let currentBlockHeight = 0;
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
-      while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
-        let status = await provider.connection.getSignatureStatus(txSig);
-        currentBlockHeight = await provider.connection.getBlockHeight(
-          provider.connection.commitment
-        );
-        if (status.value != null) {
-          if (status.value.err != null) {
-            // Gets caught and parsed in the later catch
-            let err = parseInt(
-              status.value.err["InstructionError"][1]["Custom"]
-            );
-            throw err;
+      let currentBlockHeight = 0;
+      if (!skipConfirmation) {
+        while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+          let status = await provider.connection.getSignatureStatus(txSig);
+          currentBlockHeight = await provider.connection.getBlockHeight(
+            provider.connection.commitment
+          );
+          if (status.value != null) {
+            if (status.value.err != null) {
+              // Gets caught and parsed in the later catch
+              let err = parseInt(
+                status.value.err["InstructionError"][1]["Custom"]
+              );
+              throw err;
+            }
+            if (
+              txConfirmationCheck(
+                txOpts.commitment.toString(),
+                status.value.confirmationStatus.toString()
+              )
+            ) {
+              return txSig;
+            }
           }
-          if (
-            txConfirmationCheck(
-              txOpts.commitment.toString(),
-              status.value.confirmationStatus.toString()
-            )
-          ) {
-            return txSig;
-          }
+          await sleep(1500); // Don't spam the RPC
         }
-        await sleep(1500); // Don't spam the RPC
+        throw Error(`Transaction ${txSig} was not confirmed`);
+      } else {
+        return txSig;
       }
-      throw Error(`Transaction ${txSig} was not confirmed`);
     } catch (err) {
       let parsedErr = parseError(err);
       failures += 1;

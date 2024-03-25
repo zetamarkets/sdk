@@ -289,6 +289,7 @@ export class Exchange {
   }
 
   public maxRpcRetries: number | undefined = undefined;
+  public skipRpcConfirmation: boolean | undefined = undefined;
 
   // Handy map to grab zetagroup asset by pubkey without an RPC fetch
   // or having to manually filter all zetaGroups
@@ -1116,7 +1117,17 @@ export class Exchange {
     try {
       await Promise.all(
         txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(this._provider, tx);
+          let txSig = await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            this.skipRpcConfirmation
+          );
           console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
         })
       );
