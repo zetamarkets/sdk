@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.24.2]
 
-- Update to closeOpenOrdersV4. ([#370](https://github.com/zetamarkets/sdk/pull/370))
+- Update to closeOpenOrdersV4. ([#372](https://github.com/zetamarkets/sdk/pull/372))
 
 ## [1.24.1]
 
