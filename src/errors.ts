@@ -8,30 +8,30 @@ export const DEX_ERRORS: Map<number, string> = new Map([
 ]);
 
 export enum NATIVE_ERROR_CODES {
-  ZeroLamportsBalance = 10000,
-  InsufficientLamports = 10001,
-  UnconfirmedTransaction = 10002,
-  FailedToGetRecentBlockhash = 10003,
+  ZeroLamportsBalance = 0,
+  InsufficientLamports = 1,
+  UnconfirmedTransaction = 2,
+  FailedToGetRecentBlockhash = 3,
 }
 
 export const NATIVE_ERRORS: Map<number, [string, string]> = new Map([
   [
-    10000,
+    0,
     [
       "Attempt to debit an account but found no record of a prior credit.",
       "Zero SOL in wallet.",
     ],
   ],
-  [10001, ["insufficient lamports", "Insufficient SOL in wallet."]],
+  [1, ["insufficient lamports", "Insufficient SOL in wallet."]],
   [
-    10002,
+    2,
     [
       "Transaction was not confirmed",
       "Transaction was not confirmed. Please check transaction signature.",
     ],
   ],
   [
-    10003,
+    3,
     [
       "failed to get recent blockhash",
       "Failed to get recent blockhash. Please retry.",
@@ -90,7 +90,10 @@ export class NativeError extends Error {
       errorString += error.logs.join(" ");
     }
     for (const [code, [errorSubstring, msg]] of NATIVE_ERRORS.entries()) {
-      if (errorString.includes(errorSubstring)) {
+      if (
+        errorString.includes(errorSubstring) ||
+        errorString == code.toString()
+      ) {
         if (code == NATIVE_ERROR_CODES.UnconfirmedTransaction) {
           return new NativeError(code, msg, {
             transactionSignature:

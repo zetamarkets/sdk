@@ -7,6 +7,7 @@ import {
   convertNativeLotSizeToDecimal,
   convertDecimalToNativeInteger,
   convertNativeIntegerToDecimal,
+  getFeeBps,
 } from "./utils";
 import { assetToIndex, fromProgramAsset } from "./assets";
 import { Asset } from "./constants";
@@ -376,10 +377,7 @@ export class RiskCalculator {
       if (executionInfo && executionInfo.asset == asset) {
         assetPnl -=
           convertNativeLotSizeToDecimal(Math.abs(size)) *
-          (constants.FEE_TIER_MAP_BPS[
-            executionInfo.isTaker ? "taker" : "maker"
-          ][account.accountType as constants.MarginAccountType] /
-            10000) *
+          (getFeeBps(executionInfo.isTaker, account.accountType) / 10000) *
           price;
       }
       upnlMap.set(asset, assetPnl);
@@ -873,11 +871,7 @@ export class RiskCalculator {
       state.maintenanceMarginIncludingOrdersTotal;
 
     let fee =
-      (constants.FEE_TIER_MAP_BPS[isTaker ? "taker" : "maker"][
-        marginAccount.accountType as constants.MarginAccountType
-      ] /
-        10000) *
-      tradePrice;
+      (getFeeBps(isTaker, marginAccount.accountType) / 10000) * tradePrice;
 
     let productLedger = marginAccount.productLedgers[assetIndex];
     let position = convertNativeLotSizeToDecimal(

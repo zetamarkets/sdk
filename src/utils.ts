@@ -941,6 +941,21 @@ export async function simulateTransaction(
   return { events, raw: logs };
 }
 
+function txConfirmationCheck(expectedLevel: string, currentLevel: string) {
+  const levels = ["processed", "confirmed", "finalized"];
+
+  if (levels.indexOf(expectedLevel) == -1) {
+    throw Error(
+      "Please use commitment level 'processed', 'confirmed' or 'finalized'"
+    );
+  }
+
+  if (levels.indexOf(currentLevel) >= levels.indexOf(expectedLevel)) {
+    return true;
+  }
+  return false;
+}
+
 export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -949,7 +964,8 @@ export async function processTransaction(
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
-  retries?: number
+  retries?: number,
+  skipConfirmation?: boolean
 ): Promise<TransactionSignature> {
   let failures = 0;
   while (true) {
@@ -1013,6 +1029,7 @@ export async function processTransaction(
     }
 
     let txOpts = opts || commitmentConfig(provider.connection.commitment);
+    let txSig;
     try {
       // Integration tests don't like the split send + confirm :(
       if (Exchange.network == Network.LOCALNET) {
@@ -1023,33 +1040,47 @@ export async function processTransaction(
         );
       }
 
-      let txSig = await provider.connection.sendRawTransaction(rawTx, {
+      txSig = await provider.connection.sendRawTransaction(rawTx, {
         skipPreflight: true,
       });
 
-      let now = Date.now() / 1000;
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
-      while (Date.now() / 1000 - now < Exchange._txConfirmationPollSeconds) {
-        let status = await provider.connection.getSignatureStatus(txSig);
-        if (status.value != null) {
-          if (status.value.err != null) {
-            let parsedErr = parseError(
-              parseInt(status.value.err["InstructionError"][1]["Custom"])
-            );
-            throw parsedErr;
+      let currentBlockHeight = 0;
+      if (!skipConfirmation) {
+        while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+          let status = await provider.connection.getSignatureStatus(txSig);
+          currentBlockHeight = await provider.connection.getBlockHeight(
+            provider.connection.commitment
+          );
+          if (status.value != null) {
+            if (status.value.err != null) {
+              // Gets caught and parsed in the later catch
+              let err = parseInt(
+                status.value.err["InstructionError"][1]["Custom"]
+              );
+              throw err;
+            }
+            if (
+              txConfirmationCheck(
+                txOpts.commitment.toString(),
+                status.value.confirmationStatus.toString()
+              )
+            ) {
+              return txSig;
+            }
           }
-          if (status.value.confirmationStatus == txOpts.commitment.toString()) {
-            return txSig;
-          }
+          await sleep(1500); // Don't spam the RPC
         }
-        await sleep(400); // Don't spam the RPC
+        throw Error(`Transaction ${txSig} was not confirmed`);
+      } else {
+        return txSig;
       }
-      throw `Transaction ${txSig} was not confirmed`;
     } catch (err) {
       let parsedErr = parseError(err);
       failures += 1;
       if (!retries || failures > retries) {
+        console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
         throw parsedErr;
       }
       console.log(`Transaction failed to send. Retrying...`);
@@ -1067,7 +1098,12 @@ export function parseError(err: any) {
 
   const programError = anchor.ProgramError.parse(err, errors.idlErrors);
   if (typeof err == typeof 0 && errors.idlErrors.has(err)) {
-    return errors.idlErrors.get(err);
+    return new errors.NativeAnchorError(
+      parseInt(err),
+      errors.idlErrors.get(err),
+      [],
+      []
+    );
   }
   if (programError) {
     return programError;
@@ -1731,6 +1767,19 @@ export function convertBufferToTrimmedString(buffer: number[]): string {
     }
   }
   return bufferString.substring(0, splitIndex);
+}
+
+export async function fetchReferralId(user: PublicKey) {
+  const accKey = getReferrerPubkeyAccount(Exchange.programId, user)[0];
+  const accBuffer =
+    await Exchange.program.account.referrerPubkeyAccount.fetchNullable(
+      accKey.toString()
+    );
+
+  if (accBuffer == null) {
+    return null;
+  }
+  return Buffer.from(accBuffer.referrerId).toString();
 }
 
 export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
