@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.25.1]
+
+- Update to closeOpenOrdersV4. ([#372](https://github.com/zetamarkets/sdk/pull/372))
+
 ## [1.25.0]
 
 - Subscribe to CMA manager ([#363](https://github.com/zetamarkets/sdk/pull/363))
@@ -10,7 +14,6 @@ Version changes are pinned to SDK releases.
 - Improve error handling for RPC errors ([#363](https://github.com/zetamarkets/sdk/pull/363))
 - Improve tx confirmation to use blockheight and add new Exchange.skipRpcConfirmation option ([#363](https://github.com/zetamarkets/sdk/pull/363))
 - Fix risk utils to use getFeeBps() ([#363](https://github.com/zetamarkets/sdk/pull/363))
-- Update to closeOpenOrdersV4. ([#372](https://github.com/zetamarkets/sdk/pull/372))
 
 ## [1.24.1]
 
