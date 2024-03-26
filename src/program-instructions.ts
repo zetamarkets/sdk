@@ -485,36 +485,6 @@ export function closeOpenOrdersV4Ix(
   );
 }
 
-export function closeOpenOrdersV3Ix(
-  asset: Asset,
-  userKey: PublicKey,
-  crossMarginAccount: PublicKey,
-  openOrders: PublicKey
-): TransactionInstruction {
-  const [openOrdersMap, openOrdersMapNonce] = utils.getCrossOpenOrdersMap(
-    Exchange.programId,
-    openOrders
-  );
-
-  return Exchange.program.instruction.closeOpenOrdersV3(
-    openOrdersMapNonce,
-    toProgramAsset(asset),
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        pricing: Exchange.pricingAddress,
-        dexProgram: constants.DEX_PID[Exchange.network],
-        openOrders,
-        crossMarginAccount: crossMarginAccount,
-        authority: userKey,
-        market: Exchange.getPerpMarket(asset).address,
-        serumAuthority: Exchange.serumAuthority,
-        openOrdersMap,
-      },
-    }
-  );
-}
-
 export function closeOpenOrdersV2Ix(
   market: PublicKey,
   userKey: PublicKey,
