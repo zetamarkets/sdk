@@ -2616,7 +2616,7 @@ export class CrossClient {
         vaultOwner,
         this._openOrdersAccounts[assetIndex]
       );
-      let closeIx = instructions.closeOpenOrdersV3Ix(
+      let closeIx = instructions.closeOpenOrdersV4Ix(
         asset,
         this._provider.wallet.publicKey,
         this.accountAddress,
