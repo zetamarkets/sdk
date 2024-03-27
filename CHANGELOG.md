@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.25.3]
 
-- Fix rounding in util functions. ([#373](<(https://github.com/zetamarkets/sdk/pull/373)>)
+- Fix rounding in util functions. ([#375](https://github.com/zetamarkets/sdk/pull/375))
 
 ## [1.25.2]
 
