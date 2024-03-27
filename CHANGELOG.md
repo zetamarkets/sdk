@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.25.3]
+
+- Fix rounding in util functions. ([#373](<(https://github.com/zetamarkets/sdk/pull/373)>)
+
 ## [1.25.2]
 
 - Update to closeOpenOrdersV4. ([#372](https://github.com/zetamarkets/sdk/pull/372))
