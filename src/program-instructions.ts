@@ -797,16 +797,21 @@ export function forceCancelTriggerOrderIx(
   triggerOrderBit: number,
   authority: PublicKey,
   triggerOrder: PublicKey,
-  marginAccount: PublicKey
+  marginAccount: PublicKey,
+  enforceTpslConditions: boolean = true
 ): TransactionInstruction {
-  return Exchange.program.instruction.forceCancelTriggerOrder(triggerOrderBit, {
-    accounts: {
-      state: Exchange.stateAddress,
-      admin: authority,
-      triggerOrder: triggerOrder,
-      marginAccount: marginAccount,
-    },
-  });
+  return Exchange.program.instruction.forceCancelTriggerOrder(
+    triggerOrderBit,
+    enforceTpslConditions,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin: authority,
+        triggerOrder: triggerOrder,
+        marginAccount: marginAccount,
+      },
+    }
+  );
 }
 
 export function editTriggerOrderIx(

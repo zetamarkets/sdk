@@ -5066,6 +5066,10 @@ export type Zeta = {
         {
           "name": "triggerOrderBit",
           "type": "u8"
+        },
+        {
+          "name": "enforceTpslConditions",
+          "type": "bool"
         }
       ]
     },
@@ -11152,6 +11156,11 @@ export type Zeta = {
       "code": 6166,
       "name": "OORemainingEvents",
       "msg": "Open orders has remaining events"
+    },
+    {
+      "code": 6167,
+      "name": "CannotForceCancelTriggerOrder",
+      "msg": "Cannot force cancel trigger order"
     }
   ]
 };
@@ -16224,6 +16233,10 @@ export const IDL: Zeta = {
         {
           "name": "triggerOrderBit",
           "type": "u8"
+        },
+        {
+          "name": "enforceTpslConditions",
+          "type": "bool"
         }
       ]
     },
@@ -22310,6 +22323,11 @@ export const IDL: Zeta = {
       "code": 6166,
       "name": "OORemainingEvents",
       "msg": "Open orders has remaining events"
+    },
+    {
+      "code": 6167,
+      "name": "CannotForceCancelTriggerOrder",
+      "msg": "Cannot force cancel trigger order"
     }
   ]
 };
