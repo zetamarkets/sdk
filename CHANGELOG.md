@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.26.0]
+
+- Add WIF. ([]())
+
 ## [1.25.2]
 
 - Update to closeOpenOrdersV4. ([#372](https://github.com/zetamarkets/sdk/pull/372))
