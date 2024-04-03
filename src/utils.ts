@@ -1057,7 +1057,7 @@ export async function processTransaction(
             }
             if (
               txConfirmationCheck(
-                txOpts.commitment.toString(),
+                txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
                 status.value.confirmationStatus.toString()
               )
             ) {
