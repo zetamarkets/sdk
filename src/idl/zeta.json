@@ -5066,6 +5066,10 @@
         {
           "name": "triggerOrderBit",
           "type": "u8"
+        },
+        {
+          "name": "enforceTpslConditions",
+          "type": "bool"
         }
       ]
     },
@@ -11155,6 +11159,11 @@
       "code": 6166,
       "name": "OORemainingEvents",
       "msg": "Open orders has remaining events"
+    },
+    {
+      "code": 6167,
+      "name": "CannotForceCancelTriggerOrder",
+      "msg": "Cannot force cancel trigger order"
     }
   ]
 }

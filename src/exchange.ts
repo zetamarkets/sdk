@@ -1138,7 +1138,8 @@ export class Exchange {
 
   public async adminCancelTriggerOrder(
     orderIndex: number,
-    crossMarginAccount: PublicKey
+    crossMarginAccount: PublicKey,
+    enforceTpslConditions: boolean = true
   ) {
     let triggerAccount = utils.getTriggerOrder(
       this.programId,
@@ -1150,7 +1151,8 @@ export class Exchange {
         orderIndex,
         this._provider.wallet.publicKey,
         triggerAccount,
-        crossMarginAccount
+        crossMarginAccount,
+        enforceTpslConditions
       )
     );
     return await utils.processTransaction(this._provider, tx);
