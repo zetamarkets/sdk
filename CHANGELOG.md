@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.26.0]
 
-- Add WIF. ([#377](https://github.com/zetamarkets/sdk/pull/377))
+- Add W. ([#377](https://github.com/zetamarkets/sdk/pull/377))
 
 ## [1.25.2]
 
