@@ -5363,7 +5363,7 @@ export type Zeta = {
         },
         {
           "name": "marginAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -16624,7 +16624,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "marginAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         }
       ],
