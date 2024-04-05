@@ -1373,15 +1373,21 @@ export async function crankMarket(
     })
   );
 
-  let tx = new Transaction().add(
-    instructions.crankMarketIx(
-      asset,
-      market.address,
-      market.serumMarket.eventQueueAddress,
-      constants.DEX_PID[Exchange.network],
-      remainingAccounts
+  let tx = new Transaction()
+    .add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 250_000,
+      })
     )
-  );
+    .add(
+      instructions.crankMarketIx(
+        asset,
+        market.address,
+        market.serumMarket.eventQueueAddress,
+        constants.DEX_PID[Exchange.network],
+        remainingAccounts
+      )
+    );
   await processTransaction(Exchange.provider, tx);
   return false;
 }

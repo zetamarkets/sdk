@@ -1130,6 +1130,27 @@
       "args": []
     },
     {
+      "name": "updatePricingAdmin",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAdmin",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "updateMakerRebatePercentage",
       "accounts": [
         {
@@ -1786,6 +1807,62 @@
           "type": {
             "defined": "Asset"
           }
+        }
+      ]
+    },
+    {
+      "name": "updatePricingV3",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracle",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "perpAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        },
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
         }
       ]
     },
@@ -5286,7 +5363,7 @@
         },
         {
           "name": "marginAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -6863,7 +6940,7 @@
             "type": {
               "array": [
                 "u64",
-                14
+                15
               ]
             }
           },
@@ -6872,7 +6949,7 @@
             "type": {
               "array": [
                 "u64",
-                11
+                10
               ]
             }
           },
@@ -6881,7 +6958,7 @@
             "type": {
               "array": [
                 "u64",
-                14
+                15
               ]
             }
           },
@@ -6890,7 +6967,7 @@
             "type": {
               "array": [
                 "u64",
-                11
+                10
               ]
             }
           },
@@ -6901,7 +6978,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                14
+                15
               ]
             }
           },
@@ -6912,7 +6989,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                11
+                10
               ]
             }
           },
@@ -6923,7 +7000,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                14
+                15
               ]
             }
           },
@@ -6934,7 +7011,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                11
+                10
               ]
             }
           },
@@ -6943,7 +7020,7 @@
             "type": {
               "array": [
                 "u64",
-                14
+                15
               ]
             }
           },
@@ -6952,7 +7029,7 @@
             "type": {
               "array": [
                 "u64",
-                11
+                10
               ]
             }
           },
@@ -6961,7 +7038,7 @@
             "type": {
               "array": [
                 "publicKey",
-                14
+                15
               ]
             }
           },
@@ -6970,7 +7047,7 @@
             "type": {
               "array": [
                 "publicKey",
-                11
+                10
               ]
             }
           },
@@ -6979,7 +7056,7 @@
             "type": {
               "array": [
                 "publicKey",
-                14
+                15
               ]
             }
           },
@@ -6988,7 +7065,7 @@
             "type": {
               "array": [
                 "publicKey",
-                11
+                10
               ]
             }
           },
@@ -6997,7 +7074,7 @@
             "type": {
               "array": [
                 "publicKey",
-                14
+                15
               ]
             }
           },
@@ -7006,7 +7083,7 @@
             "type": {
               "array": [
                 "publicKey",
-                11
+                10
               ]
             }
           },
@@ -7015,7 +7092,7 @@
             "type": {
               "array": [
                 "publicKey",
-                14
+                15
               ]
             }
           },
@@ -7024,7 +7101,7 @@
             "type": {
               "array": [
                 "publicKey",
-                11
+                10
               ]
             }
           },
@@ -7035,7 +7112,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                14
+                15
               ]
             }
           },
@@ -7046,7 +7123,7 @@
                 {
                   "defined": "PerpParameters"
                 },
-                11
+                10
               ]
             }
           },
@@ -7057,7 +7134,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                14
+                15
               ]
             }
           },
@@ -7068,7 +7145,7 @@
                 {
                   "defined": "MarginParameters"
                 },
-                11
+                10
               ]
             }
           },
@@ -7079,7 +7156,7 @@
                 {
                   "defined": "Product"
                 },
-                14
+                15
               ]
             }
           },
@@ -7090,7 +7167,7 @@
                 {
                   "defined": "Product"
                 },
-                11
+                10
               ]
             }
           },
@@ -7099,7 +7176,7 @@
             "type": {
               "array": [
                 "publicKey",
-                14
+                15
               ]
             }
           },
@@ -7108,7 +7185,7 @@
             "type": {
               "array": [
                 "publicKey",
-                11
+                10
               ]
             }
           },
@@ -7129,7 +7206,7 @@
             "type": {
               "array": [
                 "bool",
-                14
+                15
               ]
             }
           },
@@ -7138,7 +7215,7 @@
             "type": {
               "array": [
                 "bool",
-                11
+                10
               ]
             }
           },
@@ -7530,7 +7607,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                14
+                15
               ]
             }
           },
@@ -7541,7 +7618,7 @@
                 {
                   "defined": "HaltStateV2"
                 },
-                11
+                10
               ]
             }
           },
@@ -7554,7 +7631,7 @@
             "type": {
               "array": [
                 "u32",
-                14
+                15
               ]
             }
           },
@@ -7563,7 +7640,7 @@
             "type": {
               "array": [
                 "u32",
-                11
+                10
               ]
             }
           },
@@ -7572,7 +7649,7 @@
             "type": {
               "array": [
                 "u32",
-                14
+                15
               ]
             }
           },
@@ -7581,7 +7658,7 @@
             "type": {
               "array": [
                 "u32",
-                11
+                10
               ]
             }
           },
@@ -7602,11 +7679,15 @@
             "type": "publicKey"
           },
           {
+            "name": "pricingAdmin",
+            "type": "publicKey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                50
+                18
               ]
             }
           }
@@ -8024,7 +8105,7 @@
             "type": {
               "array": [
                 "u8",
-                14
+                15
               ]
             }
           },
@@ -8033,7 +8114,7 @@
             "type": {
               "array": [
                 "u8",
-                11
+                10
               ]
             }
           },
@@ -8048,7 +8129,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                14
+                15
               ]
             }
           },
@@ -8059,7 +8140,7 @@
                 {
                   "defined": "AnchorDecimal"
                 },
-                11
+                10
               ]
             }
           },
@@ -8070,7 +8151,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                14
+                15
               ]
             }
           },
@@ -8081,7 +8162,7 @@
                 {
                   "defined": "ProductLedger"
                 },
-                11
+                10
               ]
             }
           },
@@ -8873,7 +8954,7 @@
             "type": {
               "array": [
                 "u64",
-                14
+                15
               ]
             }
           },
@@ -9638,6 +9719,9 @@
           },
           {
             "name": "STRK"
+          },
+          {
+            "name": "W"
           },
           {
             "name": "UNDEFINED"
@@ -11161,6 +11245,16 @@
       "code": 6167,
       "name": "CannotForceCancelTriggerOrder",
       "msg": "Cannot force cancel trigger order"
+    },
+    {
+      "code": 6168,
+      "name": "InvalidPricingAdmin",
+      "msg": "Invalid pricing admin"
+    },
+    {
+      "code": 6169,
+      "name": "InvalidOracleUpdate",
+      "msg": "Invalid oracle update"
     }
   ]
 }
