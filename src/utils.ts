@@ -960,18 +960,26 @@ export async function processTransactionBloxroute(
   retries?: number,
   skipConfirmation?: boolean
 ): Promise<TransactionSignature> {
-  let failures = 0;
-  while (true) {
-    tx.add(
-      SystemProgram.transfer({
-        fromPubkey: anchorProvider.publicKey,
-        toPubkey: new PublicKey(
-          "HWEoBxYs7ssKuudEjzjmpfJVX7Dvi7wescFsVx2L5yoY" // Trader API tip wallet
-        ),
-        lamports: tip,
+  tx.add(
+    SystemProgram.transfer({
+      fromPubkey: anchorProvider.publicKey,
+      toPubkey: new PublicKey(
+        "HWEoBxYs7ssKuudEjzjmpfJVX7Dvi7wescFsVx2L5yoY" // Trader API tip wallet
+      ),
+      lamports: tip,
+    })
+  );
+
+  if (Exchange.priorityFee != 0) {
+    tx.instructions.unshift(
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: Math.round(Exchange.priorityFee),
       })
     );
+  }
 
+  let failures = 0;
+  while (true) {
     let recentBlockhash =
       blockhash ??
       (await anchorProvider.connection.getLatestBlockhash(
