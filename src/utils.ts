@@ -50,6 +50,7 @@ import { Network } from "./network";
 import cloneDeep from "lodash.clonedeep";
 import * as os from "os";
 import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
+import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
 
 export function getNativeTickSize(asset: Asset): number {
   return Exchange.state.tickSizes[assets.assetToIndex(asset)];
@@ -950,6 +951,105 @@ function txConfirmationCheck(expectedLevel: string, currentLevel: string) {
   return false;
 }
 
+export async function processTransactionBloxroute(
+  httpProvider: HttpProvider,
+  anchorProvider: anchor.AnchorProvider,
+  tx: Transaction,
+  tip: number,
+  blockhash?: { blockhash: string; lastValidBlockHeight: number },
+  retries?: number,
+  skipConfirmation?: boolean
+): Promise<TransactionSignature> {
+  let failures = 0;
+  while (true) {
+    tx.add(
+      SystemProgram.transfer({
+        fromPubkey: anchorProvider.publicKey,
+        toPubkey: new PublicKey(
+          "HWEoBxYs7ssKuudEjzjmpfJVX7Dvi7wescFsVx2L5yoY" // Trader API tip wallet
+        ),
+        lamports: tip,
+      })
+    );
+
+    let recentBlockhash =
+      blockhash ??
+      (await anchorProvider.connection.getLatestBlockhash(
+        Exchange.blockhashCommitment
+      ));
+
+    let v0Tx: VersionedTransaction = new VersionedTransaction(
+      new TransactionMessage({
+        payerKey: anchorProvider.publicKey,
+        recentBlockhash: recentBlockhash.blockhash,
+        instructions: tx.instructions,
+      }).compileToV0Message(getZetaLutArr())
+    );
+    v0Tx = (await anchorProvider.wallet.signTransaction(
+      v0Tx
+    )) as VersionedTransaction;
+    let rawTx = v0Tx.serialize();
+
+    let txSig;
+    try {
+      txSig = (
+        await httpProvider.postSubmitV2({
+          transaction: {
+            content: Buffer.from(rawTx).toString("base64"),
+            isCleanup: false,
+          },
+          skipPreFlight: true,
+          frontRunningProtection: false,
+        })
+      ).signature;
+
+      // Poll the tx confirmation for N seconds
+      // Polling is more reliable than websockets using confirmTransaction()
+      let currentBlockHeight = 0;
+      if (!skipConfirmation) {
+        while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+          let status = await anchorProvider.connection.getSignatureStatus(
+            txSig
+          );
+          currentBlockHeight = await anchorProvider.connection.getBlockHeight(
+            anchorProvider.connection.commitment
+          );
+          if (status.value != null) {
+            if (status.value.err != null) {
+              // Gets caught and parsed in the later catch
+              let err = parseInt(
+                status.value.err["InstructionError"][1]["Custom"]
+              );
+              throw err;
+            }
+            if (
+              txConfirmationCheck(
+                "confirmed",
+                status.value.confirmationStatus.toString()
+              )
+            ) {
+              return txSig;
+            }
+          }
+          await sleep(1500); // Don't spam the RPC
+        }
+        throw Error(`Transaction ${txSig} was not confirmed`);
+      } else {
+        return txSig;
+      }
+    } catch (err) {
+      let parsedErr = parseError(err);
+      failures += 1;
+      if (!retries || failures > retries) {
+        console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
+        throw parsedErr;
+      }
+      console.log(`Transaction failed to send. Retrying...`);
+      console.log(`failCount=${failures}. error=${parsedErr}`);
+    }
+  }
+}
+
 export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -961,6 +1061,19 @@ export async function processTransaction(
   retries?: number,
   skipConfirmation?: boolean
 ): Promise<TransactionSignature> {
+  if (Exchange.httpProvider) {
+    let txSig = await processTransactionBloxroute(
+      Exchange.httpProvider,
+      provider,
+      tx,
+      Exchange.priorityFee + 1050,
+      blockhash,
+      retries,
+      skipConfirmation
+    );
+    return txSig;
+  }
+
   let failures = 0;
   while (true) {
     let rawTx: Buffer | Uint8Array;
