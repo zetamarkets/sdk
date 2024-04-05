@@ -709,11 +709,8 @@ export function convertDecimalToNativeInteger(
   roundingFactor: number = constants.MIN_NATIVE_TICK_SIZE
 ): number {
   return (
-    parseInt(
-      (
-        (amount * Math.pow(10, constants.PLATFORM_PRECISION)) /
-        roundingFactor
-      ).toFixed(0)
+    Math.trunc(
+      (amount * Math.pow(10, constants.PLATFORM_PRECISION)) / roundingFactor
     ) * roundingFactor
   );
 }
@@ -772,11 +769,8 @@ export function convertDecimalToNativeLotSize(
   roundingFactor: number = constants.MIN_NATIVE_MIN_LOT_SIZE
 ): number {
   return (
-    parseInt(
-      (
-        (amount * Math.pow(10, constants.POSITION_PRECISION)) /
-        roundingFactor
-      ).toFixed(0)
+    Math.trunc(
+      (amount * Math.pow(10, constants.POSITION_PRECISION)) / roundingFactor
     ) * roundingFactor
   );
 }
@@ -1063,7 +1057,7 @@ export async function processTransaction(
             }
             if (
               txConfirmationCheck(
-                txOpts.commitment.toString(),
+                txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
                 status.value.confirmationStatus.toString()
               )
             ) {
