@@ -335,6 +335,13 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
+  public async updatePricingV3(price: anchor.BN, timestamp: anchor.BN) {
+    let tx = new Transaction().add(
+      instructions.updatePricingV3Ix(this.asset, price, timestamp)
+    );
+    await utils.processTransaction(Exchange.provider, tx);
+  }
+
   public assertInitialized() {
     if (!this.isInitialized) {
       throw Error("SubExchange uninitialized");
