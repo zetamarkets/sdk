@@ -2054,6 +2054,24 @@ export function updateAdminIx(
   return Exchange.program.instruction.updateAdmin(accounts);
 }
 
+export function updatePricingAdminIx(
+  secondary: boolean,
+  admin: PublicKey,
+  newAdmin: PublicKey
+): TransactionInstruction {
+  let accounts = {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+      newAdmin,
+    },
+  };
+  if (secondary) {
+    return Exchange.program.instruction.updatePricingAdmin(accounts);
+  }
+  return Exchange.program.instruction.updateAdmin(accounts);
+}
+
 export function initializeReferrerAccountsIx(
   id: string,
   user: PublicKey,
