@@ -324,6 +324,10 @@ export class Exchange {
   private _autoPriorityFeeOffset: number = 0;
   private _autoPriorityFeeMultiplier: number = 1;
   private _autoPriorityFeeUseMax: boolean = false;
+  public get tipMultiplier(): number {
+    return this._tipMultiplier;
+  }
+  private _tipMultiplier: number = 1;
 
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
@@ -355,6 +359,10 @@ export class Exchange {
 
   public setAutoPriorityFeeUseMax(useMax: boolean) {
     this._autoPriorityFeeUseMax = useMax;
+  }
+
+  public setTipMultiplier(multiplier: number) {
+    this._tipMultiplier = multiplier;
   }
 
   public updatePriorityFee(microLamportsPerCU: number) {

@@ -1074,7 +1074,7 @@ export async function processTransaction(
       Exchange.httpProvider,
       provider,
       tx,
-      Exchange.priorityFee + 1050,
+      Exchange.tipMultiplier * Exchange.priorityFee + 1050,
       blockhash,
       retries,
       skipConfirmation
