@@ -1081,6 +1081,14 @@ export class Exchange {
     await this.getSubExchange(asset).updatePricing();
   }
 
+  public async updatePricingV3(
+    asset: Asset,
+    price: anchor.BN,
+    timestamp: anchor.BN
+  ) {
+    await this.getSubExchange(asset).updatePricingV3(price, timestamp);
+  }
+
   public async updatePricingPubkeys(
     asset: Asset,
     oracle: PublicKey,

@@ -1527,6 +1527,32 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
   });
 }
 
+export function updatePricingV3Ix(
+  asset: Asset,
+  price: anchor.BN,
+  timestamp: anchor.BN
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = Exchange.getPerpMarket(asset);
+  let asset_index = assetToIndex(asset);
+  return Exchange.program.instruction.updatePricingV3(
+    toProgramAsset(asset),
+    price,
+    timestamp,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        oracle: Exchange.pricing.oracles[asset_index],
+        perpMarket: marketData.address,
+        perpBids: subExchange.markets.market.serumMarket.bidsAddress,
+        perpAsks: subExchange.markets.market.serumMarket.asksAddress,
+        pricingAdmin: Exchange.state.pricingAdmin,
+      },
+    }
+  );
+}
+
 export function applyPerpFundingIx(
   asset: Asset,
   remainingAccounts: any[]
@@ -2024,6 +2050,24 @@ export function updateAdminIx(
 
   if (secondary) {
     return Exchange.program.instruction.updateSecondaryAdmin(accounts);
+  }
+  return Exchange.program.instruction.updateAdmin(accounts);
+}
+
+export function updatePricingAdminIx(
+  secondary: boolean,
+  admin: PublicKey,
+  newAdmin: PublicKey
+): TransactionInstruction {
+  let accounts = {
+    accounts: {
+      state: Exchange.stateAddress,
+      admin,
+      newAdmin,
+    },
+  };
+  if (secondary) {
+    return Exchange.program.instruction.updatePricingAdmin(accounts);
   }
   return Exchange.program.instruction.updateAdmin(accounts);
 }

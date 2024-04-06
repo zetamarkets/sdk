@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.26.1]
+
+- Add new update pricing ix. ([#379](https://github.com/zetamarkets/sdk/pull/379))
+
+## [1.26.0]
+
+- Add W. ([#377](https://github.com/zetamarkets/sdk/pull/377))
+
 ## [1.25.3]
 
 - Fix rounding in util functions. ([#375](https://github.com/zetamarkets/sdk/pull/375))

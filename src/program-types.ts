@@ -42,6 +42,7 @@ export interface State {
   nativeTakeTriggerOrderFeePercentage: anchor.BN;
   nativeMakerRebatePercentage: anchor.BN;
   maTypeAdmin: PublicKey;
+  pricingAdmin: PublicKey;
   padding: Array<number>;
 }
 
