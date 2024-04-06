@@ -1527,6 +1527,32 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
   });
 }
 
+export function updatePricingV3Ix(
+  asset: Asset,
+  price: anchor.BN,
+  timestamp: anchor.BN
+): TransactionInstruction {
+  let subExchange = Exchange.getSubExchange(asset);
+  let marketData = Exchange.getPerpMarket(asset);
+  let asset_index = assetToIndex(asset);
+  return Exchange.program.instruction.updatePricingV3(
+    toProgramAsset(asset),
+    price,
+    timestamp,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        pricing: Exchange.pricingAddress,
+        oracle: Exchange.pricing.oracles[asset_index],
+        perpMarket: marketData.address,
+        perpBids: subExchange.markets.market.serumMarket.bidsAddress,
+        perpAsks: subExchange.markets.market.serumMarket.asksAddress,
+        pricingAdmin: Exchange.state.pricingAdmin,
+      },
+    }
+  );
+}
+
 export function applyPerpFundingIx(
   asset: Asset,
   remainingAccounts: any[]
