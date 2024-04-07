@@ -1036,6 +1036,7 @@ export async function processTransaction(
 
       txSig = await provider.connection.sendRawTransaction(rawTx, {
         skipPreflight: true,
+        preflightCommitment: provider.connection.commitment,
       });
 
       // Poll the tx confirmation for N seconds
@@ -1043,6 +1044,12 @@ export async function processTransaction(
       let currentBlockHeight = 0;
       if (!skipConfirmation) {
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+          // Keep resending to maximise the chance of confirmation
+          await provider.connection.sendRawTransaction(rawTx, {
+            skipPreflight: true,
+            preflightCommitment: provider.connection.commitment,
+          });
+
           let status = await provider.connection.getSignatureStatus(txSig);
           currentBlockHeight = await provider.connection.getBlockHeight(
             provider.connection.commitment
