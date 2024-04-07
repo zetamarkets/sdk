@@ -1071,7 +1071,7 @@ export async function processTransaction(
               return txSig;
             }
           }
-          await sleep(1500); // Don't spam the RPC
+          await sleep(500); // Don't spam the RPC
         }
         throw Error(`Transaction ${txSig} was not confirmed`);
       } else {
