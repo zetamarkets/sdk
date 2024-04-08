@@ -1958,6 +1958,16 @@ export function median(arr: number[]): number | undefined {
   return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
 }
 
+export async function isAffiliateCodeAvailable(code: string): Promise<boolean> {
+  let referrerIdAddress = getReferrerIdAccount(Exchange.programId, code)[0];
+  let referrerIdAccount =
+    await Exchange.program.account.referrerIdAccount.fetchNullable(
+      referrerIdAddress
+    );
+
+  return referrerIdAccount == null;
+}
+
 export const checkLiquidity = (
   size: number,
   asset: Asset,
