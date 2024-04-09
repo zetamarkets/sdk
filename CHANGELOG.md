@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.26.3]
+
+- Add crank market generation util. ([#383](https://github.com/zetamarkets/sdk/pull/383))
+
 ## [1.26.2]
 
 - Spam sendRawTransaction() in utils.processTransaction(). ([#381](https://github.com/zetamarkets/sdk/pull/381))
