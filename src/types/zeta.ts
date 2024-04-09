@@ -465,7 +465,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -2763,7 +2763,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -9721,7 +9721,7 @@ export type Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "TNSR"
           },
           {
             "name": "UNDEFINED"
@@ -11726,7 +11726,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -14024,7 +14024,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -20982,7 +20982,7 @@ export const IDL: Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "TNSR"
           },
           {
             "name": "UNDEFINED"
