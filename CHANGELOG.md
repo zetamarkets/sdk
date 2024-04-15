@@ -6,6 +6,7 @@ Version changes are pinned to SDK releases.
 ## [1.26.4]
 
 - Respect Exchange.skipRpcConfirmation everywhere. ([#384](https://github.com/zetamarkets/sdk/pull/384))
+- New util isAffiliateCodeAvailable(). ([#382](https://github.com/zetamarkets/sdk/pull/382))
 
 ## [1.26.3]
 

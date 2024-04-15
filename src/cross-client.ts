@@ -710,6 +710,10 @@ export class CrossClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction();
 
+    if ((await this.hasReferrerAccounts()) == true) {
+      throw Error("User already has a referrer account!");
+    }
+
     if (this._accountManager === null) {
       console.log(
         "User has no cross margin account manager. Creating account manager..."
@@ -1242,6 +1246,71 @@ export class CrossClient {
     this._account = null;
     this._accountManager = null;
     return txId;
+  }
+
+  public async hasReferrerAccounts(): Promise<boolean> {
+    // Firstly, close all referrer accounts
+    let referrerPubkeyAccountAddress = utils.getReferrerPubkeyAccount(
+      Exchange.programId,
+      this.publicKey
+    )[0];
+    let referrerPubkeyAccount =
+      await Exchange.program.account.referrerPubkeyAccount.fetchNullable(
+        referrerPubkeyAccountAddress
+      );
+    return referrerPubkeyAccount != null;
+  }
+
+  public async remakeReferrerAccounts(
+    id: string
+  ): Promise<TransactionSignature> {
+    this.delegatedCheck();
+
+    let tx = new Transaction();
+
+    // Firstly, close all referrer accounts
+    if ((await this.hasReferrerAccounts()) == true) {
+      let referrerPubkeyAccountAddress = utils.getReferrerPubkeyAccount(
+        Exchange.programId,
+        this.publicKey
+      )[0];
+      let referrerPubkeyAccount =
+        await Exchange.program.account.referrerPubkeyAccount.fetch(
+          referrerPubkeyAccountAddress
+        );
+      let id = Buffer.from(referrerPubkeyAccount.referrerId).toString();
+      let referrerIdAccountAddress = utils.getReferrerIdAccount(
+        Exchange.programId,
+        id
+      )[0];
+
+      tx.add(
+        instructions.closeReferrerAccountsIx(
+          this.publicKey,
+          referrerIdAccountAddress,
+          referrerPubkeyAccountAddress
+        )
+      );
+    }
+
+    // Secondly, make new ones with the provided ID
+    tx.add(
+      instructions.initializeReferrerAccountsIx(
+        id,
+        this.publicKey,
+        utils.getReferrerIdAccount(Exchange.programId, id)[0],
+        utils.getReferrerPubkeyAccount(Exchange.programId, this.publicKey)[0]
+      )
+    );
+
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined
+    );
   }
 
   public async closeReferrerAccounts(): Promise<TransactionSignature> {
