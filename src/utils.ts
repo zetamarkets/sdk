@@ -958,8 +958,7 @@ export async function processTransaction(
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
-  retries?: number,
-  skipConfirmation?: boolean
+  retries?: number
 ): Promise<TransactionSignature> {
   let failures = 0;
   while (true) {
@@ -1042,7 +1041,7 @@ export async function processTransaction(
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
       let currentBlockHeight = 0;
-      if (!skipConfirmation) {
+      if (!Exchange.skipRpcConfirmation) {
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
           // Keep resending to maximise the chance of confirmation
           await provider.connection.sendRawTransaction(rawTx, {

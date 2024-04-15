@@ -1125,17 +1125,7 @@ export class Exchange {
     try {
       await Promise.all(
         txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(
-            this._provider,
-            tx,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            this.skipRpcConfirmation
-          );
+          let txSig = await utils.processTransaction(this._provider, tx);
           console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
         })
       );
