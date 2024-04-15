@@ -2322,6 +2322,19 @@ export function toggleMarketMakerIx(
   });
 }
 
+export function chooseAirdropCommunityIx(
+  community: number,
+  accountManager: PublicKey,
+  authority: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.chooseAirdropCommunity(community, {
+    accounts: {
+      crossMarginAccountManager: accountManager,
+      authority,
+    },
+  });
+}
+
 export function editDelegatedPubkeyIx(
   delegatedPubkey: PublicKey,
   account: PublicKey,

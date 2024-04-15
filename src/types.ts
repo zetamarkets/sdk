@@ -665,3 +665,16 @@ export interface PlaceMultiOrderArg {
   tifOptions: TIFOptions;
   clientOrderId?: number;
 }
+
+
+export enum AirdropCommunity {
+  UNASSIGNED = 0,
+  BACKPACK = 1,
+  JUP = 2,
+  PYTH = 3,
+  DEBRIDGE = 4,
+  SUPERTEAM = 5,
+  MADLADS = 6,
+  TENSORIANS = 7,
+  ASSETDASH = 8
+}

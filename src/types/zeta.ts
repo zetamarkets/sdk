@@ -444,7 +444,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": []
@@ -465,7 +465,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -2160,6 +2160,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -2763,7 +2784,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -8054,11 +8075,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -9721,7 +9746,7 @@ export type Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "TNSR"
           },
           {
             "name": "UNDEFINED"
@@ -11705,7 +11730,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": []
@@ -11726,7 +11751,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -13421,6 +13446,27 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -14024,7 +14070,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -19315,11 +19361,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -20982,7 +21032,7 @@ export const IDL: Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "TNSR"
           },
           {
             "name": "UNDEFINED"

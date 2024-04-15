@@ -444,7 +444,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": []
@@ -465,7 +465,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -2160,6 +2160,27 @@
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -2763,7 +2784,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -8054,11 +8075,15 @@
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -9721,7 +9746,7 @@
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "TNSR"
           },
           {
             "name": "UNDEFINED"

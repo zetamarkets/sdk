@@ -1983,6 +1983,32 @@ export class CrossClient {
     return txSig;
   }
 
+  public async chooseAirdropCommunity(
+    community: types.AirdropCommunity
+  ): Promise<TransactionSignature> {
+    this.delegatedCheck();
+    let tx = new Transaction();
+
+    tx.add(
+      instructions.chooseAirdropCommunityIx(
+        community,
+        this.accountAddress,
+        this._provider.wallet.publicKey
+      )
+    );
+
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      this._useVersionedTxs ? utils.getZetaLutArr() : undefined,
+      undefined,
+      this._txRetryAmount
+    );
+  }
+
   public async editDelegatedPubkey(
     delegatedPubkey: PublicKey
   ): Promise<TransactionSignature> {
