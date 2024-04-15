@@ -958,8 +958,7 @@ export async function processTransaction(
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
-  retries?: number,
-  skipConfirmation?: boolean
+  retries?: number
 ): Promise<TransactionSignature> {
   let failures = 0;
   while (true) {
@@ -1042,7 +1041,7 @@ export async function processTransaction(
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
       let currentBlockHeight = 0;
-      if (!skipConfirmation) {
+      if (!Exchange.skipRpcConfirmation) {
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
           // Keep resending to maximise the chance of confirmation
           await provider.connection.sendRawTransaction(rawTx, {
@@ -1326,10 +1325,28 @@ export async function crankMarket(
   openOrdersToMargin?: Map<PublicKey, PublicKey>,
   crankLimit?: number
 ): Promise<boolean> {
+  let ix = await createCrankMarketIx(asset, openOrdersToMargin, crankLimit);
+  if (ix == null) return true;
+  let tx = new Transaction()
+    .add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 250_000,
+      })
+    )
+    .add(ix);
+  await processTransaction(Exchange.provider, tx);
+  return false;
+}
+
+export async function createCrankMarketIx(
+  asset: Asset,
+  openOrdersToMargin?: Map<PublicKey, PublicKey>,
+  crankLimit?: number
+): Promise<TransactionInstruction | null> {
   let market = Exchange.getPerpMarket(asset);
   let eventQueue = await market.serumMarket.loadEventQueue(Exchange.connection);
   if (eventQueue.length == 0) {
-    return true;
+    return null;
   }
   const openOrdersSet = new Set();
   // We pass in a couple of extra accounts for perps so the limit is lower
@@ -1353,7 +1370,6 @@ export async function crankMarket(
 
   let remainingAccounts: any[] = new Array(uniqueOpenOrders.length * 2);
 
-  // TODO test support for both crossmargin and marginaccounts
   await Promise.all(
     uniqueOpenOrders.map(async (openOrders, index) => {
       let marginAccount: PublicKey;
@@ -1380,23 +1396,13 @@ export async function crankMarket(
     })
   );
 
-  let tx = new Transaction()
-    .add(
-      ComputeBudgetProgram.setComputeUnitLimit({
-        units: 250_000,
-      })
-    )
-    .add(
-      instructions.crankMarketIx(
-        asset,
-        market.address,
-        market.serumMarket.eventQueueAddress,
-        constants.DEX_PID[Exchange.network],
-        remainingAccounts
-      )
-    );
-  await processTransaction(Exchange.provider, tx);
-  return false;
+  return instructions.crankMarketIx(
+    asset,
+    market.address,
+    market.serumMarket.eventQueueAddress,
+    constants.DEX_PID[Exchange.network],
+    remainingAccounts
+  );
 }
 
 /*

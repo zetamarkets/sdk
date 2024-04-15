@@ -3,9 +3,14 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [1.16.3]
+## [1.26.4]
 
+- Respect Exchange.skipRpcConfirmation everywhere. ([#384](https://github.com/zetamarkets/sdk/pull/384))
 - New util isAffiliateCodeAvailable(). ([#382](https://github.com/zetamarkets/sdk/pull/382))
+
+## [1.26.3]
+
+- Add crank market generation util. ([#383](https://github.com/zetamarkets/sdk/pull/383))
 
 ## [1.26.2]
 
