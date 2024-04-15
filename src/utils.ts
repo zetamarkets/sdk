@@ -50,6 +50,7 @@ import { Network } from "./network";
 import cloneDeep from "lodash.clonedeep";
 import * as os from "os";
 import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
+import axios from "axios";
 
 export function getNativeTickSize(asset: Asset): number {
   return Exchange.state.tickSizes[assets.assetToIndex(asset)];
@@ -950,6 +951,80 @@ function txConfirmationCheck(expectedLevel: string, currentLevel: string) {
   return false;
 }
 
+export async function processTransactionJito(
+  provider: anchor.AnchorProvider,
+  tx: Transaction,
+  signers?: Array<Signer>,
+  lutAccs?: AddressLookupTableAccount[],
+  blockhash?: { blockhash: string; lastValidBlockHeight: number }
+): Promise<TransactionSignature> {
+  if (Exchange.jitoTip == 0) {
+    throw Error("Jito bundle tip has not been set.");
+  }
+
+  if (Exchange.priorityFee != 0) {
+    tx.instructions.unshift(
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: Math.round(Exchange.priorityFee),
+      })
+    );
+  }
+
+  tx.instructions.push(
+    SystemProgram.transfer({
+      fromPubkey: Exchange.provider.publicKey,
+      toPubkey: new PublicKey(
+        "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL" // Jito tip account
+      ),
+      lamports: Exchange.jitoTip, // tip
+    })
+  );
+
+  let recentBlockhash =
+    blockhash ??
+    (await provider.connection.getLatestBlockhash(
+      Exchange.blockhashCommitment
+    ));
+
+  let vTx: VersionedTransaction = new VersionedTransaction(
+    new TransactionMessage({
+      payerKey: provider.wallet.publicKey,
+      recentBlockhash: recentBlockhash.blockhash,
+      instructions: tx.instructions,
+    }).compileToV0Message(lutAccs)
+  );
+
+  vTx.sign(
+    (signers ?? [])
+      .filter((s) => s !== undefined)
+      .map((kp) => {
+        return kp;
+      })
+  );
+  vTx = (await provider.wallet.signTransaction(vTx)) as VersionedTransaction;
+
+  let rawTx = vTx.serialize();
+
+  const encodedTx = bs58.encode(rawTx);
+  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
+  const payload = {
+    jsonrpc: "2.0",
+    id: 1,
+    method: "sendTransaction",
+    params: [encodedTx],
+  };
+
+  try {
+    const response = await axios.post(jitoURL, payload, {
+      headers: { "Content-Type": "application/json" },
+    });
+    return response.data.result;
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("cannot send!");
+  }
+}
+
 export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -960,6 +1035,10 @@ export async function processTransaction(
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
   retries?: number
 ): Promise<TransactionSignature> {
+  if (Exchange.useJitoBundle) {
+    return processTransactionJito(provider, tx, signers, lutAccs, blockhash);
+  }
+
   let failures = 0;
   while (true) {
     let rawTx: Buffer | Uint8Array;
