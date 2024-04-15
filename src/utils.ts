@@ -1306,7 +1306,17 @@ export async function cleanZetaMarkets(
   }
   await Promise.all(
     txs.map(async (tx) => {
-      await processTransaction(Exchange.provider, tx);
+      await processTransaction(
+        Exchange.provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        Exchange.skipRpcConfirmation
+      );
     })
   );
 }
@@ -1314,7 +1324,17 @@ export async function cleanZetaMarkets(
 export async function cleanZetaMarketHalted(asset: Asset) {
   let tx = new Transaction();
   tx.add(instructions.cleanZetaMarketHaltedIx(asset));
-  await processTransaction(Exchange.provider, tx);
+  await processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    Exchange.skipRpcConfirmation
+  );
 }
 
 /*
@@ -1335,7 +1355,17 @@ export async function crankMarket(
       })
     )
     .add(ix);
-  await processTransaction(Exchange.provider, tx);
+  await processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    Exchange.skipRpcConfirmation
+  );
   return false;
 }
 
@@ -1411,14 +1441,34 @@ export async function createCrankMarketIx(
  */
 export async function pruneExpiredTIFOrders(asset: Asset) {
   let tx = new Transaction().add(instructions.pruneExpiredTIFOrdersIx(asset));
-  return processTransaction(Exchange.provider, tx);
+  return processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    Exchange.skipRpcConfirmation
+  );
 }
 
 export async function pruneExpiredTIFOrdersV2(asset: Asset, limit: number) {
   let tx = new Transaction().add(
     instructions.pruneExpiredTIFOrdersIxV2(asset, limit)
   );
-  return processTransaction(Exchange.provider, tx);
+  return processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    Exchange.skipRpcConfirmation
+  );
 }
 
 export function getMutMarketAccounts(asset: Asset): Object[] {
@@ -1691,7 +1741,17 @@ export async function settleAndBurnVaultTokens(
     await Promise.all(
       txSlice.map(async (tx, i) => {
         try {
-          await processTransaction(provider, tx);
+          await processTransaction(
+            provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            Exchange.skipRpcConfirmation
+          );
         } catch (e) {
           console.log(`Settle failed on tx ${j + i}, continuing...`);
         }
@@ -1700,7 +1760,17 @@ export async function settleAndBurnVaultTokens(
   }
 
   let burnTx = instructions.burnVaultTokenTx(asset);
-  await processTransaction(provider, burnTx);
+  await processTransaction(
+    provider,
+    burnTx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    Exchange.skipRpcConfirmation
+  );
 }
 
 export async function burnVaultTokens(
@@ -1710,7 +1780,17 @@ export async function burnVaultTokens(
   let market = Exchange.getPerpMarket(asset);
   console.log(`Burning tokens`);
   let burnTx = instructions.burnVaultTokenTx(asset);
-  await processTransaction(provider, burnTx);
+  await processTransaction(
+    provider,
+    burnTx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    Exchange.skipRpcConfirmation
+  );
 }
 
 /**
@@ -1815,7 +1895,17 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
 
   await Promise.all(
     txs.map(async (tx) => {
-      let txSig = await processTransaction(Exchange.provider, tx);
+      let txSig = await processTransaction(
+        Exchange.provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        Exchange.skipRpcConfirmation
+      );
     })
   );
 }
@@ -1841,7 +1931,17 @@ export async function executeTriggerOrder(
     )
   );
 
-  await processTransaction(Exchange.provider, tx);
+  await processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    Exchange.skipRpcConfirmation
+  );
 }
 
 export function getProductLedger(marginAccount: MarginAccount, index: number) {
@@ -2084,7 +2184,11 @@ export async function initializeZetaMarkets(
       tx,
       [],
       defaultCommitment(),
-      Exchange.useLedger
+      Exchange.useLedger,
+      undefined,
+      undefined,
+      undefined,
+      Exchange.skipRpcConfirmation
     );
   } catch (e) {
     console.error(`Initialize market indexes failed: ${e}`);
@@ -2100,7 +2204,11 @@ export async function initializeZetaMarkets(
       tx2,
       [],
       defaultCommitment(),
-      Exchange.useLedger
+      Exchange.useLedger,
+      undefined,
+      undefined,
+      undefined,
+      Exchange.skipRpcConfirmation
     );
     await sleep(100);
   } catch (e) {
@@ -2187,7 +2295,11 @@ async function initializeZetaMarket(
         tx,
         [requestQueue, eventQueue, bids, asks],
         commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
+        Exchange.useLedger,
+        undefined,
+        undefined,
+        undefined,
+        Exchange.skipRpcConfirmation
       );
     } catch (e) {
       console.error(`Initialize zeta market serum accounts ${i} failed: ${e}`);
@@ -2203,7 +2315,11 @@ async function initializeZetaMarket(
         tx2,
         [],
         commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
+        Exchange.useLedger,
+        undefined,
+        undefined,
+        undefined,
+        Exchange.skipRpcConfirmation
       );
     } catch (e) {
       console.error(`Initialize zeta market ${i} failed: ${e}`);
