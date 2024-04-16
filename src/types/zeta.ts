@@ -11280,6 +11280,11 @@ export type Zeta = {
       "code": 6169,
       "name": "InvalidOracleUpdate",
       "msg": "Invalid oracle update"
+    },
+    {
+      "code": 6170,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };
@@ -22566,6 +22571,11 @@ export const IDL: Zeta = {
       "code": 6169,
       "name": "InvalidOracleUpdate",
       "msg": "Invalid oracle update"
+    },
+    {
+      "code": 6170,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };
