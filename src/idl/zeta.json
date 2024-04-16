@@ -444,7 +444,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": []
@@ -465,7 +465,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -2763,7 +2763,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -9721,7 +9721,7 @@
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "TNSR"
           },
           {
             "name": "UNDEFINED"
