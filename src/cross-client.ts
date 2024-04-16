@@ -1992,7 +1992,7 @@ export class CrossClient {
     tx.add(
       instructions.chooseAirdropCommunityIx(
         community,
-        this.accountAddress,
+        this.accountManagerAddress,
         this._provider.wallet.publicKey
       )
     );

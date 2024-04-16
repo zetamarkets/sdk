@@ -63,7 +63,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.JUP) return "JUP";
   if (asset == Asset.DYM) return "DYM";
   if (asset == Asset.STRK) return "STRK";
-  if (asset == Asset.W) return "W";
+  if (asset == Asset.TNSR) return "TNSR";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -83,7 +83,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "JUP") return Asset.JUP;
   if (name == "DYM") return Asset.DYM;
   if (name == "STRK") return Asset.STRK;
-  if (name == "W") return Asset.W;
+  if (name == "TNSR") return Asset.TNSR;
   return Asset.UNDEFINED;
 }
 
@@ -106,7 +106,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.JUP) return { jup: {} };
   if (asset == Asset.DYM) return { dym: {} };
   if (asset == Asset.STRK) return { strk: {} };
-  if (asset == Asset.W) return { w: {} };
+  if (asset == Asset.TNSR) return { tnsr: {} };
   return { undefined: {} };
 }
 
@@ -153,8 +153,8 @@ export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { strk: {} })) {
     return Asset.STRK;
   }
-  if (objectEquals(asset, { w: {} })) {
-    return Asset.W;
+  if (objectEquals(asset, { tnsr: {} })) {
+    return Asset.TNSR;
   }
   return Asset.UNDEFINED;
 }
@@ -203,7 +203,7 @@ export function assetToIndex(asset: Asset): number {
     case Asset.STRK: {
       return 13;
     }
-    case Asset.W: {
+    case Asset.TNSR: {
       return 14;
     }
   }
@@ -255,7 +255,7 @@ export function indexToAsset(index: number): Asset {
       return Asset.STRK;
     }
     case 14: {
-      return Asset.W;
+      return Asset.TNSR;
     }
   }
   return Asset.UNDEFINED;
