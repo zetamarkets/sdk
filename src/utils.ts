@@ -955,6 +955,7 @@ export async function processTransactionJito(
   provider: anchor.AnchorProvider,
   tx: Transaction,
   signers?: Array<Signer>,
+  opts?: ConfirmOptions,
   lutAccs?: AddressLookupTableAccount[],
   blockhash?: { blockhash: string; lastValidBlockHeight: number }
 ): Promise<TransactionSignature> {
@@ -1014,15 +1015,56 @@ export async function processTransactionJito(
     params: [encodedTx],
   };
 
+  let txOpts = opts || commitmentConfig(provider.connection.commitment);
+  let txSig: string;
   try {
     const response = await axios.post(jitoURL, payload, {
       headers: { "Content-Type": "application/json" },
     });
-    return response.data.result;
+    txSig = response.data.result;
   } catch (error) {
     console.error("Error:", error);
-    throw new Error("cannot send!");
+    throw new Error("Jito Bundle Error: cannot send.");
   }
+
+  if (Exchange.skipRpcConfirmation) {
+    return txSig;
+  }
+
+  let currentBlockHeight = await provider.connection.getBlockHeight(
+    provider.connection.commitment
+  );
+
+  while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+    // Keep resending to maximise the chance of confirmation
+    await provider.connection.sendRawTransaction(rawTx, {
+      skipPreflight: true,
+      preflightCommitment: provider.connection.commitment,
+    });
+
+    let status = await provider.connection.getSignatureStatus(txSig);
+    currentBlockHeight = await provider.connection.getBlockHeight(
+      provider.connection.commitment
+    );
+    if (status.value != null) {
+      if (status.value.err != null) {
+        // Gets caught and parsed in the later catch
+        let err = parseInt(status.value.err["InstructionError"][1]["Custom"]);
+        let parsedErr = parseError(err);
+        throw parsedErr;
+      }
+      if (
+        txConfirmationCheck(
+          txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
+          status.value.confirmationStatus.toString()
+        )
+      ) {
+        return txSig;
+      }
+    }
+    await sleep(500); // Don't spam the RPC
+  }
+  throw Error(`Transaction ${txSig} was not confirmed`);
 }
 
 export async function processTransaction(
@@ -1036,7 +1078,14 @@ export async function processTransaction(
   retries?: number
 ): Promise<TransactionSignature> {
   if (Exchange.useJitoBundle) {
-    return processTransactionJito(provider, tx, signers, lutAccs, blockhash);
+    return processTransactionJito(
+      provider,
+      tx,
+      signers,
+      opts,
+      lutAccs,
+      blockhash
+    );
   }
 
   let failures = 0;
