@@ -212,6 +212,8 @@ export interface CrossMarginAccount {
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
   rebateRebalanceAmount: anchor.BN;
+  potentialOrderLoss: Array<AnchorDecimal>;
+  potentialOrderLossPadding: Array<AnchorDecimal>;
   padding: Array<number>;
 }
 
