@@ -391,6 +391,23 @@ export class RiskCalculator {
     }
   }
 
+  public getPotentialOrderLoss(
+    account: CrossMarginAccount
+  ): Map<Asset, number> {
+    const i_list = [...Array(constants.ACTIVE_PERP_MARKETS).keys()];
+
+    const potentialOrderLossMap: Map<Asset, number> = new Map();
+    for (var i of i_list) {
+      const asset = assets.indexToAsset(i);
+      const potentialOrderLoss = convertNativeIntegerToDecimal(
+        account.potentialOrderLoss[i].toNumber()
+      );
+      potentialOrderLossMap.set(asset, potentialOrderLoss);
+    }
+
+    return potentialOrderLossMap;
+  }
+
   /**
    * Returns the total initial margin requirement for a given account.
    * This includes initial margin on positions which is used for
@@ -675,6 +692,9 @@ export class RiskCalculator {
   ): types.CrossMarginAccountState {
     let balance = convertNativeBNToDecimal(marginAccount.balance);
     let accType = types.ProgramAccountType.CrossMarginAccount;
+
+    let potentialOrderLoss = this.getPotentialOrderLoss(marginAccount);
+
     let unrealizedPnl = this.calculateUnrealizedPnl(
       marginAccount,
       accType
@@ -703,6 +723,10 @@ export class RiskCalculator {
         accType
       ) as Map<Asset, number>;
 
+    let potentialOrderLossTotal = Array.from(
+      potentialOrderLoss.values()
+    ).reduce((a, b) => a + b, 0);
+
     let upnlTotal = Array.from(unrealizedPnl.values()).reduce(
       (a, b) => a + b,
       0
@@ -725,16 +749,28 @@ export class RiskCalculator {
 
     let equity: number = balance + upnlTotal + unpaidFundingTotal;
     let availableBalanceInitial: number =
-      balance + upnlTotal + unpaidFundingTotal - imTotal;
+      balance +
+      upnlTotal +
+      unpaidFundingTotal -
+      imTotal -
+      potentialOrderLossTotal;
     let availableBalanceWithdrawable: number =
       balance +
       Math.min(0, upnlTotal) +
       unpaidFundingTotal -
       imSkipConcessionTotal;
     let availableBalanceMaintenance: number =
-      balance + upnlTotal + unpaidFundingTotal - mmTotal;
+      balance +
+      upnlTotal +
+      unpaidFundingTotal -
+      mmTotal -
+      potentialOrderLossTotal;
     let availableBalanceMaintenanceIncludingOrders: number =
-      balance + upnlTotal + unpaidFundingTotal - mmioTotal;
+      balance +
+      upnlTotal +
+      unpaidFundingTotal -
+      mmioTotal -
+      potentialOrderLossTotal;
     return {
       balance,
       equity,
@@ -748,7 +784,8 @@ export class RiskCalculator {
         maintenanceMargin,
         maintenanceMarginIncludingOrders,
         unrealizedPnl,
-        unpaidFunding
+        unpaidFunding,
+        potentialOrderLoss
       ),
       initialMarginTotal: imTotal,
       initalMarginSkipConcessionTotal: imSkipConcessionTotal,
@@ -756,6 +793,7 @@ export class RiskCalculator {
       maintenanceMarginIncludingOrdersTotal: mmioTotal,
       unrealizedPnlTotal: upnlTotal,
       unpaidFundingTotal: unpaidFundingTotal,
+      potentialOrderLossTotal,
     };
   }
 
@@ -868,7 +906,8 @@ export class RiskCalculator {
         ).values()
       ).reduce((a, b) => a + b, 0) +
       state.unpaidFundingTotal -
-      state.maintenanceMarginIncludingOrdersTotal;
+      state.maintenanceMarginIncludingOrdersTotal -
+      state.potentialOrderLossTotal;
 
     let fee =
       (getFeeBps(isTaker, marginAccount.accountType) / 10000) * tradePrice;
