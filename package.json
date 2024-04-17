@@ -1,7 +1,7 @@
 {
   "name": "@zetamarkets/sdk",
   "repository": "https://github.com/zetamarkets/sdk/",
-  "version": "1.26.4",
+  "version": "1.27.3",
   "description": "Zeta SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,12 +17,13 @@
     "@solana/spl-token": "0.1.6",
     "@solana/web3.js": "1.87.6",
     "@zetamarkets/anchor": "0.26.1-versioned",
+    "axios": "^1.6.8",
     "bs58": "^4.0.1",
     "cross-fetch": "^3.1.6",
     "lodash": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
-    "zeta-solana-web3": "1.87.7",
-    "obscenity": "0.2.0"
+    "obscenity": "0.2.0",
+    "zeta-solana-web3": "1.87.7"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",
