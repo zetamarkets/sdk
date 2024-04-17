@@ -1450,7 +1450,7 @@ export async function cleanZetaMarketHalted(asset: Asset) {
  */
 export async function crankMarket(
   asset: Asset,
-  openOrdersToMargin?: Map<PublicKey, PublicKey>,
+  openOrdersToMargin?: Map<string, PublicKey>,
   crankLimit?: number
 ): Promise<boolean> {
   let ix = await createCrankMarketIx(asset, openOrdersToMargin, crankLimit);
@@ -1468,7 +1468,7 @@ export async function crankMarket(
 
 export async function createCrankMarketIx(
   asset: Asset,
-  openOrdersToMargin?: Map<PublicKey, PublicKey>,
+  openOrdersToMargin?: Map<string, PublicKey>,
   crankLimit?: number
 ): Promise<TransactionInstruction | null> {
   let market = Exchange.getPerpMarket(asset);
@@ -1501,11 +1501,17 @@ export async function createCrankMarketIx(
   await Promise.all(
     uniqueOpenOrders.map(async (openOrders, index) => {
       let marginAccount: PublicKey;
-      if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
+      if (
+        openOrdersToMargin &&
+        !openOrdersToMargin.has(openOrders.toBase58())
+      ) {
         marginAccount = await getAccountFromOpenOrders(openOrders, asset);
-        openOrdersToMargin.set(openOrders, marginAccount);
-      } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
-        marginAccount = openOrdersToMargin.get(openOrders);
+        openOrdersToMargin.set(openOrders.toBase58(), marginAccount);
+      } else if (
+        openOrdersToMargin &&
+        openOrdersToMargin.has(openOrders.toBase58())
+      ) {
+        marginAccount = openOrdersToMargin.get(openOrders.toBase58());
       } else {
         marginAccount = await getAccountFromOpenOrders(openOrders, asset);
       }
