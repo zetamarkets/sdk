@@ -495,7 +495,7 @@ export function getReferrerIdAccount(
   return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("referrer-id-account")),
-      Buffer.from(id),
+      Buffer.from(id.replace(/[\0]+$/g, "")),
     ],
     programId
   );
