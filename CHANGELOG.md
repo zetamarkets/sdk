@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [1.27.0]
+## [1.28.0]
 
 - Add potential order loss to account margining.
 - Add 10% oracle deviation protection to orders.
