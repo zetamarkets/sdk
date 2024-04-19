@@ -8175,11 +8175,29 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "potentialOrderLoss",
+            "type": {
+              "array": [
+                "u64",
+                15
+              ]
+            }
+          },
+          {
+            "name": "potentialOrderLossPadding",
+            "type": {
+              "array": [
+                "u64",
+                10
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1976
+                1776
               ]
             }
           }
@@ -9721,7 +9739,7 @@ export type Zeta = {
             "name": "STRK"
           },
           {
-            "name": "TNSR"
+            "name": "W"
           },
           {
             "name": "UNDEFINED"
@@ -11255,6 +11273,11 @@ export type Zeta = {
       "code": 6169,
       "name": "InvalidOracleUpdate",
       "msg": "Invalid oracle update"
+    },
+    {
+      "code": 6170,
+      "name": "OrderPriceTooFarFromMarkPrice",
+      "msg": "Order price too far from mark price"
     }
   ]
 };
@@ -19436,11 +19459,29 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "potentialOrderLoss",
+            "type": {
+              "array": [
+                "u64",
+                15
+              ]
+            }
+          },
+          {
+            "name": "potentialOrderLossPadding",
+            "type": {
+              "array": [
+                "u64",
+                10
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1976
+                1776
               ]
             }
           }
@@ -20982,7 +21023,7 @@ export const IDL: Zeta = {
             "name": "STRK"
           },
           {
-            "name": "TNSR"
+            "name": "W"
           },
           {
             "name": "UNDEFINED"
@@ -22516,6 +22557,11 @@ export const IDL: Zeta = {
       "code": 6169,
       "name": "InvalidOracleUpdate",
       "msg": "Invalid oracle update"
+    },
+    {
+      "code": 6170,
+      "name": "OrderPriceTooFarFromMarkPrice",
+      "msg": "Order price too far from mark price"
     }
   ]
 };
