@@ -28,6 +28,7 @@ import {
   TransactionInstruction,
   ConfirmOptions,
   SYSVAR_CLOCK_PUBKEY,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { PublicKey as PublicKeyZstd } from "zeta-solana-web3";
@@ -1370,7 +1371,11 @@ export class CrossClient {
     options: types.OrderOptions = types.defaultOrderOptions(),
     preIxs: TransactionInstruction[] = []
   ): Promise<TransactionSignature> {
-    let tx = new Transaction();
+    let tx = new Transaction().add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 500_000,
+      })
+    );
     let assetIndex = assetToIndex(asset);
     let market = Exchange.getPerpMarket(asset);
     let openOrdersPda = null;
@@ -2397,7 +2402,11 @@ export class CrossClient {
   ): Promise<TransactionSignature> {
     let market = Exchange.getPerpMarket(asset);
     let assetIndex = assetToIndex(asset);
-    let tx = new Transaction();
+    let tx = new Transaction().add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 500_000,
+      })
+    );
     tx.add(
       instructions.cancelOrderIx(
         asset,
@@ -2464,7 +2473,11 @@ export class CrossClient {
   ): Promise<TransactionSignature> {
     let market = Exchange.getPerpMarket(asset);
     let assetIndex = assetToIndex(asset);
-    let tx = new Transaction();
+    let tx = new Transaction().add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 500_000,
+      })
+    );
     tx.add(
       instructions.cancelOrderByClientOrderIdIx(
         asset,
@@ -2531,7 +2544,11 @@ export class CrossClient {
     newOrderSide: types.Side,
     newOptions: types.OrderOptions = types.defaultOrderOptions()
   ): Promise<TransactionSignature> {
-    let tx = new Transaction();
+    let tx = new Transaction().add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 500_000,
+      })
+    );
     let market = Exchange.getPerpMarket(asset);
     let assetIndex = assetToIndex(asset);
     tx.add(
