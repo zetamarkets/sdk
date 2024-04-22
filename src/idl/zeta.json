@@ -9764,7 +9764,7 @@
             "name": "STRK"
           },
           {
-            "name": "TNSR"
+            "name": "W"
           },
           {
             "name": "UNDEFINED"
@@ -11301,6 +11301,11 @@
     },
     {
       "code": 6170,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
+    },
+    {
+      "code": 6171,
       "name": "OrderPriceTooFarFromMarkPrice",
       "msg": "Order price too far from mark price"
     }
