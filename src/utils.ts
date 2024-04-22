@@ -50,6 +50,7 @@ import { Network } from "./network";
 import cloneDeep from "lodash.clonedeep";
 import * as os from "os";
 import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
+import axios from "axios";
 
 export function getNativeTickSize(asset: Asset): number {
   return Exchange.state.tickSizes[assets.assetToIndex(asset)];
@@ -494,7 +495,7 @@ export function getReferrerIdAccount(
   return anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from(anchor.utils.bytes.utf8.encode("referrer-id-account")),
-      Buffer.from(id),
+      Buffer.from(id.replace(/[\0]+$/g, "")),
     ],
     programId
   );
@@ -950,6 +951,122 @@ function txConfirmationCheck(expectedLevel: string, currentLevel: string) {
   return false;
 }
 
+export async function processTransactionJito(
+  provider: anchor.AnchorProvider,
+  tx: Transaction,
+  signers?: Array<Signer>,
+  opts?: ConfirmOptions,
+  lutAccs?: AddressLookupTableAccount[],
+  blockhash?: { blockhash: string; lastValidBlockHeight: number }
+): Promise<TransactionSignature> {
+  if (Exchange.jitoTip == 0) {
+    throw Error("Jito bundle tip has not been set.");
+  }
+
+  if (Exchange.priorityFee != 0) {
+    tx.instructions.unshift(
+      ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: Math.round(Exchange.priorityFee),
+      })
+    );
+  }
+
+  tx.instructions.push(
+    SystemProgram.transfer({
+      fromPubkey: Exchange.provider.publicKey,
+      toPubkey: new PublicKey(
+        "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL" // Jito tip account
+      ),
+      lamports: Exchange.jitoTip, // tip
+    })
+  );
+
+  let recentBlockhash =
+    blockhash ??
+    (await provider.connection.getLatestBlockhash(
+      Exchange.blockhashCommitment
+    ));
+
+  let vTx: VersionedTransaction = new VersionedTransaction(
+    new TransactionMessage({
+      payerKey: provider.wallet.publicKey,
+      recentBlockhash: recentBlockhash.blockhash,
+      instructions: tx.instructions,
+    }).compileToV0Message(lutAccs)
+  );
+
+  vTx.sign(
+    (signers ?? [])
+      .filter((s) => s !== undefined)
+      .map((kp) => {
+        return kp;
+      })
+  );
+  vTx = (await provider.wallet.signTransaction(vTx)) as VersionedTransaction;
+
+  let rawTx = vTx.serialize();
+
+  const encodedTx = bs58.encode(rawTx);
+  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
+  const payload = {
+    jsonrpc: "2.0",
+    id: 1,
+    method: "sendTransaction",
+    params: [encodedTx],
+  };
+
+  let txOpts = opts || commitmentConfig(provider.connection.commitment);
+  let txSig: string;
+  try {
+    const response = await axios.post(jitoURL, payload, {
+      headers: { "Content-Type": "application/json" },
+    });
+    txSig = response.data.result;
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Jito Bundle Error: cannot send.");
+  }
+
+  if (Exchange.skipRpcConfirmation) {
+    return txSig;
+  }
+
+  let currentBlockHeight = await provider.connection.getBlockHeight(
+    provider.connection.commitment
+  );
+
+  while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+    // Keep resending to maximise the chance of confirmation
+    await provider.connection.sendRawTransaction(rawTx, {
+      skipPreflight: true,
+      preflightCommitment: provider.connection.commitment,
+    });
+
+    let status = await provider.connection.getSignatureStatus(txSig);
+    currentBlockHeight = await provider.connection.getBlockHeight(
+      provider.connection.commitment
+    );
+    if (status.value != null) {
+      if (status.value.err != null) {
+        // Gets caught and parsed in the later catch
+        let err = parseInt(status.value.err["InstructionError"][1]["Custom"]);
+        let parsedErr = parseError(err);
+        throw parsedErr;
+      }
+      if (
+        txConfirmationCheck(
+          txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
+          status.value.confirmationStatus.toString()
+        )
+      ) {
+        return txSig;
+      }
+    }
+    await sleep(500); // Don't spam the RPC
+  }
+  throw Error(`Transaction ${txSig} was not confirmed`);
+}
+
 export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -960,6 +1077,17 @@ export async function processTransaction(
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
   retries?: number
 ): Promise<TransactionSignature> {
+  if (Exchange.useJitoBundle) {
+    return processTransactionJito(
+      provider,
+      tx,
+      signers,
+      opts,
+      lutAccs,
+      blockhash
+    );
+  }
+
   let failures = 0;
   while (true) {
     let rawTx: Buffer | Uint8Array;
@@ -1322,7 +1450,7 @@ export async function cleanZetaMarketHalted(asset: Asset) {
  */
 export async function crankMarket(
   asset: Asset,
-  openOrdersToMargin?: Map<PublicKey, PublicKey>,
+  openOrdersToMargin?: Map<string, PublicKey>,
   crankLimit?: number
 ): Promise<boolean> {
   let ix = await createCrankMarketIx(asset, openOrdersToMargin, crankLimit);
@@ -1340,7 +1468,7 @@ export async function crankMarket(
 
 export async function createCrankMarketIx(
   asset: Asset,
-  openOrdersToMargin?: Map<PublicKey, PublicKey>,
+  openOrdersToMargin?: Map<string, PublicKey>,
   crankLimit?: number
 ): Promise<TransactionInstruction | null> {
   let market = Exchange.getPerpMarket(asset);
@@ -1373,11 +1501,17 @@ export async function createCrankMarketIx(
   await Promise.all(
     uniqueOpenOrders.map(async (openOrders, index) => {
       let marginAccount: PublicKey;
-      if (openOrdersToMargin && !openOrdersToMargin.has(openOrders)) {
+      if (
+        openOrdersToMargin &&
+        !openOrdersToMargin.has(openOrders.toBase58())
+      ) {
         marginAccount = await getAccountFromOpenOrders(openOrders, asset);
-        openOrdersToMargin.set(openOrders, marginAccount);
-      } else if (openOrdersToMargin && openOrdersToMargin.has(openOrders)) {
-        marginAccount = openOrdersToMargin.get(openOrders);
+        openOrdersToMargin.set(openOrders.toBase58(), marginAccount);
+      } else if (
+        openOrdersToMargin &&
+        openOrdersToMargin.has(openOrders.toBase58())
+      ) {
+        marginAccount = openOrdersToMargin.get(openOrders.toBase58());
       } else {
         marginAccount = await getAccountFromOpenOrders(openOrders, asset);
       }

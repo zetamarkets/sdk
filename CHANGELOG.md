@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.28.1]
+
+- Trim trailing \0s on referral IDs ([#388](https://github.com/zetamarkets/sdk/pull/388))
+
+## [1.28.0]
+
+- Add potential order loss to account margining.
+- Add 10% oracle deviation protection to orders.
+
 ## [1.26.4]
 
 - Respect Exchange.skipRpcConfirmation everywhere. ([#384](https://github.com/zetamarkets/sdk/pull/384))
