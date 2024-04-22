@@ -11301,13 +11301,13 @@ export type Zeta = {
     },
     {
       "code": 6170,
-      "name": "AirdropCommunityAlreadySet",
-      "msg": "Airdrop community already set, cannot set again"
+      "name": "OrderPriceTooFarFromMarkPrice",
+      "msg": "Order price too far from mark price"
     },
     {
       "code": 6171,
-      "name": "OrderPriceTooFarFromMarkPrice",
-      "msg": "Order price too far from mark price"
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };
@@ -22615,13 +22615,13 @@ export const IDL: Zeta = {
     },
     {
       "code": 6170,
-      "name": "AirdropCommunityAlreadySet",
-      "msg": "Airdrop community already set, cannot set again"
+      "name": "OrderPriceTooFarFromMarkPrice",
+      "msg": "Order price too far from mark price"
     },
     {
       "code": 6171,
-      "name": "OrderPriceTooFarFromMarkPrice",
-      "msg": "Order price too far from mark price"
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };
