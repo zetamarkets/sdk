@@ -1373,7 +1373,7 @@ export class CrossClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction().add(
       ComputeBudgetProgram.setComputeUnitLimit({
-        units: 400_000,
+        units: 300_000,
       })
     );
     let assetIndex = assetToIndex(asset);
@@ -2404,7 +2404,7 @@ export class CrossClient {
     let assetIndex = assetToIndex(asset);
     let tx = new Transaction().add(
       ComputeBudgetProgram.setComputeUnitLimit({
-        units: 400_000,
+        units: 300_000,
       })
     );
     tx.add(
@@ -2475,7 +2475,7 @@ export class CrossClient {
     let assetIndex = assetToIndex(asset);
     let tx = new Transaction().add(
       ComputeBudgetProgram.setComputeUnitLimit({
-        units: 400_000,
+        units: 300_000,
       })
     );
     tx.add(
@@ -2546,7 +2546,7 @@ export class CrossClient {
   ): Promise<TransactionSignature> {
     let tx = new Transaction().add(
       ComputeBudgetProgram.setComputeUnitLimit({
-        units: 400_000,
+        units: 300_000,
       })
     );
     let market = Exchange.getPerpMarket(asset);
