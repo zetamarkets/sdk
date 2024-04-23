@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.28.2]
+
+- Bump placeorder CU units to 400k ([#389](https://github.com/zetamarkets/sdk/pull/389))
+
 ## [1.28.1]
 
 - Trim trailing \0s on referral IDs ([#388](https://github.com/zetamarkets/sdk/pull/388))

@@ -2379,6 +2379,14 @@ export function calculateTakeTriggerOrderExecutionPrice(
   return executionPrice;
 }
 
+export function getFeeTier(accountType: constants.MarginAccountType): number {
+  let tier = constants.ACCOUNT_TYPE_TO_FEE_TIER_MAP[accountType];
+  if (tier == undefined) {
+    return 0;
+  }
+  return tier;
+}
+
 export function getFeeBps(
   isTaker: boolean,
   accountType: constants.MarginAccountType
