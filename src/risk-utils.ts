@@ -334,12 +334,14 @@ export function addFakeCancelToAccount(
     marginAccount.productLedgers[assetIndex].orderState.openingOrders[1];
 
   if (totalOrders == nativeOrderSize) {
-    marginAccount.potentialOrderLoss[assetIndex] = 0;
+    marginAccount.potentialOrderLoss[assetIndex] = new anchor.BN(0);
   } else {
     let totalMaxLoss = marginAccount.potentialOrderLoss[assetIndex];
     let maxLossPerLot = totalMaxLoss / totalOrders;
     let averageMaxLoss = maxLossPerLot * nativeOrderSize;
-    marginAccount.potentialOrderLoss[assetIndex] -= averageMaxLoss;
+    marginAccount.potentialOrderLoss[assetIndex].sub(
+      new anchor.BN(averageMaxLoss)
+    );
   }
 
   const cancelOpening = Math.min(
