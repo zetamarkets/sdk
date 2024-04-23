@@ -2160,6 +2160,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -8054,11 +8075,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -11278,6 +11303,11 @@ export type Zeta = {
       "code": 6170,
       "name": "OrderPriceTooFarFromMarkPrice",
       "msg": "Order price too far from mark price"
+    },
+    {
+      "code": 6171,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };
@@ -13444,6 +13474,27 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -19338,11 +19389,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -22562,6 +22617,11 @@ export const IDL: Zeta = {
       "code": 6170,
       "name": "OrderPriceTooFarFromMarkPrice",
       "msg": "Order price too far from mark price"
+    },
+    {
+      "code": 6171,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };
