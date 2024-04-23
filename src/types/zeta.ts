@@ -3,6 +3,623 @@ export type Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaGroup",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaGroupArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "overrideExpiry",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "OverrideExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupMarginParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMarginParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupPerpParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePerpParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupExpiryParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaGroupExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "toggleZetaGroupPerpsOnly",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "cleanZetaMarkets",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeMarginAccount",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeSpreadAccount",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeMarketNode",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarketNodeArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addMarketIndexes",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "expireSeriesOverride",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "ExpireSeriesOverrideArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "expireSeries",
+      "accounts": [],
+      "args": [
+        {
+          "name": "settlementNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeMarketStrikes",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "withdraw",
+      "accounts": [],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawInsuranceVault",
+      "accounts": [],
+      "args": [
+        {
+          "name": "percentageAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "deposit",
+      "accounts": [],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositInsuranceVault",
+      "accounts": [],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initializeOpenOrders",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeOpenOrdersV2",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "closeOpenOrders",
+      "accounts": [],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "closeOpenOrdersV2",
+      "accounts": [],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "closeOpenOrdersV3",
+      "accounts": [],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrderV2",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrderV3",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placePerpOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placePerpOrderV2",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "tifOffset",
+          "type": {
+            "option": "u16"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrderV4",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "tifOffset",
+          "type": {
+            "option": "u16"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "cancelTriggerOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "forceCancelOrderByOrderId",
+      "accounts": [],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "forceCancelOrders",
+      "accounts": [],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateVolatility",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateVolatilityArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateInterestRate",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateInterestRateArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "positionMovement",
+      "accounts": [],
+      "args": [
+        {
+          "name": "movementType",
+          "type": {
+            "defined": "MovementType"
+          }
+        },
+        {
+          "name": "movements",
+          "type": {
+            "vec": {
+              "defined": "PositionMovementArg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transferExcessSpreadBalance",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "updatePricingParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePricingParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "liquidate",
+      "accounts": [],
+      "args": [
+        {
+          "name": "size",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateOracle",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "updateOracleBackupFeed",
+      "accounts": [],
+      "args": []
+    },
+    {
       "name": "initializeZetaPricing",
       "accounts": [
         {
@@ -69,137 +686,6 @@ export type Zeta = {
           "name": "args",
           "type": {
             "defined": "UpdateZetaPricingPubkeysArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "initializeZetaGroup",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "underlyingMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "underlying",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "usdcMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeZetaGroupArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "overrideExpiry",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "OverrideExpiryArgs"
           }
         }
       ]
@@ -362,78 +848,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "initializeMarginAccount",
-      "accounts": [
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "zetaProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializeSpreadAccount",
-      "accounts": [
-        {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "zetaProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "closeCrossMarginAccountManager",
       "accounts": [
         {
@@ -486,7 +900,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
@@ -507,7 +921,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
@@ -648,44 +1062,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "initializeMarketNode",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeMarketNodeArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "halt",
       "accounts": [
         {
@@ -765,72 +1141,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "updateVolatility",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateVolatilityArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updateInterestRate",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateInterestRateArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "addPerpMarketIndex",
       "accounts": [
         {
@@ -852,22 +1162,6 @@ export type Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "addMarketIndexes",
-      "accounts": [
-        {
-          "name": "marketIndexes",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "initializeZetaState",
@@ -1216,86 +1510,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "updateOracle",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updateOracleBackupFeed",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updatePricingParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdatePricingParametersArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "updateMarginParameters",
       "accounts": [
         {
@@ -1325,34 +1539,6 @@ export type Zeta = {
           "name": "asset",
           "type": {
             "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updateZetaGroupMarginParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateMarginParametersArgs"
           }
         }
       ]
@@ -1390,99 +1576,6 @@ export type Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "updateZetaGroupPerpParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdatePerpParametersArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updateZetaGroupExpiryParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateZetaGroupExpiryArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "toggleZetaGroupPerpsOnly",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "cleanZetaMarkets",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "cleanZetaMarketHalted",
@@ -1542,59 +1635,6 @@ export type Zeta = {
           "type": {
             "defined": "Asset"
           }
-        }
-      ]
-    },
-    {
-      "name": "initializeMarketStrikes",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "expireSeriesOverride",
-      "accounts": [],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "ExpireSeriesOverrideArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "expireSeries",
-      "accounts": [],
-      "args": [
-        {
-          "name": "settlementNonce",
-          "type": "u8"
         }
       ]
     },
@@ -1890,62 +1930,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "deposit",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "depositV2",
       "accounts": [
         {
@@ -2053,57 +2037,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "depositInsuranceVault",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceDepositAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "depositInsuranceVaultV2",
       "accounts": [
         {
@@ -2181,77 +2114,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "withdraw",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "withdrawV2",
       "accounts": [
         {
@@ -2303,47 +2165,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "withdrawInsuranceVault",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceDepositAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "percentageAmount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "withdrawInsuranceVaultV2",
       "accounts": [
         {
@@ -2388,133 +2209,6 @@ export type Zeta = {
           "type": "u64"
         }
       ]
-    },
-    {
-      "name": "initializeOpenOrders",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializeOpenOrdersV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "initializeOpenOrdersV3",
@@ -2576,175 +2270,6 @@ export type Zeta = {
         }
       ],
       "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "closeOpenOrders",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "closeOpenOrdersV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "closeOpenOrdersV3",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "crossMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        },
         {
           "name": "asset",
           "type": {
@@ -3084,1044 +2609,6 @@ export type Zeta = {
         {
           "name": "nonce",
           "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "placeOrder",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placeOrderV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placeOrderV3",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placePerpOrder",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placePerpOrderV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        },
-        {
-          "name": "tifOffset",
-          "type": {
-            "option": "u16"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placeOrderV4",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        },
-        {
-          "name": "tifOffset",
-          "type": {
-            "option": "u16"
-          }
         }
       ]
     },
@@ -4986,157 +3473,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "executeTriggerOrder",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "triggerOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "placeOrderAccounts",
-          "accounts": [
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "rent",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marketAccounts",
-              "accounts": [
-                {
-                  "name": "market",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "requestQueue",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "eventQueue",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "bids",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "asks",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "orderPayerTokenAccount",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "coinVault",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "pcVault",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "coinWallet",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "pcWallet",
-                  "isMut": true,
-                  "isSigner": false
-                }
-              ]
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "oracleBackupFeed",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "oracleBackupProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marketMint",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "mintAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "perpSyncQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "triggerOrderBit",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "forceCancelTriggerOrder",
       "accounts": [
         {
@@ -5177,42 +3513,6 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "triggerOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "triggerOrderBit",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "cancelTriggerOrder",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": false,
           "isSigner": true
         },
         {
@@ -5302,67 +3602,6 @@ export type Zeta = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "editTriggerOrder",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "triggerOrder",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "orderPrice",
-          "type": "u64"
-        },
-        {
-          "name": "triggerPrice",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "triggerDirection",
-          "type": {
-            "option": {
-              "defined": "TriggerDirection"
-            }
-          }
-        },
-        {
-          "name": "triggerTs",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "reduceOnly",
-          "type": "bool"
-        }
-      ]
     },
     {
       "name": "editTriggerOrderV2",
@@ -6057,196 +4296,10 @@ export type Zeta = {
       ]
     },
     {
-      "name": "forceCancelOrderByOrderId",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        },
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
       "name": "forceCancelOrdersV2",
       "accounts": [
         {
           "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "forceCancelOrders",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
           "isMut": false,
           "isSigner": false
         },
@@ -6558,67 +4611,6 @@ export type Zeta = {
       ]
     },
     {
-      "name": "liquidate",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "liquidator",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "liquidatorMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "liquidatedMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "size",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "burnVaultTokens",
       "accounts": [
         {
@@ -6706,98 +4698,6 @@ export type Zeta = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "positionMovement",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "movementType",
-          "type": {
-            "defined": "MovementType"
-          }
-        },
-        {
-          "name": "movements",
-          "type": {
-            "vec": {
-              "defined": "PositionMovementArg"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "transferExcessSpreadBalance",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
         }
       ],
       "args": []
@@ -7258,178 +5158,11 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "markPrices",
-            "type": {
-              "array": [
-                "u64",
-                46
-              ]
-            }
-          },
-          {
-            "name": "markPricesPadding",
-            "type": {
-              "array": [
-                "u64",
-                91
-              ]
-            }
-          },
-          {
-            "name": "perpMarkPrice",
-            "type": "u64"
-          },
-          {
-            "name": "productGreeks",
-            "type": {
-              "array": [
-                {
-                  "defined": "ProductGreeks"
-                },
-                22
-              ]
-            }
-          },
-          {
-            "name": "productGreeksPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "ProductGreeks"
-                },
-                44
-              ]
-            }
-          },
-          {
-            "name": "updateTimestamp",
-            "type": {
-              "array": [
-                "u64",
-                2
-              ]
-            }
-          },
-          {
-            "name": "updateTimestampPadding",
-            "type": {
-              "array": [
-                "u64",
-                4
-              ]
-            }
-          },
-          {
-            "name": "retreatExpirationTimestamp",
-            "type": {
-              "array": [
-                "u64",
-                2
-              ]
-            }
-          },
-          {
-            "name": "retreatExpirationTimestampPadding",
-            "type": {
-              "array": [
-                "u64",
-                4
-              ]
-            }
-          },
-          {
-            "name": "interestRate",
-            "type": {
-              "array": [
-                "i64",
-                2
-              ]
-            }
-          },
-          {
-            "name": "interestRatePadding",
-            "type": {
-              "array": [
-                "i64",
-                4
-              ]
-            }
-          },
-          {
-            "name": "nodes",
-            "type": {
-              "array": [
-                "u64",
-                5
-              ]
-            }
-          },
-          {
-            "name": "volatility",
-            "type": {
-              "array": [
-                "u64",
-                10
-              ]
-            }
-          },
-          {
-            "name": "volatilityPadding",
-            "type": {
-              "array": [
-                "u64",
-                20
-              ]
-            }
-          },
-          {
-            "name": "nodeKeys",
-            "type": {
-              "array": [
-                "publicKey",
-                138
-              ]
-            }
-          },
-          {
-            "name": "haltForcePricing",
-            "type": {
-              "array": [
-                "bool",
-                6
-              ]
-            }
-          },
-          {
-            "name": "perpUpdateTimestamp",
-            "type": "u64"
-          },
-          {
-            "name": "perpFundingDelta",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "perpLatestFundingRate",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "perpLatestMidpoint",
-            "type": "u64"
-          },
-          {
-            "name": "padding",
+            "name": "data",
             "type": {
               "array": [
                 "u8",
-                1593
+                10232
               ]
             }
           }
@@ -7785,162 +5518,11 @@ export type Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "noncePadding",
+            "name": "data",
             "type": {
               "array": [
                 "u8",
-                2
-              ]
-            }
-          },
-          {
-            "name": "frontExpiryIndex",
-            "type": "u8"
-          },
-          {
-            "name": "haltState",
-            "type": {
-              "defined": "HaltState"
-            }
-          },
-          {
-            "name": "underlyingMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "oracle",
-            "type": "publicKey"
-          },
-          {
-            "name": "greeks",
-            "type": "publicKey"
-          },
-          {
-            "name": "pricingParameters",
-            "type": {
-              "defined": "PricingParameters"
-            }
-          },
-          {
-            "name": "marginParameters",
-            "type": {
-              "defined": "MarginParameters"
-            }
-          },
-          {
-            "name": "marginParametersPadding",
-            "type": {
-              "array": [
-                "u8",
-                104
-              ]
-            }
-          },
-          {
-            "name": "products",
-            "type": {
-              "array": [
-                {
-                  "defined": "Product"
-                },
-                46
-              ]
-            }
-          },
-          {
-            "name": "productsPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "Product"
-                },
-                91
-              ]
-            }
-          },
-          {
-            "name": "perp",
-            "type": {
-              "defined": "Product"
-            }
-          },
-          {
-            "name": "expirySeries",
-            "type": {
-              "array": [
-                {
-                  "defined": "ExpirySeries"
-                },
-                2
-              ]
-            }
-          },
-          {
-            "name": "expirySeriesPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "ExpirySeries"
-                },
-                4
-              ]
-            }
-          },
-          {
-            "name": "deprecatedPadding",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
-            }
-          },
-          {
-            "name": "asset",
-            "type": {
-              "defined": "Asset"
-            }
-          },
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "perpParameters",
-            "type": {
-              "defined": "PerpParameters"
-            }
-          },
-          {
-            "name": "perpSyncQueue",
-            "type": "publicKey"
-          },
-          {
-            "name": "oracleBackupFeed",
-            "type": "publicKey"
-          },
-          {
-            "name": "perpsOnly",
-            "type": "bool"
-          },
-          {
-            "name": "flexUnderlying",
-            "type": "bool"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                964
+                7696
               ]
             }
           }
@@ -8541,30 +6123,6 @@ export type Zeta = {
   ],
   "types": [
     {
-      "name": "ProductGreeks",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "delta",
-            "type": "u64"
-          },
-          {
-            "name": "vega",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "volatility",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "AnchorDecimal",
       "type": {
         "kind": "struct",
@@ -8613,144 +6171,6 @@ export type Zeta = {
       }
     },
     {
-      "name": "HaltState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "halted",
-            "type": "bool"
-          },
-          {
-            "name": "spotPrice",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          },
-          {
-            "name": "markPricesSet",
-            "type": {
-              "array": [
-                "bool",
-                2
-              ]
-            }
-          },
-          {
-            "name": "markPricesSetPadding",
-            "type": {
-              "array": [
-                "bool",
-                3
-              ]
-            }
-          },
-          {
-            "name": "perpMarkPriceSet",
-            "type": "bool"
-          },
-          {
-            "name": "marketNodesCleaned",
-            "type": {
-              "array": [
-                "bool",
-                2
-              ]
-            }
-          },
-          {
-            "name": "marketNodesCleanedPadding",
-            "type": {
-              "array": [
-                "bool",
-                4
-              ]
-            }
-          },
-          {
-            "name": "marketCleaned",
-            "type": {
-              "array": [
-                "bool",
-                46
-              ]
-            }
-          },
-          {
-            "name": "marketCleanedPadding",
-            "type": {
-              "array": [
-                "bool",
-                91
-              ]
-            }
-          },
-          {
-            "name": "perpMarketCleaned",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PricingParameters",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "optionTradeNormalizer",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "futureTradeNormalizer",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "maxVolatilityRetreat",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "maxInterestRetreat",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "maxDelta",
-            "type": "u64"
-          },
-          {
-            "name": "minDelta",
-            "type": "u64"
-          },
-          {
-            "name": "minVolatility",
-            "type": "u64"
-          },
-          {
-            "name": "maxVolatility",
-            "type": "u64"
-          },
-          {
-            "name": "minInterestRate",
-            "type": "i64"
-          },
-          {
-            "name": "maxInterestRate",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
       "name": "MarginParameters",
       "type": {
         "kind": "struct",
@@ -8782,35 +6202,6 @@ export type Zeta = {
           {
             "name": "impactCashDelta",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExpirySeries",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "activeTs",
-            "type": "u64"
-          },
-          {
-            "name": "expiryTs",
-            "type": "u64"
-          },
-          {
-            "name": "dirty",
-            "type": "bool"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                15
-              ]
-            }
           }
         ]
       }
@@ -8938,78 +6329,7 @@ export type Zeta = {
       }
     },
     {
-      "name": "OrderArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "price",
-            "type": "u64"
-          },
-          {
-            "name": "size",
-            "type": "u64"
-          },
-          {
-            "name": "clientOrderId",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
-            "name": "tifOffset",
-            "type": {
-              "option": "u16"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "HaltStateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "asset",
-            "type": {
-              "defined": "Asset"
-            }
-          },
-          {
-            "name": "spotPrice",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "HaltArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "spotPrices",
-            "type": {
-              "array": [
-                "u64",
-                15
-              ]
-            }
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateVolatilityArgs",
+      "name": "OverrideExpiryArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -9018,159 +6338,28 @@ export type Zeta = {
             "type": "u8"
           },
           {
-            "name": "volatility",
-            "type": {
-              "array": [
-                "u64",
-                5
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateInterestRateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "expiryIndex",
-            "type": "u8"
+            "name": "activeTs",
+            "type": "u64"
           },
           {
-            "name": "interestRate",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExpireSeriesOverrideArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "settlementNonce",
-            "type": "u8"
-          },
-          {
-            "name": "settlementPrice",
+            "name": "expiryTs",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "InitializeMarketArgs",
+      "name": "UpdateZetaGroupExpiryArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "asset",
-            "type": {
-              "defined": "Asset"
-            }
-          },
-          {
-            "name": "marketNonce",
-            "type": "u8"
-          },
-          {
-            "name": "baseMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "quoteMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaQuoteVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexQuoteVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "vaultSignerNonce",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeStateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "stateNonce",
-            "type": "u8"
-          },
-          {
-            "name": "serumNonce",
-            "type": "u8"
-          },
-          {
-            "name": "mintAuthNonce",
-            "type": "u8"
-          },
-          {
-            "name": "strikeInitializationThresholdSeconds",
+            "name": "expiryIntervalSeconds",
             "type": "u32"
           },
           {
-            "name": "pricingFrequencySeconds",
+            "name": "newExpiryThresholdSeconds",
             "type": "u32"
-          },
-          {
-            "name": "liquidatorLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "insuranceVaultLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "nativeDepositLimit",
-            "type": "u64"
-          },
-          {
-            "name": "expirationThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "positionMovementFeeBps",
-            "type": "u8"
-          },
-          {
-            "name": "marginConcessionPercentage",
-            "type": "u8"
-          },
-          {
-            "name": "maxPerpDeltaAgeSeconds",
-            "type": "u16"
-          },
-          {
-            "name": "nativeWithdrawLimit",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawLimitEpochSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "nativeOpenInterestLimit",
-            "type": "u64"
           }
         ]
       }
@@ -9192,160 +6381,16 @@ export type Zeta = {
       }
     },
     {
-      "name": "OverrideExpiryArgs",
+      "name": "ExpireSeriesOverrideArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "expiryIndex",
+            "name": "settlementNonce",
             "type": "u8"
           },
           {
-            "name": "activeTs",
-            "type": "u64"
-          },
-          {
-            "name": "expiryTs",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateStateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "strikeInitializationThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "pricingFrequencySeconds",
-            "type": "u32"
-          },
-          {
-            "name": "liquidatorLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "insuranceVaultLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "nativeDepositLimit",
-            "type": "u64"
-          },
-          {
-            "name": "expirationThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "positionMovementFeeBps",
-            "type": "u8"
-          },
-          {
-            "name": "marginConcessionPercentage",
-            "type": "u8"
-          },
-          {
-            "name": "maxPerpDeltaAgeSeconds",
-            "type": "u16"
-          },
-          {
-            "name": "nativeWithdrawLimit",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawLimitEpochSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "nativeOpenInterestLimit",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdatePricingParametersArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "optionTradeNormalizer",
-            "type": "u64"
-          },
-          {
-            "name": "futureTradeNormalizer",
-            "type": "u64"
-          },
-          {
-            "name": "maxVolatilityRetreat",
-            "type": "u64"
-          },
-          {
-            "name": "maxInterestRetreat",
-            "type": "u64"
-          },
-          {
-            "name": "minDelta",
-            "type": "u64"
-          },
-          {
-            "name": "maxDelta",
-            "type": "u64"
-          },
-          {
-            "name": "minInterestRate",
-            "type": "i64"
-          },
-          {
-            "name": "maxInterestRate",
-            "type": "i64"
-          },
-          {
-            "name": "minVolatility",
-            "type": "u64"
-          },
-          {
-            "name": "maxVolatility",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateMarginParametersArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "futureMarginInitial",
-            "type": "u64"
-          },
-          {
-            "name": "futureMarginMaintenance",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdatePerpParametersArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "minFundingRatePercent",
-            "type": "i64"
-          },
-          {
-            "name": "maxFundingRatePercent",
-            "type": "i64"
-          },
-          {
-            "name": "perpImpactCashDelta",
+            "name": "settlementPrice",
             "type": "u64"
           }
         ]
@@ -9485,50 +6530,6 @@ export type Zeta = {
       }
     },
     {
-      "name": "UpdateZetaGroupExpiryArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateGreeksArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "index",
-            "type": "u8"
-          },
-          {
-            "name": "theo",
-            "type": "u64"
-          },
-          {
-            "name": "delta",
-            "type": "u32"
-          },
-          {
-            "name": "gamma",
-            "type": "u32"
-          },
-          {
-            "name": "volatility",
-            "type": "u32"
-          }
-        ]
-      }
-    },
-    {
       "name": "PositionMovementArg",
       "type": {
         "kind": "struct",
@@ -9540,6 +6541,368 @@ export type Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdatePricingParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "optionTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "futureTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatilityRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "maxInterestRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "minDelta",
+            "type": "u64"
+          },
+          {
+            "name": "maxDelta",
+            "type": "u64"
+          },
+          {
+            "name": "minInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "minVolatility",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatility",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u64"
+          },
+          {
+            "name": "clientOrderId",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "tifOffset",
+            "type": {
+              "option": "u16"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "HaltStateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HaltArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "spotPrices",
+            "type": {
+              "array": [
+                "u64",
+                15
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateVolatilityArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIndex",
+            "type": "u8"
+          },
+          {
+            "name": "volatility",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInterestRateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIndex",
+            "type": "u8"
+          },
+          {
+            "name": "interestRate",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarketArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "marketNonce",
+            "type": "u8"
+          },
+          {
+            "name": "baseMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "quoteMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "vaultSignerNonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeStateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stateNonce",
+            "type": "u8"
+          },
+          {
+            "name": "serumNonce",
+            "type": "u8"
+          },
+          {
+            "name": "mintAuthNonce",
+            "type": "u8"
+          },
+          {
+            "name": "strikeInitializationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "pricingFrequencySeconds",
+            "type": "u32"
+          },
+          {
+            "name": "liquidatorLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "insuranceVaultLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "nativeDepositLimit",
+            "type": "u64"
+          },
+          {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateStateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strikeInitializationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "pricingFrequencySeconds",
+            "type": "u32"
+          },
+          {
+            "name": "liquidatorLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "insuranceVaultLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "nativeDepositLimit",
+            "type": "u64"
+          },
+          {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateMarginParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "futureMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "futureMarginMaintenance",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdatePerpParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
           }
         ]
       }
@@ -9606,29 +6969,6 @@ export type Zeta = {
           {
             "name": "pricingNonce",
             "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExpirySeriesStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Uninitialized"
-          },
-          {
-            "name": "Initialized"
-          },
-          {
-            "name": "Live"
-          },
-          {
-            "name": "Expired"
-          },
-          {
-            "name": "ExpiredDirty"
           }
         ]
       }
@@ -11308,6 +8648,11 @@ export type Zeta = {
       "code": 6171,
       "name": "AirdropCommunityAlreadySet",
       "msg": "Airdrop community already set, cannot set again"
+    },
+    {
+      "code": 6172,
+      "name": "InvalidReferrerAuthority",
+      "msg": "Invalid referrer authority"
     }
   ]
 };
@@ -11317,6 +8662,623 @@ export const IDL: Zeta = {
   "name": "zeta",
   "instructions": [
     {
+      "name": "initializeZetaGroup",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeZetaGroupArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "overrideExpiry",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "OverrideExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupMarginParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMarginParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupPerpParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePerpParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateZetaGroupExpiryParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateZetaGroupExpiryArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "toggleZetaGroupPerpsOnly",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "cleanZetaMarkets",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeMarginAccount",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeSpreadAccount",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeMarketNode",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitializeMarketNodeArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addMarketIndexes",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "expireSeriesOverride",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "ExpireSeriesOverrideArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "expireSeries",
+      "accounts": [],
+      "args": [
+        {
+          "name": "settlementNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initializeMarketStrikes",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "withdraw",
+      "accounts": [],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawInsuranceVault",
+      "accounts": [],
+      "args": [
+        {
+          "name": "percentageAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "deposit",
+      "accounts": [],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositInsuranceVault",
+      "accounts": [],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initializeOpenOrders",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "initializeOpenOrdersV2",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "closeOpenOrders",
+      "accounts": [],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "closeOpenOrdersV2",
+      "accounts": [],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "closeOpenOrdersV3",
+      "accounts": [],
+      "args": [
+        {
+          "name": "mapNonce",
+          "type": "u8"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrderV2",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrderV3",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placePerpOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placePerpOrderV2",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "tifOffset",
+          "type": {
+            "option": "u16"
+          }
+        }
+      ]
+    },
+    {
+      "name": "placeOrderV4",
+      "accounts": [],
+      "args": [
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "clientOrderId",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "tag",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "tifOffset",
+          "type": {
+            "option": "u16"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executeTriggerOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "cancelTriggerOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "triggerOrderBit",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "editTriggerOrder",
+      "accounts": [],
+      "args": [
+        {
+          "name": "orderPrice",
+          "type": "u64"
+        },
+        {
+          "name": "triggerPrice",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "triggerDirection",
+          "type": {
+            "option": {
+              "defined": "TriggerDirection"
+            }
+          }
+        },
+        {
+          "name": "triggerTs",
+          "type": {
+            "option": "u64"
+          }
+        },
+        {
+          "name": "size",
+          "type": "u64"
+        },
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "reduceOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "forceCancelOrderByOrderId",
+      "accounts": [],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": "Side"
+          }
+        },
+        {
+          "name": "orderId",
+          "type": "u128"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "forceCancelOrders",
+      "accounts": [],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateVolatility",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateVolatilityArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateInterestRate",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateInterestRateArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "positionMovement",
+      "accounts": [],
+      "args": [
+        {
+          "name": "movementType",
+          "type": {
+            "defined": "MovementType"
+          }
+        },
+        {
+          "name": "movements",
+          "type": {
+            "vec": {
+              "defined": "PositionMovementArg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transferExcessSpreadBalance",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "updatePricingParameters",
+      "accounts": [],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdatePricingParametersArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "liquidate",
+      "accounts": [],
+      "args": [
+        {
+          "name": "size",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateOracle",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "updateOracleBackupFeed",
+      "accounts": [],
+      "args": []
+    },
+    {
       "name": "initializeZetaPricing",
       "accounts": [
         {
@@ -11383,137 +9345,6 @@ export const IDL: Zeta = {
           "name": "args",
           "type": {
             "defined": "UpdateZetaPricingPubkeysArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "initializeZetaGroup",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "underlyingMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "underlying",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "usdcMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeZetaGroupArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "overrideExpiry",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "OverrideExpiryArgs"
           }
         }
       ]
@@ -11676,78 +9507,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "initializeMarginAccount",
-      "accounts": [
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "zetaProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializeSpreadAccount",
-      "accounts": [
-        {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "zetaProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "closeCrossMarginAccountManager",
       "accounts": [
         {
@@ -11800,7 +9559,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
@@ -11821,7 +9580,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
@@ -11962,44 +9721,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "initializeMarketNode",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "InitializeMarketNodeArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "halt",
       "accounts": [
         {
@@ -12079,72 +9800,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "updateVolatility",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateVolatilityArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updateInterestRate",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateInterestRateArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "addPerpMarketIndex",
       "accounts": [
         {
@@ -12166,22 +9821,6 @@ export const IDL: Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "addMarketIndexes",
-      "accounts": [
-        {
-          "name": "marketIndexes",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "initializeZetaState",
@@ -12530,86 +10169,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "updateOracle",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updateOracleBackupFeed",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updatePricingParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdatePricingParametersArgs"
-          }
-        }
-      ]
-    },
-    {
       "name": "updateMarginParameters",
       "accounts": [
         {
@@ -12639,34 +10198,6 @@ export const IDL: Zeta = {
           "name": "asset",
           "type": {
             "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updateZetaGroupMarginParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateMarginParametersArgs"
           }
         }
       ]
@@ -12704,99 +10235,6 @@ export const IDL: Zeta = {
           }
         }
       ]
-    },
-    {
-      "name": "updateZetaGroupPerpParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdatePerpParametersArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "updateZetaGroupExpiryParameters",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "UpdateZetaGroupExpiryArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "toggleZetaGroupPerpsOnly",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "cleanZetaMarkets",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "cleanZetaMarketHalted",
@@ -12856,59 +10294,6 @@ export const IDL: Zeta = {
           "type": {
             "defined": "Asset"
           }
-        }
-      ]
-    },
-    {
-      "name": "initializeMarketStrikes",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "expireSeriesOverride",
-      "accounts": [],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "ExpireSeriesOverrideArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "expireSeries",
-      "accounts": [],
-      "args": [
-        {
-          "name": "settlementNonce",
-          "type": "u8"
         }
       ]
     },
@@ -13204,62 +10589,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "deposit",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "depositV2",
       "accounts": [
         {
@@ -13367,57 +10696,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "depositInsuranceVault",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceDepositAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "depositInsuranceVaultV2",
       "accounts": [
         {
@@ -13495,77 +10773,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "withdraw",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "socializedLossAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "withdrawV2",
       "accounts": [
         {
@@ -13617,47 +10824,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "withdrawInsuranceVault",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "insuranceDepositAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "percentageAmount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "withdrawInsuranceVaultV2",
       "accounts": [
         {
@@ -13702,133 +10868,6 @@ export const IDL: Zeta = {
           "type": "u64"
         }
       ]
-    },
-    {
-      "name": "initializeOpenOrders",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializeOpenOrdersV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     },
     {
       "name": "initializeOpenOrdersV3",
@@ -13890,175 +10929,6 @@ export const IDL: Zeta = {
         }
       ],
       "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "closeOpenOrders",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "closeOpenOrdersV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "closeOpenOrdersV3",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "crossMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrdersMap",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "mapNonce",
-          "type": "u8"
-        },
         {
           "name": "asset",
           "type": {
@@ -14398,1044 +11268,6 @@ export const IDL: Zeta = {
         {
           "name": "nonce",
           "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "placeOrder",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placeOrderV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placeOrderV3",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placePerpOrder",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placePerpOrderV2",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "perpSyncQueue",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        },
-        {
-          "name": "tifOffset",
-          "type": {
-            "option": "u16"
-          }
-        }
-      ]
-    },
-    {
-      "name": "placeOrderV4",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "dexProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "serumAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "openOrders",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketAccounts",
-          "accounts": [
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "requestQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "orderPayerTokenAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcVault",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "coinWallet",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "pcWallet",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marketNode",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marketMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mintAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "clientOrderId",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "tag",
-          "type": {
-            "option": "string"
-          }
-        },
-        {
-          "name": "tifOffset",
-          "type": {
-            "option": "u16"
-          }
         }
       ]
     },
@@ -16300,157 +12132,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "executeTriggerOrder",
-      "accounts": [
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "triggerOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "placeOrderAccounts",
-          "accounts": [
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "pricing",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "rent",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marketAccounts",
-              "accounts": [
-                {
-                  "name": "market",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "requestQueue",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "eventQueue",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "bids",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "asks",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "orderPayerTokenAccount",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "coinVault",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "pcVault",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "coinWallet",
-                  "isMut": true,
-                  "isSigner": false
-                },
-                {
-                  "name": "pcWallet",
-                  "isMut": true,
-                  "isSigner": false
-                }
-              ]
-            },
-            {
-              "name": "oracle",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "oracleBackupFeed",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "oracleBackupProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marketMint",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "mintAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "perpSyncQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "triggerOrderBit",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "forceCancelTriggerOrder",
       "accounts": [
         {
@@ -16491,42 +12172,6 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "triggerOrder",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "triggerOrderBit",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "cancelTriggerOrder",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": false,
           "isSigner": true
         },
         {
@@ -16616,67 +12261,6 @@ export const IDL: Zeta = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "editTriggerOrder",
-      "accounts": [
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "triggerOrder",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "orderPrice",
-          "type": "u64"
-        },
-        {
-          "name": "triggerPrice",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "triggerDirection",
-          "type": {
-            "option": {
-              "defined": "TriggerDirection"
-            }
-          }
-        },
-        {
-          "name": "triggerTs",
-          "type": {
-            "option": "u64"
-          }
-        },
-        {
-          "name": "size",
-          "type": "u64"
-        },
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderType",
-          "type": {
-            "defined": "OrderType"
-          }
-        },
-        {
-          "name": "reduceOnly",
-          "type": "bool"
-        }
-      ]
     },
     {
       "name": "editTriggerOrderV2",
@@ -17371,196 +12955,10 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "forceCancelOrderByOrderId",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "side",
-          "type": {
-            "defined": "Side"
-          }
-        },
-        {
-          "name": "orderId",
-          "type": "u128"
-        },
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
       "name": "forceCancelOrdersV2",
       "accounts": [
         {
           "name": "pricing",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "cancelAccounts",
-          "accounts": [
-            {
-              "name": "state",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "marginAccount",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "dexProgram",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "serumAuthority",
-              "isMut": false,
-              "isSigner": false
-            },
-            {
-              "name": "openOrders",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "market",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "bids",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "asks",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "eventQueue",
-              "isMut": true,
-              "isSigner": false
-            }
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "asset",
-          "type": {
-            "defined": "Asset"
-          }
-        }
-      ]
-    },
-    {
-      "name": "forceCancelOrders",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
           "isMut": false,
           "isSigner": false
         },
@@ -17872,67 +13270,6 @@ export const IDL: Zeta = {
       ]
     },
     {
-      "name": "liquidate",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "liquidator",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "liquidatorMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "market",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "liquidatedMarginAccount",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "size",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "burnVaultTokens",
       "accounts": [
         {
@@ -18020,98 +13357,6 @@ export const IDL: Zeta = {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "positionMovement",
-      "accounts": [
-        {
-          "name": "state",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "greeks",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracle",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupFeed",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "oracleBackupProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "movementType",
-          "type": {
-            "defined": "MovementType"
-          }
-        },
-        {
-          "name": "movements",
-          "type": {
-            "vec": {
-              "defined": "PositionMovementArg"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "transferExcessSpreadBalance",
-      "accounts": [
-        {
-          "name": "zetaGroup",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "marginAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "spreadAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
         }
       ],
       "args": []
@@ -18572,178 +13817,11 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "markPrices",
-            "type": {
-              "array": [
-                "u64",
-                46
-              ]
-            }
-          },
-          {
-            "name": "markPricesPadding",
-            "type": {
-              "array": [
-                "u64",
-                91
-              ]
-            }
-          },
-          {
-            "name": "perpMarkPrice",
-            "type": "u64"
-          },
-          {
-            "name": "productGreeks",
-            "type": {
-              "array": [
-                {
-                  "defined": "ProductGreeks"
-                },
-                22
-              ]
-            }
-          },
-          {
-            "name": "productGreeksPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "ProductGreeks"
-                },
-                44
-              ]
-            }
-          },
-          {
-            "name": "updateTimestamp",
-            "type": {
-              "array": [
-                "u64",
-                2
-              ]
-            }
-          },
-          {
-            "name": "updateTimestampPadding",
-            "type": {
-              "array": [
-                "u64",
-                4
-              ]
-            }
-          },
-          {
-            "name": "retreatExpirationTimestamp",
-            "type": {
-              "array": [
-                "u64",
-                2
-              ]
-            }
-          },
-          {
-            "name": "retreatExpirationTimestampPadding",
-            "type": {
-              "array": [
-                "u64",
-                4
-              ]
-            }
-          },
-          {
-            "name": "interestRate",
-            "type": {
-              "array": [
-                "i64",
-                2
-              ]
-            }
-          },
-          {
-            "name": "interestRatePadding",
-            "type": {
-              "array": [
-                "i64",
-                4
-              ]
-            }
-          },
-          {
-            "name": "nodes",
-            "type": {
-              "array": [
-                "u64",
-                5
-              ]
-            }
-          },
-          {
-            "name": "volatility",
-            "type": {
-              "array": [
-                "u64",
-                10
-              ]
-            }
-          },
-          {
-            "name": "volatilityPadding",
-            "type": {
-              "array": [
-                "u64",
-                20
-              ]
-            }
-          },
-          {
-            "name": "nodeKeys",
-            "type": {
-              "array": [
-                "publicKey",
-                138
-              ]
-            }
-          },
-          {
-            "name": "haltForcePricing",
-            "type": {
-              "array": [
-                "bool",
-                6
-              ]
-            }
-          },
-          {
-            "name": "perpUpdateTimestamp",
-            "type": "u64"
-          },
-          {
-            "name": "perpFundingDelta",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "perpLatestFundingRate",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "perpLatestMidpoint",
-            "type": "u64"
-          },
-          {
-            "name": "padding",
+            "name": "data",
             "type": {
               "array": [
                 "u8",
-                1593
+                10232
               ]
             }
           }
@@ -19099,162 +14177,11 @@ export const IDL: Zeta = {
         "kind": "struct",
         "fields": [
           {
-            "name": "nonce",
-            "type": "u8"
-          },
-          {
-            "name": "noncePadding",
+            "name": "data",
             "type": {
               "array": [
                 "u8",
-                2
-              ]
-            }
-          },
-          {
-            "name": "frontExpiryIndex",
-            "type": "u8"
-          },
-          {
-            "name": "haltState",
-            "type": {
-              "defined": "HaltState"
-            }
-          },
-          {
-            "name": "underlyingMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "oracle",
-            "type": "publicKey"
-          },
-          {
-            "name": "greeks",
-            "type": "publicKey"
-          },
-          {
-            "name": "pricingParameters",
-            "type": {
-              "defined": "PricingParameters"
-            }
-          },
-          {
-            "name": "marginParameters",
-            "type": {
-              "defined": "MarginParameters"
-            }
-          },
-          {
-            "name": "marginParametersPadding",
-            "type": {
-              "array": [
-                "u8",
-                104
-              ]
-            }
-          },
-          {
-            "name": "products",
-            "type": {
-              "array": [
-                {
-                  "defined": "Product"
-                },
-                46
-              ]
-            }
-          },
-          {
-            "name": "productsPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "Product"
-                },
-                91
-              ]
-            }
-          },
-          {
-            "name": "perp",
-            "type": {
-              "defined": "Product"
-            }
-          },
-          {
-            "name": "expirySeries",
-            "type": {
-              "array": [
-                {
-                  "defined": "ExpirySeries"
-                },
-                2
-              ]
-            }
-          },
-          {
-            "name": "expirySeriesPadding",
-            "type": {
-              "array": [
-                {
-                  "defined": "ExpirySeries"
-                },
-                4
-              ]
-            }
-          },
-          {
-            "name": "deprecatedPadding",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
-            }
-          },
-          {
-            "name": "asset",
-            "type": {
-              "defined": "Asset"
-            }
-          },
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "perpParameters",
-            "type": {
-              "defined": "PerpParameters"
-            }
-          },
-          {
-            "name": "perpSyncQueue",
-            "type": "publicKey"
-          },
-          {
-            "name": "oracleBackupFeed",
-            "type": "publicKey"
-          },
-          {
-            "name": "perpsOnly",
-            "type": "bool"
-          },
-          {
-            "name": "flexUnderlying",
-            "type": "bool"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                964
+                7696
               ]
             }
           }
@@ -19855,30 +14782,6 @@ export const IDL: Zeta = {
   ],
   "types": [
     {
-      "name": "ProductGreeks",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "delta",
-            "type": "u64"
-          },
-          {
-            "name": "vega",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "volatility",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "AnchorDecimal",
       "type": {
         "kind": "struct",
@@ -19927,144 +14830,6 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "HaltState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "halted",
-            "type": "bool"
-          },
-          {
-            "name": "spotPrice",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          },
-          {
-            "name": "markPricesSet",
-            "type": {
-              "array": [
-                "bool",
-                2
-              ]
-            }
-          },
-          {
-            "name": "markPricesSetPadding",
-            "type": {
-              "array": [
-                "bool",
-                3
-              ]
-            }
-          },
-          {
-            "name": "perpMarkPriceSet",
-            "type": "bool"
-          },
-          {
-            "name": "marketNodesCleaned",
-            "type": {
-              "array": [
-                "bool",
-                2
-              ]
-            }
-          },
-          {
-            "name": "marketNodesCleanedPadding",
-            "type": {
-              "array": [
-                "bool",
-                4
-              ]
-            }
-          },
-          {
-            "name": "marketCleaned",
-            "type": {
-              "array": [
-                "bool",
-                46
-              ]
-            }
-          },
-          {
-            "name": "marketCleanedPadding",
-            "type": {
-              "array": [
-                "bool",
-                91
-              ]
-            }
-          },
-          {
-            "name": "perpMarketCleaned",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PricingParameters",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "optionTradeNormalizer",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "futureTradeNormalizer",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "maxVolatilityRetreat",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "maxInterestRetreat",
-            "type": {
-              "defined": "AnchorDecimal"
-            }
-          },
-          {
-            "name": "maxDelta",
-            "type": "u64"
-          },
-          {
-            "name": "minDelta",
-            "type": "u64"
-          },
-          {
-            "name": "minVolatility",
-            "type": "u64"
-          },
-          {
-            "name": "maxVolatility",
-            "type": "u64"
-          },
-          {
-            "name": "minInterestRate",
-            "type": "i64"
-          },
-          {
-            "name": "maxInterestRate",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
       "name": "MarginParameters",
       "type": {
         "kind": "struct",
@@ -20096,35 +14861,6 @@ export const IDL: Zeta = {
           {
             "name": "impactCashDelta",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExpirySeries",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "activeTs",
-            "type": "u64"
-          },
-          {
-            "name": "expiryTs",
-            "type": "u64"
-          },
-          {
-            "name": "dirty",
-            "type": "bool"
-          },
-          {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                15
-              ]
-            }
           }
         ]
       }
@@ -20252,78 +14988,7 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "OrderArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "price",
-            "type": "u64"
-          },
-          {
-            "name": "size",
-            "type": "u64"
-          },
-          {
-            "name": "clientOrderId",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
-            "name": "tifOffset",
-            "type": {
-              "option": "u16"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "HaltStateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "asset",
-            "type": {
-              "defined": "Asset"
-            }
-          },
-          {
-            "name": "spotPrice",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "HaltArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "spotPrices",
-            "type": {
-              "array": [
-                "u64",
-                15
-              ]
-            }
-          },
-          {
-            "name": "timestamp",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateVolatilityArgs",
+      "name": "OverrideExpiryArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -20332,159 +14997,28 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
-            "name": "volatility",
-            "type": {
-              "array": [
-                "u64",
-                5
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateInterestRateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "expiryIndex",
-            "type": "u8"
+            "name": "activeTs",
+            "type": "u64"
           },
           {
-            "name": "interestRate",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExpireSeriesOverrideArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "settlementNonce",
-            "type": "u8"
-          },
-          {
-            "name": "settlementPrice",
+            "name": "expiryTs",
             "type": "u64"
           }
         ]
       }
     },
     {
-      "name": "InitializeMarketArgs",
+      "name": "UpdateZetaGroupExpiryArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "asset",
-            "type": {
-              "defined": "Asset"
-            }
-          },
-          {
-            "name": "marketNonce",
-            "type": "u8"
-          },
-          {
-            "name": "baseMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "quoteMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaQuoteVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexQuoteVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "vaultSignerNonce",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "InitializeStateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "stateNonce",
-            "type": "u8"
-          },
-          {
-            "name": "serumNonce",
-            "type": "u8"
-          },
-          {
-            "name": "mintAuthNonce",
-            "type": "u8"
-          },
-          {
-            "name": "strikeInitializationThresholdSeconds",
+            "name": "expiryIntervalSeconds",
             "type": "u32"
           },
           {
-            "name": "pricingFrequencySeconds",
+            "name": "newExpiryThresholdSeconds",
             "type": "u32"
-          },
-          {
-            "name": "liquidatorLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "insuranceVaultLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "nativeDepositLimit",
-            "type": "u64"
-          },
-          {
-            "name": "expirationThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "positionMovementFeeBps",
-            "type": "u8"
-          },
-          {
-            "name": "marginConcessionPercentage",
-            "type": "u8"
-          },
-          {
-            "name": "maxPerpDeltaAgeSeconds",
-            "type": "u16"
-          },
-          {
-            "name": "nativeWithdrawLimit",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawLimitEpochSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "nativeOpenInterestLimit",
-            "type": "u64"
           }
         ]
       }
@@ -20506,160 +15040,16 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "OverrideExpiryArgs",
+      "name": "ExpireSeriesOverrideArgs",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "expiryIndex",
+            "name": "settlementNonce",
             "type": "u8"
           },
           {
-            "name": "activeTs",
-            "type": "u64"
-          },
-          {
-            "name": "expiryTs",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateStateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "strikeInitializationThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "pricingFrequencySeconds",
-            "type": "u32"
-          },
-          {
-            "name": "liquidatorLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "insuranceVaultLiquidationPercentage",
-            "type": "u32"
-          },
-          {
-            "name": "nativeDepositLimit",
-            "type": "u64"
-          },
-          {
-            "name": "expirationThresholdSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "positionMovementFeeBps",
-            "type": "u8"
-          },
-          {
-            "name": "marginConcessionPercentage",
-            "type": "u8"
-          },
-          {
-            "name": "maxPerpDeltaAgeSeconds",
-            "type": "u16"
-          },
-          {
-            "name": "nativeWithdrawLimit",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawLimitEpochSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "nativeOpenInterestLimit",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdatePricingParametersArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "optionTradeNormalizer",
-            "type": "u64"
-          },
-          {
-            "name": "futureTradeNormalizer",
-            "type": "u64"
-          },
-          {
-            "name": "maxVolatilityRetreat",
-            "type": "u64"
-          },
-          {
-            "name": "maxInterestRetreat",
-            "type": "u64"
-          },
-          {
-            "name": "minDelta",
-            "type": "u64"
-          },
-          {
-            "name": "maxDelta",
-            "type": "u64"
-          },
-          {
-            "name": "minInterestRate",
-            "type": "i64"
-          },
-          {
-            "name": "maxInterestRate",
-            "type": "i64"
-          },
-          {
-            "name": "minVolatility",
-            "type": "u64"
-          },
-          {
-            "name": "maxVolatility",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateMarginParametersArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "futureMarginInitial",
-            "type": "u64"
-          },
-          {
-            "name": "futureMarginMaintenance",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdatePerpParametersArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "minFundingRatePercent",
-            "type": "i64"
-          },
-          {
-            "name": "maxFundingRatePercent",
-            "type": "i64"
-          },
-          {
-            "name": "perpImpactCashDelta",
+            "name": "settlementPrice",
             "type": "u64"
           }
         ]
@@ -20799,50 +15189,6 @@ export const IDL: Zeta = {
       }
     },
     {
-      "name": "UpdateZetaGroupExpiryArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "expiryIntervalSeconds",
-            "type": "u32"
-          },
-          {
-            "name": "newExpiryThresholdSeconds",
-            "type": "u32"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UpdateGreeksArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "index",
-            "type": "u8"
-          },
-          {
-            "name": "theo",
-            "type": "u64"
-          },
-          {
-            "name": "delta",
-            "type": "u32"
-          },
-          {
-            "name": "gamma",
-            "type": "u32"
-          },
-          {
-            "name": "volatility",
-            "type": "u32"
-          }
-        ]
-      }
-    },
-    {
       "name": "PositionMovementArg",
       "type": {
         "kind": "struct",
@@ -20854,6 +15200,368 @@ export const IDL: Zeta = {
           {
             "name": "size",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdatePricingParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "optionTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "futureTradeNormalizer",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatilityRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "maxInterestRetreat",
+            "type": "u64"
+          },
+          {
+            "name": "minDelta",
+            "type": "u64"
+          },
+          {
+            "name": "maxDelta",
+            "type": "u64"
+          },
+          {
+            "name": "minInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "maxInterestRate",
+            "type": "i64"
+          },
+          {
+            "name": "minVolatility",
+            "type": "u64"
+          },
+          {
+            "name": "maxVolatility",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OrderArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u64"
+          },
+          {
+            "name": "clientOrderId",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "tifOffset",
+            "type": {
+              "option": "u16"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "HaltStateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "spotPrice",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HaltArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "spotPrices",
+            "type": {
+              "array": [
+                "u64",
+                15
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateVolatilityArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIndex",
+            "type": "u8"
+          },
+          {
+            "name": "volatility",
+            "type": {
+              "array": [
+                "u64",
+                5
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateInterestRateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "expiryIndex",
+            "type": "u8"
+          },
+          {
+            "name": "interestRate",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeMarketArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": {
+              "defined": "Asset"
+            }
+          },
+          {
+            "name": "marketNonce",
+            "type": "u8"
+          },
+          {
+            "name": "baseMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "quoteMintNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "zetaQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexBaseVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "dexQuoteVaultNonce",
+            "type": "u8"
+          },
+          {
+            "name": "vaultSignerNonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeStateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stateNonce",
+            "type": "u8"
+          },
+          {
+            "name": "serumNonce",
+            "type": "u8"
+          },
+          {
+            "name": "mintAuthNonce",
+            "type": "u8"
+          },
+          {
+            "name": "strikeInitializationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "pricingFrequencySeconds",
+            "type": "u32"
+          },
+          {
+            "name": "liquidatorLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "insuranceVaultLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "nativeDepositLimit",
+            "type": "u64"
+          },
+          {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateStateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strikeInitializationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "pricingFrequencySeconds",
+            "type": "u32"
+          },
+          {
+            "name": "liquidatorLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "insuranceVaultLiquidationPercentage",
+            "type": "u32"
+          },
+          {
+            "name": "nativeDepositLimit",
+            "type": "u64"
+          },
+          {
+            "name": "expirationThresholdSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "positionMovementFeeBps",
+            "type": "u8"
+          },
+          {
+            "name": "marginConcessionPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "maxPerpDeltaAgeSeconds",
+            "type": "u16"
+          },
+          {
+            "name": "nativeWithdrawLimit",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawLimitEpochSeconds",
+            "type": "u32"
+          },
+          {
+            "name": "nativeOpenInterestLimit",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateMarginParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "futureMarginInitial",
+            "type": "u64"
+          },
+          {
+            "name": "futureMarginMaintenance",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdatePerpParametersArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "minFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "maxFundingRatePercent",
+            "type": "i64"
+          },
+          {
+            "name": "perpImpactCashDelta",
+            "type": "u64"
           }
         ]
       }
@@ -20920,29 +15628,6 @@ export const IDL: Zeta = {
           {
             "name": "pricingNonce",
             "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ExpirySeriesStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Uninitialized"
-          },
-          {
-            "name": "Initialized"
-          },
-          {
-            "name": "Live"
-          },
-          {
-            "name": "Expired"
-          },
-          {
-            "name": "ExpiredDirty"
           }
         ]
       }
@@ -22622,6 +17307,11 @@ export const IDL: Zeta = {
       "code": 6171,
       "name": "AirdropCommunityAlreadySet",
       "msg": "Airdrop community already set, cannot set again"
+    },
+    {
+      "code": 6172,
+      "name": "InvalidReferrerAuthority",
+      "msg": "Invalid referrer authority"
     }
   ]
 };
