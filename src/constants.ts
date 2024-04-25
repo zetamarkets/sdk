@@ -459,8 +459,8 @@ export const STATIC_AND_PERPS_LUT: {
     key: new PublicKey("GYCrZc3MkTtLYiYGvcVMZUeqGZwP6S9bVGAbXASGeNtD"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 258417825,
-      lastExtendedSlotStartIndex: 189,
+      lastExtendedSlot: 262107072,
+      lastExtendedSlotStartIndex: 202,
       authority: new PublicKey("EwXPBSBUPqYDNA3dUVZ3nonFuaw3wGGJqEUTJbknDirH"),
       addresses: [
         new PublicKey("8eExPiLp47xbSDYkbuem4qnLUpbLTfZBeFuEJoh6EUr2"),
@@ -665,6 +665,7 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("HHvs3T3rcFnZFiTdKn5eXwg1w9ADGB98CpyprHW7jYMB"),
         new PublicKey("GpvkM2TeZXqQzFtBBgqoJYfc3BPScEHaSk41dwMrsKiW"),
         new PublicKey("H3j7orNNo7pzzHJZ1WFsrpJAxWCiE8QW3aatbGufu2PC"),
+        new PublicKey("6ABgrEZk8urs6kJ1JNdC1sspH5zKXRqxy8sg3ZG2cQps"),
       ],
     },
   }),
