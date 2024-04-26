@@ -167,6 +167,8 @@ export const FEE_TIER_MAP_BPS = {
     [MarginAccountType.NORMAL_T3]: 7,
     [MarginAccountType.NORMAL_T4]: 6,
     [MarginAccountType.NORMAL_T5]: 5,
+    [MarginAccountType.NORMAL_T6]: 4,
+    [MarginAccountType.NORMAL_T7]: 3,
   },
   maker: {
     [MarginAccountType.MARKET_MAKER]: 0,
@@ -182,7 +184,28 @@ export const FEE_TIER_MAP_BPS = {
     [MarginAccountType.NORMAL_T3]: 1.4,
     [MarginAccountType.NORMAL_T4]: 1.2,
     [MarginAccountType.NORMAL_T5]: 1,
+    [MarginAccountType.NORMAL_T6]: 0.8,
+    [MarginAccountType.NORMAL_T7]: 0.6,
   },
+};
+
+export const ACCOUNT_TYPE_TO_FEE_TIER_MAP = {
+  [MarginAccountType.MARKET_MAKER_T0]: 0,
+  [MarginAccountType.MARKET_MAKER_T1]: 1,
+  [MarginAccountType.MARKET_MAKER_T2]: 2,
+  [MarginAccountType.MARKET_MAKER_T3]: 3,
+  [MarginAccountType.MARKET_MAKER_T4]: 4,
+  [MarginAccountType.MARKET_MAKER_T5]: 5,
+  [MarginAccountType.MARKET_MAKER_T6]: 6,
+  [MarginAccountType.MARKET_MAKER_T7]: 7,
+  [MarginAccountType.NORMAL]: 0,
+  [MarginAccountType.NORMAL_T1]: 1,
+  [MarginAccountType.NORMAL_T2]: 2,
+  [MarginAccountType.NORMAL_T3]: 3,
+  [MarginAccountType.NORMAL_T4]: 4,
+  [MarginAccountType.NORMAL_T5]: 5,
+  [MarginAccountType.NORMAL_T6]: 6,
+  [MarginAccountType.NORMAL_T7]: 7,
 };
 
 export const MAX_SETTLE_AND_CLOSE_PER_TX = 4;

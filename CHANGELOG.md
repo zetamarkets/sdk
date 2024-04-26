@@ -3,9 +3,21 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [1.29.1]
+## [1.29.3]
 
 - WIF. ([#391](https://github.com/zetamarkets/sdk/pull/391))
+
+## [1.29.2]
+
+- Bugfix orderloss anchor.BN/number conversion ([#390](https://github.com/zetamarkets/sdk/pull/390))
+
+## [1.29.1]
+
+- Bump placeorder CU units to 400k ([#389](https://github.com/zetamarkets/sdk/pull/389))
+
+## [1.29.0]
+
+- Add airdrop communities ([#386](https://github.com/zetamarkets/sdk/pull/386))
 
 ## [1.28.1]
 
