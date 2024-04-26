@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.29.1]
+
+- WIF. ([#391](https://github.com/zetamarkets/sdk/pull/391))
+
 ## [1.28.1]
 
 - Trim trailing \0s on referral IDs ([#388](https://github.com/zetamarkets/sdk/pull/388))
