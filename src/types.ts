@@ -668,7 +668,6 @@ export interface PlaceMultiOrderArg {
   clientOrderId?: number;
 }
 
-
 export enum AirdropCommunity {
   UNASSIGNED = 0,
   BACKPACK = 1,
@@ -678,5 +677,6 @@ export enum AirdropCommunity {
   SUPERTEAM = 5,
   MADLADS = 6,
   TENSORIANS = 7,
-  ASSETDASH = 8
+  ASSETDASH = 8,
+  DRIFT = 9,
 }
