@@ -531,7 +531,7 @@
       "startEpochSeqNum": "6138179"
     }
   },
-  "W": {
+  "WIF": {
     "137": {
       "accountFlags": {
         "initialized": true,

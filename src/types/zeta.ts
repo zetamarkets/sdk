@@ -9764,7 +9764,7 @@ export type Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "WIF"
           },
           {
             "name": "UNDEFINED"
@@ -21078,7 +21078,7 @@ export const IDL: Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "WIF"
           },
           {
             "name": "UNDEFINED"
