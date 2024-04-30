@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.29.4]
+
+- Add utils.processTransactionBloxroute(). ([#380](https://github.com/zetamarkets/sdk/pull/380))
+
 ## [1.29.3]
 
 - WIF. ([#391](https://github.com/zetamarkets/sdk/pull/391))
