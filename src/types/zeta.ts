@@ -9560,10 +9560,6 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "oracleBackupFeed",
-            "type": "publicKey"
-          },
-          {
             "name": "market",
             "type": "publicKey"
           },
@@ -20871,10 +20867,6 @@ export const IDL: Zeta = {
           },
           {
             "name": "oracle",
-            "type": "publicKey"
-          },
-          {
-            "name": "oracleBackupFeed",
             "type": "publicKey"
           },
           {

@@ -162,23 +162,6 @@ export function closeCrossMarginAccountIx(
   });
 }
 
-export function initializeMarginAccountIx(
-  zetaGroup: PublicKey,
-  marginAccount: PublicKey,
-  user: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.initializeMarginAccount({
-    accounts: {
-      zetaGroup,
-      marginAccount,
-      authority: user,
-      payer: user,
-      zetaProgram: Exchange.programId,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
 export function closeMarginAccountIx(
   asset: Asset,
   userKey: PublicKey,
@@ -581,8 +564,7 @@ export function placePerpOrderV4Ix(
             pcWallet: marketData.quoteVault,
           },
           oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-          oracleBackupFeed:
-            Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+          oracleBackupFeed: PublicKey.default,
           oracleBackupProgram: constants.CHAINLINK_PID,
           marketMint:
             side == types.Side.BID
@@ -635,8 +617,7 @@ export function placeMultiOrdersIx(
         zetaBaseVault: marketData.baseVault,
         zetaQuoteVault: marketData.quoteVault,
         oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-        oracleBackupFeed:
-          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+        oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         marketBaseMint: marketData.serumMarket.baseMintAddress,
         marketQuoteMint: marketData.serumMarket.quoteMintAddress,
@@ -738,8 +719,7 @@ export function executeTriggerOrderV2Ix(
           pcWallet: marketData.quoteVault,
         },
         oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-        oracleBackupFeed:
-          Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+        oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         marketMint:
           side == types.Side.BID
@@ -767,7 +747,7 @@ export function takeTriggerOrderIx(
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
       oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
+      oracleBackupFeed: PublicKey.default,
       oracleBackupProgram: constants.CHAINLINK_PID,
       bids: marketData.serumMarket.bidsAddress,
       asks: marketData.serumMarket.asksAddress,
@@ -1054,7 +1034,7 @@ export function forceCancelOrderByOrderIdV2Ix(
       accounts: {
         pricing: Exchange.pricingAddress,
         oracle: Exchange.pricing.oracles[assetIndex],
-        oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetIndex],
+        oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
           state: Exchange.stateAddress,
@@ -1085,7 +1065,7 @@ export function forceCancelOrdersV2Ix(
       accounts: {
         pricing: Exchange.pricingAddress,
         oracle: Exchange.pricing.oracles[assetIndex],
-        oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetIndex],
+        oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
           state: Exchange.stateAddress,
@@ -1308,105 +1288,6 @@ export function initializePerpSyncQueueIx(
   );
 }
 
-export function initializeZetaGroupIx(
-  asset: Asset,
-  underlyingMint: PublicKey,
-  oracle: PublicKey,
-  oracleBackupFeed: PublicKey,
-  oracleBackupProgram: PublicKey,
-  pricingArgs: InitializeZetaGroupPricingArgs,
-  perpArgs: UpdatePerpParametersArgs,
-  marginArgs: UpdateMarginParametersArgs,
-  expiryArgs: UpdateZetaGroupExpiryArgs,
-  perpsOnly: boolean,
-  flexUnderlying: boolean
-): TransactionInstruction {
-  let [zetaGroup, zetaGroupNonce] = utils.getZetaGroup(
-    Exchange.programId,
-    underlyingMint
-  );
-
-  let [underlying, underlyingNonce] = flexUnderlying
-    ? utils.getFlexUnderlying(
-        Exchange.programId,
-        Exchange.state.numFlexUnderlyings
-      )
-    : utils.getUnderlying(Exchange.programId, Exchange.state.numUnderlyings);
-
-  let [greeks, greeksNonce] = utils.getGreeks(Exchange.programId, zetaGroup);
-
-  let [perpSyncQueue, perpSyncQueueNonce] = utils.getPerpSyncQueue(
-    Exchange.programId,
-    zetaGroup
-  );
-
-  let [vault, vaultNonce] = utils.getVault(Exchange.programId, zetaGroup);
-
-  let [insuranceVault, insuranceVaultNonce] = utils.getZetaInsuranceVault(
-    Exchange.programId,
-    zetaGroup
-  );
-
-  let [socializedLossAccount, socializedLossAccountNonce] =
-    utils.getSocializedLossAccount(Exchange.programId, zetaGroup);
-
-  return Exchange.program.instruction.initializeZetaGroup(
-    {
-      perpsOnly,
-      flexUnderlying: flexUnderlying,
-      assetOverride: toProgramAsset(asset) as any,
-      zetaGroupNonce,
-      underlyingNonce,
-      greeksNonce,
-      vaultNonce,
-      insuranceVaultNonce,
-      socializedLossAccountNonce,
-      perpSyncQueueNonce,
-      interestRate: pricingArgs.interestRate,
-      volatility: pricingArgs.volatility,
-      optionTradeNormalizer: pricingArgs.optionTradeNormalizer,
-      futureTradeNormalizer: pricingArgs.futureTradeNormalizer,
-      maxVolatilityRetreat: pricingArgs.maxVolatilityRetreat,
-      maxInterestRetreat: pricingArgs.maxInterestRetreat,
-      maxDelta: pricingArgs.maxDelta,
-      minDelta: pricingArgs.minDelta,
-      minInterestRate: pricingArgs.minInterestRate,
-      maxInterestRate: pricingArgs.maxInterestRate,
-      minVolatility: pricingArgs.minVolatility,
-      maxVolatility: pricingArgs.maxVolatility,
-      futureMarginInitial: marginArgs.futureMarginInitial,
-      futureMarginMaintenance: marginArgs.futureMarginMaintenance,
-      expiryIntervalSeconds: expiryArgs.expiryIntervalSeconds,
-      newExpiryThresholdSeconds: expiryArgs.newExpiryThresholdSeconds,
-      minFundingRatePercent: perpArgs.minFundingRatePercent,
-      maxFundingRatePercent: perpArgs.maxFundingRatePercent,
-      perpImpactCashDelta: perpArgs.perpImpactCashDelta,
-    },
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        admin: Exchange.state.admin,
-        systemProgram: SystemProgram.programId,
-        underlyingMint,
-        zetaProgram: Exchange.programId,
-        oracle,
-        oracleBackupFeed,
-        oracleBackupProgram,
-        zetaGroup,
-        greeks,
-        perpSyncQueue,
-        underlying,
-        vault,
-        insuranceVault,
-        socializedLossAccount,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        usdcMint: Exchange.usdcMintAddress,
-        rent: SYSVAR_RENT_PUBKEY,
-      },
-    }
-  );
-}
-
 export function collectTreasuryFundsIx(
   collectionTokenAccount: PublicKey,
   amount: anchor.BN,
@@ -1479,7 +1360,7 @@ export function liquidateV2Ix(
         liquidatorAccount,
         pricing: Exchange.pricingAddress,
         oracle: Exchange.pricing.oracles[asset_index],
-        oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[asset_index],
+        oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         market,
         liquidatedAccount,
@@ -1518,7 +1399,7 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
       oracle: Exchange.pricing.oracles[asset_index],
-      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[asset_index],
+      oracleBackupFeed: PublicKey.default,
       oracleBackupProgram: constants.CHAINLINK_PID,
       perpMarket: marketData.address,
       perpBids: subExchange.markets.market.serumMarket.bidsAddress,
@@ -1600,69 +1481,6 @@ export function updatePerpParametersIx(
       },
     }
   );
-}
-
-export function updateZetaGroupMarginParametersIx(
-  asset: Asset,
-  args: UpdateMarginParametersArgs,
-  admin: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.updateZetaGroupMarginParameters(
-    args,
-    toProgramAsset(asset),
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        zetaGroup: Exchange.getZetaGroupAddress(asset),
-        admin,
-      },
-    }
-  );
-}
-
-export function updateZetaGroupPerpParametersIx(
-  asset: Asset,
-  args: UpdatePerpParametersArgs,
-  admin: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.updateZetaGroupPerpParameters(
-    args,
-    toProgramAsset(asset),
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        zetaGroup: Exchange.getZetaGroupAddress(asset),
-        admin,
-      },
-    }
-  );
-}
-
-export function updateZetaGroupExpiryParametersIx(
-  asset: Asset,
-  args: UpdateZetaGroupExpiryArgs,
-  admin: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.updateZetaGroupExpiryParameters(args, {
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      admin,
-    },
-  });
-}
-
-export function toggleZetaGroupPerpsOnlyIx(
-  asset: Asset,
-  admin: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.toggleZetaGroupPerpsOnly({
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: Exchange.getZetaGroupAddress(asset),
-      admin,
-    },
-  });
 }
 
 export function initializeZetaPricingIx(
@@ -1822,21 +1640,6 @@ export function addMarketIndexesIx(
     accounts: {
       marketIndexes,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
-    },
-  });
-}
-
-export function initializeMarketStrikesIx(
-  asset: Asset
-): TransactionInstruction {
-  let subExchange = Exchange.getSubExchange(asset);
-  return Exchange.program.instruction.initializeMarketStrikes({
-    accounts: {
-      state: Exchange.stateAddress,
-      zetaGroup: subExchange.zetaGroupAddress,
-      oracle: Exchange.pricing.oracles[assetToIndex(asset)],
-      oracleBackupFeed: Exchange.pricing.oracleBackupFeeds[assetToIndex(asset)],
-      oracleBackupProgram: constants.CHAINLINK_PID,
     },
   });
 }
@@ -2118,85 +1921,6 @@ export function updateReferralsAdminIx(
   });
 }
 
-export function initializeSpreadAccountIx(
-  zetaGroup: PublicKey,
-  spreadAccount: PublicKey,
-  user: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.initializeSpreadAccount({
-    accounts: {
-      zetaGroup,
-      spreadAccount,
-      authority: user,
-      payer: user,
-      zetaProgram: Exchange.programId,
-      systemProgram: SystemProgram.programId,
-    },
-  });
-}
-
-export function closeSpreadAccountIx(
-  zetaGroup: PublicKey,
-  spreadAccount: PublicKey,
-  user: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.closeSpreadAccount({
-    accounts: {
-      zetaGroup,
-      spreadAccount,
-      authority: user,
-    },
-  });
-}
-
-export function positionMovementIx(
-  asset: Asset,
-  zetaGroup: PublicKey,
-  marginAccount: PublicKey,
-  spreadAccount: PublicKey,
-  user: PublicKey,
-  greeks: PublicKey,
-  oracle: PublicKey,
-  oracleBackupFeed: PublicKey,
-  oracleBackupProgram: PublicKey,
-  movementType: types.MovementType,
-  movements: PositionMovementArg[]
-): TransactionInstruction {
-  return Exchange.program.instruction.positionMovement(
-    types.toProgramMovementType(movementType),
-    movements,
-    {
-      accounts: {
-        state: Exchange.stateAddress,
-        zetaGroup,
-        marginAccount,
-        spreadAccount,
-        authority: user,
-        greeks,
-        oracle,
-        oracleBackupFeed,
-        oracleBackupProgram,
-      },
-    }
-  );
-}
-
-export function transferExcessSpreadBalanceIx(
-  zetaGroup: PublicKey,
-  marginAccount: PublicKey,
-  spreadAccount: PublicKey,
-  user: PublicKey
-): TransactionInstruction {
-  return Exchange.program.instruction.transferExcessSpreadBalance({
-    accounts: {
-      zetaGroup,
-      marginAccount,
-      spreadAccount,
-      authority: user,
-    },
-  });
-}
-
 export function settleDexFundsTxs(
   asset: Asset,
   vaultOwner: PublicKey,
@@ -2294,19 +2018,6 @@ export function burnVaultTokenTx(asset: Asset): Transaction {
     })
   );
   return tx;
-}
-
-export function overrideExpiryIx(
-  zetaGroup: PublicKey,
-  args: OverrideExpiryArgs
-): TransactionInstruction {
-  return Exchange.program.instruction.overrideExpiry(args, {
-    accounts: {
-      state: Exchange.stateAddress,
-      admin: Exchange.state.admin,
-      zetaGroup,
-    },
-  });
 }
 
 export function toggleMarketMakerIx(
@@ -2527,7 +2238,6 @@ export interface SetReferralsRewardsArgs {
 export interface UpdateZetaPricingPubkeysArgs {
   asset: any;
   oracle: PublicKey;
-  oracleBackupFeed: PublicKey;
   market: PublicKey;
   perpSyncQueue: PublicKey;
   zetaGroupKey: PublicKey;
