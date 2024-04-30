@@ -444,7 +444,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": []
@@ -465,7 +465,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -2160,6 +2160,27 @@
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -2763,7 +2784,7 @@
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -8054,11 +8075,15 @@
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -8175,11 +8200,29 @@
             "type": "u64"
           },
           {
+            "name": "potentialOrderLoss",
+            "type": {
+              "array": [
+                "u64",
+                15
+              ]
+            }
+          },
+          {
+            "name": "potentialOrderLossPadding",
+            "type": {
+              "array": [
+                "u64",
+                10
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1976
+                1776
               ]
             }
           }
@@ -9721,7 +9764,7 @@
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "WIF"
           },
           {
             "name": "UNDEFINED"
@@ -11255,6 +11298,16 @@
       "code": 6169,
       "name": "InvalidOracleUpdate",
       "msg": "Invalid oracle update"
+    },
+    {
+      "code": 6170,
+      "name": "OrderPriceTooFarFromMarkPrice",
+      "msg": "Order price too far from mark price"
+    },
+    {
+      "code": 6171,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 }

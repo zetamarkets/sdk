@@ -284,6 +284,7 @@ export interface AssetRiskState {
   maintenanceMarginIncludingOrders: number;
   unrealizedPnl: number;
   unpaidFunding: number;
+  potentialOrderLoss: number;
 }
 
 export interface CrossMarginAccountState {
@@ -300,6 +301,7 @@ export interface CrossMarginAccountState {
   maintenanceMarginIncludingOrdersTotal: number;
   unrealizedPnlTotal: number;
   unpaidFundingTotal: number;
+  potentialOrderLossTotal: number;
 }
 
 export interface CancelArgs {
@@ -664,4 +666,17 @@ export interface PlaceMultiOrderArg {
   size: number;
   tifOptions: TIFOptions;
   clientOrderId?: number;
+}
+
+export enum AirdropCommunity {
+  UNASSIGNED = 0,
+  BACKPACK = 1,
+  JUP = 2,
+  PYTH = 3,
+  DEBRIDGE = 4,
+  SUPERTEAM = 5,
+  MADLADS = 6,
+  TENSORIANS = 7,
+  ASSETDASH = 8,
+  DRIFT = 9,
 }

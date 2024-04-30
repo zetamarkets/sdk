@@ -192,6 +192,7 @@ export interface CrossMarginAccountManager {
   authority: PublicKey;
   accounts: Array<CrossMarginAccountInfo>;
   referrer: PublicKey;
+  airdropCommunity: number;
   padding: Array<number>;
 }
 
@@ -212,6 +213,8 @@ export interface CrossMarginAccount {
   productLedgersPadding: Array<ProductLedger>;
   triggerOrderBits: anchor.BN;
   rebateRebalanceAmount: anchor.BN;
+  potentialOrderLoss: Array<anchor.BN>;
+  potentialOrderLossPadding: Array<anchor.BN>;
   padding: Array<number>;
 }
 

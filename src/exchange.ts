@@ -316,6 +316,18 @@ export class Exchange {
   }
   private _priorityFee: number = 0;
 
+  // toggle to use jito bundles
+  public get useJitoBundle(): boolean {
+    return this._useJitoBundle;
+  }
+  private _useJitoBundle: boolean = false;
+
+  // jito tip
+  public get jitoTip(): number {
+    return this._jitoTip;
+  }
+  private _jitoTip: number = 0;
+
   public get useAutoPriorityFee(): boolean {
     return this._useAutoPriorityFee;
   }
@@ -367,6 +379,14 @@ export class Exchange {
 
   public updatePriorityFee(microLamportsPerCU: number) {
     this._priorityFee = microLamportsPerCU;
+  }
+
+  public setUseJitoBundle(option: boolean) {
+    this._useJitoBundle = option;
+  }
+
+  public updateJitoTip(tipAmountInLamports: number) {
+    this._jitoTip = tipAmountInLamports;
   }
 
   public updateAutoPriorityFeeUpperLimit(microLamportsPerCU: number) {
@@ -1149,17 +1169,7 @@ export class Exchange {
     try {
       await Promise.all(
         txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(
-            this._provider,
-            tx,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            this.skipRpcConfirmation
-          );
+          let txSig = await utils.processTransaction(this._provider, tx);
           console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
         })
       );

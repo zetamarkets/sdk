@@ -444,7 +444,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": []
@@ -465,7 +465,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -2160,6 +2160,27 @@ export type Zeta = {
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -2763,7 +2784,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -8054,11 +8075,15 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -8175,11 +8200,29 @@ export type Zeta = {
             "type": "u64"
           },
           {
+            "name": "potentialOrderLoss",
+            "type": {
+              "array": [
+                "u64",
+                15
+              ]
+            }
+          },
+          {
+            "name": "potentialOrderLossPadding",
+            "type": {
+              "array": [
+                "u64",
+                10
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1976
+                1776
               ]
             }
           }
@@ -9721,7 +9764,7 @@ export type Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "WIF"
           },
           {
             "name": "UNDEFINED"
@@ -11255,6 +11298,16 @@ export type Zeta = {
       "code": 6169,
       "name": "InvalidOracleUpdate",
       "msg": "Invalid oracle update"
+    },
+    {
+      "code": 6170,
+      "name": "OrderPriceTooFarFromMarkPrice",
+      "msg": "Order price too far from mark price"
+    },
+    {
+      "code": 6171,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };
@@ -11705,7 +11758,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": []
@@ -11726,7 +11779,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         }
       ],
       "args": [
@@ -13421,6 +13474,27 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "chooseAirdropCommunity",
+      "accounts": [
+        {
+          "name": "crossMarginAccountManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "community",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "accounts": [
         {
@@ -14024,7 +14098,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "market",
@@ -19315,11 +19389,15 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "airdropCommunity",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                23
+                22
               ]
             }
           }
@@ -19436,11 +19514,29 @@ export const IDL: Zeta = {
             "type": "u64"
           },
           {
+            "name": "potentialOrderLoss",
+            "type": {
+              "array": [
+                "u64",
+                15
+              ]
+            }
+          },
+          {
+            "name": "potentialOrderLossPadding",
+            "type": {
+              "array": [
+                "u64",
+                10
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                1976
+                1776
               ]
             }
           }
@@ -20982,7 +21078,7 @@ export const IDL: Zeta = {
             "name": "STRK"
           },
           {
-            "name": "W"
+            "name": "WIF"
           },
           {
             "name": "UNDEFINED"
@@ -22516,6 +22612,16 @@ export const IDL: Zeta = {
       "code": 6169,
       "name": "InvalidOracleUpdate",
       "msg": "Invalid oracle update"
+    },
+    {
+      "code": 6170,
+      "name": "OrderPriceTooFarFromMarkPrice",
+      "msg": "Order price too far from mark price"
+    },
+    {
+      "code": 6171,
+      "name": "AirdropCommunityAlreadySet",
+      "msg": "Airdrop community already set, cannot set again"
     }
   ]
 };

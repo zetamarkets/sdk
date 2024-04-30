@@ -28,7 +28,8 @@ export function collectRiskMaps(
   mmMap: Map<Asset, Number>,
   mmioMap: Map<Asset, Number>,
   upnlMap: Map<Asset, Number>,
-  unpaidFundingMap: Map<Asset, Number>
+  unpaidFundingMap: Map<Asset, Number>,
+  potentialOrderLossMap: Map<Asset, Number>
 ): Map<Asset, types.AssetRiskState> {
   let allAssets = assets.allAssets();
   let collectedRiskState = new Map();
@@ -40,6 +41,7 @@ export function collectRiskMaps(
       maintenanceMarginIncludingOrders: mmioMap.get(a),
       unrealizedPnl: upnlMap.get(a),
       unpaidFunding: unpaidFundingMap.get(a),
+      potentialOrderLoss: potentialOrderLossMap.get(a),
     });
   }
   return collectedRiskState;
@@ -325,6 +327,22 @@ export function addFakeCancelToAccount(
   const bidAskIndex = order.side == types.Side.BID ? 0 : 1;
 
   const nativeOrderSize = convertDecimalToNativeLotSize(order.size);
+
+  let totalOrders =
+    marginAccount.productLedgers[assetIndex].orderState.closingOrders +
+    marginAccount.productLedgers[assetIndex].orderState.openingOrders[0] +
+    marginAccount.productLedgers[assetIndex].orderState.openingOrders[1];
+
+  if (totalOrders == nativeOrderSize) {
+    marginAccount.potentialOrderLoss[assetIndex] = new anchor.BN(0);
+  } else {
+    let totalMaxLoss = marginAccount.potentialOrderLoss[assetIndex];
+    let maxLossPerLot = totalMaxLoss / totalOrders;
+    let averageMaxLoss = maxLossPerLot * nativeOrderSize;
+    marginAccount.potentialOrderLoss[assetIndex].sub(
+      new anchor.BN(averageMaxLoss)
+    );
+  }
 
   const cancelOpening = Math.min(
     marginAccount.productLedgers[assetIndex].orderState.openingOrders[
