@@ -32,6 +32,7 @@ import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
 import fetch from "cross-fetch";
+import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
 
 export class Exchange {
   /**
@@ -96,6 +97,11 @@ export class Exchange {
     return this._provider.connection as unknown as ConnectionZstd;
   }
   private _provider: anchor.AnchorProvider;
+
+  public get httpProvider(): HttpProvider {
+    return this._httpProvider;
+  }
+  private _httpProvider: HttpProvider;
 
   /**
    * Separate connection used for orderbook subscriptions.
@@ -330,6 +336,10 @@ export class Exchange {
   private _autoPriorityFeeOffset: number = 0;
   private _autoPriorityFeeMultiplier: number = 1;
   private _autoPriorityFeeUseMax: boolean = false;
+  public get tipMultiplier(): number {
+    return this._tipMultiplier;
+  }
+  private _tipMultiplier: number = 1;
 
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
@@ -361,6 +371,10 @@ export class Exchange {
 
   public setAutoPriorityFeeUseMax(useMax: boolean) {
     this._autoPriorityFeeUseMax = useMax;
+  }
+
+  public setTipMultiplier(multiplier: number) {
+    this._tipMultiplier = multiplier;
   }
 
   public updatePriorityFee(microLamportsPerCU: number) {
@@ -605,7 +619,13 @@ export class Exchange {
   public async load(
     loadConfig: types.LoadExchangeConfig,
     wallet = new types.DummyWallet(),
-    callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
+    callback?: (
+      asset: Asset,
+      event: EventType,
+      slot: number,
+      data: any
+    ) => void,
+    bloxrouteHttpProvider?: HttpProvider
   ) {
     if (this.isInitialized) {
       throw Error("Exchange already loaded");
@@ -617,6 +637,10 @@ export class Exchange {
 
     if (!this.isSetup) {
       this.initialize(loadConfig, wallet);
+    }
+
+    if (bloxrouteHttpProvider) {
+      this._httpProvider = bloxrouteHttpProvider;
     }
 
     this._riskCalculator = new RiskCalculator(this.assets);
