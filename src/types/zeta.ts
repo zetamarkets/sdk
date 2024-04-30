@@ -1599,6 +1599,132 @@ export type Zeta = {
       ]
     },
     {
+      "name": "initializeMarketPda",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeZetaSpecificMarketVaults",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "baseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "quoteMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaMarket",
       "accounts": [
         {
@@ -1653,16 +1779,6 @@ export type Zeta = {
         },
         {
           "name": "quoteMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaBaseVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaQuoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -9071,34 +9187,6 @@ export type Zeta = {
             "type": {
               "defined": "Asset"
             }
-          },
-          {
-            "name": "marketNonce",
-            "type": "u8"
-          },
-          {
-            "name": "baseMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "quoteMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaQuoteVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexQuoteVaultNonce",
-            "type": "u8"
           },
           {
             "name": "vaultSignerNonce",
@@ -12909,6 +12997,132 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "initializeMarketPda",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initializeZetaSpecificMarketVaults",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketIndexes",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pricing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "baseMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "quoteMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaBaseVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "zetaQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeZetaMarket",
       "accounts": [
         {
@@ -12963,16 +13177,6 @@ export const IDL: Zeta = {
         },
         {
           "name": "quoteMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaBaseVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "zetaQuoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -20381,34 +20585,6 @@ export const IDL: Zeta = {
             "type": {
               "defined": "Asset"
             }
-          },
-          {
-            "name": "marketNonce",
-            "type": "u8"
-          },
-          {
-            "name": "baseMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "quoteMintNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "zetaQuoteVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexBaseVaultNonce",
-            "type": "u8"
-          },
-          {
-            "name": "dexQuoteVaultNonce",
-            "type": "u8"
           },
           {
             "name": "vaultSignerNonce",
