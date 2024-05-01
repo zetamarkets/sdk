@@ -57,7 +57,16 @@ export class Oracle {
       throw Error("Invalid Oracle feed, no matching asset!");
     }
 
-    let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
+    let priceAddress: PublicKey;
+    if (this._network == Network.MAINNET) {
+      priceAddress = this._pythReceiver.getPriceFeedAccountAddress(
+        0,
+        constants.PYTHNET_PRICE_FEED_IDS[asset]
+      );
+    } else {
+      priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
+    }
+
     let priceUpdate =
       await this._pythReceiver.receiver.account.priceUpdateV2.fetch(
         priceAddress
@@ -95,7 +104,16 @@ export class Oracle {
     await Promise.all(
       assetList.map(async (asset) => {
         console.log(`Oracle subscribing to feed ${assetToName(asset)}`);
-        let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
+
+        let priceAddress: PublicKey;
+        if (this._network == Network.MAINNET) {
+          priceAddress = this._pythReceiver.getPriceFeedAccountAddress(
+            0,
+            constants.PYTHNET_PRICE_FEED_IDS[asset]
+          );
+        } else {
+          priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
+        }
 
         let eventEmitter =
           this._pythReceiver.receiver.account.priceUpdateV2.subscribe(

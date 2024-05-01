@@ -17,6 +17,7 @@ import * as constants from "./constants";
 /**
  * Wallet interface for objects that can be used to sign provider transactions.
  */
+
 export interface Wallet {
   signTransaction(
     tx: Transaction | VersionedTransaction
@@ -30,15 +31,15 @@ export interface Wallet {
 export class DummyWallet implements Wallet {
   constructor() {}
 
-  async signTransaction<T extends Transaction | VersionedTransaction>(
-    _tx: T
-  ): Promise<T> {
+  async signTransaction(
+    _tx: Transaction | VersionedTransaction
+  ): Promise<Transaction | VersionedTransaction> {
     throw Error("Not supported by dummy wallet!");
   }
 
-  async signAllTransactions<T extends Transaction | VersionedTransaction>(
-    _txs: T[]
-  ): Promise<T[]> {
+  async signAllTransactions(
+    _txs: Transaction[] | VersionedTransaction[]
+  ): Promise<Transaction[] | VersionedTransaction[]> {
     throw Error("Not supported by dummy wallet!");
   }
 
