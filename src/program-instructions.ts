@@ -563,7 +563,7 @@ export function placePerpOrderV4Ix(
             coinWallet: marketData.baseVault,
             pcWallet: marketData.quoteVault,
           },
-          oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+          oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
           oracleBackupFeed: PublicKey.default,
           oracleBackupProgram: constants.CHAINLINK_PID,
           marketMint:
@@ -616,7 +616,7 @@ export function placeMultiOrdersIx(
         // User params.
         zetaBaseVault: marketData.baseVault,
         zetaQuoteVault: marketData.quoteVault,
-        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+        oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         marketBaseMint: marketData.serumMarket.baseMintAddress,
@@ -718,7 +718,7 @@ export function executeTriggerOrderV2Ix(
           coinWallet: marketData.baseVault,
           pcWallet: marketData.quoteVault,
         },
-        oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+        oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         marketMint:
@@ -746,7 +746,7 @@ export function takeTriggerOrderIx(
       triggerOrder: triggerOrder,
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
-      oracle: Exchange.pricing.oracles[assetToIndex(asset)],
+      oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
       oracleBackupFeed: PublicKey.default,
       oracleBackupProgram: constants.CHAINLINK_PID,
       bids: marketData.serumMarket.bidsAddress,
@@ -1033,7 +1033,7 @@ export function forceCancelOrderByOrderIdV2Ix(
     {
       accounts: {
         pricing: Exchange.pricingAddress,
-        oracle: Exchange.pricing.oracles[assetIndex],
+        oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
@@ -1064,7 +1064,7 @@ export function forceCancelOrdersV2Ix(
     {
       accounts: {
         pricing: Exchange.pricingAddress,
-        oracle: Exchange.pricing.oracles[assetIndex],
+        oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         cancelAccounts: {
@@ -1210,8 +1210,6 @@ export async function initializeZetaMarketTxs(
       programId: constants.DEX_PID[Exchange.network],
     })
   );
-
-  console.log(market, requestQueue, eventQueue, bids, asks);
 
   let tx2 = new Transaction().add(
     Exchange.program.instruction.initializeZetaMarket(
@@ -1389,7 +1387,7 @@ export function liquidateV2Ix(
         liquidator,
         liquidatorAccount,
         pricing: Exchange.pricingAddress,
-        oracle: Exchange.pricing.oracles[asset_index],
+        oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
         oracleBackupProgram: constants.CHAINLINK_PID,
         market,
@@ -1428,7 +1426,7 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
-      oracle: Exchange.pricing.oracles[asset_index],
+      oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
       oracleBackupFeed: PublicKey.default,
       oracleBackupProgram: constants.CHAINLINK_PID,
       perpMarket: marketData.address,
@@ -1454,7 +1452,7 @@ export function updatePricingV3Ix(
       accounts: {
         state: Exchange.stateAddress,
         pricing: Exchange.pricingAddress,
-        oracle: Exchange.pricing.oracles[asset_index],
+        oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         perpMarket: marketData.address,
         perpBids: subExchange.markets.market.serumMarket.bidsAddress,
         perpAsks: subExchange.markets.market.serumMarket.asksAddress,

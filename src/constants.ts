@@ -250,6 +250,47 @@ export const MARGIN_ACCOUNT_ASSET_OFFSET = 5764;
 // 8 + 32 + 1 + 8 + 48 + 2208
 export const SPREAD_ACCOUNT_ASSET_OFFSET = 2305;
 
+export const PYTHNET_PRICE_FEED_IDS = {
+  // Pyth sponsored
+  [Asset.SOL]:
+    "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d",
+  // Pyth sponsored
+  [Asset.BTC]:
+    "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
+  // Pyth sponsored
+  [Asset.ETH]:
+    "0xc96458d393fe9deb7a7d63a0ac41e2898a67a7750dbd166673279e06c868df0a",
+  [Asset.APT]:
+    "0x03ae4db29ed4ae33d323568895aa00337e658e348b37509f5372ae51f0af00d5",
+  [Asset.ARB]:
+    "0x3fa4252848f9f0a1480be62745a4629d9eb1322aebab8a791e344b3b9c1adcf5",
+  [Asset.BNB]:
+    "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f",
+  // Pyth sponsored
+  [Asset.PYTH]:
+    "0x0bbf28e9a841a1cc788f6a361b17ca072d0ea3098a1e5df1c3922d06719579ff",
+  [Asset.TIA]:
+    "0x09f7c1d7dfbb7df2b8fe3d3d87ee94a2259d212da4f30c1f0540d066dfa44723",
+  // Pyth sponsored
+  [Asset.JTO]:
+    "0xb43660a5f790c69354b0729a5ef9d50d68f1df92107540210b9cccba1f947cc2",
+  // Pyth sponsored
+  [Asset.ONEMBONK]:
+    "0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419",
+  [Asset.SEI]:
+    "0x53614f1cb0c031d4af66c04cb9c756234adad0e1cee85303795091499a4084eb",
+  // Pyth sponsored
+  [Asset.JUP]:
+    "0x0a0408d619e9380abad35060f9192039ed5042fa6f82301d0e48bb52be830996",
+  [Asset.DYM]:
+    "0xa9f3b2a89c6f85a6c20a9518abde39b944e839ca49a0c92307c65974d3f14a57",
+  [Asset.STRK]:
+    "0x6a182399ff70ccf3e06024898942028204125a819e519a335ffa4579e66cd870",
+  // Pyth sponsored
+  [Asset.WIF]:
+    "0x4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc",
+};
+
 export const PYTH_PRICE_FEEDS = {
   localnet: {
     [Asset.SOL]: new PublicKey("2pRCJksgaoKRMqBfa7NTdd6tLYe9wbDFGCcCCZ6si3F7"),

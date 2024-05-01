@@ -8,7 +8,6 @@ import {
   VersionedTransaction,
 } from "@solana/web3.js";
 import { Connection as ConnectionZstd } from "zeta-solana-web3";
-import { allAssets } from "./assets";
 import { Asset, MarginAccountType } from "./constants";
 import { objectEquals } from "./utils";
 import { CrossMarginAccount, MarginAccount } from "./program-types";
@@ -31,15 +30,15 @@ export interface Wallet {
 export class DummyWallet implements Wallet {
   constructor() {}
 
-  async signTransaction(
-    _tx: Transaction | VersionedTransaction
-  ): Promise<Transaction | VersionedTransaction> {
+  async signTransaction<T extends Transaction | VersionedTransaction>(
+    _tx: T
+  ): Promise<T> {
     throw Error("Not supported by dummy wallet!");
   }
 
-  async signAllTransactions(
-    _txs: Transaction[] | VersionedTransaction[]
-  ): Promise<Transaction[] | VersionedTransaction[]> {
+  async signAllTransactions<T extends Transaction | VersionedTransaction>(
+    _txs: T[]
+  ): Promise<T[]> {
     throw Error("Not supported by dummy wallet!");
   }
 

@@ -13,6 +13,8 @@
     "build-no-idl": "./node_modules/.bin/tsc"
   },
   "dependencies": {
+    "@bloxroute/solana-trader-client-ts": "2.1.0",
+    "@pythnetwork/pyth-solana-receiver": "^0.7.0",
     "@solana/buffer-layout": "4.0.0",
     "@solana/spl-token": "0.1.6",
     "@solana/web3.js": "1.87.6",
@@ -23,7 +25,6 @@
     "lodash": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
     "obscenity": "0.2.0",
-    "@bloxroute/solana-trader-client-ts": "2.1.0",
     "zeta-solana-web3": "1.87.7"
   },
   "devDependencies": {
