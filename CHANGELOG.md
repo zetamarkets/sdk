@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.29.5]
+
+- Reshuffle airdrop communities. ([#392](https://github.com/zetamarkets/sdk/pull/392))
+
 ## [1.29.4]
 
 - Add utils.processTransactionBloxroute(). ([#380](https://github.com/zetamarkets/sdk/pull/380))
