@@ -146,10 +146,6 @@ export const DEX_PID: {
   mainnet: new PublicKey("zDEXqXEG7gAyxb1Kg9mK5fPnUdENCGKzWrM21RMdWRq"),
 };
 
-export const CHAINLINK_PID: PublicKey = new PublicKey(
-  "HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny"
-);
-
 // These are constants onchain
 // We duplicate them here for convenient access for frontend and risk utils
 export const FEE_TIER_MAP_BPS = {

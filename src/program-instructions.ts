@@ -565,7 +565,7 @@ export function placePerpOrderV4Ix(
           },
           oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
           oracleBackupFeed: PublicKey.default,
-          oracleBackupProgram: constants.CHAINLINK_PID,
+          oracleBackupProgram: PublicKey.default,
           marketMint:
             side == types.Side.BID
               ? marketData.serumMarket.quoteMintAddress
@@ -618,7 +618,7 @@ export function placeMultiOrdersIx(
         zetaQuoteVault: marketData.quoteVault,
         oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
-        oracleBackupProgram: constants.CHAINLINK_PID,
+        oracleBackupProgram: PublicKey.default,
         marketBaseMint: marketData.serumMarket.baseMintAddress,
         marketQuoteMint: marketData.serumMarket.quoteMintAddress,
         mintAuthority: Exchange.mintAuthority,
@@ -720,7 +720,7 @@ export function executeTriggerOrderV2Ix(
         },
         oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
-        oracleBackupProgram: constants.CHAINLINK_PID,
+        oracleBackupProgram: PublicKey.default,
         marketMint:
           side == types.Side.BID
             ? marketData.serumMarket.quoteMintAddress
@@ -748,7 +748,7 @@ export function takeTriggerOrderIx(
       pricing: Exchange.pricingAddress,
       oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
       oracleBackupFeed: PublicKey.default,
-      oracleBackupProgram: constants.CHAINLINK_PID,
+      oracleBackupProgram: PublicKey.default,
       bids: marketData.serumMarket.bidsAddress,
       asks: marketData.serumMarket.asksAddress,
       taker,
@@ -1035,7 +1035,7 @@ export function forceCancelOrderByOrderIdV2Ix(
         pricing: Exchange.pricingAddress,
         oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
-        oracleBackupProgram: constants.CHAINLINK_PID,
+        oracleBackupProgram: PublicKey.default,
         cancelAccounts: {
           state: Exchange.stateAddress,
           marginAccount: marginAccount,
@@ -1066,7 +1066,7 @@ export function forceCancelOrdersV2Ix(
         pricing: Exchange.pricingAddress,
         oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
-        oracleBackupProgram: constants.CHAINLINK_PID,
+        oracleBackupProgram: PublicKey.default,
         cancelAccounts: {
           state: Exchange.stateAddress,
           marginAccount: marginAccount,
@@ -1389,7 +1389,7 @@ export function liquidateV2Ix(
         pricing: Exchange.pricingAddress,
         oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
         oracleBackupFeed: PublicKey.default,
-        oracleBackupProgram: constants.CHAINLINK_PID,
+        oracleBackupProgram: PublicKey.default,
         market,
         liquidatedAccount,
       },
@@ -1428,7 +1428,7 @@ export function updatePricingV2Ix(asset: Asset): TransactionInstruction {
       pricing: Exchange.pricingAddress,
       oracle: constants.PYTH_PRICE_FEEDS[Exchange.network][asset],
       oracleBackupFeed: PublicKey.default,
-      oracleBackupProgram: constants.CHAINLINK_PID,
+      oracleBackupProgram: PublicKey.default,
       perpMarket: marketData.address,
       perpBids: subExchange.markets.market.serumMarket.bidsAddress,
       perpAsks: subExchange.markets.market.serumMarket.asksAddress,
