@@ -8,7 +8,6 @@ import {
   VersionedTransaction,
 } from "@solana/web3.js";
 import { Connection as ConnectionZstd } from "zeta-solana-web3";
-import { allAssets } from "./assets";
 import { Asset, MarginAccountType } from "./constants";
 import { objectEquals } from "./utils";
 import { CrossMarginAccount, MarginAccount } from "./program-types";
@@ -18,6 +17,7 @@ import * as constants from "./constants";
 /**
  * Wallet interface for objects that can be used to sign provider transactions.
  */
+
 export interface Wallet {
   signTransaction(
     tx: Transaction | VersionedTransaction

@@ -1,24 +1,28 @@
-import { PublicKey, Connection, AccountInfo, Context } from "@solana/web3.js";
-import { parsePythData, Price } from "./oracle-utils";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { Network } from "./network";
 import { exchange as Exchange } from "./exchange";
 import * as constants from "./constants";
 import { Asset } from "./constants";
-import { assetToName } from "./assets";
+import { assetMultiplier, assetToName } from "./assets";
+import * as types from "./types";
+import { PythSolanaReceiver } from "@pythnetwork/pyth-solana-receiver";
+import { PriceUpdateAccount } from "@pythnetwork/pyth-solana-receiver/lib/PythSolanaReceiver";
 
 export class Oracle {
   private _connection: Connection;
   private _network: Network;
   private _data: Map<Asset, OraclePrice>;
-  private _subscriptionIds: Map<Asset, number>;
+  private _eventEmitters: Map<Asset, any>;
   private _callback: (asset: Asset, price: OraclePrice, slot: number) => void;
+  private _pythReceiver: PythSolanaReceiver;
 
-  public constructor(network: Network, connection: Connection) {
+  public constructor(network: Network, connection: Connection, wallet) {
     this._network = network;
     this._connection = connection;
-    this._subscriptionIds = new Map();
+    this._eventEmitters = new Map();
     this._data = new Map();
     this._callback = undefined;
+    this._pythReceiver = new PythSolanaReceiver({ connection, wallet });
   }
 
   public getAvailablePriceFeeds(): string[] {
@@ -36,6 +40,14 @@ export class Oracle {
     return Date.now() / 1000 - this.getPrice(asset).lastUpdatedTime;
   }
 
+  public async getPriceUpdateAccount(
+    account: PublicKey
+  ): Promise<PriceUpdateAccount> {
+    return await this._pythReceiver.receiver.account.priceUpdateV2.fetch(
+      account
+    );
+  }
+
   // Fetch and update an oracle price manually
   public async pollPrice(
     asset: Asset,
@@ -45,19 +57,37 @@ export class Oracle {
       throw Error("Invalid Oracle feed, no matching asset!");
     }
 
-    let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
-    let accountInfo = await this._connection.getAccountInfo(priceAddress);
-    let priceData = parsePythData(accountInfo.data, asset);
-    let oracleData = {
+    let priceAddress: PublicKey;
+    if (this._network == Network.MAINNET) {
+      priceAddress = this._pythReceiver.getPriceFeedAccountAddress(
+        0,
+        constants.PYTHNET_PRICE_FEED_IDS[asset]
+      );
+    } else {
+      priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
+    }
+
+    let priceUpdate =
+      await this._pythReceiver.receiver.account.priceUpdateV2.fetch(
+        priceAddress
+      );
+
+    const price =
+      priceUpdate.priceMessage.price.toNumber() *
+      10 ** priceUpdate.priceMessage.exponent *
+      assetMultiplier(asset);
+
+    const oracleData = {
       asset,
-      price: priceData.price,
-      lastUpdatedTime: Exchange.clockTimestamp,
-      lastUpdatedSlot: priceData.publishSlot,
+      price,
+      lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
+      lastUpdatedSlot: priceUpdate.postedSlot.toNumber(),
     };
+
     this._data.set(asset, oracleData);
 
     if (triggerCallback) {
-      this._callback(asset, oracleData, Number(priceData.publishSlot));
+      this._callback(asset, oracleData, priceUpdate.postedSlot.toNumber());
     }
     return oracleData;
   }
@@ -74,31 +104,45 @@ export class Oracle {
     await Promise.all(
       assetList.map(async (asset) => {
         console.log(`Oracle subscribing to feed ${assetToName(asset)}`);
-        let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
-        let subscriptionId = this._connection.onAccountChange(
-          priceAddress,
-          (accountInfo: AccountInfo<Buffer>, context: Context) => {
-            let priceData = parsePythData(accountInfo.data, asset);
-            let currPrice = this._data.get(asset);
-            if (
-              currPrice !== undefined &&
-              currPrice.price === priceData.price
-            ) {
-              return;
-            }
-            let oracleData = {
-              asset,
-              price: priceData.price,
-              lastUpdatedTime: Exchange.clockTimestamp,
-              lastUpdatedSlot: priceData.publishSlot,
-            };
-            this._data.set(asset, oracleData);
-            this._callback(asset, oracleData, context.slot);
-          },
-          Exchange.provider.connection.commitment
-        );
 
-        this._subscriptionIds.set(asset, subscriptionId);
+        let priceAddress: PublicKey;
+        if (this._network == Network.MAINNET) {
+          priceAddress = this._pythReceiver.getPriceFeedAccountAddress(
+            0,
+            constants.PYTHNET_PRICE_FEED_IDS[asset]
+          );
+        } else {
+          priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
+        }
+
+        let eventEmitter =
+          this._pythReceiver.receiver.account.priceUpdateV2.subscribe(
+            priceAddress,
+            this._connection.commitment
+          );
+
+        eventEmitter.on("change", async (priceUpdate: PriceUpdateAccount) => {
+          const price =
+            priceUpdate.priceMessage.price.toNumber() *
+            10 ** priceUpdate.priceMessage.exponent *
+            assetMultiplier(asset);
+
+          const publishSlot = priceUpdate.postedSlot.toNumber();
+          let currPrice = this._data.get(asset);
+          if (currPrice !== undefined && currPrice.price === price) {
+            return;
+          }
+          const oracleData = {
+            asset,
+            price,
+            lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
+            lastUpdatedSlot: publishSlot,
+          };
+          this._data.set(asset, oracleData);
+          this._callback(asset, oracleData, publishSlot);
+        });
+        this._eventEmitters.set(asset, eventEmitter);
+
         // Set this so the oracle contains a price on initialization.
         await this.pollPrice(asset, true);
       })
@@ -106,9 +150,18 @@ export class Oracle {
   }
 
   public async close() {
-    for (let subscriptionId of this._subscriptionIds.values()) {
-      await this._connection.removeAccountChangeListener(subscriptionId);
+    await Promise.all(
+      Exchange.assets.map(async (asset) => {
+        let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
+        return this._pythReceiver.receiver.account.priceUpdateV2.unsubscribe(
+          priceAddress
+        );
+      })
+    );
+    for (let eventEmitter of this._eventEmitters.values()) {
+      await eventEmitter.removeListener("change");
     }
+    this._eventEmitters = new Map();
   }
 }
 

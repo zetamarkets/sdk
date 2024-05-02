@@ -44,7 +44,6 @@ import {
 } from "./program-types";
 import * as types from "./types";
 import * as instructions from "./program-instructions";
-import { readBigInt64LE } from "./oracle-utils";
 import { assets } from ".";
 import { Network } from "./network";
 import cloneDeep from "lodash.clonedeep";
@@ -1394,6 +1393,64 @@ const SystemClockLayout = BufferLayout.struct([
   int64("unixTimestamp"),
 ]);
 
+// https://github.com/nodejs/node/blob/v14.17.0/lib/internal/errors.js#L758
+const ERR_BUFFER_OUT_OF_BOUNDS = () =>
+  new Error("Attempt to access memory outside buffer bounds");
+
+// https://github.com/nodejs/node/blob/v14.17.0/lib/internal/errors.js#L1262
+const ERR_OUT_OF_RANGE = (str: string, range: string, received: number) =>
+  new Error(
+    `The value of "${str} is out of range. It must be ${range}. Received ${received}`
+  );
+
+// https://github.com/nodejs/node/blob/v14.17.0/lib/internal/errors.js#L968
+const ERR_INVALID_ARG_TYPE = (name: string, expected: string, actual: any) =>
+  new Error(
+    `The "${name}" argument must be of type ${expected}. Received ${actual}`
+  );
+
+// https://github.com/nodejs/node/blob/v14.17.0/lib/internal/validators.js#L127-L130
+function validateNumber(value: any, name: string) {
+  if (typeof value !== "number")
+    throw ERR_INVALID_ARG_TYPE(name, "number", value);
+}
+
+// https://github.com/nodejs/node/blob/v14.17.0/lib/internal/buffer.js#L68-L80
+function boundsError(value: number, length: number) {
+  if (Math.floor(value) !== value) {
+    validateNumber(value, "offset");
+    throw ERR_OUT_OF_RANGE("offset", "an integer", value);
+  }
+
+  if (length < 0) throw ERR_BUFFER_OUT_OF_BOUNDS();
+
+  throw ERR_OUT_OF_RANGE("offset", `>= 0 and <= ${length}`, value);
+}
+
+// https://github.com/nodejs/node/blob/v14.17.0/lib/internal/buffer.js#L129-L145
+export function readBigInt64LE(buffer: Buffer, offset = 0): bigint {
+  validateNumber(offset, "offset");
+  const first = buffer[offset];
+  const last = buffer[offset + 7];
+  if (first === undefined || last === undefined)
+    boundsError(offset, buffer.length - 8);
+  // tslint:disable-next-line:no-bitwise
+  const val =
+    buffer[offset + 4] +
+    buffer[offset + 5] * 2 ** 8 +
+    buffer[offset + 6] * 2 ** 16 +
+    (last << 24); // Overflow
+  return (
+    (BigInt(val) << BigInt(32)) + // tslint:disable-line:no-bitwise
+    BigInt(
+      first +
+        buffer[++offset] * 2 ** 8 +
+        buffer[++offset] * 2 ** 16 +
+        buffer[++offset] * 2 ** 24
+    )
+  );
+}
+
 export function getClockData(
   accountInfo: AccountInfo<Buffer>
 ): types.ClockData {
@@ -2409,7 +2466,7 @@ async function initializeZetaMarket(
   const bids = getOrCreateKeypair(`${dir}/bids-${i}.json`);
   const asks = getOrCreateKeypair(`${dir}/asks-${i}.json`);
 
-  let [tx, tx2] = await instructions.initializeZetaMarketTxs(
+  let [preTx, tx, tx2, postTx] = await instructions.initializeZetaMarketTxs(
     asset,
     marketIndexesAccount.indexes[i],
     requestQueue.publicKey,
@@ -2446,6 +2503,16 @@ async function initializeZetaMarket(
     console.log(`Market ${i} serum accounts already initialized...`);
   } else {
     try {
+      console.log("initialize market pda");
+      await processTransaction(
+        Exchange.provider,
+        preTx,
+        [],
+        commitmentConfig(Exchange.connection.commitment),
+        Exchange.useLedger
+      );
+
+      console.log("initialize zeta market instruction");
       await processTransaction(
         Exchange.provider,
         tx,
@@ -2465,6 +2532,14 @@ async function initializeZetaMarket(
       await processTransaction(
         Exchange.provider,
         tx2,
+        [],
+        commitmentConfig(Exchange.connection.commitment),
+        Exchange.useLedger
+      );
+
+      await processTransaction(
+        Exchange.provider,
+        postTx,
         [],
         commitmentConfig(Exchange.connection.commitment),
         Exchange.useLedger

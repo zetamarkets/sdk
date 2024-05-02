@@ -565,57 +565,6 @@ export class Exchange {
     await this.updateZetaPricing();
   }
 
-  public async initializeZetaGroup(
-    asset: Asset,
-    oracle: PublicKey,
-    oracleBackupFeed: PublicKey,
-    oracleBackupProgram: PublicKey,
-    pricingArgs: instructions.InitializeZetaGroupPricingArgs,
-    perpArgs: instructions.UpdatePerpParametersArgs,
-    marginArgs: instructions.UpdateMarginParametersArgs,
-    expiryArgs: instructions.UpdateZetaGroupExpiryArgs,
-    perpsOnly: boolean = false,
-    flexUnderlying: boolean = false
-  ) {
-    let underlyingMint = utils.getUnderlyingMint(asset);
-    let tx = new Transaction().add(
-      instructions.initializeZetaGroupIx(
-        asset,
-        underlyingMint,
-        oracle,
-        oracleBackupFeed,
-        oracleBackupProgram,
-        pricingArgs,
-        perpArgs,
-        marginArgs,
-        expiryArgs,
-        perpsOnly,
-        flexUnderlying
-      )
-    );
-    try {
-      await utils.processTransaction(
-        this._provider,
-        tx,
-        [],
-        utils.defaultCommitment(),
-        this.useLedger
-      );
-    } catch (e) {
-      console.error(`Initialize zeta group failed: ${e}`);
-      console.log(e);
-    }
-
-    await this.updateState();
-
-    if (this.getSubExchange(asset) == undefined) {
-      await this.addSubExchange(asset, new SubExchange());
-      await this.getSubExchange(asset).initialize(asset);
-    }
-
-    await this.updateZetaPricing();
-  }
-
   public async load(
     loadConfig: types.LoadExchangeConfig,
     wallet = new types.DummyWallet(),
@@ -664,7 +613,8 @@ export class Exchange {
     await this.updateZetaPricing();
     this._oracle = new Oracle(
       this.network,
-      this.connection as unknown as Connection
+      this.connection as unknown as Connection,
+      wallet
     );
 
     const subExchangeToFetchAddrs: PublicKey[] = this.assets
@@ -1050,17 +1000,6 @@ export class Exchange {
     await this.getSubExchange(asset).updatePerpParameters(args);
   }
 
-  public async updateZetaGroupExpiryParameters(
-    asset: Asset,
-    args: instructions.UpdateZetaGroupExpiryArgs
-  ) {
-    await this.getSubExchange(asset).updateZetaGroupExpiryParameters(args);
-  }
-
-  public async toggleZetaGroupPerpsOnly(asset: Asset) {
-    await this.getSubExchange(asset).toggleZetaGroupPerpsOnly();
-  }
-
   public async updateSerumMarkets(asset: Asset) {
     await this.getSubExchange(asset).updateSerumMarkets();
   }
@@ -1083,10 +1022,6 @@ export class Exchange {
     await this.getSubExchange(asset).initializeZetaMarketsTIFEpochCycle(
       cycleLengthSecs
     );
-  }
-
-  public async initializeMarketStrikes(asset: Asset) {
-    await this.getSubExchange(asset).initializeMarketStrikes();
   }
 
   public async initializePerpSyncQueue(asset: Asset) {
@@ -1112,7 +1047,6 @@ export class Exchange {
   public async updatePricingPubkeys(
     asset: Asset,
     oracle: PublicKey,
-    oracleBackupFeed: PublicKey,
     market: PublicKey,
     perpSyncQueue: PublicKey,
     zetaGroupKey: PublicKey
@@ -1121,7 +1055,6 @@ export class Exchange {
       instructions.updateZetaPricingPubkeysIx({
         asset: toProgramAsset(asset) as any,
         oracle,
-        oracleBackupFeed,
         market,
         perpSyncQueue,
         zetaGroupKey,

@@ -238,35 +238,6 @@ export class SubExchange {
     await utils.processTransaction(Exchange.provider, tx);
   }
 
-  /**
-   * Update the margin parameters for a zeta group.
-   */
-  public async updateZetaGroupExpiryParameters(
-    args: instructions.UpdateZetaGroupExpiryArgs
-  ) {
-    let tx = new Transaction().add(
-      instructions.updateZetaGroupExpiryParametersIx(
-        this.asset,
-        args,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
-  /**
-   * Toggles whether a zeta group is perps-only or not
-   */
-  public async toggleZetaGroupPerpsOnly() {
-    let tx = new Transaction().add(
-      instructions.toggleZetaGroupPerpsOnlyIx(
-        this.asset,
-        Exchange.provider.wallet.publicKey
-      )
-    );
-    await utils.processTransaction(Exchange.provider, tx);
-  }
-
   public async initializeZetaMarketsTIFEpochCycle(cycleLengthSecs: number) {
     if (cycleLengthSecs > 65_535) {
       throw Error("Can't initialize TIF epoch cycle > u16::MAX");
@@ -298,16 +269,6 @@ export class SubExchange {
     );
 
     await this.updateSerumMarkets();
-  }
-
-  /**
-   * Will throw if it is not strike initialization time.
-   */
-  public async initializeMarketStrikes() {
-    let tx = new Transaction().add(
-      instructions.initializeMarketStrikesIx(this.asset)
-    );
-    await utils.processTransaction(Exchange.provider, tx);
   }
 
   public async initializePerpSyncQueue() {
