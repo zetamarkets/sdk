@@ -5,7 +5,11 @@ Version changes are pinned to SDK releases.
 
 ## [1.30.0]
 
-- - Upgrade anchor to 0.28.0, solana to 1.16.20, add new pythV2 functionality. ([#393](https://github.com/zetamarkets/sdk/pull/393))
+- Upgrade anchor to 0.28.0, solana to 1.16.20, add new pythV2 functionality. ([#393](https://github.com/zetamarkets/sdk/pull/393))
+
+## [1.29.5]
+
+- Reshuffle airdrop communities. ([#392](https://github.com/zetamarkets/sdk/pull/392))
 
 ## [1.29.4]
 

@@ -670,13 +670,11 @@ export interface PlaceMultiOrderArg {
 
 export enum AirdropCommunity {
   UNASSIGNED = 0,
-  BACKPACK = 1,
-  JUP = 2,
-  PYTH = 3,
-  DEBRIDGE = 4,
-  SUPERTEAM = 5,
-  MADLADS = 6,
-  TENSORIANS = 7,
-  ASSETDASH = 8,
-  DRIFT = 9,
+  JUP = 1,
+  PYTH = 2,
+  DEBRIDGE = 3,
+  SUPERTEAM = 4,
+  MADLADS = 5,
+  TENSORIANS = 6,
+  ASSETDASH = 7
 }
