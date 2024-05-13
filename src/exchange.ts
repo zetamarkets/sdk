@@ -316,11 +316,11 @@ export class Exchange {
   }
   private _priorityFee: number = 0;
 
-  // toggle to use jito bundles
-  public get useJitoBundle(): boolean {
-    return this._useJitoBundle;
+  // enum to toggle whether to use jito or not
+  public get jitoRpcMode(): types.JitoRpcMode {
+    return this._jitoRpcMode;
   }
-  private _useJitoBundle: boolean = false;
+  private _jitoRpcMode: types.JitoRpcMode = types.JitoRpcMode.RPCONLY;
 
   // jito tip
   public get jitoTip(): number {
@@ -381,8 +381,8 @@ export class Exchange {
     this._priorityFee = microLamportsPerCU;
   }
 
-  public setUseJitoBundle(option: boolean) {
-    this._useJitoBundle = option;
+  public setJitoRpcMode(option: types.JitoRpcMode) {
+    this._jitoRpcMode = option;
   }
 
   public updateJitoTip(tipAmountInLamports: number) {

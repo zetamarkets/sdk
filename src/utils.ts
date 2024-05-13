@@ -51,6 +51,7 @@ import * as os from "os";
 import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
 import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
 import axios from "axios";
+import { searcher, bundle } from "jito-ts";
 
 export function getNativeTickSize(asset: Asset): number {
   return Exchange.state.tickSizes[assets.assetToIndex(asset)];
@@ -1064,7 +1065,8 @@ export async function processTransactionJito(
   signers?: Array<Signer>,
   opts?: ConfirmOptions,
   lutAccs?: AddressLookupTableAccount[],
-  blockhash?: { blockhash: string; lastValidBlockHeight: number }
+  blockhash?: { blockhash: string; lastValidBlockHeight: number },
+  comboRpc: boolean = false
 ): Promise<TransactionSignature> {
   if (Exchange.jitoTip == 0) {
     throw Error("Jito bundle tip has not been set.");
@@ -1124,6 +1126,19 @@ export async function processTransactionJito(
 
   let txOpts = opts || commitmentConfig(provider.connection.commitment);
   let txSig: string;
+
+  if (comboRpc) {
+    try {
+      await provider.connection.sendRawTransaction(rawTx, {
+        skipPreflight: true,
+        preflightCommitment: provider.connection.commitment,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      throw new Error("RPC rrror: cannot send.");
+    }
+  }
+
   try {
     const response = await axios.post(jitoURL, payload, {
       headers: { "Content-Type": "application/json" },
@@ -1144,10 +1159,13 @@ export async function processTransactionJito(
 
   while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
     // Keep resending to maximise the chance of confirmation
-    await provider.connection.sendRawTransaction(rawTx, {
-      skipPreflight: true,
-      preflightCommitment: provider.connection.commitment,
-    });
+
+    if (comboRpc) {
+      await provider.connection.sendRawTransaction(rawTx, {
+        skipPreflight: true,
+        preflightCommitment: provider.connection.commitment,
+      });
+    }
 
     let status = await provider.connection.getSignatureStatus(txSig);
     currentBlockHeight = await provider.connection.getBlockHeight(
@@ -1184,16 +1202,21 @@ export async function processTransaction(
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
   retries?: number
 ): Promise<TransactionSignature> {
-  if (Exchange.useJitoBundle) {
+  if (
+    Exchange.jitoRpcMode == types.JitoRpcMode.JITOONLY ||
+    Exchange.jitoRpcMode == types.JitoRpcMode.COMBO
+  ) {
     return processTransactionJito(
       provider,
       tx,
       signers,
       opts,
       lutAccs,
-      blockhash
+      blockhash,
+      Exchange.jitoRpcMode == types.JitoRpcMode.COMBO
     );
   }
+  // else it's RPC only
 
   if (Exchange.httpProvider) {
     let txSig = await processTransactionBloxroute(
