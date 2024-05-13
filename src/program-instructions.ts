@@ -1110,7 +1110,7 @@ export async function initializeZetaMarketTxs(
   asks: PublicKey,
   marketIndexes: PublicKey,
   zetaGroupAddress: PublicKey
-): Promise<[Transaction, Transaction, Transaction, Transaction]> {
+): Promise<[Transaction, Transaction]> {
   const [market, marketNonce] = utils.getMarketUninitialized(
     Exchange.programId,
     zetaGroupAddress,
@@ -1152,20 +1152,6 @@ export async function initializeZetaMarketTxs(
   let fromPubkey = Exchange.useLedger
     ? Exchange.ledgerWallet.publicKey
     : Exchange.provider.wallet.publicKey;
-
-  const preTx = new Transaction().add(
-    Exchange.program.instruction.initializeMarketPda(toProgramAsset(asset), {
-      accounts: {
-        state: Exchange.stateAddress,
-        marketIndexes,
-        pricing: Exchange.pricingAddress,
-        admin: Exchange.state.admin,
-        market,
-        systemProgram: SystemProgram.programId,
-        rent: SYSVAR_RENT_PUBKEY,
-      },
-    })
-  );
 
   const tx = new Transaction();
   tx.add(
@@ -1212,6 +1198,17 @@ export async function initializeZetaMarketTxs(
   );
 
   let tx2 = new Transaction().add(
+    Exchange.program.instruction.initializeMarketPda(toProgramAsset(asset), {
+      accounts: {
+        state: Exchange.stateAddress,
+        marketIndexes,
+        pricing: Exchange.pricingAddress,
+        admin: Exchange.state.admin,
+        market,
+        systemProgram: SystemProgram.programId,
+        rent: SYSVAR_RENT_PUBKEY,
+      },
+    }),
     Exchange.program.instruction.initializeZetaMarket(
       {
         asset: toProgramAsset(asset),
@@ -1241,10 +1238,7 @@ export async function initializeZetaMarketTxs(
           rent: SYSVAR_RENT_PUBKEY,
         },
       }
-    )
-  );
-
-  const postTx = new Transaction().add(
+    ),
     Exchange.program.instruction.initializeZetaSpecificMarketVaults(
       toProgramAsset(asset),
       {
@@ -1266,7 +1260,8 @@ export async function initializeZetaMarketTxs(
       }
     )
   );
-  return [preTx, tx, tx2, postTx];
+
+  return [tx, tx2];
 }
 
 export function initializeUnderlyingIx(
