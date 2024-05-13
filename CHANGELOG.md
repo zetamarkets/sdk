@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.31.0]
+
+- Add rndr, fix oracle loading with dummy wallet and revert some pyth changes for stale prices. ([#396](https://github.com/zetamarkets/sdk/pull/396))
+
 ## [1.30.0]
 
 - Upgrade anchor to 0.28.0, solana to 1.16.20, add new pythV2 functionality. ([#393](https://github.com/zetamarkets/sdk/pull/393))
