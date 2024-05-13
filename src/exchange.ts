@@ -613,8 +613,7 @@ export class Exchange {
     await this.updateZetaPricing();
     this._oracle = new Oracle(
       this.network,
-      this.connection as unknown as Connection,
-      wallet
+      this.connection as unknown as Connection
     );
 
     const subExchangeToFetchAddrs: PublicKey[] = this.assets

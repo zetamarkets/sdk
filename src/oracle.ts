@@ -16,7 +16,11 @@ export class Oracle {
   private _callback: (asset: Asset, price: OraclePrice, slot: number) => void;
   private _pythReceiver: PythSolanaReceiver;
 
-  public constructor(network: Network, connection: Connection, wallet) {
+  public constructor(
+    network: Network,
+    connection: Connection,
+    wallet = new types.PythDummyWallet()
+  ) {
     this._network = network;
     this._connection = connection;
     this._eventEmitters = new Map();
