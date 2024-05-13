@@ -1080,16 +1080,6 @@ export async function processTransactionJito(
     );
   }
 
-  tx.instructions.push(
-    SystemProgram.transfer({
-      fromPubkey: Exchange.provider.publicKey,
-      toPubkey: new PublicKey(
-        "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL" // Jito tip account
-      ),
-      lamports: Exchange.jitoTip, // tip
-    })
-  );
-
   let recentBlockhash =
     blockhash ??
     (await provider.connection.getLatestBlockhash(
@@ -1104,6 +1094,22 @@ export async function processTransactionJito(
     }).compileToV0Message(lutAccs)
   );
 
+  let vTxTip: VersionedTransaction = new VersionedTransaction(
+    new TransactionMessage({
+      payerKey: provider.wallet.publicKey,
+      recentBlockhash: recentBlockhash.blockhash,
+      instructions: [
+        SystemProgram.transfer({
+          fromPubkey: Exchange.provider.publicKey,
+          toPubkey: new PublicKey(
+            "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL" // Jito tip account
+          ),
+          lamports: Exchange.jitoTip, // tip
+        }),
+      ],
+    }).compileToV0Message(lutAccs)
+  );
+
   vTx.sign(
     (signers ?? [])
       .filter((s) => s !== undefined)
@@ -1112,17 +1118,27 @@ export async function processTransactionJito(
       })
   );
   vTx = (await provider.wallet.signTransaction(vTx)) as VersionedTransaction;
+  vTxTip.sign(
+    (signers ?? [])
+      .filter((s) => s !== undefined)
+      .map((kp) => {
+        return kp;
+      })
+  );
+  vTxTip = (await provider.wallet.signTransaction(
+    vTxTip
+  )) as VersionedTransaction;
 
-  let rawTx = vTx.serialize();
-
-  const encodedTx = bs58.encode(rawTx);
-  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
+  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/bundles";
+  let b = new bundle.Bundle([vTx, vTxTip], 2);
   const payload = {
     jsonrpc: "2.0",
     id: 1,
-    method: "sendTransaction",
-    params: [encodedTx],
+    method: "sendBundle",
+    params: b.packets,
   };
+
+  let rawTx = vTx.serialize();
 
   let txOpts = opts || commitmentConfig(provider.connection.commitment);
   let txSig: string;
@@ -1143,6 +1159,7 @@ export async function processTransactionJito(
     const response = await axios.post(jitoURL, payload, {
       headers: { "Content-Type": "application/json" },
     });
+    console.log(response);
     txSig = response.data.result;
   } catch (error) {
     console.error("Error:", error);
