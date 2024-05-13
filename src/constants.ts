@@ -17,6 +17,7 @@ export enum Asset {
   DYM = "DYM",
   STRK = "STRK",
   WIF = "WIF",
+  RNDR = "RNDR",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -78,6 +79,7 @@ export const FLEX_MINTS = {
     [Asset.DYM]: new PublicKey("EgsE6WkPfaNT9iEDyrUmNb4C4jCaJ6BPC9wZsp6CdRFj"),
     [Asset.STRK]: new PublicKey("7dEBs64vVgs8Ws3DkK7cwxSMe9RzQ21pnYawXgFaxisp"),
     [Asset.WIF]: new PublicKey("BgDrDxc75EqPTXPUTCFMnYVYPeWK3CimPz2LGw4egsYc"),
+    [Asset.RNDR]: new PublicKey("397Hd8iZXmzRf4jqCSuACtUUWeweYZRZ4DmgvVpMkHJf"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -99,6 +101,7 @@ export const FLEX_MINTS = {
     [Asset.DYM]: new PublicKey("FxxBzHfSZc794sRw6aLs7KuaG9iBy1hSLLFV8LLQYAiL"),
     [Asset.STRK]: new PublicKey("C42HXAXQiV6EqxzTvmwff6FgCPNw7r2MgvJ9uv8UNdce"),
     [Asset.WIF]: new PublicKey("7jCmRqJaJq5iojCwGqq5DdwUBYPhrpvJcgNZsFLM4Pd5"),
+    [Asset.RNDR]: new PublicKey("GSF4GTjWxacrQoVbf8PUcvCvMvZUzwXFEmb2Jso6XU5H"),
   },
 };
 
@@ -285,6 +288,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
   // Pyth sponsored
   [Asset.WIF]:
     "0x4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc",
+  [Asset.RNDR]:
+    "0xab7347771135fc733f8f38db462ba085ed3309955f42554a14fa13e855ac0e2f",
 };
 
 export const PYTH_PRICE_FEEDS = {
@@ -306,6 +311,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.DYM]: new PublicKey("9XFg7LwjRp2UjqkdiEdeA9wSNovgc5v9iW231UMfeSDz"),
     [Asset.STRK]: new PublicKey("6gtqwzdgeb8Luay2BSbyn3tobqfr3tWjdyP2tsySSiJu"),
     [Asset.WIF]: new PublicKey("Ae9pWfoS4jS8WFxMTApKHkmMaod171aRcekm1iFbsmoy"),
+    [Asset.RNDR]: new PublicKey("7DvNVeya3b6WqcxSzUZFW9CWdDayJoRYjnpg2HVbgv2h"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -335,6 +341,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.DYM]: new PublicKey("CSRRrhXa6DYu1W5jf89A7unCATdug2Z33tYyV2NXZZxa"),
     [Asset.STRK]: new PublicKey("899ZkaKUTFZprwCAY3xnSAdWs3Ma6oDW3YqX8zpis1No"),
     [Asset.WIF]: new PublicKey("6ABgrEZk8urs6kJ1JNdC1sspH5zKXRqxy8sg3ZG2cQps"),
+    [Asset.RNDR]: new PublicKey("CYGfrBJB9HgLf9iZyN4aH5HvUAi2htQ4MjPxeXMf4Egn"),
   },
 };
 
