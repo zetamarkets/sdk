@@ -6,6 +6,7 @@ Version changes are pinned to SDK releases.
 ## [1.31.0]
 
 - Add rndr, fix oracle loading with dummy wallet and revert some pyth changes for stale prices. ([#396](https://github.com/zetamarkets/sdk/pull/396))
+- Add account creation ixs to chooseAirdropCommunity ([#394](https://github.com/zetamarkets/sdk/pull/394))
 
 ## [1.30.0]
 
