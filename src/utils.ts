@@ -1130,30 +1130,17 @@ export async function processTransactionJito(
   )) as VersionedTransaction;
 
   const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/bundles";
-  let b = new bundle.Bundle([vTx, vTxTip], 2);
   const payload = {
     jsonrpc: "2.0",
     id: 1,
     method: "sendBundle",
-    params: b.packets,
+    params: [vTx.serialize(), vTxTip.serialize()],
   };
 
   let rawTx = vTx.serialize();
 
   let txOpts = opts || commitmentConfig(provider.connection.commitment);
   let txSig: string;
-
-  if (comboRpc) {
-    try {
-      await provider.connection.sendRawTransaction(rawTx, {
-        skipPreflight: true,
-        preflightCommitment: provider.connection.commitment,
-      });
-    } catch (error) {
-      console.error("Error:", error);
-      throw new Error("RPC rrror: cannot send.");
-    }
-  }
 
   try {
     const response = await axios.post(jitoURL, payload, {
@@ -1164,6 +1151,18 @@ export async function processTransactionJito(
   } catch (error) {
     console.error("Error:", error);
     throw new Error("Jito Bundle Error: cannot send.");
+  }
+
+  if (comboRpc) {
+    try {
+      await provider.connection.sendRawTransaction(rawTx, {
+        skipPreflight: true,
+        preflightCommitment: provider.connection.commitment,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      throw new Error("RPC error: cannot send.");
+    }
   }
 
   if (Exchange.skipRpcConfirmation) {
