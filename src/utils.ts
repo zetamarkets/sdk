@@ -1272,6 +1272,23 @@ export async function processTransaction(
     let txOpts = opts || commitmentConfig(provider.connection.commitment);
     let txSig;
     try {
+      // Jito's transactions endpoint, not a bundle
+      // Might as well send it here for extra success, it's free
+      if (Exchange.network == Network.MAINNET) {
+        const encodedTx = bs58.encode(rawTx);
+        const jitoURL =
+          "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
+        const payload = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "sendTransaction",
+          params: [encodedTx],
+        };
+        await axios.post(jitoURL, payload, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       // Integration tests don't like the split send + confirm :(
       if (Exchange.network == Network.LOCALNET) {
         return await anchor.sendAndConfirmRawTransaction(
