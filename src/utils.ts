@@ -1059,6 +1059,34 @@ export async function processTransactionBloxroute(
   }
 }
 
+async function getBundleResult(bundle: string) {
+  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/bundles";
+  const payload = {
+    jsonrpc: "2.0",
+    id: 1,
+    method: "getBundleStatuses",
+    params: [[bundle]],
+  };
+
+  try {
+    const response = await axios.post(jitoURL, payload, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (response.status != 200) {
+      throw Error(`Bundle ${bundle} not accepted by Jito`);
+    }
+    return response.data.result;
+    // console.log(response.data.result);
+    // let res = response.data.result;
+    // if (!res.value || res.value.length == 0) {
+    //   throw Error(`Bundle ${bundle} not accepted by Jito`);
+    // }
+    // return [res.value[0].transactions, res.value[0].err];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function processTransactionJito(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -1134,20 +1162,20 @@ export async function processTransactionJito(
     jsonrpc: "2.0",
     id: 1,
     method: "sendBundle",
-    params: [vTx.serialize(), vTxTip.serialize()],
+    params: [[bs58.encode(vTx.serialize()), bs58.encode(vTxTip.serialize())]],
   };
 
   let rawTx = vTx.serialize();
 
   let txOpts = opts || commitmentConfig(provider.connection.commitment);
   let txSig: string;
+  let bundleSig: string;
 
   try {
     const response = await axios.post(jitoURL, payload, {
       headers: { "Content-Type": "application/json" },
     });
-    console.log(response);
-    txSig = response.data.result;
+    bundleSig = response.data.result;
   } catch (error) {
     console.error("Error:", error);
     throw new Error("Jito Bundle Error: cannot send.");
@@ -1183,10 +1211,37 @@ export async function processTransactionJito(
       });
     }
 
-    let status = await provider.connection.getSignatureStatus(txSig);
+    let jitoStatus = await getBundleResult(bundleSig);
+    if (jitoStatus.value != null && jitoStatus.value.length > 0) {
+      if (jitoStatus.value.err != null) {
+        // Gets caught and parsed in the later catch
+        let err = parseInt(
+          jitoStatus.value.err["InstructionError"][1]["Custom"]
+        );
+        let parsedErr = parseError(err);
+        throw parsedErr;
+      }
+      if (
+        txConfirmationCheck(
+          txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
+          jitoStatus.value[0]["confirmation_status"].toString()
+        )
+      ) {
+        return jitoStatus.value[0]["transactions"][0];
+      }
+    }
+
     currentBlockHeight = await provider.connection.getBlockHeight(
       provider.connection.commitment
     );
+
+    // Skip all the RPC stuff if we only sent via Jito
+    if (!comboRpc) {
+      continue;
+    }
+
+    let status = await provider.connection.getSignatureStatus(txSig);
+
     if (status.value != null) {
       if (status.value.err != null) {
         // Gets caught and parsed in the later catch
@@ -1205,7 +1260,11 @@ export async function processTransactionJito(
     }
     await sleep(500); // Don't spam the RPC
   }
-  throw Error(`Transaction ${txSig} was not confirmed`);
+  if (comboRpc) {
+    throw Error(`Transaction ${txSig} was not confirmed`);
+  } else {
+    throw Error(`Bundle ${bundleSig} was not confirmed`);
+  }
 }
 
 export async function processTransaction(
