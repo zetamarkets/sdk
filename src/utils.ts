@@ -2466,7 +2466,7 @@ async function initializeZetaMarket(
   const bids = getOrCreateKeypair(`${dir}/bids-${i}.json`);
   const asks = getOrCreateKeypair(`${dir}/asks-${i}.json`);
 
-  let [preTx, tx, tx2, postTx] = await instructions.initializeZetaMarketTxs(
+  let [tx, tx2] = await instructions.initializeZetaMarketTxs(
     asset,
     marketIndexesAccount.indexes[i],
     requestQueue.publicKey,
@@ -2503,16 +2503,7 @@ async function initializeZetaMarket(
     console.log(`Market ${i} serum accounts already initialized...`);
   } else {
     try {
-      console.log("initialize market pda");
-      await processTransaction(
-        Exchange.provider,
-        preTx,
-        [],
-        commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
-      );
-
-      console.log("initialize zeta market instruction");
+      console.log("initialize zeta market accounts");
       await processTransaction(
         Exchange.provider,
         tx,
@@ -2529,17 +2520,10 @@ async function initializeZetaMarket(
     console.log(`Market ${i} already initialized. Skipping...`);
   } else {
     try {
+      console.log("initialize zeta market instruction");
       await processTransaction(
         Exchange.provider,
         tx2,
-        [],
-        commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
-      );
-
-      await processTransaction(
-        Exchange.provider,
-        postTx,
         [],
         commitmentConfig(Exchange.connection.commitment),
         Exchange.useLedger
