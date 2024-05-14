@@ -1174,6 +1174,32 @@ export async function processTransactionJito(
   throw Error(`Transaction ${txSig} was not confirmed`);
 }
 
+export async function sendRawTransactionCaught(con: Connection, rawTx: any) {
+  try {
+    let txSig = await con.sendRawTransaction(rawTx, {
+      skipPreflight: true,
+      preflightCommitment: con.commitment,
+    });
+    return txSig;
+  } catch (e) {
+    console.log(`Error sending tx: ${e}`);
+  }
+}
+
+export async function sendJitoTxCaught(payload: any) {
+  try {
+    await axios.post(
+      "https://mainnet.block-engine.jito.wtf/api/v1/transactions",
+      payload,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (e) {
+    console.log(`Error sending tx: ${e}`);
+  }
+}
+
 export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -1271,24 +1297,10 @@ export async function processTransaction(
 
     let txOpts = opts || commitmentConfig(provider.connection.commitment);
     let txSig;
+    let allConnections = [provider.connection].concat(
+      Exchange.doubleDownConnections
+    );
     try {
-      // Jito's transactions endpoint, not a bundle
-      // Might as well send it here for extra success, it's free
-      if (Exchange.network == Network.MAINNET) {
-        const encodedTx = bs58.encode(rawTx);
-        const jitoURL =
-          "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
-        const payload = {
-          jsonrpc: "2.0",
-          id: 1,
-          method: "sendTransaction",
-          params: [encodedTx],
-        };
-        await axios.post(jitoURL, payload, {
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-
       // Integration tests don't like the split send + confirm :(
       if (Exchange.network == Network.LOCALNET) {
         return await anchor.sendAndConfirmRawTransaction(
@@ -1298,10 +1310,26 @@ export async function processTransaction(
         );
       }
 
-      txSig = await provider.connection.sendRawTransaction(rawTx, {
-        skipPreflight: true,
-        preflightCommitment: provider.connection.commitment,
-      });
+      let promises = [];
+      for (var con of allConnections) {
+        promises.push(sendRawTransactionCaught(con, rawTx));
+      }
+
+      // Jito's transactions endpoint, not a bundle
+      // Might as well send it here for extra success, it's free
+      if (Exchange.network == Network.MAINNET) {
+        const encodedTx = bs58.encode(rawTx);
+        const payload = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "sendTransaction",
+          params: [encodedTx],
+        };
+        promises.push(sendJitoTxCaught(payload));
+      }
+
+      // First promise is the main RPC
+      let txSig = (await Promise.all(promises))[0];
 
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
@@ -1309,10 +1337,10 @@ export async function processTransaction(
       if (!Exchange.skipRpcConfirmation) {
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
           // Keep resending to maximise the chance of confirmation
-          await provider.connection.sendRawTransaction(rawTx, {
-            skipPreflight: true,
-            preflightCommitment: provider.connection.commitment,
-          });
+          for (var con of allConnections) {
+            promises.push(sendRawTransactionCaught(con, rawTx));
+          }
+          await Promise.all(promises);
 
           let status = await provider.connection.getSignatureStatus(txSig);
           currentBlockHeight = await provider.connection.getBlockHeight(

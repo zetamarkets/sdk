@@ -646,6 +646,7 @@ export interface LoadExchangeConfig {
   loadFromStore: boolean;
   TIFBufferSeconds: number;
   loadAssets?: Asset[];
+  doubleDownConnections?: Connection[];
 }
 
 export function defaultLoadExchangeConfig(
