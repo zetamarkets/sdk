@@ -1188,13 +1188,14 @@ export async function sendRawTransactionCaught(con: Connection, rawTx: any) {
 
 export async function sendJitoTxCaught(payload: any) {
   try {
-    await axios.post(
+    let response = await axios.post(
       "https://mainnet.block-engine.jito.wtf/api/v1/transactions",
       payload,
       {
         headers: { "Content-Type": "application/json" },
       }
     );
+    return response.data.result;
   } catch (e) {
     console.log(`Error sending tx: ${e}`);
   }
