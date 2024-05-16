@@ -937,12 +937,19 @@ export class Exchange {
       this._pricingAddress as PublicKeyZstd,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
         this._pricing = this.program.coder.accounts.decode(
-          "Pricing",
+          types.ProgramAccountType.Pricing,
           accountInfo.data
         );
 
+        const assetsToMarkPrices = {};
+
+        for (const asset of this.assets) {
+          const markPrice = this.subExchanges.get(asset).getMarkPrice();
+          assetsToMarkPrices[asset] = markPrice;
+        }
+
         if (callback !== undefined) {
-          callback(null, EventType.PRICING, context.slot, null);
+          callback(null, EventType.PRICING, context.slot, assetsToMarkPrices);
         }
       },
       this.provider.connection.commitment,

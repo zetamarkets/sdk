@@ -324,6 +324,7 @@ export enum ProgramAccountType {
   ZetaGroup = "ZetaGroup",
   Greeks = "Greeks",
   PerpSyncQueue = "PerpSyncQueue",
+  Pricing = "Pricing",
 }
 
 export interface ClockData {
@@ -676,5 +677,5 @@ export enum AirdropCommunity {
   SUPERTEAM = 4,
   MADLADS = 5,
   TENSORIANS = 6,
-  ASSETDASH = 7
+  ASSETDASH = 7,
 }
