@@ -328,6 +328,15 @@ export class Exchange {
   }
   private _jitoTip: number = 0;
 
+  // extra connection objects to send transactions down
+  public get doubleDownConnections(): Connection[] {
+    return this._doubleDownConnections;
+  }
+  public addDoubleDownConnection(connection: Connection) {
+    this._doubleDownConnections.push(connection);
+  }
+  private _doubleDownConnections: Connection[] = [];
+
   public get useAutoPriorityFee(): boolean {
     return this._useAutoPriorityFee;
   }
@@ -590,6 +599,12 @@ export class Exchange {
 
     if (bloxrouteHttpProvider) {
       this._httpProvider = bloxrouteHttpProvider;
+    }
+
+    if (loadConfig.doubleDownConnections) {
+      for (var con of loadConfig.doubleDownConnections) {
+        this.addDoubleDownConnection(con);
+      }
     }
 
     this._riskCalculator = new RiskCalculator(this.assets);
