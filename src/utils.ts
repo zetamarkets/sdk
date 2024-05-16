@@ -1328,8 +1328,8 @@ export async function processTransaction(
         promises.push(sendJitoTxCaught(payload));
       }
 
-      // First promise is the main RPC
-      let txSig = (await Promise.all(promises))[0];
+      // All tx sigs are the same
+      let txSig = await Promise.race(promises);
 
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
@@ -1340,7 +1340,7 @@ export async function processTransaction(
           for (var con of allConnections) {
             promises.push(sendRawTransactionCaught(con, rawTx));
           }
-          await Promise.all(promises);
+          await Promise.race(promises);
 
           let status = await provider.connection.getSignatureStatus(txSig);
           currentBlockHeight = await provider.connection.getBlockHeight(
