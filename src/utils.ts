@@ -1174,6 +1174,33 @@ export async function processTransactionJito(
   throw Error(`Transaction ${txSig} was not confirmed`);
 }
 
+export async function sendRawTransactionCaught(con: Connection, rawTx: any) {
+  try {
+    let txSig = await con.sendRawTransaction(rawTx, {
+      skipPreflight: true,
+      preflightCommitment: con.commitment,
+    });
+    return txSig;
+  } catch (e) {
+    console.log(`Error sending tx: ${e}`);
+  }
+}
+
+export async function sendJitoTxCaught(payload: any) {
+  try {
+    let response = await axios.post(
+      "https://mainnet.block-engine.jito.wtf/api/v1/transactions",
+      payload,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    return response.data.result;
+  } catch (e) {
+    console.log(`Error sending tx: ${e}`);
+  }
+}
+
 export async function processTransaction(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -1271,6 +1298,9 @@ export async function processTransaction(
 
     let txOpts = opts || commitmentConfig(provider.connection.commitment);
     let txSig;
+    let allConnections = [provider.connection].concat(
+      Exchange.doubleDownConnections
+    );
     try {
       // Integration tests don't like the split send + confirm :(
       if (Exchange.network == Network.LOCALNET) {
@@ -1281,10 +1311,26 @@ export async function processTransaction(
         );
       }
 
-      txSig = await provider.connection.sendRawTransaction(rawTx, {
-        skipPreflight: true,
-        preflightCommitment: provider.connection.commitment,
-      });
+      let promises = [];
+      for (var con of allConnections) {
+        promises.push(sendRawTransactionCaught(con, rawTx));
+      }
+
+      // Jito's transactions endpoint, not a bundle
+      // Might as well send it here for extra success, it's free
+      if (Exchange.network == Network.MAINNET) {
+        const encodedTx = bs58.encode(rawTx);
+        const payload = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "sendTransaction",
+          params: [encodedTx],
+        };
+        promises.push(sendJitoTxCaught(payload));
+      }
+
+      // All tx sigs are the same
+      let txSig = await Promise.race(promises);
 
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
@@ -1292,10 +1338,10 @@ export async function processTransaction(
       if (!Exchange.skipRpcConfirmation) {
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
           // Keep resending to maximise the chance of confirmation
-          await provider.connection.sendRawTransaction(rawTx, {
-            skipPreflight: true,
-            preflightCommitment: provider.connection.commitment,
-          });
+          for (var con of allConnections) {
+            promises.push(sendRawTransactionCaught(con, rawTx));
+          }
+          await Promise.race(promises);
 
           let status = await provider.connection.getSignatureStatus(txSig);
           currentBlockHeight = await provider.connection.getBlockHeight(
@@ -2466,7 +2512,7 @@ async function initializeZetaMarket(
   const bids = getOrCreateKeypair(`${dir}/bids-${i}.json`);
   const asks = getOrCreateKeypair(`${dir}/asks-${i}.json`);
 
-  let [preTx, tx, tx2, postTx] = await instructions.initializeZetaMarketTxs(
+  let [tx, tx2] = await instructions.initializeZetaMarketTxs(
     asset,
     marketIndexesAccount.indexes[i],
     requestQueue.publicKey,
@@ -2503,16 +2549,7 @@ async function initializeZetaMarket(
     console.log(`Market ${i} serum accounts already initialized...`);
   } else {
     try {
-      console.log("initialize market pda");
-      await processTransaction(
-        Exchange.provider,
-        preTx,
-        [],
-        commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
-      );
-
-      console.log("initialize zeta market instruction");
+      console.log("initialize zeta market accounts");
       await processTransaction(
         Exchange.provider,
         tx,
@@ -2529,17 +2566,10 @@ async function initializeZetaMarket(
     console.log(`Market ${i} already initialized. Skipping...`);
   } else {
     try {
+      console.log("initialize zeta market instruction");
       await processTransaction(
         Exchange.provider,
         tx2,
-        [],
-        commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
-      );
-
-      await processTransaction(
-        Exchange.provider,
-        postTx,
         [],
         commitmentConfig(Exchange.connection.commitment),
         Exchange.useLedger

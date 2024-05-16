@@ -6,6 +6,7 @@ import {
   PublicKey,
   Transaction,
   VersionedTransaction,
+  Keypair,
 } from "@solana/web3.js";
 import { Connection as ConnectionZstd } from "zeta-solana-web3";
 import { Asset, MarginAccountType } from "./constants";
@@ -45,6 +46,27 @@ export class DummyWallet implements Wallet {
 
   get publicKey(): PublicKey {
     throw Error("Not supported by dummy wallet!");
+  }
+}
+
+export class PythDummyWallet implements Wallet {
+  constructor() {}
+  readonly payer: Keypair;
+
+  async signTransaction<T extends Transaction | VersionedTransaction>(
+    _tx: T
+  ): Promise<T> {
+    throw Error("Not supported by dummy wallet!");
+  }
+
+  async signAllTransactions<T extends Transaction | VersionedTransaction>(
+    txs: T[]
+  ): Promise<T[]> {
+    throw Error("Not supported by dummy wallet!");
+  }
+
+  get publicKey(): PublicKey {
+    return PublicKey.default;
   }
 }
 
@@ -625,6 +647,7 @@ export interface LoadExchangeConfig {
   loadFromStore: boolean;
   TIFBufferSeconds: number;
   loadAssets?: Asset[];
+  doubleDownConnections?: Connection[];
 }
 
 export function defaultLoadExchangeConfig(
