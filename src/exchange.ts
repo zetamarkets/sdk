@@ -33,7 +33,6 @@ import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
 import fetch from "cross-fetch";
 import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
-import { setGlobalDispatcher, Agent } from "undici";
 import { BlockhashCache } from "./blockhash-cache";
 
 export class Exchange {
@@ -430,11 +429,14 @@ export class Exchange {
 
     // https://docs.triton.one/chains/solana/web3js-socket-connection-issues
     if (typeof window === "undefined") {
-      setGlobalDispatcher(
-        new Agent({
-          connections: 100,
-        })
-      );
+      import("undici").then((undici) => {
+        console.log("Setting agent connections to 100");
+        undici.setGlobalDispatcher(
+          new undici.Agent({
+            connections: 100,
+          })
+        );
+      });
     }
 
     this._blockhashCache = new BlockhashCache(
