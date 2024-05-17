@@ -648,6 +648,7 @@ export interface LoadExchangeConfig {
   TIFBufferSeconds: number;
   loadAssets?: Asset[];
   doubleDownConnections?: Connection[];
+  blockhashCacheTimeoutSeconds?: number;
 }
 
 export function defaultLoadExchangeConfig(
