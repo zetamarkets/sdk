@@ -2,8 +2,7 @@ import { BlockhashWithExpiryBlockHeight } from "@solana/web3.js";
 
 export class BlockhashCache {
   private ttlSecs: number;
-  // TODO change to private
-  public blockhashes: Array<{
+  private blockhashes: Array<{
     ts: number;
     blockhash: BlockhashWithExpiryBlockHeight;
   }>;

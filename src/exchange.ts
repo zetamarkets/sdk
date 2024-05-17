@@ -363,11 +363,17 @@ export class Exchange {
   }
   private _blockhashCommitment: Commitment = "confirmed";
 
-  public getCachedBlockhash() {
-    return this._blockhashCache.get();
+  public async getCachedBlockhash() {
+    try {
+      return this._blockhashCache.get();
+    } catch (e) {
+      console.log(e);
+      return await this.provider.connection.getLatestBlockhash(
+        this.blockhashCommitment
+      );
+    }
   }
-  // TODO change to private
-  public _blockhashCache: BlockhashCache;
+  private _blockhashCache: BlockhashCache;
 
   public setUseAutoPriorityFee(useAutoPriorityFee: boolean) {
     this._useAutoPriorityFee = useAutoPriorityFee;
@@ -432,7 +438,7 @@ export class Exchange {
     this._blockhashCache = new BlockhashCache(
       loadConfig.blockhashCacheTimeoutSeconds
         ? loadConfig.blockhashCacheTimeoutSeconds
-        : 60
+        : 50
     );
 
     if (loadConfig.loadAssets) {

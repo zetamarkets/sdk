@@ -980,7 +980,7 @@ export async function processTransactionBloxroute(
 
   let failures = 0;
   while (true) {
-    let recentBlockhash = blockhash ?? Exchange.getCachedBlockhash();
+    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
 
     let v0Tx: VersionedTransaction = new VersionedTransaction(
       new TransactionMessage({
@@ -1084,7 +1084,7 @@ export async function processTransactionJito(
     })
   );
 
-  let recentBlockhash = blockhash ?? Exchange.getCachedBlockhash();
+  let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
 
   let vTx: VersionedTransaction = new VersionedTransaction(
     new TransactionMessage({
@@ -1239,7 +1239,7 @@ export async function processTransaction(
       );
     }
 
-    let recentBlockhash = blockhash ?? Exchange.getCachedBlockhash();
+    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
 
     if (lutAccs) {
       if (useLedger) {
