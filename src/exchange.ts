@@ -429,11 +429,13 @@ export class Exchange {
     }
 
     // https://docs.triton.one/chains/solana/web3js-socket-connection-issues
-    setGlobalDispatcher(
-      new Agent({
-        connections: 100,
-      })
-    );
+    if (typeof window === "undefined") {
+      setGlobalDispatcher(
+        new Agent({
+          connections: 100,
+        })
+      );
+    }
 
     this._blockhashCache = new BlockhashCache(
       loadConfig.blockhashCacheTimeoutSeconds
