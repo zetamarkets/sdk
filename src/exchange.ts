@@ -430,7 +430,6 @@ export class Exchange {
     // https://docs.triton.one/chains/solana/web3js-socket-connection-issues
     if (typeof window === "undefined") {
       import("undici").then((undici) => {
-        console.log("Setting agent connections to 100");
         undici.setGlobalDispatcher(
           new undici.Agent({
             connections: 100,

@@ -1318,7 +1318,10 @@ export async function processTransaction(
       }
 
       // All tx sigs are the same
-      let txSig = await Promise.race(promises);
+      let txSigs = await Promise.all(promises);
+      let txSig = txSigs.find(
+        (sig) => typeof sig === "string" && sig.length > 0
+      );
 
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
