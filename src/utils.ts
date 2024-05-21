@@ -1139,6 +1139,7 @@ export async function processTransactionJito(
     await provider.connection.sendRawTransaction(rawTx, {
       skipPreflight: true,
       preflightCommitment: provider.connection.commitment,
+      maxRetries: 0,
     });
 
     let status = await provider.connection.getSignatureStatus(txSig);
@@ -1171,6 +1172,7 @@ export async function sendRawTransactionCaught(con: Connection, rawTx: any) {
     let txSig = await con.sendRawTransaction(rawTx, {
       skipPreflight: true,
       preflightCommitment: con.commitment,
+      maxRetries: 0,
     });
     return txSig;
   } catch (e) {
@@ -1327,12 +1329,16 @@ export async function processTransaction(
       // Polling is more reliable than websockets using confirmTransaction()
       let currentBlockHeight = 0;
       if (!Exchange.skipRpcConfirmation) {
+        let resendCounter = 0;
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
           // Keep resending to maximise the chance of confirmation
-          for (var con of allConnections) {
-            promises.push(sendRawTransactionCaught(con, rawTx));
+          resendCounter += 1;
+          if (resendCounter % 4 == 0) {
+            for (var con of allConnections) {
+              promises.push(sendRawTransactionCaught(con, rawTx));
+            }
+            await Promise.race(promises);
           }
-          await Promise.race(promises);
 
           let status = await provider.connection.getSignatureStatus(txSig);
           currentBlockHeight = await provider.connection.getBlockHeight(
