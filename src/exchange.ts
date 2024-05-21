@@ -33,6 +33,7 @@ import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
 import fetch from "cross-fetch";
 import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
+import { BlockhashCache } from "./blockhash-cache";
 
 export class Exchange {
   /**
@@ -359,7 +360,19 @@ export class Exchange {
   public get blockhashCommitment(): Commitment {
     return this._blockhashCommitment;
   }
-  private _blockhashCommitment: Commitment = "finalized";
+  private _blockhashCommitment: Commitment = "confirmed";
+
+  public async getCachedBlockhash() {
+    try {
+      return this._blockhashCache.get();
+    } catch (e) {
+      console.log(e);
+      return await this.provider.connection.getLatestBlockhash(
+        this.blockhashCommitment
+      );
+    }
+  }
+  private _blockhashCache: BlockhashCache;
 
   public setUseAutoPriorityFee(useAutoPriorityFee: boolean) {
     this._useAutoPriorityFee = useAutoPriorityFee;
@@ -413,6 +426,24 @@ export class Exchange {
     if (this.isSetup) {
       throw Error("Exchange already setup");
     }
+
+    // https://docs.triton.one/chains/solana/web3js-socket-connection-issues
+    if (typeof window === "undefined") {
+      import("undici").then((undici) => {
+        undici.setGlobalDispatcher(
+          new undici.Agent({
+            connections: 100,
+          })
+        );
+      });
+    }
+
+    this._blockhashCache = new BlockhashCache(
+      loadConfig.blockhashCacheTimeoutSeconds
+        ? loadConfig.blockhashCacheTimeoutSeconds
+        : 50
+    );
+
     if (loadConfig.loadAssets) {
       this._assets = loadConfig.loadAssets;
     } else {
@@ -746,6 +777,7 @@ export class Exchange {
     this.subscribePricing(callback);
     this.subscribeState(callback);
 
+    await this.updateCachedBlockhash();
     await this.updateExchangeState();
 
     this._isInitialized = true;
@@ -870,6 +902,7 @@ export class Exchange {
             this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
+            await this.updateCachedBlockhash();
             if (this._useAutoPriorityFee == true) {
               await this.updateAutoFee();
             }
@@ -942,6 +975,15 @@ export class Exchange {
       this.provider.connection.commitment,
       "base64+zstd"
     );
+  }
+
+  // Not actually a websocket subscription, this polls for a recent blockhash every N seconds and stores it in a cache
+  // Ideally you should use slightly stale blockhashes to be able to deterministically fail a tx faster instead of waiting ~90s
+  private async updateCachedBlockhash() {
+    let latestBlockhash = await this.provider.connection.getLatestBlockhash(
+      this.blockhashCommitment
+    );
+    this._blockhashCache.set(latestBlockhash, Date.now() / 1000);
   }
 
   private subscribePricing(

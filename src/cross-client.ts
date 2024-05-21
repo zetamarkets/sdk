@@ -3123,12 +3123,17 @@ export class CrossClient {
     let orders = [];
 
     Exchange.assets.forEach((asset) => {
-      let market = Exchange.getPerpMarket(asset);
-      orders.push(
-        market.getOrdersForAccount(
-          this._openOrdersAccounts[assetToIndex(asset)]
-        )
-      );
+      try {
+        let market = Exchange.getPerpMarket(asset);
+        orders.push(
+          market.getOrdersForAccount(
+            this._openOrdersAccounts[assetToIndex(asset)]
+          )
+        );
+      } catch (e) {
+        console.warn(`Warning: ${e}`);
+        return;
+      }
     });
 
     let allOrders = [].concat(...orders);
