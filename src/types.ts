@@ -346,6 +346,8 @@ export enum ProgramAccountType {
   ZetaGroup = "ZetaGroup",
   Greeks = "Greeks",
   PerpSyncQueue = "PerpSyncQueue",
+  State = "State",
+  Pricing = "Pricing",
 }
 
 export interface ClockData {

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.32.0]
+
+- reduce number of fetches on startup and speed up load. ([#400](https://github.com/zetamarkets/sdk/pull/396))
+
 ## [1.31.1]
 
 - Add rndr, fix oracle loading with dummy wallet and revert some pyth changes for stale prices. ([#396](https://github.com/zetamarkets/sdk/pull/396))

@@ -14,6 +14,7 @@ import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
 import { exchange as Exchange } from "../exchange";
 import { getClockData } from "../utils";
+import { ClockData } from "../types";
 
 export const MARKET_STATE_LAYOUT_V3 = struct([
   blob(5),
@@ -254,6 +255,14 @@ export class Market {
 
     return {
       slot: slot,
+      bids: Orderbook.decode(this, throwIfNull(bidsInfo).data),
+      asks: Orderbook.decode(this, throwIfNull(asksInfo).data),
+    };
+  }
+
+  loadBidsAndAsksFromData(clockInfo: ClockData, bidsInfo, asksInfo): any {
+    return {
+      slot: clockInfo.slot,
       bids: Orderbook.decode(this, throwIfNull(bidsInfo).data),
       asks: Orderbook.decode(this, throwIfNull(asksInfo).data),
     };

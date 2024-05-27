@@ -17,7 +17,7 @@ import {
 import * as utils from "./utils";
 import * as constants from "./constants";
 import * as assets from "./assets";
-import { PerpSyncQueue, ProductGreeks, State, Pricing } from "./program-types";
+import { PerpSyncQueue, State, Pricing } from "./program-types";
 import { Market, ZetaGroupMarkets } from "./market";
 import { RiskCalculator } from "./risk";
 import { EventType } from "./events";
@@ -30,9 +30,10 @@ import { assetToIndex, toProgramAsset } from "./assets";
 import { Asset } from "./constants";
 import { SubExchange } from "./subexchange";
 import * as instructions from "./program-instructions";
-import { Orderbook } from "./serum/market";
 import fetch from "cross-fetch";
 import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
+import { getDecodedMarket } from "./serum/generate-decoded";
+import { MARKET_STATE_LAYOUT_V3 } from "./serum/market";
 
 export class Exchange {
   /**
@@ -616,96 +617,102 @@ export class Exchange {
       this.connection as unknown as Connection
     );
 
-    const subExchangeToFetchAddrs: PublicKey[] = this.assets
+    const srmMarketAddresses = this.assets.map((a) => {
+      return this.pricing.products[assetToIndex(a)].market;
+    });
+
+    const perpSyncQueueAddresses: PublicKey[] = this.assets
       .map((a) => {
         const se = this.getSubExchange(a);
         return [se.perpSyncQueueAddress];
       })
-      .flat()
-      .concat([SYSVAR_CLOCK_PUBKEY]);
+      .flat();
 
-    const accFetchPromises: Promise<any>[] = subExchangeToFetchAddrs.map(
-      (addr) => {
-        return this.provider.connection.getAccountInfo(addr);
-      }
-    );
-    const allPromises: Promise<any>[] = accFetchPromises.concat([
+    const allAddrsToFetch: PublicKey[] = perpSyncQueueAddresses;
+
+    let srmBidAddrs: PublicKey[] = [];
+    let srmAskAddrs: PublicKey[] = [];
+    let decodedSrmMarkets: any[] = [];
+    if (!loadConfig.loadFromStore) {
+      allAddrsToFetch.push(...srmMarketAddresses);
+    }
+
+    if (this.network != Network.LOCALNET) {
+      this.assets.forEach((a) => {
+        let decodedSrmMarket = getDecodedMarket(
+          this.network,
+          a,
+          constants.PERP_INDEX
+        );
+        decodedSrmMarkets.push(decodedSrmMarket);
+        srmBidAddrs.push(decodedSrmMarket.bids);
+        srmAskAddrs.push(decodedSrmMarket.asks);
+      });
+    }
+
+    allAddrsToFetch.push(...srmBidAddrs);
+    allAddrsToFetch.push(...srmAskAddrs);
+    allAddrsToFetch.push(SYSVAR_CLOCK_PUBKEY);
+
+    const accFetchPromise: Promise<AccountInfo<Buffer>[]> =
+      this.connection.getMultipleAccountsInfo(allAddrsToFetch);
+
+    const allPromises: Promise<any>[] = [accFetchPromise as any].concat([
       this.subscribeOracle(this.assets, callback),
     ]);
 
-    // If throttleMs is passed, do each promise slowly with a delay, else load everything at once
-    let accFetches = [];
-    if (loadConfig.throttleMs > 0) {
-      console.log(
-        `Fetching ${allPromises.length} core accounts with ${loadConfig.throttleMs}ms sleep inbetween each fetch...`
-      );
-      for (var prom of allPromises) {
-        await utils.sleep(loadConfig.throttleMs);
-        accFetches.push(await Promise.resolve(prom));
-      }
-      accFetches = accFetches.slice(0, this.assets.length + 1);
-    } else {
-      accFetches = (await Promise.all(allPromises)).slice(
-        0,
-        this.assets.length + 1
-      );
-    }
+    const accFetches: AccountInfo<Buffer>[] = (
+      await Promise.all(allPromises)
+    )[0];
 
-    let perpSyncQueueAccs: PerpSyncQueue[] = [];
-    for (let i = 0; i < accFetches.length - 1; i++) {
-      perpSyncQueueAccs.push(
-        this.program.account.perpSyncQueue.coder.accounts.decode(
+    // First 0 to Assets.length-1 will always be PerpSyncQueues
+    const perpSyncQueueAccs = accFetches
+      .slice(0, this.assets.length)
+      .map((accInfo) => {
+        return this.program.account.perpSyncQueue.coder.accounts.decode(
           types.ProgramAccountType.PerpSyncQueue,
-          accFetches[i].data
-        ) as PerpSyncQueue
-      );
-    }
+          accInfo.data
+        ) as PerpSyncQueue;
+      });
 
-    // If throttleMs is passed, load sequentially with some delay, else load as fast as possible
-    if (loadConfig.throttleMs > 0) {
-      for (var asset of this.assets) {
-        await utils.sleep(loadConfig.throttleMs);
-        await this.getSubExchange(asset).load(
+    const clockData = utils.getClockData(accFetches.at(-1));
+
+    // Assets.length to Assets.length + Assets.length-1 will sometimes be SerumMarket data
+    await Promise.all(
+      this.assets.map(async (asset, i) => {
+        let decodedSrmMarket = undefined;
+        let bidAccInfo: AccountInfo<Buffer> = undefined;
+        let askAccInfo: AccountInfo<Buffer> = undefined;
+
+        if (this.network != Network.LOCALNET) {
+          if (loadConfig.loadFromStore) {
+            decodedSrmMarket = decodedSrmMarkets[i];
+            bidAccInfo = accFetches[this.assets.length + i];
+            askAccInfo = accFetches[this.assets.length * 2 + i];
+          } else {
+            decodedSrmMarket = MARKET_STATE_LAYOUT_V3.decode(
+              accFetches[this.assets.length + i].data
+            );
+            bidAccInfo = accFetches[this.assets.length * 2 + i];
+            askAccInfo = accFetches[this.assets.length * 3 + i];
+          }
+        } else {
+          decodedSrmMarket = MARKET_STATE_LAYOUT_V3.decode(
+            accFetches[this.assets.length + i].data
+          );
+        }
+
+        return this.getSubExchange(asset).load(
           asset,
           this.opts,
-          [perpSyncQueueAccs[this.assets.indexOf(asset)]],
-          loadConfig.loadFromStore,
-          callback
+          perpSyncQueueAccs[i],
+          decodedSrmMarket,
+          bidAccInfo,
+          askAccInfo,
+          clockData
         );
-      }
-    } else {
-      await Promise.all(
-        this.assets.map(async (asset, i) => {
-          return this.getSubExchange(asset).load(
-            asset,
-            this.opts,
-            [perpSyncQueueAccs[i]],
-            loadConfig.loadFromStore,
-            callback
-          );
-        })
-      );
-    }
-
-    if (loadConfig.throttleMs > 0) {
-      console.log(
-        `Updating ${this.assets.length} markets with ${loadConfig.throttleMs}ms sleep inbetween each update...`
-      );
-      for (var asset of this.assets) {
-        await utils.sleep(loadConfig.throttleMs);
-        await this.getPerpMarket(asset).serumMarket.updateDecoded(
-          this.connection as unknown as ConnectionZstd
-        );
-      }
-    } else {
-      await Promise.all(
-        this._assets.map(async (a) => {
-          await this.getPerpMarket(a).serumMarket.updateDecoded(
-            this.connection as unknown as ConnectionZstd
-          );
-        })
-      );
-    }
+      })
+    );
 
     for (var se of this.getAllSubExchanges()) {
       // Only subscribe to the orderbook for assets provided in the override
@@ -726,7 +733,6 @@ export class Exchange {
       this._zetaGroupPubkeyToAsset.set(se.zetaGroupAddress, se.asset);
     }
 
-    const clockData = utils.getClockData(accFetches.at(-1));
     this.subscribeClock(clockData, callback);
     this.subscribePricing(callback);
     this.subscribeState(callback);
@@ -874,8 +880,20 @@ export class Exchange {
   }
 
   public async updateExchangeState() {
-    await this.updateState();
-    await this.updateZetaPricing();
+    let accInfos = await this.connection.getMultipleAccountsInfo([
+      this.stateAddress,
+      this.pricingAddress,
+    ]);
+
+    this._state = this.program.account.state.coder.accounts.decode(
+      types.ProgramAccountType.State,
+      accInfos[0].data
+    );
+
+    this._pricing = this.program.account.pricing.coder.accounts.decode(
+      types.ProgramAccountType.Pricing,
+      accInfos[1].data
+    );
   }
 
   /**
