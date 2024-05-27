@@ -26,7 +26,8 @@
     "lodash": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
     "obscenity": "0.2.0",
-    "zeta-solana-web3": "1.87.7"
+    "zeta-solana-web3": "1.87.7",
+    "undici": "6.16.1"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",

@@ -980,11 +980,7 @@ export async function processTransactionBloxroute(
 
   let failures = 0;
   while (true) {
-    let recentBlockhash =
-      blockhash ??
-      (await anchorProvider.connection.getLatestBlockhash(
-        Exchange.blockhashCommitment
-      ));
+    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
 
     let v0Tx: VersionedTransaction = new VersionedTransaction(
       new TransactionMessage({
@@ -1088,11 +1084,7 @@ export async function processTransactionJito(
     })
   );
 
-  let recentBlockhash =
-    blockhash ??
-    (await provider.connection.getLatestBlockhash(
-      Exchange.blockhashCommitment
-    ));
+  let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
 
   let vTx: VersionedTransaction = new VersionedTransaction(
     new TransactionMessage({
@@ -1147,6 +1139,7 @@ export async function processTransactionJito(
     await provider.connection.sendRawTransaction(rawTx, {
       skipPreflight: true,
       preflightCommitment: provider.connection.commitment,
+      maxRetries: 0,
     });
 
     let status = await provider.connection.getSignatureStatus(txSig);
@@ -1172,6 +1165,34 @@ export async function processTransactionJito(
     await sleep(500); // Don't spam the RPC
   }
   throw Error(`Transaction ${txSig} was not confirmed`);
+}
+
+export async function sendRawTransactionCaught(con: Connection, rawTx: any) {
+  try {
+    let txSig = await con.sendRawTransaction(rawTx, {
+      skipPreflight: true,
+      preflightCommitment: con.commitment,
+      maxRetries: 0,
+    });
+    return txSig;
+  } catch (e) {
+    console.log(`Error sending tx: ${e}`);
+  }
+}
+
+export async function sendJitoTxCaught(payload: any) {
+  try {
+    let response = await axios.post(
+      "https://mainnet.block-engine.jito.wtf/api/v1/transactions",
+      payload,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    return response.data.result;
+  } catch (e) {
+    console.log(`Error sending tx: ${e}`);
+  }
 }
 
 export async function processTransaction(
@@ -1220,11 +1241,7 @@ export async function processTransaction(
       );
     }
 
-    let recentBlockhash =
-      blockhash ??
-      (await provider.connection.getLatestBlockhash(
-        Exchange.blockhashCommitment
-      ));
+    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
 
     if (lutAccs) {
       if (useLedger) {
@@ -1271,6 +1288,9 @@ export async function processTransaction(
 
     let txOpts = opts || commitmentConfig(provider.connection.commitment);
     let txSig;
+    let allConnections = [provider.connection].concat(
+      Exchange.doubleDownConnections
+    );
     try {
       // Integration tests don't like the split send + confirm :(
       if (Exchange.network == Network.LOCALNET) {
@@ -1281,21 +1301,44 @@ export async function processTransaction(
         );
       }
 
-      txSig = await provider.connection.sendRawTransaction(rawTx, {
-        skipPreflight: true,
-        preflightCommitment: provider.connection.commitment,
-      });
+      let promises = [];
+      for (var con of allConnections) {
+        promises.push(sendRawTransactionCaught(con, rawTx));
+      }
+
+      // Jito's transactions endpoint, not a bundle
+      // Might as well send it here for extra success, it's free
+      if (Exchange.network == Network.MAINNET) {
+        const encodedTx = bs58.encode(rawTx);
+        const payload = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "sendTransaction",
+          params: [encodedTx],
+        };
+        promises.push(sendJitoTxCaught(payload));
+      }
+
+      // All tx sigs are the same
+      let txSigs = await Promise.all(promises);
+      let txSig = txSigs.find(
+        (sig) => typeof sig === "string" && sig.length > 0
+      );
 
       // Poll the tx confirmation for N seconds
       // Polling is more reliable than websockets using confirmTransaction()
       let currentBlockHeight = 0;
       if (!Exchange.skipRpcConfirmation) {
+        let resendCounter = 0;
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
           // Keep resending to maximise the chance of confirmation
-          await provider.connection.sendRawTransaction(rawTx, {
-            skipPreflight: true,
-            preflightCommitment: provider.connection.commitment,
-          });
+          resendCounter += 1;
+          if (resendCounter % 4 == 0) {
+            for (var con of allConnections) {
+              promises.push(sendRawTransactionCaught(con, rawTx));
+            }
+            await Promise.race(promises);
+          }
 
           let status = await provider.connection.getSignatureStatus(txSig);
           currentBlockHeight = await provider.connection.getBlockHeight(

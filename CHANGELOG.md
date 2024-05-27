@@ -5,7 +5,15 @@ Version changes are pinned to SDK releases.
 
 ## [1.32.0]
 
-- reduce number of fetches on startup and speed up load. ([#400](https://github.com/zetamarkets/sdk/pull/396))
+- reduce number of fetches on startup and speed up load. ([#401](https://github.com/zetamarkets/sdk/pull/401))
+
+## [1.31.3]
+
+- Update subscribePricing to return mark prices ([#399](https://github.com/zetamarkets/sdk/pull/399))
+
+## [1.31.2]
+
+- Send to Jito transactions endpoint too. ([#398](https://github.com/zetamarkets/sdk/pull/398))
 
 ## [1.31.1]
 
