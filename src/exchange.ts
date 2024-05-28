@@ -351,6 +351,17 @@ export class Exchange {
   }
   private _tipMultiplier: number = 1;
 
+  public _performanceCallback: (
+    ixName: string,
+    ixAsset: Asset,
+    sentTs: number,
+    sentSlot: number,
+    confirmedOnchainSlot: number,
+    confirmedOnchainTs: number,
+    confirmedLocalSlot: number,
+    confirmedLocalTs: number
+  ) => void;
+
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
     return this._autoPriorityFeeUpperLimit;
@@ -487,7 +498,17 @@ export class Exchange {
       instructions.initializeCombinedInsuranceVaultIx()
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "initializeCombinedInsuranceVault"
+      );
     } catch (e) {
       console.error(`initializeCombinedInsuranceVault failed: ${e}`);
     }
@@ -500,7 +521,17 @@ export class Exchange {
   public async initializeCombinedVault() {
     let tx = new Transaction().add(instructions.initializeCombinedVaultIx());
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "initializeCombinedVault"
+      );
     } catch (e) {
       console.error(`initializeCombinedVault failed: ${e}`);
     }
@@ -514,7 +545,17 @@ export class Exchange {
       instructions.initializeCombinedSocializedLossAccountIx()
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "initializeCombinedSocializedLossAccount"
+      );
     } catch (e) {
       console.error(`initializeCombinedSocializedLossAccount failed: ${e}`);
     }
@@ -568,7 +609,17 @@ export class Exchange {
       )
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "intializeZetaState"
+      );
     } catch (e) {
       console.error(`Initialize zeta state failed: ${e}`);
     }
@@ -595,7 +646,11 @@ export class Exchange {
         tx,
         [],
         utils.defaultCommitment(),
-        this.useLedger
+        this.useLedger,
+        undefined,
+        undefined,
+        undefined,
+        "initializeZetaPricing"
       );
     } catch (e) {
       console.error(`Initialize zeta pricing failed: ${e}`);
@@ -614,7 +669,17 @@ export class Exchange {
       slot: number,
       data: any
     ) => void,
-    bloxrouteHttpProvider?: HttpProvider
+    bloxrouteHttpProvider?: HttpProvider,
+    performanceCallback?: (
+      ixName: string,
+      ixAsset: Asset,
+      sentTs: number,
+      sentSlot: number,
+      confirmedOnchainSlot: number,
+      confirmedOnchainTs: number,
+      confirmedLocalSlot: number,
+      confirmedLocalTs: number
+    ) => void
   ) {
     if (this.isInitialized) {
       throw Error("Exchange already loaded");
@@ -630,6 +695,10 @@ export class Exchange {
 
     if (bloxrouteHttpProvider) {
       this._httpProvider = bloxrouteHttpProvider;
+    }
+
+    if (performanceCallback) {
+      this._performanceCallback = performanceCallback;
     }
 
     if (loadConfig.doubleDownConnections) {
@@ -953,7 +1022,17 @@ export class Exchange {
     let tx = new Transaction().add(
       instructions.updateZetaStateIx(params, this.provider.wallet.publicKey)
     );
-    await utils.processTransaction(this.provider, tx);
+    await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "updateZetaState"
+    );
     await this.updateState();
   }
 
@@ -1123,7 +1202,17 @@ export class Exchange {
         zetaGroupKey,
       })
     );
-    await utils.processTransaction(this.provider, tx);
+    await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "updatePricingPubkeys"
+    );
 
     await this.updateZetaPricing();
   }
@@ -1147,7 +1236,17 @@ export class Exchange {
     let tx = new Transaction().add(
       instructions.treasuryMovementIx(treasuryMovementType, amount)
     );
-    await utils.processTransaction(this._provider, tx);
+    await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "treasuryMovement"
+    );
   }
 
   public async rebalanceInsuranceVault(marginAccounts: any[]) {
@@ -1165,7 +1264,17 @@ export class Exchange {
     try {
       await Promise.all(
         txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(this._provider, tx);
+          let txSig = await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            "rebalanceInsuranceVault"
+          );
           console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
         })
       );
@@ -1193,7 +1302,17 @@ export class Exchange {
         enforceTpslConditions
       )
     );
-    return await utils.processTransaction(this._provider, tx);
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "adminCancelTriggerOrder"
+    );
   }
 
   public async halt(asset: Asset) {

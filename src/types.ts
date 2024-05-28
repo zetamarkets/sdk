@@ -705,7 +705,7 @@ export enum AirdropCommunity {
 }
 
 export enum JitoRpcMode {
-  JITOONLY = 0,
+  JITOBUNDLEONLY = 0,
   RPCONLY = 1,
   COMBO = 2,
 }
