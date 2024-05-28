@@ -1994,6 +1994,29 @@ export class CrossClient {
     this.delegatedCheck();
     let tx = new Transaction();
 
+    if (this._accountManager === null) {
+      console.log(
+        "User has no cross margin account manager. Creating account manager..."
+      );
+      tx.add(
+        instructions.initializeCrossMarginAccountManagerV2Ix(
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
+
+    if (this._account === null) {
+      console.log("User has no cross margin account. Creating account...");
+      tx.add(
+        instructions.initializeCrossMarginAccountIx(
+          this._accountAddress,
+          this._accountManagerAddress,
+          this._provider.wallet.publicKey
+        )
+      );
+    }
+
     tx.add(
       instructions.chooseAirdropCommunityIx(
         community,
@@ -3100,12 +3123,17 @@ export class CrossClient {
     let orders = [];
 
     Exchange.assets.forEach((asset) => {
-      let market = Exchange.getPerpMarket(asset);
-      orders.push(
-        market.getOrdersForAccount(
-          this._openOrdersAccounts[assetToIndex(asset)]
-        )
-      );
+      try {
+        let market = Exchange.getPerpMarket(asset);
+        orders.push(
+          market.getOrdersForAccount(
+            this._openOrdersAccounts[assetToIndex(asset)]
+          )
+        );
+      } catch (e) {
+        console.warn(`Warning: ${e}`);
+        return;
+      }
     });
 
     let allOrders = [].concat(...orders);

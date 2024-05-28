@@ -33,6 +33,7 @@ import * as instructions from "./program-instructions";
 import { Orderbook } from "./serum/market";
 import fetch from "cross-fetch";
 import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
+import { BlockhashCache } from "./blockhash-cache";
 
 export class Exchange {
   /**
@@ -328,6 +329,15 @@ export class Exchange {
   }
   private _jitoTip: number = 0;
 
+  // extra connection objects to send transactions down
+  public get doubleDownConnections(): Connection[] {
+    return this._doubleDownConnections;
+  }
+  public addDoubleDownConnection(connection: Connection) {
+    this._doubleDownConnections.push(connection);
+  }
+  private _doubleDownConnections: Connection[] = [];
+
   public get useAutoPriorityFee(): boolean {
     return this._useAutoPriorityFee;
   }
@@ -350,7 +360,19 @@ export class Exchange {
   public get blockhashCommitment(): Commitment {
     return this._blockhashCommitment;
   }
-  private _blockhashCommitment: Commitment = "finalized";
+  private _blockhashCommitment: Commitment = "confirmed";
+
+  public async getCachedBlockhash() {
+    try {
+      return this._blockhashCache.get();
+    } catch (e) {
+      console.log(e);
+      return await this.provider.connection.getLatestBlockhash(
+        this.blockhashCommitment
+      );
+    }
+  }
+  private _blockhashCache: BlockhashCache;
 
   public setUseAutoPriorityFee(useAutoPriorityFee: boolean) {
     this._useAutoPriorityFee = useAutoPriorityFee;
@@ -404,6 +426,24 @@ export class Exchange {
     if (this.isSetup) {
       throw Error("Exchange already setup");
     }
+
+    // https://docs.triton.one/chains/solana/web3js-socket-connection-issues
+    if (typeof window === "undefined") {
+      import("undici").then((undici) => {
+        undici.setGlobalDispatcher(
+          new undici.Agent({
+            connections: 100,
+          })
+        );
+      });
+    }
+
+    this._blockhashCache = new BlockhashCache(
+      loadConfig.blockhashCacheTimeoutSeconds
+        ? loadConfig.blockhashCacheTimeoutSeconds
+        : 50
+    );
+
     if (loadConfig.loadAssets) {
       this._assets = loadConfig.loadAssets;
     } else {
@@ -592,6 +632,12 @@ export class Exchange {
       this._httpProvider = bloxrouteHttpProvider;
     }
 
+    if (loadConfig.doubleDownConnections) {
+      for (var con of loadConfig.doubleDownConnections) {
+        this.addDoubleDownConnection(con);
+      }
+    }
+
     this._riskCalculator = new RiskCalculator(this.assets);
 
     // Load variables from state.
@@ -613,8 +659,7 @@ export class Exchange {
     await this.updateZetaPricing();
     this._oracle = new Oracle(
       this.network,
-      this.connection as unknown as Connection,
-      wallet
+      this.connection as unknown as Connection
     );
 
     const subExchangeToFetchAddrs: PublicKey[] = this.assets
@@ -732,6 +777,7 @@ export class Exchange {
     this.subscribePricing(callback);
     this.subscribeState(callback);
 
+    await this.updateCachedBlockhash();
     await this.updateExchangeState();
 
     this._isInitialized = true;
@@ -856,6 +902,7 @@ export class Exchange {
             this.isInitialized
           ) {
             this._lastPollTimestamp = this._clockTimestamp;
+            await this.updateCachedBlockhash();
             if (this._useAutoPriorityFee == true) {
               await this.updateAutoFee();
             }
@@ -930,6 +977,15 @@ export class Exchange {
     );
   }
 
+  // Not actually a websocket subscription, this polls for a recent blockhash every N seconds and stores it in a cache
+  // Ideally you should use slightly stale blockhashes to be able to deterministically fail a tx faster instead of waiting ~90s
+  private async updateCachedBlockhash() {
+    let latestBlockhash = await this.provider.connection.getLatestBlockhash(
+      this.blockhashCommitment
+    );
+    this._blockhashCache.set(latestBlockhash, Date.now() / 1000);
+  }
+
   private subscribePricing(
     callback?: (asset: Asset, type: EventType, slot: number, data: any) => void
   ) {
@@ -937,12 +993,19 @@ export class Exchange {
       this._pricingAddress as PublicKeyZstd,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
         this._pricing = this.program.coder.accounts.decode(
-          "Pricing",
+          types.ProgramAccountType.Pricing,
           accountInfo.data
         );
 
+        const assetsToMarkPrices = {};
+
+        for (const asset of this.assets) {
+          const markPrice = this.subExchanges.get(asset).getMarkPrice();
+          assetsToMarkPrices[asset] = markPrice;
+        }
+
         if (callback !== undefined) {
-          callback(null, EventType.PRICING, context.slot, null);
+          callback(null, EventType.PRICING, context.slot, assetsToMarkPrices);
         }
       },
       this.provider.connection.commitment,

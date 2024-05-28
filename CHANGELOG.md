@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.31.3]
+
+- Update subscribePricing to return mark prices ([#399](https://github.com/zetamarkets/sdk/pull/399))
+
+## [1.31.2]
+
+- Send to Jito transactions endpoint too. ([#398](https://github.com/zetamarkets/sdk/pull/398))
+
+## [1.31.1]
+
+- Add rndr, fix oracle loading with dummy wallet and revert some pyth changes for stale prices. ([#396](https://github.com/zetamarkets/sdk/pull/396))
+- Add account creation ixs to chooseAirdropCommunity ([#394](https://github.com/zetamarkets/sdk/pull/394))
+
 ## [1.30.0]
 
 - Upgrade anchor to 0.28.0, solana to 1.16.20, add new pythV2 functionality. ([#393](https://github.com/zetamarkets/sdk/pull/393))

@@ -64,6 +64,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.DYM) return "DYM";
   if (asset == Asset.STRK) return "STRK";
   if (asset == Asset.WIF) return "WIF";
+  if (asset == Asset.RNDR) return "RNDR";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -84,6 +85,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "DYM") return Asset.DYM;
   if (name == "STRK") return Asset.STRK;
   if (name == "WIF") return Asset.WIF;
+  if (name == "RNDR") return Asset.RNDR;
   return Asset.UNDEFINED;
 }
 
@@ -107,6 +109,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.DYM) return { dym: {} };
   if (asset == Asset.STRK) return { strk: {} };
   if (asset == Asset.WIF) return { wif: {} };
+  if (asset == Asset.RNDR) return { rndr: {} };
   return { undefined: {} };
 }
 
@@ -155,6 +158,9 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { wif: {} })) {
     return Asset.WIF;
+  }
+  if (objectEquals(asset, { rndr: {} })) {
+    return Asset.RNDR;
   }
   return Asset.UNDEFINED;
 }
@@ -206,6 +212,9 @@ export function assetToIndex(asset: Asset): number {
     case Asset.WIF: {
       return 14;
     }
+    case Asset.RNDR: {
+      return 15;
+    }
   }
   return 255; // Undefined is 255 onchain
 }
@@ -256,6 +265,9 @@ export function indexToAsset(index: number): Asset {
     }
     case 14: {
       return Asset.WIF;
+    }
+    case 15: {
+      return Asset.RNDR;
     }
   }
   return Asset.UNDEFINED;
