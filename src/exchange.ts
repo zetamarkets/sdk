@@ -327,7 +327,7 @@ export class Exchange {
   public get jitoTip(): number {
     return this._jitoTip;
   }
-  private _jitoTip: number = 0;
+  private _jitoTip: number = 1000;
 
   // extra connection objects to send transactions down
   public get doubleDownConnections(): Connection[] {
@@ -346,10 +346,6 @@ export class Exchange {
   private _autoPriorityFeeOffset: number = 0;
   private _autoPriorityFeeMultiplier: number = 1;
   private _autoPriorityFeeUseMax: boolean = false;
-  public get tipMultiplier(): number {
-    return this._tipMultiplier;
-  }
-  private _tipMultiplier: number = 1;
 
   public _performanceCallback: (
     ixName: string,
@@ -404,10 +400,6 @@ export class Exchange {
 
   public setAutoPriorityFeeUseMax(useMax: boolean) {
     this._autoPriorityFeeUseMax = useMax;
-  }
-
-  public setTipMultiplier(multiplier: number) {
-    this._tipMultiplier = multiplier;
   }
 
   public updatePriorityFee(microLamportsPerCU: number) {
