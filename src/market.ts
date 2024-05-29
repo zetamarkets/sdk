@@ -73,7 +73,10 @@ export class ZetaGroupMarkets {
   public static async load(
     asset: Asset,
     opts: ConfirmOptions,
-    loadFromStore: boolean
+    decodedSrmMarket: any,
+    bidAccInfo: AccountInfo<Buffer> | undefined,
+    askAccInfo: AccountInfo<Buffer> | undefined,
+    clockData: types.ClockData
   ): Promise<ZetaGroupMarkets> {
     let instance = new ZetaGroupMarkets(asset);
     let subExchange = Exchange.getSubExchange(asset);
@@ -81,31 +84,15 @@ export class ZetaGroupMarkets {
     // Perps product/market is separate
     let marketAddr = Exchange.pricing.products[assetToIndex(asset)].market;
     let serumMarket: SerumMarket;
-    if (loadFromStore) {
-      const decoded = getDecodedMarket(
-        Exchange.network,
-        asset,
-        constants.PERP_INDEX
-      );
-      serumMarket = SerumMarket.loadFromDecoded(
-        decoded,
-        {
-          commitment: opts.commitment,
-          skipPreflight: opts.skipPreflight,
-        },
-        constants.DEX_PID[Exchange.network] as PublicKeyZstd
-      );
-    } else {
-      serumMarket = await SerumMarket.load(
-        Exchange.connection,
-        marketAddr as PublicKeyZstd,
-        {
-          commitment: opts.commitment,
-          skipPreflight: opts.skipPreflight,
-        },
-        constants.DEX_PID[Exchange.network] as PublicKeyZstd
-      );
-    }
+
+    serumMarket = SerumMarket.loadFromDecoded(
+      decodedSrmMarket,
+      {
+        commitment: opts.commitment,
+        skipPreflight: opts.skipPreflight,
+      },
+      constants.DEX_PID[Exchange.network] as PublicKeyZstd
+    );
 
     let [baseVaultAddr, _baseVaultNonce] = getZetaVault(
       Exchange.programId,
@@ -125,9 +112,22 @@ export class ZetaGroupMarkets {
       serumMarket
     );
 
-    let book = await serumMarket.loadBidsAndAsks(
-      Exchange.provider.connection as unknown as ConnectionZstd
-    );
+    let book = undefined;
+    if (bidAccInfo && askAccInfo) {
+      book = serumMarket.loadBidsAndAsksFromData(
+        clockData,
+        bidAccInfo,
+        askAccInfo
+      );
+    } else {
+      book = await serumMarket.loadBidsAndAsks(
+        Exchange.provider.connection as unknown as ConnectionZstd
+      );
+    }
+
+    instance._market.bids = book.bids;
+    instance._market.asks = book.asks;
+
     instance._market.bids = book.bids;
     instance._market.asks = book.asks;
     instance._market.updateOrderbook();

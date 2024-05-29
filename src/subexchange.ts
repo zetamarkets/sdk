@@ -5,6 +5,7 @@ import {
   ConfirmOptions,
   AccountMeta,
   TransactionInstruction,
+  AccountInfo,
 } from "@solana/web3.js";
 import * as utils from "./utils";
 import * as constants from "./constants";
@@ -131,9 +132,11 @@ export class SubExchange {
   public async load(
     asset: Asset,
     opts: ConfirmOptions,
-    fetchedAccs: any[],
-    loadFromStore: boolean,
-    callback?: (asset: Asset, event: EventType, slot: number, data: any) => void
+    perpSyncQueue: PerpSyncQueue,
+    decodedSrmMarket: any,
+    bidAccInfo: AccountInfo<Buffer>,
+    askAccInfo: AccountInfo<Buffer>,
+    clockData: types.ClockData
   ) {
     console.info(`Loading ${assetToName(asset)} subExchange.`);
 
@@ -141,9 +144,16 @@ export class SubExchange {
       throw Error("SubExchange already loaded.");
     }
 
-    this._perpSyncQueue = fetchedAccs[0] as PerpSyncQueue;
+    this._perpSyncQueue = perpSyncQueue;
 
-    this._markets = await ZetaGroupMarkets.load(asset, opts, loadFromStore);
+    this._markets = await ZetaGroupMarkets.load(
+      asset,
+      opts,
+      decodedSrmMarket,
+      bidAccInfo,
+      askAccInfo,
+      clockData
+    );
 
     Exchange.riskCalculator.updateMarginRequirements(asset);
 
@@ -187,6 +197,7 @@ export class SubExchange {
 
     if (
       m.serumMarket.epochLength.toNumber() == 0 ||
+      m.serumMarket.startEpochSeqNum.isZero() ||
       m.serumMarket.epochStartTs.toNumber() +
         m.serumMarket.epochLength.toNumber() +
         epochDelay >
