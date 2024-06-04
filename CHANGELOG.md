@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.35.0]
+
+- Fix load bug with TIF expiry ts. ([#403](https://github.com/zetamarkets/sdk/pull/403))
+- Add referred timestamp. ([#402](https://github.com/zetamarkets/sdk/pull/402))
+- Optimise blockhash cache. ([#401](https://github.com/zetamarkets/sdk/pull/401))
+
 ## [1.34.0]
 
 - reduce number of fetches on startup and speed up load. ([#401](https://github.com/zetamarkets/sdk/pull/401))
