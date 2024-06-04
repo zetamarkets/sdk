@@ -1335,13 +1335,6 @@ export async function processTransaction(
           currentBlockHeight <
           recentBlockhash.lastValidBlockHeight - 151
         ) {
-          console.log(
-            `[DEBUG] currentBlockHeight = ${currentBlockHeight} lastValidBlockHeight = ${
-              recentBlockhash.lastValidBlockHeight - 151
-            } diff = ${
-              recentBlockhash.lastValidBlockHeight - 151 - currentBlockHeight
-            }`
-          );
           // Keep resending to maximise the chance of confirmation
           resendCounter += 1;
           if (resendCounter % 4 == 0) {
