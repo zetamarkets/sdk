@@ -153,9 +153,15 @@ export class Market {
     programId: PublicKey,
     layoutOverride?: any
   ) {
+    // Use local clock if Exchange.clockTimestamp isn't set yet
+    let nowTs = Math.floor(Date.now() / 1000);
+
+    if (Exchange.clockTimestamp != undefined && Exchange.clockTimestamp != 0) {
+      nowTs = Exchange.clockTimestamp;
+    }
+
     decoded.epochStartTs = new BN(
-      Exchange.clockTimestamp -
-        (Exchange.clockTimestamp % decoded.epochLength.toNumber())
+      nowTs - (nowTs % decoded.epochLength.toNumber())
     );
 
     return new Market(decoded, 0, 6, options, programId, layoutOverride);
