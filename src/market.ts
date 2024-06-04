@@ -25,10 +25,9 @@ import {
   isOrderExpired,
 } from "./utils";
 import * as types from "./types";
-import { EventType, OrderbookEvent } from "./events";
+import { EventType } from "./events";
 import { assetToIndex } from "./assets";
 import { Asset } from "./constants";
-import { getDecodedMarket } from "./serum/generate-decoded";
 
 export class ZetaGroupMarkets {
   /**
