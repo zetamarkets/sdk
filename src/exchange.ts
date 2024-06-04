@@ -367,7 +367,9 @@ export class Exchange {
     try {
       return this._blockhashCache.get();
     } catch (e) {
-      console.log(e);
+      if (this.network != Network.LOCALNET) {
+        console.log(e);
+      }
       return await this.provider.connection.getLatestBlockhash(
         this.blockhashCommitment
       );
