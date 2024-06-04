@@ -18,6 +18,7 @@ export enum Asset {
   STRK = "STRK",
   WIF = "WIF",
   RNDR = "RNDR",
+  TNSR = "TNSR",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -80,6 +81,7 @@ export const FLEX_MINTS = {
     [Asset.STRK]: new PublicKey("7dEBs64vVgs8Ws3DkK7cwxSMe9RzQ21pnYawXgFaxisp"),
     [Asset.WIF]: new PublicKey("BgDrDxc75EqPTXPUTCFMnYVYPeWK3CimPz2LGw4egsYc"),
     [Asset.RNDR]: new PublicKey("397Hd8iZXmzRf4jqCSuACtUUWeweYZRZ4DmgvVpMkHJf"),
+    [Asset.TNSR]: new PublicKey("58MFM7mjjYMc6GoK6QUu7HuUmsih8aL5MTHptPE29p8G"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -102,6 +104,7 @@ export const FLEX_MINTS = {
     [Asset.STRK]: new PublicKey("C42HXAXQiV6EqxzTvmwff6FgCPNw7r2MgvJ9uv8UNdce"),
     [Asset.WIF]: new PublicKey("7jCmRqJaJq5iojCwGqq5DdwUBYPhrpvJcgNZsFLM4Pd5"),
     [Asset.RNDR]: new PublicKey("GSF4GTjWxacrQoVbf8PUcvCvMvZUzwXFEmb2Jso6XU5H"),
+    [Asset.TNSR]: new PublicKey("3bTWLSNoD95dP2SHq4diRz3ZTeDXmybTsjPUQzRpTCHR"),
   },
 };
 
@@ -290,6 +293,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0x4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc",
   [Asset.RNDR]:
     "0xab7347771135fc733f8f38db462ba085ed3309955f42554a14fa13e855ac0e2f",
+  [Asset.TNSR]:
+    "0x05ecd4597cd48fe13d6cc3596c62af4f9675aee06e2e0b94c06d8bee2b659e05",
 };
 
 export const PYTH_PRICE_FEEDS = {
@@ -312,6 +317,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.STRK]: new PublicKey("6gtqwzdgeb8Luay2BSbyn3tobqfr3tWjdyP2tsySSiJu"),
     [Asset.WIF]: new PublicKey("Ae9pWfoS4jS8WFxMTApKHkmMaod171aRcekm1iFbsmoy"),
     [Asset.RNDR]: new PublicKey("7DvNVeya3b6WqcxSzUZFW9CWdDayJoRYjnpg2HVbgv2h"),
+    [Asset.TNSR]: new PublicKey("GXza7qdvAfYhdBC3jTrhXt2kQyakrMsx6PoYFqddfeGu"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -366,8 +372,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 16;
-export const UNUSED_PERP_MARKETS = 9;
+export const ACTIVE_PERP_MARKETS = 17;
+export const UNUSED_PERP_MARKETS = 8;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 10;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
