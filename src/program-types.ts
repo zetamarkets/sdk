@@ -193,6 +193,7 @@ export interface CrossMarginAccountManager {
   accounts: Array<CrossMarginAccountInfo>;
   referrer: PublicKey;
   airdropCommunity: number;
+  referredTimestamp: anchor.BN;
   padding: Array<number>;
 }
 

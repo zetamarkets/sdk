@@ -8195,11 +8195,15 @@ export type Zeta = {
             "type": "u8"
           },
           {
+            "name": "referredTimestamp",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                22
+                14
               ]
             }
           }
@@ -19596,11 +19600,15 @@ export const IDL: Zeta = {
             "type": "u8"
           },
           {
+            "name": "referredTimestamp",
+            "type": "u64"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                22
+                14
               ]
             }
           }
