@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.36.0]
+
+- Add new asset TNSR. ([#405](https://github.com/zetamarkets/sdk/pull/405))
+
 ## [1.35.0]
 
 - Fix load bug with TIF expiry ts. ([#403](https://github.com/zetamarkets/sdk/pull/403))
