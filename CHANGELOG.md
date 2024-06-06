@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.36.0]
+
+- Add new asset TNSR. ([#405](https://github.com/zetamarkets/sdk/pull/405))
+
+## [1.35.0]
+
+- Add referred timestamp. ([#402](https://github.com/zetamarkets/sdk/pull/402))
+
 ## [1.34.0]
 
 - reduce number of fetches on startup and speed up load. ([#401](https://github.com/zetamarkets/sdk/pull/401))
