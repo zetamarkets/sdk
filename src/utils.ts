@@ -1298,7 +1298,11 @@ export async function processTransaction(
       let currentBlockHeight = 0;
       if (!Exchange.skipRpcConfirmation) {
         let resendCounter = 0;
-        while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+        // https://solana.com/docs/advanced/confirmation#how-does-transaction-expiration-work
+        while (
+          currentBlockHeight <
+          recentBlockhash.lastValidBlockHeight - 151
+        ) {
           if (Exchange.jitoRpcMode == types.JitoRpcMode.JITOBUNDLEONLY) {
             let jitoStatus = await getBundleResult(txSig);
             if (jitoStatus) {

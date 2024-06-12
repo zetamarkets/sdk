@@ -132,6 +132,37 @@ export class Oracle {
         let priceAddress: PublicKey =
           constants.PYTH_PRICE_FEEDS[this._network][asset];
 
+        if (asset == Asset.TNSR) {
+          let eventEmitter =
+            this._pythReceiver.receiver.account.priceUpdateV2.subscribe(
+              priceAddress,
+              this._connection.commitment
+            );
+
+          eventEmitter.on("change", async (priceUpdate: PriceUpdateAccount) => {
+            const price =
+              priceUpdate.priceMessage.price.toNumber() *
+              10 ** priceUpdate.priceMessage.exponent *
+              assetMultiplier(asset);
+
+            const publishSlot = priceUpdate.postedSlot.toNumber();
+            let currPrice = this._data.get(asset);
+            if (currPrice !== undefined && currPrice.price === price) {
+              return;
+            }
+            const oracleData = {
+              asset,
+              price,
+              lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
+              lastUpdatedSlot: publishSlot,
+            };
+            this._data.set(asset, oracleData);
+            this._callback(asset, oracleData, publishSlot);
+          });
+          this._eventEmitters.set(asset, eventEmitter);
+          return;
+        }
+
         if (this._network == Network.LOCALNET) {
           let eventEmitter =
             this._pythReceiver.receiver.account.priceUpdateV2.subscribe(
@@ -202,6 +233,16 @@ export class Oracle {
           );
         })
       );
+      for (let eventEmitter of this._eventEmitters.values()) {
+        await eventEmitter.removeListener("change");
+      }
+      this._eventEmitters = new Map();
+    } else {
+      let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][Asset.TNSR];
+      await this._pythReceiver.receiver.account.priceUpdateV2.unsubscribe(
+        priceAddress
+      );
+
       for (let eventEmitter of this._eventEmitters.values()) {
         await eventEmitter.removeListener("change");
       }

@@ -14,6 +14,7 @@ import { decodeEventQueue, decodeRequestQueue } from "./queue";
 import { Buffer } from "buffer";
 import { exchange as Exchange } from "../exchange";
 import { getClockData } from "../utils";
+import { ClockData } from "../types";
 
 export const MARKET_STATE_LAYOUT_V3 = struct([
   blob(5),
@@ -152,9 +153,15 @@ export class Market {
     programId: PublicKey,
     layoutOverride?: any
   ) {
+    // Use local clock if Exchange.clockTimestamp isn't set yet
+    let nowTs = Math.floor(Date.now() / 1000);
+
+    if (Exchange.clockTimestamp != undefined && Exchange.clockTimestamp != 0) {
+      nowTs = Exchange.clockTimestamp;
+    }
+
     decoded.epochStartTs = new BN(
-      Exchange.clockTimestamp -
-        (Exchange.clockTimestamp % decoded.epochLength.toNumber())
+      nowTs - (nowTs % decoded.epochLength.toNumber())
     );
 
     return new Market(decoded, 0, 6, options, programId, layoutOverride);
@@ -254,6 +261,14 @@ export class Market {
 
     return {
       slot: slot,
+      bids: Orderbook.decode(this, throwIfNull(bidsInfo).data),
+      asks: Orderbook.decode(this, throwIfNull(asksInfo).data),
+    };
+  }
+
+  loadBidsAndAsksFromData(clockInfo: ClockData, bidsInfo, asksInfo): any {
+    return {
+      slot: clockInfo.slot,
       bids: Orderbook.decode(this, throwIfNull(bidsInfo).data),
       asks: Orderbook.decode(this, throwIfNull(asksInfo).data),
     };
