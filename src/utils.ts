@@ -1094,6 +1094,34 @@ export async function processTransaction(
     let rawTx: Buffer | Uint8Array;
     let rawTxTip: Buffer | Uint8Array;
 
+    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
+
+    // simulateTransaction is deprecated for old txs, only works with VersionedTransactions
+    // so no matter if we're using LUTs or not, we can still build a dummy verioned tx to simulate with
+    // the result is close enough for CU purposes
+    if (Exchange.optimiseTransactionCU) {
+      let estimatedCU = Math.round(
+        (
+          await provider.connection.simulateTransaction(
+            new VersionedTransaction(
+              new TransactionMessage({
+                payerKey: provider.wallet.publicKey,
+                recentBlockhash: recentBlockhash.blockhash,
+                instructions: tx.instructions,
+              }).compileToV0Message()
+            )
+          )
+        ).value.unitsConsumed * 1.25
+      );
+
+      console.log(`Estimating transaction CU to be ${estimatedCU}`);
+      tx.instructions.unshift(
+        ComputeBudgetProgram.setComputeUnitLimit({
+          units: estimatedCU,
+        })
+      );
+    }
+
     if (Exchange.priorityFee != 0) {
       tx.instructions.unshift(
         ComputeBudgetProgram.setComputeUnitPrice({
@@ -1101,8 +1129,6 @@ export async function processTransaction(
         })
       );
     }
-
-    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
 
     if (lutAccs) {
       if (useLedger) {

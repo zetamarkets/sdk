@@ -297,6 +297,7 @@ export class Exchange {
 
   public maxRpcRetries: number | undefined = undefined;
   public skipRpcConfirmation: boolean | undefined = undefined;
+  public optimiseTransactionCU: boolean | undefined = undefined;
 
   // Handy map to grab zetagroup asset by pubkey without an RPC fetch
   // or having to manually filter all zetaGroups
