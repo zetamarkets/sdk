@@ -5,7 +5,7 @@ Version changes are pinned to SDK releases.
 
 ## [1.37.0]
 
-- Move over oracle to new pyth model. ([#405](https://github.com/zetamarkets/sdk/pull/405))
+- Move over oracle to new pyth model. ([#406](https://github.com/zetamarkets/sdk/pull/406))
 
 ## [1.36.0]
 
