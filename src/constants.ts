@@ -329,6 +329,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.PYTH]: new PublicKey("ELF78ZhSr8u4SCixA7YSpjdZHZoSNrAhcyysbavpC2kA"),
     [Asset.TIA]: new PublicKey("4GiL1Y6u6JkPb7ckakzJgc414h6P7qoYnEKFcd1YtSB9"),
   },
+  // Update to Pyth shard 0 addresses
   mainnet: {
     [Asset.SOL]: new PublicKey("7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE"),
     [Asset.BTC]: new PublicKey("4cSM2e6rvbGQUFiJbqytoVMi5GgghSMr8LwVrT9VPSPo"),
@@ -348,7 +349,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.STRK]: new PublicKey("CcRDwd4VYKq5pmUHHnzwujBZwTwfgE95UjjdoZW7qyEs"),
     [Asset.WIF]: new PublicKey("6B23K3tkb51vLZA14jcEQVCA1pfHptzEHFA93V5dYwbT"),
     [Asset.RNDR]: new PublicKey("GbgH1oen3Ne1RY4LwDgh8kEeA1KywHvs5x8zsx6uNV5M"),
-    [Asset.TNSR]: new PublicKey("9TSGDwcPQX4JpAvZbu2Wp5b68wSYkQvHCvfeBjYcCyC"), // New pyth price feed addr,
+    [Asset.TNSR]: new PublicKey("9TSGDwcPQX4JpAvZbu2Wp5b68wSYkQvHCvfeBjYcCyC"),
   },
 };
 
