@@ -7,9 +7,6 @@ import { assetMultiplier, assetToName } from "./assets";
 import * as types from "./types";
 import { PythSolanaReceiver } from "@pythnetwork/pyth-solana-receiver";
 import { PriceUpdateAccount } from "@pythnetwork/pyth-solana-receiver/lib/PythSolanaReceiver";
-import { parsePriceData } from "@pythnetwork/client";
-
-// TODO: Replace the LOCALNET / MAINNET PYTH DIFF STUFF ONCE WE START CRANKING NEW PRICE FEEDS
 
 export class Oracle {
   private _connection: Connection;
@@ -56,20 +53,6 @@ export class Oracle {
     );
   }
 
-  public getOwnOraclePriceObjectFromBuffer(
-    asset: Asset,
-    data: Buffer
-  ): OraclePrice {
-    let priceData = parsePriceData(data);
-    const price = priceData.aggregate.price * assetMultiplier(asset);
-    return {
-      asset,
-      price,
-      lastUpdatedTime: Exchange.clockTimestamp,
-      lastUpdatedSlot: BigInt(priceData.aggregate.publishSlot),
-    };
-  }
-
   // Fetch and update an oracle price manually
   public async pollPrice(
     asset: Asset,
@@ -82,31 +65,20 @@ export class Oracle {
     let priceAddress: PublicKey =
       constants.PYTH_PRICE_FEEDS[this._network][asset];
 
-    let oracleData: OraclePrice;
-    let slot: number;
+    let priceUpdate = await this.getPriceUpdateAccount(priceAddress);
 
-    if (this._network == Network.LOCALNET) {
-      let priceUpdate = await this.getPriceUpdateAccount(priceAddress);
+    const price =
+      priceUpdate.priceMessage.price.toNumber() *
+      10 ** priceUpdate.priceMessage.exponent *
+      assetMultiplier(asset);
 
-      const price =
-        priceUpdate.priceMessage.price.toNumber() *
-        10 ** priceUpdate.priceMessage.exponent *
-        assetMultiplier(asset);
-
-      oracleData = {
-        asset,
-        price,
-        lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
-        lastUpdatedSlot: BigInt(priceUpdate.postedSlot.toNumber()),
-      };
-      slot = priceUpdate.postedSlot.toNumber();
-    } else {
-      let accountInfo = await this._connection.getAccountInfo(priceAddress);
-      oracleData = this.getOwnOraclePriceObjectFromBuffer(
-        asset,
-        accountInfo.data
-      );
-    }
+    let oracleData: OraclePrice = {
+      asset,
+      price,
+      lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
+      lastUpdatedSlot: BigInt(priceUpdate.postedSlot.toNumber()),
+    };
+    let slot = priceUpdate.postedSlot.toNumber();
 
     this._data.set(asset, oracleData);
 
@@ -132,123 +104,52 @@ export class Oracle {
         let priceAddress: PublicKey =
           constants.PYTH_PRICE_FEEDS[this._network][asset];
 
-        if (asset == Asset.TNSR) {
-          let eventEmitter =
-            this._pythReceiver.receiver.account.priceUpdateV2.subscribe(
-              priceAddress,
-              this._connection.commitment
-            );
-
-          eventEmitter.on("change", async (priceUpdate: PriceUpdateAccount) => {
-            const price =
-              priceUpdate.priceMessage.price.toNumber() *
-              10 ** priceUpdate.priceMessage.exponent *
-              assetMultiplier(asset);
-
-            const publishSlot = priceUpdate.postedSlot.toNumber();
-            let currPrice = this._data.get(asset);
-            if (currPrice !== undefined && currPrice.price === price) {
-              return;
-            }
-            const oracleData = {
-              asset,
-              price,
-              lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
-              lastUpdatedSlot: publishSlot,
-            };
-            this._data.set(asset, oracleData);
-            this._callback(asset, oracleData, publishSlot);
-          });
-          this._eventEmitters.set(asset, eventEmitter);
-          return;
-        }
-
-        if (this._network == Network.LOCALNET) {
-          let eventEmitter =
-            this._pythReceiver.receiver.account.priceUpdateV2.subscribe(
-              priceAddress,
-              this._connection.commitment
-            );
-
-          eventEmitter.on("change", async (priceUpdate: PriceUpdateAccount) => {
-            const price =
-              priceUpdate.priceMessage.price.toNumber() *
-              10 ** priceUpdate.priceMessage.exponent *
-              assetMultiplier(asset);
-
-            const publishSlot = priceUpdate.postedSlot.toNumber();
-            let currPrice = this._data.get(asset);
-            if (currPrice !== undefined && currPrice.price === price) {
-              return;
-            }
-            const oracleData = {
-              asset,
-              price,
-              lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
-              lastUpdatedSlot: publishSlot,
-            };
-            this._data.set(asset, oracleData);
-            this._callback(asset, oracleData, publishSlot);
-          });
-          this._eventEmitters.set(asset, eventEmitter);
-        } else {
-          let subscriptionId = this._connection.onAccountChange(
-            priceAddress,
-            (accountInfo: AccountInfo<Buffer>, context: Context) => {
-              let oracleData = this.getOwnOraclePriceObjectFromBuffer(
-                asset,
+        let subscriptionId = this._connection.onAccountChange(
+          priceAddress,
+          (accountInfo: AccountInfo<Buffer>, context: Context) => {
+            const priceUpdate =
+              this._pythReceiver.receiver.coder.accounts.decode(
+                "priceUpdateV2",
                 accountInfo.data
               );
+            const price =
+              priceUpdate.priceMessage.price.toNumber() *
+              10 ** priceUpdate.priceMessage.exponent *
+              assetMultiplier(asset);
 
-              let currPrice = this._data.get(asset);
-              if (
-                currPrice !== undefined &&
-                currPrice.price === oracleData.price
-              ) {
-                return;
-              }
+            const publishSlot = priceUpdate.postedSlot.toNumber();
 
-              this._data.set(asset, oracleData);
-              this._callback(asset, oracleData, context.slot);
-            },
-            Exchange.provider.connection.commitment
-          );
+            const oracleData = {
+              asset,
+              price,
+              lastUpdatedTime: priceUpdate.priceMessage.publishTime.toNumber(),
+              lastUpdatedSlot: publishSlot,
+            };
 
-          this._subscriptionIds.set(asset, subscriptionId);
-        }
+            let currPrice = this._data.get(asset);
+            if (
+              currPrice !== undefined &&
+              currPrice.price === oracleData.price
+            ) {
+              return;
+            }
+
+            this._data.set(asset, oracleData);
+            this._callback(asset, oracleData, context.slot);
+          },
+          Exchange.provider.connection.commitment
+        );
+
+        this._subscriptionIds.set(asset, subscriptionId);
 
         // Set this so the oracle contains a price on initialization.
         await this.pollPrice(asset, true);
+        return;
       })
     );
   }
 
   public async close() {
-    if (this._network == Network.LOCALNET) {
-      await Promise.all(
-        Exchange.assets.map(async (asset) => {
-          let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][asset];
-          return this._pythReceiver.receiver.account.priceUpdateV2.unsubscribe(
-            priceAddress
-          );
-        })
-      );
-      for (let eventEmitter of this._eventEmitters.values()) {
-        await eventEmitter.removeListener("change");
-      }
-      this._eventEmitters = new Map();
-    } else {
-      let priceAddress = constants.PYTH_PRICE_FEEDS[this._network][Asset.TNSR];
-      await this._pythReceiver.receiver.account.priceUpdateV2.unsubscribe(
-        priceAddress
-      );
-
-      for (let eventEmitter of this._eventEmitters.values()) {
-        await eventEmitter.removeListener("change");
-      }
-      this._eventEmitters = new Map();
-    }
-
     for (let subscriptionId of this._subscriptionIds.values()) {
       await this._connection.removeAccountChangeListener(subscriptionId);
     }
