@@ -1054,6 +1054,89 @@ export async function processTransactionBloxroute(
   }
 }
 
+/// Note that you must add in the jito tip instruction before you send this to here
+export async function processVersionedTransactionJito(
+  provider: anchor.AnchorProvider,
+  tx: VersionedTransaction,
+  signers?: Array<Signer>,
+  opts?: ConfirmOptions,
+  blockhash?: { blockhash: string; lastValidBlockHeight: number }
+): Promise<TransactionSignature> {
+  let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
+
+  tx.sign(
+    (signers ?? [])
+      .filter((s) => s !== undefined)
+      .map((kp) => {
+        return kp;
+      })
+  );
+  tx = (await provider.wallet.signTransaction(tx)) as VersionedTransaction;
+
+  let rawTx = tx.serialize();
+
+  const encodedTx = bs58.encode(rawTx);
+  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
+  const payload = {
+    jsonrpc: "2.0",
+    id: 1,
+    method: "sendTransaction",
+    params: [encodedTx],
+  };
+
+  let txOpts = opts || commitmentConfig(provider.connection.commitment);
+  let txSig: string;
+  try {
+    const response = await axios.post(jitoURL, payload, {
+      headers: { "Content-Type": "application/json" },
+    });
+    txSig = response.data.result;
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Jito Bundle Error: cannot send.");
+  }
+
+  if (Exchange.skipRpcConfirmation) {
+    return txSig;
+  }
+
+  let currentBlockHeight = await provider.connection.getBlockHeight(
+    provider.connection.commitment
+  );
+
+  while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
+    // Keep resending to maximise the chance of confirmation
+    await provider.connection.sendRawTransaction(rawTx, {
+      skipPreflight: true,
+      preflightCommitment: provider.connection.commitment,
+      maxRetries: 0,
+    });
+
+    let status = await provider.connection.getSignatureStatus(txSig);
+    currentBlockHeight = await provider.connection.getBlockHeight(
+      provider.connection.commitment
+    );
+    if (status.value != null) {
+      if (status.value.err != null) {
+        // Gets caught and parsed in the later catch
+        let err = parseInt(status.value.err["InstructionError"][1]["Custom"]);
+        let parsedErr = parseError(err);
+        throw parsedErr;
+      }
+      if (
+        txConfirmationCheck(
+          txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
+          status.value.confirmationStatus.toString()
+        )
+      ) {
+        return txSig;
+      }
+    }
+    await sleep(500); // Don't spam the RPC
+  }
+  throw Error(`Transaction ${txSig} was not confirmed`);
+}
+
 export async function processTransactionJito(
   provider: anchor.AnchorProvider,
   tx: Transaction,
@@ -1192,6 +1275,140 @@ export async function sendJitoTxCaught(payload: any) {
     return response.data.result;
   } catch (e) {
     console.log(`Error sending tx: ${e}`);
+  }
+}
+
+export async function processVersionedTransaction(
+  provider: anchor.AnchorProvider,
+  tx: VersionedTransaction,
+  signers?: Array<Signer>,
+  opts?: ConfirmOptions,
+  lutAccs?: AddressLookupTableAccount[],
+  blockhash?: { blockhash: string; lastValidBlockHeight: number },
+  retries?: number
+): Promise<TransactionSignature> {
+  if (Exchange.useJitoBundle) {
+    return processTransactionJito(
+      provider,
+      tx,
+      signers,
+      opts,
+      lutAccs,
+      blockhash
+    );
+  }
+
+  let failures = 0;
+  while (true) {
+    let rawTx: Buffer | Uint8Array;
+
+    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
+
+    tx.sign(
+      (signers ?? [])
+        .filter((s) => s !== undefined)
+        .map((kp) => {
+          return kp;
+        })
+    );
+    tx = (await provider.wallet.signTransaction(tx)) as VersionedTransaction;
+    rawTx = tx.serialize();
+
+    let txOpts = opts || commitmentConfig(provider.connection.commitment);
+    let txSig;
+    let allConnections = [provider.connection].concat(
+      Exchange.doubleDownConnections
+    );
+    try {
+      // Integration tests don't like the split send + confirm :(
+      if (Exchange.network == Network.LOCALNET) {
+        return await anchor.sendAndConfirmRawTransaction(
+          provider.connection,
+          rawTx,
+          txOpts
+        );
+      }
+
+      let promises = [];
+      for (var con of allConnections) {
+        promises.push(sendRawTransactionCaught(con, rawTx));
+      }
+
+      // Jito's transactions endpoint, not a bundle
+      // Might as well send it here for extra success, it's free
+      if (Exchange.network == Network.MAINNET) {
+        const encodedTx = bs58.encode(rawTx);
+        const payload = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "sendTransaction",
+          params: [encodedTx],
+        };
+        promises.push(sendJitoTxCaught(payload));
+      }
+
+      // All tx sigs are the same
+      let txSigs = await Promise.all(promises);
+      let txSig = txSigs.find(
+        (sig) => typeof sig === "string" && sig.length > 0
+      );
+
+      // Poll the tx confirmation for N seconds
+      // Polling is more reliable than websockets using confirmTransaction()
+      let currentBlockHeight = 0;
+      if (!Exchange.skipRpcConfirmation) {
+        let resendCounter = 0;
+        // https://solana.com/docs/advanced/confirmation#how-does-transaction-expiration-work
+        while (
+          currentBlockHeight <
+          recentBlockhash.lastValidBlockHeight - 151
+        ) {
+          // Keep resending to maximise the chance of confirmation
+          resendCounter += 1;
+          if (resendCounter % 4 == 0) {
+            for (var con of allConnections) {
+              promises.push(sendRawTransactionCaught(con, rawTx));
+            }
+            await Promise.race(promises);
+          }
+
+          let status = await provider.connection.getSignatureStatus(txSig);
+          currentBlockHeight = await provider.connection.getBlockHeight(
+            provider.connection.commitment
+          );
+          if (status.value != null) {
+            if (status.value.err != null) {
+              // Gets caught and parsed in the later catch
+              let err = parseInt(
+                status.value.err["InstructionError"][1]["Custom"]
+              );
+              throw err;
+            }
+            if (
+              txConfirmationCheck(
+                txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
+                status.value.confirmationStatus.toString()
+              )
+            ) {
+              return txSig;
+            }
+          }
+          await sleep(500); // Don't spam the RPC
+        }
+        throw Error(`Transaction ${txSig} was not confirmed`);
+      } else {
+        return txSig;
+      }
+    } catch (err) {
+      let parsedErr = parseError(err);
+      failures += 1;
+      if (!retries || failures > retries) {
+        console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
+        throw parsedErr;
+      }
+      console.log(`Transaction failed to send. Retrying...`);
+      console.log(`failCount=${failures}. error=${parsedErr}`);
+    }
   }
 }
 
