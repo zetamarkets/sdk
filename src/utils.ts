@@ -1283,17 +1283,15 @@ export async function processVersionedTransaction(
   tx: VersionedTransaction,
   signers?: Array<Signer>,
   opts?: ConfirmOptions,
-  lutAccs?: AddressLookupTableAccount[],
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
   retries?: number
 ): Promise<TransactionSignature> {
   if (Exchange.useJitoBundle) {
-    return processTransactionJito(
+    return processVersionedTransactionJito(
       provider,
       tx,
       signers,
       opts,
-      lutAccs,
       blockhash
     );
   }
