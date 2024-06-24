@@ -10260,6 +10260,9 @@ export type Zeta = {
           },
           {
             "name": "NormalT9"
+          },
+          {
+            "name": "WithdrawOnly"
           }
         ]
       }
@@ -11662,6 +11665,11 @@ export type Zeta = {
       "code": 6173,
       "name": "OODoesntMatch",
       "msg": "Can only pop events for open orders passed in"
+    },
+    {
+      "code": 6174,
+      "name": "WithdrawOnlyAccount",
+      "msg": "Account is restricted, only withdrawals are allowed"
     }
   ]
 };
@@ -21928,6 +21936,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "NormalT9"
+          },
+          {
+            "name": "WithdrawOnly"
           }
         ]
       }
@@ -23330,6 +23341,11 @@ export const IDL: Zeta = {
       "code": 6173,
       "name": "OODoesntMatch",
       "msg": "Can only pop events for open orders passed in"
+    },
+    {
+      "code": 6174,
+      "name": "WithdrawOnlyAccount",
+      "msg": "Account is restricted, only withdrawals are allowed"
     }
   ]
 };

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.38.0]
+
+### Breaking
+
+- Add new account type withdraw_only. This will break account deserialisation if fetching all accounts and reading one that has withdraw_only set. ([#407](https://github.com/zetamarkets/sdk/pull/407))
+
 ## [1.37.0]
 
 - Move over oracle to new pyth model. ([#406](https://github.com/zetamarkets/sdk/pull/406))
