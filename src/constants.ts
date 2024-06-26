@@ -44,7 +44,7 @@ export enum MarginAccountType {
   NORMAL_T7 = 18,
   NORMAL_T8 = 19,
   NORMAL_T9 = 20,
-  WITHDRAW_ONLY = 100,
+  WITHDRAW_ONLY = 21,
 }
 
 export const ZETA_PID: {
