@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.39.0]
+
+- Change enum u8 for withdraw_only account type. ([#409](https://github.com/zetamarkets/sdk/pull/409))
+
 ## [1.38.0]
 
 ### Breaking
