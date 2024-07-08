@@ -962,21 +962,13 @@ async function getBundleResult(bundle: string) {
   };
 
   try {
-    console.log("[DEBUG] sending getBundleStatuses Jito request");
     const response = await axios.post(jitoURL, payload, {
       headers: { "Content-Type": "application/json" },
     });
-    console.log("[DEBUG] sent getBundleStatuses Jito request");
     if (response.status != 200) {
-      throw Error(`Bundle ${bundle} not accepted by Jito`);
+      throw Error(`Bundle ${bundle} not found on Jito`);
     }
     return response.data.result;
-    // console.log(response.data.result);
-    // let res = response.data.result;
-    // if (!res.value || res.value.length == 0) {
-    //   throw Error(`Bundle ${bundle} not accepted by Jito`);
-    // }
-    // return [res.value[0].transactions, res.value[0].err];
   } catch (error) {
     console.log(error);
   }
@@ -984,7 +976,6 @@ async function getBundleResult(bundle: string) {
 
 export async function sendBloxrouteTransactionCaught(rawTx: any) {
   try {
-    console.log("[DEBUG] sending to Bloxroute");
     let txSig = (
       await Exchange.httpProvider.postSubmitV2({
         transaction: {
@@ -995,7 +986,6 @@ export async function sendBloxrouteTransactionCaught(rawTx: any) {
         frontRunningProtection: false,
       })
     ).signature;
-    console.log("[DEBUG] sent to Bloxroute");
     return txSig;
   } catch (e) {
     console.log(`Error sending tx to Bloxroute: ${e}`);
@@ -1024,7 +1014,6 @@ export async function sendJitoTxCaught(rawTx: any) {
       method: "sendTransaction",
       params: [encodedTx],
     };
-    console.log("[DEBUG] sending to Jito /transactions endpoint");
     let response = await axios.post(
       "https://mainnet.block-engine.jito.wtf/api/v1/transactions",
       payload,
@@ -1032,7 +1021,6 @@ export async function sendJitoTxCaught(rawTx: any) {
         headers: { "Content-Type": "application/json" },
       }
     );
-    console.log("[DEBUG] sent to Jito /transactions endpoint");
     return response.data.result;
   } catch (e) {
     console.log(`Error sending tx: ${e}`);
@@ -1052,7 +1040,6 @@ export async function sendJitoBundleCaught(rawTxs: any[]) {
       params: [paramsTxs],
     };
 
-    console.log("[DEBUG] sending to Jito /bundles endpoint");
     let response = await axios.post(
       "https://mainnet.block-engine.jito.wtf/api/v1/bundles",
       payload,
@@ -1060,7 +1047,6 @@ export async function sendJitoBundleCaught(rawTxs: any[]) {
         headers: { "Content-Type": "application/json" },
       }
     );
-    console.log("[DEBUG] sent to Jito /bundles endpoint");
     return response.data.result;
   } catch (e) {
     console.log(`Error sending bundle: ${e}`);
@@ -1305,11 +1291,6 @@ export async function processTransaction(
         ) {
           if (Exchange.jitoRpcMode == types.JitoRpcMode.JITOBUNDLEONLY) {
             let jitoStatus = await getBundleResult(txSig);
-            if (jitoStatus) {
-              console.log(
-                `[DEBUG] Jito bundle status: ${JSON.stringify(jitoStatus)}`
-              );
-            }
             if (
               jitoStatus &&
               jitoStatus.value != null &&
@@ -1404,11 +1385,6 @@ export async function processTransaction(
           }
 
           let status = await provider.connection.getSignatureStatus(txSig);
-          if (status) {
-            console.log(
-              `[DEBUG] TX signature status: ${JSON.stringify(status)}`
-            );
-          }
           currentBlockHeight = await provider.connection.getBlockHeight(
             provider.connection.commitment
           );
