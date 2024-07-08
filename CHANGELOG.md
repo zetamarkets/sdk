@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.41.0]
+
+- Add Jito bundles functionality. ([#395](https://github.com/zetamarkets/sdk/pull/395))
+- Add performance callback to Exchange. ([#395](https://github.com/zetamarkets/sdk/pull/395))
+- Add the option to simulate transactions to more efficiently choose the compute unit limit for better tx success. ([#395](https://github.com/zetamarkets/sdk/pull/395))
+
 ## [1.40.0]
 
 - Add versioned tx support for process transaction. ([#408](https://github.com/zetamarkets/sdk/pull/408))
