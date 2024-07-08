@@ -2937,6 +2937,74 @@ export type Zeta = {
       ]
     },
     {
+      "name": "adminResetDexOpenOrders",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeWhitelistDepositAccount",
       "accounts": [
         {
@@ -10192,6 +10260,9 @@ export type Zeta = {
           },
           {
             "name": "NormalT9"
+          },
+          {
+            "name": "WithdrawOnly"
           }
         ]
       }
@@ -11594,6 +11665,11 @@ export type Zeta = {
       "code": 6173,
       "name": "OODoesntMatch",
       "msg": "Can only pop events for open orders passed in"
+    },
+    {
+      "code": 6174,
+      "name": "WithdrawOnlyAccount",
+      "msg": "Account is restricted, only withdrawals are allowed"
     }
   ]
 };
@@ -14537,6 +14613,74 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "adminResetDexOpenOrders",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "crossMarginAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "eventQueue",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "asset",
+          "type": {
+            "defined": "Asset"
+          }
+        }
+      ]
+    },
+    {
       "name": "initializeWhitelistDepositAccount",
       "accounts": [
         {
@@ -21792,6 +21936,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "NormalT9"
+          },
+          {
+            "name": "WithdrawOnly"
           }
         ]
       }
@@ -23194,6 +23341,11 @@ export const IDL: Zeta = {
       "code": 6173,
       "name": "OODoesntMatch",
       "msg": "Can only pop events for open orders passed in"
+    },
+    {
+      "code": 6174,
+      "name": "WithdrawOnlyAccount",
+      "msg": "Account is restricted, only withdrawals are allowed"
     }
   ]
 };

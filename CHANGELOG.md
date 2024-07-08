@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.40.0]
+
+- Add versioned tx support for process transaction. ([#408](https://github.com/zetamarkets/sdk/pull/408))
+
+## [1.39.0]
+
+- Change enum u8 for withdraw_only account type. ([#409](https://github.com/zetamarkets/sdk/pull/409))
+
+## [1.38.0]
+
+### Breaking
+
+- Add new account type withdraw_only. This will break account deserialisation if fetching all accounts and reading one that has withdraw_only set. ([#407](https://github.com/zetamarkets/sdk/pull/407))
+
+## [1.37.0]
+
+- Move over oracle to new pyth model. ([#406](https://github.com/zetamarkets/sdk/pull/406))
+
 ## [1.36.0]
 
 - Add new asset TNSR. ([#405](https://github.com/zetamarkets/sdk/pull/405))

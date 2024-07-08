@@ -461,6 +461,9 @@ export function fromProgramMarginAccountType(
   if (objectEquals(accountType, { normalT9: {} })) {
     return MarginAccountType.NORMAL_T9;
   }
+  if (objectEquals(accountType, { withdrawOnly: {} })) {
+    return MarginAccountType.WITHDRAW_ONLY;
+  }
   throw Error("Invalid margin account type");
 }
 
@@ -529,6 +532,9 @@ export function toProgramMarginAccountType(
   }
   if (accountType == MarginAccountType.NORMAL_T9) {
     return { normalT9: {} };
+  }
+  if (accountType == MarginAccountType.WITHDRAW_ONLY) {
+    return { withdrawOnly: {} };
   }
   throw Error("Invalid margin account type");
 }
