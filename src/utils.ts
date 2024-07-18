@@ -995,7 +995,7 @@ export async function processTransactionBloxroute(
     let rawTx = v0Tx.serialize();
 
     if (Exchange.postSignCallback) {
-      Exchange.postSignCallback();
+      await Exchange.postSignCallback();
     }
 
     let txSig;
@@ -1092,7 +1092,7 @@ export async function processVersionedTransactionJito(
   let txSig: string;
 
   if (Exchange.postSignCallback) {
-    Exchange.postSignCallback();
+    await Exchange.postSignCallback();
   }
 
   try {
@@ -1207,7 +1207,7 @@ export async function processTransactionJito(
   };
 
   if (Exchange.postSignCallback) {
-    Exchange.postSignCallback();
+    await Exchange.postSignCallback();
   }
 
   let txOpts = opts || commitmentConfig(provider.connection.commitment);
@@ -1515,7 +1515,7 @@ export async function processTransaction(
     }
 
     if (Exchange.postSignCallback) {
-      Exchange.postSignCallback();
+      await Exchange.postSignCallback();
     }
 
     let txOpts = opts || commitmentConfig(provider.connection.commitment);

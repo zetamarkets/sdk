@@ -352,13 +352,13 @@ export class Exchange {
   }
   private _tipMultiplier: number = 1;
 
-  public get postSignCallback(): () => void {
+  public get postSignCallback(): () => Promise<void> {
     return this._postSignCallback;
   }
-  public set postSignCallback(callback: () => void) {
+  public set postSignCallback(callback: () => Promise<void>) {
     this._postSignCallback = callback;
   }
-  private _postSignCallback: () => void = undefined;
+  private _postSignCallback: () => Promise<void> = undefined;
 
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
@@ -625,7 +625,7 @@ export class Exchange {
       slot: number,
       data: any
     ) => void,
-    postSignCallback?: () => void,
+    postSignCallback?: () => Promise<void>,
     bloxrouteHttpProvider?: HttpProvider
   ) {
     if (this.isInitialized) {
