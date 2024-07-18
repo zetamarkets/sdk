@@ -994,6 +994,10 @@ export async function processTransactionBloxroute(
     )) as VersionedTransaction;
     let rawTx = v0Tx.serialize();
 
+    if (Exchange.postSignCallback) {
+      Exchange.postSignCallback();
+    }
+
     let txSig;
     try {
       txSig = (
@@ -1086,6 +1090,11 @@ export async function processVersionedTransactionJito(
 
   let txOpts = opts || commitmentConfig(provider.connection.commitment);
   let txSig: string;
+
+  if (Exchange.postSignCallback) {
+    Exchange.postSignCallback();
+  }
+
   try {
     const response = await axios.post(jitoURL, payload, {
       headers: { "Content-Type": "application/json" },
@@ -1196,6 +1205,10 @@ export async function processTransactionJito(
     method: "sendTransaction",
     params: [encodedTx],
   };
+
+  if (Exchange.postSignCallback) {
+    Exchange.postSignCallback();
+  }
 
   let txOpts = opts || commitmentConfig(provider.connection.commitment);
   let txSig: string;
