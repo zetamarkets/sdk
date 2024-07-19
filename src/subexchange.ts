@@ -437,7 +437,7 @@ export class SubExchange {
     let txs = instructions.settlePositionsHaltedTxs(
       this._asset,
       marginAccounts,
-      Exchange.provider.wallet.publicKey
+      Exchange.state.pricingAdmin
     );
 
     await Promise.all(
