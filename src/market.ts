@@ -473,7 +473,7 @@ export class Market {
   public async cancelAllOrdersHalted() {
     Exchange.getSubExchange(this.asset).assertHalted();
 
-    await this.updateOrderbook();
+    this.updateOrderbook();
     let orders = this.getMarketOrders();
     let ixs = await getCancelAllIxs(this.asset, orders, false);
     let txs = splitIxsIntoTx(ixs, constants.MAX_CANCELS_PER_TX);
