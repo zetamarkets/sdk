@@ -101,6 +101,19 @@ export function fromProgramOrderType(orderType: any): OrderType {
     return OrderType.POSTONLYFRONT;
 }
 
+export enum SelfTradeBehavior {
+  DECREMENTTAKE,
+  CANCELPROVIDE,
+  ABORTTRANSACTION,
+}
+
+export function toProgramSelfTradeBehavior(behavior: SelfTradeBehavior) {
+  if (behavior == SelfTradeBehavior.DECREMENTTAKE) return { decrementtake: {} };
+  if (behavior == SelfTradeBehavior.CANCELPROVIDE) return { cancelprovide: {} };
+  if (behavior == SelfTradeBehavior.ABORTTRANSACTION)
+    return { aborttransaction: {} };
+}
+
 export enum Side {
   BID,
   ASK,
