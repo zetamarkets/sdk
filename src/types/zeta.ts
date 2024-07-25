@@ -4677,6 +4677,14 @@ export type Zeta = {
           "type": {
             "defined": "Asset"
           }
+        },
+        {
+          "name": "selfTradeBehavior",
+          "type": {
+            "option": {
+              "defined": "SelfTradeBehaviorZeta"
+            }
+          }
         }
       ]
     },
@@ -9336,6 +9344,42 @@ export type Zeta = {
       }
     },
     {
+      "name": "OrderArgsV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u64"
+          },
+          {
+            "name": "clientOrderId",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "tifOffset",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "selfTradeBehavior",
+            "type": {
+              "option": {
+                "defined": "SelfTradeBehaviorZeta"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
@@ -10311,6 +10355,23 @@ export type Zeta = {
           },
           {
             "name": "CrossMarginAccount"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SelfTradeBehaviorZeta",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DecrementTake"
+          },
+          {
+            "name": "CancelProvide"
+          },
+          {
+            "name": "AbortTransaction"
           }
         ]
       }
@@ -16353,6 +16414,14 @@ export const IDL: Zeta = {
           "type": {
             "defined": "Asset"
           }
+        },
+        {
+          "name": "selfTradeBehavior",
+          "type": {
+            "option": {
+              "defined": "SelfTradeBehaviorZeta"
+            }
+          }
         }
       ]
     },
@@ -21012,6 +21081,42 @@ export const IDL: Zeta = {
       }
     },
     {
+      "name": "OrderArgsV2",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "size",
+            "type": "u64"
+          },
+          {
+            "name": "clientOrderId",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "tifOffset",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "selfTradeBehavior",
+            "type": {
+              "option": {
+                "defined": "SelfTradeBehaviorZeta"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
@@ -21987,6 +22092,23 @@ export const IDL: Zeta = {
           },
           {
             "name": "CrossMarginAccount"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SelfTradeBehaviorZeta",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DecrementTake"
+          },
+          {
+            "name": "CancelProvide"
+          },
+          {
+            "name": "AbortTransaction"
           }
         ]
       }
