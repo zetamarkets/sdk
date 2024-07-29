@@ -536,7 +536,7 @@ export function placePerpOrderV4Ix(
     new String(tag),
     tifOffset == 0 ? null : tifOffset,
     toProgramAsset(asset),
-    selfTradeBehavior
+    selfTradeBehavior != undefined
       ? types.toProgramSelfTradeBehavior(selfTradeBehavior)
       : null,
     {

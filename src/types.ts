@@ -108,10 +108,10 @@ export enum SelfTradeBehavior {
 }
 
 export function toProgramSelfTradeBehavior(behavior: SelfTradeBehavior) {
-  if (behavior == SelfTradeBehavior.DECREMENTTAKE) return { decrementtake: {} };
-  if (behavior == SelfTradeBehavior.CANCELPROVIDE) return { cancelprovide: {} };
+  if (behavior == SelfTradeBehavior.DECREMENTTAKE) return { decrementTake: {} };
+  if (behavior == SelfTradeBehavior.CANCELPROVIDE) return { cancelProvide: {} };
   if (behavior == SelfTradeBehavior.ABORTTRANSACTION)
-    return { aborttransaction: {} };
+    return { abortTransaction: {} };
 }
 
 export enum Side {
@@ -611,6 +611,7 @@ export interface OrderOptions {
   clientOrderId?: number;
   tag?: string;
   blockhash?: { blockhash: string; lastValidBlockHeight: number };
+  selfTradeBehavior?: SelfTradeBehavior;
 }
 
 export interface TriggerOrderOptions {
