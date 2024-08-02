@@ -9344,42 +9344,6 @@
       }
     },
     {
-      "name": "OrderArgsV2",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "price",
-            "type": "u64"
-          },
-          {
-            "name": "size",
-            "type": "u64"
-          },
-          {
-            "name": "clientOrderId",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
-            "name": "tifOffset",
-            "type": {
-              "option": "u16"
-            }
-          },
-          {
-            "name": "selfTradeBehavior",
-            "type": {
-              "option": {
-                "defined": "SelfTradeBehaviorZeta"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "HaltStateArgs",
       "type": {
         "kind": "struct",
