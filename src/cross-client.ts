@@ -1419,7 +1419,8 @@ export class CrossClient {
       this.accountAddress,
       this._provider.wallet.publicKey,
       openOrdersPda,
-      this._whitelistTradingFeesAddress
+      this._whitelistTradingFeesAddress,
+      options.selfTradeBehavior
     );
 
     tx.add(orderIx);

@@ -4677,6 +4677,14 @@ export type Zeta = {
           "type": {
             "defined": "Asset"
           }
+        },
+        {
+          "name": "selfTradeBehavior",
+          "type": {
+            "option": {
+              "defined": "SelfTradeBehaviorZeta"
+            }
+          }
         }
       ]
     },
@@ -10311,6 +10319,23 @@ export type Zeta = {
           },
           {
             "name": "CrossMarginAccount"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SelfTradeBehaviorZeta",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DecrementTake"
+          },
+          {
+            "name": "CancelProvide"
+          },
+          {
+            "name": "AbortTransaction"
           }
         ]
       }
@@ -16353,6 +16378,14 @@ export const IDL: Zeta = {
           "type": {
             "defined": "Asset"
           }
+        },
+        {
+          "name": "selfTradeBehavior",
+          "type": {
+            "option": {
+              "defined": "SelfTradeBehaviorZeta"
+            }
+          }
         }
       ]
     },
@@ -21987,6 +22020,23 @@ export const IDL: Zeta = {
           },
           {
             "name": "CrossMarginAccount"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SelfTradeBehaviorZeta",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DecrementTake"
+          },
+          {
+            "name": "CancelProvide"
+          },
+          {
+            "name": "AbortTransaction"
           }
         ]
       }

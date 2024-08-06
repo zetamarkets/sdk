@@ -4677,6 +4677,14 @@
           "type": {
             "defined": "Asset"
           }
+        },
+        {
+          "name": "selfTradeBehavior",
+          "type": {
+            "option": {
+              "defined": "SelfTradeBehaviorZeta"
+            }
+          }
         }
       ]
     },
@@ -10311,6 +10319,23 @@
           },
           {
             "name": "CrossMarginAccount"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SelfTradeBehaviorZeta",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DecrementTake"
+          },
+          {
+            "name": "CancelProvide"
+          },
+          {
+            "name": "AbortTransaction"
           }
         ]
       }
