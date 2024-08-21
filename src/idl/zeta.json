@@ -10329,9 +10329,6 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "DecrementTake"
-          },
-          {
             "name": "CancelProvide"
           },
           {

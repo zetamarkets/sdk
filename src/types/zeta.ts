@@ -10329,9 +10329,6 @@ export type Zeta = {
         "kind": "enum",
         "variants": [
           {
-            "name": "DecrementTake"
-          },
-          {
             "name": "CancelProvide"
           },
           {
@@ -22029,9 +22026,6 @@ export const IDL: Zeta = {
       "type": {
         "kind": "enum",
         "variants": [
-          {
-            "name": "DecrementTake"
-          },
           {
             "name": "CancelProvide"
           },

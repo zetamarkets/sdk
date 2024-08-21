@@ -1753,7 +1753,8 @@ export class CrossClient {
       this.accountAddress,
       this._provider.wallet.publicKey,
       this._openOrdersAccounts[assetToIndex(asset)],
-      this._whitelistTradingFeesAddress
+      this._whitelistTradingFeesAddress,
+      options.selfTradeBehavior
     );
 
     // Edge case where user has 0 trigger orders
@@ -2290,7 +2291,8 @@ export class CrossClient {
       this.accountAddress,
       this._provider.wallet.publicKey,
       openOrdersAccount,
-      this._whitelistTradingFeesAddress
+      this._whitelistTradingFeesAddress,
+      options.selfTradeBehavior
     );
   }
 
@@ -2486,7 +2488,8 @@ export class CrossClient {
         this.accountAddress,
         this._provider.wallet.publicKey,
         this._openOrdersAccounts[assetIndex],
-        this._whitelistTradingFeesAddress
+        this._whitelistTradingFeesAddress,
+        options.selfTradeBehavior
       )
     );
 
