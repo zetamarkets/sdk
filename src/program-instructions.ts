@@ -493,7 +493,7 @@ export function closeOpenOrdersV2Ix(
   });
 }
 
-export function placePerpOrderV4Ix(
+export function placePerpOrderV5Ix(
   asset: Asset,
   price: number,
   size: number,
@@ -526,7 +526,7 @@ export function placePerpOrderV4Ix(
           },
         ]
       : [];
-  return Exchange.program.instruction.placePerpOrderV4(
+  return Exchange.program.instruction.placePerpOrderV5(
     new anchor.BN(price),
     new anchor.BN(size),
     types.toProgramSide(side),

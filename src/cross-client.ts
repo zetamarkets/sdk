@@ -1404,7 +1404,7 @@ export class CrossClient {
 
     let tifOffsetToUse = utils.getTIFOffset(market, options.tifOptions);
 
-    let orderIx = instructions.placePerpOrderV4Ix(
+    let orderIx = instructions.placePerpOrderV5Ix(
       asset,
       price,
       size,
@@ -1738,7 +1738,7 @@ export class CrossClient {
 
     let txs = this.createCancelTriggerOrdersTxs(triggerOrderIndexes);
 
-    let placeIx = instructions.placePerpOrderV4Ix(
+    let placeIx = instructions.placePerpOrderV5Ix(
       asset,
       price,
       size,
@@ -2276,7 +2276,7 @@ export class CrossClient {
     let market = Exchange.getPerpMarket(asset);
     let tifOffset = utils.getTIFOffset(market, options.tifOptions);
 
-    return instructions.placePerpOrderV4Ix(
+    return instructions.placePerpOrderV5Ix(
       asset,
       price,
       size,
@@ -2473,7 +2473,7 @@ export class CrossClient {
     let tifOffsetToUse = utils.getTIFOffset(market, options.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV4Ix(
+      instructions.placePerpOrderV5Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -2544,7 +2544,7 @@ export class CrossClient {
     let tifOffsetToUse = utils.getTIFOffset(market, newOptions.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV4Ix(
+      instructions.placePerpOrderV5Ix(
         asset,
         newOrderPrice,
         newOrderSize,
@@ -2617,7 +2617,7 @@ export class CrossClient {
     let tifOffsetToUse = utils.getTIFOffset(market, newOptions.tifOptions);
 
     tx.add(
-      instructions.placePerpOrderV4Ix(
+      instructions.placePerpOrderV5Ix(
         asset,
         newOrderPrice,
         newOrderSize,
