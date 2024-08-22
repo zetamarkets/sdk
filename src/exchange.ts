@@ -360,6 +360,14 @@ export class Exchange {
     confirmedLocalTs: number
   ) => void;
 
+  public get postSignCallback(): () => Promise<void> {
+    return this._postSignCallback;
+  }
+  public set postSignCallback(callback: () => Promise<void>) {
+    this._postSignCallback = callback;
+  }
+  private _postSignCallback: () => Promise<void> = undefined;
+
   // Micro lamports per CU of fees.
   public get autoPriorityFeeUpperLimit(): number {
     return this._autoPriorityFeeUpperLimit;
@@ -846,6 +854,10 @@ export class Exchange {
     this.subscribeClock(clockData, callback);
     this.subscribePricing(callback);
     this.subscribeState(callback);
+
+    if (postSignCallback) {
+      this._postSignCallback = postSignCallback;
+    }
 
     await this.updateCachedBlockhash();
     await this.updateExchangeState();

@@ -1220,6 +1220,10 @@ export async function processTransaction(
       rawTx = tx.serialize();
     }
 
+    if (Exchange.postSignCallback) {
+      await Exchange.postSignCallback();
+    }
+
     let txOpts = opts || commitmentConfig(provider.connection.commitment);
     let txSig;
     let allConnections = [provider.connection].concat(
