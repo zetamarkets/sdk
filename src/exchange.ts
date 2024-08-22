@@ -674,6 +674,7 @@ export class Exchange {
       data: any
     ) => void,
     bloxrouteHttpProvider?: HttpProvider,
+    postSignCallback?: () => Promise<void>,
     performanceCallback?: (
       ixName: string,
       ixAsset: Asset,
