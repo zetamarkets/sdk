@@ -354,27 +354,31 @@ export class CrossClient {
     client._accountSubscriptionId = connection.onAccountChange(
       client._accountAddress,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
-        client._account = Exchange.program.coder.accounts.decode(
-          types.ProgramAccountType.CrossMarginAccount,
-          accountInfo.data
-        );
-
-        if (throttle || client._updatingState) {
-          client._pendingUpdate = true;
-          client._pendingUpdateSlot = context.slot;
-          return;
+        try {
+          client._account = Exchange.program.coder.accounts.decode(
+            types.ProgramAccountType.CrossMarginAccount,
+            accountInfo.data
+          );
+  
+          if (throttle || client._updatingState) {
+            client._pendingUpdate = true;
+            client._pendingUpdateSlot = context.slot;
+            return;
+          }
+  
+          await client.updateState(false);
+          client._lastUpdateTimestamp = Exchange.clockTimestamp;
+  
+          if (callback !== undefined) {
+            callback(null, EventType.USER, context.slot, {
+              UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
+            });
+          }
+  
+          client.updateOpenOrdersAddresses();
+        } catch (e) {
+          console.log(`Get CrossClient account subscription id failed. Error: ${e}`);
         }
-
-        await client.updateState(false);
-        client._lastUpdateTimestamp = Exchange.clockTimestamp;
-
-        if (callback !== undefined) {
-          callback(null, EventType.USER, context.slot, {
-            UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
-          });
-        }
-
-        client.updateOpenOrdersAddresses();
       },
       connection.commitment
     );
@@ -382,15 +386,19 @@ export class CrossClient {
     client._accountManagerSubscriptionId = connection.onAccountChange(
       client._accountManagerAddress,
       async (accountInfo: AccountInfo<Buffer>, context: Context) => {
-        client._accountManager = Exchange.program.coder.accounts.decode(
-          types.ProgramAccountType.CrossMarginAccountManager,
-          accountInfo.data
-        );
-
-        if (callback !== undefined) {
-          callback(null, EventType.USER, context.slot, {
-            UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
-          });
+        try {
+          client._accountManager = Exchange.program.coder.accounts.decode(
+            types.ProgramAccountType.CrossMarginAccountManager,
+            accountInfo.data
+          );
+  
+          if (callback !== undefined) {
+            callback(null, EventType.USER, context.slot, {
+              UserCallbackType: types.UserCallbackType.CROSSMARGINACCOUNTCHANGE,
+            });
+          }
+        } catch (e) {
+          console.log(`Get CrossClient account manager subscription id failed. Error: ${e}`);
         }
       },
       connection.commitment
