@@ -493,7 +493,7 @@ export function closeOpenOrdersV2Ix(
   });
 }
 
-export function placePerpOrderV4Ix(
+export function placePerpOrderV5Ix(
   asset: Asset,
   price: number,
   size: number,
@@ -506,7 +506,8 @@ export function placePerpOrderV4Ix(
   marginAccount: PublicKey,
   authority: PublicKey,
   openOrders: PublicKey,
-  whitelistTradingFeesAccount: PublicKey | undefined
+  whitelistTradingFeesAccount: PublicKey | undefined,
+  selfTradeBehavior?: types.SelfTradeBehavior
 ): TransactionInstruction {
   if (tag.length > constants.MAX_ORDER_TAG_LENGTH) {
     throw Error(
@@ -525,7 +526,7 @@ export function placePerpOrderV4Ix(
           },
         ]
       : [];
-  return Exchange.program.instruction.placePerpOrderV4(
+  return Exchange.program.instruction.placePerpOrderV5(
     new anchor.BN(price),
     new anchor.BN(size),
     types.toProgramSide(side),
@@ -535,6 +536,9 @@ export function placePerpOrderV4Ix(
     new String(tag),
     tifOffset == 0 ? null : tifOffset,
     toProgramAsset(asset),
+    selfTradeBehavior != undefined
+      ? types.toProgramSelfTradeBehavior(selfTradeBehavior)
+      : null,
     {
       accounts: {
         authority: authority,
