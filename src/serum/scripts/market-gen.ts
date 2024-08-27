@@ -29,6 +29,8 @@ const main = async () => {
       TIFBufferSeconds: 0,
     };
 
+    // Note: If exchange.load() is failing you may need to use the old code before we sped up loading
+    // Commit: https://github.com/zetamarkets/sdk/commit/c6ff9376a5cc9255b2dcfffaa330d3bac1446954#diff-c15e612fadecac34c3bc31bc36799f0f4be12ee1703b1a1753a89ae644f55305
     await Exchange.load(LOAD_CONFIG);
     for (var asset of assetList) {
       populateMarketStore(marketStore, asset, constants.PERP_INDEX);
