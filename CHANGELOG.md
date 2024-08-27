@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.41.0]
+
+- Add self trade behaviour and PlacePerpOrderV5. ([#413](https://github.com/zetamarkets/sdk/pull/413))
+- Add post-sign callback. ([#412](https://github.com/zetamarkets/sdk/pull/412))
+
 ## [1.40.0]
 
 - Add versioned tx support for process transaction. ([#408](https://github.com/zetamarkets/sdk/pull/408))
