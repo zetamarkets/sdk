@@ -19,6 +19,7 @@ export enum Asset {
   WIF = "WIF",
   RNDR = "RNDR",
   TNSR = "TNSR",
+  GMCITHIRTY = "GMCITHIRTY",
   UNDEFINED = "UNDEFINED",
 }
 
