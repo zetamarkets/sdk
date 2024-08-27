@@ -377,7 +377,7 @@ export class CrossClient {
   
           client.updateOpenOrdersAddresses();
         } catch (e) {
-          console.log(`Get CrossClient account subscription id failed. Error: ${e}`);
+          console.log(`CrossMarginAccount subscription failed. Error: ${e}`);
         }
       },
       connection.commitment
@@ -398,7 +398,7 @@ export class CrossClient {
             });
           }
         } catch (e) {
-          console.log(`Get CrossClient account manager subscription id failed. Error: ${e}`);
+          console.log(`CrossMarginAccountManager subscription failed. Error: ${e}`);
         }
       },
       connection.commitment
