@@ -10309,7 +10309,7 @@ export type Zeta = {
             "name": "TNSR"
           },
           {
-            "name": "GMCITHIRTY"
+            "name": "GMC"
           },
           {
             "name": "UNDEFINED"
@@ -22200,7 +22200,7 @@ export const IDL: Zeta = {
             "name": "TNSR"
           },
           {
-            "name": "GMCITHIRTY"
+            "name": "GMC"
           },
           {
             "name": "UNDEFINED"
