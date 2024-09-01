@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.44.0]
+
+- Fix 'Invalid account discriminator' error when closing account. ([#416](https://github.com/zetamarkets/sdk/pull/416))
+
 ## [1.43.0]
 
 - New asset GMC. ([#415](https://github.com/zetamarkets/sdk/pull/415))
