@@ -19,7 +19,7 @@ export enum Asset {
   WIF = "WIF",
   RNDR = "RNDR",
   TNSR = "TNSR",
-  GMC = "GMC",
+  POPCAT = "POPCAT",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -84,7 +84,9 @@ export const FLEX_MINTS = {
     [Asset.WIF]: new PublicKey("BgDrDxc75EqPTXPUTCFMnYVYPeWK3CimPz2LGw4egsYc"),
     [Asset.RNDR]: new PublicKey("397Hd8iZXmzRf4jqCSuACtUUWeweYZRZ4DmgvVpMkHJf"),
     [Asset.TNSR]: new PublicKey("58MFM7mjjYMc6GoK6QUu7HuUmsih8aL5MTHptPE29p8G"),
-    [Asset.GMC]: new PublicKey("wWmjLtKGmXqJnDFnyQtKX1ZNHoBs9JD6bVxNa47zJWr"),
+    [Asset.POPCAT]: new PublicKey(
+      "wWmjLtKGmXqJnDFnyQtKX1ZNHoBs9JD6bVxNa47zJWr"
+    ),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -108,7 +110,9 @@ export const FLEX_MINTS = {
     [Asset.WIF]: new PublicKey("7jCmRqJaJq5iojCwGqq5DdwUBYPhrpvJcgNZsFLM4Pd5"),
     [Asset.RNDR]: new PublicKey("GSF4GTjWxacrQoVbf8PUcvCvMvZUzwXFEmb2Jso6XU5H"),
     [Asset.TNSR]: new PublicKey("3bTWLSNoD95dP2SHq4diRz3ZTeDXmybTsjPUQzRpTCHR"),
-    [Asset.GMC]: new PublicKey("CoGwjBS8stc4HCwpa6xh55LmGRTPxPkNXDVc1qBjwa5"),
+    [Asset.POPCAT]: new PublicKey(
+      "CoGwjBS8stc4HCwpa6xh55LmGRTPxPkNXDVc1qBjwa5"
+    ),
   },
 };
 
@@ -299,8 +303,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0xab7347771135fc733f8f38db462ba085ed3309955f42554a14fa13e855ac0e2f",
   [Asset.TNSR]:
     "0x05ecd4597cd48fe13d6cc3596c62af4f9675aee06e2e0b94c06d8bee2b659e05",
-  [Asset.GMC]:
-    "0xb3bd2a89c026fe7873da91b39bf9347fdea24e5b588330b4899788cf48878133",
+  [Asset.POPCAT]:
+    "0xb9312a7ee50e189ef045aa3c7842e099b061bd9bdc99ac645956c3b660dc8cce",
 };
 
 export const PYTH_PRICE_FEEDS = {
@@ -324,7 +328,9 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.WIF]: new PublicKey("Ae9pWfoS4jS8WFxMTApKHkmMaod171aRcekm1iFbsmoy"),
     [Asset.RNDR]: new PublicKey("7DvNVeya3b6WqcxSzUZFW9CWdDayJoRYjnpg2HVbgv2h"),
     [Asset.TNSR]: new PublicKey("2NVLHqPc1nhVYxb7nM5mjfXg26krgz8N2UKWtkJ7J77a"),
-    [Asset.GMC]: new PublicKey("3msDcvnV1csrwSetu98fZzoS3Nj2AXuQjjaGiTjSxPEg"),
+    [Asset.POPCAT]: new PublicKey(
+      "3msDcvnV1csrwSetu98fZzoS3Nj2AXuQjjaGiTjSxPEg"
+    ),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -357,7 +363,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.WIF]: new PublicKey("6B23K3tkb51vLZA14jcEQVCA1pfHptzEHFA93V5dYwbT"),
     [Asset.RNDR]: new PublicKey("GbgH1oen3Ne1RY4LwDgh8kEeA1KywHvs5x8zsx6uNV5M"),
     [Asset.TNSR]: new PublicKey("9TSGDwcPQX4JpAvZbu2Wp5b68wSYkQvHCvfeBjYcCyC"),
-    [Asset.GMC]: new PublicKey("GfvaqdmMFT6nmWrSjonR9wDx5tncRj8QPDmxRCtLKP89"),
+    [Asset.POPCAT]: new PublicKey("TODO"),
   },
 };
 
