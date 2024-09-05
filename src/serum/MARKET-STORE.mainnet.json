@@ -15,10 +15,10 @@
       "baseMint": "2ZLdhFsrkAtdn9Kud4SZvqchQFvn5jVCHUdJ83vumKyR",
       "quoteMint": "BKt2FdgBahn77joeawhNidswFxfgasPYCHWghRL4AKBR",
       "baseVault": "BEjGhNFnKT5weGtpBoFs5Y1mDN47Ntvag5aMV59nZRpk",
-      "baseDepositsTotal": "9979000",
+      "baseDepositsTotal": "7233800",
       "baseFeesAccrued": "0",
       "quoteVault": "CHBUBfU3zscTNsihdK3x44TbpTza1hwcsTUaZfk751b5",
-      "quoteDepositsTotal": "1175495079480000",
+      "quoteDepositsTotal": "1224989927472500",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "EaNR74nCjrYyNDsuoWmq19pH76QSd1nuTzvJSr3RDQ6x",
@@ -33,8 +33,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "337056227"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "344905800"
     }
   },
   "BTC": {
@@ -53,10 +53,10 @@
       "baseMint": "63DZkAzoDXmzGzn9esoWSYpMLo4YB9oPHXreHKwuu4HA",
       "quoteMint": "DhMH8oRQoAAb6poHVsvCqq3NCMj6aKUH2tGQG5Lo4bCg",
       "baseVault": "DbzL5mT4nBaxuAs8ti4UeT2qougRBdujxa7GhLndM5Jz",
-      "baseDepositsTotal": "23827",
+      "baseDepositsTotal": "13795",
       "baseFeesAccrued": "0",
       "quoteVault": "7M9xhY2ARnrkCaBK5SNM3Lyd3FdbTu2EWBwG4TQcqpsv",
-      "quoteDepositsTotal": "1578055835329700",
+      "quoteDepositsTotal": "727321370409500",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "6JSdqUr24mBt4MCQrZHRoSfeZbjgALx4MQunZwD8Uarg",
@@ -71,8 +71,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "240381962"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "246571337"
     }
   },
   "ETH": {
@@ -91,10 +91,10 @@
       "baseMint": "2Stzi7XE3btUQXaauTVB9brPAtPmGnrEDSJmp3w5VY2j",
       "quoteMint": "5Ehp2LtTRmjug39GphXhFEeguz7hGeg41N1U49wU8Kov",
       "baseVault": "9YVE9r9cHFZNwm91p3Js8NBWVznesLSM8FZyswG2MG1B",
-      "baseDepositsTotal": "242910",
+      "baseDepositsTotal": "346720",
       "baseFeesAccrued": "0",
       "quoteVault": "DecjLCYjb7jdDp2UqA2MS4xjgDjZfvdgMjvkRW7oWs9L",
-      "quoteDepositsTotal": "619586978113000",
+      "quoteDepositsTotal": "854778823718000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "A7D8zuxAmtui3XKz2VcxthAZ5HuwLbN74rrDapMJ3Z5d",
@@ -109,8 +109,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "249371341"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "255751127"
     }
   },
   "APT": {
@@ -129,10 +129,10 @@
       "baseMint": "GuNWJSV4k95FZdwhAcjdaPGGoh9cArc27yV4P54QwWdg",
       "quoteMint": "6S6WYL1mQFmVxsf3ft5MEH8hzxJA1LcUDzgwdJDj3yxc",
       "baseVault": "GqCVQuGMf8YkiaJkSrD98D3WZxFfktcKzAwdBEQsx1th",
-      "baseDepositsTotal": "35527100",
+      "baseDepositsTotal": "67231100",
       "baseFeesAccrued": "0",
       "quoteVault": "2BpEtArGNotp97DjVKwhYZ86WEq2Y5bLtGGDvicuJ9br",
-      "quoteDepositsTotal": "209186671550000",
+      "quoteDepositsTotal": "273483195360000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "EPf7hymYW7bnwiBYGTRF4Ji2jJ2yTdn4XMTpR6N4zsGA",
@@ -147,8 +147,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "206142297"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "211019246"
     }
   },
   "ARB": {
@@ -167,10 +167,10 @@
       "baseMint": "Eqt3anUy8nqDvzJaNvWvqBM32Ln4UUnLkfvdd9Ztfj81",
       "quoteMint": "7j1N5UiXLFxaxFWq5tzZc5R3sjPHcF7jqfHJgAtE74q8",
       "baseVault": "GnSRgncxFbtxqZ4HmfnF6daCmgkc8tuQz9i37hUmwV5t",
-      "baseDepositsTotal": "135109000",
+      "baseDepositsTotal": "221898000",
       "baseFeesAccrued": "0",
       "quoteVault": "6JjDgGzqzU6Az7ZmTARAvBSwBxfXsqbVG3Rc9JGU9i4L",
-      "quoteDepositsTotal": "100758257600000",
+      "quoteDepositsTotal": "123709587900000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "gP91avgCrV9KB2ATgRtMCNN2AN7oU9hK1frENe17QkR",
@@ -185,8 +185,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "198779318"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "199923772"
     }
   },
   "BNB": {
@@ -205,10 +205,10 @@
       "baseMint": "B6sV248kSsj6n72osn3Wcuz87JX3RFMD7FZpgwdYGQTm",
       "quoteMint": "5DPKMXmf9WK1C6N1MoJLWjYApiP4KR8zNf1oofevGEub",
       "baseVault": "GNp5Q8fwD45azybdXKfuYYTHRkUh2krX9ejYuNKMFNmR",
-      "baseDepositsTotal": "84570",
+      "baseDepositsTotal": "216380",
       "baseFeesAccrued": "0",
       "quoteVault": "DZdqa3nVJmyPc2ei397Cr1TufzZiNG3G6aRrV1AZ52p7",
-      "quoteDepositsTotal": "66633981918000",
+      "quoteDepositsTotal": "96930195988000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "Ao4fdNfwP1KPUwxoKbKVZ3Jp12MiCsK8gvvxbumn75by",
@@ -223,8 +223,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "47905963"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "48988025"
     }
   },
   "PYTH": {
@@ -243,10 +243,10 @@
       "baseMint": "5Q245C352ChdBGWmNbiYmFneAUiMjhnbPwUqmdHWJ8U6",
       "quoteMint": "7Pnbf6WLGpsYjbjnQN4t8wMCzdDGsx9ZAyuLd4vZmN49",
       "baseVault": "7cdY8U9Q5T5ktvF8VtkkZ1E7bt5mqbcQJQUw4433uEaV",
-      "baseDepositsTotal": "963267000",
+      "baseDepositsTotal": "1270454000",
       "baseFeesAccrued": "0",
       "quoteVault": "137rR2TJ7ryu7nBxNNCeCdXqEt79jQLo4YvTzhEoAEh4",
-      "quoteDepositsTotal": "269456384400000",
+      "quoteDepositsTotal": "254866271600000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "DCSXWke6HzdA8J6FhcxxM7mrdr4mkNhN32KjVAPtCZeG",
@@ -261,8 +261,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "85673398"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "90394019"
     }
   },
   "TIA": {
@@ -281,10 +281,10 @@
       "baseMint": "Bm6PXLobn7LBudgNdJKzUUNumAKAnEWuCoLVafsvPBda",
       "quoteMint": "JB7F3kQvRYcQj8kogwGR78CMshg857E96ef4LQYDzSu1",
       "baseVault": "CXWkPH6BzU8dhNy3LQkaCH54jSxQATyp11wHuhsAzT9n",
-      "baseDepositsTotal": "60242290",
+      "baseDepositsTotal": "66166690",
       "baseFeesAccrued": "0",
       "quoteVault": "2x1c7fXQdL5TDK9jbMvJ5VYM7wmPKUAQXrLAAFjvxSoc",
-      "quoteDepositsTotal": "216065078430000",
+      "quoteDepositsTotal": "273868605920000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "6xkyhooKT2wnciP7xjipque9SDwHwPPamwsprsoVXgg9",
@@ -299,8 +299,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "77722697"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "82551988"
     }
   },
   "JTO": {
@@ -319,10 +319,10 @@
       "baseMint": "Avy1abPkJKJdadFVieTuF8oeN6ZFWsKNtKzU1a8tgn6Z",
       "quoteMint": "GZycSPLqxhZuQYmv5wWjdwK4v3T1WStBpGxYem691vMG",
       "baseVault": "2BXEjZqnRBhj3BrRbMERWnToEKErzxZmLPzLEmBHKdJT",
-      "baseDepositsTotal": "60032800",
+      "baseDepositsTotal": "62956900",
       "baseFeesAccrued": "0",
       "quoteVault": "9g3YcLnENdQKYCxg88o1VUhSXJQVD3Kf7uMVB7d1SyuG",
-      "quoteDepositsTotal": "169231782470000",
+      "quoteDepositsTotal": "166046476890000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "9uYZdYf8aQd9YK6UrGUmz78pYpHscgHdD5f4cZojvmpH",
@@ -337,8 +337,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "89707916"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "91136748"
     }
   },
   "ONEMBONK": {
@@ -357,10 +357,10 @@
       "baseMint": "GdAX1L7jNsMmfN3kcCijk774aE2UtARV8frTozeUWT2E",
       "quoteMint": "J7yjhCLdftzL95kGetry8pyX4eXn4Tjjh7KoWo599Sry",
       "baseVault": "gn46ys7QKtWqQAW2MsuSV475AcFGn7gdNnSCLgw71DL",
-      "baseDepositsTotal": "18746800",
+      "baseDepositsTotal": "24489400",
       "baseFeesAccrued": "0",
       "quoteVault": "HTN3dEduTUp2VuFgo885BJ3KTp8WrPrZgEPiCVg2cVtD",
-      "quoteDepositsTotal": "162685130210000",
+      "quoteDepositsTotal": "191615517630000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "CgUMT14wR6WHX9mKMS5BWtd4tk39hRxbxtNRvp4BdMHf",
@@ -375,8 +375,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "62237152"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "66306528"
     }
   },
   "SEI": {
@@ -395,10 +395,10 @@
       "baseMint": "EU9uvnDuqNgunfmnxNAjhYi8iEKV3m7gnr5vatg2tgPj",
       "quoteMint": "9Lsei9qMonizuuusFgdh94djt7fpgktGmh9PRi2j2GUQ",
       "baseVault": "5xSPk47YF3HCoU4wA4HR6KmzQK9whiA8HeUMBcGo9HXn",
-      "baseDepositsTotal": "64727000",
+      "baseDepositsTotal": "89964000",
       "baseFeesAccrued": "0",
       "quoteVault": "BWhHgAgRXoyLfTU33iZ31ME2bk6WTYZxSr74eUqJsJUM",
-      "quoteDepositsTotal": "24172308900000",
+      "quoteDepositsTotal": "28849435600000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "APx2hFAqRAtbN6N7LdvYzDCtqGMGWySqVuvg9iMWfkZ8",
@@ -413,8 +413,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "51893210"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "52687198"
     }
   },
   "JUP": {
@@ -433,10 +433,10 @@
       "baseMint": "2Vaf7yEBXi86SGhDM79w1dRQxz5NC2YFWshm5NxkRUDB",
       "quoteMint": "DdFzaannSyXs12sB517GbtCsZihh8X9RS2ZKJKuTp5sG",
       "baseVault": "5raajUcFKgaRbyh6yRkAKWroLe6PwtgCAU1vT7wmmpFu",
-      "baseDepositsTotal": "1867658000",
+      "baseDepositsTotal": "565648000",
       "baseFeesAccrued": "0",
       "quoteVault": "7Hz86pfpm5hxmzuJbNFbfJ8LEU8EnLL7fc3oyFgVrm5G",
-      "quoteDepositsTotal": "1284281968800000",
+      "quoteDepositsTotal": "340792835500000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "GkjperyMoy6MCUyg73KzZy4WbfaRhKYAoTBjW3JRjYuG",
@@ -451,8 +451,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "60298559"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "64706534"
     }
   },
   "DYM": {
@@ -471,10 +471,10 @@
       "baseMint": "MPT1KEM3kE5XQZCYrMrvQqEVUJwdnkgbAhrrwvYeYa1",
       "quoteMint": "7cwSf9v33vH7HDcbD9fLTa7Dwr6e91f8C3aUMHuNkvHg",
       "baseVault": "4E2zitVTKfaJB91DJ3JvCR9yr3KcRAKmHee3GQcqmqMu",
-      "baseDepositsTotal": "292935700",
+      "baseDepositsTotal": "201211600",
       "baseFeesAccrued": "0",
       "quoteVault": "APNsyPLc1dNRzwk9C6puX8s7vtUFC6U2o7wyZ7kxk3GV",
-      "quoteDepositsTotal": "285435262380000",
+      "quoteDepositsTotal": "236300648650000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "Er174YjnV2nuAacfV4nYCAFBgJ6cTgJNaYNp5xPwGZUq",
@@ -489,8 +489,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "31776808"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "36042589"
     }
   },
   "STRK": {
@@ -509,10 +509,10 @@
       "baseMint": "EV1UdC9dSz7a66hqYW5TkVe6JihSAyfEwVLwYzy1cGXz",
       "quoteMint": "ygRrmycNpMzEsqLYRpDMS9J1SHaFMG4Rm3tjkyVGVnc",
       "baseVault": "CdES4frNaF9AvE1Hyso6wbW3jaB1jR7HpZiSNSP4bC7m",
-      "baseDepositsTotal": "146615000",
+      "baseDepositsTotal": "378605000",
       "baseFeesAccrued": "0",
       "quoteVault": "4qdMQ6iLN8Mm4Sa8geNkF1E2PmYN4zB9mGdeW4kxMGBY",
-      "quoteDepositsTotal": "56388345700000",
+      "quoteDepositsTotal": "104009271400000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "2SgUVRAWs1yuUjiYW8JCHb4g7R2gBHdEk5x9KJgn9zNy",
@@ -527,8 +527,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "34124707"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "35385992"
     }
   },
   "WIF": {
@@ -547,10 +547,10 @@
       "baseMint": "H3j7orNNo7pzzHJZ1WFsrpJAxWCiE8QW3aatbGufu2PC",
       "quoteMint": "GpvkM2TeZXqQzFtBBgqoJYfc3BPScEHaSk41dwMrsKiW",
       "baseVault": "FnDtHqrTuySW94Yy3QFYjMtvyYuJkRp3H6xtDDG1Ehi",
-      "baseDepositsTotal": "234128000",
+      "baseDepositsTotal": "149602000",
       "baseFeesAccrued": "0",
       "quoteVault": "KsUoxhYnaTUFTJ6SuAdAAmUBVrExhCq7SXE7BCu5irh",
-      "quoteDepositsTotal": "265427038800000",
+      "quoteDepositsTotal": "168090950400000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "AXrWGEh3c8Jiz2Uhr6kiUxYypjgVYanm48jSWhXjudV8",
@@ -565,8 +565,8 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "31871405"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "34531661"
     }
   },
   "RNDR": {
@@ -623,10 +623,10 @@
       "baseMint": "5oXbnF6JLwEbEc8gt91aTWyjeEAYVG21WdqK2KxeA2MR",
       "quoteMint": "8rq8Z7hpk1mbaP61KremihYfBLyJ4hCZ4xBhBUCBC8bP",
       "baseVault": "7rNJEJBevis6xjuGCqdijdgaVroYmkVswnywDxZV8dbP",
-      "baseDepositsTotal": "104800000",
+      "baseDepositsTotal": "346353000",
       "baseFeesAccrued": "0",
       "quoteVault": "BsWCDy6ZdYC4YXLmMmkRV9wCBxirCQpzQgAasQh8SMMy",
-      "quoteDepositsTotal": "50548623900000",
+      "quoteDepositsTotal": "84413305600000",
       "quoteFeesAccrued": "0",
       "quoteDustThreshold": "0",
       "requestQueue": "3Ey7Y7o7gf4GtaWvhsrMwzHoEacEMhmmh9QQUZxdwxfD",
@@ -641,11 +641,11 @@
       "pruneAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "consumeEventsAuthority": "AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n",
       "epochLength": "65535",
-      "epochStartTs": "1724684595",
-      "startEpochSeqNum": "18731398"
+      "epochStartTs": "1725471015",
+      "startEpochSeqNum": "20139599"
     }
   },
-  "GMC": {
+  "POPCAT": {
     "137": {
       "accountFlags": {
         "initialized": true,

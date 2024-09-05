@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.45.1]
+
+- Change GMC to POPCAT. ([#417](https://github.com/zetamarkets/sdk/pull/417))
+
 ## [1.44.0]
 
 - Fix 'Invalid account discriminator' error when closing account. ([#416](https://github.com/zetamarkets/sdk/pull/416))

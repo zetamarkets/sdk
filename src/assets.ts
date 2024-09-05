@@ -66,7 +66,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.WIF) return "WIF";
   if (asset == Asset.RNDR) return "RNDR";
   if (asset == Asset.TNSR) return "TNSR";
-  if (asset == Asset.GMC) return "GMC";
+  if (asset == Asset.POPCAT) return "POPCAT";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -89,7 +89,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "WIF") return Asset.WIF;
   if (name == "RNDR") return Asset.RNDR;
   if (name == "TNSR") return Asset.TNSR;
-  if (name == "GMC") return Asset.GMC;
+  if (name == "POPCAT") return Asset.POPCAT;
   return Asset.UNDEFINED;
 }
 
@@ -115,7 +115,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.WIF) return { wif: {} };
   if (asset == Asset.RNDR) return { rndr: {} };
   if (asset == Asset.TNSR) return { tnsr: {} };
-  if (asset == Asset.GMC) return { gmc: {} };
+  if (asset == Asset.POPCAT) return { popcat: {} };
   return { undefined: {} };
 }
 
@@ -171,8 +171,8 @@ export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { tnsr: {} })) {
     return Asset.TNSR;
   }
-  if (objectEquals(asset, { GMC: {} })) {
-    return Asset.GMC;
+  if (objectEquals(asset, { POPCAT: {} })) {
+    return Asset.POPCAT;
   }
   return Asset.UNDEFINED;
 }
@@ -230,7 +230,7 @@ export function assetToIndex(asset: Asset): number {
     case Asset.TNSR: {
       return 16;
     }
-    case Asset.GMC: {
+    case Asset.POPCAT: {
       return 17;
     }
   }
@@ -291,7 +291,7 @@ export function indexToAsset(index: number): Asset {
       return Asset.TNSR;
     }
     case 17: {
-      return Asset.GMC;
+      return Asset.POPCAT;
     }
   }
   return Asset.UNDEFINED;
