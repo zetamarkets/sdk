@@ -550,8 +550,8 @@ export const STATIC_AND_PERPS_LUT: {
     key: new PublicKey("LAZFv47awUnd9jHkv8XGKFvkUjHtbg64WxDiZqZHubz"),
     state: {
       deactivationSlot: BigInt("18446744073709551615"),
-      lastExtendedSlot: 286114199,
-      lastExtendedSlotStartIndex: 227,
+      lastExtendedSlot: 287890308,
+      lastExtendedSlotStartIndex: 239,
       authority: new PublicKey("EwXPBSBUPqYDNA3dUVZ3nonFuaw3wGGJqEUTJbknDirH"),
       addresses: [
         new PublicKey("8eExPiLp47xbSDYkbuem4qnLUpbLTfZBeFuEJoh6EUr2"),
@@ -781,7 +781,6 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("6B23K3tkb51vLZA14jcEQVCA1pfHptzEHFA93V5dYwbT"),
         new PublicKey("GbgH1oen3Ne1RY4LwDgh8kEeA1KywHvs5x8zsx6uNV5M"),
         new PublicKey("9TSGDwcPQX4JpAvZbu2Wp5b68wSYkQvHCvfeBjYcCyC"),
-        new PublicKey("GfvaqdmMFT6nmWrSjonR9wDx5tncRj8QPDmxRCtLKP89"),
         new PublicKey("6o2AifckJtQnwwg8Ee82iFkpocGpJRr3pY9jM7zeNCH1"),
         new PublicKey("CWY7nSGmkLAedL36cdc6cQYCdHGy9sUCV16vTNoupuw1"),
         new PublicKey("9e1DZ5mKwUvFsGyBBuCh9DCJmwx72fpyDBsYo3gsGCwY"),
@@ -793,6 +792,7 @@ export const STATIC_AND_PERPS_LUT: {
         new PublicKey("CJESiofGZkrKmVYYR2DCtfxAj2h1jdT9oV6EsdfbYZjr"),
         new PublicKey("6ZfjZUd2pgmcevfL6aLTGzpTsLoNyi8pxuboDUnrVf23"),
         new PublicKey("5xt8uuStpThtSX1PqHeiJuWtXZFpnkrrTtHDK1srXuL8"),
+        new PublicKey("6UxPR2nXJNNM1nESVWGAf8NXMVu3SGgYf3ZfUFoGB9cs"),
       ],
     },
   }),
