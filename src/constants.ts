@@ -363,7 +363,9 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.WIF]: new PublicKey("6B23K3tkb51vLZA14jcEQVCA1pfHptzEHFA93V5dYwbT"),
     [Asset.RNDR]: new PublicKey("GbgH1oen3Ne1RY4LwDgh8kEeA1KywHvs5x8zsx6uNV5M"),
     [Asset.TNSR]: new PublicKey("9TSGDwcPQX4JpAvZbu2Wp5b68wSYkQvHCvfeBjYcCyC"),
-    [Asset.POPCAT]: new PublicKey("TODO"),
+    [Asset.POPCAT]: new PublicKey(
+      "6UxPR2nXJNNM1nESVWGAf8NXMVu3SGgYf3ZfUFoGB9cs"
+    ),
   },
 };
 
