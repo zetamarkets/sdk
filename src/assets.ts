@@ -171,7 +171,7 @@ export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { tnsr: {} })) {
     return Asset.TNSR;
   }
-  if (objectEquals(asset, { POPCAT: {} })) {
+  if (objectEquals(asset, { popcat: {} })) {
     return Asset.POPCAT;
   }
   return Asset.UNDEFINED;
