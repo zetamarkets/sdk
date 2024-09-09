@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.45.2]
+
+- Fix typo in popcat asset.ts. ([#418](https://github.com/zetamarkets/sdk/pull/418))
+
 ## [1.45.1]
 
 - Change GMC to POPCAT. ([#417](https://github.com/zetamarkets/sdk/pull/417))
