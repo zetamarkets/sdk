@@ -298,6 +298,7 @@ export class Exchange {
 
   public maxRpcRetries: number | undefined = undefined;
   public skipRpcConfirmation: boolean | undefined = undefined;
+  public optimiseTransactionCU: boolean | undefined = undefined;
 
   // Handy map to grab zetagroup asset by pubkey without an RPC fetch
   // or having to manually filter all zetaGroups
@@ -318,17 +319,17 @@ export class Exchange {
   }
   private _priorityFee: number = 0;
 
-  // toggle to use jito bundles
-  public get useJitoBundle(): boolean {
-    return this._useJitoBundle;
+  // enum to toggle whether to use jito or not
+  public get jitoRpcMode(): types.JitoRpcMode {
+    return this._jitoRpcMode;
   }
-  private _useJitoBundle: boolean = false;
+  private _jitoRpcMode: types.JitoRpcMode = types.JitoRpcMode.RPCONLY;
 
   // jito tip
   public get jitoTip(): number {
     return this._jitoTip;
   }
-  private _jitoTip: number = 0;
+  private _jitoTip: number = 1000;
 
   // extra connection objects to send transactions down
   public get doubleDownConnections(): Connection[] {
@@ -347,10 +348,17 @@ export class Exchange {
   private _autoPriorityFeeOffset: number = 0;
   private _autoPriorityFeeMultiplier: number = 1;
   private _autoPriorityFeeUseMax: boolean = false;
-  public get tipMultiplier(): number {
-    return this._tipMultiplier;
-  }
-  private _tipMultiplier: number = 1;
+
+  public _performanceCallback: (
+    ixName: string,
+    ixAsset: Asset,
+    sentTs: number,
+    sentSlot: number,
+    confirmedOnchainSlot: number,
+    confirmedOnchainTs: number,
+    confirmedLocalSlot: number,
+    confirmedLocalTs: number
+  ) => void;
 
   public get postSignCallback(): () => Promise<void> {
     return this._postSignCallback;
@@ -406,16 +414,12 @@ export class Exchange {
     this._autoPriorityFeeUseMax = useMax;
   }
 
-  public setTipMultiplier(multiplier: number) {
-    this._tipMultiplier = multiplier;
-  }
-
   public updatePriorityFee(microLamportsPerCU: number) {
     this._priorityFee = microLamportsPerCU;
   }
 
-  public setUseJitoBundle(option: boolean) {
-    this._useJitoBundle = option;
+  public setJitoRpcMode(option: types.JitoRpcMode) {
+    this._jitoRpcMode = option;
   }
 
   public updateJitoTip(tipAmountInLamports: number) {
@@ -498,7 +502,17 @@ export class Exchange {
       instructions.initializeCombinedInsuranceVaultIx()
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "initializeCombinedInsuranceVault"
+      );
     } catch (e) {
       console.error(`initializeCombinedInsuranceVault failed: ${e}`);
     }
@@ -511,7 +525,17 @@ export class Exchange {
   public async initializeCombinedVault() {
     let tx = new Transaction().add(instructions.initializeCombinedVaultIx());
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "initializeCombinedVault"
+      );
     } catch (e) {
       console.error(`initializeCombinedVault failed: ${e}`);
     }
@@ -525,7 +549,17 @@ export class Exchange {
       instructions.initializeCombinedSocializedLossAccountIx()
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "initializeCombinedSocializedLossAccount"
+      );
     } catch (e) {
       console.error(`initializeCombinedSocializedLossAccount failed: ${e}`);
     }
@@ -579,7 +613,17 @@ export class Exchange {
       )
     );
     try {
-      await utils.processTransaction(this._provider, tx);
+      await utils.processTransaction(
+        this._provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "intializeZetaState"
+      );
     } catch (e) {
       console.error(`Initialize zeta state failed: ${e}`);
     }
@@ -606,7 +650,11 @@ export class Exchange {
         tx,
         [],
         utils.defaultCommitment(),
-        this.useLedger
+        this.useLedger,
+        undefined,
+        undefined,
+        undefined,
+        "initializeZetaPricing"
       );
     } catch (e) {
       console.error(`Initialize zeta pricing failed: ${e}`);
@@ -625,8 +673,18 @@ export class Exchange {
       slot: number,
       data: any
     ) => void,
+    bloxrouteHttpProvider?: HttpProvider,
     postSignCallback?: () => Promise<void>,
-    bloxrouteHttpProvider?: HttpProvider
+    performanceCallback?: (
+      ixName: string,
+      ixAsset: Asset,
+      sentTs: number,
+      sentSlot: number,
+      confirmedOnchainSlot: number,
+      confirmedOnchainTs: number,
+      confirmedLocalSlot: number,
+      confirmedLocalTs: number
+    ) => void
   ) {
     if (this.isInitialized) {
       throw Error("Exchange already loaded");
@@ -642,6 +700,10 @@ export class Exchange {
 
     if (bloxrouteHttpProvider) {
       this._httpProvider = bloxrouteHttpProvider;
+    }
+
+    if (performanceCallback) {
+      this._performanceCallback = performanceCallback;
     }
 
     if (loadConfig.doubleDownConnections) {
@@ -986,7 +1048,17 @@ export class Exchange {
     let tx = new Transaction().add(
       instructions.updateZetaStateIx(params, this.provider.wallet.publicKey)
     );
-    await utils.processTransaction(this.provider, tx);
+    await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "updateZetaState"
+    );
     await this.updateState();
   }
 
@@ -1156,7 +1228,17 @@ export class Exchange {
         zetaGroupKey,
       })
     );
-    await utils.processTransaction(this.provider, tx);
+    await utils.processTransaction(
+      this.provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "updatePricingPubkeys"
+    );
 
     await this.updateZetaPricing();
   }
@@ -1180,7 +1262,17 @@ export class Exchange {
     let tx = new Transaction().add(
       instructions.treasuryMovementIx(treasuryMovementType, amount)
     );
-    await utils.processTransaction(this._provider, tx);
+    await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "treasuryMovement"
+    );
   }
 
   public async rebalanceInsuranceVault(marginAccounts: any[]) {
@@ -1198,7 +1290,17 @@ export class Exchange {
     try {
       await Promise.all(
         txs.map(async (tx) => {
-          let txSig = await utils.processTransaction(this._provider, tx);
+          let txSig = await utils.processTransaction(
+            this._provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            "rebalanceInsuranceVault"
+          );
           console.log(`[REBALANCE INSURANCE VAULT]: ${txSig}`);
         })
       );
@@ -1226,7 +1328,17 @@ export class Exchange {
         enforceTpslConditions
       )
     );
-    return await utils.processTransaction(this._provider, tx);
+    return await utils.processTransaction(
+      this._provider,
+      tx,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      "adminCancelTriggerOrder"
+    );
   }
 
   public async halt(asset: Asset) {

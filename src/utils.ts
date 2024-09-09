@@ -51,6 +51,7 @@ import * as os from "os";
 import { OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from "./serum/market";
 import { HttpProvider } from "@bloxroute/solana-trader-client-ts";
 import axios from "axios";
+import { searcher, bundle } from "jito-ts";
 
 export function getNativeTickSize(asset: Asset): number {
   return Exchange.state.tickSizes[assets.assetToIndex(asset)];
@@ -951,316 +952,44 @@ function txConfirmationCheck(expectedLevel: string, currentLevel: string) {
   return false;
 }
 
-export async function processTransactionBloxroute(
-  httpProvider: HttpProvider,
-  anchorProvider: anchor.AnchorProvider,
-  tx: Transaction,
-  tip: number,
-  blockhash?: { blockhash: string; lastValidBlockHeight: number },
-  retries?: number,
-  skipConfirmation?: boolean
-): Promise<TransactionSignature> {
-  tx.add(
-    SystemProgram.transfer({
-      fromPubkey: anchorProvider.publicKey,
-      toPubkey: new PublicKey(
-        "HWEoBxYs7ssKuudEjzjmpfJVX7Dvi7wescFsVx2L5yoY" // Trader API tip wallet
-      ),
-      lamports: tip,
-    })
-  );
-
-  if (Exchange.priorityFee != 0) {
-    tx.instructions.unshift(
-      ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: Math.round(Exchange.priorityFee),
-      })
-    );
-  }
-
-  let failures = 0;
-  while (true) {
-    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
-
-    let v0Tx: VersionedTransaction = new VersionedTransaction(
-      new TransactionMessage({
-        payerKey: anchorProvider.publicKey,
-        recentBlockhash: recentBlockhash.blockhash,
-        instructions: tx.instructions,
-      }).compileToV0Message(getZetaLutArr())
-    );
-    v0Tx = (await anchorProvider.wallet.signTransaction(
-      v0Tx
-    )) as VersionedTransaction;
-    let rawTx = v0Tx.serialize();
-
-    if (Exchange.postSignCallback) {
-      await Exchange.postSignCallback();
-    }
-
-    let txSig;
-    try {
-      txSig = (
-        await httpProvider.postSubmitV2({
-          transaction: {
-            content: Buffer.from(rawTx).toString("base64"),
-            isCleanup: false,
-          },
-          skipPreFlight: true,
-          frontRunningProtection: false,
-        })
-      ).signature;
-
-      // Poll the tx confirmation for N seconds
-      // Polling is more reliable than websockets using confirmTransaction()
-      let currentBlockHeight = 0;
-      if (!skipConfirmation) {
-        while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
-          let status = await anchorProvider.connection.getSignatureStatus(
-            txSig
-          );
-          currentBlockHeight = await anchorProvider.connection.getBlockHeight(
-            anchorProvider.connection.commitment
-          );
-          if (status.value != null) {
-            if (status.value.err != null) {
-              // Gets caught and parsed in the later catch
-              let err = parseInt(
-                status.value.err["InstructionError"][1]["Custom"]
-              );
-              throw err;
-            }
-            if (
-              txConfirmationCheck(
-                "confirmed",
-                status.value.confirmationStatus.toString()
-              )
-            ) {
-              return txSig;
-            }
-          }
-          await sleep(1500); // Don't spam the RPC
-        }
-        throw Error(`Transaction ${txSig} was not confirmed`);
-      } else {
-        return txSig;
-      }
-    } catch (err) {
-      let parsedErr = parseError(err);
-      failures += 1;
-      if (!retries || failures > retries) {
-        console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
-        throw parsedErr;
-      }
-      console.log(`Transaction failed to send. Retrying...`);
-      console.log(`failCount=${failures}. error=${parsedErr}`);
-    }
-  }
-}
-
-/// Note that you must add in the jito tip instruction before you send this to here
-export async function processVersionedTransactionJito(
-  provider: anchor.AnchorProvider,
-  tx: VersionedTransaction,
-  signers?: Array<Signer>,
-  opts?: ConfirmOptions,
-  blockhash?: { blockhash: string; lastValidBlockHeight: number }
-): Promise<TransactionSignature> {
-  let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
-
-  tx.sign(
-    (signers ?? [])
-      .filter((s) => s !== undefined)
-      .map((kp) => {
-        return kp;
-      })
-  );
-  tx = (await provider.wallet.signTransaction(tx)) as VersionedTransaction;
-
-  let rawTx = tx.serialize();
-
-  const encodedTx = bs58.encode(rawTx);
-  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
+async function getBundleResult(bundle: string) {
+  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/bundles";
   const payload = {
     jsonrpc: "2.0",
     id: 1,
-    method: "sendTransaction",
-    params: [encodedTx],
+    method: "getBundleStatuses",
+    params: [[bundle]],
   };
-
-  let txOpts = opts || commitmentConfig(provider.connection.commitment);
-  let txSig: string;
-
-  if (Exchange.postSignCallback) {
-    await Exchange.postSignCallback();
-  }
 
   try {
     const response = await axios.post(jitoURL, payload, {
       headers: { "Content-Type": "application/json" },
     });
-    txSig = response.data.result;
-  } catch (error) {
-    console.error("Error:", error);
-    throw new Error("Jito Bundle Error: cannot send.");
-  }
-
-  if (Exchange.skipRpcConfirmation) {
-    return txSig;
-  }
-
-  let currentBlockHeight = await provider.connection.getBlockHeight(
-    provider.connection.commitment
-  );
-
-  while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
-    // Keep resending to maximise the chance of confirmation
-    await provider.connection.sendRawTransaction(rawTx, {
-      skipPreflight: true,
-      preflightCommitment: provider.connection.commitment,
-      maxRetries: 0,
-    });
-
-    let status = await provider.connection.getSignatureStatus(txSig);
-    currentBlockHeight = await provider.connection.getBlockHeight(
-      provider.connection.commitment
-    );
-    if (status.value != null) {
-      if (status.value.err != null) {
-        // Gets caught and parsed in the later catch
-        let err = parseInt(status.value.err["InstructionError"][1]["Custom"]);
-        let parsedErr = parseError(err);
-        throw parsedErr;
-      }
-      if (
-        txConfirmationCheck(
-          txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-          status.value.confirmationStatus.toString()
-        )
-      ) {
-        return txSig;
-      }
+    if (response.status != 200) {
+      throw Error(`Bundle ${bundle} not found on Jito`);
     }
-    await sleep(500); // Don't spam the RPC
+    return response.data.result;
+  } catch (error) {
+    console.log(error);
   }
-  throw Error(`Transaction ${txSig} was not confirmed`);
 }
 
-export async function processTransactionJito(
-  provider: anchor.AnchorProvider,
-  tx: Transaction,
-  signers?: Array<Signer>,
-  opts?: ConfirmOptions,
-  lutAccs?: AddressLookupTableAccount[],
-  blockhash?: { blockhash: string; lastValidBlockHeight: number }
-): Promise<TransactionSignature> {
-  if (Exchange.jitoTip == 0) {
-    throw Error("Jito bundle tip has not been set.");
-  }
-
-  if (Exchange.priorityFee != 0) {
-    tx.instructions.unshift(
-      ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: Math.round(Exchange.priorityFee),
-      })
-    );
-  }
-
-  tx.instructions.push(
-    SystemProgram.transfer({
-      fromPubkey: Exchange.provider.publicKey,
-      toPubkey: new PublicKey(
-        "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL" // Jito tip account
-      ),
-      lamports: Exchange.jitoTip, // tip
-    })
-  );
-
-  let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
-
-  let vTx: VersionedTransaction = new VersionedTransaction(
-    new TransactionMessage({
-      payerKey: provider.wallet.publicKey,
-      recentBlockhash: recentBlockhash.blockhash,
-      instructions: tx.instructions,
-    }).compileToV0Message(lutAccs)
-  );
-
-  vTx.sign(
-    (signers ?? [])
-      .filter((s) => s !== undefined)
-      .map((kp) => {
-        return kp;
-      })
-  );
-  vTx = (await provider.wallet.signTransaction(vTx)) as VersionedTransaction;
-
-  let rawTx = vTx.serialize();
-
-  const encodedTx = bs58.encode(rawTx);
-  const jitoURL = "https://mainnet.block-engine.jito.wtf/api/v1/transactions";
-  const payload = {
-    jsonrpc: "2.0",
-    id: 1,
-    method: "sendTransaction",
-    params: [encodedTx],
-  };
-
-  if (Exchange.postSignCallback) {
-    await Exchange.postSignCallback();
-  }
-
-  let txOpts = opts || commitmentConfig(provider.connection.commitment);
-  let txSig: string;
+export async function sendBloxrouteTransactionCaught(rawTx: any) {
   try {
-    const response = await axios.post(jitoURL, payload, {
-      headers: { "Content-Type": "application/json" },
-    });
-    txSig = response.data.result;
-  } catch (error) {
-    console.error("Error:", error);
-    throw new Error("Jito Bundle Error: cannot send.");
-  }
-
-  if (Exchange.skipRpcConfirmation) {
+    let txSig = (
+      await Exchange.httpProvider.postSubmitV2({
+        transaction: {
+          content: Buffer.from(rawTx).toString("base64"),
+          isCleanup: false,
+        },
+        skipPreFlight: true,
+        frontRunningProtection: false,
+      })
+    ).signature;
     return txSig;
+  } catch (e) {
+    console.log(`Error sending tx to Bloxroute: ${e}`);
   }
-
-  let currentBlockHeight = await provider.connection.getBlockHeight(
-    provider.connection.commitment
-  );
-
-  while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
-    // Keep resending to maximise the chance of confirmation
-    await provider.connection.sendRawTransaction(rawTx, {
-      skipPreflight: true,
-      preflightCommitment: provider.connection.commitment,
-      maxRetries: 0,
-    });
-
-    let status = await provider.connection.getSignatureStatus(txSig);
-    currentBlockHeight = await provider.connection.getBlockHeight(
-      provider.connection.commitment
-    );
-    if (status.value != null) {
-      if (status.value.err != null) {
-        // Gets caught and parsed in the later catch
-        let err = parseInt(status.value.err["InstructionError"][1]["Custom"]);
-        let parsedErr = parseError(err);
-        throw parsedErr;
-      }
-      if (
-        txConfirmationCheck(
-          txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-          status.value.confirmationStatus.toString()
-        )
-      ) {
-        return txSig;
-      }
-    }
-    await sleep(500); // Don't spam the RPC
-  }
-  throw Error(`Transaction ${txSig} was not confirmed`);
 }
 
 export async function sendRawTransactionCaught(con: Connection, rawTx: any) {
@@ -1276,8 +1005,15 @@ export async function sendRawTransactionCaught(con: Connection, rawTx: any) {
   }
 }
 
-export async function sendJitoTxCaught(payload: any) {
+export async function sendJitoTxCaught(rawTx: any) {
   try {
+    const encodedTx = bs58.encode(rawTx);
+    const payload = {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "sendTransaction",
+      params: [encodedTx],
+    };
     let response = await axios.post(
       "https://mainnet.block-engine.jito.wtf/api/v1/transactions",
       payload,
@@ -1291,135 +1027,29 @@ export async function sendJitoTxCaught(payload: any) {
   }
 }
 
-export async function processVersionedTransaction(
-  provider: anchor.AnchorProvider,
-  tx: VersionedTransaction,
-  signers?: Array<Signer>,
-  opts?: ConfirmOptions,
-  blockhash?: { blockhash: string; lastValidBlockHeight: number },
-  retries?: number
-): Promise<TransactionSignature> {
-  if (Exchange.useJitoBundle) {
-    return processVersionedTransactionJito(
-      provider,
-      tx,
-      signers,
-      opts,
-      blockhash
-    );
-  }
-
-  let failures = 0;
-  while (true) {
-    let rawTx: Buffer | Uint8Array;
-
-    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
-
-    tx.sign(
-      (signers ?? [])
-        .filter((s) => s !== undefined)
-        .map((kp) => {
-          return kp;
-        })
-    );
-    tx = (await provider.wallet.signTransaction(tx)) as VersionedTransaction;
-    rawTx = tx.serialize();
-
-    let txOpts = opts || commitmentConfig(provider.connection.commitment);
-    let txSig;
-    let allConnections = [provider.connection].concat(
-      Exchange.doubleDownConnections
-    );
-    try {
-      // Integration tests don't like the split send + confirm :(
-      if (Exchange.network == Network.LOCALNET) {
-        return await anchor.sendAndConfirmRawTransaction(
-          provider.connection,
-          rawTx,
-          txOpts
-        );
-      }
-
-      let promises = [];
-      for (var con of allConnections) {
-        promises.push(sendRawTransactionCaught(con, rawTx));
-      }
-
-      // Jito's transactions endpoint, not a bundle
-      // Might as well send it here for extra success, it's free
-      if (Exchange.network == Network.MAINNET) {
-        const encodedTx = bs58.encode(rawTx);
-        const payload = {
-          jsonrpc: "2.0",
-          id: 1,
-          method: "sendTransaction",
-          params: [encodedTx],
-        };
-        promises.push(sendJitoTxCaught(payload));
-      }
-
-      // All tx sigs are the same
-      let txSigs = await Promise.all(promises);
-      let txSig = txSigs.find(
-        (sig) => typeof sig === "string" && sig.length > 0
-      );
-
-      // Poll the tx confirmation for N seconds
-      // Polling is more reliable than websockets using confirmTransaction()
-      let currentBlockHeight = 0;
-      if (!Exchange.skipRpcConfirmation) {
-        let resendCounter = 0;
-        // https://solana.com/docs/advanced/confirmation#how-does-transaction-expiration-work
-        while (
-          currentBlockHeight <
-          recentBlockhash.lastValidBlockHeight - 151
-        ) {
-          // Keep resending to maximise the chance of confirmation
-          resendCounter += 1;
-          if (resendCounter % 4 == 0) {
-            for (var con of allConnections) {
-              promises.push(sendRawTransactionCaught(con, rawTx));
-            }
-            await Promise.race(promises);
-          }
-
-          let status = await provider.connection.getSignatureStatus(txSig);
-          currentBlockHeight = await provider.connection.getBlockHeight(
-            provider.connection.commitment
-          );
-          if (status.value != null) {
-            if (status.value.err != null) {
-              // Gets caught and parsed in the later catch
-              let err = parseInt(
-                status.value.err["InstructionError"][1]["Custom"]
-              );
-              throw err;
-            }
-            if (
-              txConfirmationCheck(
-                txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-                status.value.confirmationStatus.toString()
-              )
-            ) {
-              return txSig;
-            }
-          }
-          await sleep(500); // Don't spam the RPC
-        }
-        throw Error(`Transaction ${txSig} was not confirmed`);
-      } else {
-        return txSig;
-      }
-    } catch (err) {
-      let parsedErr = parseError(err);
-      failures += 1;
-      if (!retries || failures > retries) {
-        console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
-        throw parsedErr;
-      }
-      console.log(`Transaction failed to send. Retrying...`);
-      console.log(`failCount=${failures}. error=${parsedErr}`);
+export async function sendJitoBundleCaught(rawTxs: any[]) {
+  try {
+    let paramsTxs = [];
+    for (var tx of rawTxs) {
+      paramsTxs.push(bs58.encode(tx));
     }
+    const payload = {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "sendBundle",
+      params: [paramsTxs],
+    };
+
+    let response = await axios.post(
+      "https://mainnet.block-engine.jito.wtf/api/v1/bundles",
+      payload,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    return response.data.result;
+  } catch (e) {
+    console.log(`Error sending bundle: ${e}`);
   }
 }
 
@@ -1431,35 +1061,52 @@ export async function processTransaction(
   useLedger: boolean = false,
   lutAccs?: AddressLookupTableAccount[],
   blockhash?: { blockhash: string; lastValidBlockHeight: number },
-  retries?: number
+  retries?: number,
+  instructionName: string = "",
+  instructionAsset: Asset = Asset.UNDEFINED
 ): Promise<TransactionSignature> {
-  if (Exchange.useJitoBundle) {
-    return processTransactionJito(
-      provider,
-      tx,
-      signers,
-      opts,
-      lutAccs,
-      blockhash
+  if (
+    Exchange.httpProvider &&
+    (Exchange.jitoRpcMode == types.JitoRpcMode.COMBO ||
+      Exchange.jitoRpcMode == types.JitoRpcMode.JITOBUNDLEONLY)
+  ) {
+    throw Error(
+      "Can't send via Bloxroute and Jito together, set Exchange.setJitoRpcMode(types.JitoRpcMode.RPCONLY)"
     );
-  }
-
-  if (Exchange.httpProvider) {
-    let txSig = await processTransactionBloxroute(
-      Exchange.httpProvider,
-      provider,
-      tx,
-      Exchange.tipMultiplier * Exchange.priorityFee + 1050,
-      blockhash,
-      retries,
-      Exchange.skipRpcConfirmation
-    );
-    return txSig;
   }
 
   let failures = 0;
   while (true) {
     let rawTx: Buffer | Uint8Array;
+    let rawTxTip: Buffer | Uint8Array;
+
+    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
+
+    // simulateTransaction is deprecated for old txs, only works with VersionedTransactions
+    // so no matter if we're using LUTs or not, we can still build a dummy verioned tx to simulate with
+    // the result is close enough for CU purposes
+    if (Exchange.optimiseTransactionCU) {
+      let estimatedCU = Math.round(
+        (
+          await provider.connection.simulateTransaction(
+            new VersionedTransaction(
+              new TransactionMessage({
+                payerKey: provider.wallet.publicKey,
+                recentBlockhash: recentBlockhash.blockhash,
+                instructions: tx.instructions,
+              }).compileToV0Message()
+            )
+          )
+        ).value.unitsConsumed * 1.25
+      );
+
+      console.log(`Estimating transaction CU to be ${estimatedCU}`);
+      tx.instructions.unshift(
+        ComputeBudgetProgram.setComputeUnitLimit({
+          units: estimatedCU,
+        })
+      );
+    }
 
     if (Exchange.priorityFee != 0) {
       tx.instructions.unshift(
@@ -1469,11 +1116,21 @@ export async function processTransaction(
       );
     }
 
-    let recentBlockhash = blockhash ?? (await Exchange.getCachedBlockhash());
-
     if (lutAccs) {
       if (useLedger) {
         throw Error("Ledger does not support versioned transactions");
+      }
+
+      if (Exchange.httpProvider) {
+        tx.add(
+          SystemProgram.transfer({
+            fromPubkey: provider.publicKey,
+            toPubkey: new PublicKey(
+              "HWEoBxYs7ssKuudEjzjmpfJVX7Dvi7wescFsVx2L5yoY" // Trader API tip wallet
+            ),
+            lamports: Exchange.jitoTip,
+          })
+        );
       }
 
       let v0Tx: VersionedTransaction = new VersionedTransaction(
@@ -1483,6 +1140,7 @@ export async function processTransaction(
           instructions: tx.instructions,
         }).compileToV0Message(lutAccs)
       );
+
       v0Tx.sign(
         (signers ?? [])
           .filter((s) => s !== undefined)
@@ -1490,11 +1148,59 @@ export async function processTransaction(
             return kp;
           })
       );
+
       v0Tx = (await provider.wallet.signTransaction(
         v0Tx
       )) as VersionedTransaction;
+
       rawTx = v0Tx.serialize();
+
+      if (
+        !Exchange.httpProvider &&
+        (Exchange.jitoRpcMode == types.JitoRpcMode.COMBO ||
+          Exchange.jitoRpcMode == types.JitoRpcMode.JITOBUNDLEONLY)
+      ) {
+        let v0TxTip: VersionedTransaction = new VersionedTransaction(
+          new TransactionMessage({
+            payerKey: provider.wallet.publicKey,
+            recentBlockhash: recentBlockhash.blockhash,
+            instructions: [
+              SystemProgram.transfer({
+                fromPubkey: Exchange.provider.publicKey,
+                toPubkey: new PublicKey(
+                  "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL" // Jito tip account
+                ),
+                lamports: Exchange.jitoTip, // tip
+              }),
+            ],
+          }).compileToV0Message(lutAccs)
+        );
+
+        v0TxTip.sign(
+          (signers ?? [])
+            .filter((s) => s !== undefined)
+            .map((kp) => {
+              return kp;
+            })
+        );
+
+        v0TxTip = (await provider.wallet.signTransaction(
+          v0TxTip
+        )) as VersionedTransaction;
+
+        rawTxTip = v0TxTip.serialize();
+      }
     } else {
+      if (Exchange.jitoRpcMode == types.JitoRpcMode.JITOBUNDLEONLY) {
+        throw Error(
+          "Jito bundle does not support legacy transactions, client.setUseVersionedTxs(true)"
+        );
+      }
+      if (Exchange.httpProvider) {
+        throw Error(
+          "Bloxroute does not support legacy transactions, set client.setUseVersionedTxs(true)"
+        );
+      }
       tx.recentBlockhash = recentBlockhash.blockhash;
       tx.feePayer = useLedger
         ? Exchange.ledgerWallet.publicKey
@@ -1523,6 +1229,16 @@ export async function processTransaction(
     let allConnections = [provider.connection].concat(
       Exchange.doubleDownConnections
     );
+
+    // Don't do an RPC call if we're not measuring performance
+    let sendTs = Date.now() / 1000;
+    let sendSlot: number;
+    if (Exchange._performanceCallback) {
+      sendSlot = await Exchange.connection.getSlot(
+        provider.connection.commitment
+      );
+    }
+
     try {
       // Integration tests don't like the split send + confirm :(
       if (Exchange.network == Network.LOCALNET) {
@@ -1534,24 +1250,34 @@ export async function processTransaction(
       }
 
       let promises = [];
-      for (var con of allConnections) {
-        promises.push(sendRawTransactionCaught(con, rawTx));
+      if (Exchange.jitoRpcMode != types.JitoRpcMode.JITOBUNDLEONLY) {
+        for (var con of allConnections) {
+          promises.push(sendRawTransactionCaught(con, rawTx));
+        }
       }
 
-      // Jito's transactions endpoint, not a bundle
-      // Might as well send it here for extra success, it's free
-      if (Exchange.network == Network.MAINNET) {
-        const encodedTx = bs58.encode(rawTx);
-        const payload = {
-          jsonrpc: "2.0",
-          id: 1,
-          method: "sendTransaction",
-          params: [encodedTx],
-        };
-        promises.push(sendJitoTxCaught(payload));
+      if (Exchange.httpProvider) {
+        promises.push(sendBloxrouteTransactionCaught(rawTx));
+      } else {
+        // Jito's transactions endpoint, not a bundle
+        // Might as well send it here for extra success, it's free
+        if (Exchange.network == Network.MAINNET) {
+          if (Exchange.jitoRpcMode != types.JitoRpcMode.JITOBUNDLEONLY) {
+            promises.push(sendJitoTxCaught(rawTx));
+          }
+
+          if (
+            Exchange.jitoRpcMode == types.JitoRpcMode.COMBO ||
+            Exchange.jitoRpcMode == types.JitoRpcMode.JITOBUNDLEONLY
+          ) {
+            promises.push(sendJitoBundleCaught([rawTx, rawTxTip]));
+          }
+        }
       }
 
       // All tx sigs are the same
+      // If jitoRpcMode == JITOBUNDLEONLY, then the first and only one will be the bundle ID
+      // If using Bloxroute, the postSubmitV2 call returns the tx sig too
       let txSigs = await Promise.all(promises);
       let txSig = txSigs.find(
         (sig) => typeof sig === "string" && sig.length > 0
@@ -1567,7 +1293,93 @@ export async function processTransaction(
           currentBlockHeight <
           recentBlockhash.lastValidBlockHeight - 151
         ) {
+          if (Exchange.jitoRpcMode == types.JitoRpcMode.JITOBUNDLEONLY) {
+            let jitoStatus = await getBundleResult(txSig);
+            if (
+              jitoStatus &&
+              jitoStatus.value != null &&
+              jitoStatus.value.length > 0
+            ) {
+              if (jitoStatus.value.err != null) {
+                // Gets caught and parsed in the later catch
+                let err = parseInt(
+                  jitoStatus.value.err["InstructionError"][1]["Custom"]
+                );
+                let parsedErr = parseError(err);
+                if (Exchange._performanceCallback) {
+                  let confirmedOnchainTs = 0;
+                  let confirmedLocalSlot = 0;
+                  try {
+                    confirmedOnchainTs = await Exchange.connection.getBlockTime(
+                      jitoStatus.context.slot
+                    );
+                  } catch (e) {
+                    console.log(e);
+                  }
+                  try {
+                    confirmedLocalSlot = await Exchange.connection.getSlot(
+                      provider.connection.commitment
+                    );
+                  } catch (e) {
+                    console.log(e);
+                  }
+                  Exchange._performanceCallback(
+                    instructionName,
+                    instructionAsset,
+                    sendTs,
+                    sendSlot,
+                    jitoStatus.context.slot,
+                    confirmedOnchainTs,
+                    confirmedLocalSlot,
+                    Date.now() / 1000
+                  );
+                }
+                throw parsedErr;
+              }
+              if (
+                txConfirmationCheck(
+                  txOpts.commitment
+                    ? txOpts.commitment.toString()
+                    : "confirmed",
+                  jitoStatus.value[0]["confirmation_status"].toString()
+                )
+              ) {
+                if (Exchange._performanceCallback) {
+                  let confirmedOnchainTs = 0;
+                  let confirmedLocalSlot = 0;
+                  try {
+                    confirmedOnchainTs = await Exchange.connection.getBlockTime(
+                      jitoStatus.context.slot
+                    );
+                  } catch (e) {
+                    console.log(e);
+                  }
+                  try {
+                    confirmedLocalSlot = await Exchange.connection.getSlot(
+                      provider.connection.commitment
+                    );
+                  } catch (e) {
+                    console.log(e);
+                  }
+                  Exchange._performanceCallback(
+                    instructionName,
+                    instructionAsset,
+                    sendTs,
+                    sendSlot,
+                    jitoStatus.context.slot,
+                    confirmedOnchainTs,
+                    confirmedLocalSlot,
+                    Date.now() / 1000
+                  );
+                }
+                return jitoStatus.value[0]["transactions"][0];
+              }
+            }
+            continue;
+          }
+
           // Keep resending to maximise the chance of confirmation
+          promises = [];
           resendCounter += 1;
           if (resendCounter % 4 == 0) {
             for (var con of allConnections) {
@@ -1586,6 +1398,34 @@ export async function processTransaction(
               let err = parseInt(
                 status.value.err["InstructionError"][1]["Custom"]
               );
+              if (Exchange._performanceCallback) {
+                let confirmedOnchainTs = 0;
+                let confirmedLocalSlot = 0;
+                try {
+                  confirmedOnchainTs = await Exchange.connection.getBlockTime(
+                    status.context.slot
+                  );
+                } catch (e) {
+                  console.log(e);
+                }
+                try {
+                  confirmedLocalSlot = await Exchange.connection.getSlot(
+                    provider.connection.commitment
+                  );
+                } catch (e) {
+                  console.log(e);
+                }
+                Exchange._performanceCallback(
+                  instructionName,
+                  instructionAsset,
+                  sendTs,
+                  sendSlot,
+                  status.context.slot,
+                  confirmedOnchainTs,
+                  confirmedLocalSlot,
+                  Date.now() / 1000
+                );
+              }
               throw err;
             }
             if (
@@ -1594,10 +1434,50 @@ export async function processTransaction(
                 status.value.confirmationStatus.toString()
               )
             ) {
+              if (Exchange._performanceCallback) {
+                let confirmedOnchainTs = 0;
+                let confirmedLocalSlot = 0;
+                try {
+                  confirmedOnchainTs = await Exchange.connection.getBlockTime(
+                    status.context.slot
+                  );
+                } catch (e) {
+                  console.log(e);
+                }
+                try {
+                  confirmedLocalSlot = await Exchange.connection.getSlot(
+                    provider.connection.commitment
+                  );
+                } catch (e) {
+                  console.log(e);
+                }
+                Exchange._performanceCallback(
+                  instructionName,
+                  instructionAsset,
+                  sendTs,
+                  sendSlot,
+                  status.context.slot,
+                  confirmedOnchainTs,
+                  confirmedLocalSlot,
+                  Date.now() / 1000
+                );
+              }
               return txSig;
             }
           }
           await sleep(500); // Don't spam the RPC
+        }
+        if (Exchange._performanceCallback) {
+          Exchange._performanceCallback(
+            instructionName,
+            instructionAsset,
+            sendTs,
+            sendSlot,
+            0,
+            0,
+            0,
+            0
+          );
         }
         throw Error(`Transaction ${txSig} was not confirmed`);
       } else {
@@ -1608,6 +1488,18 @@ export async function processTransaction(
       failures += 1;
       if (!retries || failures > retries) {
         console.log(`txSig: ${txSig} failed. Error = ${parsedErr}`);
+        if (Exchange._performanceCallback) {
+          Exchange._performanceCallback(
+            instructionName,
+            instructionAsset,
+            sendTs,
+            sendSlot,
+            0,
+            0,
+            0,
+            0
+          );
+        }
         throw parsedErr;
       }
       console.log(`Transaction failed to send. Retrying...`);
@@ -1890,7 +1782,17 @@ export async function cleanZetaMarkets(
   }
   await Promise.all(
     txs.map(async (tx) => {
-      await processTransaction(Exchange.provider, tx);
+      await processTransaction(
+        Exchange.provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "cleanZetaMarkets"
+      );
     })
   );
 }
@@ -1898,7 +1800,17 @@ export async function cleanZetaMarkets(
 export async function cleanZetaMarketHalted(asset: Asset) {
   let tx = new Transaction();
   tx.add(instructions.cleanZetaMarketHaltedIx(asset));
-  await processTransaction(Exchange.provider, tx);
+  await processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    "cleanZetaMarketHalted"
+  );
 }
 
 /*
@@ -1919,7 +1831,17 @@ export async function crankMarket(
       })
     )
     .add(ix);
-  await processTransaction(Exchange.provider, tx);
+  await processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    "crankMarket"
+  );
   return false;
 }
 
@@ -2001,14 +1923,34 @@ export async function createCrankMarketIx(
  */
 export async function pruneExpiredTIFOrders(asset: Asset) {
   let tx = new Transaction().add(instructions.pruneExpiredTIFOrdersIx(asset));
-  return processTransaction(Exchange.provider, tx);
+  return processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    "pruneExpiredTIFOrders"
+  );
 }
 
 export async function pruneExpiredTIFOrdersV2(asset: Asset, limit: number) {
   let tx = new Transaction().add(
     instructions.pruneExpiredTIFOrdersIxV2(asset, limit)
   );
-  return processTransaction(Exchange.provider, tx);
+  return processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    "pruneExpiredTIFOrdersV2"
+  );
 }
 
 export function getMutMarketAccounts(asset: Asset): Object[] {
@@ -2281,7 +2223,17 @@ export async function settleAndBurnVaultTokens(
     await Promise.all(
       txSlice.map(async (tx, i) => {
         try {
-          await processTransaction(provider, tx);
+          await processTransaction(
+            provider,
+            tx,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            "settleDexFunds"
+          );
         } catch (e) {
           console.log(`Settle failed on tx ${j + i}, continuing...`);
         }
@@ -2290,7 +2242,17 @@ export async function settleAndBurnVaultTokens(
   }
 
   let burnTx = instructions.burnVaultTokenTx(asset);
-  await processTransaction(provider, burnTx);
+  await processTransaction(
+    provider,
+    burnTx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    "burnVaultTokens"
+  );
 }
 
 export async function burnVaultTokens(
@@ -2300,7 +2262,17 @@ export async function burnVaultTokens(
   let market = Exchange.getPerpMarket(asset);
   console.log(`Burning tokens`);
   let burnTx = instructions.burnVaultTokenTx(asset);
-  await processTransaction(provider, burnTx);
+  await processTransaction(
+    provider,
+    burnTx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    "burnVaultTokens"
+  );
 }
 
 /**
@@ -2405,7 +2377,17 @@ export async function applyPerpFunding(asset: Asset, keys: PublicKey[]) {
 
   await Promise.all(
     txs.map(async (tx) => {
-      let txSig = await processTransaction(Exchange.provider, tx);
+      let txSig = await processTransaction(
+        Exchange.provider,
+        tx,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "applyPerpFunding"
+      );
     })
   );
 }
@@ -2431,7 +2413,17 @@ export async function executeTriggerOrder(
     )
   );
 
-  await processTransaction(Exchange.provider, tx);
+  await processTransaction(
+    Exchange.provider,
+    tx,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    "executeTriggerOrder"
+  );
 }
 
 export function getProductLedger(marginAccount: MarginAccount, index: number) {
@@ -2684,7 +2676,11 @@ export async function initializeZetaMarkets(
       tx,
       [],
       defaultCommitment(),
-      Exchange.useLedger
+      Exchange.useLedger,
+      undefined,
+      undefined,
+      undefined,
+      "initializeZetaMarkets"
     );
   } catch (e) {
     console.error(`Initialize market indexes failed: ${e}`);
@@ -2700,7 +2696,11 @@ export async function initializeZetaMarkets(
       tx2,
       [],
       defaultCommitment(),
-      Exchange.useLedger
+      Exchange.useLedger,
+      undefined,
+      undefined,
+      undefined,
+      "initializeZetaMarkets"
     );
     await sleep(100);
   } catch (e) {
@@ -2788,7 +2788,11 @@ async function initializeZetaMarket(
         tx,
         [requestQueue, eventQueue, bids, asks],
         commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
+        Exchange.useLedger,
+        undefined,
+        undefined,
+        undefined,
+        "initializeZetaMarket"
       );
     } catch (e) {
       console.error(`Initialize zeta market serum accounts ${i} failed: ${e}`);
@@ -2805,7 +2809,11 @@ async function initializeZetaMarket(
         tx2,
         [],
         commitmentConfig(Exchange.connection.commitment),
-        Exchange.useLedger
+        Exchange.useLedger,
+        undefined,
+        undefined,
+        undefined,
+        "initializeZetaMarket"
       );
     } catch (e) {
       console.error(`Initialize zeta market ${i} failed: ${e}`);
