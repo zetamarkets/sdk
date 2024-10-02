@@ -20,6 +20,7 @@ export enum Asset {
   RNDR = "RNDR",
   TNSR = "TNSR",
   POPCAT = "POPCAT",
+  EIGEN = "EIGEN",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -87,6 +88,9 @@ export const FLEX_MINTS = {
     [Asset.POPCAT]: new PublicKey(
       "wWmjLtKGmXqJnDFnyQtKX1ZNHoBs9JD6bVxNa47zJWr"
     ),
+    [Asset.EIGEN]: new PublicKey(
+      "F7pcDmpVokQJgToqN9DU7cmkWNgwUCd7qs3jZURMvL3L" // TODO: update this
+    ),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -112,6 +116,9 @@ export const FLEX_MINTS = {
     [Asset.TNSR]: new PublicKey("3bTWLSNoD95dP2SHq4diRz3ZTeDXmybTsjPUQzRpTCHR"),
     [Asset.POPCAT]: new PublicKey(
       "CoGwjBS8stc4HCwpa6xh55LmGRTPxPkNXDVc1qBjwa5"
+    ),
+    [Asset.EIGEN]: new PublicKey(
+      "F7pcDmpVokQJgToqN9DU7cmkWNgwUCd7qs3jZURMvL3L"
     ),
   },
 };
@@ -305,6 +312,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0x05ecd4597cd48fe13d6cc3596c62af4f9675aee06e2e0b94c06d8bee2b659e05",
   [Asset.POPCAT]:
     "0xb9312a7ee50e189ef045aa3c7842e099b061bd9bdc99ac645956c3b660dc8cce",
+  [Asset.EIGEN]:
+    "0xc65db025687356496e8653d0d6608eec64ce2d96e2e28c530e574f0e4f712380",
 };
 
 export const PYTH_PRICE_FEEDS = {
@@ -366,6 +375,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.POPCAT]: new PublicKey(
       "6UxPR2nXJNNM1nESVWGAf8NXMVu3SGgYf3ZfUFoGB9cs"
     ),
+    [Asset.EIGEN]: new PublicKey("64x2TaUVMrmxGDCcWYntWR8TPrXA3uaC8TfX9997Kam"),
   },
 };
 

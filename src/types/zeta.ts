@@ -10312,6 +10312,9 @@ export type Zeta = {
             "name": "POPCAT"
           },
           {
+            "name": "EIGEN"
+          },
+          {
             "name": "UNDEFINED"
           }
         ]
@@ -22201,6 +22204,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "POPCAT"
+          },
+          {
+            "name": "EIGEN"
           },
           {
             "name": "UNDEFINED"
