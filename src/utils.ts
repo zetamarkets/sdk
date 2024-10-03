@@ -1018,22 +1018,22 @@ export async function processTransactionBloxroute(
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
           let status = await anchorProvider.connection.getSignatureStatuses([
             txSig,
-          ])[0];
+          ]);
           currentBlockHeight = await anchorProvider.connection.getBlockHeight(
             anchorProvider.connection.commitment
           );
-          if (status.value != null) {
-            if (status.value.err != null) {
+          if (status.value[0] != null) {
+            if (status.value[0].err != null) {
               // Gets caught and parsed in the later catch
               let err = parseInt(
-                status.value.err["InstructionError"][1]["Custom"]
+                status.value[0].err["InstructionError"][1]["Custom"]
               );
               throw err;
             }
             if (
               txConfirmationCheck(
                 "confirmed",
-                status.value.confirmationStatus.toString()
+                status.value[0].confirmationStatus.toString()
               )
             ) {
               return txSig;
@@ -1121,21 +1121,23 @@ export async function processVersionedTransactionJito(
       maxRetries: 0,
     });
 
-    let status = await provider.connection.getSignatureStatuses([txSig])[0];
+    let status = await provider.connection.getSignatureStatuses([txSig]);
     currentBlockHeight = await provider.connection.getBlockHeight(
       provider.connection.commitment
     );
-    if (status.value != null) {
-      if (status.value.err != null) {
+    if (status.value[0] != null) {
+      if (status.value[0].err != null) {
         // Gets caught and parsed in the later catch
-        let err = parseInt(status.value.err["InstructionError"][1]["Custom"]);
+        let err = parseInt(
+          status.value[0].err["InstructionError"][1]["Custom"]
+        );
         let parsedErr = parseError(err);
         throw parsedErr;
       }
       if (
         txConfirmationCheck(
           txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-          status.value.confirmationStatus.toString()
+          status.value[0].confirmationStatus.toString()
         )
       ) {
         return txSig;
@@ -1238,21 +1240,23 @@ export async function processTransactionJito(
       maxRetries: 0,
     });
 
-    let status = await provider.connection.getSignatureStatuses([txSig])[0];
+    let status = await provider.connection.getSignatureStatuses([txSig]);
     currentBlockHeight = await provider.connection.getBlockHeight(
       provider.connection.commitment
     );
-    if (status.value != null) {
-      if (status.value.err != null) {
+    if (status.value[0] != null) {
+      if (status.value[0].err != null) {
         // Gets caught and parsed in the later catch
-        let err = parseInt(status.value.err["InstructionError"][1]["Custom"]);
+        let err = parseInt(
+          status.value[0].err["InstructionError"][1]["Custom"]
+        );
         let parsedErr = parseError(err);
         throw parsedErr;
       }
       if (
         txConfirmationCheck(
           txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-          status.value.confirmationStatus.toString()
+          status.value[0].confirmationStatus.toString()
         )
       ) {
         return txSig;
@@ -1383,24 +1387,22 @@ export async function processVersionedTransaction(
             await Promise.race(promises);
           }
 
-          let status = await provider.connection.getSignatureStatuses([
-            txSig,
-          ])[0];
+          let status = await provider.connection.getSignatureStatuses([txSig]);
           currentBlockHeight = await provider.connection.getBlockHeight(
             provider.connection.commitment
           );
-          if (status.value != null) {
-            if (status.value.err != null) {
+          if (status.value[0] != null) {
+            if (status.value[0].err != null) {
               // Gets caught and parsed in the later catch
               let err = parseInt(
-                status.value.err["InstructionError"][1]["Custom"]
+                status.value[0].err["InstructionError"][1]["Custom"]
               );
               throw err;
             }
             if (
               txConfirmationCheck(
                 txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-                status.value.confirmationStatus.toString()
+                status.value[0].confirmationStatus.toString()
               )
             ) {
               return txSig;
@@ -1578,24 +1580,22 @@ export async function processTransaction(
             await Promise.race(promises);
           }
 
-          let status = await provider.connection.getSignatureStatuses([
-            txSig,
-          ])[0];
+          let status = await provider.connection.getSignatureStatuses([txSig]);
           currentBlockHeight = await provider.connection.getBlockHeight(
             provider.connection.commitment
           );
-          if (status.value != null) {
-            if (status.value.err != null) {
+          if (status.value[0] != null) {
+            if (status.value[0].err != null) {
               // Gets caught and parsed in the later catch
               let err = parseInt(
-                status.value.err["InstructionError"][1]["Custom"]
+                status.value[0].err["InstructionError"][1]["Custom"]
               );
               throw err;
             }
             if (
               txConfirmationCheck(
                 txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-                status.value.confirmationStatus.toString()
+                status.value[0].confirmationStatus.toString()
               )
             ) {
               return txSig;
