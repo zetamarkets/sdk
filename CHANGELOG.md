@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.46.0]
+
+- Change RPC to use getSignatureStatuses for compatibility with Agave 2.0. ([#420](https://github.com/zetamarkets/sdk/pull/420))
+
 ## [1.45.2]
 
 - Fix typo in popcat asset.ts. ([#418](https://github.com/zetamarkets/sdk/pull/418))
