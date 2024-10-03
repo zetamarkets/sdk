@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.46.0]
+
+- New asset EIGEN. ([#421](https://github.com/zetamarkets/sdk/pull/421))
+
 ## [1.45.2]
 
 - Fix typo in popcat asset.ts. ([#418](https://github.com/zetamarkets/sdk/pull/418))
