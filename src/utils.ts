@@ -1016,9 +1016,9 @@ export async function processTransactionBloxroute(
       let currentBlockHeight = 0;
       if (!skipConfirmation) {
         while (currentBlockHeight < recentBlockhash.lastValidBlockHeight) {
-          let status = await anchorProvider.connection.getSignatureStatus(
-            txSig
-          );
+          let status = await anchorProvider.connection.getSignatureStatuses([
+            txSig,
+          ])[0];
           currentBlockHeight = await anchorProvider.connection.getBlockHeight(
             anchorProvider.connection.commitment
           );
@@ -1121,7 +1121,7 @@ export async function processVersionedTransactionJito(
       maxRetries: 0,
     });
 
-    let status = await provider.connection.getSignatureStatus(txSig);
+    let status = await provider.connection.getSignatureStatuses([txSig])[0];
     currentBlockHeight = await provider.connection.getBlockHeight(
       provider.connection.commitment
     );
@@ -1238,7 +1238,7 @@ export async function processTransactionJito(
       maxRetries: 0,
     });
 
-    let status = await provider.connection.getSignatureStatus(txSig);
+    let status = await provider.connection.getSignatureStatuses([txSig])[0];
     currentBlockHeight = await provider.connection.getBlockHeight(
       provider.connection.commitment
     );
@@ -1383,7 +1383,9 @@ export async function processVersionedTransaction(
             await Promise.race(promises);
           }
 
-          let status = await provider.connection.getSignatureStatus(txSig);
+          let status = await provider.connection.getSignatureStatuses([
+            txSig,
+          ])[0];
           currentBlockHeight = await provider.connection.getBlockHeight(
             provider.connection.commitment
           );
@@ -1576,7 +1578,9 @@ export async function processTransaction(
             await Promise.race(promises);
           }
 
-          let status = await provider.connection.getSignatureStatus(txSig);
+          let status = await provider.connection.getSignatureStatuses([
+            txSig,
+          ])[0];
           currentBlockHeight = await provider.connection.getBlockHeight(
             provider.connection.commitment
           );
