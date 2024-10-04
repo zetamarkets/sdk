@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [1.46.0]
+## [1.46.1]
 
 - Change RPC to use getSignatureStatuses for compatibility with Agave 2.0. ([#420](https://github.com/zetamarkets/sdk/pull/420))
 
