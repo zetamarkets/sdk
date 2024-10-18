@@ -10315,7 +10315,7 @@ export type Zeta = {
             "name": "EIGEN"
           },
           {
-            "name": "DEBRIDGE"
+            "name": "DBR"
           },
           {
             "name": "UNDEFINED"
@@ -22212,7 +22212,7 @@ export const IDL: Zeta = {
             "name": "EIGEN"
           },
           {
-            "name": "DEBRIDGE"
+            "name": "DBR"
           },
           {
             "name": "UNDEFINED"
