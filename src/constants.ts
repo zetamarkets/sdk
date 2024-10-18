@@ -21,6 +21,7 @@ export enum Asset {
   TNSR = "TNSR",
   POPCAT = "POPCAT",
   EIGEN = "EIGEN",
+  DBR = "DBR",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -89,6 +90,7 @@ export const FLEX_MINTS = {
       "wWmjLtKGmXqJnDFnyQtKX1ZNHoBs9JD6bVxNa47zJWr"
     ),
     [Asset.EIGEN]: new PublicKey("DHtEPob1XKiP5pVGXJNdxaesvMen38apDEFi2adNjiC"),
+    [Asset.DBR]: new PublicKey("Guk6JzRKssoagWHU62GUsdzF4JisJDaL2VNytMqTYW7U"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -118,6 +120,7 @@ export const FLEX_MINTS = {
     [Asset.EIGEN]: new PublicKey(
       "F7pcDmpVokQJgToqN9DU7cmkWNgwUCd7qs3jZURMvL3L"
     ),
+    [Asset.DBR]: new PublicKey("B69Kty2ejokBZQBGo4BUtQb1iAhjG2d8xTigL9PB4vRz"),
   },
 };
 
@@ -312,6 +315,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0xb9312a7ee50e189ef045aa3c7842e099b061bd9bdc99ac645956c3b660dc8cce",
   [Asset.EIGEN]:
     "0xc65db025687356496e8653d0d6608eec64ce2d96e2e28c530e574f0e4f712380",
+  [Asset.DBR]:
+    "0xf788488fe2df341b10a498e0a789f03209c0938d9ed04bc521f8224748d6d236",
 };
 
 export const PYTH_PRICE_FEEDS = {
@@ -341,6 +346,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.EIGEN]: new PublicKey(
       "Gn5ff6XG1dNvDdDWDcvgctaa1C61GbQFRYYsBeDBgPYD"
     ),
+    [Asset.DBR]: new PublicKey("G3eVjXUwsh2ioFopj4k4YtjDeXh2JRXBsgmW1BbHaMT8"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -377,6 +383,7 @@ export const PYTH_PRICE_FEEDS = {
       "6UxPR2nXJNNM1nESVWGAf8NXMVu3SGgYf3ZfUFoGB9cs"
     ),
     [Asset.EIGEN]: new PublicKey("64x2TaUVMrmxGDCcWYntWR8TPrXA3uaC8TfX9997Kam"),
+    [Asset.DBR]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"),
   },
 };
 
@@ -401,8 +408,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 19;
-export const UNUSED_PERP_MARKETS = 6;
+export const ACTIVE_PERP_MARKETS = 20;
+export const UNUSED_PERP_MARKETS = 5;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 10;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
