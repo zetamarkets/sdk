@@ -390,7 +390,7 @@ export const PYTH_PRICE_FEEDS = {
     ),
     [Asset.EIGEN]: new PublicKey("64x2TaUVMrmxGDCcWYntWR8TPrXA3uaC8TfX9997Kam"),
     [Asset.DBR]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"),
-    [Asset.GOAT]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"),
+    [Asset.GOAT]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"), // TODO edit when feed is live
   },
 };
 
