@@ -22,6 +22,7 @@ export enum Asset {
   POPCAT = "POPCAT",
   EIGEN = "EIGEN",
   DBR = "DBR",
+  GOAT = "GOAT",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -121,6 +122,9 @@ export const FLEX_MINTS = {
       "F7pcDmpVokQJgToqN9DU7cmkWNgwUCd7qs3jZURMvL3L"
     ),
     [Asset.DBR]: new PublicKey("B69Kty2ejokBZQBGo4BUtQb1iAhjG2d8xTigL9PB4vRz"),
+    [Asset.GOAT]: new PublicKey(
+      "Hopt52KvyrefDrjCyU46FRppT217eXT43TS7QbctKjuD"
+    ),
   },
 };
 
@@ -317,6 +321,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0xc65db025687356496e8653d0d6608eec64ce2d96e2e28c530e574f0e4f712380",
   [Asset.DBR]:
     "0xf788488fe2df341b10a498e0a789f03209c0938d9ed04bc521f8224748d6d236",
+  [Asset.GOAT]:
+    "0xf7731dc812590214d3eb4343bfb13d1b4cfa9b1d4e020644b5d5d8e07d60c66c"
 };
 
 export const PYTH_PRICE_FEEDS = {
@@ -384,6 +390,7 @@ export const PYTH_PRICE_FEEDS = {
     ),
     [Asset.EIGEN]: new PublicKey("64x2TaUVMrmxGDCcWYntWR8TPrXA3uaC8TfX9997Kam"),
     [Asset.DBR]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"),
+    [Asset.GOAT]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"),
   },
 };
 
@@ -408,8 +415,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 20;
-export const UNUSED_PERP_MARKETS = 5;
+export const ACTIVE_PERP_MARKETS = 21;
+export const UNUSED_PERP_MARKETS = 4;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 10;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
