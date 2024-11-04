@@ -2535,7 +2535,7 @@ export function getZetaLutArr(): AddressLookupTableAccount[] {
   if (Exchange.network == Network.LOCALNET) {
     return [];
   }
-  return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
+  return constants.STATIC_AND_PERPS_LUT[Exchange.network];
 }
 
 export function getUnderlyingMint(asset: Asset) {

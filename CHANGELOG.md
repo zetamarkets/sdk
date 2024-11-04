@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.49.0]
+
+- New asset GOAT. ([#422](https://github.com/zetamarkets/sdk/pull/423))
+
+## [1.48.0]
+
+- Skipped
+
 ## [1.47.0]
 
 - New asset DBR. ([#422](https://github.com/zetamarkets/sdk/pull/422))
