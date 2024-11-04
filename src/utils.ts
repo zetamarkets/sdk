@@ -1388,15 +1388,15 @@ export async function processTransaction(
             await Promise.race(promises);
           }
 
-          let status = await provider.connection.getSignatureStatus(txSig);
+          let status = await provider.connection.getSignatureStatuses([txSig]);
           currentBlockHeight = await provider.connection.getBlockHeight(
             provider.connection.commitment
           );
-          if (status.value != null) {
-            if (status.value.err != null) {
+          if (status.value[0] != null) {
+            if (status.value[0].err != null) {
               // Gets caught and parsed in the later catch
               let err = parseInt(
-                status.value.err["InstructionError"][1]["Custom"]
+                status.value[0].err["InstructionError"][1]["Custom"]
               );
               if (Exchange._performanceCallback) {
                 let confirmedOnchainTs = 0;
@@ -1431,7 +1431,7 @@ export async function processTransaction(
             if (
               txConfirmationCheck(
                 txOpts.commitment ? txOpts.commitment.toString() : "confirmed",
-                status.value.confirmationStatus.toString()
+                status.value[0].confirmationStatus.toString()
               )
             ) {
               if (Exchange._performanceCallback) {
@@ -2523,7 +2523,7 @@ export function getZetaLutArr(): AddressLookupTableAccount[] {
   if (Exchange.network == Network.LOCALNET) {
     return [];
   }
-  return [constants.STATIC_AND_PERPS_LUT[Exchange.network]];
+  return constants.STATIC_AND_PERPS_LUT[Exchange.network];
 }
 
 export function getUnderlyingMint(asset: Asset) {

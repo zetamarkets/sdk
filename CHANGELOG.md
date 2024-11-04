@@ -3,11 +3,31 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
-## [1.46.0]
+## [1.50.0]
 
 - Add Jito bundles functionality. ([#395](https://github.com/zetamarkets/sdk/pull/395))
 - Add performance callback to Exchange. ([#395](https://github.com/zetamarkets/sdk/pull/395))
 - Add the option to simulate transactions to more efficiently choose the compute unit limit for better tx success. ([#395](https://github.com/zetamarkets/sdk/pull/395))
+
+## [1.49.0]
+
+- New asset GOAT. ([#422](https://github.com/zetamarkets/sdk/pull/423))
+
+## [1.48.0]
+
+- Skipped
+
+## [1.47.0]
+
+- New asset DBR. ([#422](https://github.com/zetamarkets/sdk/pull/422))
+
+## [1.46.1]
+
+- Change RPC to use getSignatureStatuses for compatibility with Agave 2.0. ([#420](https://github.com/zetamarkets/sdk/pull/420))
+
+## [1.46.0]
+
+- New asset EIGEN. ([#421](https://github.com/zetamarkets/sdk/pull/421))
 
 ## [1.45.2]
 
