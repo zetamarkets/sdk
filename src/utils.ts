@@ -1097,7 +1097,7 @@ export async function processTransaction(
               }).compileToV0Message()
             )
           )
-        ).value.unitsConsumed * 1.25
+        ).value.unitsConsumed * 1.5
       );
 
       console.log(`Estimating transaction CU to be ${estimatedCU}`);
