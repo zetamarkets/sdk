@@ -92,6 +92,7 @@ export const FLEX_MINTS = {
     ),
     [Asset.EIGEN]: new PublicKey("DHtEPob1XKiP5pVGXJNdxaesvMen38apDEFi2adNjiC"),
     [Asset.DBR]: new PublicKey("Guk6JzRKssoagWHU62GUsdzF4JisJDaL2VNytMqTYW7U"),
+    [Asset.GOAT]: new PublicKey("Guk6JzRKssoagWHU62GUsdzF4JisJDaL2VNytMqTYW7U"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -353,6 +354,7 @@ export const PYTH_PRICE_FEEDS = {
       "Gn5ff6XG1dNvDdDWDcvgctaa1C61GbQFRYYsBeDBgPYD"
     ),
     [Asset.DBR]: new PublicKey("G3eVjXUwsh2ioFopj4k4YtjDeXh2JRXBsgmW1BbHaMT8"),
+    [Asset.GOAT]: new PublicKey("G3UPGTgtU9Mb8jHgiNgJ3kw9BaH8V4NBaX2ZbDedaBCh"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -390,7 +392,7 @@ export const PYTH_PRICE_FEEDS = {
     ),
     [Asset.EIGEN]: new PublicKey("64x2TaUVMrmxGDCcWYntWR8TPrXA3uaC8TfX9997Kam"),
     [Asset.DBR]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"),
-    [Asset.GOAT]: new PublicKey("5jdovW9tF9p4Wzd5SECyq8nE2ujgf5ZguqE8HHcHenw3"), // TODO edit when feed is live
+    [Asset.GOAT]: new PublicKey("3KebxXoZLaZvvdc3ecmdgwWQWSCLQeuouS6mrF7ar1en"),
   },
 };
 
