@@ -1046,7 +1046,6 @@ export async function processTransactionBloxroute(
         return txSig;
       }
     } catch (err) {
-      console.log(err);
       let parsedErr = parseError(err);
       failures += 1;
       if (!retries || failures > retries) {
@@ -1416,7 +1415,6 @@ export async function processVersionedTransaction(
         return txSig;
       }
     } catch (err) {
-      console.log(err);
       let parsedErr = parseError(err);
       failures += 1;
       if (!retries || failures > retries) {
@@ -1610,7 +1608,6 @@ export async function processTransaction(
         return txSig;
       }
     } catch (err) {
-      console.log(err);
       let parsedErr = parseError(err);
       failures += 1;
       if (!retries || failures > retries) {
