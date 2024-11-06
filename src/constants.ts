@@ -92,7 +92,7 @@ export const FLEX_MINTS = {
     ),
     [Asset.EIGEN]: new PublicKey("DHtEPob1XKiP5pVGXJNdxaesvMen38apDEFi2adNjiC"),
     [Asset.DBR]: new PublicKey("Guk6JzRKssoagWHU62GUsdzF4JisJDaL2VNytMqTYW7U"),
-    [Asset.GOAT]: new PublicKey("Guk6JzRKssoagWHU62GUsdzF4JisJDaL2VNytMqTYW7U"),
+    [Asset.GOAT]: new PublicKey("CJo41KKsawgr45p7pcucwcPk9SpRQLpVzD7tsh74eFin"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
