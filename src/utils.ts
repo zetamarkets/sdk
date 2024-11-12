@@ -1373,10 +1373,9 @@ export async function processVersionedTransaction(
       let currentBlockHeight = 0;
       if (!Exchange.skipRpcConfirmation) {
         let resendCounter = 0;
-        // https://solana.com/docs/advanced/confirmation#how-does-transaction-expiration-work
         while (
           currentBlockHeight <
-          recentBlockhash.lastValidBlockHeight - 151
+          recentBlockhash.lastValidBlockHeight
         ) {
           // Keep resending to maximise the chance of confirmation
           resendCounter += 1;
@@ -1566,10 +1565,9 @@ export async function processTransaction(
       let currentBlockHeight = 0;
       if (!Exchange.skipRpcConfirmation) {
         let resendCounter = 0;
-        // https://solana.com/docs/advanced/confirmation#how-does-transaction-expiration-work
         while (
           currentBlockHeight <
-          recentBlockhash.lastValidBlockHeight - 151
+          recentBlockhash.lastValidBlockHeight
         ) {
           // Keep resending to maximise the chance of confirmation
           resendCounter += 1;
