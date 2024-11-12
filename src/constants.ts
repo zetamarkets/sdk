@@ -430,8 +430,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 21;
-export const UNUSED_PERP_MARKETS = 4;
+export const ACTIVE_PERP_MARKETS = 22;
+export const UNUSED_PERP_MARKETS = 3;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 10;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
@@ -853,10 +853,10 @@ export const STATIC_AND_PERPS_LUT: {
     }),
     new AddressLookupTableAccount({
       // GOAT and DRIFT assets only
-      key: new PublicKey("6cJ34VXwfMTr48XcPAPFQFkiEFB5N3bP5gvj6JbKQRMW"),
+      key: new PublicKey("DHqBV5oWK8NgKRkBtn8wYg8vrCePjPEB9EEkX9Q2d5Ee"),
       state: {
         deactivationSlot: BigInt("18446744073709551615"),
-        lastExtendedSlot: 300937385,
+        lastExtendedSlot: 300944544,
         lastExtendedSlotStartIndex: 20,
         authority: new PublicKey(
           "Fc8bpeCMifWYv97pQ3k5xDvd98nuVg6yAaZrwmy4RRp6"
