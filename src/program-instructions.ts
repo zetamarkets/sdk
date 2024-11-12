@@ -37,7 +37,7 @@ export function initializeCombinedInsuranceVaultIx(): TransactionInstruction {
         insuranceVault: insuranceVault,
         tokenProgram: TOKEN_PROGRAM_ID,
         usdcMint: Exchange.usdcMintAddress,
-        admin: Exchange.state.admin,
+        admin: Exchange.state.secondaryAdmin,
         systemProgram: SystemProgram.programId,
       },
     }
@@ -52,7 +52,7 @@ export function initializeCombinedVaultIx(): TransactionInstruction {
       vault: vault,
       tokenProgram: TOKEN_PROGRAM_ID,
       usdcMint: Exchange.usdcMintAddress,
-      admin: Exchange.state.admin,
+      admin: Exchange.state.secondaryAdmin,
       systemProgram: SystemProgram.programId,
     },
   });
@@ -70,7 +70,7 @@ export function initializeCombinedSocializedLossAccountIx(): TransactionInstruct
         socializedLossAccount: account,
         tokenProgram: TOKEN_PROGRAM_ID,
         usdcMint: Exchange.usdcMintAddress,
-        admin: Exchange.state.admin,
+        admin: Exchange.state.secondaryAdmin,
         systemProgram: SystemProgram.programId,
       },
     }
@@ -1096,7 +1096,7 @@ export function initializeZetaMarketTIFEpochCyclesIx(
     {
       accounts: {
         state: Exchange.stateAddress,
-        admin: Exchange.state.admin,
+        admin: Exchange.state.secondaryAdmin,
         market: Exchange.getPerpMarket(asset).address,
         serumAuthority: Exchange.serumAuthority,
         dexProgram: constants.DEX_PID[Exchange.network],
@@ -1207,7 +1207,7 @@ export async function initializeZetaMarketTxs(
         state: Exchange.stateAddress,
         marketIndexes,
         pricing: Exchange.pricingAddress,
-        admin: Exchange.state.admin,
+        admin: Exchange.state.secondaryAdmin,
         market,
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
@@ -1223,7 +1223,7 @@ export async function initializeZetaMarketTxs(
           state: Exchange.stateAddress,
           marketIndexes: marketIndexes,
           pricing: Exchange.pricingAddress,
-          admin: Exchange.state.admin,
+          admin: Exchange.state.secondaryAdmin,
           market,
           requestQueue: requestQueue,
           eventQueue: eventQueue,
@@ -1250,7 +1250,7 @@ export async function initializeZetaMarketTxs(
           state: Exchange.stateAddress,
           marketIndexes,
           pricing: Exchange.pricingAddress,
-          admin: Exchange.state.admin,
+          admin: Exchange.state.secondaryAdmin,
           market,
           baseMint,
           quoteMint,
@@ -1281,7 +1281,7 @@ export function initializeUnderlyingIx(
 
   return Exchange.program.instruction.initializeUnderlying(flexUnderlying, {
     accounts: {
-      admin: Exchange.state.admin,
+      admin: Exchange.state.secondaryAdmin,
       zetaProgram: Exchange.programId,
       state: Exchange.stateAddress,
       systemProgram: SystemProgram.programId,
@@ -1304,7 +1304,7 @@ export function initializePerpSyncQueueIx(
     toProgramAsset(asset),
     {
       accounts: {
-        admin: Exchange.state.admin,
+        admin: Exchange.state.secondaryAdmin,
         zetaProgram: Exchange.programId,
         state: Exchange.stateAddress,
         perpSyncQueue,
@@ -1528,7 +1528,7 @@ export function initializeZetaPricingIx(
       accounts: {
         state: Exchange.stateAddress,
         pricing: pricing,
-        admin: Exchange.state.admin,
+        admin: Exchange.state.secondaryAdmin,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         rent: SYSVAR_RENT_PUBKEY,
@@ -1544,7 +1544,7 @@ export function updateZetaPricingPubkeysIx(
     accounts: {
       state: Exchange.stateAddress,
       pricing: Exchange.pricingAddress,
-      admin: Exchange.state.admin,
+      admin: Exchange.state.secondaryAdmin,
     },
   });
 }
@@ -1652,7 +1652,7 @@ export function initializeMarketIndexesIx(
       accounts: {
         state: Exchange.stateAddress,
         marketIndexes: marketIndexes,
-        admin: Exchange.state.admin,
+        admin: Exchange.state.secondaryAdmin,
         systemProgram: SystemProgram.programId,
         pricing: Exchange.pricingAddress,
       },
@@ -2054,7 +2054,7 @@ export function toggleMarketMakerIx(
   return Exchange.program.instruction.toggleMarketMaker(isMarketMaker, {
     accounts: {
       state: Exchange.stateAddress,
-      admin: Exchange.state.admin,
+      admin: Exchange.state.secondaryAdmin,
       marginAccount: account,
     },
   });

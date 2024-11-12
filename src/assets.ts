@@ -70,6 +70,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.EIGEN) return "EIGEN";
   if (asset == Asset.DBR) return "DBR";
   if (asset == Asset.GOAT) return "GOAT";
+  if (asset == Asset.DRIFT) return "DRIFT";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -96,6 +97,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "EIGEN") return Asset.EIGEN;
   if (name == "DBR") return Asset.DBR;
   if (name == "GOAT") return Asset.GOAT;
+  if (name == "DRIFT") return Asset.DRIFT;
   return Asset.UNDEFINED;
 }
 
@@ -125,6 +127,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.EIGEN) return { eigen: {} };
   if (asset == Asset.DBR) return { dbr: {} };
   if (asset == Asset.GOAT) return { goat: {} };
+  if (asset == Asset.DRIFT) return { drift: {} };
   return { undefined: {} };
 }
 
@@ -191,6 +194,9 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { goat: {} })) {
     return Asset.GOAT;
+  }
+  if (objectEquals(asset, { drift: {} })) {
+    return Asset.DRIFT;
   }
   return Asset.UNDEFINED;
 }
@@ -260,6 +266,9 @@ export function assetToIndex(asset: Asset): number {
     case Asset.GOAT: {
       return 20;
     }
+    case Asset.DRIFT: {
+      return 21;
+    }
   }
   return 255; // Undefined is 255 onchain
 }
@@ -328,6 +337,9 @@ export function indexToAsset(index: number): Asset {
     }
     case 20: {
       return Asset.GOAT;
+    }
+    case 21: {
+      return Asset.DRIFT;
     }
   }
   return Asset.UNDEFINED;

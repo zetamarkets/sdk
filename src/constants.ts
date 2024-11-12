@@ -23,6 +23,7 @@ export enum Asset {
   EIGEN = "EIGEN",
   DBR = "DBR",
   GOAT = "GOAT",
+  DRIFT = "DRIFT",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -322,6 +323,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0xf788488fe2df341b10a498e0a789f03209c0938d9ed04bc521f8224748d6d236",
   [Asset.GOAT]:
     "0xf7731dc812590214d3eb4343bfb13d1b4cfa9b1d4e020644b5d5d8e07d60c66c",
+  [Asset.DRIFT]:
+    "0x5c1690b27bb02446db17cdda13ccc2c1d609ad6d2ef5bf4983a85ea8b6f19d07",
 };
 
 export const PYTH_PRICE_FEEDS = {
