@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.52.0]
+
+- New asset DRIFT. ([#426](https://github.com/zetamarkets/sdk/pull/426))
+
+## [1.51.0]
+
+- Skipped
+
 ## [1.50.0]
 
 - Remove -151 magic number from blockhash confirmation ([#425](https://github.com/zetamarkets/sdk/pull/425))
