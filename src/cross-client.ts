@@ -1089,7 +1089,11 @@ export class CrossClient {
   public async withdraw(amount: number): Promise<TransactionSignature> {
     this.delegatedCheck();
 
-    let tx = new Transaction();
+    let tx = new Transaction().add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 300_000,
+      })
+    );
     try {
       await this.usdcAccountCheck();
     } catch (e) {
@@ -2942,7 +2946,11 @@ export class CrossClient {
     liquidatedMarginAccount: PublicKey,
     size: number
   ): Promise<TransactionSignature> {
-    let tx = new Transaction();
+    let tx = new Transaction().add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: 300_000,
+      })
+    );
     let ix = instructions.liquidateV2Ix(
       asset,
       this._provider.wallet.publicKey,
