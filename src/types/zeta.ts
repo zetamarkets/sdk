@@ -7525,7 +7525,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -7534,7 +7534,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -7543,7 +7543,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -7552,7 +7552,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -7563,7 +7563,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                22
+                23
               ]
             }
           },
@@ -7574,7 +7574,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                3
+                2
               ]
             }
           },
@@ -7585,7 +7585,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                22
+                23
               ]
             }
           },
@@ -7596,7 +7596,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                3
+                2
               ]
             }
           },
@@ -7605,7 +7605,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -7614,7 +7614,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -7623,7 +7623,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -7632,7 +7632,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -7641,7 +7641,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -7650,7 +7650,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -7659,7 +7659,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -7668,7 +7668,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -7677,7 +7677,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -7686,7 +7686,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -7697,7 +7697,7 @@ export type Zeta = {
                 {
                   "defined": "PerpParameters"
                 },
-                22
+                23
               ]
             }
           },
@@ -7708,7 +7708,7 @@ export type Zeta = {
                 {
                   "defined": "PerpParameters"
                 },
-                3
+                2
               ]
             }
           },
@@ -7719,7 +7719,7 @@ export type Zeta = {
                 {
                   "defined": "MarginParameters"
                 },
-                22
+                23
               ]
             }
           },
@@ -7730,7 +7730,7 @@ export type Zeta = {
                 {
                   "defined": "MarginParameters"
                 },
-                3
+                2
               ]
             }
           },
@@ -7741,7 +7741,7 @@ export type Zeta = {
                 {
                   "defined": "Product"
                 },
-                22
+                23
               ]
             }
           },
@@ -7752,7 +7752,7 @@ export type Zeta = {
                 {
                   "defined": "Product"
                 },
-                3
+                2
               ]
             }
           },
@@ -7761,7 +7761,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -7770,7 +7770,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -7791,7 +7791,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "bool",
-                22
+                23
               ]
             }
           },
@@ -7800,7 +7800,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "bool",
-                3
+                2
               ]
             }
           },
@@ -8192,7 +8192,7 @@ export type Zeta = {
                 {
                   "defined": "HaltStateV2"
                 },
-                22
+                23
               ]
             }
           },
@@ -8203,7 +8203,7 @@ export type Zeta = {
                 {
                   "defined": "HaltStateV2"
                 },
-                3
+                2
               ]
             }
           },
@@ -8216,7 +8216,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u32",
-                22
+                23
               ]
             }
           },
@@ -8225,7 +8225,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u32",
-                3
+                2
               ]
             }
           },
@@ -8234,7 +8234,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u32",
-                22
+                23
               ]
             }
           },
@@ -8243,7 +8243,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u32",
-                3
+                2
               ]
             }
           },
@@ -8698,7 +8698,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                22
+                23
               ]
             }
           },
@@ -8707,7 +8707,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u8",
-                3
+                2
               ]
             }
           },
@@ -8722,7 +8722,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                22
+                23
               ]
             }
           },
@@ -8733,7 +8733,7 @@ export type Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                3
+                2
               ]
             }
           },
@@ -8744,7 +8744,7 @@ export type Zeta = {
                 {
                   "defined": "ProductLedger"
                 },
-                22
+                23
               ]
             }
           },
@@ -8755,7 +8755,7 @@ export type Zeta = {
                 {
                   "defined": "ProductLedger"
                 },
-                3
+                2
               ]
             }
           },
@@ -8772,7 +8772,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -8781,7 +8781,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -9565,7 +9565,7 @@ export type Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -19431,7 +19431,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -19440,7 +19440,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -19449,7 +19449,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -19458,7 +19458,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -19469,7 +19469,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                22
+                23
               ]
             }
           },
@@ -19480,7 +19480,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                3
+                2
               ]
             }
           },
@@ -19491,7 +19491,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                22
+                23
               ]
             }
           },
@@ -19502,7 +19502,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                3
+                2
               ]
             }
           },
@@ -19511,7 +19511,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -19520,7 +19520,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -19529,7 +19529,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -19538,7 +19538,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -19547,7 +19547,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -19556,7 +19556,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -19565,7 +19565,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -19574,7 +19574,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -19583,7 +19583,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -19592,7 +19592,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -19603,7 +19603,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "PerpParameters"
                 },
-                22
+                23
               ]
             }
           },
@@ -19614,7 +19614,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "PerpParameters"
                 },
-                3
+                2
               ]
             }
           },
@@ -19625,7 +19625,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "MarginParameters"
                 },
-                22
+                23
               ]
             }
           },
@@ -19636,7 +19636,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "MarginParameters"
                 },
-                3
+                2
               ]
             }
           },
@@ -19647,7 +19647,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "Product"
                 },
-                22
+                23
               ]
             }
           },
@@ -19658,7 +19658,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "Product"
                 },
-                3
+                2
               ]
             }
           },
@@ -19667,7 +19667,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                22
+                23
               ]
             }
           },
@@ -19676,7 +19676,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "publicKey",
-                3
+                2
               ]
             }
           },
@@ -19697,7 +19697,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "bool",
-                22
+                23
               ]
             }
           },
@@ -19706,7 +19706,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "bool",
-                3
+                2
               ]
             }
           },
@@ -20098,7 +20098,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "HaltStateV2"
                 },
-                22
+                23
               ]
             }
           },
@@ -20109,7 +20109,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "HaltStateV2"
                 },
-                3
+                2
               ]
             }
           },
@@ -20122,7 +20122,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u32",
-                22
+                23
               ]
             }
           },
@@ -20131,7 +20131,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u32",
-                3
+                2
               ]
             }
           },
@@ -20140,7 +20140,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u32",
-                22
+                23
               ]
             }
           },
@@ -20149,7 +20149,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u32",
-                3
+                2
               ]
             }
           },
@@ -20604,7 +20604,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                22
+                23
               ]
             }
           },
@@ -20613,7 +20613,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u8",
-                3
+                2
               ]
             }
           },
@@ -20628,7 +20628,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                22
+                23
               ]
             }
           },
@@ -20639,7 +20639,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "AnchorDecimal"
                 },
-                3
+                2
               ]
             }
           },
@@ -20650,7 +20650,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "ProductLedger"
                 },
-                22
+                23
               ]
             }
           },
@@ -20661,7 +20661,7 @@ export const IDL: Zeta = {
                 {
                   "defined": "ProductLedger"
                 },
-                3
+                2
               ]
             }
           },
@@ -20678,7 +20678,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },
@@ -20687,7 +20687,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                3
+                2
               ]
             }
           },
@@ -21471,7 +21471,7 @@ export const IDL: Zeta = {
             "type": {
               "array": [
                 "u64",
-                22
+                23
               ]
             }
           },

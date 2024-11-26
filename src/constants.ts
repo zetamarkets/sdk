@@ -24,6 +24,7 @@ export enum Asset {
   DBR = "DBR",
   GOAT = "GOAT",
   DRIFT = "DRIFT",
+  PNUT = "PNUT",
   UNDEFINED = "UNDEFINED",
 }
 
@@ -97,6 +98,7 @@ export const FLEX_MINTS = {
     [Asset.DRIFT]: new PublicKey(
       "2QavZSkiL69Y6hJAZeUGoBEhdg6LyboBjbVBQCuAuj8p"
     ),
+    [Asset.PNUT]: new PublicKey("Ft6X51KdMwQd6P7AEJkEZCFQoV2X6TtyZWjHGadg7A8f"),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
@@ -131,6 +133,7 @@ export const FLEX_MINTS = {
     [Asset.DRIFT]: new PublicKey(
       "Cn7SsBwWfRA9ciM4jYZmYdvxmovVmqXwSbrKbDdu9PSH"
     ),
+    [Asset.PNUT]: new PublicKey("CQvKapickUcQCo22vqgsEU7Ppxw8Z8AvQg38dk1K9ufR"),
   },
 };
 
@@ -331,6 +334,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0xf7731dc812590214d3eb4343bfb13d1b4cfa9b1d4e020644b5d5d8e07d60c66c",
   [Asset.DRIFT]:
     "0x5c1690b27bb02446db17cdda13ccc2c1d609ad6d2ef5bf4983a85ea8b6f19d07",
+  [Asset.PNUT]:
+    "0x116da895807f81f6b5c5f01b109376e7f6834dc8b51365ab7cdfa66634340e54",
 };
 
 export const PYTH_PRICE_FEEDS = {
@@ -365,6 +370,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.DRIFT]: new PublicKey(
       "9HVdzkm2qVWMhqGWCsXeUyGcxatpYrEDLesfyySvUnEJ"
     ),
+    [Asset.PNUT]: new PublicKey("CKEjnoaB8NhhLuNZctEh3DjzRug4XQ6njoKiBzPgwaPm"),
   },
   devnet: {
     [Asset.SOL]: new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"),
@@ -406,6 +412,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.DRIFT]: new PublicKey(
       "9iGAnDv9JbAfV5PUPif7mNu55FoBtJcysYWjfXPAy6ho"
     ),
+    [Asset.PNUT]: new PublicKey("8EWYFU21Gf1rVa93qbpvPxpnfCpRJ1URyXNcbP6EqLAY"),
   },
 };
 
@@ -430,8 +437,8 @@ export const ACTIVE_MARKETS = ACTIVE_EXPIRIES * PRODUCTS_PER_EXPIRY + 1; // +1 f
 export const TOTAL_EXPIRIES = 5;
 export const TOTAL_MARKETS = PRODUCTS_PER_EXPIRY * (TOTAL_EXPIRIES + 1);
 export const PERP_INDEX = TOTAL_MARKETS - 1;
-export const ACTIVE_PERP_MARKETS = 22;
-export const UNUSED_PERP_MARKETS = 3;
+export const ACTIVE_PERP_MARKETS = 23;
+export const UNUSED_PERP_MARKETS = 2;
 
 export const DEFAULT_EXCHANGE_POLL_INTERVAL = 10;
 export const DEFAULT_MARKET_POLL_INTERVAL = 5;
@@ -852,7 +859,7 @@ export const STATIC_AND_PERPS_LUT: {
       },
     }),
     new AddressLookupTableAccount({
-      // GOAT and DRIFT assets only
+      // GOAT, DRIFT and PNUT assets only
       key: new PublicKey("DHqBV5oWK8NgKRkBtn8wYg8vrCePjPEB9EEkX9Q2d5Ee"),
       state: {
         deactivationSlot: BigInt("18446744073709551615"),
