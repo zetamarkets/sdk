@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.54.0]
+
+- Drop maximum number of funding accounts. ([#428](https://github.com/zetamarkets/sdk/pull/428))
+
 ## [1.53.0]
 
 - Add extra CU to liquidate and withdraw ixs. ([#427](https://github.com/zetamarkets/sdk/pull/427))
