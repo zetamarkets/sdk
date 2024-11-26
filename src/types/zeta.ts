@@ -10324,6 +10324,9 @@ export type Zeta = {
             "name": "DRIFT"
           },
           {
+            "name": "PNUT"
+          },
+          {
             "name": "UNDEFINED"
           }
         ]
@@ -22225,6 +22228,9 @@ export const IDL: Zeta = {
           },
           {
             "name": "DRIFT"
+          },
+          {
+            "name": "PNUT"
           },
           {
             "name": "UNDEFINED"
