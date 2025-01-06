@@ -64,7 +64,6 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.DYM) return "DYM";
   if (asset == Asset.STRK) return "STRK";
   if (asset == Asset.WIF) return "WIF";
-  if (asset == Asset.RNDR) return "RNDR";
   if (asset == Asset.TNSR) return "TNSR";
   if (asset == Asset.POPCAT) return "POPCAT";
   if (asset == Asset.EIGEN) return "EIGEN";
@@ -92,7 +91,6 @@ export function nameToAsset(name: string): Asset {
   if (name == "DYM") return Asset.DYM;
   if (name == "STRK") return Asset.STRK;
   if (name == "WIF") return Asset.WIF;
-  if (name == "RNDR") return Asset.RNDR;
   if (name == "TNSR") return Asset.TNSR;
   if (name == "POPCAT") return Asset.POPCAT;
   if (name == "EIGEN") return Asset.EIGEN;
@@ -123,7 +121,6 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.DYM) return { dym: {} };
   if (asset == Asset.STRK) return { strk: {} };
   if (asset == Asset.WIF) return { wif: {} };
-  if (asset == Asset.RNDR) return { rndr: {} };
   if (asset == Asset.TNSR) return { tnsr: {} };
   if (asset == Asset.POPCAT) return { popcat: {} };
   if (asset == Asset.EIGEN) return { eigen: {} };
@@ -179,9 +176,6 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { wif: {} })) {
     return Asset.WIF;
-  }
-  if (objectEquals(asset, { rndr: {} })) {
-    return Asset.RNDR;
   }
   if (objectEquals(asset, { tnsr: {} })) {
     return Asset.TNSR;
@@ -254,9 +248,6 @@ export function assetToIndex(asset: Asset): number {
     case Asset.WIF: {
       return 14;
     }
-    case Asset.RNDR: {
-      return 15;
-    }
     case Asset.TNSR: {
       return 16;
     }
@@ -328,9 +319,6 @@ export function indexToAsset(index: number): Asset {
     }
     case 14: {
       return Asset.WIF;
-    }
-    case 15: {
-      return Asset.RNDR;
     }
     case 16: {
       return Asset.TNSR;
