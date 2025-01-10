@@ -98,6 +98,9 @@ export const FLEX_MINTS = {
       "2QavZSkiL69Y6hJAZeUGoBEhdg6LyboBjbVBQCuAuj8p"
     ),
     [Asset.PNUT]: new PublicKey("Ft6X51KdMwQd6P7AEJkEZCFQoV2X6TtyZWjHGadg7A8f"),
+    [Asset.PENGU]: new PublicKey(
+      "AjyLiag5iTcBvcEHPdHPL6JUxD3Cigg6KEEvrKRSNE5j"
+    ),
   },
   devnet: {
     [Asset.APT]: new PublicKey("FbfkphUHaAd7c27RqhzKBRAPX8T5AzFBH259sbGmNuvG"),
