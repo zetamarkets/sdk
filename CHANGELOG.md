@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.57.0]
+
+- New asset PENGU. ([#431](https://github.com/zetamarkets/sdk/pull/431))
+
 ## [1.56.0]
 
 - Remove RNDR from constants. ([#430](https://github.com/zetamarkets/sdk/pull/430))
