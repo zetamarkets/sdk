@@ -126,9 +126,6 @@ export class ZetaGroupMarkets {
 
     instance._market.bids = book.bids;
     instance._market.asks = book.asks;
-
-    instance._market.bids = book.bids;
-    instance._market.asks = book.asks;
     instance._market.updateOrderbook();
 
     return instance;
