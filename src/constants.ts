@@ -88,22 +88,22 @@ export const FLEX_MINTS = {
     [Asset.DYM]: new PublicKey("EgsE6WkPfaNT9iEDyrUmNb4C4jCaJ6BPC9wZsp6CdRFj"),
     [Asset.STRK]: new PublicKey("7dEBs64vVgs8Ws3DkK7cwxSMe9RzQ21pnYawXgFaxisp"),
     [Asset.WIF]: new PublicKey("BgDrDxc75EqPTXPUTCFMnYVYPeWK3CimPz2LGw4egsYc"),
-    [Asset.TNSR]: new PublicKey("58MFM7mjjYMc6GoK6QUu7HuUmsih8aL5MTHptPE29p8G"),
+    [Asset.TNSR]: new PublicKey("397Hd8iZXmzRf4jqCSuACtUUWeweYZRZ4DmgvVpMkHJf"),
     [Asset.POPCAT]: new PublicKey(
-      "wWmjLtKGmXqJnDFnyQtKX1ZNHoBs9JD6bVxNa47zJWr"
+      "58MFM7mjjYMc6GoK6QUu7HuUmsih8aL5MTHptPE29p8G"
     ),
-    [Asset.EIGEN]: new PublicKey("DHtEPob1XKiP5pVGXJNdxaesvMen38apDEFi2adNjiC"),
-    [Asset.DBR]: new PublicKey("Guk6JzRKssoagWHU62GUsdzF4JisJDaL2VNytMqTYW7U"),
-    [Asset.GOAT]: new PublicKey("CJo41KKsawgr45p7pcucwcPk9SpRQLpVzD7tsh74eFin"),
+    [Asset.EIGEN]: new PublicKey("wWmjLtKGmXqJnDFnyQtKX1ZNHoBs9JD6bVxNa47zJWr"),
+    [Asset.DBR]: new PublicKey("DHtEPob1XKiP5pVGXJNdxaesvMen38apDEFi2adNjiC"),
+    [Asset.GOAT]: new PublicKey("Guk6JzRKssoagWHU62GUsdzF4JisJDaL2VNytMqTYW7U"),
     [Asset.DRIFT]: new PublicKey(
-      "2QavZSkiL69Y6hJAZeUGoBEhdg6LyboBjbVBQCuAuj8p"
+      "CJo41KKsawgr45p7pcucwcPk9SpRQLpVzD7tsh74eFin"
     ),
-    [Asset.PNUT]: new PublicKey("Ft6X51KdMwQd6P7AEJkEZCFQoV2X6TtyZWjHGadg7A8f"),
+    [Asset.PNUT]: new PublicKey("2QavZSkiL69Y6hJAZeUGoBEhdg6LyboBjbVBQCuAuj8p"),
     [Asset.PENGU]: new PublicKey(
-      "AjyLiag5iTcBvcEHPdHPL6JUxD3Cigg6KEEvrKRSNE5j"
+      "Ft6X51KdMwQd6P7AEJkEZCFQoV2X6TtyZWjHGadg7A8f"
     ),
     [Asset.TRUMP]: new PublicKey(
-      "5e4cdcBUgqLthGDuj4FipeDWMsUZLjfasJC2nRfiPXxG"
+      "AjyLiag5iTcBvcEHPdHPL6JUxD3Cigg6KEEvrKRSNE5j"
     ),
   },
   devnet: {
