@@ -72,6 +72,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.DRIFT) return "DRIFT";
   if (asset == Asset.PNUT) return "PNUT";
   if (asset == Asset.PENGU) return "PENGU";
+  if (asset == Asset.TRUMP) return "TRUMP";
   if (asset == null) return null; // Some things, like clock callbacks, are for all assets and return asset=null
   return "UNDEFINED";
 }
@@ -100,6 +101,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "DRIFT") return Asset.DRIFT;
   if (name == "PNUT") return Asset.PNUT;
   if (name == "PENGU") return Asset.PENGU;
+  if (name == "TRUMP") return Asset.TRUMP;
   return Asset.UNDEFINED;
 }
 
@@ -131,6 +133,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.DRIFT) return { drift: {} };
   if (asset == Asset.PNUT) return { pnut: {} };
   if (asset == Asset.PENGU) return { pengu: {} };
+  if (asset == Asset.TRUMP) return { trump: {} };
   return { undefined: {} };
 }
 
@@ -203,6 +206,9 @@ export function fromProgramAsset(asset: any): Asset {
   }
   if (objectEquals(asset, { pengu: {} })) {
     return Asset.PENGU;
+  }
+  if (objectEquals(asset, { trump: {} })) {
+    return Asset.TRUMP;
   }
   return Asset.UNDEFINED;
 }
@@ -278,6 +284,9 @@ export function assetToIndex(asset: Asset): number {
     case Asset.PENGU: {
       return 23;
     }
+    case Asset.TRUMP: {
+      return 24;
+    }
   }
   return 255; // Undefined is 255 onchain
 }
@@ -352,6 +361,9 @@ export function indexToAsset(index: number): Asset {
     }
     case 23: {
       return Asset.PENGU;
+    }
+    case 24: {
+      return Asset.TRUMP;
     }
   }
   return Asset.UNDEFINED;
