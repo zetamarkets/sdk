@@ -40,7 +40,7 @@ export function allAssets(network: Network = Network.MAINNET): Asset[] {
       constants.Asset.ARB,
       constants.Asset.APT,
       constants.Asset.PYTH,
-      constants.Asset.BNB,
+      constants.Asset.BERA,
       constants.Asset.TIA,
     ];
   }
@@ -54,7 +54,7 @@ export function assetToName(asset: Asset): string | null {
   if (asset == Asset.ETH) return "ETH";
   if (asset == Asset.APT) return "APT";
   if (asset == Asset.ARB) return "ARB";
-  if (asset == Asset.BNB) return "BNB";
+  if (asset == Asset.BERA) return "BERA";
   if (asset == Asset.PYTH) return "PYTH";
   if (asset == Asset.TIA) return "TIA";
   if (asset == Asset.JTO) return "JTO";
@@ -83,7 +83,7 @@ export function nameToAsset(name: string): Asset {
   if (name == "ETH") return Asset.ETH;
   if (name == "APT") return Asset.APT;
   if (name == "ARB") return Asset.ARB;
-  if (name == "BNB") return Asset.BNB;
+  if (name == "BERA") return Asset.BERA;
   if (name == "PYTH") return Asset.PYTH;
   if (name == "TIA") return Asset.TIA;
   if (name == "JTO") return Asset.JTO;
@@ -115,7 +115,7 @@ export function toProgramAsset(asset: Asset): any {
   if (asset == Asset.ETH) return { eth: {} };
   if (asset == Asset.APT) return { apt: {} };
   if (asset == Asset.ARB) return { arb: {} };
-  if (asset == Asset.BNB) return { bnb: {} };
+  if (asset == Asset.BERA) return { bera: {} };
   if (asset == Asset.PYTH) return { pyth: {} };
   if (asset == Asset.TIA) return { tia: {} };
   if (asset == Asset.JTO) return { jto: {} };
@@ -153,8 +153,8 @@ export function fromProgramAsset(asset: any): Asset {
   if (objectEquals(asset, { arb: {} })) {
     return Asset.ARB;
   }
-  if (objectEquals(asset, { bnb: {} })) {
-    return Asset.BNB;
+  if (objectEquals(asset, { bera: {} })) {
+    return Asset.BERA;
   }
   if (objectEquals(asset, { pyth: {} })) {
     return Asset.PYTH;
@@ -230,7 +230,7 @@ export function assetToIndex(asset: Asset): number {
     case Asset.ARB: {
       return 4;
     }
-    case Asset.BNB: {
+    case Asset.BERA: {
       return 5;
     }
     case Asset.PYTH: {
@@ -309,7 +309,7 @@ export function indexToAsset(index: number): Asset {
       return Asset.ARB;
     }
     case 5: {
-      return Asset.BNB;
+      return Asset.BERA;
     }
     case 6: {
       return Asset.PYTH;

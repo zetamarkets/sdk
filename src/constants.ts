@@ -7,7 +7,7 @@ export enum Asset {
   ETH = "ETH",
   APT = "APT",
   ARB = "ARB",
-  BNB = "BNB",
+  BERA = "BERA",
   PYTH = "PYTH",
   TIA = "TIA",
   JTO = "JTO",
@@ -69,7 +69,7 @@ export const MINTS = {
   [Asset.SOL]: new PublicKey("So11111111111111111111111111111111111111112"),
   [Asset.BTC]: new PublicKey("qfnqNqs3nCAHjnyCgLRDbBtq4p2MtHZxw8YjSyYhPoL"),
   [Asset.ETH]: new PublicKey("FeGn77dhg1KXRRFeSwwMiykZnZPw5JXW6naf2aQgZDQf"),
-  [Asset.BNB]: new PublicKey("9gP2kCy3wA1ctvYWQk75guqXuHfrEomqydHLtcTCqiLa"),
+  [Asset.BERA]: new PublicKey("9gP2kCy3wA1ctvYWQk75guqXuHfrEomqydHLtcTCqiLa"),
 };
 
 // These are generated flexible PDAs and aren't reflective of an spl token mint.
@@ -155,7 +155,7 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["8Ccch7LW5hd5j2NW8HdhUbDqB1yUN4dULVMNNHtfbPbV"]: Asset.ETH,
     ["5QyPHfnRttz4Tq7W7U5XEpKpvj7g3FTvMpE1BzL9w2Qi"]: Asset.APT,
     ["4fecsFCi8Tx4aFxvc8rAYT74RBmknQ3kqidZTejoqiw7"]: Asset.ARB,
-    ["BAyFQXp7JBc26ZxMNBdzSjVDtEjQFXkcu7FYVniQFgyK"]: Asset.BNB,
+    ["BAyFQXp7JBc26ZxMNBdzSjVDtEjQFXkcu7FYVniQFgyK"]: Asset.BERA,
     ["HzEPLf1xmHdGjrbHG2WjfvEfU8AgcLudQyReVrWyZWB8"]: Asset.PYTH,
     ["9diwAsKMFYaAey7enhAWcWbyLgZ5XRALaukUhbcGytgm"]: Asset.TIA,
   },
@@ -165,7 +165,7 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["8Ccch7LW5hd5j2NW8HdhUbDqB1yUN4dULVMNNHtfbPbV"]: Asset.ETH,
     ["5QyPHfnRttz4Tq7W7U5XEpKpvj7g3FTvMpE1BzL9w2Qi"]: Asset.APT,
     ["4fecsFCi8Tx4aFxvc8rAYT74RBmknQ3kqidZTejoqiw7"]: Asset.ARB,
-    ["BAyFQXp7JBc26ZxMNBdzSjVDtEjQFXkcu7FYVniQFgyK"]: Asset.BNB,
+    ["BAyFQXp7JBc26ZxMNBdzSjVDtEjQFXkcu7FYVniQFgyK"]: Asset.BERA,
     ["HzEPLf1xmHdGjrbHG2WjfvEfU8AgcLudQyReVrWyZWB8"]: Asset.PYTH,
     ["9diwAsKMFYaAey7enhAWcWbyLgZ5XRALaukUhbcGytgm"]: Asset.TIA,
   },
@@ -175,7 +175,7 @@ export const ZETAGROUP_PUBKEY_ASSET_MAP = {
     ["HPnqfiRSVvuBjfHN9ah4Kecb6J9et2UTnNgUwtAJdV26"]: Asset.ETH,
     ["D19K6rrppbWAFa4jE1DJUStPnr7cSrqKk5TruGqfc5Ns"]: Asset.APT,
     ["CU6pPA2E2yQFqMzZKrFCmfjrSBEc6GxfmFrSqpqazygu"]: Asset.ARB,
-    ["83vVPH4DaUxsi7otAK3yr8atUebbBxHQfHA6CLyzcDiW"]: Asset.BNB,
+    ["83vVPH4DaUxsi7otAK3yr8atUebbBxHQfHA6CLyzcDiW"]: Asset.BERA,
     ["2JRRckcZK4pRCMpLXtG9TkDw4QxJNiwwjs8BG6b5piFy"]: Asset.PYTH,
     ["3gbBUKLs2Xm4KKRemwFNxSWmNRMohXwKtV8Yj1PNBUeD"]: Asset.TIA,
     ["Ddvq1YADoRuL4ATP4ThE9NWwsBSegb4XHd9C6jmUecQy"]: Asset.JTO,
@@ -306,8 +306,8 @@ export const PYTHNET_PRICE_FEED_IDS = {
     "0x03ae4db29ed4ae33d323568895aa00337e658e348b37509f5372ae51f0af00d5",
   [Asset.ARB]:
     "0x3fa4252848f9f0a1480be62745a4629d9eb1322aebab8a791e344b3b9c1adcf5",
-  [Asset.BNB]:
-    "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f",
+  [Asset.BERA]:
+    "0x962088abcfdbdb6e30db2e340c8cf887d9efb311b1f2f17b155a63dbb6d40265",
   // Pyth sponsored
   [Asset.PYTH]:
     "0x0bbf28e9a841a1cc788f6a361b17ca072d0ea3098a1e5df1c3922d06719579ff",
@@ -358,7 +358,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ETH]: new PublicKey("4L2jLMAy8L7BbHKuaPoH7M7sxdYF9wE7B655WR5dTevM"),
     [Asset.APT]: new PublicKey("64nz875oGiwcDCx9RuwUjj188hBWPP4GRdJvYk6hrgay"),
     [Asset.ARB]: new PublicKey("APN6KouMoYPF3rR8KxSmWCWQwEW8PykMVpyTAPdLogk4"),
-    [Asset.BNB]: new PublicKey("27xFcQmxoHoqpuMcZdwVMCwrrmZAFwN3QEuwtxskR1Lc"),
+    [Asset.BERA]: new PublicKey("27xFcQmxoHoqpuMcZdwVMCwrrmZAFwN3QEuwtxskR1Lc"),
     [Asset.PYTH]: new PublicKey("5kkS7RmNdcECCMcgJ4gz4sCSFqnFozQeSNb3YhtZrhYx"),
     [Asset.TIA]: new PublicKey("FwZ5ZzkcWseaCKcu5iVWT5Ru29FDReARyiA6BaSSB5RH"),
     [Asset.JTO]: new PublicKey("EZg2yWshcvHikVk6KDw6vEsbbPtKPfTx537Fz4hhSmsc"),
@@ -394,7 +394,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ETH]: new PublicKey("EdVCmQ9FSPcVe5YySXDPCRmc8aDQLKJ9xvYBMZPie1Vw"),
     [Asset.APT]: new PublicKey("5d2QJ6u2NveZufmJ4noHja5EHs3Bv1DUMPLG5xfasSVs"),
     [Asset.ARB]: new PublicKey("4mRGHzjGerQNWKXyQAmr9kWqb9saPPHKqo1xziXGQ5Dh"),
-    [Asset.BNB]: new PublicKey("GwzBgrXb4PG59zjce24SF2b9JXbLEjJJTBkmytuEZj1b"),
+    [Asset.BERA]: new PublicKey("GwzBgrXb4PG59zjce24SF2b9JXbLEjJJTBkmytuEZj1b"),
     [Asset.PYTH]: new PublicKey("ELF78ZhSr8u4SCixA7YSpjdZHZoSNrAhcyysbavpC2kA"),
     [Asset.TIA]: new PublicKey("4GiL1Y6u6JkPb7ckakzJgc414h6P7qoYnEKFcd1YtSB9"),
   },
@@ -405,7 +405,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ETH]: new PublicKey("42amVS4KgzR9rA28tkVYqVXjq9Qa8dcZQMbH5EYFX6XC"),
     [Asset.APT]: new PublicKey("9oR3Uh2zsp1CxLdsuFrg3QhY2eZ2e5eLjDgDfZ6oG2ev"),
     [Asset.ARB]: new PublicKey("36XiLSLUq1trLrK5ApwWs6LvozCjyTVgpr2uSAF3trF1"),
-    [Asset.BNB]: new PublicKey("A3qp5QG9xGeJR1gexbW9b9eMMsMDLzx3rhud9SnNhwb4"),
+    [Asset.BERA]: new PublicKey("Ghby4XwpWnkmBnZ7a1SgBrwy2gEZE9P8HAWkHLUu6CDX"),
     [Asset.PYTH]: new PublicKey("8vjchtMuJNY4oFQdTi8yCe6mhCaNBFaUbktT482TpLPS"),
     [Asset.TIA]: new PublicKey("6HpM5WSg4PCS4iAD13iSbcG4RbFErLS3pyC5qgtjqxqF"),
     [Asset.JTO]: new PublicKey("7ajR2zA4MGMMTqRAVjghTKqPPn4kbrj3pYkAVRVwTGzP"),

@@ -1538,7 +1538,7 @@ export function initializeZetaPricingIx(
 }
 
 export function updateZetaPricingPubkeysIx(
-  args: UpdateZetaPricingPubkeysArgs
+  args: UpdateZetaPricingPubkeysArgs,
 ): TransactionInstruction {
   return Exchange.program.instruction.updateZetaPricingPubkeys(args, {
     accounts: {
@@ -2268,6 +2268,7 @@ export interface UpdateZetaPricingPubkeysArgs {
   market: PublicKey;
   perpSyncQueue: PublicKey;
   zetaGroupKey: PublicKey;
+  resetOracle: boolean;
 }
 
 export interface OrderArgs {

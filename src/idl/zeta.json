@@ -10110,6 +10110,10 @@
           {
             "name": "zetaGroupKey",
             "type": "publicKey"
+          },
+          {
+            "name": "resetOracle",
+            "type": "bool"
           }
         ]
       }
@@ -10273,7 +10277,7 @@
             "name": "ARB"
           },
           {
-            "name": "BNB"
+            "name": "BERA"
           },
           {
             "name": "PYTH"
