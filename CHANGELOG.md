@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.60.0]
+
+- Fix oracle constant in constants.ts. ([#435](https://github.com/zetamarkets/sdk/pull/435))
+
 ## [1.59.0]
 
 - Swap BNB (delisted) for BERA. ([#435](https://github.com/zetamarkets/sdk/pull/435))
