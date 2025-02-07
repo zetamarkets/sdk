@@ -10110,6 +10110,10 @@
           {
             "name": "zetaGroupKey",
             "type": "publicKey"
+          },
+          {
+            "name": "resetOracle",
+            "type": "bool"
           }
         ]
       }

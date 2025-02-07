@@ -10110,6 +10110,10 @@ export type Zeta = {
           {
             "name": "zetaGroupKey",
             "type": "publicKey"
+          },
+          {
+            "name": "resetOracle",
+            "type": "bool"
           }
         ]
       }
@@ -22022,6 +22026,10 @@ export const IDL: Zeta = {
           {
             "name": "zetaGroupKey",
             "type": "publicKey"
+          },
+          {
+            "name": "resetOracle",
+            "type": "bool"
           }
         ]
       }
