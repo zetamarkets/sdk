@@ -10273,7 +10273,7 @@ export type Zeta = {
             "name": "ARB"
           },
           {
-            "name": "BNB"
+            "name": "BERA"
           },
           {
             "name": "PYTH"
@@ -22185,7 +22185,7 @@ export const IDL: Zeta = {
             "name": "ARB"
           },
           {
-            "name": "BNB"
+            "name": "BERA"
           },
           {
             "name": "PYTH"
