@@ -405,7 +405,7 @@ export const PYTH_PRICE_FEEDS = {
     [Asset.ETH]: new PublicKey("42amVS4KgzR9rA28tkVYqVXjq9Qa8dcZQMbH5EYFX6XC"),
     [Asset.APT]: new PublicKey("9oR3Uh2zsp1CxLdsuFrg3QhY2eZ2e5eLjDgDfZ6oG2ev"),
     [Asset.ARB]: new PublicKey("36XiLSLUq1trLrK5ApwWs6LvozCjyTVgpr2uSAF3trF1"),
-    [Asset.BERA]: new PublicKey("A3qp5QG9xGeJR1gexbW9b9eMMsMDLzx3rhud9SnNhwb4"),
+    [Asset.BERA]: new PublicKey("Ghby4XwpWnkmBnZ7a1SgBrwy2gEZE9P8HAWkHLUu6CDX"),
     [Asset.PYTH]: new PublicKey("8vjchtMuJNY4oFQdTi8yCe6mhCaNBFaUbktT482TpLPS"),
     [Asset.TIA]: new PublicKey("6HpM5WSg4PCS4iAD13iSbcG4RbFErLS3pyC5qgtjqxqF"),
     [Asset.JTO]: new PublicKey("7ajR2zA4MGMMTqRAVjghTKqPPn4kbrj3pYkAVRVwTGzP"),
