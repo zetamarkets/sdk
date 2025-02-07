@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 Version changes are pinned to SDK releases.
 
+## [1.59.0]
+
+- Swap BNB (delisted) for BERA. ([#435](https://github.com/zetamarkets/sdk/pull/435))
+
 ## [1.58.0]
 
 - New asset TRUMP. ([#433](https://github.com/zetamarkets/sdk/pull/433))
