@@ -1151,6 +1151,32 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "updateTreasurySplitWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "treasurySplitWallet",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "treasurySplitPercentage",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "updateMakerRebatePercentage",
       "accounts": [
         {
@@ -8268,11 +8294,19 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "treasurySplitWallet",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasurySplitPercentage",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                18
+                185
               ]
             }
           }
@@ -13067,6 +13101,32 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "updateTreasurySplitWallet",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "treasurySplitWallet",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "treasurySplitPercentage",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "updateMakerRebatePercentage",
       "accounts": [
         {
@@ -20184,11 +20244,19 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
+            "name": "treasurySplitWallet",
+            "type": "publicKey"
+          },
+          {
+            "name": "treasurySplitPercentage",
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                18
+                185
               ]
             }
           }
