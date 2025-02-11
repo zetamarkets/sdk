@@ -7086,6 +7086,47 @@ export type Zeta = {
       "args": []
     },
     {
+      "name": "rebalanceInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasurySplitWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "liquidateV2",
       "accounts": [
         {
@@ -11944,6 +11985,11 @@ export type Zeta = {
       "code": 6174,
       "name": "WithdrawOnlyAccount",
       "msg": "Account is restricted, only withdrawals are allowed"
+    },
+    {
+      "code": 6175,
+      "name": "InvalidTreasurySplitWallet",
+      "msg": "Invalid treasury split wallet"
     }
   ]
 };
@@ -19036,6 +19082,47 @@ export const IDL: Zeta = {
       "args": []
     },
     {
+      "name": "rebalanceInsuranceVaultV2",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "zetaVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "insuranceVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasurySplitWallet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "socializedLossAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "liquidateV2",
       "accounts": [
         {
@@ -23894,6 +23981,11 @@ export const IDL: Zeta = {
       "code": 6174,
       "name": "WithdrawOnlyAccount",
       "msg": "Account is restricted, only withdrawals are allowed"
+    },
+    {
+      "code": 6175,
+      "name": "InvalidTreasurySplitWallet",
+      "msg": "Invalid treasury split wallet"
     }
   ]
 };
