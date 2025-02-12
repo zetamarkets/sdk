@@ -536,14 +536,14 @@ export class Exchange {
     this._combinedSocializedLossAccountAddress = account;
   }
 
-  public async updateTreasurySplitWallet(
-    treasurySplitWallet: PublicKey,
+  public async updateTreasurySplitTokenAccount(
+    treasurySplitTokenAccount: PublicKey,
     treasurySplitPercentage: number,
     admin: PublicKey
   ) {
     let tx = new Transaction().add(
-      instructions.updateTreasurySplitWalletIx(
-        treasurySplitWallet,
+      instructions.updateTreasurySplitTokenAccountIx(
+        treasurySplitTokenAccount,
         treasurySplitPercentage,
         admin
       )
@@ -551,7 +551,7 @@ export class Exchange {
     try {
       await utils.processTransaction(this._provider, tx);
     } catch (e) {
-      console.error(`updateTreasurySplitWallet failed: ${e}`);
+      console.error(`updateTreasurySplitTokenAccount failed: ${e}`);
     }
   }
 

@@ -1360,7 +1360,7 @@ export function rebalanceInsuranceVaultIx(
       zetaVault: Exchange.combinedVaultAddress,
       insuranceVault: Exchange.combinedInsuranceVaultAddress,
       treasuryWallet: Exchange.treasuryWalletAddress,
-      treasurySplitWallet: Exchange.state.treasurySplitWallet,
+      treasurySplitTokenAccount: Exchange.state.treasurySplitTokenAccount,
       socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
@@ -1475,18 +1475,18 @@ export function applyPerpFundingIx(
   });
 }
 
-export function updateTreasurySplitWalletIx(
-  treasurySplitWallet: PublicKey,
+export function updateTreasurySplitTokenAccountIx(
+  treasurySplitTokenAccount: PublicKey,
   treasurySplitPercentage: number,
   admin: PublicKey
 ): TransactionInstruction {
-  return Exchange.program.instruction.updateTreasurySplitWallet(
+  return Exchange.program.instruction.updateTreasurySplitTokenAccount(
     treasurySplitPercentage,
     {
       accounts: {
         state: Exchange.stateAddress,
         admin,
-        treasurySplitWallet,
+        treasurySplitTokenAccount,
       },
     }
   );

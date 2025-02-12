@@ -1151,7 +1151,7 @@
       "args": []
     },
     {
-      "name": "updateTreasurySplitWallet",
+      "name": "updateTreasurySplitTokenAccount",
       "accounts": [
         {
           "name": "state",
@@ -1164,7 +1164,7 @@
           "isSigner": true
         },
         {
-          "name": "treasurySplitWallet",
+          "name": "treasurySplitTokenAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -7109,7 +7109,7 @@
           "isSigner": false
         },
         {
-          "name": "treasurySplitWallet",
+          "name": "treasurySplitTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -8335,7 +8335,7 @@
             "type": "publicKey"
           },
           {
-            "name": "treasurySplitWallet",
+            "name": "treasurySplitTokenAccount",
             "type": "publicKey"
           },
           {
@@ -11988,8 +11988,8 @@
     },
     {
       "code": 6175,
-      "name": "InvalidTreasurySplitWallet",
-      "msg": "Invalid treasury split wallet"
+      "name": "InvalidTreasurySplitTokenAccount",
+      "msg": "Invalid treasury split token account"
     }
   ]
 }

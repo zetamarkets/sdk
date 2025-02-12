@@ -1151,7 +1151,7 @@ export type Zeta = {
       "args": []
     },
     {
-      "name": "updateTreasurySplitWallet",
+      "name": "updateTreasurySplitTokenAccount",
       "accounts": [
         {
           "name": "state",
@@ -1164,7 +1164,7 @@ export type Zeta = {
           "isSigner": true
         },
         {
-          "name": "treasurySplitWallet",
+          "name": "treasurySplitTokenAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -7109,7 +7109,7 @@ export type Zeta = {
           "isSigner": false
         },
         {
-          "name": "treasurySplitWallet",
+          "name": "treasurySplitTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -8335,7 +8335,7 @@ export type Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "treasurySplitWallet",
+            "name": "treasurySplitTokenAccount",
             "type": "publicKey"
           },
           {
@@ -11988,8 +11988,8 @@ export type Zeta = {
     },
     {
       "code": 6175,
-      "name": "InvalidTreasurySplitWallet",
-      "msg": "Invalid treasury split wallet"
+      "name": "InvalidTreasurySplitTokenAccount",
+      "msg": "Invalid treasury split token account"
     }
   ]
 };
@@ -13147,7 +13147,7 @@ export const IDL: Zeta = {
       "args": []
     },
     {
-      "name": "updateTreasurySplitWallet",
+      "name": "updateTreasurySplitTokenAccount",
       "accounts": [
         {
           "name": "state",
@@ -13160,7 +13160,7 @@ export const IDL: Zeta = {
           "isSigner": true
         },
         {
-          "name": "treasurySplitWallet",
+          "name": "treasurySplitTokenAccount",
           "isMut": false,
           "isSigner": false
         }
@@ -19105,7 +19105,7 @@ export const IDL: Zeta = {
           "isSigner": false
         },
         {
-          "name": "treasurySplitWallet",
+          "name": "treasurySplitTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -20331,7 +20331,7 @@ export const IDL: Zeta = {
             "type": "publicKey"
           },
           {
-            "name": "treasurySplitWallet",
+            "name": "treasurySplitTokenAccount",
             "type": "publicKey"
           },
           {
@@ -23984,8 +23984,8 @@ export const IDL: Zeta = {
     },
     {
       "code": 6175,
-      "name": "InvalidTreasurySplitWallet",
-      "msg": "Invalid treasury split wallet"
+      "name": "InvalidTreasurySplitTokenAccount",
+      "msg": "Invalid treasury split token account"
     }
   ]
 };
