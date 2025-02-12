@@ -1354,12 +1354,13 @@ export function treasuryMovementIx(
 export function rebalanceInsuranceVaultIx(
   remainingAccounts: any[]
 ): TransactionInstruction {
-  return Exchange.program.instruction.rebalanceInsuranceVault({
+  return Exchange.program.instruction.rebalanceInsuranceVaultV2({
     accounts: {
       state: Exchange.stateAddress,
       zetaVault: Exchange.combinedVaultAddress,
       insuranceVault: Exchange.combinedInsuranceVaultAddress,
       treasuryWallet: Exchange.treasuryWalletAddress,
+      treasurySplitTokenAccount: Exchange.state.treasurySplitTokenAccount,
       socializedLossAccount: Exchange.combinedSocializedLossAccountAddress,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
@@ -1474,6 +1475,23 @@ export function applyPerpFundingIx(
   });
 }
 
+export function updateTreasurySplitTokenAccountIx(
+  treasurySplitTokenAccount: PublicKey,
+  treasurySplitPercentage: number,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.updateTreasurySplitTokenAccount(
+    treasurySplitPercentage,
+    {
+      accounts: {
+        state: Exchange.stateAddress,
+        admin,
+        treasurySplitTokenAccount,
+      },
+    }
+  );
+}
+
 export function updateMarginParametersIx(
   asset: Asset,
   args: UpdateMarginParametersArgs,
@@ -1538,7 +1556,7 @@ export function initializeZetaPricingIx(
 }
 
 export function updateZetaPricingPubkeysIx(
-  args: UpdateZetaPricingPubkeysArgs,
+  args: UpdateZetaPricingPubkeysArgs
 ): TransactionInstruction {
   return Exchange.program.instruction.updateZetaPricingPubkeys(args, {
     accounts: {
