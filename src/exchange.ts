@@ -536,6 +536,25 @@ export class Exchange {
     this._combinedSocializedLossAccountAddress = account;
   }
 
+  public async updateTreasurySplitTokenAccount(
+    treasurySplitTokenAccount: PublicKey,
+    treasurySplitPercentage: number,
+    admin: PublicKey
+  ) {
+    let tx = new Transaction().add(
+      instructions.updateTreasurySplitTokenAccountIx(
+        treasurySplitTokenAccount,
+        treasurySplitPercentage,
+        admin
+      )
+    );
+    try {
+      await utils.processTransaction(this._provider, tx);
+    } catch (e) {
+      console.error(`updateTreasurySplitTokenAccount failed: ${e}`);
+    }
+  }
+
   public async initializeZetaState(
     params: instructions.StateParams,
     referralAdmin: PublicKey,
@@ -1154,7 +1173,7 @@ export class Exchange {
         market,
         perpSyncQueue,
         zetaGroupKey,
-        resetOracle: false
+        resetOracle: false,
       })
     );
     await utils.processTransaction(this.provider, tx);

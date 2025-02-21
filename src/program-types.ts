@@ -43,6 +43,8 @@ export interface State {
   nativeMakerRebatePercentage: anchor.BN;
   maTypeAdmin: PublicKey;
   pricingAdmin: PublicKey;
+  treasurySplitTokenAccount: PublicKey;
+  treasurySplitPercentage: number;
   padding: Array<number>;
 }
 
