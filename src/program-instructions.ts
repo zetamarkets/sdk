@@ -1331,6 +1331,22 @@ export function collectTreasuryFundsIx(
   });
 }
 
+export function collectVaultFundsIx(
+  collectionTokenAccount: PublicKey,
+  amount: anchor.BN,
+  admin: PublicKey
+): TransactionInstruction {
+  return Exchange.program.instruction.collectVaultFunds(amount, {
+    accounts: {
+      state: Exchange.stateAddress,
+      vault: Exchange.combinedVaultAddress,
+      collectionTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      admin,
+    },
+  });
+}
+
 export function treasuryMovementIx(
   treasuryMovementType: types.TreasuryMovementType,
   amount: anchor.BN
