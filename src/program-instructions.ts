@@ -127,6 +127,9 @@ export function closeCrossMarginAccountManagerIx(
     accounts: {
       crossMarginAccountManager,
       authority: userKey,
+      admin: Exchange.state.admin,
+      pricingAdmin: Exchange.state.pricingAdmin,
+      state: Exchange.stateAddress,
     },
   });
 }
@@ -158,6 +161,9 @@ export function closeCrossMarginAccountIx(
       crossMarginAccount,
       crossMarginAccountManager,
       authority: userKey,
+      admin: Exchange.state.admin,
+      pricingAdmin: Exchange.state.pricingAdmin,
+      state: Exchange.stateAddress,
     },
   });
 }
@@ -172,6 +178,9 @@ export function closeMarginAccountIx(
       marginAccount,
       authority: userKey,
       zetaGroup: Exchange.getZetaGroupAddress(asset),
+      admin: Exchange.state.admin,
+      pricingAdmin: Exchange.state.pricingAdmin,
+      state: Exchange.stateAddress,
     },
   });
 }
@@ -463,6 +472,8 @@ export function closeOpenOrdersV4Ix(
         serumAuthority: Exchange.serumAuthority,
         openOrdersMap,
         eventQueue: market.serumMarket.eventQueueAddress,
+        admin: Exchange.state.admin,
+        pricingAdmin: Exchange.state.pricingAdmin,
       },
     }
   );
@@ -1965,6 +1976,9 @@ export function closeReferrerAccountsIx(
       authority: user,
       referrerIdAccount,
       referrerPubkeyAccount,
+      admin: Exchange.state.admin,
+      pricingAdmin: Exchange.state.pricingAdmin,
+      state: Exchange.stateAddress,
     },
   });
 }
