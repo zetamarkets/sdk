@@ -500,6 +500,8 @@ export function closeOpenOrdersV2Ix(
       market: market,
       serumAuthority: Exchange.serumAuthority,
       openOrdersMap,
+      admin: Exchange.state.admin,
+      pricingAdmin: Exchange.state.pricingAdmin,
     },
   });
 }

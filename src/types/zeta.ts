@@ -516,7 +516,7 @@ export type Zeta = {
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
@@ -2867,8 +2867,8 @@ export type Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "market",
@@ -2884,6 +2884,16 @@ export type Zeta = {
           "name": "openOrdersMap",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -2923,7 +2933,7 @@ export type Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -12638,7 +12648,7 @@ export const IDL: Zeta = {
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
@@ -14989,8 +14999,8 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "market",
@@ -15006,6 +15016,16 @@ export const IDL: Zeta = {
           "name": "openOrdersMap",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -15045,7 +15065,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {

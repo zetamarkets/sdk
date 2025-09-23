@@ -516,7 +516,7 @@
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
@@ -2867,8 +2867,8 @@
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "market",
@@ -2884,6 +2884,16 @@
           "name": "openOrdersMap",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -2923,7 +2933,7 @@
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
