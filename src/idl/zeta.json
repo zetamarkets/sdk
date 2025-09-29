@@ -443,7 +443,22 @@
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -464,7 +479,22 @@
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -485,11 +515,26 @@
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -506,11 +551,26 @@
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
           "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -2807,8 +2867,8 @@
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "market",
@@ -2824,6 +2884,16 @@
           "name": "openOrdersMap",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -2863,7 +2933,7 @@
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -2947,6 +3017,16 @@
           "name": "eventQueue",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -7003,6 +7083,42 @@
       ]
     },
     {
+      "name": "collectVaultFunds",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "treasuryMovement",
       "accounts": [
         {
@@ -7505,8 +7621,23 @@
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -11990,6 +12121,11 @@
       "code": 6175,
       "name": "InvalidTreasurySplitTokenAccount",
       "msg": "Invalid treasury split token account"
+    },
+    {
+      "code": 6176,
+      "name": "InvalidReferrerRemainingAccounts",
+      "msg": "Invalid referrer remaining accounts"
     }
   ]
 }

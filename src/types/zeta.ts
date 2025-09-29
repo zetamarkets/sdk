@@ -443,7 +443,22 @@ export type Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -464,7 +479,22 @@ export type Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -485,11 +515,26 @@ export type Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -506,11 +551,26 @@ export type Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
           "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -2807,8 +2867,8 @@ export type Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "market",
@@ -2824,6 +2884,16 @@ export type Zeta = {
           "name": "openOrdersMap",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -2863,7 +2933,7 @@ export type Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -2947,6 +3017,16 @@ export type Zeta = {
           "name": "eventQueue",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -7003,6 +7083,42 @@ export type Zeta = {
       ]
     },
     {
+      "name": "collectVaultFunds",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "treasuryMovement",
       "accounts": [
         {
@@ -7505,8 +7621,23 @@ export type Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -11990,6 +12121,11 @@ export type Zeta = {
       "code": 6175,
       "name": "InvalidTreasurySplitTokenAccount",
       "msg": "Invalid treasury split token account"
+    },
+    {
+      "code": 6176,
+      "name": "InvalidReferrerRemainingAccounts",
+      "msg": "Invalid referrer remaining accounts"
     }
   ]
 };
@@ -12439,7 +12575,22 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -12460,7 +12611,22 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -12481,11 +12647,26 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -12502,11 +12683,26 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
           "name": "zetaGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "state",
           "isMut": false,
           "isSigner": false
         }
@@ -14803,8 +14999,8 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "market",
@@ -14820,6 +15016,16 @@ export const IDL: Zeta = {
           "name": "openOrdersMap",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -14859,7 +15065,7 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -14943,6 +15149,16 @@ export const IDL: Zeta = {
           "name": "eventQueue",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
+          "isSigner": true
         }
       ],
       "args": [
@@ -18999,6 +19215,42 @@ export const IDL: Zeta = {
       ]
     },
     {
+      "name": "collectVaultFunds",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "treasuryMovement",
       "accounts": [
         {
@@ -19501,8 +19753,23 @@ export const IDL: Zeta = {
         },
         {
           "name": "authority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pricingAdmin",
+          "isMut": false,
           "isSigner": true
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -23986,6 +24253,11 @@ export const IDL: Zeta = {
       "code": 6175,
       "name": "InvalidTreasurySplitTokenAccount",
       "msg": "Invalid treasury split token account"
+    },
+    {
+      "code": 6176,
+      "name": "InvalidReferrerRemainingAccounts",
+      "msg": "Invalid referrer remaining accounts"
     }
   ]
 };
